@@ -46,6 +46,8 @@
 
 #include "contour_data.hpp"
 #include "shape.hpp"
+#include "point.hpp"
+#include "point_hash.hpp"
 
 namespace ofeli_ip
 {
@@ -192,6 +194,51 @@ struct AcConfig
     }
 };
 
+struct LinearGaussianKernel
+{
+    int radius;
+    int size;
+    std::vector<int> weights;
+    std::vector<int> offsets;
+};
+
+inline LinearGaussianKernel
+build_gaussian_kernel_linear(int kernel_length,
+                             float sigma,
+                             int image_width)
+{
+    LinearGaussianKernel k;
+
+    const int width = kernel_length;
+    const int radius = (width - 1) / 2;
+
+    k.radius = radius;
+    k.size   = width * width;
+    k.weights.reserve(k.size);
+    k.offsets.reserve(k.size);
+
+    const float sigma2 = 2.f * sigma * sigma;
+
+    for (int dy = -radius; dy <= radius; ++dy)
+    {
+        for (int dx = -radius; dx <= radius; ++dx)
+        {
+            // poids gaussien (même formule que toi)
+            float g =
+                0.5f +
+                100000.f *
+                    std::exp(-(float(dx*dx + dy*dy)) / sigma2);
+
+            k.weights.push_back(static_cast<int>(g));
+
+            // offset linéaire
+            k.offsets.push_back(dy * image_width + dx);
+        }
+    }
+
+    return k;
+}
+
 //! \class WayContext to perform a switch generically for both procedures switch in and switch out.
 struct WayContext
 {
@@ -240,11 +287,11 @@ struct WayContext
 
     WayContextConfig config;
 
-    List_i& l_out;
-    List_i& l_in;
+    ContourList& l_out;
+    ContourList& l_in;
 
-    List_i* scanned_boundary;
-    List_i* adjacent_boundary;
+    ContourList* scanned_boundary;
+    ContourList* adjacent_boundary;
 
     SpeedValue way;
 
@@ -295,7 +342,7 @@ struct EvolutionData
     float centroids_distance;
 
     //! Intersection, i.e common points between #l_out_shape and #previous_shape.
-    std::unordered_set<int>intersection;
+    std::unordered_set<Point_i>intersection;
 
     //! Constructor.
     EvolutionData(const ContourData& cd)
@@ -304,16 +351,15 @@ struct EvolutionData
           total_iter_max( 5*std::max(cd.get_phi().get_width(),
                                      cd.get_phi().get_height()) ),
           is_moving( true ),
-          l_out_shape(cd.get_phi().get_width(),
-                      cd.get_phi().get_height()),
-          previous_shape(cd.get_phi().get_width(),
-                         cd.get_phi().get_height()),
+
+          l_out_shape( cd.get_preallocation_size() ),
+          previous_shape( cd.get_preallocation_size() ),
           previous_total_iter(0),
           previous_quantile(0.f),
           hausdorff_quantile(std::numeric_limits<float>().max()),
           centroids_distance(std::numeric_limits<float>().max())
     {
-        intersection.reserve( INITIAL_SPEED_ARRAY_ALLOC_SIZE );
+        intersection.reserve( cd.get_preallocation_size() );
     }
 
     //! Reinitialize evolution data. Used for video tracking.
@@ -355,9 +401,9 @@ public :
     const Matrix<PhiValue>& get_phi() const { return cd.get_phi(); }
 
     //! Getter for the list of offset points representing the exterior boundary.
-    const List_i& get_l_out() const { return cd.get_l_out(); }
+    const ContourList& get_l_out() const { return cd.get_l_out(); }
     //! Getter for the list of offset points representing the interior boundary.
-    const List_i& get_l_in() const { return cd.get_l_in(); }
+    const ContourList& get_l_in() const { return cd.get_l_in(); }
 
     //! Getter method for #state.
     State get_state() const { return state; }
@@ -407,29 +453,30 @@ private :
     bool evolve_one_way(WayContextConfig ctx_cfg);
 
     //! Eliminates generically redundant points in one boundary list. Each point of one boundary list must be connected at least by one point of the adjacent boundary list.
-    void eliminate_redundant_points(List_i& boundary,
+    void eliminate_redundant_points(ContourList& boundary,
                                     PhiValue region_value);
 
-    //! Second procedure for generic method swap.
-    void add_region_neighbor(int x, int y);
+    //! Second procedure for generic method switch_one_way.
+    void add_region_neighbor(int neighbor_offset,
+                             int neighbor_x);
 
     //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one boundary list to the other.
-    Itera_i switch_one_way(Itera_i point);
+    void switch_one_way(ContourPoint& point);
 
     //! Computes the speed for all points of a boundary list #l_out or #l_in.
-    void compute_speed(const List_i& boundary);
+    void compute_speed(ContourList& boundary);
 
     //! Computes the external speed Fd for all points of a boundary list #l_out or #l_in.
-    void compute_external_speed_Fd(const List_i& boundary);
+    void compute_external_speed_Fd(ContourList& boundary);
 
     //! Computes the external speed \a Fd for a current point (\a x,\a y) of #l_out or #l_in.
-    virtual SpeedValue compute_external_speed_Fd(int offset);
+    virtual void compute_external_speed_Fd(ContourPoint& point);
 
     //! Computes the internal speed  Fint for all points of a boundary list #l_out or #l_in.
-    void compute_internal_speed_Fint(const List_i& boundary);
+    void compute_internal_speed_Fint(ContourList& boundary);
 
     //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
-    signed char compute_internal_speed_Fint(int offset);
+    void compute_internal_speed_Fint(ContourPoint& point);
 
     //! Specific step for each iteration in cycle 1.
     virtual void do_specific_cycle1() { }
@@ -454,14 +501,18 @@ private :
     //! Gives the sign of the opposite of phi_val. Return the integer value -1 or 1.
     static int get_sign_opposite(PhiValue phi_val);
 
+    //! To transformate active contour data point to the points for the Hausdorff distance.
+    static Point_i from_ContourPoint(const ContourPoint& point,
+                                     int grid_width);
+
     //! Generic configuration of the active contour.
     const AcConfig config;
 
     //! Number of iterations in one cycle1-cycle2.
     int n_iter_by_cycle;
 
-    //! Gaussian kernel matrix used to calculate Fint.
-    const Matrix<unsigned int> gaussian_kernel;
+    //! Linear gaussian kernel used to calculate Fint.
+    LinearGaussianKernel kernel;
 
     //! Evolution state of the active contour given at a current iteration.
     //!  There are 4 states : CYCLE_1, CYCLE_2, LAST_CYCLE_2 and STOPPED.
@@ -469,9 +520,6 @@ private :
 
     //! Stopping condition status.
     StoppingStatus stopping_status;
-
-    //! Internal speed Fint or external speed Fd to evolve the active contour in one direction locally.
-    std::vector<signed char> speed;
 
     //! A waycontext to perform a switch_in or a switch_out generically.
     WayContext ctx;
@@ -483,6 +531,9 @@ private :
     //! Boolean egals to true if the cycle 2 stopping condition (based on hausdorff distance)
     //! is performed.
     bool is_cycle2_condition;
+
+    //! Temporary points to add after each scan of the list #l_in or #l_out.
+    ContourList points_to_append;
 };
 
 template <typename T>
@@ -498,101 +549,96 @@ inline int ActiveContour::get_sign_opposite(PhiValue phi_val)
 
 inline SpeedValue ActiveContour::get_discrete_speed(int speed)
 {
-    SpeedValue discrete_speed = SpeedValue::NO_MOVE;
-
-    if ( speed < 0 )
-    {
-        discrete_speed = SpeedValue::GO_INWARD;
-    }
-    else if ( speed > 0 )
-    {
-        discrete_speed = SpeedValue::GO_OUTWARD;
-    }
-
-    return discrete_speed;
+    if (speed < 0) return SpeedValue::GO_INWARD;
+    if (speed > 0) return SpeedValue::GO_OUTWARD;
+    return SpeedValue::NO_MOVE;
 }
 
-inline void ActiveContour::add_region_neighbor(int x, int y)
+inline void ActiveContour::add_region_neighbor(int neighbor_offset,
+                                               int neighbor_x)
 {
-    int neighbor = cd.get_phi().get_offset(x, y);
-
     // if a neighbor ∈ one region
-    if( cd.get_phi()[ neighbor ] == ctx.neighbor_region_phi_val )
+    if( cd.get_phi()[ neighbor_offset ] == ctx.neighbor_region_phi_val )
     {
-        cd.get_phi()[ neighbor ] = ctx.neighbor_boundary_phi_val;
+        cd.get_phi()[ neighbor_offset ] = ctx.neighbor_boundary_phi_val;
 
         // neighbor ∈ region ==> ∈ neighbor list
-        ctx.scanned_boundary->push_front( neighbor );
+        points_to_append.emplace_back( neighbor_offset, neighbor_x );
     }
 }
 
 //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one scanned boundary list to the other adjacent.
-inline Itera_i ActiveContour::switch_one_way(Itera_i point)
+inline void ActiveContour::switch_one_way(ContourPoint& point)
 {
-    int x, y;
-    cd.get_phi().get_position( *point, x, y ); // x and y passed by reference
+    int offset = point.get_offset();
+    int x = point.get_x();
+    int w = cd.get_phi().get_width();
+    int h = cd.get_phi().get_height();
+    int last_row_offset = w * (h - 1);
 
-    // Local movement
-
-    if( x-1 >= 0 )
+    // Voisins horizontaux
+    if (x > 0)
     {
-        add_region_neighbor( x-1, y );
+        int left_offset = offset - 1;
+        add_region_neighbor(left_offset, x-1);
     }
-    if( x+1 < cd.get_phi().get_width() )
+
+    if (x < w - 1)
     {
-        add_region_neighbor( x+1, y );
+        int right_offset = offset + 1;
+        add_region_neighbor(right_offset, x+1);
     }
 
-    if( y-1 >= 0 )
+    // Voisins verticaux
+    if (offset >= w) // Pas dans la première ligne
     {
-        add_region_neighbor( x, y-1 );
+        int up_offset = offset - w;
+        add_region_neighbor(up_offset, x);
+    }
+
+    if (offset < last_row_offset) // Pas dans la dernière ligne
+    {
+        int down_offset = offset + w;
+        add_region_neighbor(down_offset, x);
+    }
 
 #ifdef ALGO_8_CONNEXITY
-        if( x-1 >= 0 )
-        {
-            add_region_neighbor( x-1, y-1 );
-        }
-        if( x+1 < phi.get_width() )
-        {
-            add_region_neighbor( x+1, y-1 );
-        }
-#endif
-
-    }
-
-    if( y+1 < cd.get_phi().get_height() )
+    // Diagonaux supérieurs
+    if (x > 0 && offset >= w)
     {
-        add_region_neighbor( x, y+1 );
-
-#ifdef ALGO_8_CONNEXITY
-        if( x-1 >= 0 )
-        {
-            add_region_neighbor( x-1, y+1 );
-        }
-        if( x+1 < phi.get_width() )
-        {
-            add_region_neighbor( x+1, y+1 );
-        }
-#endif
-
+        int up_left_offset = offset - w - 1;
+        add_region_neighbor(up_left_offset, x-1);
     }
+
+    if (x < w - 1 && offset >= w)
+    {
+        int up_right_offset = offset - w + 1;
+        add_region_neighbor(up_right_offset, x+1);
+    }
+
+    // Diagonaux inférieurs
+    if (x > 0 && offset < last_row_offset)
+    {
+        int down_left_offset = offset + w - 1;
+        add_region_neighbor(down_left_offset, x-1);
+    }
+
+    if (x < w - 1 && offset < last_row_offset)
+    {
+        int down_right_offset = offset + w + 1;
+        add_region_neighbor(down_right_offset, x+1);
+    }
+#endif
 
     // change the phi value of the current point
     // according to the phi value of the adjacent list
-    cd.get_phi()[ *point ] = ctx.adjacent_phi_val;
+    cd.get_phi()[ offset ] = ctx.adjacent_phi_val;
 
     // switch the current point to the adjacent boundary list
-    // ctx.adjacent_boundary->push_front( *point );
-    // return ctx.scanned_boundary->erase( point );
+    ctx.adjacent_boundary->emplace_back( offset, x );
 
-    Itera_i next = point;
-    ++next;
-
-    ctx.adjacent_boundary->splice( ctx.adjacent_boundary->begin(),
-                                   *ctx.scanned_boundary,
-                                   point );
-
-    return next;
+    point = ctx.scanned_boundary->back();
+    ctx.scanned_boundary->pop_back();
 }
 
 }
@@ -657,7 +703,7 @@ inline Itera_i ActiveContour::switch_one_way(Itera_i point)
  */
 
 /**
- * \fn virtual signed char ActiveContour::compute_external_speed_Fd(int offset)
+ * \fn virtual signed char ActiveContour::compute_external_speed_Fd(ContourPoint& point)
  * \param offset offset of the image data buffer with \a offset = \a x + \a y × #img_width
  * \return Fd, the external speed for the data dependant evolution of the active contour used in the cycle 1
  */

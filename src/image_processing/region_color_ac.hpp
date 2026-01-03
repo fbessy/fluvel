@@ -197,9 +197,6 @@ public :
 
 private :
 
-    //! Affects the variable rgb from the buffer img_rgb_data
-    void buffer2rgb(int offset);
-
     //! Initializes the six sums and #n_in and #n_out with scanning through the image.
     void initialize_sums();
 
@@ -207,7 +204,7 @@ private :
     virtual void do_specific_cycle1() override;
 
     //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of #l_out or #l_in.
-    virtual SpeedValue compute_external_speed_Fd(int offset) override;
+    virtual void compute_external_speed_Fd(ContourPoint& point) override;
 
     //! Updates the six sums, #n_in and #n_out, before each #switch_in, in the cycle 1, in order to calculate means #CoutYUV and #CinYUV.
     virtual void do_specific_when_switch(int offset,
@@ -264,10 +261,6 @@ private :
     Rgb_ui sum_out;
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
     int pxl_nbr_out;
-
-
-    //! Red, green and blue component of the current pixel.
-    Rgb_uc current_pixel_value;
 };
 
 // Definitions
@@ -284,17 +277,6 @@ RegionColorAc::RegionColorAc(Image32ConstView image1,
 {
     initialize_sums();
     RegionColorAc::do_specific_cycle1();
-}
-
-inline void RegionColorAc::buffer2rgb(int offset)
-{
-    /*
-    for( int chl_idx = 0;
-         chl_idx < CHANNELS_NBR;
-         chl_idx++ )
-    {
-        rgb[chl_idx] = img_rgb_data[ CHANNELS_NBR*offset + chl_idx ];
-    }*/
 }
 
 inline void RegionColorAc::rgb_to_xyz(float R, float G, float B,
@@ -375,14 +357,15 @@ inline void RegionColorAc::rgb_to_color(const Rgb_uc& rgb,
                                         int color[]) const
 {
     float cie_color[CHANNELS_NBR];
+    const auto cs = region_config.color_space;
 
-    if( region_config.color_space == ColorSpaceOption::YUV )
+    if( cs == ColorSpaceOption::YUV )
     {
         color[0] = ( (  66 * int(rgb.red) + 129 * int(rgb.green) +  25 * int(rgb.blue) + 128) >> 8) +  16; // Y
         color[1] = ( ( -38 * int(rgb.red) -  74 * int(rgb.green) + 112 * int(rgb.blue) + 128) >> 8) + 128; // U
         color[2] = ( ( 112 * int(rgb.red) -  94 * int(rgb.green) -  18 * int(rgb.blue) + 128) >> 8) + 128; // V
     }
-    else if ( region_config.color_space == ColorSpaceOption::Lab )
+    else if ( cs == ColorSpaceOption::Lab )
     {
         rgb_to_Lab(float(rgb.red)/255.f,
                    float(rgb.green)/255.f,
@@ -398,7 +381,7 @@ inline void RegionColorAc::rgb_to_color(const Rgb_uc& rgb,
             color[chl_idx] = int( 255.f * cie_color[chl_idx] );
         }
     }
-    else if ( region_config.color_space == ColorSpaceOption::Luv )
+    else if ( cs == ColorSpaceOption::Luv )
     {
         rgb_to_Luv(float(rgb.red)/255.f,
                    float(rgb.green)/255.f,
@@ -422,38 +405,40 @@ inline void RegionColorAc::rgb_to_color(const Rgb_uc& rgb,
     }
 }
 
-inline SpeedValue RegionColorAc::compute_external_speed_Fd(int offset)
+inline void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    //buffer2rgb(offset);
-
     int color[CHANNELS_NBR];
 
-    Rgb_uc rgb = image.pixel_rgb_at(offset);
-
+    const Rgb_uc rgb = image.pixel_rgb_at( point.get_offset() );
     rgb_to_color(rgb, color);
 
+    const int lambda_out = region_config.lambda_out;
+    const int lambda_in  = region_config.lambda_in;
+
+    const int* weights   = region_config.weights;
+    const int* avg_out   = average_color_out;
+    const int* avg_in    = average_color_in;
+
     int speed_out = 0;
-    int speed_in = 0;
+    int speed_in  = 0;
 
-    for( int chl_idx = 0;
-         chl_idx < CHANNELS_NBR;
-         chl_idx++ )
+    for (int chl_idx = 0; chl_idx < CHANNELS_NBR; ++chl_idx)
     {
-        speed_out += region_config.lambda_out *
-                     ( region_config.weights[chl_idx]*square( color[chl_idx]-average_color_out[chl_idx] ));
+        const int diff_out = color[chl_idx] - avg_out[chl_idx];
+        const int diff_in  = color[chl_idx] - avg_in[chl_idx];
 
-        speed_in += region_config.lambda_in *
-                    ( region_config.weights[chl_idx]*square( color[chl_idx]-average_color_in[chl_idx] ));
+        const int w = weights[chl_idx];
+
+        speed_out += w * square(diff_out);
+        speed_in  += w * square(diff_in);
     }
 
-    return get_discrete_speed( speed_out - speed_in);
+    point.set_speed( get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in) );
 }
 
 inline void RegionColorAc::do_specific_when_switch(int offset,
                                                    WayContextConfig ctx_cfg)
 {
-    //buffer2rgb(offset);
-
     Rgb_uc rgb = image.pixel_rgb_at(offset);
 
     if ( ctx_cfg == WayContextConfig::SWITCH_IN )
@@ -476,7 +461,7 @@ inline void RegionColorAc::do_specific_when_switch(int offset,
 
 }
 
-#endif // REGION_COLOR_AC
+#endif // REGION_COLOR_AC_HPP
 
 
 //! \class ofeli::RegionColorAc
@@ -548,7 +533,7 @@ inline void RegionColorAc::do_specific_when_switch(int offset,
  */
 
 /**
- * \fn virtual signed char RegionColorAc::compute_external_speed_Fd(int offset)
+ * \fn virtual signed char RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
  * \param offset offset of the image data buffer with \a offset = \a x + \a y × #img_width
  */
 

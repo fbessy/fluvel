@@ -150,7 +150,7 @@ private :
     virtual void do_specific_cycle1() override;
 
     //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of #l_out or #l_in.
-    virtual SpeedValue compute_external_speed_Fd(int offset) override;
+    virtual void compute_external_speed_Fd(ContourPoint& point) override;
 
     //! Updates variables #sum_in, #sum_out and #pxl_nbr_out in order to calculate the means #average_out and #average_in in constant time ( complexity 0(1) ).
     virtual void do_specific_when_switch(int offset,
@@ -195,12 +195,17 @@ RegionAc::RegionAc(Image8ConstView image1,
     RegionAc::do_specific_cycle1();
 }
 
-inline SpeedValue RegionAc::compute_external_speed_Fd(int offset)
+inline void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    int pxl_val = int( image.pixel_at(offset) );
+    const int pxl = int( image.pixel_at( point.get_offset() ) );
 
-    return get_discrete_speed(   region_config.lambda_out * square( pxl_val - int(average_out) )
-                               - region_config.lambda_in  * square( pxl_val - int(average_in)  ) );
+    const int diff_out = pxl - int(average_out);
+    const int diff_in  = pxl - int(average_in);
+
+    const int speed =   region_config.lambda_out * ( square(diff_out) )
+                      - region_config.lambda_in  * ( square(diff_in) );
+
+    point.set_speed( get_discrete_speed( speed ) );
 }
 
 inline void RegionAc::do_specific_when_switch(int offset,
@@ -277,7 +282,7 @@ inline void RegionAc::do_specific_when_switch(int offset,
  */
 
 /**
- * \fn virtual signed char RegionAc::compute_external_speed_Fd(int offset)
+ * \fn virtual signed char RegionAc::compute_external_speed_Fd(ContourPoint& point)
  * \param offset offset of the image data buffer with \a offset = \a x + \a y × #img_width
  */
 

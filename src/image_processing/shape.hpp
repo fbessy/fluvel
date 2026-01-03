@@ -41,7 +41,6 @@
 #define SHAPE_HPP
 
 #include <vector>
-#include "list_i.hpp"
 #include "point.hpp"
 
 namespace ofeli_ip
@@ -56,17 +55,19 @@ public:
     Shape();
 
     //! Constructor.
-    Shape(int grid_width1, int grid_height1);
+    Shape(size_t initial_array_alloc_size);
 
     //! Clear all the points of the shape.
     void clear();
 
-    //! Push back an offset point into the shape.
-    void push_back(int offset);
+    //! Push back a point into the shape.
+    void push_back(int x, int y);
 
-    //! Assign points from a List_i to points of Shape which is
-    //! a std::vector and calculates the centroid.
-    void transform(const List_i& list_i);
+    //! Push back a point into the shape.
+    void push_back(const Point_i& p);
+
+    //! Push back a point into the shape.
+    void push_back(Point_i&& p);
 
     //! Swap the shape *this with an other shape in constant time, i.e. O(1) complexity.
     void swap(Shape& other);
@@ -80,43 +81,18 @@ public:
     //! Returns true if the shape is ready for the hausdorff distance computation.
     bool is_valid() const;
 
-    //! Gets the position (x,y) from an offset point.
-    void get_position(int offset,
-                      Point_i& point) const;
-
     //! Gets the vector of points.
-    const std::vector<int>& get_points() const { return points; }
+    const std::vector<Point_i>& get_points() const { return points; }
 
     //! Gets the centroid of the shape.
     const Point_f& get_centroid() const { return centroid; }
 
-    //! Sets the grid size of the shape.
-    void set_grid_size(int grid_width1,
-                       int grid_height1)
-    {
-        grid_width  = grid_width1;
-        grid_height = grid_height1;
-    };
-
-    //! Getter for #grid_width.
-    int get_grid_width() const { return grid_width; }
-
-    //! Getter for #grid_height.
-    int get_grid_height() const { return grid_height; }
-
-    //! Gets frid diagonal.
-    float get_grid_diagonal() const;
+    //! Gets grid diagonal.
+    static float get_grid_diagonal(int grid_width, int grid_height);
 
 private:
 
-    //! Grid or matrix width.
-    int grid_width;
-
-    //! Grid or matrix height.
-    int grid_height;
-
-    //! Points are defined by offset in a grid.
-    std::vector<int> points;
+    std::vector<Point_i> points;
 
     //! Position of the shape's centroid.
     Point_f centroid;

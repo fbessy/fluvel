@@ -37,13 +37,12 @@
 **
 ****************************************************************************/
 
-#ifndef CONTOUR_DATA_H
-#define CONTOUR_DATA_H
+#ifndef CONTOUR_DATA_HPP
+#define CONTOUR_DATA_HPP
 
 #include <vector>
 
 #include "matrix.hpp"
-#include "list_i.hpp"
 
 namespace ofeli_ip
 {
@@ -64,45 +63,26 @@ enum SpeedValue : signed char
     GO_OUTWARD =  1
 };
 
-struct ContourPoint
+class ContourPoint
 {
-    int offset;
-    signed char speed;
-};
-
-class ContourList
-{
-
 public:
-    ContourList(int phi_width1, int phi_height1):
-        phi_width(phi_width1),
-        phi_height(phi_height1)
-    {
-    }
+    ContourPoint(int offset1, int x1): offset(offset1), x(x1)
+    {}
 
-    void get_point(int index,
-                   int& x, int& y) const
-    {
-        int offset = points[index].offset;
-        y = offset/phi_width;
-        x = offset-y*phi_width;
-    }
-
-    int get_point(int index) const
-    {
-        return points[index].offset;
-    }
-
-    int size() const
-    {
-        return points.size();
-    }
+    int get_offset() const { return offset; }
+    int get_x() const { return x; }
+    SpeedValue get_speed() const { return speed; }
+    void set_speed(SpeedValue speed1) { speed = speed1; }
 
 private:
-    std::vector<ContourPoint> points;
-    int phi_width;
-    int phi_height;
+    int offset;
+    int x; // in order to check fastly neighborhood existence (border cases to handle)
+
+    //! Internal speed Fint or external speed Fd to evolve the active contour in one direction locally.
+    SpeedValue speed;
 };
+
+using ContourList = std::vector<ContourPoint>;
 
 class ContourData
 {
@@ -117,8 +97,8 @@ public :
                 int phi_width, int phi_height);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of #l_out and #l_in.
-    ContourData(const List_i& l_out1,
-                const List_i& l_in1,
+    ContourData(const ContourList& l_out1,
+                const ContourList& l_in1,
                 int phi_width, int phi_height);
 
     //! Copy constructor.
@@ -128,10 +108,13 @@ public :
     ContourData(ContourData&& contour) noexcept;
 
     //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
-    bool is_boundary_redundant(int offset) const;
+    bool is_redundant(const ContourPoint& point) const;
 
     //! Checks lists.
     bool check_lists();
+
+    //! Allocate lists.
+    void allocate_lists();
 
     //! Wrapper to use directly with offset lists without the need to get the variable #phi.
     Point_i get_position(int offet) const
@@ -143,11 +126,13 @@ public :
     Matrix<PhiValue>& get_phi() { return phi; }
     const Matrix<PhiValue>& get_phi() const { return phi; }
     //! Getter function for the exterior boundary #l_out.
-    List_i& get_l_out() { return l_out; }
-    const List_i& get_l_out() const { return l_out; }
+    ContourList& get_l_out() { return l_out; }
+    const ContourList& get_l_out() const { return l_out; }
     //! Getter function for the interior boundary #l_in.
-    List_i& get_l_in() { return l_in; }
-    const List_i& get_l_in() const { return l_in; }
+    ContourList& get_l_in() { return l_in; }
+    const ContourList& get_l_in() const { return l_in; }
+
+    size_t get_preallocation_size() const { return preallocation_size; }
 
 private :
 
@@ -169,91 +154,81 @@ private :
     Matrix<PhiValue> phi;
 
     //! List of offset points representing the exterior boundary.
-    List_i l_out;
+    ContourList l_out;
     //! List of offset points representing the interior boundary.
-    List_i l_in;
+    ContourList l_in;
 
-    //std::vector<int> l_out2;
-    //std::vector<int> l_in2;
-
-    //std::vector<int> points_to_append;
+    //! Preallocation size for each list.
+    size_t preallocation_size;
 };
 
-inline bool ContourData::is_boundary_redundant(int offset) const
+inline bool ContourData::is_redundant(const ContourPoint& point) const
 {
-    int x, y;
-    phi.get_position(offset,x,y); // x and y passed by reference
+    int offset = point.get_offset();
+    int x = point.get_x();
+    int w = phi.get_width();
+    int h = phi.get_height();
+    int last_row_offset = w * (h - 1);
 
-    if( x-1 >= 0 )
+    const auto phi_center = phi[offset];
+
+    // Voisins horizontaux
+    if (x > 0)
     {
-        if( phi(x-1,y)*phi[offset] < 0 )
-        {
-            return false;
-        }
-    }
-    if( x+1 < phi.get_width() )
-    {
-        if( phi(x+1,y)*phi[offset] < 0 )
-        {
-            return false;
-        }
+        int left_offset = offset - 1;
+        if (phi[left_offset] * phi_center < 0) return false;
     }
 
-    if( y-1 >= 0 )
+    if (x < w - 1)
     {
-        if( phi(x,y-1)*phi[offset] < 0 )
-        {
-            return false;
-        }
+        int right_offset = offset + 1;
+        if (phi[right_offset] * phi_center < 0) return false;
+    }
+
+    // Voisins verticaux
+    if (offset >= w) // Pas dans la première ligne
+    {
+        int up_offset = offset - w;
+        if (phi[up_offset] * phi_center < 0) return false;
+    }
+
+    if (offset < last_row_offset) // Pas dans la dernière ligne
+    {
+        int down_offset = offset + w;
+        if (phi[down_offset] * phi_center < 0) return false;
+    }
 
 #ifdef ALGO_8_CONNEXITY
-        if( x-1 >= 0 )
-        {
-            if( phi(x-1,y-1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-        if( x+1 < phi.get_width() )
-        {
-            if( phi(x+1,y-1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-#endif
-
-    }
-
-    if( y+1 < phi.get_height() )
+    // Diagonaux supérieurs
+    if (x > 0 && offset >= w)
     {
-        if( phi(x,y+1)*phi[offset] < 0 )
-        {
-            return false;
-        }
-
-#ifdef ALGO_8_CONNEXITY
-        if( x-1 >= 0 )
-        {
-            if( phi(x-1,y+1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-        if( x+1 < phi.get_width() )
-        {
-            if( phi(x+1,y+1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-#endif
-
+        int up_left_offset = offset - w - 1;
+        if (phi[up_left_offset] * phi_center < 0) return false;
     }
+
+    if (x < w - 1 && offset >= w)
+    {
+        int up_right_offset = offset - w + 1;
+        if (phi[up_right_offset] * phi_center < 0) return false;
+    }
+
+    // Diagonaux inférieurs
+    if (x > 0 && offset < last_row_offset)
+    {
+        int down_left_offset = offset + w - 1;
+        if (phi[down_left_offset] * phi_center < 0) return false;
+    }
+
+    if (x < w - 1 && offset < last_row_offset)
+    {
+        int down_right_offset = offset + w + 1;
+        if (phi[down_right_offset] * phi_center < 0) return false;
+    }
+#endif
 
     return true;
 }
 
 }
 
-#endif // CONTOUR_DATA_H
+#endif // CONTOUR_DATA_HPP

@@ -18,6 +18,8 @@ set(IP_SRC
 
 qt_add_library(image_processing STATIC
     ${IP_SRC}
+    point_hash.hpp
+    math.hpp
 )
 
 target_include_directories(image_processing PUBLIC

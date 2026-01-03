@@ -70,7 +70,7 @@ constexpr size_t INITIAL_ARRAY_ALLOC_SIZE = 10000u;
 //! to compute in constant time ( complexity in 0(1) ), with an image or a matrix.
 HausdorffDistance::HausdorffDistance(Shape& shape_a1,
                                      Shape& shape_b1,
-                                     const std::unordered_set<int>& intersection1):
+                                     const std::unordered_set<Point_i>& intersection1):
     shape_a(shape_a1),
     shape_b(shape_b1),
     intersection_a_b(intersection1),
@@ -109,7 +109,6 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
                                             float& directed_hd,
                                             std::vector<float>& directed_min_dists)
 {
-    Point_i p1, p2;
     Point_f relative_p1, relative_p2;
 
     float euclidean_dist, min_dist, sq;
@@ -119,9 +118,7 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
     directed_hd = 0.f;
 
     // outer loop
-    for( auto point1 = shape_1.get_points().cbegin();
-         point1 != shape_1.get_points().cend();
-         ++point1 )
+    for( const auto& p1 : shape_1.get_points() )
     {
         // intersection_a_b is optional and can be empty by default,
         // cf constructor documentation.
@@ -129,11 +126,9 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
         // due to the stl unordered set container.
 
 #if defined(INTERSECTION_EXCLUSION) && !defined(NAIVE_ALGO)
-        if( !intersection_a_b.contains( *point1 ) )
+        if( !intersection_a_b.contains( p1 ) )
         {
 #endif
-            shape_1.get_position( *point1, p1 );
-
             relative_p1.x = float(p1.x) - shape_1.get_centroid().x;
             relative_p1.y = float(p1.y) - shape_1.get_centroid().y;
 
@@ -141,12 +136,8 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
             min_dist = std::numeric_limits<float>::max();
 
             // inner loop
-            for( auto point2 = shape_2.get_points().cbegin();
-                 point2 != shape_2.get_points().cend();
-                 ++point2 )
+            for( const auto& p2 : shape_2.get_points() )
             {
-                shape_2.get_position( *point2, p2 );
-
                 relative_p2.x = float(p2.x) - shape_2.get_centroid().x;
                 relative_p2.y = float(p2.y) - shape_2.get_centroid().y;
 
@@ -291,7 +282,7 @@ float HausdorffDistance::get_centroids_distance() const
         shape_b.is_valid() )
     {
         Point_f gap( shape_b.get_centroid().x - shape_a.get_centroid().x,
-                          shape_b.get_centroid().y - shape_a.get_centroid().y );
+                     shape_b.get_centroid().y - shape_a.get_centroid().y );
 
         float sq_val = square( gap.x ) + square( gap.y );
 
@@ -306,26 +297,6 @@ float HausdorffDistance::get_centroids_distance() const
     }
 
     return gap_dist;
-}
-
-float HausdorffDistance::get_grid_diagonal() const
-{
-    float sqrt_val = -1.f;
-
-    int max_width = std::max( shape_a.get_grid_width(),
-                              shape_b.get_grid_width() );
-
-    int max_height = std::max( shape_a.get_grid_height(),
-                               shape_b.get_grid_height() );
-
-    float sq_val = float( square(max_width) + square(max_height) );
-
-    if( sq_val > 0.f )
-    {
-        sqrt_val = std::sqrt( sq_val );
-    }
-
-    return sqrt_val;
 }
 
 }

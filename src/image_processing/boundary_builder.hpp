@@ -40,7 +40,8 @@
 #ifndef BOUNDARY_BUILDER_H
 #define BOUNDARY_BUILDER_H
 
-#include "list_i.hpp"
+#include <vector>
+#include "contour_data.hpp"
 
 // false or true below, respectively,
 // if you want to use a matrix with a row/column wise data buffer
@@ -59,7 +60,8 @@ class BoundaryBuilder
 public :
 
     BoundaryBuilder(int phi_width1, int phi_height1,
-                    List_i& l_out_init1, List_i& l_in_init1);
+                    ContourList& l_out_init1,
+                    ContourList& l_in_init1);
 
     //! Clears the both lists.
     void clear_lists();
@@ -100,28 +102,28 @@ private :
 
     void get_rectangle_points(int x1, int y1,
                               int x2, int y2,
-                              List_i& list_out,
-                              List_i& list_in);
+                              ContourList& list_out,
+                              ContourList& list_in);
 
-    void get_rectangle_points_for_one_list(List_i& list_init,
+    void get_rectangle_points_for_one_list(ContourList& list_init,
                                            int x1, int y1,
                                            int x2, int y2);
 
     void build_ellipse_midpoint_connected(int x0, int y0,
                                           unsigned int a, unsigned int b,
-                                          List_i& list_out);
+                                          ContourList& list_out);
 
     void build_inner_contiguous(int x0, int y0,
-                                const List_i& list_out,
-                                List_i& list_in);
+                                const ContourList& l_out,
+                                ContourList& l_in);
 
     //! Gets ellipse points with center point and width and height.
     void get_ellipse_points(int x0, int y0,
                             unsigned int a, unsigned int b,
-                            List_i& list_out,
-                            List_i& list_in);
+                            ContourList& list_out,
+                            ContourList& list_in);
 
-    void add_4_points_in_ellipse(List_i& list_init,
+    void add_4_points_in_ellipse(ContourList& list_init,
                                  int x, int y,
                                  int x0, int y0);
 
@@ -143,8 +145,8 @@ private :
     int phi_width;
     int phi_height;
 
-    List_i& Lout_init;
-    List_i& Lin_init;
+    ContourList& Lout_init;
+    ContourList& Lin_init;
 };
 
 inline int BoundaryBuilder::get_offset(int x, int y) const
@@ -174,7 +176,7 @@ inline void BoundaryBuilder::get_position(int offset,
     }
 }
 
-inline void BoundaryBuilder::add_4_points_in_ellipse(List_i& list,
+inline void BoundaryBuilder::add_4_points_in_ellipse(ContourList& list,
                                                      int x, int y,
                                                      int x0, int y0)
 {
@@ -183,7 +185,7 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(List_i& list,
         y0-y >= 0 &&
         y0-y < phi_height )
     {
-        list.push_front( get_offset(x0-x,y0-y) );
+        list.emplace_back( get_offset(x0-x,y0-y), x0-x );
     }
 
     if( x0-x >= 0 &&
@@ -191,7 +193,7 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(List_i& list,
         y0+y >= 0 &&
         y0+y < phi_height )
     {
-        list.push_front( get_offset(x0-x,y0+y) );
+        list.emplace_back( get_offset(x0-x,y0+y), x0-x );
     }
 
     if( x0+x >= 0 &&
@@ -199,7 +201,7 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(List_i& list,
         y0-y >= 0 &&
         y0-y < phi_height )
     {
-        list.push_front( get_offset(x0+x,y0-y) );
+        list.emplace_back( get_offset(x0+x,y0-y), x0+x );
     }
 
     if( x0+x >= 0 &&
@@ -207,7 +209,7 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(List_i& list,
         y0+y >= 0 &&
         y0+y < phi_height )
     {
-        list.push_front( get_offset(x0+x,y0+y) );
+        list.emplace_back( get_offset(x0+x,y0+y), x0+x );
     }
 }
 

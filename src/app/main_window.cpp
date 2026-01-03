@@ -1221,11 +1221,9 @@ void MainWindow::erase_displayed_active_contour(const unsigned char* img, unsign
     {
         if( config.outside_combo != QComboBoxColorIndex::NO )
         {
-            for( auto it = ac->get_l_out().cbegin();
-                 it != ac->get_l_out().cend();
-                 ++it )
+            for( const auto& point : ac->get_l_out() )
             {
-                offset = *it;
+                offset = point.get_offset();
 
                 I = (unsigned char)(255.f*float(img[offset]-min)/float(max-min));
 
@@ -1237,11 +1235,9 @@ void MainWindow::erase_displayed_active_contour(const unsigned char* img, unsign
 
         if( config.inside_combo != QComboBoxColorIndex::NO )
         {
-            for( auto it = ac->get_l_in().cbegin();
-                 it != ac->get_l_in().cend();
-                 ++it )
+            for( const auto& point : ac->get_l_in() )
             {
-                offset = *it;
+                offset = point.get_offset();
 
                 I = (unsigned char)(255.f*float(img[offset]-min)/float(max-min));
 

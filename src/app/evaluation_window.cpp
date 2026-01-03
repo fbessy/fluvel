@@ -197,7 +197,8 @@ void EvaluationWindow::compute_hd()
     float hausdorff_quantile = hd->get_hausdorff_quantile( hundredth_sp->value() );
     float centr_gap = hd->get_centroids_distance();
 
-    factor = 100.f / hd->get_grid_diagonal();
+    factor = 100.f / ofeli_ip::Shape::get_grid_diagonal(std::max(widget1->get_img_width(), widget2->get_img_width()),
+                                                        std::max(widget1->get_img_height(), widget2->get_img_height()));
 
     float hd_ratio         = factor * hausdorff_dist;
     float quantile_ratio   = factor * hausdorff_quantile;
@@ -265,17 +266,12 @@ void EvaluationWindow::calculate_shapes_intersection()
     const RgbColor& chosen_rgb = ( size1 < size2 ) ?
                                  widget2->get_rgb() : widget1->get_rgb();
 
-    ofeli_ip::Point_i p;
     QRgb rgb_pix;
 
     intersection.clear();
 
-    for( auto it = smaller_shape.get_points().cbegin();
-         it != smaller_shape.get_points().cend();
-         ++it )
+    for( const auto& p : smaller_shape.get_points() )
     {
-        smaller_shape.get_position(*it, p);
-
         if ( p.x >= 0 &&
              p.x < larger_shape_img.width() &&
              p.y >= 0 &&
@@ -287,7 +283,7 @@ void EvaluationWindow::calculate_shapes_intersection()
                 (unsigned char)(qGreen(rgb_pix)) == chosen_rgb.green &&
                 (unsigned char)(qBlue(rgb_pix)   == chosen_rgb.blue)    )
             {
-                intersection.insert( *it );
+                intersection.insert( p );
             }
         }
     }

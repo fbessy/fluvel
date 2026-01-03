@@ -48,6 +48,7 @@
 #include "qspinbox_kernel.hpp"
 #include "matrix.hpp"
 #include "windows_tools.hpp"
+#include "contour_data.hpp"
 
 #include <QtWidgets>
 
@@ -297,22 +298,22 @@ private :
 
     // phi avant nettoyage des frontières
     ofeli_ip::Matrix<signed char>* phi2;
-    ofeli_ip::List_i Lout33;
-    ofeli_ip::List_i Lin33;
+    std::vector<ofeli_ip::ContourPoint> Lout33;
+    std::vector<ofeli_ip::ContourPoint> Lin33;
 
     ofeli_ip::Matrix<signed char>* displayed_phi_shape;
-    ofeli_ip::List_i Lout_shape11;
-    ofeli_ip::List_i Lin_shape11;
+    std::vector<ofeli_ip::ContourPoint> Lout_shape11;
+    std::vector<ofeli_ip::ContourPoint> Lin_shape11;
 
-    void do_flood_fill_from_lists(const ofeli_ip::List_i& Lout, const ofeli_ip::List_i& Lin,
+    void do_flood_fill_from_lists(const std::vector<ofeli_ip::ContourPoint>& Lout, const std::vector<ofeli_ip::ContourPoint>& Lin,
                                   ofeli_ip::Matrix<signed char>& phi);
 
     void do_flood_fill(ofeli_ip::Matrix<signed char>& phi, int offset_seed,
                        ofeli_ip::PhiValue target_value, ofeli_ip::PhiValue replacement_value);
 
     void find_lists_from_phi(const ofeli_ip::Matrix<signed char>& phi,
-                             ofeli_ip::List_i& Lout,
-                             ofeli_ip::List_i& Lin);
+                             std::vector<ofeli_ip::ContourPoint>& Lout,
+                             std::vector<ofeli_ip::ContourPoint>& Lin);
 
     bool find_redundant_list_point(const ofeli_ip::Matrix<signed char>& phi, int offset) const;
 
@@ -377,17 +378,6 @@ private :
                                           const QImage& img_phi_save);
 
     QStringList nameFilters;
-
-    template <typename T>
-    struct Point
-    {
-        explicit Point(T x1, T y1) : x(x1), y(y1)
-        {
-        }
-
-        T x;
-        T y;
-    };
 
 private slots :
 

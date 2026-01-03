@@ -43,27 +43,19 @@
 #include <algorithm>
 #include <limits>
 
-#ifndef IS_COLUMN_WISE
-#define IS_COLUMN_WISE false
-#endif
-
 namespace ofeli_ip
 {
 
-constexpr size_t INITIAL_ARRAY_ALLOC_SIZE = 10000u;
-
-Shape::Shape(): Shape(0,0)
+Shape::Shape(): Shape(100u)
 {
 }
 
-Shape::Shape(int grid_width1, int grid_height1):
-    grid_width(grid_width1),
-    grid_height(grid_height1),
+Shape::Shape(size_t initial_array_alloc_size):
     centroid(std::numeric_limits<float>::min(),
              std::numeric_limits<float>::min())
 
 {
-    points.reserve( INITIAL_ARRAY_ALLOC_SIZE );
+    points.reserve( initial_array_alloc_size );
 }
 
 void Shape::clear()
@@ -71,28 +63,23 @@ void Shape::clear()
     points.clear();
 }
 
-void Shape::push_back(int offset)
+void Shape::push_back(int x, int y)
 {
-    points.push_back( offset );
+    points.emplace_back( x, y );
 }
 
-void Shape::transform(const List_i& list_i)
+void Shape::push_back(const Point_i& p)
 {
-    points.clear();
+    points.push_back( p );
+}
 
-    for (auto it = list_i.cbegin(); it != list_i.cend(); ++it)
-    {
-        points.push_back(*it);
-    }
-
-    calculate_centroid();
+void Shape::push_back(Point_i&& p)
+{
+    points.emplace_back( std::move(p) );
 }
 
 void Shape::swap(Shape& other)
 {
-    std::swap(this->grid_width,  other.grid_width);
-    std::swap(this->grid_height, other.grid_height);
-
     this->points.swap(other.points);
 
     std::swap(this->centroid.x,  other.centroid.x);
@@ -112,15 +99,10 @@ void Shape::calculate_centroid()
 
     if( points.size() >= 1 )
     {
-        Point_i p;
         Point_i sum( 0, 0 );
 
-        for( auto it = points.cbegin();
-             it != points.cend();
-             ++it )
+        for( const auto& p : points )
         {
-            get_position(*it, p);
-
             sum += p;
         }
 
@@ -132,28 +114,11 @@ void Shape::calculate_centroid()
 bool Shape::is_valid() const
 {
     return ( !points.empty()         &&
-              grid_width      >= 1   &&
-              grid_height     >= 1   &&
               centroid.x      >= 0.f &&
               centroid.y      >= 0.f    );
 }
 
-void Shape::get_position(int offset,
-                         Point_i& point) const
-{
-    if( IS_COLUMN_WISE )
-    {
-        point.x = offset/grid_height;
-        point.y = offset-point.x*grid_height;
-    }
-    else
-    {
-        point.y = offset/grid_width;
-        point.x = offset-point.y*grid_width;
-    }
-}
-
-float Shape::get_grid_diagonal() const
+float Shape::get_grid_diagonal(int grid_width, int grid_height)
 {
     float square_sum = float( grid_width*grid_width + grid_height*grid_height );
 

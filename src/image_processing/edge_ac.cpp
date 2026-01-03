@@ -44,10 +44,11 @@ namespace ofeli_ip
 
 constexpr auto GRAYSCALE_DEPTH = 256u;
 
-SpeedValue EdgeAc::compute_external_speed_Fd(int offset)
+void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
 {
     int x, y;
-    cd.get_phi().get_position(offset,x,y); // ux and uy passed by reference
+    cd.get_phi().get_position( point.get_offset(),
+                               x,y ); // ux and uy passed by reference
 
     int max_out = 0;
     int max_in = 0;
@@ -79,7 +80,7 @@ SpeedValue EdgeAc::compute_external_speed_Fd(int offset)
 
     int global_speed = global_speed_sign * (int(threshold) - int(gradient_image.pixel_at(x,y)));
 
-    return get_discrete_speed( 3*local_speed + global_speed );
+    point.set_speed( get_discrete_speed( 3*local_speed + global_speed ) );
 }
 
 int EdgeAc::get_global_speed_sign() const

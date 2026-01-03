@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include <cstdlib>     // std::abs
+#include <cassert>
 
 #include "active_contour.hpp"
 #include "hausdorff_distance.hpp"
@@ -50,7 +51,6 @@ namespace ofeli_ip
 ActiveContour::ActiveContour(const ContourData& initial_contour,
                              const AcConfig& config1)
     : config(config1),
-    gaussian_kernel(config.kernel_length, config.sigma),
     cd( initial_contour ),
     state( State::CYCLE_1 ),
     stopping_status( StoppingStatus::NONE ),
@@ -58,7 +58,11 @@ ActiveContour::ActiveContour(const ContourData& initial_contour,
     ed( cd ),
     is_cycle2_condition( true )
 {
-    speed.reserve( INITIAL_SPEED_ARRAY_ALLOC_SIZE );
+    kernel = build_gaussian_kernel_linear(config.kernel_length,
+                                          config.sigma,
+                                          cd.get_phi().get_width());
+
+    points_to_append.reserve( cd.get_preallocation_size() );
 
     if ( config.is_cycle2 )
     {
@@ -73,7 +77,6 @@ ActiveContour::ActiveContour(const ContourData& initial_contour,
 ActiveContour::ActiveContour(ContourData&& initial_contour,
                              const AcConfig& config1)
     : config(config1),
-    gaussian_kernel(config.kernel_length, config.sigma),
     cd( std::move(initial_contour) ),
     state( State::CYCLE_1 ),
     stopping_status( StoppingStatus::NONE ),
@@ -81,7 +84,11 @@ ActiveContour::ActiveContour(ContourData&& initial_contour,
     ed( cd ),
     is_cycle2_condition(true)
 {
-    speed.reserve( INITIAL_SPEED_ARRAY_ALLOC_SIZE );
+    kernel = build_gaussian_kernel_linear(config.kernel_length,
+                                          config.sigma,
+                                          cd.get_phi().get_width());
+
+    points_to_append.reserve( cd.get_preallocation_size() );
 
     if ( config.is_cycle2 )
     {
@@ -186,55 +193,66 @@ bool ActiveContour::evolve_one_way(WayContextConfig ctx_cfg)
 
     ctx.set_context( ctx_cfg );
 
-    compute_speed( *ctx.scanned_boundary );
+    auto& scanned  = *ctx.scanned_boundary;
+    auto& adjacent = *ctx.adjacent_boundary;
 
-    int speed_idx = 0;
+    points_to_append.clear();
 
-    for( auto point = ctx.scanned_boundary->begin();
-         point != ctx.scanned_boundary->end();
-         speed_idx++ )
+    compute_speed( scanned );
+
+    for( std::size_t i = 0; i < scanned.size(); )
     {
-        if( speed[ speed_idx ] == ctx.way )
+        auto& point = scanned[i];
+
+        if( point.get_speed() == ctx.way )
         {
             is_moving = true;
 
-            do_specific_when_switch( *point, ctx.config );
+            do_specific_when_switch( point.get_offset(),
+                                     ctx.config );
 
-            point = switch_one_way( point );
+            switch_one_way( point );
         }
         else
         {
-            ++point;
+            i++;
         }
     }
 
+    scanned.insert( scanned.end(),
+                    points_to_append.begin(),
+                    points_to_append.end() );
+
     if( is_moving )
     {
-        eliminate_redundant_points( *ctx.adjacent_boundary,
+        eliminate_redundant_points( adjacent,
                                     ctx.region_redundant_phi_val );
     }
 
     return is_moving;
 }
 
-void ActiveContour::eliminate_redundant_points(List_i& boundary,
+void ActiveContour::eliminate_redundant_points(ContourList& boundary,
                                                PhiValue region_value)
 {
-    for( auto point = boundary.begin(); point != boundary.end();   )
+    for( std::size_t i = 0; i < boundary.size(); )
     {
-        if( cd.is_boundary_redundant( *point ) )
+        auto& point = boundary[i];
+
+        if( cd.is_redundant(point) )
         {
-            cd.get_phi()[ *point ] = region_value;
-            point = boundary.erase( point ); // it returns the following point
+            cd.get_phi()[ point.get_offset() ] = region_value;
+            point = boundary.back();
+            boundary.pop_back();
         }
         else
         {
-            ++point;
+            i++;
         }
     }
 }
 
-void ActiveContour::compute_speed(const List_i& boundary)
+void ActiveContour::compute_speed(ContourList& boundary)
 {
     if( state == State::CYCLE_1 )
     {
@@ -247,85 +265,81 @@ void ActiveContour::compute_speed(const List_i& boundary)
     }
 }
 
-void ActiveContour::compute_external_speed_Fd(const List_i& boundary)
+void ActiveContour::compute_external_speed_Fd(ContourList& boundary)
 {
-    speed.resize( 0u );
-
-    for( auto point = boundary.cbegin(); point != boundary.cend(); ++point )
+    for( auto& point : boundary )
     {
-        speed.push_back( compute_external_speed_Fd( *point ) );
+        compute_external_speed_Fd( point );
     }
 }
 
 // input integer is an offset
-SpeedValue ActiveContour::compute_external_speed_Fd(int)
+void ActiveContour::compute_external_speed_Fd(ContourPoint& point)
 {
     // this class should never be instantiated
     // reimplement a better and data-dependent speed function in a child class
-
-    return GO_INWARD;
+    point.set_speed( GO_INWARD );
 }
 
-void ActiveContour::compute_internal_speed_Fint(const List_i& boundary)
+void ActiveContour::compute_internal_speed_Fint(ContourList& boundary)
 {
-    speed.resize( 0u );
-
-    for( auto point = boundary.cbegin(); point != boundary.cend(); ++point )
+    for( auto& point : boundary )
     {
-        speed.push_back( compute_internal_speed_Fint( *point ) );
+        compute_internal_speed_Fint( point );
     }
 }
 
-signed char ActiveContour::compute_internal_speed_Fint(int offset)
+void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 {
-    int x, y;
-    cd.get_phi().get_position(offset,x,y); // x and y passed by reference
+    assert( kernel.weights.size() == kernel.offsets.size() );
+    assert( kernel.size == config.kernel_length * config.kernel_length );
 
-    const int kernel_radius = (gaussian_kernel.get_width() - 1) / 2;
+    const auto& phi = cd.get_phi();
+    const int width  = phi.get_width();
+    const int height = phi.get_height();
+
+    const int radius = kernel.radius;
+    const int offset = point.get_offset();
+    const auto phi_center  = phi[offset];
+    const int center_sign = get_sign_opposite(phi_center);
+
     int Fint = 0;
 
-    // if not in the image's border, no neighbors' tests
-    if(    x-kernel_radius >= 0
-        && x+kernel_radius < cd.get_phi().get_width()
-        && y-kernel_radius >= 0
-        && y+kernel_radius < cd.get_phi().get_height()
-      )
+    const int x = point.get_x();
+    const int y = offset / width;
+
+    // --- Chemin rapide : entièrement dans l'image ---
+    if (   x >= radius
+        && x <  width  - radius
+        && y >= radius
+        && y <  height - radius)
     {
-        for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
+        const int* w = kernel.weights.data();
+        const int* o = kernel.offsets.data();
+
+        for (int i = 0; i < kernel.size; ++i)
         {
-            for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
-            {
-                Fint += int( gaussian_kernel(kernel_radius+dx,kernel_radius+dy) )
-                        * get_sign_opposite( cd.get_phi()(x+dx,y+dy) );
-            }
+            Fint += w[i] * get_sign_opposite(phi[offset + o[i]]);
         }
     }
-    // if in the border of the image, tests of neighbors
+    // --- Chemin lent : bords ---
     else
     {
-        for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
+        const int* w = kernel.weights.data();
+        const int* o = kernel.offsets.data();
+
+        for (int i = 0; i < kernel.size; ++i)
         {
-            for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
-            {
-                if(    x+dx >= 0
-                    && x+dx < cd.get_phi().get_width()
-                    && y+dy >= 0
-                    && y+dy < cd.get_phi().get_height()
-                  )
-                {
-                    Fint += int( gaussian_kernel(kernel_radius+dx,kernel_radius+dy) )
-                            * get_sign_opposite( cd.get_phi()(x+dx,y+dy) );
-                }
-                else
-                {
-                    Fint += int( gaussian_kernel(kernel_radius+dx,kernel_radius+dy) )
-                            * get_sign_opposite( cd.get_phi()[offset] );
-                }
-            }
+            const int n = offset + o[i];
+
+            if (n >= 0 && n < width * height)
+                Fint += w[i] * get_sign_opposite(phi[n]);
+            else
+                Fint += w[i] * center_sign;
         }
     }
 
-    return get_discrete_speed( Fint );
+    point.set_speed( get_discrete_speed(Fint) );
 }
 
 void ActiveContour::check_stopped_state()
@@ -386,15 +400,24 @@ void ActiveContour::calculate_state_cycle_2()
             {
                 float diff_iter = float(ed.total_iter - ed.previous_total_iter);
 
+                const int w = cd.get_phi().get_width();
+                const int h = cd.get_phi().get_height();
+                const int diagonal = Shape::get_grid_diagonal(w, h);
+
                 // normalize in function of l_outshape/phi size
                 // to handle different images sizes.
-                if( diff_iter >= ed.l_out_shape.get_grid_diagonal() / 20.f )
+                if( diff_iter >= diagonal / 20.f )
                 {
-                    // retrieve a std::vector from a std::list
-                    // (needed to shuffle points for haudorff distance
-                    // efficient computation)
-                    // and compute l_out centroid
-                    ed.l_out_shape.transform( cd.get_l_out() );
+                    ed.l_out_shape.clear();
+
+                    for( const auto& point : cd.get_l_out() )
+                    {
+                        Point_i p = from_ContourPoint( point,
+                                                       cd.get_phi().get_width() );
+
+                        ed.l_out_shape.push_back( p );
+                    }
+                    ed.l_out_shape.calculate_centroid();
 
                     calculate_shapes_intersection();
 
@@ -402,7 +425,7 @@ void ActiveContour::calculate_state_cycle_2()
                                           ed.previous_shape,
                                           ed.intersection );
 
-                    float size_factor = 100.f / hd.get_grid_diagonal();
+                    float size_factor = 100.f / diagonal;
                     ed.hausdorff_quantile = size_factor * hd.get_hausdorff_quantile(80);
                     ed.centroids_distance = size_factor * hd.get_centroids_distance();
                     float delta_quantile = ed.previous_quantile - ed.hausdorff_quantile;
@@ -434,18 +457,27 @@ void ActiveContour::calculate_state_cycle_2()
     }
 }
 
+Point_i ActiveContour::from_ContourPoint(const ContourPoint& point,
+                                         int grid_width)
+{
+    Point_i p;
+
+    p.x = point.get_x();
+    p.y = point.get_offset() / grid_width;
+
+    return p;
+}
+
 void ActiveContour::calculate_shapes_intersection()
 {
     ed.intersection.clear();
 
-    for( auto point = ed.previous_shape.get_points().cbegin();
-         point != ed.previous_shape.get_points().cend();
-         ++point )
+    for( const auto& point : ed.previous_shape.get_points() )
     {
         // if a point of ed.previous_shape ∈ ed.l_out_shape
-        if( cd.get_phi()[ *point ] == PhiValue::EXTERIOR_BOUNDARY )
+        if( cd.get_phi()(point.x, point.y) == PhiValue::EXTERIOR_BOUNDARY )
         {
-            ed.intersection.insert( *point );
+            ed.intersection.insert( point );
         }
     }
 }

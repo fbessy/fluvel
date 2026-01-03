@@ -2987,22 +2987,22 @@ void SettingsWindow::save_phi()
             }
         }
 
-        int x, y;
-        for( auto it = Lout33.cbegin(); it != Lout33.cend(); ++it )
-        {
-            y = *it/img_width;
-            x = *it-y*img_width;
+        int y;
 
-            *(img_phi_save.scanLine(y)+x) = 85;
+        for( const auto& point : Lout33 )
+        {
+            y = point.get_offset()/img_width;
+            *(img_phi_save.scanLine(y)+point.get_x()) = 85;
         }
 
-        for( auto it = Lin33.cbegin(); it != Lin33.cend(); ++it )
+        for( const auto& point : Lin33 )
         {
-            y = *it/img_width;
-            x = *it-y*img_width;
-
-            *(img_phi_save.scanLine(y)+x) = 170;
+            y = point.get_offset()/img_width;
+            *(img_phi_save.scanLine(y)+point.get_x()) = 170;
         }
+
+
+
 
         QVector<QRgb> table(256);
         for( int I = 0; I < 256; I++ )
@@ -3167,53 +3167,57 @@ void SettingsWindow::wheel_zoom(int val, ScrollAreaWidget* obj)
     }
 }
 
-void SettingsWindow::do_flood_fill_from_lists(const ofeli_ip::List_i& Lout, const ofeli_ip::List_i& Lin,
+void SettingsWindow::do_flood_fill_from_lists(const std::vector<ofeli_ip::ContourPoint>& Lout,
+                                              const std::vector<ofeli_ip::ContourPoint>& Lin,
                                               ofeli_ip::Matrix<signed char>& phi)
 {
     phi.memset(ofeli_ip::PhiValue::OUTSIDE_REGION);
 
-    for( auto it = Lout.cbegin(); it != Lout.cend(); ++it )
+    for( const auto& point : Lout )
     {
-        phi[*it] = ofeli_ip::PhiValue::EXTERIOR_BOUNDARY;
+        phi[ point.get_offset() ] = ofeli_ip::PhiValue::EXTERIOR_BOUNDARY;
     }
 
-    for( auto it = Lin.cbegin(); it != Lin.cend(); ++it )
+    for( const auto& point : Lin )
     {
         do_flood_fill( phi,
-                       *it,
+                       point.get_offset(),
                        ofeli_ip::PhiValue::OUTSIDE_REGION,
                        ofeli_ip::PhiValue::INSIDE_REGION );
     }
 
-    for( auto it = Lout.cbegin(); it != Lout.cend(); ++it )
+    for( const auto& point : Lout )
     {
-        phi[*it] = ofeli_ip::PhiValue::OUTSIDE_REGION;
+        phi[ point.get_offset() ] = ofeli_ip::PhiValue::OUTSIDE_REGION;
     }
 }
 
 void SettingsWindow::find_lists_from_phi(const ofeli_ip::Matrix<signed char>& phi,
-                                         ofeli_ip::List_i& Lout,
-                                         ofeli_ip::List_i& Lin)
+                                         std::vector<ofeli_ip::ContourPoint>& Lout,
+                                         std::vector<ofeli_ip::ContourPoint>& Lin)
 {
     Lout.clear();
     Lin.clear();
-
+// vite fait a optimiser ensuite
     const int phi_size = phi.get_width()*phi.get_height();
+    int x, y;
 
     for( int offset = 0; offset < phi_size; offset++ )
     {
+        phi.get_position(offset, x, y);
+
         if( phi[offset] < ofeli_ip::PhiValue::ZERO_LEVEL_SET )
         {
             if( !find_redundant_list_point(phi, offset) )
             {
-                Lin.push_front(offset);
+                Lin.emplace_back(offset, x);
             }
         }
         else
         {
             if( !find_redundant_list_point(phi, offset) )
             {
-                Lout.push_front(offset);
+                Lout.emplace_back(offset, x);
             }
         }
     }

@@ -63,7 +63,7 @@ public :
 private :
 
     //! Computes external speed \a Fd with a geodesic model for a current point \a (x,y) of #l_out or #l_in.
-    virtual SpeedValue compute_external_speed_Fd(int offset) override;
+    virtual void compute_external_speed_Fd(ContourPoint& point) override;
 
     //! Gets the global speed sign to evolve the initial active contour is the good way.
     int get_global_speed_sign() const;
@@ -136,6 +136,6 @@ EdgeAc::EdgeAc(Image8ConstView gradient_image1,
  */
 
 /**
- * \fn virtual signed char EdgeAc::compute_external_speed_Fd(int offset)
+ * \fn virtual signed char EdgeAc::compute_external_speed_Fd(ContourPoint& point)
  * \param offset offset of the image data buffer with \a offset = \a x + \a y × #img_width
  */

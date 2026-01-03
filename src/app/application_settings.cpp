@@ -84,19 +84,32 @@ ApplicationSettings::ApplicationSettings()
 
     phi_width = settings.value("Settings/Initialization/phi_width", 100).toInt();
     phi_height = settings.value("Settings/Initialization/phi_height", 100).toInt();
+
+    int offset, x, y;
+
     int Lout_init_size = settings.beginReadArray("Settings/Initialization/Lout_init");
-    for( int index = Lout_init_size-1; index >= 0; index-- )
+    for( int index = 0; index < Lout_init_size; index++ )
     {
         settings.setArrayIndex(index);
-        Lout_init.push_front( settings.value("Offset").toInt() );
+        offset = settings.value("Offset").toInt();
+
+        y = offset/phi_width;
+        x = offset-y*phi_width;
+
+        Lout_init.emplace_back( offset, x );
     }
     settings.endArray();
 
     int Lin_init_size = settings.beginReadArray("Settings/Initialization/Lin_init");
-    for( int index = Lin_init_size-1; index >= 0; index-- )
+    for( int index = 0; index < Lin_init_size; index++ )
     {
         settings.setArrayIndex(index);
-        Lin_init.push_front( settings.value("Offset").toInt() );
+        offset = settings.value("Offset").toInt();
+
+        y = offset/phi_width;
+        x = offset-y*phi_width;
+
+        Lin_init.emplace_back( offset, x );
     }
     settings.endArray();
 
@@ -230,29 +243,19 @@ void ApplicationSettings::save()
 
     settings.remove("Settings/Initialization/Lout_init");
     settings.beginWriteArray("Settings/Initialization/Lout_init");
-    int index = 0;
-    for( auto it = Lout_init.cbegin();
-         it != Lout_init.cend();
-         ++it )
+    for( std::size_t index = 0; index < Lout_init.size(); index++ )
     {
-        settings.setArrayIndex(index);
-        settings.setValue( "Offset", *it );
-
-        index++;
+        settings.setArrayIndex( int(index) );
+        settings.setValue( "Offset", Lout_init[index].get_offset() );
     }
     settings.endArray();
 
     settings.remove("Settings/Initialization/Lin_init");
     settings.beginWriteArray("Settings/Initialization/Lin_init");
-    index = 0;
-    for( auto it = Lin_init.cbegin();
-         it != Lin_init.cend();
-         ++it )
+    for( std::size_t index = 0; index < Lin_init.size(); index++ )
     {
-        settings.setArrayIndex(index);
-        settings.setValue( "Offset", *it );
-
-        index++;
+        settings.setArrayIndex( int(index) );
+        settings.setValue( "Offset", Lin_init[index].get_offset() );
     }
     settings.endArray();
 

@@ -44,6 +44,7 @@
 #include <unordered_set>
 
 #include "shape.hpp"
+#include "point_hash.hpp"
 
 namespace ofeli_ip
 {
@@ -56,7 +57,7 @@ public :
     //! Constructor.
     HausdorffDistance(Shape& shape_a1,
                       Shape& shape_b1,
-                      const std::unordered_set<int>& intersection1 = std::unordered_set<int>());
+                      const std::unordered_set<Point_i>& intersection1 = std::unordered_set<Point_i>());
 
     //! Gets the hausdorff distance between #shape_a and #shape_b.
     float get_distance() const;
@@ -71,10 +72,6 @@ public :
 
     //! Gets the centroids distance, i.e. the gap between the #shape_a 's centroid and the #shape_b 's centroid.
     float get_centroids_distance() const;
-
-    //! Gets the grid diagonal distance in order to normalize the results and
-    //! to be able to compare results between different input image size.
-    float get_grid_diagonal() const;
 
 private:
 
@@ -106,7 +103,7 @@ private:
     Shape& shape_b;
 
     //! Optional intersection with common points between #shape_a and #shape_b.
-    const std::unordered_set<int>& intersection_a_b;
+    const std::unordered_set<Point_i>& intersection_a_b;
 
     //! Directed or relative hausdorff distance from #shape_a (outer loop) to #shape_b (inner loop).
     float hd_a_to_b;

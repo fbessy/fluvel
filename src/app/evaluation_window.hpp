@@ -46,6 +46,7 @@
 
 #include "evaluation_widget.hpp"
 #include "hausdorff_distance.hpp"
+#include "point.hpp"
 
 namespace ofeli_gui
 {
@@ -74,7 +75,7 @@ private :
     EvaluationWidget* widget2;
     QPushButton* compute_button;
 
-    std::unordered_set<int> intersection;
+    std::unordered_set<ofeli_ip::Point_i> intersection;
 
     QDialog* result_popup;
     QLabel* hausdorff_label;

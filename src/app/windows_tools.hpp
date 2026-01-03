@@ -40,7 +40,7 @@
 #ifndef WINDOWS_TOOLS_HPP
 #define WINDOWS_TOOLS_HPP
 
-#include "list_i.hpp"
+#include "contour_data.hpp"
 #include <QRgb>
 #include <QImage>
 
@@ -86,35 +86,35 @@ enum QComboBoxColorIndex : int
 void get_color(int index,
                RgbColor& color);
 
-void draw_list_to_img(const ofeli_ip::List_i& list,
+void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
                       const RgbColor& color,
                       int combobox_index,
                       unsigned char* img_rgb32_data,
                       int img_rgb32_width,
                       int img_rgb32_height);
 
-void draw_upscale_list(const ofeli_ip::List_i& list,
+void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                        const RgbColor& color,
                        int combobox_index,
                        unsigned int upscale_factor,
                        QImage& img_rgb32);
 
-void draw_list_to_img1_img2(const ofeli_ip::List_i& list,
+void draw_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
                             const RgbColor& color1,
                             const RgbColor& color2,
                             unsigned char* img1_rgb_data,
                             unsigned char* img2_rgb_data);
 
-void erase_list_to_img(const ofeli_ip::List_i& list,
+void erase_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
                        const unsigned char* img_to_copy,
                        unsigned char* img_rgb_data);
 
-void erase_list_to_img1_img2(const ofeli_ip::List_i& list,
+void erase_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
                              const unsigned char* img_to_copy,
                              unsigned char* img1_rgb_data,
                              unsigned char* img2_rgb_data);
 
-void erase_list_to_img_grayscale(const ofeli_ip::List_i& list,
+void erase_list_to_img_grayscale(const std::vector<ofeli_ip::ContourPoint>& list,
                                  const unsigned char* img_grayscale_to_copy,
                                  unsigned char* img_rgb_data);
 

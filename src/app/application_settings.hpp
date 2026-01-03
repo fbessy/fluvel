@@ -87,8 +87,8 @@ public:
 
     int phi_width;
     int phi_height;
-    ofeli_ip::List_i Lout_init;
-    ofeli_ip::List_i Lin_init;
+    std::vector<ofeli_ip::ContourPoint> Lout_init;
+    std::vector<ofeli_ip::ContourPoint> Lin_init;
 
     bool has_ellipse;
     float init_width;

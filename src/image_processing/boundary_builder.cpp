@@ -44,7 +44,8 @@ namespace ofeli_ip
 {
 
 BoundaryBuilder::BoundaryBuilder(int phi_width1, int phi_height1,
-                                 List_i& l_out_init1, List_i& l_in_init1)
+                                 ContourList& l_out_init1,
+                                 ContourList& l_in_init1)
     : phi_width(phi_width1), phi_height(phi_height1),
     Lout_init(l_out_init1), Lin_init(l_in_init1)
 {
@@ -96,8 +97,8 @@ void BoundaryBuilder::get_reversed_rectangle_points(float x1, float y1,
 
 void BoundaryBuilder::get_rectangle_points(int x1, int y1,
                                            int x2, int y2,
-                                           List_i& list_out,
-                                           List_i& list_in)
+                                           ContourList& list_out,
+                                           ContourList& list_in)
 {
     if( phi_width != 0 && phi_height != 0 )
     {
@@ -123,11 +124,11 @@ void BoundaryBuilder::get_rectangle_points(int x1, int y1,
                 {
                     if( y1-1 >= 0 && y1-1 < int(phi_height) )
                     {
-                        list_out.push_front( get_offset(x,y1-1) );
+                        list_out.emplace_back( get_offset(x,y1-1), x );
                     }
                     if( y2+1 >= 0 && y2+1 < int(phi_height) )
                     {
-                        list_out.push_front( get_offset(x,y2+1) );
+                        list_out.emplace_back( get_offset(x,y2+1), x );
                     }
                 }
             }
@@ -138,12 +139,12 @@ void BoundaryBuilder::get_rectangle_points(int x1, int y1,
                 {
                     if( x1-1 >= 0 && x1-1 < int(phi_width) )
                     {
-                        list_out.push_front( get_offset(x1-1,y) );
+                        list_out.emplace_back( get_offset(x1-1,y), x1-1 );
                     }
 
                     if( x2+1 >= 0 && x2+1 < int(phi_width) )
                     {
-                        list_out.push_front( get_offset(x2+1,y) );
+                        list_out.emplace_back( get_offset(x2+1,y), x2+1 );
                     }
                 }
             }
@@ -159,7 +160,7 @@ void BoundaryBuilder::get_rectangle_points(int x1, int y1,
     }
 }
 
-void BoundaryBuilder::get_rectangle_points_for_one_list(List_i& list_init,
+void BoundaryBuilder::get_rectangle_points_for_one_list(ContourList& list_init,
                                                         int x1, int y1,
                                                         int x2, int y2)
 {
@@ -169,11 +170,11 @@ void BoundaryBuilder::get_rectangle_points_for_one_list(List_i& list_init,
         {
             if( y1 >= 0 && y1 < int(phi_height) )
             {
-                list_init.push_front( get_offset(x,y1) );
+                list_init.emplace_back( get_offset(x,y1), x );
             }
             if( y2 >= 0 && y2 < int(phi_height) )
             {
-                list_init.push_front( get_offset(x,y2) );
+                list_init.emplace_back( get_offset(x,y2), x );
             }
         }
     }
@@ -184,12 +185,12 @@ void BoundaryBuilder::get_rectangle_points_for_one_list(List_i& list_init,
         {
             if( x1 >= 0 && x1 < int(phi_width) )
             {
-                list_init.push_front( get_offset(x1,y) );
+                list_init.emplace_back( get_offset(x1,y), x1 );
             }
 
             if( x2 >= 0 && x2 < int(phi_width) )
             {   
-                list_init.push_front( get_offset(x2,y) );
+                list_init.emplace_back( get_offset(x2,y), x2 );
             }
         }
     }
@@ -198,7 +199,7 @@ void BoundaryBuilder::get_rectangle_points_for_one_list(List_i& list_init,
 void BoundaryBuilder::build_ellipse_midpoint_connected(
     int x0, int y0,
     unsigned int a, unsigned int b,
-    List_i& list_out)
+    ContourList& list_out)
 {
     int x = 0;
     int y = b;
@@ -282,34 +283,38 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(
 
 void BoundaryBuilder::build_inner_contiguous(
     int x0, int y0,
-    const List_i& list_out,
-    List_i& list_in)
+    const ContourList& l_out,
+    ContourList& l_in)
 {
     int x, y;
+    int dx, dy;
+    int sx, sy;
+    int xi, yi;
 
-    for (auto it = list_out.cbegin(); it != list_out.cend(); ++it)
+    for( std::size_t i = 0; i < l_out.size(); i++ )
     {
-        get_position(*it, x, y);
+        get_position( l_out[i].get_offset(), x, y);
 
-        int dx = x0 - x;
-        int dy = y0 - y;
+        dx = x0 - x;
+        dy = y0 - y;
 
-        int sx = (dx > 0) - (dx < 0);
-        int sy = (dy > 0) - (dy < 0);
+        sx = (dx > 0) - (dx < 0);
+        sy = (dy > 0) - (dy < 0);
 
-        int xi = x + sx;
-        int yi = y + sy;
+        xi = x + sx;
+        yi = y + sy;
 
-        if (inside_image(xi, yi)) {
-            list_in.push_front( get_offset(xi, yi) );
+        if ( inside_image(xi, yi) )
+        {
+            l_in.emplace_back( get_offset(xi, yi), xi );
         }
     }
 }
 
 void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                                          unsigned int a, unsigned int b,
-                                         List_i& list_out,
-                                         List_i& list_in)
+                                         ContourList& list_out,
+                                         ContourList& list_in)
 {
 
     build_ellipse_midpoint_connected(x0, y0, a, b, list_out);
@@ -393,7 +398,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                   > 1.f
                   )
             {
-                list_out_temp.push_front( get_offset(pos_x-1,pos_y) );
+                list_out_temp.emplace_back( get_offset(pos_x-1,pos_y) );
                 list_out_temp.sort();
             }
         }
@@ -405,7 +410,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                   > 1.f
                   )
             {
-                list_out_temp.push_front( get_offset(pos_x+1,pos_y) );
+                list_out_temp.emplace_back( get_offset(pos_x+1,pos_y) );
                 list_out_temp.sort();
             }
         }
@@ -417,7 +422,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                   > 1.f
                   )
             {
-                list_out_temp.push_front( get_offset(pos_x,pos_y-1) );
+                list_out_temp.emplace_back( get_offset(pos_x,pos_y-1) );
                 list_out_temp.sort();
             }
 
@@ -430,7 +435,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                     )
 
                 {
-                    list_out_temp.push_front( get_offset(x_ui-1,y_ui-1) );
+                    list_out_temp.emplace_back( get_offset(x_ui-1,y_ui-1) );
                     list_out_temp.sort();
                 }
             }
@@ -443,7 +448,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                     )
 
                 {
-                    list_out_temp.push_front( get_offset(x_ui+1,y_ui-1) );
+                    list_out_temp.emplace_back( get_offset(x_ui+1,y_ui-1) );
                     list_out_temp.sort();
                 }
             }
@@ -458,7 +463,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                   )
 
             {
-                list_out_temp.push_front( get_offset(pos_x,pos_y+1) );
+                list_out_temp.emplace_back( get_offset(pos_x,pos_y+1) );
                 list_out_temp.sort();
             }
 
@@ -471,7 +476,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                     )
 
                 {
-                    list_out_temp.push_front( get_offset(pos_x-1,pos_y+1) );
+                    list_out_temp.emplace_back( get_offset(pos_x-1,pos_y+1) );
                     list_out_temp.sort();
                 }
             }
@@ -485,7 +490,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
                     )
 
                 {
-                    list_out_temp.push_front( get_offset(pos_x+1,pos_y+1) );
+                    list_out_temp.emplace_back( get_offset(pos_x+1,pos_y+1) );
                     list_out_temp.sort();
                 }
             }
@@ -503,15 +508,15 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
 
     for( auto it = list_out_temp.cbegin(); it != list_out_temp.cend(); ++it )
     {
-        list_out.push_front(*it);
+        list_out.emplace_back(*it);
     }
     for( auto it = list_in_temp.cbegin(); it != list_in_temp.cend(); ++it )
     {
-        list_in_temp.push_front(*it);
+        list_in_temp.emplace_back(*it);
     }
 
-    //list_out.push_front(list_out_temp);
-    //list_in.push_front(list_in_temp);
+    //list_out.emplace_back(list_out_temp);
+    //list_in.emplace_back(list_in_temp);
 
     list_out.splice( list_out.end(), list_out_temp );
     list_in.splice( list_in.end(), list_in_temp );

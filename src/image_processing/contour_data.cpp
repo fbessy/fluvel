@@ -91,9 +91,20 @@ bool ContourData::check_lists()
     return is_ok;
 }
 
+void ContourData::allocate_lists()
+{
+    size_t perimeter = 2*( phi.get_width() + phi.get_height() );
+    preallocation_size = 3 * perimeter;
+
+    l_out.reserve( preallocation_size );
+    l_in.reserve( preallocation_size );
+}
+
 ContourData::ContourData(int phi_width, int phi_height)
     : phi(phi_width, phi_height)
 {
+    allocate_lists();
+
     if (    is_ok_phi_dimension( phi_width )
          && is_ok_phi_dimension( phi_height ) )
     {
@@ -105,7 +116,10 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
                          int phi_width, int phi_height)
     : phi(phi_width, phi_height)
 {
+    allocate_lists();
+
     bool is_ok_ptr = true;
+    int x, y;
 
     if( phi_grayscale_img_data == nullptr )
     {
@@ -136,17 +150,19 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
 
         for( int offset = 0; offset < phi_size; offset++ )
         {
-            if ( !is_boundary_redundant(offset) )
+            phi.get_position(offset, x, y);
+
+            if ( !is_redundant( {offset, x} ) )
             {
                 if ( phi[offset] == PhiValue::INSIDE_REGION )
                 {
                     phi[offset] = PhiValue::INTERIOR_BOUNDARY;
-                    l_in.push_front(offset);
+                    l_in.emplace_back( offset, x );
                 }
                 else
                 {
                     phi[offset] = EXTERIOR_BOUNDARY;
-                    l_out.push_front(offset);
+                    l_out.emplace_back( offset, x );
                 }
             }
         }
@@ -167,11 +183,13 @@ void ContourData::initialize_with_one_ellipse()
     define_phi_with_boundary();
 }
 
-ContourData::ContourData(const List_i& l_out1,
-                         const List_i& l_in1,
+ContourData::ContourData(const ContourList& l_out1,
+                         const ContourList& l_in1,
                          int phi_width, int phi_height)
     : phi(phi_width, phi_height), l_out(l_out1), l_in(l_in1)
 {
+    allocate_lists();
+
     if (    is_ok_phi_dimension( phi_width )
          && is_ok_phi_dimension( phi_height ) )
     {
@@ -187,6 +205,7 @@ ContourData::ContourData(const ContourData& contour)
     l_out( contour.l_out ),
     l_in( contour.l_in )
 {
+    allocate_lists();
 }
 
 ContourData::ContourData(ContourData&& contour) noexcept
@@ -194,22 +213,25 @@ ContourData::ContourData(ContourData&& contour) noexcept
     l_out( std::move(contour.l_out) ),
     l_in( std::move(contour.l_in) )
 {
+    allocate_lists();
 }
 
 void ContourData::define_phi_with_boundary()
 {
     phi.memset(PhiValue::OUTSIDE_REGION);
 
-    for( auto it = l_out.cbegin(); it != l_out.cend(); ++it )
+    for( std::size_t i = 0; i < l_out.size(); i++ )
     {
-        phi[*it] = PhiValue::EXTERIOR_BOUNDARY;
+        phi[ l_out[i].get_offset() ] = PhiValue::EXTERIOR_BOUNDARY;
     }
 
-    for( auto it = l_in.cbegin(); it != l_in.cend(); ++it )
+    for( std::size_t i = 0; i < l_in.size(); i++ )
     {
-        do_flood_fill(*it, PhiValue::OUTSIDE_REGION, PhiValue::INSIDE_REGION);
+        do_flood_fill(l_in[i].get_offset(),
+                      PhiValue::OUTSIDE_REGION,
+                      PhiValue::INSIDE_REGION);
 
-        phi[*it] = PhiValue::INTERIOR_BOUNDARY;
+        phi[ l_in[i].get_offset() ] = PhiValue::INTERIOR_BOUNDARY;
     }
 }
 

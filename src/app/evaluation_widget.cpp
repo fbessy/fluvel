@@ -271,8 +271,6 @@ void EvaluationWidget::refresh_rgb(int color_list_index)
 
 void EvaluationWidget::create_list()
 {
-    shape.set_grid_size( img_width,
-                         img_height );
     shape.clear();
 
     QRgb pix;
@@ -287,7 +285,7 @@ void EvaluationWidget::create_list()
                 && (unsigned char)(qGreen(pix)) == rgb.green
                 && (unsigned char)(qBlue(pix)   == rgb.blue) )
             {
-                shape.push_back( x+y*img_width );
+                shape.push_back( x, y );
             }
         }
     }

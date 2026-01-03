@@ -40,8 +40,6 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
-#include <cmath>
-
 namespace ofeli_ip
 {
 
@@ -51,49 +49,27 @@ struct Point
     T x;
     T y;
 
-    Point(): x(0), y(0)
+    Point() = default;
+    constexpr Point(T x_, T y_) noexcept : x(x_), y(y_) {}
+
+    bool operator==(const Point& other) const noexcept
     {
+        return x == other.x && y == other.y;
     }
 
-    Point(T x1, T y1):
-        x(x1), y(y1)
+    Point& operator+=(const Point& rhs) noexcept
     {
-    }
-
-    Point(const Point& copied):
-        x(copied.x), y(copied.y)
-    {
-    }
-
-    Point(Point&& moved) noexcept
-    {
-        std::swap(moved, *this);
-    }
-
-    Point& operator=(const Point& rhs)
-    {
-        this->x = rhs.x;
-        this->y = rhs.y;
-
+        x += rhs.x;
+        y += rhs.y;
         return *this;
-    }
-
-    Point& operator+=(const Point& rhs)
-    {
-        this->x += rhs.x;
-        this->y += rhs.y;
-
-        return *this;
-    }
-
-    static inline T square(const T& value)
-    {
-        return value*value;
     }
 };
 
 using Point_i = Point<int>;
 using Point_f = Point<float>;
+
+template<typename T>
+constexpr T square(T v) noexcept { return v*v; }
 
 }
 
