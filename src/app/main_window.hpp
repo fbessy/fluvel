@@ -53,7 +53,7 @@
 #include "about_window.hpp"
 #include "language_window.hpp"
 
-#include "pixmap_widget.hpp"
+#include "image_view_base.hpp"
 #include "scroll_area_widget.hpp"
 
 #include "active_contour.hpp"
@@ -130,8 +130,7 @@ private :
     QAction* startCameraAction = nullptr;
     QMediaDevices* mediaDevices = nullptr;
 
-    PixmapWidget* imageLabel;
-    ScrollAreaWidget* scrollArea;
+    ImageViewBase* imageView;
 
     QLabel* Cin_text;
     QLabel* Cout_text;
@@ -210,7 +209,6 @@ private :
     bool has_algo_breaking;
 
     // filtre des evenements pour avoir la position que sur l'image et pas la fenêtre
-    virtual bool eventFilter(QObject* object, QEvent* event) override;
     // position du curseur souris
     int positionX;
     int positionY;
@@ -254,12 +252,14 @@ private :
 
     QMenu* fileMenu;
     QMenu* viewMenu;
-    QMenu* segmentationMenu;
+    QMenu* windowMenu;
     QMenu* helpMenu;
 
 #ifndef QT_NO_PRINTER
     QPrinter printer;
 #endif
+
+    QDockWidget* dockInfo;
 
 signals :
 

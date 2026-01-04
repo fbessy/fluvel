@@ -52,8 +52,9 @@
 
 #include "video_active_contour_thread.hpp"
 #include "application_settings.hpp"
-#include "camera_graphics_view.hpp"
+#include "image_view_base.hpp"
 #include "frame_stats.hpp"
+#include "camera_overlay_widget.hpp"
 
 namespace ofeli_gui
 {
@@ -80,7 +81,8 @@ private:
     QComboBox* cameraSelector;
     QStackedWidget* labels;
     QLabel* blackLabel;
-    CameraGraphicsView* videoView;
+    ImageViewBase* videoView;
+    CameraOverlayWidget* cameraOverlay;
 
     QMediaDevices*         mediaDevices;
     QList<QCameraDevice>  cameras;
@@ -94,6 +96,9 @@ private:
     quint64 nextFrameId;  // compteur unique des frames
     QTimer* statsTimer; // timer pour snapshot périodique
     qint64 lastFrameReceiveTs;
+
+signals:
+    void cameraStatsUpdated(const CameraStatsUi& stats);
 };
 
 }

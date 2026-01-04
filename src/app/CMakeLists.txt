@@ -14,7 +14,7 @@ set(app_src
 
     "camera_window.cpp" "camera_window.hpp"
     "video_active_contour_thread.cpp" "video_active_contour_thread.hpp"
-    "camera_graphics_view.cpp" "camera_graphics_view.hpp"
+    "image_view_base.cpp" "image_view_base.hpp"
     "frame_stats.cpp" "frame_stats.hpp"
     "frame_clock.cpp" "frame_clock.hpp"
 
@@ -22,6 +22,7 @@ set(app_src
     "about_window.cpp" "about_window.hpp"
 
     "contour_rendering.cpp" "contour_rendering.hpp"
+    "camera_overlay_widget.cpp" "camera_overlay_widget.hpp"
 
     "application_settings.cpp" "application_settings.hpp"
     "runtime_settings.cpp" "runtime_settings.hpp"

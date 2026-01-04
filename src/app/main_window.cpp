@@ -76,7 +76,6 @@ namespace ofeli_gui
 {
 
 MainWindow::MainWindow() :
-    imageLabel(nullptr),
     scale_spin0(nullptr), scale_slider0(nullptr),
     img1(nullptr), img_width(0), img_height(0),
     ac(nullptr), image_result_uchar(nullptr),
@@ -101,26 +100,7 @@ MainWindow::MainWindow() :
 
     //////////////////////////////////////////////////////////////////////////
 
-    scrollArea = new ScrollAreaWidget(this);
-    imageLabel = new PixmapWidget(scrollArea);
-    imageLabel->setBackgroundRole(QPalette::Dark);
-    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    imageLabel->setScaledContents(true);
-    imageLabel->setFocusPolicy(Qt::StrongFocus);
-    imageLabel->setMouseTracking(true);
-    imageLabel->installEventFilter(this);
-    imageLabel->setAcceptDrops(true);
-    imageLabel->resize(280, 487);
-    imageLabel->setAlignment(Qt::AlignCenter);
-    imageLabel->set_text(tr("<drag image>"));
-    connect(scrollArea->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(adjustVerticalScroll(int,int)));
-    scrollArea->setBackgroundRole(QPalette::Dark);
-    scrollArea->setWidget(imageLabel);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setAlignment(Qt::AlignCenter);
-    scrollArea->installEventFilter(this);
-
-    connect(scrollArea->horizontalScrollBar(),SIGNAL(rangeChanged(int,int)),this,SLOT(adjustHorizontalScroll(int,int)));
+    imageView = new ImageViewBase(this);
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -256,21 +236,30 @@ MainWindow::MainWindow() :
     connect(scale_spin0,SIGNAL(valueChanged(int)),scale_slider0,SLOT(setValue(int)));
 
     scale_spin0->setValue(settings.value("Settings/Display/zoom_factor", 100).toInt());
-    imageLabel->set_zoomFactor(float(scale_spin0->value())/100.0f);
 
     //////////////////////////////////////////////////////////////////////////
 
-    QVBoxLayout* info_layout = new QVBoxLayout;
+    dockInfo = new QDockWidget(tr("Informations"), this);
+    //dockInfo->setAllowedAreas(Qt::RightDockWidgetArea);
+
+    addDockWidget(Qt::RightDockWidgetArea, dockInfo);
+    //menuBar()->addMenu(tr("Affichage"))->addAction(dockInfo->toggleViewAction());
+
+    QWidget* info = new QWidget(dockInfo);
+    QVBoxLayout* info_layout = new QVBoxLayout(info);
     info_layout->addWidget(stackedWidget);
     info_layout->addWidget(stop_group);
     info_layout->addWidget(time_group);
-    info_layout->addWidget(data_group);
-    info_layout->addWidget(scale_group);
+
+    //info_layout->addWidget(data_group);
+    //info_layout->addWidget(scale_group);
     info_layout->addStretch(1);
 
+    dockInfo->setWidget(info);
+
     QHBoxLayout *layout_this = new QHBoxLayout;
-    layout_this->addWidget(scrollArea,1);
-    layout_this->addLayout(info_layout,0);
+    layout_this->addWidget(imageView,1);
+    //layout_this->addLayout(info_layout,0);
     layout_this->setSizeConstraint(QLayout::SetMinimumSize);
 
     QLabel* widget_this = new QLabel;
@@ -309,60 +298,7 @@ MainWindow::MainWindow() :
 
     connect(openAct, SIGNAL(triggered()), this, SLOT(openFileName()));
 
-/*
-    auto videoInputs = QMediaDevices::videoInputs();
-    QMenu *cameraMenu = new QMenu(this);
-
-    if (videoInputs.isEmpty()) {
-        cameraAct->setEnabled(false);
-    } else {
-        cameraAct->setEnabled(true);
-
-        for (const auto &device : videoInputs) {
-            QAction *action = new QAction(device.description(), this);
-            connect(action, &QAction::triggered, this, [this, device]() {
-                // Ouvrir la caméra correspondante
-                camera_window->openCamera(device.id());
-            });
-            cameraMenu->addAction(action);
-        }
-
-        //cameraAct->setMenu(cameraMenu);
-    }
-
-    connect(cameraAct, SIGNAL(triggered()), camera_window, SLOT(show_camera()));
-*/
-
-/*    QString cameraAct_qstr = tr("Open") + QString(" ") + QMediaDevices::defaultVideoInput().description();
-    cameraAct = new QAction(cameraAct_qstr, this);
-
-
-    cameraAct->setShortcut(tr("Ctrl+C"));
-    cameraAct->setEnabled(true);
-
-    cameraAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraWeb) );
-
-    connect(cameraAct, SIGNAL(triggered()), camera_window, SLOT(show()));*/
-
-    //connect(cameraAct, SIGNAL(triggered()), camera_window, SLOT(show_camera()));
-
-    //cameras = QMediaDevices::videoInputs();
-/*
-    for (const auto& cam : cameras)
-    {
-        cameraSelector->addItem(cam.description(),
-                                cam.id()   // QByteArray → QVariant OK
-                                );
-    }
-
-    auto* toolbar = addToolBar("Caméra");
-    toolbar->addWidget(cameraSelector);*/
-
-    //connect(cameraSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            //this, &MainWindow::onCameraChanged);
-
-
-    cameraAct = new QAction(tr("Start Camera…"), this);
+    cameraAct = new QAction(tr("Camera"), this);
     cameraAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraWeb) );
     cameraAct->setEnabled(false);
 
@@ -514,7 +450,6 @@ MainWindow::MainWindow() :
 
     fileMenu = new QMenu(tr("&File"), this);
     fileMenu->addAction(openAct);
-    fileMenu->addAction(cameraAct);
 
     separatorAct = fileMenu->addSeparator();
     for( int i = 0; i < MaxRecentFiles; ++i )
@@ -538,10 +473,10 @@ MainWindow::MainWindow() :
     viewMenu->addAction(zoomOutAct);
     viewMenu->addAction(normalSizeAct);
 
-    segmentationMenu = new QMenu(tr("&Segmentation"), this);
-    segmentationMenu->addAction(startAct);
-    segmentationMenu->addAction(evaluateAct);
-    segmentationMenu->addAction(settingsAct);
+    windowMenu = new QMenu(tr("&Window"), this);
+    windowMenu->addAction(cameraAct);
+    windowMenu->addAction(evaluateAct);
+    windowMenu->addAction(settingsAct);
 
     helpMenu = new QMenu(tr("&Help"), this);
     helpMenu->addAction(aboutAct);
@@ -551,7 +486,7 @@ MainWindow::MainWindow() :
 
     menuBar()->addMenu(fileMenu);
     menuBar()->addMenu(viewMenu);
-    menuBar()->addMenu(segmentationMenu);
+    menuBar()->addMenu(windowMenu);
     menuBar()->addMenu(helpMenu);
 
     //////////////////////////////////////////////////////////////////////////
@@ -668,7 +603,7 @@ void MainWindow::open()
 
         image_format = img.format();
 
-        imageLabel->set_qimage0( img );
+        imageView->displayImage( img );
         QApplication::processEvents();
         is_input_image_displayed = true;
         statusBar()->showMessage(tr("Push the left mouse button or click on the right mouse button in the window."));
@@ -1088,7 +1023,7 @@ void MainWindow::start()
             }
 
             put_displayed_active_contour();
-            imageLabel->set_qimage(image_result);
+            imageView->displayImage(image_result);
             QApplication::processEvents();
             is_input_image_displayed = false;
 
@@ -1099,8 +1034,6 @@ void MainWindow::start()
             infinite_loop();
 
             erase_displayed_active_contour(img1_filtered,min,max);
-
-            imageLabel->setMouseTracking(false);
 
             float elapsed_time;
             std::clock_t start_time, stop_time;
@@ -1137,7 +1070,6 @@ void MainWindow::start()
                     ac->evolve_one_iteration();
 
                     put_displayed_active_contour();
-                    imageLabel->update();
                     QApplication::processEvents();
 
                     show_phi_list_value();
@@ -1160,7 +1092,6 @@ void MainWindow::start()
                 elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
 
                 put_displayed_active_contour();
-                imageLabel->update();
                 QApplication::processEvents();
 
                 if( has_click_stopping )
@@ -1173,8 +1104,6 @@ void MainWindow::start()
             time_text->setText("<font color=red>"+tr("time = ")+QString::number(elapsed_time, 'g', 4)+" s");
             show_phi_list_value();
             statusBar()->clearMessage();
-
-            imageLabel->setMouseTracking(true);
 
             statusBar()->showMessage(tr("Push the left mouse button or click on the right mouse button in the window."));
         }
@@ -1312,9 +1241,9 @@ void MainWindow::saveImage()
         }
     }
 
-    QImage img_displayed = imageLabel->get_qimage();
+    QImage img_displayed = imageView->currentImage();
 
-    if( !fileName_save.isEmpty() )
+    if( !fileName_save.isEmpty() && !img_displayed.isNull() )
     {
         QFileInfo fi1(fileName_save);
         last_directory_used = fi1.absolutePath();
@@ -1415,17 +1344,17 @@ void MainWindow::display_settings()
 
 void MainWindow::zoomIn()
 {
-    scale_spin0->setValue( int(100.0f*imageLabel->get_zoomFactor()*1.25f) );
+    //scale_spin0->setValue( int(100.0f*imageLabel->get_zoomFactor()*1.25f) );
 }
 
 void MainWindow::zoomOut()
 {
-    scale_spin0->setValue( int(100.0f*imageLabel->get_zoomFactor()*0.8f) );
+    //scale_spin0->setValue( int(100.0f*imageLabel->get_zoomFactor()*0.8f) );
 }
 
 void MainWindow::normalSize()
 {
-    scale_spin0->setValue(100);
+    //scale_spin0->setValue(100);
 }
 
 // Evénement clic souris dans imageLabel (image de la fenêtre principale) permet de rentrer dans la boucle infinie ou d'en sortir pour bloquer momentanément l'algo et prendre du temps sur une étape du contour actif
@@ -1553,9 +1482,6 @@ void MainWindow::infinite_loop()
 {
     if( has_click_stopping )
     {
-        bool temp = imageLabel->hasMouseTracking();
-        imageLabel->setMouseTracking(true);
-
         if( has_step_by_step )
         {
             statusBar()->showMessage(tr("Click on the right mouse button to evolve the contour of one iteration."));
@@ -1565,8 +1491,6 @@ void MainWindow::infinite_loop()
         {
             QApplication::processEvents();
         }
-
-        imageLabel->setMouseTracking(temp);
     }
 }
 
@@ -1578,6 +1502,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
     // si l'image est chargée
     if( img1 != nullptr && img1_filtered != nullptr )
     {
+        /*
         positionX = int(float(img_width)
                         * float( ( (event->pos()).x() - imageLabel->get_xoffset() )
                                   / float( imageLabel->getPixWidth() )
@@ -1588,7 +1513,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
                         * float( (  (event->pos()).y() - imageLabel->get_yoffset() )
                                   / float(imageLabel->getPixHeight() )
                                   )
-                        );
+                        );*/
 
         if( positionX >= 0 &&
             positionX < img_width &&
@@ -1823,8 +1748,9 @@ void MainWindow::stop()
 }
 
 // Filtre des événements pour avoir le tracking au niveau du widget image de la fenêtre principale et de la fenêtre de parametres et pour ne pas avoir le tracking/la position au niveau de l'ensemble de chaque fenêtre
-bool MainWindow::eventFilter(QObject* object, QEvent* event)
-{
+//bool MainWindow::eventFilter(QObject* object, QEvent* event)
+//{
+    /*
     if( object == imageLabel )
     {
         if( event->type() == QEvent::DragEnter )
@@ -1871,23 +1797,23 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
         {
             if( img1 != nullptr )
             {
-                imageLabel->set_has_text(false);
-                imageLabel->setBackgroundRole(QPalette::Dark);
+                //imageLabel->set_has_text(false);
+                //imageLabel->setBackgroundRole(QPalette::Dark);
             }
             positionX = img_width/2;
             positionY = img_height/2;
         }
     }
 
-    return false;
-}
+    return false;*/
+//}
 
 // Fonction appelée pour le changement d'échelle dans la fenêtre viewer
 void MainWindow::do_scale0(int value)
 {
     if( img1 != nullptr )
     {
-        imageLabel->setZoomFactor(float(value)/100.0);
+        //imageLabel->setZoomFactor(float(value)/100.0);
     }
 }
 
@@ -1896,9 +1822,9 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
     if( !settings_window->isVisible() )
     {
         QString text(tr("<drop image>"));
-        imageLabel->set_text(text);
-        imageLabel->setBackgroundRole(QPalette::Highlight);
-        imageLabel->set_has_text(true);
+        //imageLabel->set_text(text);
+        //imageLabel->setBackgroundRole(QPalette::Highlight);
+        //imageLabel->set_has_text(true);
 
         event->acceptProposedAction();
         emit changed(event->mimeData());
@@ -1924,7 +1850,7 @@ void MainWindow::dropEvent(QDropEvent* event)
             QList<QUrl> urlList = mimeData->urls();
             fileName = urlList.first().toLocalFile();
         }
-        imageLabel->setBackgroundRole(QPalette::Dark);
+        //imageLabel->setBackgroundRole(QPalette::Dark);
         emit signal_open();
         event->acceptProposedAction();
     }
@@ -1935,9 +1861,9 @@ void MainWindow::dragLeaveEvent(QDragLeaveEvent* event)
     if( !settings_window->isVisible() )
     {
         QString text(tr("<drag image>"));
-        imageLabel->set_text(text);
-        imageLabel->setBackgroundRole(QPalette::Dark);
-        imageLabel->set_has_text(true);
+        //imageLabel->set_text(text);
+        //imageLabel->setBackgroundRole(QPalette::Dark);
+        //imageLabel->set_has_text(true);
         emit changed();
         event->accept();
     }
@@ -1948,10 +1874,10 @@ void MainWindow::adjustVerticalScroll(int min, int max)
     if( img_height != 0 )
     {
         //scrollArea->verticalScrollBar()->setValue( (max-min)*positionY/img_height );
-        scrollArea->verticalScrollBar()->setValue( scrollArea->verticalScrollBar()->value() );
-        std ::cout << scrollArea->verticalScrollBar()->value() << std::endl;
-        std ::cout << min << std::endl;
-        std ::cout << max << std::endl;
+        //scrollArea->verticalScrollBar()->setValue( scrollArea->verticalScrollBar()->value() );
+        //std ::cout << scrollArea->verticalScrollBar()->value() << std::endl;
+        //std ::cout << min << std::endl;
+        //std ::cout << max << std::endl;
     }
 }
 
@@ -1959,7 +1885,7 @@ void MainWindow::adjustHorizontalScroll(int min, int max)
 {
     if( img_width != 0 )
     {
-        scrollArea->horizontalScrollBar()->setValue( (max-min)*positionX/img_width );
+        //scrollArea->horizontalScrollBar()->setValue( (max-min)*positionX/img_width );
     }
 }
 
@@ -2068,20 +1994,20 @@ void MainWindow::deleteList()
 
 void MainWindow::wheel_zoom(int val, ScrollAreaWidget* obj)
 {
-    if( obj == scrollArea && img1 != nullptr )
-    {
-        imageLabel->set_has_text(false);
-        imageLabel->setBackgroundRole(QPalette::Dark);
+    //if( obj == scrollArea && img1 != nullptr )
+    //{
+        //imageLabel->set_has_text(false);
+        //imageLabel->setBackgroundRole(QPalette::Dark);
 
-        float value = 0.002f*float( val ) + imageLabel->get_zoomFactor();
+        //float value = 0.002f*float( val ) + imageLabel->get_zoomFactor();
 
-        if( value < 32.0f/float( imageLabel->get_qimage().width() ) )
-        {
-            value = 32.0f/float( imageLabel->get_qimage().width() );
-        }
+        //if( value < 32.0f/float( imageLabel->get_qimage().width() ) )
+        //{
+         //   value = 32.0f/float( imageLabel->get_qimage().width() );
+        //}
 
-        scale_spin0->setValue( int(100.0f*value) );
-    }
+        //scale_spin0->setValue( int(100.0f*value) );
+    //}
 }
 
 void MainWindow::set_zoom_factor(int val)
@@ -2111,15 +2037,15 @@ void MainWindow::updateCameraAction()
 {
     auto cameras = QMediaDevices::videoInputs();
 
-    if (cameras.isEmpty()) {
+    if (cameras.isEmpty())
+    {
         cameraAct->setEnabled(false);
-        cameraAct->setText(tr("Start Camera…"));
-    } else if (cameras.size() == 1) {
+        cameraAct->setText(tr("Camera"));
+    }
+    else
+    {
         cameraAct->setEnabled(true);
-        cameraAct->setText(cameras.first().description());
-    } else {
-        cameraAct->setEnabled(true);
-        cameraAct->setText(tr("Start Camera…"));
+        cameraAct->setText(tr("Camera"));
     }
 }
 

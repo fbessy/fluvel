@@ -44,6 +44,7 @@
 #include <QMediaDevices>
 
 #include <QVBoxLayout>
+#include <QStackedLayout>
 #include <QVideoFrame>
 #include <QImage>
 #include <QCloseEvent>
@@ -80,11 +81,25 @@ CameraWindow::CameraWindow(QWidget* parent)
     blackImage.fill(Qt::black);
     blackLabel->setPixmap(QPixmap::fromImage(blackImage));
 
-    videoView = new CameraGraphicsView(this);
+    videoView = new ImageViewBase(this);
+
+    cameraOverlay = new CameraOverlayWidget(this);
+
+
+
+    QString info = QString("=================================");
+
+    QWidget* viewContainer = new QWidget(this);
+    QStackedLayout* overlayStack = new QStackedLayout(viewContainer);
+    overlayStack->setStackingMode(QStackedLayout::StackAll);
+
+    overlayStack->addWidget(videoView);
+    overlayStack->addWidget(cameraOverlay);
+    cameraOverlay->raise();
 
     labels = new QStackedWidget(this);
     labels->addWidget(blackLabel);
-    labels->addWidget(videoView);
+    labels->addWidget(viewContainer);
 
 
     // État initial
@@ -109,8 +124,17 @@ CameraWindow::CameraWindow(QWidget* parent)
     setLayout(layout);
 
     statsTimer = new QTimer(this);
-    connect(statsTimer, &QTimer::timeout, this, &CameraWindow::updateStatsUi);
-    statsTimer->start(1000);
+    statsTimer->setInterval(500);
+
+    connect(statsTimer, &QTimer::timeout,
+            this, &CameraWindow::updateStatsUi);
+
+    connect(this,
+            &CameraWindow::cameraStatsUpdated,
+            cameraOverlay,
+            &CameraOverlayWidget::setStats);
+
+    statsTimer->start();
 }
 
 CameraWindow::~CameraWindow()
@@ -159,31 +183,6 @@ void CameraWindow::startCamera(const QCameraDevice& device)
                     frameStats.frameDisplayed(recvTs, displayTs); // ✅ display + latence
                 },
                 Qt::QueuedConnection);
-
-        // --- timer pour mettre à jour les FPS et stats toutes les secondes ---
-        connect(statsTimer, &QTimer::timeout, this, [this]()
-                {
-                    auto snap = frameStats.snapshot();
-
-                    videoView->setInputFps(snap.inputFps);
-                    videoView->setProcessingFps(snap.processingFps);
-                    videoView->setDropRate(snap.dropRate);
-                    videoView->setAvgLatencyMs(snap.avgLatencyMs);
-                    videoView->setMaxLatencyMs(snap.maxLatencyMs);
-
-                    qDebug() << "FPS input:" << snap.inputFps
-                             << "FPS processing:" << snap.processingFps
-                             << "FPS display:" << snap.displayFps
-                             << "Avg latency (ms):" << snap.avgLatencyMs
-                             << "Max latency (ms):" << snap.maxLatencyMs
-                             << "Drop rate:" << snap.dropRate;
-                });
-
-        statsTimer = new QTimer(this);
-        statsTimer->setInterval(500);   // 1 seconde = FPS stable
-        connect(statsTimer, &QTimer::timeout,
-                this, &CameraWindow::updateStatsUi);
-        statsTimer->start();
 
         ac_thread->start();
         frameStats.reset();
@@ -267,14 +266,18 @@ void CameraWindow::stopCamera()
 
 void CameraWindow::updateStatsUi()
 {
-    FrameStats::Snapshot snap = frameStats.snapshot();
+    auto snap = frameStats.snapshot();
 
-    videoView->setInputFps(snap.inputFps);
-    videoView->setProcessingFps(snap.processingFps);
-    videoView->setDisplayFps(snap.displayFps);
-    videoView->setDropRate(snap.dropRate);
-    videoView->setAvgLatencyMs(snap.avgLatencyMs);
-    videoView->setMaxLatencyMs(snap.maxLatencyMs);
+    CameraStatsUi stats {
+        snap.inputFps,
+        snap.processingFps,
+        snap.displayFps,
+        snap.dropRate,
+        snap.avgLatencyMs,
+        snap.maxLatencyMs
+    };
+
+    emit cameraStatsUpdated(stats);
 }
 
 void CameraWindow::closeEvent(QCloseEvent* event)

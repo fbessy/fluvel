@@ -12,14 +12,14 @@ set(IP_SRC
     "shape.cpp" "shape.hpp"
     "matrix.txx" "matrix.hpp"
 
-    "image_views.cpp" "image_views.hpp"
+    "image_views.hpp"
     "point.hpp"
+    "point_hash.hpp"
+    "math.hpp"
 )
 
 qt_add_library(image_processing STATIC
     ${IP_SRC}
-    point_hash.hpp
-    math.hpp
 )
 
 target_include_directories(image_processing PUBLIC
