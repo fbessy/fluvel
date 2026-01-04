@@ -45,7 +45,7 @@
 // Qt GUI part of Ofeli
 
 #include "main_window.hpp"
-#include "windows_tools.hpp"
+#include "contour_rendering.hpp"
 
                     /////////////////////
 
@@ -75,8 +75,7 @@
 namespace ofeli_gui
 {
 
-MainWindow::MainWindow(ApplicationSettings& config1) :
-    config(config1),
+MainWindow::MainWindow() :
     imageLabel(nullptr),
     scale_spin0(nullptr), scale_slider0(nullptr),
     img1(nullptr), img_width(0), img_height(0),
@@ -95,8 +94,10 @@ MainWindow::MainWindow(ApplicationSettings& config1) :
 #endif
 
     QSettings settings;
-    resize( settings.value("Main/Window/size", QSize(600, 375)).toSize() );
-    move( settings.value("Main/Window/position", QPoint(200, 200)).toPoint() );
+
+    const auto geo = settings.value("Main/Window/geometry").toByteArray();
+    if (!geo.isEmpty())
+        restoreGeometry(geo);
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -280,21 +281,17 @@ MainWindow::MainWindow(ApplicationSettings& config1) :
     //////////////////////////////////////////////////////////////////////////
 
     // config is modified inside settings window when the user clicks on accept.
-    settings_window = new SettingsWindow(this,
-                                         config);
+    settings_window = new SettingsWindow(this);
 
     evaluation_window = new EvaluationWindow(this);
 
     // config reference is const inside CameraWindow
-    camera_window = new CameraWindow(this,
-                                     config);
+    camera_window = new CameraWindow(this);
 
     // config.app_language reference is const inside AboutWindow
-    about_window = new AboutWindow(this,
-                                   config.app_language);
+    about_window = new AboutWindow(this);
 
-    language_window = new LanguageWindow(this,
-                                         config.app_language);
+    language_window = new LanguageWindow(this);
 
     ////////////////////////////////////////////////////////////////////////////////////////
     /////////////                          Create Actions                /////////////////////
@@ -820,6 +817,8 @@ void MainWindow::open()
             image_save_preprocess = QImage(img_width,img_height, QImage::Format_Indexed8);
         }
 
+        const auto& config = AppSettings::instance();
+
         if( config.speed == SpeedModel::REGION_BASED )
         {
             if( is_rgb1 )
@@ -935,6 +934,8 @@ void MainWindow::initialize_active_contour()
             delete ac;
             ac = nullptr;
         }
+
+        const auto& config = AppSettings::instance();
         
         img1_filtered = settings_window->get_filtered_img_data();
 
@@ -1000,6 +1001,8 @@ void MainWindow::start()
             }
 
             time_text->setText( tr("time =") );
+
+            const auto& config = AppSettings::instance();
 
             if( config.speed == SpeedModel::REGION_BASED )
             {
@@ -1185,6 +1188,8 @@ void MainWindow::start()
 
 void MainWindow::put_displayed_active_contour()
 {
+    const auto& config = AppSettings::instance();
+
     draw_list_to_img( ac->get_l_out(),
                       config.color_out,
                       config.outside_combo,
@@ -1198,19 +1203,21 @@ void MainWindow::put_displayed_active_contour()
 
 void MainWindow::erase_displayed_active_contour(const unsigned char* img, unsigned char min, unsigned char max)
 {
+    const auto& config = AppSettings::instance();
+
     int offset;
     unsigned char I;
 
     if( config.speed == SpeedModel::REGION_BASED && is_rgb1 )
     {
-        if( config.outside_combo != QComboBoxColorIndex::NO )
+        if( config.outside_combo != ComboBoxColorIndex::NO )
         {
             erase_list_to_img( ac->get_l_out(),
                                img,
                                image_result_uchar );
         }
 
-        if( config.inside_combo != QComboBoxColorIndex::NO )
+        if( config.inside_combo != ComboBoxColorIndex::NO )
         {
             erase_list_to_img( ac->get_l_in(),
                                img,
@@ -1219,7 +1226,7 @@ void MainWindow::erase_displayed_active_contour(const unsigned char* img, unsign
     }
     else if( config.speed == SpeedModel::EDGE_BASED && config.has_histo_normaliz )
     {
-        if( config.outside_combo != QComboBoxColorIndex::NO )
+        if( config.outside_combo != ComboBoxColorIndex::NO )
         {
             for( const auto& point : ac->get_l_out() )
             {
@@ -1233,7 +1240,7 @@ void MainWindow::erase_displayed_active_contour(const unsigned char* img, unsign
             }
         }
 
-        if( config.inside_combo != QComboBoxColorIndex::NO )
+        if( config.inside_combo != ComboBoxColorIndex::NO )
         {
             for( const auto& point : ac->get_l_in() )
             {
@@ -1249,14 +1256,14 @@ void MainWindow::erase_displayed_active_contour(const unsigned char* img, unsign
     }
     else // in case (REGION_BASED && !is_rgb1) || (EDGE_BASED && !has_histo_normaliz)
     {
-        if( config.outside_combo != QComboBoxColorIndex::NO )
+        if( config.outside_combo != ComboBoxColorIndex::NO )
         {
             erase_list_to_img_grayscale( ac->get_l_out(),
                                          img,
                                          image_result_uchar );
         }
 
-        if( config.inside_combo != QComboBoxColorIndex::NO )
+        if( config.inside_combo != ComboBoxColorIndex::NO )
         {
             erase_list_to_img_grayscale( ac->get_l_in(),
                                          img,
@@ -1268,6 +1275,7 @@ void MainWindow::erase_displayed_active_contour(const unsigned char* img, unsign
 // Fonction appelée quand on clique sur save
 void MainWindow::saveImage()
 {
+    const auto& config = AppSettings::instance();
     QFileInfo fi(fileName);
     QString fileName_save;
     QString selected_filter;
@@ -1394,13 +1402,8 @@ void MainWindow::display_settings()
         if( settings_window->exec() == QDialog::Accepted )
         {
             // Ok = les variables vont prendre leur valeur en fonction de l'état des widgets de la fenêtre de configuration
-            bool ac_config_is_changed = settings_window->apply_settings();
+            settings_window->apply_settings();
             initialize_active_contour();
-
-            if ( ac_config_is_changed )
-            {
-                //camera_window->do_when_ac_config_changed();
-            }
         }
         else
         {
@@ -1570,6 +1573,8 @@ void MainWindow::infinite_loop()
 // Evénement déplacement souris au niveau de imageLabel pour pouvoir donner les infos pixels
 void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
+    const auto& config = AppSettings::instance();
+
     // si l'image est chargée
     if( img1 != nullptr && img1_filtered != nullptr )
     {
@@ -1659,11 +1664,13 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
 
 void MainWindow::show_phi_list_value()
 {
+    auto& config = AppSettings::instance();
+
     QColor RGBout, RGBin;
     int Cout1, Cin1;
 
-    QColor RGBout_list( config.color_out.get_QRgb() );
-    QColor RGBin_list( config.color_in.get_QRgb() );
+    QColor RGBout_list( get_QRgb(config.color_out) );
+    QColor RGBin_list( get_QRgb(config.color_in) );
 
     QString Cout_str = QString("<font color="+RGBout_list.name()+">"+"Cout"+"<font color=black>"+" = ");
     QString Cin_str = QString("<font color="+RGBin_list.name()+">"+"Cin"+"<font color=black>"+" = ");
@@ -1781,8 +1788,8 @@ void MainWindow::show_phi_list_value()
             positionX < img_width &&
             positionY < img_height )
         {
-            QColor RGBout( config.color_out.get_QRgb() );
-            QColor RGBin( config.color_in.get_QRgb() );
+            QColor RGBout( get_QRgb(config.color_out) );
+            QColor RGBin( get_QRgb(config.color_in) );
 
             if( phi(positionX,positionY) == ofeli_ip::PhiValue::OUTSIDE_REGION )
             {
@@ -2089,21 +2096,15 @@ int MainWindow::get_zoom_factor() const
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+    auto& config = AppSettings::instance();
     QSettings settings;
 
-    settings.setValue( "Main/Window/size", size() );
-    settings.setValue( "Main/Window/position", pos() );
+    settings.setValue( "Main/Window/geometry", saveGeometry() );
     settings.setValue( "Main/Name/last_directory_used", last_directory_used);
-
-    settings_window->save_settings();
-    evaluation_window->save_settings();
-    //camera_window->save_settings();
-    about_window->save_settings();
-    language_window->save_settings();
 
     config.save();
 
-    event->accept();
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::updateCameraAction()

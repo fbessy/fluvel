@@ -45,17 +45,16 @@
 namespace ofeli_gui
 {
 
-AboutWindow::AboutWindow(QWidget* parent,
-                         const Language& language) :
+AboutWindow::AboutWindow(QWidget* parent) :
     QDialog(parent)
 {
     QSettings settings;
 
     setWindowTitle( tr("About Ofeli") );
-    resize( settings.value("About/Window/size", QSize(650, 400)).toSize() );
-    move( settings.value("About/Window/position",
-                         QPoint(200, 200)).toPoint() );
 
+    const auto geo_about = settings.value("About/Window/geometry").toByteArray();
+    if (!geo_about.isEmpty())
+        restoreGeometry(geo_about);
 
 
     ///////////////////////////////////////
@@ -82,7 +81,7 @@ AboutWindow::AboutWindow(QWidget* parent,
     QFont font2;
     font2.setPointSize(12);
     version_label->setFont(font2);
-    version_label->setText("Version 1.0.8");
+    version_label->setText("Version 2.0.0");
     version_label->setAlignment(Qt::AlignCenter);
     version_label->setTextInteractionFlags(Qt::TextSelectableByMouse
                                            | Qt::LinksAccessibleByMouse
@@ -92,7 +91,7 @@ AboutWindow::AboutWindow(QWidget* parent,
     QFont font3;
     font3.setPointSize(12);
     years_label->setFont(font3);
-    years_label->setText("2010-2015");
+    years_label->setText("2010-2025");
     years_label->setAlignment(Qt::AlignCenter);
     years_label->setTextInteractionFlags(Qt::TextSelectableByMouse
                                          | Qt::LinksAccessibleByMouse
@@ -107,6 +106,9 @@ AboutWindow::AboutWindow(QWidget* parent,
 
 
     QString locale = QLocale::system().name().section('_', 0, 0);
+
+    const auto& config = AppSettings::instance();
+    const auto language = config.app_language;
 
     QString txt_file;
     if( language == Language::FRENCH ||
@@ -140,11 +142,10 @@ AboutWindow::AboutWindow(QWidget* parent,
 
     license_window = new QDialog(this);
     license_window->setWindowTitle( tr("License") );
-    license_window->resize(settings.value( "About/License/size",
-                                           QSize(562,351)).toSize() );
 
-    license_window->move(settings.value( "About/License/position",
-                                         QPoint(200, 200)).toPoint() );
+    const auto geo_license = settings.value("About/License/geometry").toByteArray();
+    if (!geo_license.isEmpty())
+        license_window->restoreGeometry(geo_license);
 
     license_window->setLayout(layout_license);
     connect( license, SIGNAL(clicked()), license_window, SLOT(show()) );
@@ -266,14 +267,14 @@ void AboutWindow::open_webpage()
                                     QUrl::TolerantMode) );
 }
 
-void AboutWindow::save_settings() const
+void AboutWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue( "About/Window/size", size() );
-    settings.setValue( "About/Window/position", pos() );
-    settings.setValue( "About/License/size", license_window->size() );
-    settings.setValue( "About/License/position", license_window->pos() );
+    settings.setValue( "About/Window/geometry", saveGeometry() );
+    settings.setValue( "About/License/geometry", license_window->saveGeometry() );
+
+    QDialog::closeEvent(event);
 }
 
 }

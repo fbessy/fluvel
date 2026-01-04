@@ -39,7 +39,7 @@
 
 #include "application_settings.hpp"
 #include "boundary_builder.hpp"
-#include "filters.hpp"
+#include "contour_rendering.hpp"
 
 #include <QSettings>
 
@@ -62,7 +62,7 @@ ApplicationSettings::ApplicationSettings()
     algo_config.Na = settings.value("Settings/Algorithm/Na", 30).toInt();
     algo_config.Ns = settings.value("Settings/Algorithm/Ns", 3).toInt();
 
-    speed = SpeedModel( settings.value("Settings/Algorithm/speed", SpeedModel::REGION_BASED).toUInt() );
+    speed = SpeedModel( settings.value("Settings/Algorithm/speed", SpeedModel::REGION_BASED).toInt() );
 
     region_ac_config.lambda_in = settings.value("Settings/Algorithm/lambda_in", 1).toInt();
     region_ac_config.lambda_out = settings.value("Settings/Algorithm/lambda_out", 1).toInt();
@@ -176,8 +176,8 @@ ApplicationSettings::ApplicationSettings()
 
     has_display_each = settings.value("Settings/Display/has_display_each", true).toBool();
 
-    outside_combo = settings.value("Settings/Display/outside_combo", QComboBoxColorIndex::BLUE).toInt();
-    inside_combo = settings.value("Settings/Display/inside_combo", QComboBoxColorIndex::RED).toInt();
+    outside_combo = settings.value("Settings/Display/outside_combo", ComboBoxColorIndex::BLUE).toInt();
+    inside_combo = settings.value("Settings/Display/inside_combo", ComboBoxColorIndex::RED).toInt();
 
     selected_out.red   = (unsigned char)(settings.value("Settings/Display/Rout_selected", 128).toUInt());
     selected_out.green = (unsigned char)(settings.value("Settings/Display/Gout_selected", 0).toUInt());
@@ -186,7 +186,7 @@ ApplicationSettings::ApplicationSettings()
     selected_in.green  = (unsigned char)(settings.value("Settings/Display/Gin_selected", 128).toUInt());
     selected_in.blue   = (unsigned char)(settings.value("Settings/Display/Bin_selected", 0).toUInt());
 
-    if( outside_combo == QComboBoxColorIndex::SELECTED )
+    if( outside_combo == ComboBoxColorIndex::SELECTED )
     {
         color_out = selected_out;
     }
@@ -195,7 +195,7 @@ ApplicationSettings::ApplicationSettings()
         get_color( outside_combo, color_out );
     }
 
-    if( inside_combo == QComboBoxColorIndex::SELECTED )
+    if( inside_combo == ComboBoxColorIndex::SELECTED )
     {
         color_in = selected_in;
     }
@@ -314,6 +314,92 @@ void ApplicationSettings::save()
 
     settings.setValue("Settings/Display/is_show_fps", is_show_fps);
     settings.setValue("Settings/Display/is_show_mirrored", is_show_mirrored);
+
+    emit settingsApplied();
+}
+
+RuntimeSettings ApplicationSettings::snapshot() const
+{
+    RuntimeSettings rs;
+
+    rs.app_language = app_language;
+
+    rs.algo_config = algo_config;
+    rs.region_ac_config = region_ac_config;
+
+    rs.speed = speed;
+    rs.kernel_gradient_length = kernel_gradient_length;
+
+    rs.downscale_factor = downscale_factor;
+    rs.cycles_nbr = cycles_nbr;
+
+    /////////////////////////////////////////
+
+    rs.phi_width = phi_width;
+    rs.phi_height = phi_height;
+    rs.Lout_init = Lout_init;
+    rs.Lin_init = Lin_init;
+
+    rs.has_ellipse = has_ellipse;
+    rs.init_width = init_width;
+    rs.init_height = init_height;
+    rs.center_x = center_x;
+    rs.center_y = center_y;
+
+    /////////////////////////////////////////
+
+    rs.has_preprocess = has_preprocess;
+
+    rs.has_gaussian_noise = has_gaussian_noise;
+    rs.std_noise = std_noise;
+    rs.has_salt_noise = has_salt_noise;
+    rs.proba_noise = proba_noise;
+    rs.has_speckle_noise = has_speckle_noise;
+    rs.std_speckle_noise = std_speckle_noise;
+
+    rs.has_median_filt = has_median_filt;
+    rs.kernel_median_length = kernel_median_length;
+    rs.has_O1_algo = has_O1_algo;
+    rs.has_mean_filt = has_mean_filt;
+    rs.kernel_mean_length = kernel_mean_length;
+    rs.has_gaussian_filt = has_gaussian_filt;
+    rs.kernel_gaussian_length = kernel_gaussian_length;
+    rs.sigma = sigma;
+
+    rs.has_aniso_diff = has_aniso_diff;
+    rs.aniso_option = aniso_option;
+    rs.max_itera = max_itera;
+    rs.lambda = lambda;
+    rs.kappa = kappa;
+
+    rs.has_open_filt = has_open_filt;
+    rs.kernel_open_length = kernel_open_length;
+    rs.has_close_filt = has_close_filt;
+    rs.kernel_close_length = kernel_close_length;
+    rs.has_top_hat_filt = has_top_hat_filt;
+    rs.is_white_top_hat = is_white_top_hat;
+    rs.kernel_tophat_length = kernel_tophat_length;
+
+    rs.has_O1_morpho = has_O1_morpho;
+
+    /////////////////////////////////////////
+
+    rs.has_histo_normaliz = has_histo_normaliz;
+
+    rs.has_display_each = has_display_each;
+
+    rs.outside_combo = outside_combo;
+    rs.inside_combo = inside_combo;
+
+    rs.color_out = color_out;
+    rs.color_in = color_in;
+    rs.selected_out = selected_out;
+    rs.selected_in = selected_in;
+
+    rs.is_show_fps = is_show_fps;
+    rs.is_show_mirrored = is_show_mirrored;
+
+    return rs;
 }
 
 }

@@ -38,7 +38,7 @@
 ****************************************************************************/
 
 #include "settings_window.hpp"
-#include "windows_tools.hpp"
+#include "contour_rendering.hpp"
 #include "application_settings.hpp"
 
 #include "main_window.hpp"
@@ -58,10 +58,8 @@
 namespace ofeli_gui
 {
 
-SettingsWindow::SettingsWindow(QWidget* parent,
-                               ApplicationSettings& config1) :
+SettingsWindow::SettingsWindow(QWidget* parent) :
     QDialog(parent),
-    config(config1),
     scale_spin(nullptr),
     scale_slider(nullptr),
     filters2(nullptr),
@@ -77,27 +75,9 @@ SettingsWindow::SettingsWindow(QWidget* parent,
 
     QSettings settings;
 
-#ifdef Q_OS_LINUX
-    resize(settings.value("Settings/Window/size",
-                          QSize(550+327,550+60)).toSize());
-    move(settings.value("Settings/Window/position",
-                        QPoint(200, 200)).toPoint());
-#elif Q_OS_MAC
-    resize(settings.value("Settings/Window/size",
-                          QSize(550+477,550+82)).toSize());
-    move(settings.value("Settings/Window/position",
-                        QPoint(200, 200)).toPoint());
-#elif Q_OS_WIN
-    resize(settings.value("Settings/Window/size",
-                          QSize(550+335,550+55)).toSize());
-    move(settings.value("Settings/Window/position",
-                        QPoint(200, 200)).toPoint());
-
-#else
-
-#error OS macro of Qt is not defined.
-
-#endif
+    const auto geo = settings.value("Settings/Window/geometry").toByteArray();
+    if (!geo.isEmpty())
+        restoreGeometry(geo);
 
     scrollArea_settings = new ScrollAreaWidget(this);
     imageLabel_settings = new PixmapWidget(scrollArea_settings);
@@ -173,8 +153,10 @@ SettingsWindow::SettingsWindow(QWidget* parent,
 
     QFormLayout* lambda_layout = new QFormLayout;
 
-    QColor RGBout_list( config.color_out.get_QRgb() );
-    QColor RGBin_list( config.color_in.get_QRgb() );
+    auto& config = AppSettings::instance();
+
+    QColor RGBout_list( get_QRgb(config.color_out) );
+    QColor RGBin_list( get_QRgb(config.color_in) );
 
     lambda_layout->addRow("<font color="+RGBout_list.name()+">"+"λout"+"<font color=black>"+" =", lambda_out_spin);
     lambda_layout->addRow("<font color="+RGBin_list.name()+">"+"λin"+"<font color=black>"+" =", lambda_in_spin);
@@ -1072,6 +1054,8 @@ void SettingsWindow::init(const unsigned char* img0,
             displayed_phi_shape = new ofeli_ip::Matrix<signed char>(img_width,img_height);
         }
 
+        auto& config = AppSettings::instance();
+
         if( config.Lout_init.empty() ||
             config.Lin_init.empty() ||
             config.phi_width  <= 0 ||
@@ -1286,8 +1270,10 @@ void SettingsWindow::update_visu()
     }
 }
 
-bool SettingsWindow::apply_settings()
+void SettingsWindow::apply_settings()
 {
+    auto& config = AppSettings::instance();
+
     bool is_ac_config_changed = false;
 
     ///////////////////////////////////
@@ -1432,7 +1418,7 @@ bool SettingsWindow::apply_settings()
     config.selected_out = selected_out_disp;
 
 
-    if( config.outside_combo == QComboBoxColorIndex::SELECTED )
+    if( config.outside_combo == ComboBoxColorIndex::SELECTED )
     {
         config.color_out = config.selected_out;
     }
@@ -1442,7 +1428,7 @@ bool SettingsWindow::apply_settings()
                  config.color_out);
     }
 
-    if( config.inside_combo == QComboBoxColorIndex::SELECTED )
+    if( config.inside_combo == ComboBoxColorIndex::SELECTED )
     {
         config.color_in = config.selected_in;
     }
@@ -1455,13 +1441,16 @@ bool SettingsWindow::apply_settings()
     config.is_show_fps = fps_checkbox->isChecked();
     config.is_show_mirrored = mirrored_checkbox->isChecked();
 
-    return is_ac_config_changed;
+    // for data persistence
+    config.save();
 }
 
 // si on clique sur le boutton Cancel de settings_window
 // les widgets reprennent leur état, correspondant aux valeurs des paramètres
 void SettingsWindow::cancel_settings()
 {
+    const auto& config = AppSettings::instance();
+
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
@@ -1623,7 +1612,7 @@ void SettingsWindow::cancel_settings()
 
     RgbColor color;
 
-    if( config.inside_combo == QComboBoxColorIndex::SELECTED )
+    if( config.inside_combo == ComboBoxColorIndex::SELECTED )
     {
         color = selected_in_disp;
     }
@@ -1633,10 +1622,10 @@ void SettingsWindow::cancel_settings()
                   color);
     }
     QPixmap pm1(12,12);
-    pm1.fill( QColor( color.get_QRgb() ) );
-    insidecolor_combobox->setItemIcon(QComboBoxColorIndex::SELECTED,pm1);
+    pm1.fill( QColor( get_QRgb(color) ) );
+    insidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm1);
 
-    if( config.outside_combo == QComboBoxColorIndex::SELECTED )
+    if( config.outside_combo == ComboBoxColorIndex::SELECTED )
     {
         color = selected_out_disp;
     }
@@ -1646,8 +1635,8 @@ void SettingsWindow::cancel_settings()
                   color);
     }
     QPixmap pm2(12,12);
-    pm2.fill( QColor( color.get_QRgb() ) );
-    outsidecolor_combobox->setItemIcon(QComboBoxColorIndex::SELECTED,pm2);
+    pm2.fill( QColor( get_QRgb(color) ) );
+    outsidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm2);
 
 
     fps_checkbox->setChecked(config.is_show_fps);
@@ -1755,8 +1744,8 @@ void SettingsWindow::default_settings()
     histo_checkbox->setChecked( true );
     step_checkbox->setChecked( true );
 
-    outsidecolor_combobox->setCurrentIndex( QComboBoxColorIndex::BLUE );
-    insidecolor_combobox->setCurrentIndex( QComboBoxColorIndex::RED );
+    outsidecolor_combobox->setCurrentIndex( ComboBoxColorIndex::BLUE );
+    insidecolor_combobox->setCurrentIndex( ComboBoxColorIndex::RED );
 
     fps_checkbox->setChecked( true );
     mirrored_checkbox->setChecked( true );
@@ -1796,14 +1785,14 @@ void SettingsWindow::shape_visu()
         }
 
         // efface les listes de la QImage
-        if( outsidecolor_combobox->currentIndex() != QComboBoxColorIndex::NO )
+        if( outsidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
         {
             erase_list_to_img( Lout_shape11,
                                image_phi_uchar,
                                image_shape_uchar );
         }
 
-        if( insidecolor_combobox->currentIndex() != QComboBoxColorIndex::NO )
+        if( insidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
         {
             erase_list_to_img( Lin_shape11,
                                image_phi_uchar,
@@ -2019,7 +2008,7 @@ void SettingsWindow::phi_visu(bool dark_color)
     if(      image_phi_uchar != nullptr
         && image_shape_uchar != nullptr )
     {
-        if( outsidecolor_combobox->currentIndex() == QComboBoxColorIndex::SELECTED )
+        if( outsidecolor_combobox->currentIndex() == ComboBoxColorIndex::SELECTED )
         {
             color_out_disp = selected_out_disp;
         }
@@ -2029,7 +2018,7 @@ void SettingsWindow::phi_visu(bool dark_color)
                       color_out_disp);
         }
 
-        if( insidecolor_combobox->currentIndex() == QComboBoxColorIndex::SELECTED )
+        if( insidecolor_combobox->currentIndex() == ComboBoxColorIndex::SELECTED )
         {
             color_in_disp = selected_in_disp;
         }
@@ -2049,7 +2038,7 @@ void SettingsWindow::phi_visu(bool dark_color)
             color_factor = 1;
         }
 
-        if( outsidecolor_combobox->currentIndex() != QComboBoxColorIndex::NO )
+        if( outsidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
         {
             draw_list_to_img1_img2( Lout33,
                                     color_out_disp.divide( color_factor ),
@@ -2058,7 +2047,7 @@ void SettingsWindow::phi_visu(bool dark_color)
                                     image_shape_uchar );
         }
 
-        if( insidecolor_combobox->currentIndex() != QComboBoxColorIndex::NO )
+        if( insidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
         {
             draw_list_to_img1_img2( Lin33,
                                     color_in_disp.divide( color_factor ),
@@ -2122,9 +2111,9 @@ void SettingsWindow::set_color_out()
 
         QPixmap pm(12,12);
         pm.fill(color_out);
-        outsidecolor_combobox->setItemIcon(QComboBoxColorIndex::SELECTED,pm);
+        outsidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
 
-        outsidecolor_combobox->setCurrentIndex(QComboBoxColorIndex::SELECTED);
+        outsidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
     }
     // affichage de l'image avec la nouvelle couleur sélectionnée
     phi_visu(false);
@@ -2145,9 +2134,9 @@ void SettingsWindow::set_color_in()
 
         QPixmap pm(12,12);
         pm.fill(color_in);
-        insidecolor_combobox->setItemIcon(QComboBoxColorIndex::SELECTED,pm);
+        insidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
 
-        insidecolor_combobox->setCurrentIndex(QComboBoxColorIndex::SELECTED);
+        insidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
     }
     // affichage de l'image avec la nouvelle couleur sélectionnée
     phi_visu(false);
@@ -2155,6 +2144,8 @@ void SettingsWindow::set_color_in()
 
 const unsigned char* SettingsWindow::get_filtered_img_data()
 {
+    const auto& config = AppSettings::instance();
+
     if(    config.has_preprocess
         && ( config.has_gaussian_noise || config.has_salt_noise || config.has_speckle_noise ) )
     {
@@ -3370,12 +3361,13 @@ void SettingsWindow::do_flood_fill(ofeli_ip::Matrix<signed char>& phi, int offse
     }
 }
 
-void SettingsWindow::save_settings() const
+void SettingsWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("Settings/Window/size", size());
-    settings.setValue("Settings/Window/position", pos());
+    settings.setValue( "Settings/Window/geometry", saveGeometry() );
+
+    QDialog::closeEvent(event);
 }
 
 }

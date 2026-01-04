@@ -38,25 +38,22 @@
 ****************************************************************************/
 
 #include "language_window.hpp"
+
 #include <QtWidgets>
 
 namespace ofeli_gui
 {
 
-LanguageWindow::LanguageWindow(QWidget* parent,
-                               Language& language1) :
+LanguageWindow::LanguageWindow(QWidget* parent) :
     QDialog(parent),
-    language(language1)
+    language(AppSettings::instance().app_language)
 {
     setWindowTitle( tr("Language") );
 
     QSettings settings;
-
-    resize( settings.value("Language/Window/size",
-                           QSize(250, 250)).toSize() );
-
-    move( settings.value("Language/Window/position",
-                         QPoint(200, 200)).toPoint() );
+    const auto geo = settings.value("Language/Window/geometry").toByteArray();
+    if (!geo.isEmpty())
+        restoreGeometry(geo);
 
     list_widget = new QListWidget(this);
 
@@ -98,12 +95,12 @@ void LanguageWindow::cancel_setting()
     list_widget->setCurrentRow( language );
 }
 
-void LanguageWindow::save_settings() const
+void LanguageWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
+    settings.setValue("Language/Window/geometry", saveGeometry());
 
-    settings.setValue( "Language/Window/size", size() );
-    settings.setValue( "Language/Window/position", pos() );
+    QDialog::closeEvent(event);
 }
 
 

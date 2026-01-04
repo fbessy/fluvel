@@ -37,8 +37,9 @@
 **
 ****************************************************************************/
 
-#include "windows_tools.hpp"
+#include "contour_rendering.hpp"
 #include "contour_data.hpp"
+#include "common_settings.hpp"
 
 namespace ofeli_gui
 {
@@ -48,51 +49,51 @@ void get_color(int index,
 {
     switch( index )
     {
-    case QComboBoxColorIndex::RED :
+    case ComboBoxColorIndex::RED :
         color.red   = 255;
         color.green = 0;
         color.blue  = 0;
         break;
 
-    case QComboBoxColorIndex::GREEN :
+    case ComboBoxColorIndex::GREEN :
         color.red   = 0;
         color.green = 255;
         color.blue  = 0;
         break;
 
-    case QComboBoxColorIndex::BLUE :
+    case ComboBoxColorIndex::BLUE :
         color.red   = 0;
         color.green = 0;
         color.blue  = 255;
         break;
 
-    case QComboBoxColorIndex::CYAN :
+    case ComboBoxColorIndex::CYAN :
         color.red   = 0;
         color.green = 255;
         color.blue  = 255;
         break;
 
-    case QComboBoxColorIndex::MAGENTA :
+    case ComboBoxColorIndex::MAGENTA :
         color.red   = 255;
         color.green = 0;
         color.blue  = 255;
         break;
 
-    case QComboBoxColorIndex::YELLOW :
+    case ComboBoxColorIndex::YELLOW :
         color.red   = 255;
         color.green = 255;
         color.blue  = 0;
         break;
 
-    case QComboBoxColorIndex::BLACK :
-    case QComboBoxColorIndex::NO :
+    case ComboBoxColorIndex::BLACK :
+    case ComboBoxColorIndex::NO :
     default :
         color.red   = 0;
         color.green = 0;
         color.blue  = 0;
         break;
 
-    case QComboBoxColorIndex::WHITE :
+    case ComboBoxColorIndex::WHITE :
         color.red   = 255;
         color.green = 255;
         color.blue  = 255;
@@ -111,7 +112,7 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
            && img_rgb32_width > 0
            && img_rgb32_height >0 );
 
-    if( combobox_index != QComboBoxColorIndex::NO )
+    if( combobox_index != ComboBoxColorIndex::NO )
     {
         int offset;
 
@@ -139,7 +140,7 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
     if (    upscale_factor == 2
          || upscale_factor == 4 )
     {
-        if ( combobox_index != QComboBoxColorIndex::NO )
+        if ( combobox_index != ComboBoxColorIndex::NO )
         {
             int offset;
             int x, y;
@@ -277,6 +278,13 @@ void erase_list_to_img_grayscale(const std::vector<ofeli_ip::ContourPoint>& list
         img_rgb_data[ 4*offset+1 ] = intensity;
         img_rgb_data[ 4*offset   ] = intensity;
     }
+}
+
+QRgb get_QRgb(RgbColor col)
+{
+    return qRgb(int(col.red),
+                int(col.green),
+                int(col.blue));
 }
 
 }

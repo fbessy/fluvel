@@ -40,6 +40,7 @@
 #include "camera_window.hpp"
 #include "frame_clock.hpp"
 
+#include <QSettings>
 #include <QMediaDevices>
 
 #include <QVBoxLayout>
@@ -51,8 +52,8 @@
 namespace ofeli_gui
 {
 
-CameraWindow::CameraWindow(QWidget* parent, const ApplicationSettings& config1)
-    : QDialog(parent), config(config1),
+CameraWindow::CameraWindow(QWidget* parent)
+    : QDialog(parent),
     cameraSelector(nullptr),
     labels(nullptr),
     blackLabel(nullptr),
@@ -66,6 +67,13 @@ CameraWindow::CameraWindow(QWidget* parent, const ApplicationSettings& config1)
     statsTimer(nullptr),
     lastFrameReceiveTs(0)
 {
+    setWindowTitle( tr("Camera") );
+
+    QSettings settings;
+    const auto geo = settings.value("Camera/Window/geometry").toByteArray();
+    if (!geo.isEmpty())
+        restoreGeometry(geo);
+
     blackLabel = new QLabel(this);
     blackLabel->setAlignment(Qt::AlignCenter);
     QImage blackImage(640, 480, QImage::Format_RGB32);
@@ -124,7 +132,7 @@ void CameraWindow::startCamera(const QCameraDevice& device)
         captureSession->setVideoSink(videoSink);
         camera->start();
 
-        ac_thread = new VideoActiveContourThread(this, config);
+        ac_thread = new VideoActiveContourThread(this);
 
         connect(videoSink, &QVideoSink::videoFrameChanged,
                 this, [this](const QVideoFrame& frame)
@@ -257,12 +265,6 @@ void CameraWindow::stopCamera()
     labels->setCurrentIndex(0);
 }
 
-void CameraWindow::closeEvent(QCloseEvent *event)
-{
-    stopCamera();
-    event->accept();
-}
-
 void CameraWindow::updateStatsUi()
 {
     FrameStats::Snapshot snap = frameStats.snapshot();
@@ -275,5 +277,15 @@ void CameraWindow::updateStatsUi()
     videoView->setMaxLatencyMs(snap.maxLatencyMs);
 }
 
+void CameraWindow::closeEvent(QCloseEvent* event)
+{
+    stopCamera();
+
+    QSettings settings;
+
+    settings.setValue( "Camera/Window/geometry", saveGeometry() );
+
+    QDialog::closeEvent(event);
+}
 
 }

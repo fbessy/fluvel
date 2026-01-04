@@ -62,7 +62,7 @@ class CameraWindow : public QDialog
 {
     Q_OBJECT
 public:
-    explicit CameraWindow(QWidget* parent, const ApplicationSettings& config1);
+    explicit CameraWindow(QWidget* parent);
     ~CameraWindow();
 
 private slots:
@@ -75,9 +75,7 @@ private:
     void startCamera(const QCameraDevice& device);
     void stopCamera();
 
-    void closeEvent(QCloseEvent *event) override;
-
-    const ApplicationSettings& config;
+    virtual void closeEvent(QCloseEvent* event) override;
 
     QComboBox* cameraSelector;
     QStackedWidget* labels;

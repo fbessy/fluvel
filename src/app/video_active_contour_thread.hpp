@@ -6,7 +6,7 @@
 #include <QWaitCondition>
 #include <QVideoFrame>
 #include "frame_stats.hpp"
-#include "application_settings.hpp"
+#include "runtime_settings.hpp"
 
 namespace ofeli_gui {
 
@@ -19,7 +19,7 @@ class VideoActiveContourThread : public QThread
 {
     Q_OBJECT
 public:
-    VideoActiveContourThread(QObject* parent, const ApplicationSettings& config);
+    VideoActiveContourThread(QObject* parent);
 
     void submitFrame(const QVideoFrame& frame);
     void stop();
@@ -32,6 +32,9 @@ protected:
     void run() override;
 
 private:
+
+    RuntimeSettings runtime_settings;
+
     QImage processFrame(QVideoFrame& frame, qint64& processTs);
 
     QMutex frameMutex;
@@ -39,10 +42,12 @@ private:
     FrameData lastFrameData;
     bool frameAvailable;
     bool running;
-
-    ApplicationSettings config;
+    bool configChanged;
 
     std::unique_ptr<ofeli_ip::RegionColorAc> region_ac;
+
+private slots:
+    void reloadSettings();
 };
 
 } // namespace ofeli_gui

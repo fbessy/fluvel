@@ -37,51 +37,16 @@
 **
 ****************************************************************************/
 
-#ifndef WINDOWS_TOOLS_HPP
-#define WINDOWS_TOOLS_HPP
+#ifndef CONTOUR_RENDERING_H
+#define CONTOUR_RENDERING_H
 
 #include "contour_data.hpp"
+#include "common_settings.hpp"
 #include <QRgb>
 #include <QImage>
 
 namespace ofeli_gui
 {
-
-struct RgbColor
-{
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-
-    QRgb get_QRgb() { return qRgb(int(red),
-                                  int(green),
-                                  int(blue)); }
-
-    RgbColor divide(unsigned char n)
-    {
-        RgbColor tmp;
-
-        tmp.red = red / n;
-        tmp.green = green / n;
-        tmp.blue = blue / n;
-
-        return tmp;
-    }
-};
-
-enum QComboBoxColorIndex : int
-{
-    RED = 0,
-    GREEN,
-    BLUE,
-    CYAN,
-    MAGENTA,
-    YELLOW,
-    BLACK,
-    WHITE,
-    SELECTED,
-    NO
-};
 
 void get_color(int index,
                RgbColor& color);
@@ -118,6 +83,8 @@ void erase_list_to_img_grayscale(const std::vector<ofeli_ip::ContourPoint>& list
                                  const unsigned char* img_grayscale_to_copy,
                                  unsigned char* img_rgb_data);
 
+QRgb get_QRgb(RgbColor col);
+
 }
 
-#endif // WINDOWS_TOOLS_HPP
+#endif // CONTOUR_RENDERING_H

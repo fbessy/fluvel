@@ -130,7 +130,7 @@ int main( int argc, char* argv[] )
 
     ofeli_gui::FrameClock::init();
 
-    ofeli_gui::ApplicationSettings config;
+    const auto& config = ofeli_gui::AppSettings::instance();
     ofeli_gui::Language language = config.app_language;
 
     static QTranslator translator_qt;
@@ -158,27 +158,13 @@ int main( int argc, char* argv[] )
         app.installTranslator(&translator_qt);
     }
 
-    qDebug() << "Exists ?"
-             << QFile::exists(":/i18n/Ofeli_fr.qm")
-             << QFile::exists(":/i18n/Ofeli_en.qm");
-
-    qDebug() << "Exists ?"
-             << QFile::exists(":/i18n/Ofeli_fr.qm");
-    qDebug() << locale;
-
-    // Traductions Ofeli
-    if (translator_ofeli.load(":/i18n/Ofeli_fr.qm"))
-    {
-        app.installTranslator(&translator_ofeli);
-    }
-/*
     // Traductions Ofeli
     if (translator_ofeli.load(QString(":/i18n/Ofeli_%1.qm").arg(locale)))
     {
         app.installTranslator(&translator_ofeli);
-    }*/
+    }
 
-    ofeli_gui::MainWindow mainWindow( config );
+    ofeli_gui::MainWindow mainWindow;
     mainWindow.show();
 
     return app.exec();

@@ -20,8 +20,7 @@ class LanguageWindow : public QDialog
 public :
 
     //! A parametric constructor with a pointer on the QWidget parent.
-    LanguageWindow(QWidget* parent,
-                   Language& language1);
+    LanguageWindow(QWidget* parent);
 
     //! Save window size and position.
     void apply_setting();
@@ -29,10 +28,9 @@ public :
     //! Restores the current row of #list_widget from #selected_index.
     void cancel_setting();
 
-    //! This function is called by the the #main_window close event in order to save persistent settings (window size, position, etc...) of #language_window.
-    void save_settings() const;
-
 private :
+
+    virtual void closeEvent(QCloseEvent* event) override;
 
     Language& language;
 

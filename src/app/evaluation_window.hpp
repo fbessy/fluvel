@@ -60,15 +60,13 @@ public :
     //! A parametric constructor with a pointer on the QWidget parent.
     EvaluationWindow(QWidget* parent);
 
-    //! This function is called by the the #main_window close event in order to save persistent settings (window size, position, etc...) of #evaluation_window.
-    void save_settings() const;
-
 public slots :
 
     void check_lists();
 
 private :
 
+    virtual void closeEvent(QCloseEvent* event) override;
     void calculate_shapes_intersection();
 
     EvaluationWidget* widget1;

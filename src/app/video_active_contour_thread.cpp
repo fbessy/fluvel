@@ -1,12 +1,25 @@
 #include "video_active_contour_thread.hpp"
 #include "image_adapters.hpp"
 #include "frame_clock.hpp"
+#include "application_settings.hpp"
+#include "contour_rendering.hpp"
 
 namespace ofeli_gui {
 
-VideoActiveContourThread::VideoActiveContourThread(QObject* parent, const ApplicationSettings& config1)
-    : QThread(parent), config(config1), frameAvailable(false), running(true)
+VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
+    : QThread(parent),
+    runtime_settings(AppSettings::instance().snapshot()),
+    frameAvailable(false),
+    running(true),
+    configChanged(false)
 {
+    QObject::connect(
+        &AppSettings::instance(),
+        &ApplicationSettings::settingsApplied,
+        this,
+        &VideoActiveContourThread::reloadSettings,
+        Qt::QueuedConnection
+        );
 }
 
 void VideoActiveContourThread::submitFrame(const QVideoFrame& frame)
@@ -57,6 +70,8 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
     QImage result = frame.toImage().convertToFormat(QImage::Format_RGB32);
 
+    const auto& config = runtime_settings;
+
     if (!result.isNull())
     {
         if (config.is_show_mirrored)
@@ -73,19 +88,21 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         auto img_algo = image32_view_from_qimage(q_img_algo);
 
-        if ( !region_ac || region_ac->get_phi().get_width() != img_algo.get_width()
-             || region_ac->get_phi().get_height() != img_algo.get_height())
+        if ( !region_ac || configChanged )
         {
-            region_ac.reset(new ofeli_ip::RegionColorAc(img_algo,
-                                                        ofeli_ip::ContourData(img_algo.get_width(), img_algo.get_height()),
-                                                        config.algo_config,
-                                                        config.region_ac_config));
+            region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
+                                                                  ofeli_ip::ContourData(img_algo.get_width(), img_algo.get_height()),
+                                                                  config.algo_config,
+                                                                  config.region_ac_config);
+
+            configChanged = false;
         }
         else
         {
             region_ac->reinitialize(img_algo);
-            region_ac->evolve_n_cycles(config.cycles_nbr);
         }
+
+        region_ac->evolve_n_cycles(config.cycles_nbr);
 
         if (region_ac)
         {
@@ -113,6 +130,12 @@ void VideoActiveContourThread::stop()
     QMutexLocker locker(&frameMutex);
     running = false;
     condition.wakeAll();
+}
+
+void VideoActiveContourThread::reloadSettings()
+{
+    runtime_settings = AppSettings::instance().snapshot();
+    configChanged = true;
 }
 
 } // namespace ofeli_gui

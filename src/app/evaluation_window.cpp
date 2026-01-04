@@ -58,10 +58,9 @@ EvaluationWindow::EvaluationWindow(QWidget* parent) :
 
     setWindowTitle(tr("Evaluation : input"));
 
-    move(settings.value( "Evaluation/Window/position",
-                         QPoint(200, 200)).toPoint() );
-    resize(settings.value( "Evaluation/Window/size",
-                           QSize(665,542)).toSize() );
+    const auto geo = settings.value("Evaluation/Window/geometry").toByteArray();
+    if (!geo.isEmpty())
+        restoreGeometry(geo);
 
     ///////////////////////////////////////////////////////////////
     ///          Input evaluation QDialog window (this)         ///
@@ -289,15 +288,16 @@ void EvaluationWindow::calculate_shapes_intersection()
     }
 }
 
-void EvaluationWindow::save_settings() const
+void EvaluationWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("Evaluation/Window/size", size());
-    settings.setValue("Evaluation/Window/position", pos());
+    settings.setValue( "Evaluation/Window/geometry", saveGeometry() );
 
     widget1->save_settings();
     widget2->save_settings();
+
+    QDialog::closeEvent(event);
 }
 
 }

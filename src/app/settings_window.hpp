@@ -47,7 +47,7 @@
 #include "scroll_area_widget.hpp"
 #include "qspinbox_kernel.hpp"
 #include "matrix.hpp"
-#include "windows_tools.hpp"
+#include "contour_rendering.hpp"
 #include "contour_data.hpp"
 
 #include <QtWidgets>
@@ -70,8 +70,7 @@ class SettingsWindow : public QDialog
 
 public :
 
-    SettingsWindow(QWidget* parent,
-                   ApplicationSettings& config1);
+    SettingsWindow(QWidget* parent);
 
     void init(const unsigned char* img0,
               int img0_width,
@@ -82,17 +81,15 @@ public :
     // elles sont appeles apres fermeture de la fenêtre modale, fenêtre modale qui apparait grace a la methode exec()
     // la methode exec() renvoie un booléen en fonction de Ok ou Cancel
     // clic Ok
-    bool apply_settings();
+    void apply_settings();
     // clic Cancel
     void cancel_settings();
 
-    //! This function is called by the the #main_window close event in order to save persistent settings (window size, position, etc... ) of #settings_window.
-    void save_settings() const;
     const unsigned char* get_filtered_img_data();
 
 private :
 
-    ApplicationSettings& config;
+    virtual void closeEvent(QCloseEvent* event) override;
 
     //////////////////////////////////////////
     //   pour la fenêtre de configuration   //

@@ -81,7 +81,7 @@ class MainWindow : public QMainWindow
 
 public :
 
-    MainWindow(ApplicationSettings& config);
+    MainWindow();
     void set_zoom_factor(int val);
     int get_zoom_factor() const;
 
@@ -129,8 +129,6 @@ private :
 
     QAction* startCameraAction = nullptr;
     QMediaDevices* mediaDevices = nullptr;
-
-    ApplicationSettings& config;
 
     PixmapWidget* imageLabel;
     ScrollAreaWidget* scrollArea;

@@ -43,34 +43,25 @@
 #include "active_contour.hpp"
 #include "region_color_ac.hpp"
 #include "filters.hpp"
-#include "list_i.hpp"
-#include "windows_tools.hpp"
+#include "runtime_settings.hpp"
+
+#include <QObject>
 
 namespace ofeli_gui
 {
 
-enum SpeedModel : unsigned int
-{
-    REGION_BASED = 0,  // Chan-Vese model
-    EDGE_BASED         // Geodesic model
-};
-
-enum Language : int
-{
-    SYSTEM = 0,
-    ENGLISH,
-    FRENCH
-};
-
 //! This structure contains all the configuration of the application.
-struct ApplicationSettings
+class ApplicationSettings : public QObject
 {
+    Q_OBJECT
+
 public:
 
     ApplicationSettings();
     virtual ~ApplicationSettings();
 
     void save();
+    RuntimeSettings snapshot() const;
 
     Language app_language;
 
@@ -148,6 +139,19 @@ public:
 
     bool is_show_fps;
     bool is_show_mirrored;
+
+signals:
+    void settingsApplied();
+};
+
+class AppSettings
+{
+public:
+    static ApplicationSettings& instance()
+    {
+        static ApplicationSettings settings;
+        return settings;
+    }
 };
 
 }

@@ -257,7 +257,7 @@ void EvaluationWidget::open_img()
 
 void EvaluationWidget::refresh_rgb(int color_list_index)
 {
-    if ( color_list_index == QComboBoxColorIndex::SELECTED )
+    if ( color_list_index == ComboBoxColorIndex::SELECTED )
     {
         rgb = selected;
     }
@@ -440,11 +440,11 @@ void EvaluationWidget::mousePressEvent(QMouseEvent*)
         pm.fill( QColor( selected.red,
                          selected.green,
                          selected.blue ) );
-        color_list->setItemIcon(QComboBoxColorIndex::SELECTED,pm);
+        color_list->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
 
-        color_list->setCurrentIndex(QComboBoxColorIndex::SELECTED);
+        color_list->setCurrentIndex(ComboBoxColorIndex::SELECTED);
 
-        refresh_rgb( int(QComboBoxColorIndex::SELECTED) );
+        refresh_rgb( int(ComboBoxColorIndex::SELECTED) );
     }
 }
 
@@ -513,11 +513,11 @@ void EvaluationWidget::get_list_color()
 
         QPixmap pm(12,12);
         pm.fill(color);
-        color_list->setItemIcon(QComboBoxColorIndex::SELECTED,pm);
+        color_list->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
 
-        color_list->setCurrentIndex(QComboBoxColorIndex::SELECTED);
+        color_list->setCurrentIndex(ComboBoxColorIndex::SELECTED);
 
-        refresh_rgb( int(QComboBoxColorIndex::SELECTED) );
+        refresh_rgb( int(ComboBoxColorIndex::SELECTED) );
     }
 }
 

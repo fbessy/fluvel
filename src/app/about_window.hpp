@@ -53,13 +53,11 @@ class AboutWindow : public QDialog
 public :
 
     //! A parametric constructor with a pointer on the QWidget parent.
-    AboutWindow(QWidget* parent,
-                const Language& language);
-
-    //! This function is called by the the #main_window close event in order to save persistent settings (window size, position, etc... ) of #about_window.
-    void save_settings() const;
+    AboutWindow(QWidget* parent);
 
 private :
+
+    virtual void closeEvent(QCloseEvent* event) override;
 
     //! A subwindow with the license application, displayed when the user clicks on the license button.
     QDialog* license_window;

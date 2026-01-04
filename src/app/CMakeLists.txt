@@ -20,11 +20,13 @@ set(app_src
 
     "language_window.cpp" "language_window.hpp"
     "about_window.cpp" "about_window.hpp"
+
+    "contour_rendering.cpp" "contour_rendering.hpp"
+
     "application_settings.cpp" "application_settings.hpp"
-
-    "windows_tools.cpp" "windows_tools.hpp"
-
+    "runtime_settings.cpp" "runtime_settings.hpp"
     "image_adapters.hpp"
+    "common_settings.hpp"
 )
 
 if(APPLE)
