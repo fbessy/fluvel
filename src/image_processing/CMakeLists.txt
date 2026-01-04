@@ -11,7 +11,7 @@ set(IP_SRC
     "filters.cpp" "filters.hpp"
     "shape.cpp" "shape.hpp"
     "matrix.txx" "matrix.hpp"
-    "list_i.cpp" "list_i.hpp"
+
     "image_views.cpp" "image_views.hpp"
     "point.hpp"
 )
