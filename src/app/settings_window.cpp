@@ -1020,7 +1020,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     scale_spin->setValue(settings.value("Settings/Display/zoom_factor", 100).toInt());
     imageLabel_settings->set_zoomFactor(float(scale_spin->value())/100.0f);
 
-    cancel_settings();
+    reject();
     scrollArea_settings->setFocus(Qt::OtherFocusReason);
 }
 
@@ -1254,7 +1254,7 @@ void SettingsWindow::update_visu()
 {
     if( parent() != nullptr )
     {
-        scale_spin->setValue(static_cast<MainWindow*>(parent())->get_zoom_factor());
+        //scale_spin->setValue(static_cast<MainWindow*>(parent())->get_zoom_factor());
 
         if( tabs->currentIndex() == TabIndex::INITIALIZATION )
         {
@@ -1270,7 +1270,7 @@ void SettingsWindow::update_visu()
     }
 }
 
-void SettingsWindow::apply_settings()
+void SettingsWindow::accept()
 {
     auto& config = AppSettings::instance();
 
@@ -1405,7 +1405,7 @@ void SettingsWindow::apply_settings()
 
     if( parent() != nullptr )
     {
-        static_cast<MainWindow*>(parent())->set_zoom_factor(scale_spin->value());
+        //static_cast<MainWindow*>(parent())->set_zoom_factor(scale_spin->value());
     }
 
     config.has_histo_normaliz = histo_checkbox->isChecked();
@@ -1443,11 +1443,13 @@ void SettingsWindow::apply_settings()
 
     // for data persistence
     config.save();
+
+    QDialog::accept();
 }
 
 // si on clique sur le boutton Cancel de settings_window
 // les widgets reprennent leur état, correspondant aux valeurs des paramètres
-void SettingsWindow::cancel_settings()
+void SettingsWindow::reject()
 {
     const auto& config = AppSettings::instance();
 
@@ -1598,7 +1600,7 @@ void SettingsWindow::cancel_settings()
 
     if( parent() != nullptr )
     {
-        scale_spin->setValue(static_cast<MainWindow*>(parent())->get_zoom_factor());
+        //scale_spin->setValue(static_cast<MainWindow*>(parent())->get_zoom_factor());
     }
 
     histo_checkbox->setChecked(config.has_histo_normaliz);
@@ -1644,6 +1646,8 @@ void SettingsWindow::cancel_settings()
 
     calculate_filtered_copy_visu_buffers();
     tab_visu( tabs->currentIndex() );
+
+    QDialog::reject();
 }
 
 void SettingsWindow::default_settings()

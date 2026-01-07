@@ -85,32 +85,72 @@ void ImageViewBase::flushPendingFrame()
 
 void ImageViewBase::updatePixmap(const QImage& img)
 {
+    bool needUpdateDragMode = false;
+
+    if( lastDisplayedImage.width()  != img.width() ||
+        lastDisplayedImage.height() != img.height()   )
+    {
+        needUpdateDragMode = true;
+    }
+
     lastDisplayedImage = img;
 
     const bool firstFrame = (pixmapItem == nullptr);
 
-    if (!pixmapItem) {
+    if (!pixmapItem)
+    {
         pixmapItem = scene->addPixmap(QPixmap::fromImage(img));
-    } else {
+    }
+    else
+    {
         pixmapItem->setPixmap(QPixmap::fromImage(img));
     }
 
     scene->setSceneRect(pixmapItem->boundingRect());
 
-    if (firstFrame || autoViewEnabled) {
-        resetTransform();
-        currentZoom = 1.0;
-        fitInView(pixmapItem, Qt::KeepAspectRatio);
+    if (firstFrame || autoViewEnabled)
+    {
+        applyAutoView();
+        needUpdateDragMode = true;
+    }
+
+    if( needUpdateDragMode )
+    {
         updateDragMode();
     }
 }
 
+void ImageViewBase::applyAutoView()
+{
+    if (!pixmapItem)
+        return;
+
+    resetTransform();
+    fitInView(pixmapItem, Qt::KeepAspectRatio);
+}
+
 void ImageViewBase::updateDragMode()
 {
-    if (autoViewEnabled)
+    if ( !scene )
+        return;
+
+    if ( autoViewEnabled )
+    {
         setDragMode(QGraphicsView::NoDrag);
+    }
     else
-        setDragMode(QGraphicsView::ScrollHandDrag);
+    {
+        QRectF sceneRect = scene->sceneRect();
+        QRectF viewRect  = mapToScene(viewport()->rect()).boundingRect();
+
+        bool canPan =
+            sceneRect.width()  > viewRect.width() ||
+            sceneRect.height() > viewRect.height();
+
+        setDragMode(canPan
+                        ? QGraphicsView::ScrollHandDrag
+                        : QGraphicsView::NoDrag);
+    }
 }
 
 // ------------------------------------------------------------
@@ -126,11 +166,12 @@ void ImageViewBase::wheelEvent(QWheelEvent* event)
                         ? zoomFactor
                         : 1.0 / zoomFactor;
 
+    double currentZoom = getCurrentZoom();
     double newZoom = currentZoom * factor;
+
     if (newZoom < minZoom || newZoom > maxZoom)
         return;
 
-    currentZoom = newZoom;
     scale(factor, factor);
 
     QPointF scenePosAfter = mapToScene(event->position().toPoint());
@@ -139,22 +180,21 @@ void ImageViewBase::wheelEvent(QWheelEvent* event)
 
     autoViewEnabled = false;
 
-    if (currentZoom > 1.01)
-        setDragMode(QGraphicsView::ScrollHandDrag);
-    else
-        setDragMode(QGraphicsView::NoDrag);
+    updateDragMode();
+
+    qDebug()
+        << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
+        << "zoom =" << currentZoom
+        << " new zoom =" << newZoom
+        << "delta =" << delta.x() << delta.y();
 }
 
 void ImageViewBase::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::MiddleButton) {
         autoViewEnabled = true;
-        resetTransform();
-        currentZoom = 1.0;
 
-        if (pixmapItem)
-            fitInView(pixmapItem, Qt::KeepAspectRatio);
-
+        applyAutoView();
         updateDragMode();
 
         event->accept();
@@ -168,15 +208,20 @@ void ImageViewBase::mouseDoubleClickEvent(QMouseEvent* event)
 {
     Q_UNUSED(event);
 
-    if (!isFullScreenMode) {
+    if (!isFullScreenMode)
+    {
         normalGeometry = geometry();
         normalWindowFlags = windowFlags();
 
         setWindowFlags(Qt::Window);
         showFullScreen();
         isFullScreenMode = true;
+
+        autoViewEnabled = true;
+        applyAutoView();
     }
-    else {
+    else
+    {
         setWindowFlags(normalWindowFlags);
         showNormal();
 
@@ -186,18 +231,24 @@ void ImageViewBase::mouseDoubleClickEvent(QMouseEvent* event)
 
         isFullScreenMode = false;
     }
+
+    updateDragMode();
 }
 
 void ImageViewBase::resizeEvent(QResizeEvent* event)
 {
     QGraphicsView::resizeEvent(event);
 
-    if (pixmapItem && autoViewEnabled) {
-        resetTransform();
-        currentZoom = 1.0;
-        fitInView(pixmapItem, Qt::KeepAspectRatio);
-        updateDragMode();
+    if ( autoViewEnabled ) {
+        applyAutoView();
     }
+
+    updateDragMode();
+}
+
+double ImageViewBase::getCurrentZoom() const
+{
+    return transform().m11(); // scale X
 }
 
 QImage ImageViewBase::currentImage() const

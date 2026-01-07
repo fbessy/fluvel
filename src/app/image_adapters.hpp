@@ -19,7 +19,7 @@ namespace ofeli_gui
 
 inline ofeli_ip::Image8ConstView image8_view_from_qimage(const QImage& img)
 {
-    assert(img.format() == QImage::Format_Grayscale8);
+    //assert(img.format() == QImage::Format_Grayscale8);
 
     return ofeli_ip::Image8ConstView( img.constBits(),
                                       img.width(),
@@ -28,8 +28,8 @@ inline ofeli_ip::Image8ConstView image8_view_from_qimage(const QImage& img)
 
 inline ofeli_ip::Image32ConstView image32_view_from_qimage(const QImage& img)
 {
-    assert(img.format() == QImage::Format_ARGB32 ||
-           img.format() == QImage::Format_RGB32);
+    //assert(img.format() == QImage::Format_ARGB32 ||
+           //img.format() == QImage::Format_RGB32);
 
     return ofeli_ip::Image32ConstView( img.constBits(),
                                        img.width(),

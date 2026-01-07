@@ -29,7 +29,7 @@ set(OFELI_BUILD_DIR
 
 set(CMAKE_BINARY_DIR ${OFELI_BUILD_DIR})
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Multimedia MultimediaWidgets Widgets PrintSupport LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Multimedia MultimediaWidgets Widgets LinguistTools)
 
 add_subdirectory(src/app)
 add_subdirectory(src/image_processing)

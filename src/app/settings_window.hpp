@@ -77,15 +77,16 @@ public :
               int img0_height,
               bool is_rgb0,
               const QImage& qimg0);
-    // ces fonctions ne sont pas des slots car elles ne recoivent pas de signaux de widgets (ne sont pas connectes)
-    // elles sont appeles apres fermeture de la fenêtre modale, fenêtre modale qui apparait grace a la methode exec()
-    // la methode exec() renvoie un booléen en fonction de Ok ou Cancel
-    // clic Ok
-    void apply_settings();
-    // clic Cancel
-    void cancel_settings();
 
     const unsigned char* get_filtered_img_data();
+
+protected:
+
+    //! Save the configuration chosen into the ApplicationSettings.
+    void accept() override;
+
+    //! Restore the ui states in function of the ApplicationSettings.
+    void reject() override;
 
 private :
 

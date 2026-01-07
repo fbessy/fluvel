@@ -36,7 +36,9 @@ private slots:
 
 private:
     void updatePixmap(const QImage& img);
+    void applyAutoView();
     void updateDragMode();
+    double getCurrentZoom() const;
 
 private:
     QGraphicsScene*        scene = nullptr;
@@ -45,7 +47,6 @@ private:
     bool autoViewEnabled = true;
 
     // --- Zoom / Pan ---
-    double currentZoom = 1.0;
     const double minZoom = 0.1;
     const double maxZoom = 20.0;
 

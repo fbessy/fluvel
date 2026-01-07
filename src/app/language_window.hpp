@@ -1,8 +1,6 @@
 #ifndef LANGUAGE_WINDOW_HPP
 #define LANGUAGE_WINDOW_HPP
 
-#include "application_settings.hpp"
-
 #include <QDialog>
 
 QT_BEGIN_NAMESPACE
@@ -22,17 +20,18 @@ public :
     //! A parametric constructor with a pointer on the QWidget parent.
     LanguageWindow(QWidget* parent);
 
-    //! Save window size and position.
-    void apply_setting();
 
-    //! Restores the current row of #list_widget from #selected_index.
-    void cancel_setting();
+protected:
+
+    //! Save the language chosen into the ApplicationSettings.
+    void accept() override;
+
+    //! Restore the language combobox state in function of the ApplicationSettings language.
+    void reject() override;
 
 private :
 
     virtual void closeEvent(QCloseEvent* event) override;
-
-    Language& language;
 
     //! This widget is the part of the window that displays the list of languages.
     QListWidget* list_widget;

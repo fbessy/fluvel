@@ -164,6 +164,16 @@ int main( int argc, char* argv[] )
         app.installTranslator(&translator_ofeli);
     }
 
+    QIcon appIcon;
+    appIcon.addFile(":/icons/Ofeli_16.png", QSize(16,16));
+    appIcon.addFile(":/icons/Ofeli_32.png", QSize(32,32));
+    appIcon.addFile(":/icons/Ofeli_48.png", QSize(48,48));
+    appIcon.addFile(":/icons/Ofeli_128.png", QSize(128,128));
+    appIcon.addFile(":/icons/Ofeli_256.png", QSize(256,256));
+
+    QApplication::setWindowIcon(appIcon);
+    qputenv("QT_QPA_PLATFORMTHEME", "kde");
+
     ofeli_gui::MainWindow mainWindow;
     mainWindow.show();
 

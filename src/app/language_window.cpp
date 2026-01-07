@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include "language_window.hpp"
+#include "application_settings.hpp"
 
 #include <QtWidgets>
 
@@ -45,8 +46,7 @@ namespace ofeli_gui
 {
 
 LanguageWindow::LanguageWindow(QWidget* parent) :
-    QDialog(parent),
-    language(AppSettings::instance().app_language)
+    QDialog(parent)
 {
     setWindowTitle( tr("Language") );
 
@@ -62,7 +62,7 @@ LanguageWindow::LanguageWindow(QWidget* parent) :
     list_widget->addItem( tr("System (")+locale+")" );
     list_widget->addItem( tr("English") );
     list_widget->addItem( tr("French") );
-    list_widget->setCurrentRow( int(language) );
+    list_widget->setCurrentRow( int(AppSettings::instance().app_language) );
 
     QDialogButtonBox* buttons = new QDialogButtonBox(this);
     buttons->addButton(QDialogButtonBox::Ok);
@@ -85,14 +85,23 @@ LanguageWindow::LanguageWindow(QWidget* parent) :
     setLayout(layout_this);
 }
 
-void LanguageWindow::apply_setting()
+void LanguageWindow::accept()
 {
-    language = Language( list_widget->currentRow() );
+    auto language = Language( list_widget->currentRow() );
+    AppSettings::instance().app_language = language;
+
+    QSettings settings;
+    settings.setValue("Language/current_index", language);
+
+    QDialog::accept();
 }
 
-void LanguageWindow::cancel_setting()
+void LanguageWindow::reject()
 {
-    list_widget->setCurrentRow( language );
+    auto language = AppSettings::instance().app_language;
+    list_widget->setCurrentRow( int(language) );
+
+    QDialog::reject();
 }
 
 void LanguageWindow::closeEvent(QCloseEvent* event)

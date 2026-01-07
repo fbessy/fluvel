@@ -4,6 +4,9 @@ set(target_name Ofeli)
 set(app_src
     "main.cpp"
     "main_window.cpp" "main_window.hpp"
+    "image_pipeline_controller.cpp" "image_pipeline_controller.hpp"
+
+
     "settings_window.cpp" "settings_window.hpp"
 
     "evaluation_window.cpp" "evaluation_window.hpp"
@@ -61,6 +64,7 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
+        active_contour_worker.hpp active_contour_worker.cpp
     )
 endif()
 
@@ -89,6 +93,11 @@ qt_add_resources(${target_name} ofeli_translations
 set(APP_RESOURCES
     ${OFELI_RESOURCES_DIR}/icons/app/Ofeli.svg
     ${OFELI_RESOURCES_DIR}/icons/app/Ofeli.png
+    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_16.png
+    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_32.png
+    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_48.png
+    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_128.png
+    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_256.png
 
     #${OFELI_RESOURCES_DIR}/icons/toolbar/application-exit.svg
     ${OFELI_RESOURCES_DIR}/icons/toolbar/configure.svg
@@ -137,7 +146,6 @@ target_link_libraries(${target_name} PUBLIC
     Qt::Multimedia
     Qt::MultimediaWidgets
     Qt::Widgets
-    Qt::PrintSupport
     image_processing
 )
 

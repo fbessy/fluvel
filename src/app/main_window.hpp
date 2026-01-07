@@ -41,242 +41,100 @@
 #define MAIN_WINDOW_HPP
 
 #include <QMainWindow>
-#ifndef QT_NO_PRINTER
-#include <QPrinter>
-#endif
 
-#include "application_settings.hpp"
-
-#include "settings_window.hpp"
-#include "evaluation_window.hpp"
 #include "camera_window.hpp"
+#include "evaluation_window.hpp"
+#include "settings_window.hpp"
 #include "about_window.hpp"
 #include "language_window.hpp"
 
-#include "image_view_base.hpp"
-#include "scroll_area_widget.hpp"
+namespace ofeli_gui {
 
-#include "active_contour.hpp"
-
-
-QT_BEGIN_NAMESPACE
-class QAction;
-class QLabel;
-class QMenu;
-class QScrollArea;
-class QScrollBar;
-class QStackedWidget;
-class QSpinBox;
-class QSlider;
-class QMimeData;
-QT_END_NAMESPACE
-
-//! [0]
-namespace ofeli_gui
-{
+class ImageViewBase;
+class ImagePipelineController;
+class ActiveContourWorker;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public :
+public:
+    explicit MainWindow(QWidget* parent = nullptr);
+    ~MainWindow() override = default;
 
-    MainWindow();
-    void set_zoom_factor(int val);
-    int get_zoom_factor() const;
-
-private slots :
-
-    void open();
-    //void onCameraChanged(int index);
-    void openFileName();
-    void openRecentFile();
-    void deleteList();
-    void saveImage();
-    void print();
-    void zoomIn();
-    void zoomOut();
-    void normalSize();
-    void start();
-    void stop();
-    void display_settings();
-    void language();
-    void doc();
-
-    void do_scale0(int value);
-
-    void adjustVerticalScroll(int min, int max);
-    void adjustHorizontalScroll(int min, int max);
-
-    void wheel_zoom(int,ScrollAreaWidget*);
-
-    void onStartCameraActionTriggered();
-
-private :
-
-    /////////////////////////////////////////////////
-    //        variables liés à la fenêtre          //
-    /////////////////////////////////////////////////
-
-    void initialize_active_contour();
-    //void try_graphics();
-
-    const unsigned char* img1_filtered;
-    void put_displayed_active_contour();
-    void erase_displayed_active_contour(const unsigned char* img, unsigned char min, unsigned char max);
-
-    void updateCameraAction();
-
-    QAction* startCameraAction = nullptr;
-    QMediaDevices* mediaDevices = nullptr;
-
-    ImageViewBase* imageView;
-
-    QLabel* Cin_text;
-    QLabel* Cout_text;
-    QLabel* threshold_text;
-    QStackedWidget* stackedWidget;
-
-    QLabel* state_text;
-    QLabel* iter_text;
-    QLabel* changes_text;
-    QLabel* quantile_text;
-    QLabel* centroids_text;
-
-    QLabel* time_text;
-
-    QLabel* pixel_text;
-    QLabel* phi_text;
-    QLabel* lists_text;
-
-    QSpinBox* scale_spin0;
-    QSlider* scale_slider0;
-
-    SettingsWindow* settings_window;
-    EvaluationWindow* evaluation_window;
-    CameraWindow* camera_window;
-    AboutWindow* about_window;
-    LanguageWindow* language_window;
-
-    /////////////////////////////////////////////////
-    //        variables liés au slot open()        //
-    /////////////////////////////////////////////////
-
-    // chaîne de caractère du chemin+nom de l'image obtenu a partir d'une boite de dialogue ouverture de Qt
-    QString fileName;
-    // buffer et informations des images
-    // buffer 8 bits
-    unsigned char* img1;
-    bool is_rgb1;
-    QImage::Format image_format;
-    // colonne
-    int img_width;
-    // ligne
-    int img_height;
-    // taille de l'image
-    int img_size;
-    int find_offset(int x, int y) const;
-
-    ///////////////////////////////////////////////////
-    //    objets et variable liés au slot start()    //
-    ///////////////////////////////////////////////////
-
-    // objet filtre
-    ofeli_ip::ActiveContour* ac;
-
-    QImage image_result;
-    unsigned char* image_result_uchar;
-    QImage image_save_preprocess;
-
-    QImage img;
-
+private:
     virtual void closeEvent(QCloseEvent* event) override;
 
+    // --- UI ---
+    CameraWindow* camera_window = nullptr;
+    EvaluationWindow* evaluation_window = nullptr;
+    SettingsWindow* settings_window = nullptr;
+    AboutWindow* about_window = nullptr;
+    LanguageWindow* language_window = nullptr;
 
-    /////////////////////////////////////////////////////
-    //   variables pour les events souris et claviers  //
-    /////////////////////////////////////////////////////
+    QPushButton* startButton = nullptr;
+    QPushButton* pauseButton = nullptr;
+    QPushButton* stepButton = nullptr;
 
-    // pour la fenêtre principale
-    bool has_click_stopping;
-    bool has_step_by_step;
-    virtual void mousePressEvent(QMouseEvent* event) override;
-    virtual void mouseReleaseEvent(QMouseEvent* event) override;
-    virtual void keyPressEvent(QKeyEvent* event) override;
-    virtual void keyReleaseEvent(QKeyEvent* event) override;
-    virtual void mouseMoveEvent(QMouseEvent* event) override;
-    void infinite_loop();
-    bool has_algo_breaking;
+    ImageViewBase* imageView = nullptr;
 
-    // filtre des evenements pour avoir la position que sur l'image et pas la fenêtre
-    // position du curseur souris
-    int positionX;
-    int positionY;
-    void show_phi_list_value();
 
-    bool is_input_image_displayed;
+
+
+    QAction* openAct = nullptr;
+    QAction* separatorAct = nullptr;
+    enum { MaxRecentFiles = 5 };
+    QAction* recentFileActs[MaxRecentFiles];
+    QAction* deleteAct = nullptr;
+    QAction* saveAct = nullptr;
+    QAction* exitAct = nullptr;
+
+    QAction* cameraAct = nullptr;
+    QMediaDevices* mediaDevices = nullptr;
+    QAction* evaluateAct = nullptr;
+    QAction* settingsAct = nullptr;
+
+    QAction* aboutAct = nullptr;
+    QAction* languageAct = nullptr;
+
+    QMenu* fileMenu = nullptr;
+    QMenu* windowMenu = nullptr;
+    QMenu* helpMenu = nullptr;
 
     QStringList nameFilters;
     QString last_directory_used;
     void setCurrentFile(const QString &fileName1);
     void updateRecentFileActions();
     QString strippedName(const QString &fullFileName);
-    QString curFile;
 
-    virtual void dragEnterEvent(QDragEnterEvent* event) override;
-    virtual void dragMoveEvent(QDragMoveEvent* event) override;
-    virtual void dropEvent(QDropEvent* event) override;
-    virtual void dragLeaveEvent(QDragLeaveEvent* event) override;
+    void updateCameraAction();
+    void onStartCameraActionTriggered();
 
 
 
-    QAction* openAct;
-    QAction* separatorAct;
-    enum { MaxRecentFiles = 5 };
-    QAction* recentFileActs[MaxRecentFiles];
-    QAction* deleteAct;
-    QAction* saveAct;
-    QAction* printAct;
-    QAction* cameraAct;
-    QAction* exitAct;
-    QAction* zoomInAct;
-    QAction* zoomOutAct;
-    QAction* normalSizeAct;
-    QAction* startAct;
-    QAction* evaluateAct;
-    QAction* settingsAct;
-    QAction* aboutAct;
-    QAction* languageAct;
-    QAction* docAct;
-    QAction* aboutQtAct;
+    // --- Controllers / Workers ---
+    ImagePipelineController* imageController = nullptr;
+    ActiveContourWorker* acWorker = nullptr;
 
-    QMenu* fileMenu;
-    QMenu* viewMenu;
-    QMenu* windowMenu;
-    QMenu* helpMenu;
+    // --- Setup ---
+    void setupUi();
+    void setupActions();
+    void setupConnections();
 
-#ifndef QT_NO_PRINTER
-    QPrinter printer;
-#endif
+signals:
 
-    QDockWidget* dockInfo;
+    void fileSelected(QString fileName);
 
-signals :
+    /*
+    // Actions UI (fines, lisibles)
+    void openImage();
+    void saveImage();
 
-    void changed(const QMimeData* mimeData = 0);
-    void signal_open();
-
+    void startContour(); // start or restart contour
+    void suspendResumeContour();
+    void suspendToNextIteration();*/
 };
-
-inline int MainWindow::find_offset(int x, int y) const
-{
-    return x+y*img_width;
-}
 
 }
 
 #endif // MAIN_WINDOW_HPP
-
-//! \class ofeli::MainWindow
-//! The class MainWindow is a graphical user interface using the Qt4 framework (QtCore and QtGui) to show an image with the active contour, to configure the parameters of the active contour and optionally the preprocessing step and to evaluate two segmentation results thanks to the evaluation window.
-//! It based on the Qt example of the documentation http://doc.qt.nokia.com/4.7/widgets-imageviewer.html.
