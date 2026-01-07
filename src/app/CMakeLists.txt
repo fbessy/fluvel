@@ -1,36 +1,77 @@
 set(target_name Ofeli)
 
-# 34 files
+set(APP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(UI_WIN_DIR ${APP_DIR}/ui/windows)
+set(UI_COMP_DIR ${APP_DIR}/ui/components)
+set(CORE_DIR ${APP_DIR}/core)
+
 set(app_src
-    "main.cpp"
-    "main_window.cpp" "main_window.hpp"
-    "image_pipeline_controller.cpp" "image_pipeline_controller.hpp"
 
+    ${APP_DIR}/main.cpp
 
-    "settings_window.cpp" "settings_window.hpp"
+    ${UI_WIN_DIR}/main_window.cpp
+    ${UI_WIN_DIR}/main_window.hpp
 
-    "evaluation_window.cpp" "evaluation_window.hpp"
-    "evaluation_widget.cpp" "evaluation_widget.hpp"
-    "pixmap_widget.cpp" "pixmap_widget.hpp"
-    "qspinbox_kernel.cpp" "qspinbox_kernel.hpp"
-    "scroll_area_widget.cpp" "scroll_area_widget.hpp"
+    ${UI_WIN_DIR}/camera_window.cpp
+    ${UI_WIN_DIR}/camera_window.hpp
 
-    "camera_window.cpp" "camera_window.hpp"
-    "video_active_contour_thread.cpp" "video_active_contour_thread.hpp"
-    "image_view_base.cpp" "image_view_base.hpp"
-    "frame_stats.cpp" "frame_stats.hpp"
-    "frame_clock.cpp" "frame_clock.hpp"
+    ${UI_WIN_DIR}/evaluation_window.cpp
+    ${UI_WIN_DIR}/evaluation_window.hpp
 
-    "language_window.cpp" "language_window.hpp"
-    "about_window.cpp" "about_window.hpp"
+    ${UI_WIN_DIR}/settings_window.cpp
+    ${UI_WIN_DIR}/settings_window.hpp
 
-    "contour_rendering.cpp" "contour_rendering.hpp"
-    "camera_overlay_widget.cpp" "camera_overlay_widget.hpp"
+    ${UI_WIN_DIR}/language_window.cpp
+    ${UI_WIN_DIR}/language_window.hpp
 
-    "application_settings.cpp" "application_settings.hpp"
-    "runtime_settings.cpp" "runtime_settings.hpp"
-    "image_adapters.hpp"
-    "common_settings.hpp"
+    ${UI_WIN_DIR}/about_window.cpp
+    ${UI_WIN_DIR}/about_window.hpp
+
+    ${UI_COMP_DIR}/image_view_base.cpp
+    ${UI_COMP_DIR}/image_view_base.hpp
+
+    ${UI_COMP_DIR}/camera_overlay_widget.cpp
+    ${UI_COMP_DIR}/camera_overlay_widget.hpp
+
+    ${UI_COMP_DIR}/evaluation_widget.cpp
+    ${UI_COMP_DIR}/evaluation_widget.hpp
+
+    ${UI_COMP_DIR}/pixmap_widget.cpp
+    ${UI_COMP_DIR}/pixmap_widget.hpp
+
+    ${UI_COMP_DIR}/qspinbox_kernel.cpp
+    ${UI_COMP_DIR}/qspinbox_kernel.hpp
+
+    ${UI_COMP_DIR}/scroll_area_widget.cpp
+    ${UI_COMP_DIR}/scroll_area_widget.hpp
+
+    ${UI_COMP_DIR}/frame_stats.cpp
+    ${UI_COMP_DIR}/frame_stats.hpp
+
+    ${CORE_DIR}/image_pipeline_controller.cpp
+    ${CORE_DIR}/image_pipeline_controller.hpp
+
+    ${CORE_DIR}/active_contour_worker.cpp
+    ${CORE_DIR}/active_contour_worker.hpp
+
+    ${CORE_DIR}/video_active_contour_thread.cpp
+    ${CORE_DIR}/video_active_contour_thread.hpp
+
+    ${CORE_DIR}/frame_clock.cpp
+    ${CORE_DIR}/frame_clock.hpp
+
+    ${CORE_DIR}/contour_rendering.cpp
+    ${CORE_DIR}/contour_rendering.hpp
+
+    ${CORE_DIR}/application_settings.cpp
+    ${CORE_DIR}/application_settings.hpp
+
+    ${CORE_DIR}/runtime_settings.cpp
+    ${CORE_DIR}/runtime_settings.hpp
+
+    ${CORE_DIR}/image_adapters.hpp
+    ${CORE_DIR}/common_settings.hpp
 )
 
 if(APPLE)
@@ -64,7 +105,6 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
-        active_contour_worker.hpp active_contour_worker.cpp
     )
 endif()
 
@@ -140,13 +180,10 @@ if(APPLE AND NOT IOS)
     )
 endif()
 
-target_link_libraries(${target_name} PUBLIC
-    Qt::Core
-    Qt::Gui
-    Qt::Multimedia
-    Qt::MultimediaWidgets
-    Qt::Widgets
-    image_processing
+target_include_directories(${target_name} PRIVATE
+    ${CORE_DIR}
+    ${UI_COMP_DIR}
+    ${UI_WIN_DIR}
 )
 
 if(OpenCV_FOUND)
@@ -157,18 +194,57 @@ if(Qt6_FOUND)
     target_compile_definitions(${target_name} PRIVATE OFELI_HAS_QT)
 endif()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "(Clang|GNU)")
+target_compile_definitions(${target_name} PRIVATE
+    $<$<CONFIG:Debug>:OFELI_DEBUG>
+)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${target_name} PRIVATE
-        -O3
-        -Wall
-        -Wextra
-        -Wpedantic
-        # -Werror  <-- je te conseille de l'enlever
+        $<$<CONFIG:Debug>:
+            -O0
+            -g
+            -Wall
+            -Wextra
+            -Wpedantic
+        >
+        $<$<CONFIG:Release>:
+            -O3
+            -DNDEBUG
+        >
+        $<$<CONFIG:RelWithDebInfo>:
+            -O2
+            -g
+            -DNDEBUG
+        >
+        $<$<CONFIG:MinSizeRel>:
+            -Os
+            -DNDEBUG
+        >
+    )
+elseif (MSVC)
+    target_compile_options(${target_name} PRIVATE
+        $<$<CONFIG:Debug>:/Od /Zi>
+        $<$<CONFIG:Release>:/O2>
+        $<$<CONFIG:RelWithDebInfo>:/O2 /Zi>
+        $<$<CONFIG:MinSizeRel>:/O1>
     )
 endif()
 
-# install(TARGETS ${target_name}
-#         RUNTIME DESTINATION "${OFELI_BUILD_DIR}/runtime"
-#         BUNDLE DESTINATION  "${OFELI_BUILD_DIR}/bundle"
-#         LIBRARY DESTINATION "${OFELI_BUILD_DIR}/library"
+target_link_libraries(${target_name} PRIVATE
+    Qt::Core
+    Qt::Gui
+    Qt::Multimedia
+    Qt::MultimediaWidgets
+    Qt::Widgets
+    ofeli::image_processing
+)
+
+# target_compile_features(my_target PUBLIC cxx_std_23) au lieu de global dans le fichier projet
+# définir par projets chaque prérequis
+
+#idem préférer :
+# set_target_properties(my_qt_target PROPERTIES
+#     AUTOMOC ON
+#     AUTOUIC ON
+#     AUTORCC ON
 # )

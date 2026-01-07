@@ -182,11 +182,13 @@ void ImageViewBase::wheelEvent(QWheelEvent* event)
 
     updateDragMode();
 
+#ifdef OFELI_DEBUG
     qDebug()
         << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
         << "zoom =" << currentZoom
         << " new zoom =" << newZoom
         << "delta =" << delta.x() << delta.y();
+#endif
 }
 
 void ImageViewBase::mousePressEvent(QMouseEvent* event)

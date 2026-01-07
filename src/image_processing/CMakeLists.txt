@@ -1,27 +1,71 @@
-# 25 files
 
-set(IP_SRC
-    "boundary_builder.cpp" "boundary_builder.hpp"
-    "contour_data.cpp" "contour_data.hpp"
-    "active_contour.cpp" "active_contour.hpp"
-    "region_ac.cpp" "region_ac.hpp"
-    "region_color_ac.cpp" "region_color_ac.hpp"
-    "edge_ac.cpp" "edge_ac.hpp"
-    "hausdorff_distance.cpp" "hausdorff_distance.hpp"
-    "filters.cpp" "filters.hpp"
-    "shape.cpp" "shape.hpp"
-    "matrix.txx" "matrix.hpp"
+# current image_processing directory
+set(IP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-    "image_views.hpp"
-    "point.hpp"
-    "point_hash.hpp"
-    "math.hpp"
+set(TARGET_NAME ofeli_image_processing)
+
+set(ALGO_DIR ${IP_DIR}/algo)
+set(CORE_DIR ${IP_DIR}/core)
+
+
+set(ip_src
+    ${ALGO_DIR}/contour_data.cpp
+    ${ALGO_DIR}/contour_data.hpp
+
+    ${ALGO_DIR}/active_contour.cpp
+    ${ALGO_DIR}/active_contour.hpp
+
+    ${ALGO_DIR}/region_ac.cpp
+    ${ALGO_DIR}/region_ac.hpp
+
+    ${ALGO_DIR}/region_color_ac.cpp
+    ${ALGO_DIR}/region_color_ac.hpp
+
+    ${ALGO_DIR}/edge_ac.cpp
+    ${ALGO_DIR}/edge_ac.hpp
+
+    ${ALGO_DIR}/hausdorff_distance.cpp
+    ${ALGO_DIR}/hausdorff_distance.hpp
+
+    ${ALGO_DIR}/filters.cpp
+    ${ALGO_DIR}/filters.hpp
+
+    ${CORE_DIR}/boundary_builder.cpp
+    ${CORE_DIR}/boundary_builder.hpp
+
+    ${CORE_DIR}/shape.cpp
+    ${CORE_DIR}/shape.hpp
+
+    ${CORE_DIR}/matrix.txx
+    ${CORE_DIR}/matrix.hpp
+
+    ${CORE_DIR}/image_views.hpp
+    ${CORE_DIR}/point.hpp
+    ${CORE_DIR}/point_hash.hpp
+    ${CORE_DIR}/math.hpp
 )
 
-qt_add_library(image_processing STATIC
-    ${IP_SRC}
+add_library(${TARGET_NAME} STATIC ${ip_src})
+add_library(ofeli::image_processing ALIAS ${TARGET_NAME})
+
+
+target_include_directories(${TARGET_NAME} PUBLIC
+    ${CORE_DIR}
+    ${ALGO_DIR}
 )
 
-target_include_directories(image_processing PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
+# image_processing/
+#   include/ofeli/image_processing/   <-- API publique
+#   core/                             <-- interne
+#   algo/                             <-- interne
+# Et côté CMake :
+
+# cmake
+# Copier le code
+# target_include_directories(${TARGET_NAME}
+#     PUBLIC
+#         ${IP_DIR}/include
+#     PRIVATE
+#         ${CORE_DIR}
+#         ${ALGO_DIR}
+# )
