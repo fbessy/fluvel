@@ -125,16 +125,6 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     statsTimer = new QTimer(this);
     statsTimer->setInterval(500);
-
-    connect(statsTimer, &QTimer::timeout,
-            this, &CameraWindow::updateStatsUi);
-
-    connect(this,
-            &CameraWindow::cameraStatsUpdated,
-            cameraOverlay,
-            &CameraOverlayWidget::setStats);
-
-    statsTimer->start();
 }
 
 CameraWindow::~CameraWindow()
@@ -185,6 +175,17 @@ void CameraWindow::startCamera(const QCameraDevice& device)
                 Qt::QueuedConnection);
 
         ac_thread->start();
+
+        statsTimer->start();
+
+        connect(statsTimer, &QTimer::timeout,
+                this, &CameraWindow::updateStatsUi);
+
+        connect(this,
+                &CameraWindow::cameraStatsUpdated,
+                cameraOverlay,
+                &CameraOverlayWidget::setStats);
+
         frameStats.reset();
 
         labels->setCurrentIndex(1);

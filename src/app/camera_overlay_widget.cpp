@@ -41,12 +41,12 @@ void CameraOverlayWidget::setStats(const CameraStatsUi& s)
 {
     label_->setText(QString(
                         "In: %1 fps | Proc: %2 fps | Disp: %3 fps\n"
-                        "Drop: %4 %% | Avg: %5 ms | Max: %6 ms"
+                        "Drop: %4 % | Avg: %5 ms | Max: %6 ms"
                         )
                         .arg(s.inputFps, 0, 'f', 1)
                         .arg(s.processingFps, 0, 'f', 1)
                         .arg(s.displayFps, 0, 'f', 1)
-                        .arg(s.dropRate, 0, 'f', 1)
+                        .arg(100.f * s.dropRate, 0, 'f', 1)
                         .arg(s.avgLatencyMs, 0, 'f', 1)
                         .arg(s.maxLatencyMs, 0, 'f', 1));
 

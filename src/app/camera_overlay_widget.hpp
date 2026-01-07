@@ -9,12 +9,12 @@ namespace ofeli_gui {
 
 struct CameraStatsUi
 {
-    float inputFps = 0.0;
-    float processingFps = 0.0;
-    float displayFps = 0.0;
-    float dropRate = 0.0;
-    float avgLatencyMs = 0.0;
-    float maxLatencyMs = 0.0;
+    float inputFps = 0.f;
+    float processingFps = 0.f;
+    float displayFps = 0.f;
+    float dropRate = 0.f;
+    float avgLatencyMs = 0.f;
+    float maxLatencyMs = 0.f;
 };
 
 class CameraOverlayWidget : public QWidget
