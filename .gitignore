@@ -1,0 +1,79 @@
+# =========================
+# Build directories (CMake)
+# =========================
+/build/
+/build-*/
+/cmake-build-*/
+out/
+bin/
+lib/
+
+# =========================
+# CMake generated files
+# =========================
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+CTestTestfile.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+*.cmake.user
+
+# =========================
+# Qt Creator
+# =========================
+*.user
+*.user.*
+*.autosave
+*.qmlproject.user
+*.qmlproject.user.*
+*.creator
+*.creator.user
+
+# =========================
+# Qt / moc / rcc / uic
+# =========================
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+
+# =========================
+# Object files
+# =========================
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.so.*
+*.dll
+*.dylib
+
+# =========================
+# Executables
+# =========================
+*.exe
+*.app
+
+# =========================
+# Debug / profiling
+# =========================
+*.log
+*.core
+core.*
+vgcore.*
+perf.data*
+callgrind.out.*
+
+# =========================
+# OS / editor junk
+# =========================
+.DS_Store
+Thumbs.db
+*~
+*.swp
+*.swo
