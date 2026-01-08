@@ -2,6 +2,22 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Ofeli VERSION 2.0.0 LANGUAGES CXX)
 
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+
+if(ENABLE_ASAN)
+    message(STATUS "AddressSanitizer ENABLED")
+
+    add_compile_options(
+        -fsanitize=address
+        -fno-omit-frame-pointer
+        -g
+    )
+
+    add_link_options(
+        -fsanitize=address
+    )
+endif()
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

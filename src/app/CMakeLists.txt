@@ -192,9 +192,14 @@ if(Qt6_FOUND)
     target_compile_definitions(${target_name} PRIVATE OFELI_HAS_QT)
 endif()
 
-target_compile_definitions(${target_name} PRIVATE
-    $<$<CONFIG:Debug>:OFELI_DEBUG>
-)
+
+if(ENABLE_ASAN)
+    target_compile_definitions(${target_name} PRIVATE OFELI_ASAN)
+else()
+    target_compile_definitions(${target_name} PRIVATE
+        $<$<CONFIG:Debug>:OFELI_DEBUG>
+    )
+endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${target_name} PRIVATE
