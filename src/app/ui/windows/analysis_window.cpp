@@ -44,7 +44,7 @@
 #include <QtWidgets>
 #include <ctime>       // for std::clock_t, std::clock() and CLOCKS_PER_SEC
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 AnalysisWindow::AnalysisWindow(QWidget* parent) :

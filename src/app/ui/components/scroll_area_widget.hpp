@@ -42,7 +42,7 @@
 
 #include <QScrollArea>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class ScrollAreaWidget : public QScrollArea

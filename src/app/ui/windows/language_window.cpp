@@ -42,7 +42,7 @@
 
 #include <QtWidgets>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 LanguageWindow::LanguageWindow(QWidget* parent) :

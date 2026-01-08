@@ -42,7 +42,7 @@
 
 #include <QtWidgets>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 AboutWindow::AboutWindow(QWidget* parent) :

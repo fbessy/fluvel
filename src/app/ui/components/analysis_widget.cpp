@@ -43,7 +43,7 @@
 #include "scroll_area_widget.hpp"
 #include <QtWidgets>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 int AnalysisWidget::count_this = 0;

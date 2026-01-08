@@ -3,7 +3,7 @@
 
 #include <QElapsedTimer>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 class FrameClock
 {

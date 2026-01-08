@@ -55,7 +55,7 @@
 #include <ctime>         // for std::clock_t, std::clock() and CLOCKS_PER_SEC
 #include <cstring>       // for std::memcpy
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 SettingsWindow::SettingsWindow(QWidget* parent) :

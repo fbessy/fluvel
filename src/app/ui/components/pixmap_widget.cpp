@@ -44,7 +44,7 @@
 #include "pixmap_widget.hpp"
 #include <QPainter>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 PixmapWidget::PixmapWidget(QWidget* parent) :

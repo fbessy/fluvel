@@ -42,7 +42,7 @@
 
 #include <QLabel>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class PixmapWidget : public QLabel

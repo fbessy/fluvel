@@ -50,7 +50,7 @@
 #include <QCloseEvent>
 #include <QTimer>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 CameraWindow::CameraWindow(QWidget* parent)

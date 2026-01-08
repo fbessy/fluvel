@@ -48,7 +48,7 @@
 #include "hausdorff_distance.hpp"
 #include "point.hpp"
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class AnalysisWindow : public QDialog

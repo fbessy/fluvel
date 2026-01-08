@@ -9,7 +9,7 @@
 #include <QAction>
 #include <QFileDialog>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 ImageWindow::ImageWindow(QWidget* parent)
     : QMainWindow(parent)

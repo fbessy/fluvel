@@ -5,7 +5,7 @@
 #include <QMouseEvent>
 #include <QThread>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 ImageView::ImageView(QWidget* parent)
     : QGraphicsView(parent),
@@ -258,4 +258,4 @@ QImage ImageView::currentImage() const
     return lastDisplayedImage;
 }
 
-} // namespace ofeli_gui
+} // namespace ofeli_app

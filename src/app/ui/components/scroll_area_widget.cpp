@@ -41,7 +41,7 @@
 #include <QScrollBar>
 #include <QWheelEvent>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 ScrollAreaWidget::ScrollAreaWidget(QWidget* parent)

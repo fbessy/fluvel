@@ -11,7 +11,7 @@
 
 #include <QTimer>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 ActiveContourWorker::ActiveContourWorker()

@@ -6,7 +6,7 @@
 #include "region_color_ac.hpp"
 #include "filters.hpp"
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 struct RuntimeSettings

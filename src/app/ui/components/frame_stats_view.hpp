@@ -4,7 +4,7 @@
 #include <QtGlobal>
 #include <QMutex>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 class FrameStatsView
 {

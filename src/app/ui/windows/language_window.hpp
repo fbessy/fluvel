@@ -7,7 +7,7 @@ QT_BEGIN_NAMESPACE
 class QListWidget;
 QT_END_NAMESPACE
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class LanguageWindow : public QDialog

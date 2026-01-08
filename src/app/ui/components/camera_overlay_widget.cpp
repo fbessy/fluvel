@@ -2,7 +2,7 @@
 
 #include <QVBoxLayout>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 CameraOverlayWidget::CameraOverlayWidget(QWidget* parent)
     : QWidget(parent)

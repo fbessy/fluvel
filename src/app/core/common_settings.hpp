@@ -1,7 +1,7 @@
 #ifndef COMMON_SETTINGS_HPP
 #define COMMON_SETTINGS_HPP
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 enum SpeedModel : int

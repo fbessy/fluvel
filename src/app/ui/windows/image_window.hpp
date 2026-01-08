@@ -48,7 +48,7 @@
 #include "about_window.hpp"
 #include "language_window.hpp"
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 class ImageView;
 class ImageController;

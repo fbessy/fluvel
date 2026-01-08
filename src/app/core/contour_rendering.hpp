@@ -45,7 +45,7 @@
 #include <QRgb>
 #include <QImage>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 void get_color(int index,

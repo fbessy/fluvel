@@ -42,7 +42,7 @@
 
 #include <QSpinBox>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class KernelSizeSpinBox : public QSpinBox

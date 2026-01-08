@@ -1,6 +1,6 @@
 #include "frame_stats_view.hpp"
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 static constexpr qint64 WINDOW_NS = 1'000'000'000LL; // 1 seconde
 

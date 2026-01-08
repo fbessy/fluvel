@@ -8,7 +8,7 @@
 #include <QTimer>
 #include <QImage>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 class ImageView : public QGraphicsView
 {
@@ -67,6 +67,6 @@ private:
     QImage lastDisplayedImage;
 };
 
-} // namespace ofeli_gui
+} // namespace ofeli_app
 
 #endif // IMAGE_VIEW_BASE_H

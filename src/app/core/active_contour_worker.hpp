@@ -5,7 +5,7 @@
 #include <QImage>
 #include "active_contour.hpp"
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 enum class WorkerState

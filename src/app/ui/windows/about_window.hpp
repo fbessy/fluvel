@@ -43,7 +43,7 @@
 #include "application_settings.hpp"
 #include <QDialog>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class AboutWindow : public QDialog

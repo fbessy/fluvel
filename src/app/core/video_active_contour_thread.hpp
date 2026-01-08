@@ -8,7 +8,7 @@
 #include "frame_stats_view.hpp"
 #include "runtime_settings.hpp"
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 struct FrameData {
     QVideoFrame frame;
@@ -50,6 +50,6 @@ private slots:
     void reloadSettings();
 };
 
-} // namespace ofeli_gui
+} // namespace ofeli_app
 
 #endif // VIDEO_ACTIVE_CONTOUR_THREAD_H

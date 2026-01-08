@@ -4,7 +4,7 @@
 #include <QImage>
 #include <QObject>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 class ImageController : public QObject
 {

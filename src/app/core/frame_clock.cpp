@@ -1,6 +1,6 @@
 #include "frame_clock.hpp"
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 QElapsedTimer FrameClock::timer;
 

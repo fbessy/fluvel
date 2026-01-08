@@ -47,7 +47,7 @@
 
 #include <QObject>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 //! This structure contains all the configuration of the application.

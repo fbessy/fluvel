@@ -1,6 +1,6 @@
 #include "image_controller.hpp"
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 ImageController::ImageController(QWidget* parent)
 {

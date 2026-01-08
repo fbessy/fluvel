@@ -52,7 +52,7 @@
 
 #include <QtWidgets>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 enum TabIndex : int

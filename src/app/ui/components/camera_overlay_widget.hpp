@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QLabel>
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 struct CameraStatsUi
 {

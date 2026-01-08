@@ -41,7 +41,7 @@
 #include "contour_data.hpp"
 #include "common_settings.hpp"
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 void get_color(int index,

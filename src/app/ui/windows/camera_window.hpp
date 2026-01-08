@@ -56,7 +56,7 @@
 #include "frame_stats_view.hpp"
 #include "camera_overlay_widget.hpp"
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class CameraWindow : public QDialog

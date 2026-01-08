@@ -43,7 +43,7 @@
 
 #include <QSettings>
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 ApplicationSettings::ApplicationSettings()

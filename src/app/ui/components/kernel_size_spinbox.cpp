@@ -39,7 +39,7 @@
 
 #include "kernel_size_spinbox.hpp"
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent) :

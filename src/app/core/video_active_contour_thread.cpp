@@ -4,7 +4,7 @@
 #include "application_settings.hpp"
 #include "contour_rendering.hpp"
 
-namespace ofeli_gui {
+namespace ofeli_app {
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
     : QThread(parent),
@@ -138,5 +138,5 @@ void VideoActiveContourThread::reloadSettings()
     configChanged = true;
 }
 
-} // namespace ofeli_gui
+} // namespace ofeli_app
 

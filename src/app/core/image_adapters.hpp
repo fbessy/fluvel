@@ -12,7 +12,7 @@
 #include "core/image_span.hpp"
 #endif
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 #ifdef OFELI_HAS_QT

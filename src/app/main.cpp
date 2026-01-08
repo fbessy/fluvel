@@ -128,10 +128,10 @@ int main( int argc, char* argv[] )
     QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/fastlevelset/");
     QCoreApplication::setApplicationName("ofeli");
 
-    ofeli_gui::FrameClock::init();
+    ofeli_app::FrameClock::init();
 
-    const auto& config = ofeli_gui::AppSettings::instance();
-    ofeli_gui::Language language = config.app_language;
+    const auto& config = ofeli_app::AppSettings::instance();
+    ofeli_app::Language language = config.app_language;
 
     static QTranslator translator_qt;
     static QTranslator translator_ofeli;
@@ -139,13 +139,13 @@ int main( int argc, char* argv[] )
     QString locale;
     switch(language)
     {
-    case ofeli_gui::Language::SYSTEM:
+    case ofeli_app::Language::SYSTEM:
         locale = QLocale::system().name().section('_', 0, 0);
         break;
-    case ofeli_gui::Language::FRENCH:
+    case ofeli_app::Language::FRENCH:
         locale = "fr";
         break;
-    case ofeli_gui::Language::ENGLISH:
+    case ofeli_app::Language::ENGLISH:
     default:
         locale = "en";
         break;
@@ -174,7 +174,7 @@ int main( int argc, char* argv[] )
     QApplication::setWindowIcon(appIcon);
     qputenv("QT_QPA_PLATFORMTHEME", "kde");
 
-    ofeli_gui::ImageWindow mainWindow;
+    ofeli_app::ImageWindow mainWindow;
     mainWindow.show();
 
     return app.exec();

@@ -52,7 +52,7 @@ class QLabel;
 class QPushButton;
 QT_END_NAMESPACE
 
-namespace ofeli_gui
+namespace ofeli_app
 {
 
 class PixmapWidget;
