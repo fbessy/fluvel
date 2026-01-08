@@ -87,15 +87,14 @@ void ActiveContourWorker::initializeActiveContour()
                                               config.Lin_init,
                                               m_workImage.width(), m_workImage.height());
 
-        ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(m_workImage));
-        ofeli_ip::ImageSpan32 image_rgb(image_span_32_from_qimage(m_workImage));
-
         bool is_rgb = ( m_workImage.format() != QImage::Format_Grayscale8 );
 
         if( config.speed == SpeedModel::REGION_BASED )
         {
             if( is_rgb )
             {
+                ofeli_ip::ImageSpan32 image_rgb(image_span_32_from_qimage(m_workImage));
+
                 ac = std::make_unique<ofeli_ip::RegionColorAc>(image_rgb,
                                                                std::move(initial_tmp_ctr),
                                                                config.algo_config,
@@ -103,6 +102,8 @@ void ActiveContourWorker::initializeActiveContour()
             }
             else
             {
+                ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(m_workImage));
+
                 ac = std::make_unique<ofeli_ip::RegionAc>(image_grayscale,
                                                           std::move(initial_tmp_ctr),
                                                           config.algo_config,
@@ -111,6 +112,8 @@ void ActiveContourWorker::initializeActiveContour()
         }
         else if( config.speed == SpeedModel::EDGE_BASED )
         {
+            ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(m_workImage));
+
             ac = std::make_unique<ofeli_ip::EdgeAc>(image_grayscale,
                                                     std::move(initial_tmp_ctr),
                                                     config.algo_config);
