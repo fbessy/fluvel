@@ -37,19 +37,19 @@
 **
 ****************************************************************************/
 
-#ifndef QSPINBOX_KERNEL_HPP
-#define QSPINBOX_KERNEL_HPP
+#ifndef KERNEL_SIZE_SPINBOX_H
+#define KERNEL_SIZE_SPINBOX_H
 
 #include <QSpinBox>
 
 namespace ofeli_gui
 {
 
-class QSpinBoxKernel : public QSpinBox
+class KernelSizeSpinBox : public QSpinBox
 {
     Q_OBJECT
 public:
-    explicit QSpinBoxKernel(QWidget* parent = nullptr);
+    explicit KernelSizeSpinBox(QWidget* parent = nullptr);
 
 signals:
 
@@ -66,4 +66,4 @@ private:
 
 }
 
-#endif // QSPINBOX_KERNEL_HPP
+#endif // KERNEL_SIZE_SPINBOX_H

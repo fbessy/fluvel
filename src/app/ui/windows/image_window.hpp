@@ -37,37 +37,37 @@
 **
 ****************************************************************************/
 
-#ifndef MAIN_WINDOW_HPP
-#define MAIN_WINDOW_HPP
+#ifndef IMAGE_WINDOW_HPP
+#define IMAGE_WINDOW_HPP
 
 #include <QMainWindow>
 
 #include "camera_window.hpp"
-#include "evaluation_window.hpp"
+#include "analysis_window.hpp"
 #include "settings_window.hpp"
 #include "about_window.hpp"
 #include "language_window.hpp"
 
 namespace ofeli_gui {
 
-class ImageViewBase;
-class ImagePipelineController;
+class ImageView;
+class ImageController;
 class ActiveContourWorker;
 
-class MainWindow : public QMainWindow
+class ImageWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
-    ~MainWindow() override = default;
+    explicit ImageWindow(QWidget* parent = nullptr);
+    ~ImageWindow() override = default;
 
 private:
     virtual void closeEvent(QCloseEvent* event) override;
 
     // --- UI ---
     CameraWindow* camera_window = nullptr;
-    EvaluationWindow* evaluation_window = nullptr;
+    AnalysisWindow* evaluation_window = nullptr;
     SettingsWindow* settings_window = nullptr;
     AboutWindow* about_window = nullptr;
     LanguageWindow* language_window = nullptr;
@@ -76,7 +76,7 @@ private:
     QPushButton* pauseButton = nullptr;
     QPushButton* stepButton = nullptr;
 
-    ImageViewBase* imageView = nullptr;
+    ImageView* imageView = nullptr;
 
 
 
@@ -113,7 +113,7 @@ private:
 
 
     // --- Controllers / Workers ---
-    ImagePipelineController* imageController = nullptr;
+    ImageController* imageController = nullptr;
     ActiveContourWorker* acWorker = nullptr;
 
     // --- Setup ---
@@ -137,4 +137,4 @@ signals:
 
 }
 
-#endif // MAIN_WINDOW_HPP
+#endif // IMAGE_WINDOW_H

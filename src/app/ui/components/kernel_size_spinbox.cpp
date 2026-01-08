@@ -37,19 +37,19 @@
 **
 ****************************************************************************/
 
-#include "qspinbox_kernel.hpp"
+#include "kernel_size_spinbox.hpp"
 
 namespace ofeli_gui
 {
 
-QSpinBoxKernel::QSpinBoxKernel(QWidget* parent) :
+KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent) :
     QSpinBox(parent), previous_result(QValidator::Acceptable)
 {
     setSuffix(" × ");
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(set_suffix(const QString&)), Qt::UniqueConnection );
 }
 
-QValidator::State QSpinBoxKernel::validate(QString& text, int& pos) const
+QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
 {
     QString text_without_suffix(text);
     text_without_suffix.chop( suffix().size() );
@@ -94,47 +94,47 @@ QValidator::State QSpinBoxKernel::validate(QString& text, int& pos) const
 
         if( result == QValidator::Acceptable )
         {
-            const_cast<QSpinBoxKernel*>(this)->setStyleSheet("color:green");
+            const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:green");
         }
         else if( result == QValidator::Intermediate )
         {
-            const_cast<QSpinBoxKernel*>(this)->setStyleSheet("color:orange");
+            const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:orange");
         }
         else if( result == QValidator::Invalid )
         {
             if( previous_result == QValidator::Acceptable )
             {
-                const_cast<QSpinBoxKernel*>(this)->setStyleSheet("color:green");
+                const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:green");
             }
             else
             {
-                const_cast<QSpinBoxKernel*>(this)->setStyleSheet("color:orange");
+                const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:orange");
             }
         }
     }
     else
     {
-        const_cast<QSpinBoxKernel*>(this)->setStyleSheet("");
+        const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("");
     }
 
     if( result != QValidator::Invalid )
     {
-        const_cast<QSpinBoxKernel*>(this)->previous_result = result;
+        const_cast<KernelSizeSpinBox*>(this)->previous_result = result;
     }
 
     return result;
 }
 
-void QSpinBoxKernel::set_suffix(const QString& text)
+void KernelSizeSpinBox::set_suffix(const QString& text)
 {
     QString text_without_suffix(text);
     text_without_suffix.chop( suffix().size() );
 
     text_without_suffix = " × " + text_without_suffix;
-    const_cast<QSpinBoxKernel*>(this)->setSuffix(text_without_suffix);
+    const_cast<KernelSizeSpinBox*>(this)->setSuffix(text_without_suffix);
 }
 
-void QSpinBoxKernel::focusInEvent(QFocusEvent* event)
+void KernelSizeSpinBox::focusInEvent(QFocusEvent* event)
 {
     setStyleSheet("color:green");
     QAbstractSpinBox::focusInEvent(event);

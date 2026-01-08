@@ -41,7 +41,7 @@
 #define EDGE_AC_HPP
 
 #include "active_contour.hpp"
-#include "image_views.hpp"
+#include "image_span.hpp"
 
 namespace ofeli_ip
 {
@@ -53,7 +53,7 @@ public :
 
     //! Constructor to initialize with an initial contour.
     template<typename T>
-    EdgeAc(Image8ConstView gradient_image1,
+    EdgeAc(ImageSpan8 gradient_image1,
            T&& initial_contour1,
            const AcConfig& config1 = AcConfig()); /* optional parameter */
 
@@ -69,10 +69,10 @@ private :
     int get_global_speed_sign() const;
 
     //! Otsu's method to calculate an optimal global threshold.
-    static unsigned char do_otsu_method(const Image8ConstView& image);
+    static unsigned char do_otsu_method(const ImageSpan8& image);
 
     //! Image wrapper.
-    Image8ConstView gradient_image;
+    ImageSpan8 gradient_image;
 
     //! Global speed sign (1 or -1).
     const int global_speed_sign;
@@ -83,7 +83,7 @@ private :
 
 
 template<typename T>
-EdgeAc::EdgeAc(Image8ConstView gradient_image1,
+EdgeAc::EdgeAc(ImageSpan8 gradient_image1,
                T&& initial_contour1,
                const AcConfig& config1) /* optional parameter with AcConfig() */
     : ActiveContour(std::forward<T>(initial_contour1), config1),

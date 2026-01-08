@@ -37,28 +37,28 @@
 **
 ****************************************************************************/
 
-#ifndef EVALUATION_WINDOW_HPP
-#define EVALUATION_WINDOW_HPP
+#ifndef ANALYSIS_WINDOW_HPP
+#define ANALYSIS_WINDOW_HPP
 
 #include <QDialog>
 #include <QLabel>
 #include <QSpinBox>
 
-#include "evaluation_widget.hpp"
+#include "analysis_widget.hpp"
 #include "hausdorff_distance.hpp"
 #include "point.hpp"
 
 namespace ofeli_gui
 {
 
-class EvaluationWindow : public QDialog
+class AnalysisWindow : public QDialog
 {
     Q_OBJECT
 
 public :
 
     //! A parametric constructor with a pointer on the QWidget parent.
-    EvaluationWindow(QWidget* parent);
+    AnalysisWindow(QWidget* parent);
 
 public slots :
 
@@ -69,8 +69,8 @@ private :
     virtual void closeEvent(QCloseEvent* event) override;
     void calculate_shapes_intersection();
 
-    EvaluationWidget* widget1;
-    EvaluationWidget* widget2;
+    AnalysisWidget* widget1;
+    AnalysisWidget* widget2;
     QPushButton* compute_button;
 
     std::unordered_set<ofeli_ip::Point_i> intersection;
@@ -96,7 +96,7 @@ private slots :
 
 }
 
-#endif // EVALUATION_WINDOW_HPP
+#endif // ANALYSIS_WINDOW_HPP
 
-//! \class ofeli::EvaluationWindow
-//! The class EvaluationWindow is a QDialog window that informs the user about Ofeli . An instance of this class is created by #ofeli::MainWindow and displayed when the user clicks on menu About.
+//! \class ofeli::AnalysisWindow
+//! The class AnalysisWindow is a QDialog window that informs the user about Ofeli . An instance of this class is created by #ofeli::ImageWindow and displayed when the user clicks on menu About.

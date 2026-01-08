@@ -64,9 +64,9 @@
  * In this project, the <b>G</b>raphical <b>U</b>ser <b>I</b>nterface (GUI) is clearly separated of the image processing part.
  *
  * GUI part :
- * - MainWindow.cpp
+ * - ImageWindow.cpp
  * - SettingsWindow.cpp
- * - EvaluationWindow.cpp
+ * - AnalysisWindow.cpp
  * - CameraWindow.cpp
  * - CameraController.cpp
  * - AboutWindow.cpp
@@ -112,7 +112,7 @@
  */
 
 #include "application_settings.hpp"
-#include "main_window.hpp"
+#include "image_window.hpp"
 #include "frame_clock.hpp"
 
 #include <QTranslator>
@@ -174,7 +174,7 @@ int main( int argc, char* argv[] )
     QApplication::setWindowIcon(appIcon);
     qputenv("QT_QPA_PLATFORMTHEME", "kde");
 
-    ofeli_gui::MainWindow mainWindow;
+    ofeli_gui::ImageWindow mainWindow;
     mainWindow.show();
 
     return app.exec();

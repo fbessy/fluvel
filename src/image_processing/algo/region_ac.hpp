@@ -41,7 +41,7 @@
 #define REGION_AC_HPP
 
 #include "active_contour.hpp"
-#include "image_views.hpp"
+#include "image_span.hpp"
 
 namespace ofeli_ip
 {
@@ -131,7 +131,7 @@ public :
 
     //! Constructor to initialize with an initial contour.
     template<typename T>
-    RegionAc(Image8ConstView image1,
+    RegionAc(ImageSpan8 image1,
              T&& initial_contour1,
              const AcConfig& general_config1 = AcConfig(),              /* optional parameter */
              const RegionConfig& region_config1 = RegionConfig());  /* optional parameter */
@@ -157,7 +157,7 @@ private :
                                          WayContextConfig ctx_cfg) override;
 
     //! Image wrapper.
-    Image8ConstView image;
+    ImageSpan8 image;
 
     //! Specific configuration for region based active contour.
     const RegionConfig region_config;
@@ -180,7 +180,7 @@ private :
 };
 
 template<typename T>
-RegionAc::RegionAc(Image8ConstView image1,
+RegionAc::RegionAc(ImageSpan8 image1,
                    T&& initial_contour1,
                    const AcConfig& general_config1,      /* optional parameter with AcConfig() */
                    const RegionConfig& region_config1) /* optional parameter with RegionConfig() */

@@ -41,11 +41,11 @@
 #include "contour_rendering.hpp"
 #include "application_settings.hpp"
 
-#include "main_window.hpp"
+#include "image_window.hpp"
 #include "filters.hpp"
 #include "pixmap_widget.hpp"
 #include "scroll_area_widget.hpp"
-#include "qspinbox_kernel.hpp"
+#include "kernel_size_spinbox.hpp"
 #include "boundary_builder.hpp"
 #include "active_contour.hpp"
 
@@ -131,7 +131,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
 #endif
 
 
-    klength_gradient_spin = new QSpinBoxKernel;
+    klength_gradient_spin = new KernelSizeSpinBox;
     klength_gradient_spin->setSingleStep(2);
     klength_gradient_spin->setMinimum(3);
     klength_gradient_spin->setMaximum(499);
@@ -172,7 +172,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     geodesic_radio = new QRadioButton(tr("geodesic model"));
     geodesic_radio->setToolTip(tr("edge-based model for smoothed multimodal images"));
 
-    klength_gradient_spin = new QSpinBoxKernel;
+    klength_gradient_spin = new KernelSizeSpinBox;
     klength_gradient_spin->setSingleStep(2);
     klength_gradient_spin->setMinimum(3);
     klength_gradient_spin->setMaximum(499);
@@ -265,7 +265,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     Ns_spin->setSuffix(tr(" iterations"));
     Ns_spin->setToolTip(tr("iterations in the cycle 2, active contour regularization"));
 
-    klength_spin = new QSpinBoxKernel;
+    klength_spin = new KernelSizeSpinBox;
     klength_spin->setSingleStep(2);
     klength_spin->setMinimum(3);
     klength_spin->setMaximum(499);
@@ -609,7 +609,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     mean_groupbox = new QGroupBox(tr("Mean filter"));
     mean_groupbox->setCheckable(true);
     mean_groupbox->setChecked(false);
-    klength_mean_spin = new QSpinBoxKernel;
+    klength_mean_spin = new KernelSizeSpinBox;
     klength_mean_spin->setSingleStep(2);
     klength_mean_spin->setMinimum(3);
     klength_mean_spin->setMaximum(499);
@@ -623,7 +623,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     gaussian_groupbox = new QGroupBox(tr("Gaussian filter"));
     gaussian_groupbox->setCheckable(true);
     gaussian_groupbox->setChecked(false);
-    klength_gaussian_spin = new QSpinBoxKernel;
+    klength_gaussian_spin = new KernelSizeSpinBox;
     klength_gaussian_spin->setSingleStep(2);
     klength_gaussian_spin->setMinimum(3);
     klength_gaussian_spin->setMaximum(499);
@@ -645,7 +645,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     median_groupbox = new QGroupBox(tr("Median filter"));
     median_groupbox->setCheckable(true);
     median_groupbox->setChecked(false);
-    klength_median_spin = new QSpinBoxKernel;
+    klength_median_spin = new KernelSizeSpinBox;
     klength_median_spin->setSingleStep(2);
     klength_median_spin->setMinimum(3);
     klength_median_spin->setMaximum(499);
@@ -696,7 +696,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     open_groupbox = new QGroupBox(tr("Opening"));
     open_groupbox->setCheckable(true);
     open_groupbox->setChecked(false);
-    klength_open_spin = new QSpinBoxKernel;
+    klength_open_spin = new KernelSizeSpinBox;
     klength_open_spin->setSingleStep(2);
     klength_open_spin->setMinimum(3);
     klength_open_spin->setMaximum(499);
@@ -710,7 +710,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     close_groupbox = new QGroupBox(tr("Closing"));
     close_groupbox->setCheckable(true);
     close_groupbox->setChecked(false);
-    klength_close_spin = new QSpinBoxKernel;
+    klength_close_spin = new KernelSizeSpinBox;
     klength_close_spin->setSingleStep(2);
     klength_close_spin->setMinimum(3);
     klength_close_spin->setMaximum(499);
@@ -730,7 +730,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     whitetophat_radio->setToolTip(tr("difference between the input image the opened"));
     blacktophat_radio = new QRadioButton(tr("black top-hat"));
     blacktophat_radio->setToolTip(tr("difference between the closed and the input image"));
-    klength_tophat_spin = new QSpinBoxKernel;
+    klength_tophat_spin = new KernelSizeSpinBox;
     klength_tophat_spin->setSingleStep(2);
     klength_tophat_spin->setMinimum(3);
     klength_tophat_spin->setMaximum(499);
@@ -1254,7 +1254,7 @@ void SettingsWindow::update_visu()
 {
     if( parent() != nullptr )
     {
-        //scale_spin->setValue(static_cast<MainWindow*>(parent())->get_zoom_factor());
+        //scale_spin->setValue(static_cast<ImageWindow*>(parent())->get_zoom_factor());
 
         if( tabs->currentIndex() == TabIndex::INITIALIZATION )
         {
@@ -1405,7 +1405,7 @@ void SettingsWindow::accept()
 
     if( parent() != nullptr )
     {
-        //static_cast<MainWindow*>(parent())->set_zoom_factor(scale_spin->value());
+        //static_cast<ImageWindow*>(parent())->set_zoom_factor(scale_spin->value());
     }
 
     config.has_histo_normaliz = histo_checkbox->isChecked();
@@ -1600,7 +1600,7 @@ void SettingsWindow::reject()
 
     if( parent() != nullptr )
     {
-        //scale_spin->setValue(static_cast<MainWindow*>(parent())->get_zoom_factor());
+        //scale_spin->setValue(static_cast<ImageWindow*>(parent())->get_zoom_factor());
     }
 
     histo_checkbox->setChecked(config.has_histo_normaliz);

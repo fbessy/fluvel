@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <QVideoFrame>
-#include "frame_stats.hpp"
+#include "frame_stats_view.hpp"
 #include "runtime_settings.hpp"
 
 namespace ofeli_gui {

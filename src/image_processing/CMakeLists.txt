@@ -39,7 +39,7 @@ set(ip_src
     ${CORE_DIR}/matrix.txx
     ${CORE_DIR}/matrix.hpp
 
-    ${CORE_DIR}/image_views.hpp
+    ${CORE_DIR}/image_span.hpp
     ${CORE_DIR}/point.hpp
     ${CORE_DIR}/point_hash.hpp
     ${CORE_DIR}/math.hpp

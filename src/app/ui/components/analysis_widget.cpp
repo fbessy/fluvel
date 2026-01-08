@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#include "evaluation_widget.hpp"
+#include "analysis_widget.hpp"
 
 #include "pixmap_widget.hpp"
 #include "scroll_area_widget.hpp"
@@ -46,9 +46,9 @@
 namespace ofeli_gui
 {
 
-int EvaluationWidget::count_this = 0;
+int AnalysisWidget::count_this = 0;
 
-EvaluationWidget::EvaluationWidget(QWidget *parent) :
+AnalysisWidget::AnalysisWidget(QWidget *parent) :
     QWidget(parent),
     scale_spin(nullptr),
     img_width(0), img_height(0)
@@ -216,7 +216,7 @@ EvaluationWidget::EvaluationWidget(QWidget *parent) :
     connect( this, SIGNAL(change_list()), parent, SLOT(check_lists()) );
 }
 
-void EvaluationWidget::open_filename()
+void AnalysisWidget::open_filename()
 {
     absolute_name = QFileDialog::getOpenFileName(this,
                                                  tr("Open File") + " " + QString::number(id_this),
@@ -225,7 +225,7 @@ void EvaluationWidget::open_filename()
     open_img();
 }
 
-void EvaluationWidget::open_img()
+void AnalysisWidget::open_img()
 {
     if( !absolute_name.isEmpty() )
     {
@@ -255,7 +255,7 @@ void EvaluationWidget::open_img()
     }
 }
 
-void EvaluationWidget::refresh_rgb(int color_list_index)
+void AnalysisWidget::refresh_rgb(int color_list_index)
 {
     if ( color_list_index == ComboBoxColorIndex::SELECTED )
     {
@@ -269,7 +269,7 @@ void EvaluationWidget::refresh_rgb(int color_list_index)
     refresh_img_noise( noise_sp->value() );
 }
 
-void EvaluationWidget::create_list()
+void AnalysisWidget::create_list()
 {
     shape.clear();
 
@@ -322,7 +322,7 @@ void EvaluationWidget::create_list()
     emit change_list();
 }
 
-void EvaluationWidget::refresh_img_noise(int noise_percent)
+void AnalysisWidget::refresh_img_noise(int noise_percent)
 {
     if ( !img.isNull() )
     {
@@ -356,7 +356,7 @@ void EvaluationWidget::refresh_img_noise(int noise_percent)
     }
 }
 
-bool EvaluationWidget::eventFilter(QObject* object, QEvent* event)
+bool AnalysisWidget::eventFilter(QObject* object, QEvent* event)
 {
     if( object == scale_spin && event->type() == QEvent::MouseButtonPress )
     {
@@ -408,7 +408,7 @@ bool EvaluationWidget::eventFilter(QObject* object, QEvent* event)
     return false;
 }
 
-void EvaluationWidget::mouseMoveEvent(QMouseEvent* event)
+void AnalysisWidget::mouseMoveEvent(QMouseEvent* event)
 {
     if( !img.isNull() )
     {
@@ -421,7 +421,7 @@ void EvaluationWidget::mouseMoveEvent(QMouseEvent* event)
     }
 }
 
-void EvaluationWidget::mousePressEvent(QMouseEvent*)
+void AnalysisWidget::mousePressEvent(QMouseEvent*)
 {
     if( !img.isNull() &&
         X_position >= 0 &&
@@ -448,7 +448,7 @@ void EvaluationWidget::mousePressEvent(QMouseEvent*)
     }
 }
 
-void EvaluationWidget::dragEnterEvent(QDragEnterEvent* event)
+void AnalysisWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     QString text( tr("<drop image")+QString::number(id_this)+">" );
     img_disp->set_text(text);
@@ -459,12 +459,12 @@ void EvaluationWidget::dragEnterEvent(QDragEnterEvent* event)
     emit changed(event->mimeData());
 }
 
-void EvaluationWidget::dragMoveEvent(QDragMoveEvent* event)
+void AnalysisWidget::dragMoveEvent(QDragMoveEvent* event)
 {
     event->acceptProposedAction();
 }
 
-void EvaluationWidget::dropEvent(QDropEvent* event)
+void AnalysisWidget::dropEvent(QDropEvent* event)
 {
     const QMimeData* mimeData = event->mimeData();
 
@@ -478,7 +478,7 @@ void EvaluationWidget::dropEvent(QDropEvent* event)
     event->acceptProposedAction();
 }
 
-void EvaluationWidget::dragLeaveEvent(QDragLeaveEvent* event)
+void AnalysisWidget::dragLeaveEvent(QDragLeaveEvent* event)
 {
     QString text( tr("<drag image")+QString::number(id_this)+">" );
     img_disp->set_text(text);
@@ -488,7 +488,7 @@ void EvaluationWidget::dragLeaveEvent(QDragLeaveEvent* event)
     event->accept();
 }
 
-void EvaluationWidget::get_list_color()
+void AnalysisWidget::get_list_color()
 {
     QColor color;
     QString title_str;
@@ -521,7 +521,7 @@ void EvaluationWidget::get_list_color()
     }
 }
 
-void EvaluationWidget::wheel_zoom(int val, ScrollAreaWidget* obj)
+void AnalysisWidget::wheel_zoom(int val, ScrollAreaWidget* obj)
 {
     if( obj == area && !img.isNull() )
     {
@@ -539,7 +539,7 @@ void EvaluationWidget::wheel_zoom(int val, ScrollAreaWidget* obj)
     }
 }
 
-void EvaluationWidget::scale_img_disp(int value)
+void AnalysisWidget::scale_img_disp(int value)
 {
     if( !img.isNull() )
     {
@@ -547,7 +547,7 @@ void EvaluationWidget::scale_img_disp(int value)
     }
 }
 
-void EvaluationWidget::adjust_vertical_scroll(int min, int max)
+void AnalysisWidget::adjust_vertical_scroll(int min, int max)
 {
     if( img_height != 0 )
     {
@@ -555,7 +555,7 @@ void EvaluationWidget::adjust_vertical_scroll(int min, int max)
     }
 }
 
-void EvaluationWidget::adjust_horizontal_scroll(int min, int max)
+void AnalysisWidget::adjust_horizontal_scroll(int min, int max)
 {
     if( img_width != 0 )
     {
@@ -563,7 +563,7 @@ void EvaluationWidget::adjust_horizontal_scroll(int min, int max)
     }
 }
 
-void EvaluationWidget::save_settings() const
+void AnalysisWidget::save_settings() const
 {
     QSettings settings;
 

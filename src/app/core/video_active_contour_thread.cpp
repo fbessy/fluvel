@@ -86,7 +86,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
                                        Qt::IgnoreAspectRatio,
                                        Qt::FastTransformation);
 
-        auto img_algo = image32_view_from_qimage(q_img_algo);
+        auto img_algo = image_span_32_from_qimage(q_img_algo);
 
         if ( !region_ac || configChanged )
         {

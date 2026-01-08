@@ -1,5 +1,5 @@
-#ifndef IMAGE_VIEWS_H
-#define IMAGE_VIEWS_H
+#ifndef IMAGE_SPAN_HPP
+#define IMAGE_SPAN_HPP
 
 #include <cassert>
 #include <bit>
@@ -7,12 +7,12 @@
 namespace ofeli_ip
 {
 
-class Image8ConstView final
+class ImageSpan8 final
 {
 
 public:
 
-    Image8ConstView(const unsigned char* image_data1,
+    ImageSpan8(const unsigned char* image_data1,
                     int image_width1,
                     int image_height1):
         image_data(image_data1),
@@ -72,10 +72,10 @@ using Rgb_uc = Rgb<unsigned char>;
 using Rgb_i = Rgb<int>;
 using Rgb_ui = Rgb<unsigned int>;
 
-class Image32ConstView final
+class ImageSpan32 final
 {
 public:
-    Image32ConstView(const unsigned char* data,
+    ImageSpan32(const unsigned char* data,
                      int width,
                      int height):
         image_data(data),
@@ -136,4 +136,4 @@ private:
 
 }
 
-#endif // IMAGE_VIEWS_H
+#endif // IMAGE_SPAN_HPP

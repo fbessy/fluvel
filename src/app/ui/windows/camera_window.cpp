@@ -81,7 +81,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     blackImage.fill(Qt::black);
     blackLabel->setPixmap(QPixmap::fromImage(blackImage));
 
-    videoView = new ImageViewBase(this);
+    videoView = new ImageView(this);
 
     cameraOverlay = new CameraOverlayWidget(this);
 

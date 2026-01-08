@@ -10,14 +10,14 @@ set(app_src
 
     ${APP_DIR}/main.cpp
 
-    ${UI_WIN_DIR}/main_window.cpp
-    ${UI_WIN_DIR}/main_window.hpp
+    ${UI_WIN_DIR}/image_window.cpp
+    ${UI_WIN_DIR}/image_window.hpp
 
     ${UI_WIN_DIR}/camera_window.cpp
     ${UI_WIN_DIR}/camera_window.hpp
 
-    ${UI_WIN_DIR}/evaluation_window.cpp
-    ${UI_WIN_DIR}/evaluation_window.hpp
+    ${UI_WIN_DIR}/analysis_window.cpp
+    ${UI_WIN_DIR}/analysis_window.hpp
 
     ${UI_WIN_DIR}/settings_window.cpp
     ${UI_WIN_DIR}/settings_window.hpp
@@ -28,29 +28,29 @@ set(app_src
     ${UI_WIN_DIR}/about_window.cpp
     ${UI_WIN_DIR}/about_window.hpp
 
-    ${UI_COMP_DIR}/image_view_base.cpp
-    ${UI_COMP_DIR}/image_view_base.hpp
+    ${UI_COMP_DIR}/image_view.cpp
+    ${UI_COMP_DIR}/image_view.hpp
 
     ${UI_COMP_DIR}/camera_overlay_widget.cpp
     ${UI_COMP_DIR}/camera_overlay_widget.hpp
 
-    ${UI_COMP_DIR}/evaluation_widget.cpp
-    ${UI_COMP_DIR}/evaluation_widget.hpp
+    ${UI_COMP_DIR}/analysis_widget.cpp
+    ${UI_COMP_DIR}/analysis_widget.hpp
 
     ${UI_COMP_DIR}/pixmap_widget.cpp
     ${UI_COMP_DIR}/pixmap_widget.hpp
 
-    ${UI_COMP_DIR}/qspinbox_kernel.cpp
-    ${UI_COMP_DIR}/qspinbox_kernel.hpp
+    ${UI_COMP_DIR}/kernel_size_spinbox.cpp
+    ${UI_COMP_DIR}/kernel_size_spinbox.hpp
 
     ${UI_COMP_DIR}/scroll_area_widget.cpp
     ${UI_COMP_DIR}/scroll_area_widget.hpp
 
-    ${UI_COMP_DIR}/frame_stats.cpp
-    ${UI_COMP_DIR}/frame_stats.hpp
+    ${UI_COMP_DIR}/frame_stats_view.cpp
+    ${UI_COMP_DIR}/frame_stats_view.hpp
 
-    ${CORE_DIR}/image_pipeline_controller.cpp
-    ${CORE_DIR}/image_pipeline_controller.hpp
+    ${CORE_DIR}/image_controller.cpp
+    ${CORE_DIR}/image_controller.hpp
 
     ${CORE_DIR}/active_contour_worker.cpp
     ${CORE_DIR}/active_contour_worker.hpp

@@ -1,12 +1,12 @@
-#ifndef FRAME_STATS_HPP
-#define FRAME_STATS_HPP
+#ifndef FRAME_STATS_VIEW_HPP
+#define FRAME_STATS_VIEW_HPP
 
 #include <QtGlobal>
 #include <QMutex>
 
 namespace ofeli_gui {
 
-class FrameStats
+class FrameStatsView
 {
 public:
     struct Snapshot {
@@ -18,7 +18,7 @@ public:
         float maxLatencyMs = 0.f;
     };
 
-    FrameStats();
+    FrameStatsView();
 
     // événements
     void frameReceived(qint64 recvTsNs);
@@ -55,4 +55,4 @@ private:
 
 }
 
-#endif // FRAME_STATS_HPP
+#endif // FRAME_STATS_VIEW_HPP

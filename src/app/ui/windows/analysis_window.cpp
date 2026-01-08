@@ -37,8 +37,8 @@
 **
 ****************************************************************************/
 
-#include "evaluation_window.hpp"
-#include "evaluation_widget.hpp"
+#include "analysis_window.hpp"
+#include "analysis_widget.hpp"
 #include "hausdorff_distance.hpp"
 
 #include <QtWidgets>
@@ -47,7 +47,7 @@
 namespace ofeli_gui
 {
 
-EvaluationWindow::EvaluationWindow(QWidget* parent) :
+AnalysisWindow::AnalysisWindow(QWidget* parent) :
     QDialog(parent),
     hd(nullptr),
     factor(0.f)
@@ -66,8 +66,8 @@ EvaluationWindow::EvaluationWindow(QWidget* parent) :
     ///          Input evaluation QDialog window (this)         ///
     ///////////////////////////////////////////////////////////////
 
-    widget1 = new EvaluationWidget(this);
-    widget2 = new EvaluationWidget(this);
+    widget1 = new AnalysisWidget(this);
+    widget2 = new AnalysisWidget(this);
 
 
     QHBoxLayout* lists_select_layout = new QHBoxLayout;
@@ -171,7 +171,7 @@ EvaluationWindow::EvaluationWindow(QWidget* parent) :
     result_popup->setLayout(result_layout);
 }
 
-void EvaluationWindow::compute_hd()
+void AnalysisWindow::compute_hd()
 {
     if( hd != nullptr )
     {
@@ -223,7 +223,7 @@ void EvaluationWindow::compute_hd()
     result_popup->show();
 }
 
-void EvaluationWindow::refresh_quantile(int hundredth)
+void AnalysisWindow::refresh_quantile(int hundredth)
 {
     if( hd != nullptr )
     {
@@ -237,7 +237,7 @@ void EvaluationWindow::refresh_quantile(int hundredth)
     }
 }
 
-void EvaluationWindow::check_lists()
+void AnalysisWindow::check_lists()
 {
     if( widget1->get_shape().is_valid() &&
         widget2->get_shape().is_valid()    )
@@ -251,7 +251,7 @@ void EvaluationWindow::check_lists()
     }
 }
 
-void EvaluationWindow::calculate_shapes_intersection()
+void AnalysisWindow::calculate_shapes_intersection()
 {
     std::size_t size1 = widget1->get_shape().get_points().size();
     std::size_t size2 = widget2->get_shape().get_points().size();
@@ -288,7 +288,7 @@ void EvaluationWindow::calculate_shapes_intersection()
     }
 }
 
-void EvaluationWindow::closeEvent(QCloseEvent* event)
+void AnalysisWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 

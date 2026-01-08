@@ -1,4 +1,4 @@
-#include "image_view_base.hpp"
+#include "image_view.hpp"
 
 #include <QPainter>
 #include <QWheelEvent>
@@ -7,7 +7,7 @@
 
 namespace ofeli_gui {
 
-ImageViewBase::ImageViewBase(QWidget* parent)
+ImageView::ImageView(QWidget* parent)
     : QGraphicsView(parent),
       scene(new QGraphicsScene(this))
 {
@@ -26,13 +26,13 @@ ImageViewBase::ImageViewBase(QWidget* parent)
     throttleTimer->setSingleShot(true);
 
     connect(throttleTimer, &QTimer::timeout,
-            this, &ImageViewBase::flushPendingFrame);
+            this, &ImageView::flushPendingFrame);
 }
 
 // ------------------------------------------------------------
 // Public API
 // ------------------------------------------------------------
-void ImageViewBase::setMaxDisplayFps(double fps)
+void ImageView::setMaxDisplayFps(double fps)
 {
     if (fps <= 0.0) {
         minDisplayIntervalMs = 0;
@@ -42,7 +42,7 @@ void ImageViewBase::setMaxDisplayFps(double fps)
     minDisplayIntervalMs = static_cast<int>(1000.0 / fps);
 }
 
-void ImageViewBase::displayImage(const QImage& img)
+void ImageView::displayImage(const QImage& img)
 {
     // Toujours garder la dernière image
     pendingFrame = img;
@@ -73,7 +73,7 @@ void ImageViewBase::displayImage(const QImage& img)
 // ------------------------------------------------------------
 // Internal rendering
 // ------------------------------------------------------------
-void ImageViewBase::flushPendingFrame()
+void ImageView::flushPendingFrame()
 {
     if (!hasPendingFrame)
         return;
@@ -83,7 +83,7 @@ void ImageViewBase::flushPendingFrame()
     displayTimer.restart();
 }
 
-void ImageViewBase::updatePixmap(const QImage& img)
+void ImageView::updatePixmap(const QImage& img)
 {
     bool needUpdateDragMode = false;
 
@@ -120,7 +120,7 @@ void ImageViewBase::updatePixmap(const QImage& img)
     }
 }
 
-void ImageViewBase::applyAutoView()
+void ImageView::applyAutoView()
 {
     if (!pixmapItem)
         return;
@@ -129,7 +129,7 @@ void ImageViewBase::applyAutoView()
     fitInView(pixmapItem, Qt::KeepAspectRatio);
 }
 
-void ImageViewBase::updateDragMode()
+void ImageView::updateDragMode()
 {
     if ( !scene )
         return;
@@ -156,7 +156,7 @@ void ImageViewBase::updateDragMode()
 // ------------------------------------------------------------
 // Interaction
 // ------------------------------------------------------------
-void ImageViewBase::wheelEvent(QWheelEvent* event)
+void ImageView::wheelEvent(QWheelEvent* event)
 {
     constexpr double zoomFactor = 1.15;
 
@@ -191,7 +191,7 @@ void ImageViewBase::wheelEvent(QWheelEvent* event)
 #endif
 }
 
-void ImageViewBase::mousePressEvent(QMouseEvent* event)
+void ImageView::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::MiddleButton) {
         autoViewEnabled = true;
@@ -206,7 +206,7 @@ void ImageViewBase::mousePressEvent(QMouseEvent* event)
     QGraphicsView::mousePressEvent(event);
 }
 
-void ImageViewBase::mouseDoubleClickEvent(QMouseEvent* event)
+void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 {
     Q_UNUSED(event);
 
@@ -237,7 +237,7 @@ void ImageViewBase::mouseDoubleClickEvent(QMouseEvent* event)
     updateDragMode();
 }
 
-void ImageViewBase::resizeEvent(QResizeEvent* event)
+void ImageView::resizeEvent(QResizeEvent* event)
 {
     QGraphicsView::resizeEvent(event);
 
@@ -248,12 +248,12 @@ void ImageViewBase::resizeEvent(QResizeEvent* event)
     updateDragMode();
 }
 
-double ImageViewBase::getCurrentZoom() const
+double ImageView::getCurrentZoom() const
 {
     return transform().m11(); // scale X
 }
 
-QImage ImageViewBase::currentImage() const
+QImage ImageView::currentImage() const
 {
     return lastDisplayedImage;
 }

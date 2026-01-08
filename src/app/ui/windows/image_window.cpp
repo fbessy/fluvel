@@ -1,7 +1,7 @@
-#include "main_window.hpp"
+#include "image_window.hpp"
 
-#include "image_view_base.hpp"
-#include "image_pipeline_controller.hpp"
+#include "image_view.hpp"
+#include "image_controller.hpp"
 #include "active_contour_worker.hpp"
 
 #include <QMenuBar>
@@ -11,7 +11,7 @@
 
 namespace ofeli_gui {
 
-MainWindow::MainWindow(QWidget* parent)
+ImageWindow::ImageWindow(QWidget* parent)
     : QMainWindow(parent)
 {
     setupUi();
@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget* parent)
     last_directory_used = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
 }
 
-void MainWindow::setupUi()
+void ImageWindow::setupUi()
 {
     setWindowTitle( tr("Ofeli") );
     setWindowIcon( QIcon(":/icons/app/Ofeli.svg") );
@@ -37,7 +37,7 @@ void MainWindow::setupUi()
         restoreGeometry(geo);
 
     camera_window = new CameraWindow(this);
-    evaluation_window = new EvaluationWindow(this);
+    evaluation_window = new AnalysisWindow(this);
     settings_window = new SettingsWindow(this);
     about_window = new AboutWindow(this);
     language_window = new LanguageWindow(this);
@@ -66,7 +66,7 @@ void MainWindow::setupUi()
     controlLayout->addStretch();
     // --- Image view ---
 
-    imageView = new ImageViewBase(central);
+    imageView = new ImageView(central);
     imageView->setMaxDisplayFps(60);
 
     // Assemblage
@@ -76,7 +76,7 @@ void MainWindow::setupUi()
     setCentralWidget(central);
 }
 
-void MainWindow::setupActions()
+void ImageWindow::setupActions()
 {
     ////////////////////////////////////////////////////////////////////////////////////////
     /////////////                          Create Actions                /////////////////////
@@ -195,11 +195,11 @@ void MainWindow::setupActions()
     menuBar()->addMenu(windowMenu);
     menuBar()->addMenu(helpMenu);
 
-    imageController = new ImagePipelineController(this);
+    imageController = new ImageController(this);
     acWorker = new ActiveContourWorker;
 }
 
-void MainWindow::setupConnections()
+void ImageWindow::setupConnections()
 {
     nameFilters << "*.bmp"
                 << "*.gif"
@@ -235,29 +235,29 @@ void MainWindow::setupConnections()
             }
         });
     }
-    connect(this, &MainWindow::fileSelected, imageController, &ImagePipelineController::loadImage);
+    connect(this, &ImageWindow::fileSelected, imageController, &ImageController::loadImage);
 
-    //connect(deleteAct, &QAction::triggered, this, &MainWindow::deleteList);
-    //connect(saveAct, &QAction::triggered, this, &MainWindow::saveImage);
-    connect(exitAct, &QAction::triggered, this, &MainWindow::close);
+    //connect(deleteAct, &QAction::triggered, this, &ImageWindow::deleteList);
+    //connect(saveAct, &QAction::triggered, this, &ImageWindow::saveImage);
+    connect(exitAct, &QAction::triggered, this, &ImageWindow::close);
 
-    connect(cameraAct, &QAction::triggered, this, &MainWindow::onStartCameraActionTriggered);
-    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this, &MainWindow::updateCameraAction);
-    connect(evaluateAct, &QAction::triggered, evaluation_window, &EvaluationWindow::show);
+    connect(cameraAct, &QAction::triggered, this, &ImageWindow::onStartCameraActionTriggered);
+    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this, &ImageWindow::updateCameraAction);
+    connect(evaluateAct, &QAction::triggered, evaluation_window, &AnalysisWindow::show);
     connect(settingsAct, &QAction::triggered, settings_window, &SettingsWindow::show);
 
     connect(aboutAct, &QAction::triggered, about_window, &AboutWindow::show);
     connect(languageAct, &QAction::triggered, language_window, &LanguageWindow::show);
 
 
-    connect(imageController, &ImagePipelineController::imageReady,
-            imageView,       &ImageViewBase::displayImage);
+    connect(imageController, &ImageController::imageReady,
+            imageView,       &ImageView::displayImage);
 
-    connect(imageController, &ImagePipelineController::contourReady,
+    connect(imageController, &ImageController::contourReady,
             acWorker,        &ActiveContourWorker::setImage);
 
     connect(acWorker,  &ActiveContourWorker::resultReady,
-            imageView, &ImageViewBase::displayImage);
+            imageView, &ImageView::displayImage);
 
     connect(startButton,   &QPushButton::clicked,
             acWorker,      &ActiveContourWorker::start);
@@ -269,12 +269,12 @@ void MainWindow::setupConnections()
             acWorker,     &ActiveContourWorker::stop);
 }
 
-QString MainWindow::strippedName(const QString &fullFileName)
+QString ImageWindow::strippedName(const QString &fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
 }
 
-void MainWindow::updateRecentFileActions()
+void ImageWindow::updateRecentFileActions()
 {
     QSettings settings;
     QStringList files = settings.value("Main/Name/recentFileList").toStringList();
@@ -307,7 +307,7 @@ void MainWindow::updateRecentFileActions()
     }
 }
 
-void MainWindow::updateCameraAction()
+void ImageWindow::updateCameraAction()
 {
     auto cameras = QMediaDevices::videoInputs();
 
@@ -321,7 +321,7 @@ void MainWindow::updateCameraAction()
     }
 }
 
-void MainWindow::onStartCameraActionTriggered()
+void ImageWindow::onStartCameraActionTriggered()
 {
     auto cameras = QMediaDevices::videoInputs();
 
@@ -335,7 +335,7 @@ void MainWindow::onStartCameraActionTriggered()
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent* event)
+void ImageWindow::closeEvent(QCloseEvent* event)
 {
     auto& config = AppSettings::instance();
     QSettings settings;

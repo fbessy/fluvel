@@ -42,7 +42,7 @@
 namespace ofeli_ip
 {
 
-void RegionColorAc::reinitialize(Image32ConstView image1)
+void RegionColorAc::reinitialize(ImageSpan32 image1)
 {
     ActiveContour::reinitialize();
 

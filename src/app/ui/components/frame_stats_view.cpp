@@ -1,15 +1,15 @@
-#include "frame_stats.hpp"
+#include "frame_stats_view.hpp"
 
 namespace ofeli_gui {
 
 static constexpr qint64 WINDOW_NS = 1'000'000'000LL; // 1 seconde
 
-FrameStats::FrameStats()
+FrameStatsView::FrameStatsView()
 {
     reset();
 }
 
-void FrameStats::reset()
+void FrameStatsView::reset()
 {
     QMutexLocker lock(&mutex);
 
@@ -25,7 +25,7 @@ void FrameStats::reset()
     lastSnapshot = {};
 }
 
-void FrameStats::frameReceived(qint64 recvTsNs)
+void FrameStatsView::frameReceived(qint64 recvTsNs)
 {
     QMutexLocker lock(&mutex);
 
@@ -36,13 +36,13 @@ void FrameStats::frameReceived(qint64 recvTsNs)
     updateWindowLocked(recvTsNs);
 }
 
-void FrameStats::frameProcessed()
+void FrameStatsView::frameProcessed()
 {
     QMutexLocker lock(&mutex);
     processedFrames++;
 }
 
-void FrameStats::frameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
+void FrameStatsView::frameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
 {
     QMutexLocker lock(&mutex);
 
@@ -58,13 +58,13 @@ void FrameStats::frameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
     updateWindowLocked(displayTsNs);
 }
 
-FrameStats::Snapshot FrameStats::snapshot()
+FrameStatsView::Snapshot FrameStatsView::snapshot()
 {
     QMutexLocker lock(&mutex);
     return lastSnapshot;
 }
 
-void FrameStats::updateWindowLocked(qint64 nowNs)
+void FrameStatsView::updateWindowLocked(qint64 nowNs)
 {
     qint64 elapsed = nowNs - windowStartNs;
     if (elapsed < WINDOW_NS)

@@ -43,4 +43,4 @@ private :
 
 
 //! \class ofeli::LanguageWindow
-//! The class LanguageWindow is a QDialog window to choose the application langage for the user. An instance of this class is created by #ofeli::MainWindow and displayed when the user clicks on menu Language.
+//! The class LanguageWindow is a QDialog window to choose the application langage for the user. An instance of this class is created by #ofeli::ImageWindow and displayed when the user clicks on menu Language.

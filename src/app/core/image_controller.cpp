@@ -1,14 +1,14 @@
-#include "image_pipeline_controller.hpp"
+#include "image_controller.hpp"
 
 namespace ofeli_gui {
 
-ImagePipelineController::ImagePipelineController(QWidget* parent)
+ImageController::ImageController(QWidget* parent)
 {
-    connect(this, &ImagePipelineController::imageReady,
-            this, &ImagePipelineController::applyFilters);
+    connect(this, &ImageController::imageReady,
+            this, &ImageController::applyFilters);
 }
 
-void ImagePipelineController::loadImage(const QString& path)
+void ImageController::loadImage(const QString& path)
 {
     img = QImage(path);
 
@@ -56,7 +56,7 @@ void ImagePipelineController::loadImage(const QString& path)
     emit imageReady(img);
 }
 
-void ImagePipelineController::applyFilters()
+void ImageController::applyFilters()
 {
     filtered = img;
     emit contourReady(filtered);

@@ -45,7 +45,7 @@
 #include "filters.hpp"
 #include "pixmap_widget.hpp"
 #include "scroll_area_widget.hpp"
-#include "qspinbox_kernel.hpp"
+#include "kernel_size_spinbox.hpp"
 #include "matrix.hpp"
 #include "contour_rendering.hpp"
 #include "contour_data.hpp"
@@ -118,7 +118,7 @@ private :
     QSpinBox* lambda_out_spin;
     QSpinBox* lambda_in_spin;
     QRadioButton* geodesic_radio;
-    QSpinBoxKernel* klength_gradient_spin;
+    KernelSizeSpinBox* klength_gradient_spin;
     QGroupBox* color_weights_groupbox;
     QComboBox* color_space_cb;
     QSpinBox* alpha_spin;
@@ -131,7 +131,7 @@ private :
     unsigned int gamma2;
 
     QGroupBox* internalspeed_groupbox;
-    QSpinBoxKernel* klength_spin;
+    KernelSizeSpinBox* klength_spin;
     QDoubleSpinBox* std_spin;
 
     QComboBox* downscale_factor_cb;
@@ -202,7 +202,7 @@ private :
     QVBoxLayout* filter_layout();
 
     QGroupBox* median_groupbox;
-    QSpinBoxKernel* klength_median_spin;
+    KernelSizeSpinBox* klength_median_spin;
     QRadioButton* complex_radio1;
     QRadioButton* complex_radio2;
     bool has_median_filt2;
@@ -210,12 +210,12 @@ private :
     int kernel_median_length2;
 
     QGroupBox* mean_groupbox;
-    QSpinBoxKernel* klength_mean_spin;
+    KernelSizeSpinBox* klength_mean_spin;
     bool has_mean_filt2;
     int kernel_mean_length2;
 
     QGroupBox* gaussian_groupbox;
-    QSpinBoxKernel* klength_gaussian_spin;
+    KernelSizeSpinBox* klength_gaussian_spin;
     QDoubleSpinBox* std_filter_spin;
     bool has_gaussian_filt2;
     int kernel_gaussian_length2;
@@ -234,19 +234,19 @@ private :
     ofeli_ip::AnisoDiff aniso_option2;
 
     QGroupBox* open_groupbox;
-    QSpinBoxKernel* klength_open_spin;
+    KernelSizeSpinBox* klength_open_spin;
     bool has_open_filt2;
     int kernel_open_length2;
 
     QGroupBox* close_groupbox;
-    QSpinBoxKernel* klength_close_spin;
+    KernelSizeSpinBox* klength_close_spin;
     bool has_close_filt2;
     int kernel_close_length2;
 
     QGroupBox* tophat_groupbox;
     QRadioButton* whitetophat_radio;
     QRadioButton* blacktophat_radio;
-    QSpinBoxKernel* klength_tophat_spin;
+    KernelSizeSpinBox* klength_tophat_spin;
     bool has_top_hat_filt2;
     bool is_white_top_hat2;
     int kernel_tophat_length2;

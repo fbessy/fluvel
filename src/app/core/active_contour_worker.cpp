@@ -6,7 +6,7 @@
 
 #include "application_settings.hpp"
 #include "contour_rendering.hpp"
-#include "image_views.hpp"
+#include "image_span.hpp"
 #include "image_adapters.hpp"
 
 #include <QTimer>
@@ -87,8 +87,8 @@ void ActiveContourWorker::initializeActiveContour()
                                               config.Lin_init,
                                               m_workImage.width(), m_workImage.height());
 
-        ofeli_ip::Image8ConstView  image_grayscale(image8_view_from_qimage(m_workImage));
-        ofeli_ip::Image32ConstView image_rgb(image32_view_from_qimage(m_workImage));
+        ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(m_workImage));
+        ofeli_ip::ImageSpan32 image_rgb(image_span_32_from_qimage(m_workImage));
 
         bool is_rgb = ( m_workImage.format() != QImage::Format_Grayscale8 );
 

@@ -1,17 +1,17 @@
-#ifndef IMAGE_PIPELINE_CONTROLLER_HPP
-#define IMAGE_PIPELINE_CONTROLLER_HPP
+#ifndef IMAGE_CONTROLLER_HPP
+#define IMAGE_CONTROLLER_HPP
 
 #include <QImage>
 #include <QObject>
 
 namespace ofeli_gui {
 
-class ImagePipelineController : public QObject
+class ImageController : public QObject
 {
 Q_OBJECT
 
 public:
-    ImagePipelineController(QWidget* parent);
+    ImageController(QWidget* parent);
     void applyFilters();
 
 public slots:
@@ -28,4 +28,4 @@ private:
 
 }
 
-#endif // IMAGE_PIPELINE_CONTROLLER_HPP
+#endif // IMAGE_CONTROLLER_HPP

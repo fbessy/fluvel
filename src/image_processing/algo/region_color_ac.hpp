@@ -42,7 +42,7 @@
 
 #include "active_contour.hpp"
 #include "region_ac.hpp"
-#include "image_views.hpp"
+#include "image_span.hpp"
 
 namespace ofeli_ip
 {
@@ -181,13 +181,13 @@ public :
 
     ///! Constructor to initialize with an initial contour.
     template<typename T>
-    RegionColorAc(Image32ConstView image1,
+    RegionColorAc(ImageSpan32 image1,
                  T&& initial_contour1,
                  const AcConfig& general_config1 = AcConfig(),                       /* optional parameter */
                  const RegionColorConfig& region_config1 = RegionColorConfig()); /* optional parameter */
 
     //! Reinitializes the active contour with a new image buffer. Used for video tracking.
-    void reinitialize(Image32ConstView image1);
+    void reinitialize(ImageSpan32 image1);
 
     //! Getter function for #average_rgb_out
     const Rgb_uc& get_Cout() const { return average_out; }
@@ -234,7 +234,7 @@ private :
                       int color[]) const;
 
     //! Image wrapper.
-    Image32ConstView image;
+    ImageSpan32 image;
 
     //! Specific configuration for YUV region based active contour.
     const RegionColorConfig region_config;
@@ -266,7 +266,7 @@ private :
 // Definitions
 
 template<typename T>
-RegionColorAc::RegionColorAc(Image32ConstView image1,
+RegionColorAc::RegionColorAc(ImageSpan32 image1,
                              T&& initial_contour1,
                              const AcConfig& general_config1,           /* optional parameter with AcConfig() */
                              const RegionColorConfig& region_config1) /* optional parameter with RegionColorConfig() */

@@ -37,8 +37,8 @@
 **
 ****************************************************************************/
 
-#ifndef EVALUATION_WIDGET_HPP
-#define EVALUATION_WIDGET_HPP
+#ifndef ANALYSIS_WIDGET_H
+#define ANALYSIS_WIDGET_H
 
 #include <QWidget>
 #include "shape.hpp"
@@ -58,13 +58,13 @@ namespace ofeli_gui
 class PixmapWidget;
 class ScrollAreaWidget;
 
-class EvaluationWidget : public QWidget
+class AnalysisWidget : public QWidget
 {
     Q_OBJECT
 
 public :
 
-    EvaluationWidget(QWidget* parent = nullptr);
+    AnalysisWidget(QWidget* parent = nullptr);
 
     int get_img_width() const { return img_width; }
     int get_img_height() const { return img_height; }
@@ -142,4 +142,4 @@ signals :
 
 }
 
-#endif // EVALUATION_WIDGET_HPP
+#endif // ANALYSIS_WIDGET_H

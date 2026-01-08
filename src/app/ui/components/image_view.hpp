@@ -1,5 +1,5 @@
-#ifndef IMAGE_VIEW_BASE_HPP
-#define IMAGE_VIEW_BASE_HPP
+#ifndef IMAGE_VIEW_HPP
+#define IMAGE_VIEW_HPP
 
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -10,12 +10,12 @@
 
 namespace ofeli_gui {
 
-class ImageViewBase : public QGraphicsView
+class ImageView : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    explicit ImageViewBase(QWidget* parent = nullptr);
+    explicit ImageView(QWidget* parent = nullptr);
 
     // Affichage image (thread-safe via event loop)
     void displayImage(const QImage& img);
