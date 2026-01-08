@@ -60,7 +60,7 @@ class ImageWindow : public QMainWindow
 
 public:
     explicit ImageWindow(QWidget* parent = nullptr);
-    ~ImageWindow() override = default;
+    ~ImageWindow() override;
 
 private:
     virtual void closeEvent(QCloseEvent* event) override;
@@ -114,7 +114,7 @@ private:
 
     // --- Controllers / Workers ---
     ImageController* imageController = nullptr;
-    ActiveContourWorker* acWorker = nullptr;
+    std::unique_ptr<ActiveContourWorker> acWorker;
 
     // --- Setup ---
     void setupUi();

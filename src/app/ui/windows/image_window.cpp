@@ -25,6 +25,15 @@ ImageWindow::ImageWindow(QWidget* parent)
     last_directory_used = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
 }
 
+ImageWindow::~ImageWindow()
+{
+    if ( acWorker )
+    {
+        acWorker->stop();
+        acWorker.reset();
+    }
+}
+
 void ImageWindow::setupUi()
 {
     setWindowTitle( tr("Ofeli") );
@@ -196,7 +205,7 @@ void ImageWindow::setupActions()
     menuBar()->addMenu(helpMenu);
 
     imageController = new ImageController(this);
-    acWorker = new ActiveContourWorker;
+    acWorker = std::make_unique<ActiveContourWorker>();
 }
 
 void ImageWindow::setupConnections()
@@ -254,19 +263,19 @@ void ImageWindow::setupConnections()
             imageView,       &ImageView::displayImage);
 
     connect(imageController, &ImageController::contourReady,
-            acWorker,        &ActiveContourWorker::setImage);
+            acWorker.get(),        &ActiveContourWorker::setImage);
 
-    connect(acWorker,  &ActiveContourWorker::resultReady,
+    connect(acWorker.get(),  &ActiveContourWorker::resultReady,
             imageView, &ImageView::displayImage);
 
     connect(startButton,   &QPushButton::clicked,
-            acWorker,      &ActiveContourWorker::start);
+            acWorker.get(),      &ActiveContourWorker::start);
 
     connect(pauseButton,  &QPushButton::clicked,
-            acWorker,     &ActiveContourWorker::restart);
+            acWorker.get(),     &ActiveContourWorker::restart);
 
     connect(stepButton,   &QPushButton::clicked,
-            acWorker,     &ActiveContourWorker::stop);
+            acWorker.get(),     &ActiveContourWorker::stop);
 }
 
 QString ImageWindow::strippedName(const QString &fullFileName)

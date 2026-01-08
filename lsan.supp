@@ -1,0 +1,9 @@
+# Qt – singletons & plugins (bruit connu)
+leak:Qt
+leak:QGuiApplication
+leak:QApplication
+leak:QFactoryLoader
+leak:QMetaType
+leak:QThreadStorage
+leak:QOpenGLContext
+leak:QOffscreenSurface
