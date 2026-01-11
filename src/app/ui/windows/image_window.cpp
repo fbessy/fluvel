@@ -276,6 +276,9 @@ void ImageWindow::setupConnections()
 
     connect(stepButton,   &QPushButton::clicked,
             acWorker.get(),     &ActiveContourWorker::stop);
+
+    connect(imageController, &ImageController::imageReady,
+            settings_window, &SettingsWindow::init2);
 }
 
 QString ImageWindow::strippedName(const QString &fullFileName)

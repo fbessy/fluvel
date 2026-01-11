@@ -49,6 +49,8 @@
 #include "matrix.hpp"
 #include "contour_rendering.hpp"
 #include "contour_data.hpp"
+#include "phi_editor.hpp"
+#include "phi_view_model.hpp"
 
 #include <QtWidgets>
 
@@ -71,12 +73,6 @@ class SettingsWindow : public QDialog
 public :
 
     SettingsWindow(QWidget* parent);
-
-    void init(const unsigned char* img0,
-              int img0_width,
-              int img0_height,
-              bool is_rgb0,
-              const QImage& qimg0);
 
     const unsigned char* get_filtered_img_data();
 
@@ -316,12 +312,10 @@ private :
     bool find_redundant_list_point(const ofeli_ip::Matrix<signed char>& phi, int offset) const;
 
     QImage img;
+
     QImage image_filter;
-    unsigned char* image_filter_uchar;
     QImage image_phi;
-    unsigned char* image_phi_uchar;
     QImage image_shape;
-    unsigned char* image_shape_uchar;
 
     QString last_directory_used;
 
@@ -377,6 +371,10 @@ private :
 
     QStringList nameFilters;
 
+
+    std::unique_ptr<PhiEditor> phiEditor;
+    std::unique_ptr<PhiViewModel> phiViewModel;
+
 private slots :
 
     //void do_scale0(int value);
@@ -413,6 +411,9 @@ private slots :
 signals :
 
     void changed(const QMimeData* mimeData = 0);
+
+public slots:
+    void init2(const QImage& img);
 };
 
 inline int SettingsWindow::find_offset(int x, int y) const

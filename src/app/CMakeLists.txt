@@ -103,6 +103,10 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
+        core/phi_editor.hpp core/phi_editor.cpp
+        core/preview_pipeline.hpp core/preview_pipeline.cpp
+        core/shape_overlay_renderer.hpp core/shape_overlay_renderer.cpp
+        ui/components/phi_view_model.hpp ui/components/phi_view_model.cpp
     )
 endif()
 

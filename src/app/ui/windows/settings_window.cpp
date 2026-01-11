@@ -48,6 +48,8 @@
 #include "kernel_size_spinbox.hpp"
 #include "boundary_builder.hpp"
 #include "active_contour.hpp"
+#include "shape_overlay_renderer.hpp"
+#include "phi_view_model.hpp"
 
 #include <QtWidgets>
 
@@ -64,11 +66,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     scale_slider(nullptr),
     filters2(nullptr),
     img2_filtered(nullptr),
-    phi2(nullptr),
     displayed_phi_shape(nullptr),
-    image_filter_uchar(nullptr),
-    image_phi_uchar(nullptr),
-    image_shape_uchar(nullptr),
     img1(nullptr)
 {
     setWindowTitle(tr("Settings"));
@@ -1024,230 +1022,192 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     scrollArea_settings->setFocus(Qt::OtherFocusReason);
 }
 
-void SettingsWindow::init(const unsigned char* img0,
-                          int img0_width,
-                          int img0_height,
-                          bool is_rgb0,
-                          const QImage& qimg0)
+void SettingsWindow::init2(const QImage& qimg0)
 {
-    if( img0 != nullptr &&
-        img0_width > 0 &&
-        img0_height > 0 &&
-        !qimg0.isNull() )
+    if (qimg0.isNull())
     {
-        imageLabel_settings->set_qimage0(qimg0);
+        std::cerr << "Error." << std::endl;
+        return;
+    }
 
-        img1 = img0;
-        img_width = img0_width;
-        img_height = img0_height;
-        img_size = img0_width*img0_height;
-        is_rgb1 = is_rgb0;
-        img = qimg0;
+    // ------------------------------------------------------------------
+    // ÉQUIVALENT de : img0 / img0_width / img0_height / is_rgb0
+    // ------------------------------------------------------------------
 
-        if( displayed_phi_shape != nullptr )
-        {
-            delete displayed_phi_shape;
-            displayed_phi_shape = nullptr;
-        }
-        if( displayed_phi_shape == nullptr )
-        {
-            displayed_phi_shape = new ofeli_ip::Matrix<signed char>(img_width,img_height);
-        }
+    QImage qimg;
 
-        auto& config = AppSettings::instance();
-
-        if( config.Lout_init.empty() ||
-            config.Lin_init.empty() ||
-            config.phi_width  <= 0 ||
-            config.phi_height <= 0 )
-        {
-            config.phi_width = img_width;
-            config.phi_height = img_height;
-
-            config.Lout_init.clear();
-            config.Lin_init.clear();
-
-            ofeli_ip::BoundaryBuilder lists_init( config.phi_width,
-                                                  config.phi_height,
-                                                  config.Lout_init,
-                                                  config.Lin_init );
-
-            lists_init.get_rectangle_points(0.05f, 0.05f, 0.95f, 0.95f);
-        }
-        else if( config.phi_width  != img_width ||
-                 config.phi_height != img_height )
-        {
-            ofeli_ip::Matrix<signed char> phi_temp( config.phi_width,
-                                                    config.phi_height );
-
-            do_flood_fill_from_lists( config.Lout_init,
-                                      config.Lin_init,
-                                      phi_temp );
-
-            QImage img_phi = QImage( (const unsigned char*)( phi_temp.get_matrix_data() ),
-                                     phi_temp.get_width(),
-                                     phi_temp.get_height(),
-                                     phi_temp.get_width(),
-                                     QImage::Format_Indexed8 );
-
-            QVector<QRgb> table(256);
-            for( int I = 0; I < 256; I++ )
-            {
-                table[I] = qRgb(I,I,I);
-            }
-            img_phi.setColorTable(table);
-
-            QImage scaled_img_phi = img_phi.scaled( img_width,
-                                                    img_height,
-                                                    Qt::IgnoreAspectRatio,
-                                                    Qt::SmoothTransformation );
-
-            scaled_img_phi = scaled_img_phi.convertToFormat(QImage::Format_RGB32);
-
-            ofeli_ip::Matrix<signed char> scaled_phi( img_width,
-                                                      img_height );
-
-            QRgb pix;
-
-            for( int y = 0; y < img_height; y++ )
-            {
-                for( int x = 0; x < img_width; x++ )
-                {
-                    pix = scaled_img_phi.pixel(x,y);
-
-                    if( qRed(pix) > 127 )
-                    {
-                        scaled_phi(x,y) = ofeli_ip::PhiValue::INSIDE_REGION;
-                    }
-                    else
-                    {
-                        scaled_phi(x,y) = ofeli_ip::PhiValue::OUTSIDE_REGION;
-                    }
-                }
-            }
-
-            find_lists_from_phi( scaled_phi,
-                                 config.Lout_init,
-                                 config.Lin_init );
-
-            config.phi_width = img_width;
-            config.phi_height = img_height;
-        }
-
-        Lout33 = config.Lout_init;
-        Lin33 = config.Lin_init;
-
-        if( phi2 != nullptr )
-        {
-            delete phi2;
-            phi2 = nullptr;
-        }
-        if( phi2 == nullptr )
-        {
-            phi2 = new ofeli_ip::Matrix<signed char>( config.phi_width,
-                                                      config.phi_height );
-        }
-
-        do_flood_fill_from_lists(Lout33,Lin33,*phi2);
-
-        if( filters2 != nullptr )
-        {
-            delete filters2;
-            filters2 = nullptr;
-        }
-
-        if( filters2 == nullptr )
-        {
-            if( is_rgb1 )
-            {
-                filters2 = new ofeli_ip::Filters(img1,img_width,img_height,4);
-            }
-            else
-            {
-                filters2 = new ofeli_ip::Filters(img1,img_width,img_height,1);
-            }
-        }
-
-
-
-
-
-
-        if( image_filter_uchar != nullptr )
-        {
-            delete[] image_filter_uchar;
-            image_filter_uchar = nullptr;
-        }
-        if( image_filter_uchar == nullptr )
-        {
-            image_filter_uchar = new unsigned char[4*img_size];
-        }
-        image_filter = QImage(image_filter_uchar, img_width, img_height, 4*img_width, QImage::Format_RGB32);
-
-        if( image_phi_uchar != nullptr )
-        {
-            delete[] image_phi_uchar;
-            image_phi_uchar = nullptr;
-        }
-        if( image_phi_uchar == nullptr )
-        {
-            image_phi_uchar = new unsigned char[4*img_size];
-        }
-        image_phi = QImage(image_phi_uchar, img_width, img_height, 4*img_width, QImage::Format_RGB32);
-
-        if( image_shape_uchar != nullptr )
-        {
-            delete[] image_shape_uchar;
-            image_shape_uchar = nullptr;
-        }
-        if( image_shape_uchar == nullptr )
-        {
-            image_shape_uchar = new unsigned char[4*img_size];
-        }
-        image_shape = QImage(image_shape_uchar, img_width, img_height, 4*img_width, QImage::Format_RGB32);
-
-
-
-
-
-
-
-
-
-
-
-        update_visu();
-
-        disconnect(scale_spin,SIGNAL(valueChanged(int)),this,SLOT(do_scale(int)));
-
-        scale_spin->setMaximum(1000000/img_height);
-        scale_spin->setSingleStep(80000/(7*img_height));
-
-        scale_slider->setMaximum(160000/img_height);
-        scale_slider->setTickInterval(160000/(7*img_height));
-
-        connect(scale_spin,SIGNAL(valueChanged(int)),this,SLOT(do_scale(int)));
-
-        page2->setEnabled(true);
-        open_phi_button->setEnabled(true);
-        save_phi_button->setEnabled(true);
-        add_button->setEnabled(true);
-        subtract_button->setEnabled(true);
-        clean_button->setEnabled(true);
-
-        if( is_rgb1 )
-        {
-            color_weights_groupbox->setHidden(false);
-        }
-        else
-        {
-            color_weights_groupbox->setHidden(true);
-        }
+    if (qimg0.format() == QImage::Format_RGB32 ||
+        qimg0.format() == QImage::Format_ARGB32)
+    {
+        qimg = qimg0;
+        is_rgb1 = true;
     }
     else
     {
-        std::cerr << "Error." << std::endl;
+        qimg = qimg0.convertToFormat(QImage::Format_RGB32);
+        is_rgb1 = true;
     }
+
+    const unsigned char* img0 =
+        reinterpret_cast<const unsigned char*>(qimg.bits());
+
+    const int img0_width  = qimg.width();
+    const int img0_height = qimg.height();
+
+    // ------------------------------------------------------------------
+    // À PARTIR D’ICI : CODE IDENTIQUE À TON ANCIEN init
+    // ------------------------------------------------------------------
+
+    imageLabel_settings->set_qimage0(qimg);
+
+    img1       = img0;
+    img_width  = img0_width;
+    img_height = img0_height;
+    img_size   = img_width * img_height;
+    img        = qimg;
+
+    // PhiEditor : création UNE SEULE FOIS
+    if (!phiEditor)
+    {
+        phiEditor = std::make_unique<PhiEditor>(img_width, img_height);
+    }
+    else
+    {
+        //phiEditor->resize(img_width, img_height); // si tu as une méthode
+        phiEditor->clear();
+    }
+
+    // ViewModel : UNE SEULE FOIS
+    if (!phiViewModel)
+    {
+        phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());
+
+        connect(phiViewModel.get(),
+                &PhiViewModel::viewChanged,
+                this,
+                [this]() {
+                    imageLabel_settings->set_qimage(
+                        phiViewModel->phiImage());
+                });
+    }
+
+    // Initialisation de φ depuis les settings
+
+    auto& config = AppSettings::instance();
+
+    //phiEditor.clear();
+
+    //phiEditor->setPhiFromLists(config.Lout_init,
+                               //config.Lin_init);
+
+    if (displayed_phi_shape != nullptr)
+    {
+        delete displayed_phi_shape;
+        displayed_phi_shape = nullptr;
+    }
+
+    displayed_phi_shape =
+        new ofeli_ip::Matrix<signed char>(img_width, img_height);
+
+    if (config.Lout_init.empty() ||
+        config.Lin_init.empty() ||
+        config.phi_width  <= 0 ||
+        config.phi_height <= 0)
+    {
+        config.phi_width  = img_width;
+        config.phi_height = img_height;
+
+        config.Lout_init.clear();
+        config.Lin_init.clear();
+
+        ofeli_ip::BoundaryBuilder lists_init(
+            config.phi_width,
+            config.phi_height,
+            config.Lout_init,
+            config.Lin_init);
+
+        lists_init.get_rectangle_points(0.05f, 0.05f, 0.95f, 0.95f);
+    }
+    else if (config.phi_width != img_width ||
+             config.phi_height != img_height)
+    {
+        ofeli_ip::Matrix<signed char> phi_temp(
+            config.phi_width,
+            config.phi_height);
+
+        do_flood_fill_from_lists(
+            config.Lout_init,
+            config.Lin_init,
+            phi_temp);
+
+        QImage img_phi(
+            reinterpret_cast<const unsigned char*>(
+                phi_temp.get_matrix_data()),
+            phi_temp.get_width(),
+            phi_temp.get_height(),
+            phi_temp.get_width(),
+            QImage::Format_Indexed8);
+
+        QVector<QRgb> table(256);
+        for (int i = 0; i < 256; ++i)
+            table[i] = qRgb(i, i, i);
+
+        img_phi.setColorTable(table);
+
+        QImage scaled_img_phi =
+            img_phi.scaled(img_width,
+                           img_height,
+                           Qt::IgnoreAspectRatio,
+                           Qt::SmoothTransformation)
+                .convertToFormat(QImage::Format_RGB32);
+
+        ofeli_ip::Matrix<signed char> scaled_phi(
+            img_width, img_height);
+
+        for (int y = 0; y < img_height; ++y)
+        {
+            for (int x = 0; x < img_width; ++x)
+            {
+                QRgb pix = scaled_img_phi.pixel(x, y);
+                scaled_phi(x, y) =
+                    (qRed(pix) > 127)
+                        ? ofeli_ip::PhiValue::INSIDE_REGION
+                        : ofeli_ip::PhiValue::OUTSIDE_REGION;
+            }
+        }
+
+        find_lists_from_phi(
+            scaled_phi,
+            config.Lout_init,
+            config.Lin_init);
+
+        config.phi_width  = img_width;
+        config.phi_height = img_height;
+    }
+
+    if (filters2 != nullptr)
+        delete filters2;
+
+    filters2 = new ofeli_ip::Filters(
+        img1,
+        img_width,
+        img_height,
+        4);
+
+    image_filter = QImage(img_width, img_height, QImage::Format_RGB32);
+    image_phi    = QImage(img_width, img_height, QImage::Format_RGB32);
+    image_shape  = QImage(img_width, img_height, QImage::Format_RGB32);
+
+    update_visu();
+
+    page2->setEnabled(true);
+    open_phi_button->setEnabled(true);
+    save_phi_button->setEnabled(true);
+    add_button->setEnabled(true);
+    subtract_button->setEnabled(true);
+    clean_button->setEnabled(true);
+
+    color_weights_groupbox->setHidden(!is_rgb1);
 }
 
 void SettingsWindow::update_visu()
@@ -1770,75 +1730,32 @@ void SettingsWindow::do_scale(int value)
 // Fonction appelée dans l'onglet initalisation pour calculer et afficher l'image+phi(couleur foncé)+forme(couleur clair)
 void SettingsWindow::shape_visu()
 {
-    if(    ( phi2 != nullptr && !phi2->is_null() )
-        && image_shape_uchar != nullptr
-        && image_phi_uchar != nullptr   )
-    {
-        init_width2 = float(width_shape_spin->value())/100.f;
-        init_height2 = float(height_shape_spin->value())/100.f;
-        center_x2 = float(abscissa_spin->value())/100.f;
-        center_y2 = float(ordinate_spin->value())/100.f;
+    if (img.isNull())
+        return;
 
-        if( rectangle_radio->isChecked() )
-        {
-            has_ellipse2 = false;
-        }
-        else if( ellipse_radio->isChecked() )
-        {
-            has_ellipse2 = true;
-        }
+    // Base : image + φ déjà affichée par phi_visu()
+    QImage base = imageLabel_settings->get_qimage();
+    if (base.isNull())
+        return;
 
-        // efface les listes de la QImage
-        if( outsidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
-        {
-            erase_list_to_img( Lout_shape11,
-                               image_phi_uchar,
-                               image_shape_uchar );
-        }
+    ShapeParams params;
 
-        if( insidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
-        {
-            erase_list_to_img( Lin_shape11,
-                               image_phi_uchar,
-                               image_shape_uchar );
-        }
+    params.type = rectangle_radio->isChecked()
+                      ? ShapeType::Rectangle
+                      : ShapeType::Ellipse;
 
-        Lout_shape11.clear();
-        Lin_shape11.clear();
-        ofeli_ip::BoundaryBuilder lists_init( phi2->get_width(),
-                                              phi2->get_height(),
-                                              Lout_shape11,
-                                              Lin_shape11 );
+    params.center_x = float(abscissa_spin->value()) / 100.f;
+    params.center_y = float(ordinate_spin->value()) / 100.f;
 
+    params.width  = float(width_shape_spin->value())  / 100.f;
+    params.height = float(height_shape_spin->value()) / 100.f;
 
-        if( has_ellipse2 )
-        {
-            lists_init.get_ellipse_points( center_x2+0.5f,
-                                           center_y2+0.5f,
-                                           0.5f*init_width2,
-                                           0.5f*init_height2 );
-        }
-        else
-        {
-            lists_init.get_rectangle_points( center_x2+0.5f - 0.5f*init_width2,
-                                             center_y2+0.5f - 0.5f*init_height2,
-                                             center_x2+0.5f + 0.5f*init_width2,
-                                             center_y2+0.5f + 0.5f*init_height2 );
-        }
+    params.color = QColor(0, 255, 255); // cyan, par ex
 
-        draw_list_to_img( Lout_shape11,
-                          color_out_disp,
-                          outsidecolor_combobox->currentIndex(),
-                          image_shape_uchar, img_width, img_height );
+    QImage withShape =
+        ShapeOverlayRenderer::render(image_phi, params);
 
-
-        draw_list_to_img( Lin_shape11,
-                          color_in_disp,
-                          insidecolor_combobox->currentIndex(),
-                          image_shape_uchar, img_width, img_height );
-
-        imageLabel_settings->set_qimage(image_shape);
-    }
+    imageLabel_settings->set_qimage(withShape);
 }
 
 // Surcharge pour avoir une signature identique (memes paramètres) entre signaux et slots de Qt
@@ -1851,28 +1768,15 @@ void SettingsWindow::shape_visu(int)
 // Remet phi_init2_clean a zéro, c'est à dire tout correspond à l'extérieur
 void SettingsWindow::clean_phi_visu()
 {
-    if(    ( phi2 != nullptr && !phi2->is_null() )
-        && image_phi_uchar != nullptr
-        && image_filter_uchar != nullptr
-        && image_shape_uchar != nullptr   )
-    {
-        phi2->memset(ofeli_ip::PhiValue::OUTSIDE_REGION);
+    if (!phiEditor) return;
 
-        erase_list_to_img1_img2( Lout33,
-                                 image_filter_uchar,
-                                 image_phi_uchar,
-                                 image_shape_uchar );
+    phiEditor->clear();
 
-        erase_list_to_img1_img2( Lin33,
-                                 image_filter_uchar,
-                                 image_phi_uchar,
-                                 image_shape_uchar );
+    Lout33 = phiEditor->Lout();
+    Lin33  = phiEditor->Lin();
 
-        Lout33.clear();
-        Lin33.clear();
-
-        shape_visu();
-    }
+    phi_visu(true);
+    shape_visu();
 }
 
 // Soustrait une forme à phi_init2
@@ -1880,9 +1784,9 @@ void SettingsWindow::phi_subtract_shape()
 {
     if (    ( displayed_phi_shape != nullptr && !displayed_phi_shape->is_null() )
          && ( phi2 != nullptr && !phi2->is_null() )
-         && image_phi_uchar != nullptr
-         && image_filter_uchar != nullptr
-         && image_shape_uchar != nullptr   )
+         && !image_phi.isNull()
+         && !image_filter.isNull()
+         && !image_shape.isNull() )
     {
         do_flood_fill_from_lists(Lout_shape11,Lin_shape11,*displayed_phi_shape);
 
@@ -1925,14 +1829,14 @@ void SettingsWindow::phi_subtract_shape()
         else
         {
             erase_list_to_img1_img2( Lout33,
-                                     image_filter_uchar,
-                                     image_phi_uchar,
-                                     image_shape_uchar );
+                                     image_filter.bits(),
+                                     image_phi.bits(),
+                                     image_shape.bits() );
 
             erase_list_to_img1_img2( Lin33,
-                                     image_filter_uchar,
-                                     image_phi_uchar,
-                                     image_shape_uchar );
+                                     image_filter.bits(),
+                                     image_phi.bits(),
+                                     image_shape.bits() );
 
             find_lists_from_phi(*phi2,Lout33,Lin33);
         }
@@ -1944,9 +1848,9 @@ void SettingsWindow::phi_add_shape()
 {
     if (    ( displayed_phi_shape != nullptr && !displayed_phi_shape->is_null() )
          && ( phi2 != nullptr && !phi2->is_null() )
-         && image_phi_uchar != nullptr
-         && image_filter_uchar != nullptr
-         && image_shape_uchar != nullptr   )
+         && !image_phi.isNull()
+         && !image_filter.isNull()
+         && !image_shape.isNull() )
     {
         do_flood_fill_from_lists(Lout_shape11,Lin_shape11,*displayed_phi_shape);
 
@@ -1990,14 +1894,14 @@ void SettingsWindow::phi_add_shape()
         else
         {
             erase_list_to_img1_img2( Lout33,
-                                     image_filter_uchar,
-                                     image_phi_uchar,
-                                     image_shape_uchar );
+                                     image_filter.bits(),
+                                     image_phi.bits(),
+                                     image_shape.bits() );
 
             erase_list_to_img1_img2( Lin33,
-                                     image_filter_uchar,
-                                     image_phi_uchar,
-                                     image_shape_uchar );
+                                     image_filter.bits(),
+                                     image_phi.bits(),
+                                     image_shape.bits() );
 
             find_lists_from_phi(*phi2,Lout33,Lin33);
         }
@@ -2009,8 +1913,8 @@ void SettingsWindow::phi_add_shape()
 // ou qu'on appuie sur les bouttons add subtract
 void SettingsWindow::phi_visu(bool dark_color)
 {
-    if(      image_phi_uchar != nullptr
-        && image_shape_uchar != nullptr )
+    if(    !image_phi.isNull()
+        && !image_shape.isNull() )
     {
         if( outsidecolor_combobox->currentIndex() == ComboBoxColorIndex::SELECTED )
         {
@@ -2042,23 +1946,22 @@ void SettingsWindow::phi_visu(bool dark_color)
             color_factor = 1;
         }
 
-        if( outsidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
-        {
-            draw_list_to_img1_img2( Lout33,
-                                    color_out_disp.divide( color_factor ),
-                                    color_out_disp.divide( 2 ),
-                                    image_phi_uchar,
-                                    image_shape_uchar );
-        }
+        const auto& Lout = phiEditor->Lout();
+        const auto& Lin  = phiEditor->Lin();
 
-        if( insidecolor_combobox->currentIndex() != ComboBoxColorIndex::NO )
-        {
-            draw_list_to_img1_img2( Lin33,
-                                    color_in_disp.divide( color_factor ),
-                                    color_in_disp.divide( 2 ),
-                                    image_phi_uchar,
-                                    image_shape_uchar );
-        }
+        draw_list_to_img( Lout,
+                          color_out_disp.divide( color_factor ),
+                          outsidecolor_combobox->currentIndex(),
+                          image_phi.bits(),
+                          image_phi.width(),
+                          image_phi.height() );
+
+        draw_list_to_img( Lin,
+                          color_in_disp.divide( color_factor ),
+                          insidecolor_combobox->currentIndex(),
+                          image_phi.bits(),
+                          image_phi.width(),
+                          image_phi.height() );
 
         if( has_contours_hidden && tabs->currentIndex() == TabIndex::PREPROCESSING )
         {
@@ -2084,9 +1987,13 @@ void SettingsWindow::phi_visu(int)
 // ou par clic gauche
 void SettingsWindow::add_visu()
 {
-    // ajoute
-    phi_add_shape();
-    // visualisation de phi en foncé (booléen true)
+    if (!phiEditor) return;
+
+    ofeli_ip::Matrix<signed char> shapePhi(img_width, img_height);
+    do_flood_fill_from_lists(Lout_shape11, Lin_shape11, shapePhi);
+
+    phiEditor->addShape(shapePhi);
+
     phi_visu(true);
 }
 
@@ -2094,9 +2001,13 @@ void SettingsWindow::add_visu()
 // ou par clic droit
 void SettingsWindow::subtract_visu()
 {
-    // soustrait
-    phi_subtract_shape();
-    // visualisation de phi en foncé (booléen true)
+    if (!phiEditor) return;
+
+    ofeli_ip::Matrix<signed char> shapePhi(img_width, img_height);
+    do_flood_fill_from_lists(Lout_shape11, Lin_shape11, shapePhi);
+
+    phiEditor->subtractShape(shapePhi);
+
     phi_visu(true);
 }
 
@@ -2290,9 +2201,9 @@ void SettingsWindow::calculate_filtered_copy_visu_buffers()
 {
     if(                  img1 != nullptr
         &&           filters2 != nullptr
-        && image_filter_uchar != nullptr
-        &&    image_phi_uchar != nullptr
-        &&  image_shape_uchar != nullptr )
+        && !image_filter.isNull()
+        && !image_phi.isNull()
+        && !image_shape.isNull() )
     {
         // récupération de tous les états des widgets de l'onglet preprocessing
         if( page3->isChecked() )
@@ -2482,14 +2393,17 @@ void SettingsWindow::calculate_filtered_copy_visu_buffers()
 
 
         unsigned char I;
+        unsigned char* image_filter_uchar = image_filter.bits();
+        unsigned char* image_phi_uchar = image_phi.bits();
+        unsigned char* image_shape_uchar = image_shape.bits();
 
         if( speed == SpeedModel::REGION_BASED )
         {
             if( is_rgb1 )
             {
-                std::memcpy(image_filter_uchar,img2_filtered,4*img_size);
-                std::memcpy(image_phi_uchar,img2_filtered,4*img_size);
-                std::memcpy(image_shape_uchar,img2_filtered,4*img_size);
+                std::memcpy(image_filter.bits(),img2_filtered,4*img_size);
+                std::memcpy(image_phi.bits(),img2_filtered,4*img_size);
+                std::memcpy(image_shape.bits(),img2_filtered,4*img_size);
             }
             else
             {
@@ -2901,14 +2815,14 @@ void SettingsWindow::open_phi()
             }
 
             erase_list_to_img1_img2( Lout33,
-                                     image_filter_uchar,
-                                     image_phi_uchar,
-                                     image_shape_uchar );
+                                    image_filter.bits(),
+                                     image_phi.bits(),
+                                     image_shape.bits() );
 
             erase_list_to_img1_img2( Lin33,
-                                     image_filter_uchar,
-                                     image_phi_uchar,
-                                     image_shape_uchar );
+                                     image_filter.bits(),
+                                     image_phi.bits(),
+                                     image_shape.bits() );
 
             Lout33.clear();
             Lin33.clear();
