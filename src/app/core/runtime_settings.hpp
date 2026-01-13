@@ -6,6 +6,8 @@
 #include "region_color_ac.hpp"
 #include "filters.hpp"
 
+#include <QImage>
+
 namespace ofeli_app
 {
 
@@ -24,16 +26,13 @@ struct RuntimeSettings
 
     /////////////////////////////////////////
 
-    int phi_width;
-    int phi_height;
-    std::vector<ofeli_ip::ContourPoint> Lout_init;
-    std::vector<ofeli_ip::ContourPoint> Lin_init;
-
     bool has_ellipse;
     float init_width;
     float init_height;
     float center_x;
     float center_y;
+
+    QImage initialPhi;
 
     /////////////////////////////////////////
 

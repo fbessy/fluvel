@@ -10,37 +10,18 @@ PhiViewModel::PhiViewModel(PhiEditor* editor, QObject* parent)
     Q_ASSERT(editor_);
 
     connect(editor_, &PhiEditor::phiChanged,
-            this, &PhiViewModel::rebuild);
+            this, &PhiViewModel::updateFromEditor);
 
-    rebuild();
+    updateFromEditor();
 }
 
-void PhiViewModel::rebuild()
+void PhiViewModel::updateFromEditor()
 {
-    const auto& phi = editor_->phi();
-
-    const int w = phi.get_width();
-    const int h = phi.get_height();
-
-    if (w <= 0 || h <= 0)
+    if (!editor_)
         return;
 
-    phiImage_ = QImage(w, h, QImage::Format_RGB32);
-
-    for (int y = 0; y < h; ++y) {
-        uchar* line = phiImage_.scanLine(y);
-        for (int x = 0; x < w; ++x) {
-            const bool inside =
-                (phi(x, y) == ofeli_ip::PhiValue::INSIDE_REGION);
-
-            const uchar v = inside ? 255 : 0;
-
-            line[4*x + 0] = v;
-            line[4*x + 1] = v;
-            line[4*x + 2] = v;
-            line[4*x + 3] = 255;
-        }
-    }
+    phiImage_ = editor_->get_phi().copy();
+    background_ = editor_->get_phi().copy();
 
     emit viewChanged();
 }

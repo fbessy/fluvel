@@ -53,6 +53,7 @@ namespace ofeli_app {
 class ImageView;
 class ImageController;
 class ActiveContourWorker;
+class PreviewPipeline;
 
 class ImageWindow : public QMainWindow
 {
@@ -115,6 +116,7 @@ private:
     // --- Controllers / Workers ---
     ImageController* imageController = nullptr;
     std::unique_ptr<ActiveContourWorker> acWorker;
+    PreviewPipeline* previewPipeline = nullptr;
 
     // --- Setup ---
     void setupUi();

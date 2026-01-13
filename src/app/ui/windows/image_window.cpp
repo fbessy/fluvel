@@ -3,6 +3,7 @@
 #include "image_view.hpp"
 #include "image_controller.hpp"
 #include "active_contour_worker.hpp"
+#include "preview_pipeline.hpp"
 
 #include <QMenuBar>
 #include <QToolBar>
@@ -206,6 +207,8 @@ void ImageWindow::setupActions()
 
     imageController = new ImageController(this);
     acWorker = std::make_unique<ActiveContourWorker>();
+
+    previewPipeline = new PreviewPipeline(this);
 }
 
 void ImageWindow::setupConnections()
@@ -263,7 +266,7 @@ void ImageWindow::setupConnections()
             imageView,       &ImageView::displayImage);
 
     connect(imageController, &ImageController::contourReady,
-            acWorker.get(),        &ActiveContourWorker::setImage);
+            acWorker.get(),  &ActiveContourWorker::setImage);
 
     connect(acWorker.get(),  &ActiveContourWorker::resultReady,
             imageView, &ImageView::displayImage);
@@ -278,7 +281,7 @@ void ImageWindow::setupConnections()
             acWorker.get(),     &ActiveContourWorker::stop);
 
     connect(imageController, &ImageController::imageReady,
-            settings_window, &SettingsWindow::init2);
+            previewPipeline, &PreviewPipeline::setSourceImage);
 }
 
 QString ImageWindow::strippedName(const QString &fullFileName)

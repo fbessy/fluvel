@@ -191,6 +191,9 @@ RegionAc::RegionAc(ImageSpan8 image1,
     sum_total(0), pxl_nbr_total(image.get_size()),
     sum_out(0), pxl_nbr_out(0)
 {
+    assert( image.get_width()  == cd.get_phi().get_width() &&
+            image.get_height() == cd.get_phi().get_height()   );
+
     initialize_sums();
     RegionAc::do_specific_cycle1();
 }

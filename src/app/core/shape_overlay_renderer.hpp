@@ -4,14 +4,10 @@
 #include <QImage>
 #include <QColor>
 
+#include "shape_type.hpp"
+
 namespace ofeli_app
 {
-
-enum class ShapeType
-{
-    Rectangle,
-    Ellipse
-};
 
 struct ShapeParams
 {

@@ -11,7 +11,7 @@ class ImageController : public QObject
 Q_OBJECT
 
 public:
-    ImageController(QWidget* parent);
+    ImageController(QObject* parent);
     void applyFilters();
 
 public slots:

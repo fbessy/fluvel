@@ -17,15 +17,16 @@ public:
 
     const QImage& phiImage() const { return phiImage_; }
 
+public slots:
+    void updateFromEditor();
+
 signals:
     void viewChanged();
-
-private slots:
-    void rebuild();
 
 private:
     PhiEditor* editor_;   // non owning
     QImage phiImage_;
+    QImage background_;
 };
 
 } // namespace ofeli_app

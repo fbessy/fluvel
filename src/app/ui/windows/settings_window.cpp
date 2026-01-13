@@ -50,6 +50,7 @@
 #include "active_contour.hpp"
 #include "shape_overlay_renderer.hpp"
 #include "phi_view_model.hpp"
+#include "shape_type.hpp"
 
 #include <QtWidgets>
 
@@ -62,11 +63,8 @@ namespace ofeli_app
 
 SettingsWindow::SettingsWindow(QWidget* parent) :
     QDialog(parent),
-    scale_spin(nullptr),
-    scale_slider(nullptr),
     filters2(nullptr),
     img2_filtered(nullptr),
-    displayed_phi_shape(nullptr),
     img1(nullptr)
 {
     setWindowTitle(tr("Settings"));
@@ -77,38 +75,51 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
-    scrollArea_settings = new ScrollAreaWidget(this);
-    imageLabel_settings = new PixmapWidget(scrollArea_settings);
-    imageLabel_settings->setBackgroundRole(QPalette::Dark);
-    imageLabel_settings->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    imageLabel_settings->setScaledContents(true);
-    imageLabel_settings->setMouseTracking(true);
-    imageLabel_settings->installEventFilter(this);
-    imageLabel_settings->setAcceptDrops(true);
-    imageLabel_settings->setAlignment(Qt::AlignCenter);
-    QString text(tr("<drag ϕ(t=0)>"));
-    imageLabel_settings->set_text(text);
-    imageLabel_settings->resize(200,200);
-    scrollArea_settings->setBackgroundRole(QPalette::Dark);
-    scrollArea_settings->setWidget(imageLabel_settings);
-    scrollArea_settings->setAlignment(Qt::AlignCenter);
-    scrollArea_settings->setWidgetResizable(true);
-    connect(scrollArea_settings->verticalScrollBar(),
-            SIGNAL(rangeChanged(int,int)),this,
-            SLOT(adjustVerticalScroll_settings (int,int)));
-    connect(scrollArea_settings->horizontalScrollBar(),
-            SIGNAL(rangeChanged(int,int)),this,
-            SLOT(adjustHorizontalScroll_settings(int,int)));
-
     dial_buttons = new QDialogButtonBox(this);
     dial_buttons->addButton(QDialogButtonBox::Ok);
     dial_buttons->addButton(QDialogButtonBox::Cancel);
     dial_buttons->addButton(QDialogButtonBox::Reset);
-    connect( dial_buttons, SIGNAL(accepted()), this, SLOT(accept()) );
-    connect( dial_buttons, SIGNAL(rejected()), this, SLOT(reject()) );
-    connect( dial_buttons->button(QDialogButtonBox::Reset),
-             SIGNAL(clicked()), this, SLOT(default_settings()) );
 
+
+
+
+    setupUiAlgoTab();
+    setupUiInitTab();
+    setupUiPreprocessingTab();
+    setupUiDisplayTab();
+
+    tabs = new QTabWidget(this);
+    tabs->addTab( page1, tr("Algorithm") );
+    tabs->addTab( page2, tr("Initialization") );
+    tabs->addTab( page3, tr("Preprocessing") );
+    tabs->addTab( page4, tr("Display") );
+
+
+    settingsView = new ImageView(this);
+
+    phiEditor = std::make_unique<PhiEditor>();
+    phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());
+
+    QGridLayout *settings_grid = new QGridLayout;
+    settings_grid->addWidget(tabs,0,0);
+    settings_grid->addWidget(settingsView,0,1);
+
+    settings_grid->addWidget(dial_buttons,1,1);
+
+    settings_grid->setColumnStretch(1,1);
+    setLayout(settings_grid);
+
+    last_directory_used = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
+
+    has_contours_hidden = true;
+
+    reject();
+
+    setupConnections();
+}
+
+void SettingsWindow::setupUiAlgoTab()
+{
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /// Algorithm tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,11 +134,6 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     Na_spin->setToolTip(tr("iterations in the cycle 1, active contour penetrability"));
     QFormLayout *Na_layout = new QFormLayout;
     Na_layout->addRow("Na =", Na_spin);
-
-#ifdef Q_OS_MAC
-    Na_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
 
     klength_gradient_spin = new KernelSizeSpinBox;
     klength_gradient_spin->setSingleStep(2);
@@ -159,10 +165,6 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     lambda_layout->addRow("<font color="+RGBout_list.name()+">"+"λout"+"<font color=black>"+" =", lambda_out_spin);
     lambda_layout->addRow("<font color="+RGBin_list.name()+">"+"λin"+"<font color=black>"+" =", lambda_in_spin);
 
-#ifdef Q_OS_MAC
-    lambda_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
     QVBoxLayout* chanvese_layout = new QVBoxLayout;
     chanvese_layout->addWidget(chanvese_radio);
     chanvese_layout->addLayout(lambda_layout);
@@ -174,17 +176,9 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     klength_gradient_spin->setSingleStep(2);
     klength_gradient_spin->setMinimum(3);
     klength_gradient_spin->setMaximum(499);
-    //klength_gradient_spin->setSuffix("²");
     klength_gradient_spin->setToolTip(tr("morphological gradient structuring element size"));
     QFormLayout *gradient_layout = new QFormLayout;
     gradient_layout->addRow(tr("SE size ="), klength_gradient_spin);
-
-#ifdef Q_OS_MAC
-    gradient_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
-    connect(klength_gradient_spin,SIGNAL(valueChanged(int)),this,
-            SLOT(show_phi_with_filtered_image()));
 
     QVBoxLayout* geodesic_layout = new QVBoxLayout;
     geodesic_layout->addWidget(geodesic_radio);
@@ -221,18 +215,12 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     gamma_spin->setMaximum(100000);
     gamma_spin->setToolTip(tr("blue–yellow chrominance weight"));
 
-    connect(alpha_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    connect(beta_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    connect(gamma_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
 
     QFormLayout* color_weights_layout = new QFormLayout;
     color_weights_layout->addRow(tr("1st component weight ="), alpha_spin);
     color_weights_layout->addRow(tr("2nd component weight ="), beta_spin);
     color_weights_layout->addRow(tr("3rd component weight ="), gamma_spin);
-
-#ifdef Q_OS_MAC
-    color_weights_layout->setFormAlignment(Qt::AlignLeft);
-#endif
 
     QVBoxLayout* vcolor_layout = new QVBoxLayout;
     vcolor_layout->addWidget(color_space_cb);
@@ -240,8 +228,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
 
     color_weights_groupbox->setLayout(vcolor_layout);
 
-    connect(chanvese_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(geodesic_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+
 
     QVBoxLayout* externalspeed_layout = new QVBoxLayout;
 
@@ -279,10 +266,6 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     internalspeed_layout->addRow("Ng =", klength_spin);
     internalspeed_layout->addRow("σ =", std_spin);
 
-#ifdef Q_OS_MAC
-    internalspeed_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
     internalspeed_groupbox->setLayout(internalspeed_layout);
 
     ////////////////////////////////////////////
@@ -312,9 +295,12 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     algorithm_layout->addWidget(tracking_groupbox);
     algorithm_layout->addStretch(1);
 
-    QWidget* page1 = new QWidget;
+    page1 = new QWidget;
     page1->setLayout(algorithm_layout);
+}
 
+void SettingsWindow::setupUiInitTab()
+{
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /// Initialization tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -322,8 +308,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     open_phi_button = new QPushButton(tr("Open ϕ(t=0)"));
     open_phi_button->setToolTip(tr("or drag and drop an image of ϕ(t=0)"));
     save_phi_button = new QPushButton(tr("Save ϕ(t=0)"));
-    connect(open_phi_button,SIGNAL(clicked()),this,SLOT(openFilenamePhi()));
-    connect(save_phi_button,SIGNAL(clicked()),this,SLOT(save_phi()));
+
     open_phi_button->setEnabled(false);
     save_phi_button->setEnabled(false);
 
@@ -341,8 +326,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     rectangle_radio->setToolTip(tr("or click on the middle mouse button when the cursor is in the image"));
     ellipse_radio = new QRadioButton(tr("ellipse"));
     ellipse_radio->setToolTip(tr("or click on the middle mouse button when the cursor is in the image"));
-    connect(rectangle_radio,SIGNAL(clicked()),this,SLOT(shape_visu()));
-    connect(ellipse_radio,SIGNAL(clicked()),this,SLOT(shape_visu()));
+
 
     QHBoxLayout* shape_layout = new QHBoxLayout;
     shape_layout->addWidget(rectangle_radio);
@@ -363,29 +347,16 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     QFormLayout* width_spin_layout = new QFormLayout;
     width_spin_layout->addRow(tr("width ="), width_shape_spin);
 
-#ifdef Q_OS_MAC
-    width_spin_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
     width_slider = new QSlider(Qt::Horizontal, this);
 
-#ifdef Q_OS_LINUX
-    width_slider->setTickPosition(QSlider::TicksBelow);
-#else
     width_slider->setTickPosition(QSlider::TicksAbove);
-#endif
 
     width_slider->setMinimum(0);
     width_slider->setMaximum(150);
     width_slider->setTickInterval(25);
     width_slider->setSingleStep(15);
 
-    connect(width_shape_spin,SIGNAL(valueChanged(int)),this,
-            SLOT(shape_visu(int)));
-    connect(width_slider,SIGNAL(valueChanged(int)),width_shape_spin,
-            SLOT(setValue(int)));
-    connect(width_shape_spin,SIGNAL(valueChanged(int)),width_slider,
-            SLOT(setValue(int)));
+
 
     height_shape_spin = new QSpinBox;
     height_shape_spin->setSingleStep(15);
@@ -396,29 +367,16 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     QFormLayout* height_spin_layout = new QFormLayout;
     height_spin_layout->addRow(tr("height ="), height_shape_spin);
 
-#ifdef Q_OS_MAC
-    height_spin_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
     height_slider = new QSlider(Qt::Horizontal, this);
 
-#ifdef Q_OS_LINUX
-    height_slider->setTickPosition(QSlider::TicksBelow);
-#else
     height_slider->setTickPosition(QSlider::TicksAbove);
-#endif
 
     height_slider->setMinimum(0);
     height_slider->setMaximum(150);
     height_slider->setTickInterval(25);
     height_slider->setSingleStep(15);
 
-    connect(height_shape_spin,SIGNAL(valueChanged(int)),this,
-            SLOT(shape_visu(int)));
-    connect(height_slider,SIGNAL(valueChanged(int)),height_shape_spin,
-            SLOT(setValue(int)));
-    connect(height_shape_spin,SIGNAL(valueChanged(int)),height_slider,
-            SLOT(setValue(int)));
+
 
     QVBoxLayout* shape_size_layout = new QVBoxLayout;
     shape_size_layout->addLayout(width_spin_layout);
@@ -441,26 +399,16 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     QFormLayout* abscissa_spin_layout = new QFormLayout;
     abscissa_spin_layout->addRow("x = Xo +", abscissa_spin);
 
-#ifdef Q_OS_MAC
-    abscissa_spin_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
     abscissa_slider = new QSlider(Qt::Horizontal, this);
 
-#ifdef Q_OS_LINUX
-    abscissa_slider->setTickPosition(QSlider::TicksBelow);
-#else
     abscissa_slider->setTickPosition(QSlider::TicksAbove);
-#endif
 
     abscissa_slider->setMinimum(-75);
     abscissa_slider->setMaximum(75);
     abscissa_slider->setTickInterval(25);
     abscissa_slider->setSingleStep(15);
 
-    connect(abscissa_spin,SIGNAL(valueChanged(int)),this,SLOT(shape_visu(int)));
-    connect(abscissa_slider,SIGNAL(valueChanged(int)),abscissa_spin,SLOT(setValue(int)));
-    connect(abscissa_spin,SIGNAL(valueChanged(int)),abscissa_slider,SLOT(setValue(int)));
+
 
     ordinate_spin = new QSpinBox;
     ordinate_spin->setSingleStep(15);
@@ -471,26 +419,16 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     QFormLayout* ordinate_spin_layout = new QFormLayout;
     ordinate_spin_layout->addRow("y = Yo +", ordinate_spin);
 
-#ifdef Q_OS_MAC
-    ordinate_spin_layout->setFormAlignment(Qt::AlignLeft);
-#endif
-
     ordinate_slider = new QSlider(Qt::Horizontal, this);
 
-#ifdef Q_OS_LINUX
-    ordinate_slider->setTickPosition(QSlider::TicksBelow);
-#else
     ordinate_slider->setTickPosition(QSlider::TicksAbove);
-#endif
 
     ordinate_slider->setMinimum(-75);
     ordinate_slider->setMaximum(75);
     ordinate_slider->setTickInterval(25);
     ordinate_slider->setSingleStep(15);
 
-    connect(ordinate_spin,SIGNAL(valueChanged(int)),this,SLOT(shape_visu(int)));
-    connect(ordinate_slider,SIGNAL(valueChanged(int)),ordinate_spin,SLOT(setValue(int)));
-    connect(ordinate_spin,SIGNAL(valueChanged(int)),ordinate_slider,SLOT(setValue(int)));
+
 
     QVBoxLayout* position_layout = new QVBoxLayout;
     position_layout->addLayout(abscissa_spin_layout);
@@ -506,21 +444,14 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
 
     add_button = new QPushButton(tr("Add"));
     add_button->setToolTip(tr("or click on the left mouse button when the cursor is in the image"));
-    connect(add_button,SIGNAL(clicked()),this,SLOT(add_visu()));
 
     subtract_button = new QPushButton(tr("Subtract"));
     subtract_button->setToolTip(tr("or click on the right mouse button when the cursor is in the image"));
-    connect(subtract_button,SIGNAL(clicked()),this,SLOT(subtract_visu()));
 
-    clean_button = new QPushButton(tr("Clean"));
-    connect(clean_button,SIGNAL(clicked()),this,SLOT(clean_phi_visu()));
-
-    add_button->setEnabled(false);
-    subtract_button->setEnabled(false);
-    clean_button->setEnabled(false);
+    clear_button = new QPushButton(tr("Clear"));
 
     QHBoxLayout* modify_layout = new QHBoxLayout;
-    modify_layout->addWidget(clean_button);
+    modify_layout->addWidget(clear_button);
     modify_layout->addWidget(subtract_button);
     modify_layout->addWidget(add_button);
     modify_groupbox->setLayout(modify_layout);
@@ -537,8 +468,10 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
 
     page2 = new QWidget;
     page2->setLayout(initialization_layout);
-    page2->setEnabled(false);
+}
 
+void SettingsWindow::setupUiPreprocessingTab()
+{
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /// Preprocessing tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -551,8 +484,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     std_noise_spin->setMinimum(0.0);
     std_noise_spin->setMaximum(10000.0);
     std_noise_spin->setToolTip(tr("standard deviation"));
-    connect(gaussian_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(std_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
 
     QFormLayout* gaussian_noise_layout = new QFormLayout;
     gaussian_noise_layout->addRow("σ =", std_noise_spin);
@@ -566,8 +498,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     proba_noise_spin->setMaximum(100.0);
     proba_noise_spin->setSuffix(" %");
     proba_noise_spin->setToolTip(tr("impulsional noise probability for each pixel"));
-    connect(salt_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(proba_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
 
     QFormLayout* salt_noise_layout = new QFormLayout;
     salt_noise_layout->addRow(tr("d ="), proba_noise_spin);
@@ -580,17 +511,10 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     std_speckle_noise_spin->setMinimum(0.0);
     std_speckle_noise_spin->setMaximum(1000.0);
     std_speckle_noise_spin->setToolTip(tr("standard deviation"));
-    connect(speckle_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(std_speckle_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
 
     QFormLayout* speckle_noise_layout = new QFormLayout;
     speckle_noise_layout->addRow("σ =", std_speckle_noise_spin);
-
-#ifdef Q_OS_MAC
-    gaussian_noise_layout->setFormAlignment(Qt::AlignLeft);
-    salt_noise_layout->setFormAlignment(Qt::AlignLeft);
-    speckle_noise_layout->setFormAlignment(Qt::AlignLeft);
-#endif
 
     gaussian_noise_groupbox->setLayout(gaussian_noise_layout);
     salt_noise_groupbox->setLayout(salt_noise_layout);
@@ -611,10 +535,8 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     klength_mean_spin->setSingleStep(2);
     klength_mean_spin->setMinimum(3);
     klength_mean_spin->setMaximum(499);
-    //klength_mean_spin->setSuffix("²");
 
-    connect(mean_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(klength_mean_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
     QFormLayout* mean_layout = new QFormLayout;
     mean_layout->addRow(tr("kernel size ="), klength_mean_spin);
 
@@ -625,15 +547,12 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     klength_gaussian_spin->setSingleStep(2);
     klength_gaussian_spin->setMinimum(3);
     klength_gaussian_spin->setMaximum(499);
-    //klength_gaussian_spin->setSuffix("²");
     std_filter_spin = new QDoubleSpinBox;
     std_filter_spin->setSingleStep(0.1);
     std_filter_spin->setMinimum(0.0);
     std_filter_spin->setMaximum(1000000.0);
     std_filter_spin->setToolTip(tr("standard deviation"));
-    connect(gaussian_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(klength_gaussian_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    connect(std_filter_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
     QFormLayout* gaussian_layout = new QFormLayout;
     gaussian_layout->addRow(tr("kernel size ="), klength_gaussian_spin);
     gaussian_layout->addRow("σ =", std_filter_spin);
@@ -650,10 +569,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     //klength_median_spin->setSuffix("²");
     complex_radio1= new QRadioButton("O(r log r)×O(n)");
     complex_radio2= new QRadioButton("O(1)×O(n)");
-    connect(median_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(klength_median_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    connect(complex_radio1,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(complex_radio2,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+
     QFormLayout* median_layout = new QFormLayout;
     median_layout->addRow(tr("kernel size ="), klength_median_spin);
     median_layout->addRow(tr("quick sort algorithm"), complex_radio1);
@@ -676,12 +592,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     kappa_spin->setSingleStep(1.0);
     kappa_spin->setMinimum(0.0);
     kappa_spin->setMaximum(10000.0);
-    connect(aniso_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(aniso1_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(aniso2_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(iteration_filter_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    connect(lambda_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
-    connect(kappa_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
     QFormLayout* aniso_layout = new QFormLayout;
     aniso_layout->addRow(tr("iterations ="), iteration_filter_spin);
     aniso_layout->addRow("λ =", lambda_spin);
@@ -698,10 +609,8 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     klength_open_spin->setSingleStep(2);
     klength_open_spin->setMinimum(3);
     klength_open_spin->setMaximum(499);
-    //klength_open_spin->setSuffix("²");
     klength_open_spin->setToolTip(tr("the structuring element shape is a square and its origin is the center of the square"));
-    connect(open_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(klength_open_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
     QFormLayout* open_layout = new QFormLayout;
     open_layout->addRow(tr("SE size ="), klength_open_spin);
 
@@ -712,10 +621,8 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     klength_close_spin->setSingleStep(2);
     klength_close_spin->setMinimum(3);
     klength_close_spin->setMaximum(499);
-    //klength_close_spin->setSuffix("²");
     klength_close_spin->setToolTip(tr("the structuring element shape is a square and its origin is the center of the square"));
-    connect(close_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(klength_close_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
     QFormLayout* close_layout = new QFormLayout;
     close_layout->addRow(tr("SE size ="), klength_close_spin);
 
@@ -732,12 +639,8 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     klength_tophat_spin->setSingleStep(2);
     klength_tophat_spin->setMinimum(3);
     klength_tophat_spin->setMaximum(499);
-    //klength_tophat_spin->setSuffix("²");
     klength_tophat_spin->setToolTip(tr("the structuring element shape is a square and its origin is the center of the square"));
-    connect(tophat_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(whitetophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(blacktophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(klength_tophat_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
     QFormLayout* tophat_layout = new QFormLayout;
     tophat_layout->addRow(" ", whitetophat_radio);
     tophat_layout->addRow(" ", blacktophat_radio);
@@ -749,18 +652,6 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     QVBoxLayout* algo_layout = new QVBoxLayout;
     algo_layout->addWidget(complex1_morpho_radio);
     algo_layout->addWidget(complex2_morpho_radio);
-    connect(complex1_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(complex2_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-
-#ifdef Q_OS_MAC
-    median_layout->setFormAlignment(Qt::AlignLeft);
-    mean_layout->setFormAlignment(Qt::AlignLeft);
-    gaussian_layout->setFormAlignment(Qt::AlignLeft);
-    aniso_layout->setFormAlignment(Qt::AlignLeft);
-    open_layout->setFormAlignment(Qt::AlignLeft);
-    close_layout->setFormAlignment(Qt::AlignLeft);
-    tophat_layout->setFormAlignment(Qt::AlignLeft);
-#endif
 
     mean_groupbox->setLayout(mean_layout);
     gaussian_groupbox->setLayout(gaussian_layout);
@@ -819,7 +710,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     page3 = new QGroupBox(tr("Preprocessing"));
     page3->setCheckable(true);
     page3->setChecked(false);
-    connect(page3,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+
 
     time_filt = new QLabel(this);
     time_filt->setText(tr("time = "));
@@ -832,54 +723,21 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     page3_layout->addWidget(preprocess_tabs);
     page3_layout->addWidget(time_filt_groupbox);
     page3->setLayout(page3_layout);
+}
 
+void SettingsWindow::setupUiDisplayTab()
+{
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /// Display tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     QGroupBox* size_groupbox = new QGroupBox(tr("Image"));
 
-    scale_spin = new QSpinBox;
-    scale_spin->setSingleStep(25);
-    scale_spin->setMinimum(1);
-    scale_spin->setMaximum(5000);
-    scale_spin->setSuffix(" %");
-    scale_spin->setValue(100);
-
-    scale_slider = new QSlider(Qt::Horizontal, this);
-
-#ifdef Q_OS_LINUX
-    scale_slider->setTickPosition(QSlider::TicksBelow);
-#else
-    scale_slider->setTickPosition(QSlider::TicksAbove);
-#endif
-
-    scale_slider->setMinimum(1);
-    scale_slider->setMaximum(1000);
-    scale_slider->setTickInterval(100);
-    scale_slider->setSingleStep(25);
-    scale_slider->setValue(100);
-
-    connect(scale_spin,SIGNAL(valueChanged(int)),this,SLOT(do_scale(int)));
-    connect(scale_slider,SIGNAL(valueChanged(int)),scale_spin,SLOT(setValue(int)));
-    connect(scale_spin,SIGNAL(valueChanged(int)),scale_slider,SLOT(setValue(int)));
-
-    scale_spin->installEventFilter(this);
-    scale_slider->installEventFilter(this);
-    scale_spin->setMouseTracking(true);
-    scale_slider->setMouseTracking(true);
-
     histo_checkbox = new QCheckBox(tr("histogram normalization for the gradient"));
-    connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+
 
     QFormLayout* size_layout = new QFormLayout;
-    size_layout->addRow(tr("scale ="), scale_spin);
-    size_layout->addRow(scale_slider);
     size_layout->addRow(" ",histo_checkbox);
-
-#ifdef Q_OS_MAC
-    size_layout->setFormAlignment(Qt::AlignLeft);
-#endif
 
     size_groupbox->setLayout(size_layout);
 
@@ -925,29 +783,14 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     outsidecolor_combobox->addItem (pm, tr("No"));
     insidecolor_combobox->addItem (pm, tr("No"));
 
-
-    connect(outsidecolor_combobox,SIGNAL(activated(int)),this,SLOT(phi_visu(int)));
-    connect(insidecolor_combobox,SIGNAL(activated(int)),this,SLOT(phi_visu(int)));
-
-    QPushButton* outsidecolor_select = new QPushButton(tr("Select"));
-    connect(outsidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_out()));
-
-    QPushButton* insidecolor_select = new QPushButton(tr("Select"));
-    connect(insidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_in()));
+    outsidecolor_select = new QPushButton(tr("Select"));
+    insidecolor_select = new QPushButton(tr("Select"));
 
     QFormLayout* Loutcolor_form = new QFormLayout;
     Loutcolor_form->addRow(tr("Lout :"), outsidecolor_combobox);
 
-#ifdef Q_OS_MAC
-    Loutcolor_form->setFormAlignment(Qt::AlignLeft);
-#endif
-
     QFormLayout* Lincolor_form = new QFormLayout;
     Lincolor_form->addRow(tr("   Lin :"), insidecolor_combobox);
-
-#ifdef Q_OS_MAC
-    Lincolor_form->setFormAlignment(Qt::AlignLeft);
-#endif
 
     QHBoxLayout* Loutcolor_hlay = new QHBoxLayout;
     Loutcolor_hlay->addLayout(Loutcolor_form);
@@ -990,244 +833,174 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
     display_layout->addWidget(tracking_display_groupbox);
     display_layout->addStretch(1);
 
-    QWidget* page4 = new QWidget;
+    page4 = new QWidget;
     page4->setLayout( display_layout );
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    tabs = new QTabWidget(this);
-    tabs->addTab( page1, tr("Algorithm") );
-    tabs->addTab( page2, tr("Initialization") );
-    tabs->addTab( page3, tr("Preprocessing") );
-    tabs->addTab( page4, tr("Display") );
-    connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
-
-    QGridLayout *settings_grid = new QGridLayout;
-    settings_grid->addWidget(tabs,0,0);
-    settings_grid->addWidget(scrollArea_settings,0,1);
-    settings_grid->addWidget(dial_buttons,1,1);
-
-    settings_grid->setColumnStretch(1,1);
-    setLayout(settings_grid);
-
-    last_directory_used = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
-
-    has_contours_hidden = true;
-    scale_spin->setValue(settings.value("Settings/Display/zoom_factor", 100).toInt());
-    imageLabel_settings->set_zoomFactor(float(scale_spin->value())/100.0f);
-
-    reject();
-    scrollArea_settings->setFocus(Qt::OtherFocusReason);
 }
 
-void SettingsWindow::init2(const QImage& qimg0)
+void SettingsWindow::setupConnections()
 {
-    if (qimg0.isNull())
-    {
-        std::cerr << "Error." << std::endl;
-        return;
-    }
+    //connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
 
-    // ------------------------------------------------------------------
-    // ÉQUIVALENT de : img0 / img0_width / img0_height / is_rgb0
-    // ------------------------------------------------------------------
+    connect( dial_buttons, SIGNAL(accepted()), this, SLOT(accept()) );
+    connect( dial_buttons, SIGNAL(rejected()), this, SLOT(reject()) );
+    connect( dial_buttons->button(QDialogButtonBox::Reset),
+            SIGNAL(clicked()), this, SLOT(default_settings()) );
 
-    QImage qimg;
+    //connect(klength_gradient_spin,SIGNAL(valueChanged(int)),this,
+    //SLOT(show_phi_with_filtered_image()));
 
-    if (qimg0.format() == QImage::Format_RGB32 ||
-        qimg0.format() == QImage::Format_ARGB32)
-    {
-        qimg = qimg0;
-        is_rgb1 = true;
-    }
-    else
-    {
-        qimg = qimg0.convertToFormat(QImage::Format_RGB32);
-        is_rgb1 = true;
-    }
+    //connect(alpha_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    //connect(beta_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    //connect(gamma_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
 
-    const unsigned char* img0 =
-        reinterpret_cast<const unsigned char*>(qimg.bits());
+    //connect(chanvese_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(geodesic_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
-    const int img0_width  = qimg.width();
-    const int img0_height = qimg.height();
 
-    // ------------------------------------------------------------------
-    // À PARTIR D’ICI : CODE IDENTIQUE À TON ANCIEN init
-    // ------------------------------------------------------------------
 
-    imageLabel_settings->set_qimage0(qimg);
+    connect(open_phi_button,SIGNAL(clicked()),this,SLOT(openFilenamePhi()));
+    connect(save_phi_button,SIGNAL(clicked()),this,SLOT(save_phi()));
+    connect(rectangle_radio,SIGNAL(clicked()),this,SLOT(shape_visu()));
+    connect(ellipse_radio,SIGNAL(clicked()),this,SLOT(shape_visu()));
 
-    img1       = img0;
-    img_width  = img0_width;
-    img_height = img0_height;
-    img_size   = img_width * img_height;
-    img        = qimg;
+    connect(width_shape_spin,SIGNAL(valueChanged(int)),this,
+            SLOT(shape_visu(int)));
+    connect(width_slider,SIGNAL(valueChanged(int)),width_shape_spin,
+            SLOT(setValue(int)));
+    connect(width_shape_spin,SIGNAL(valueChanged(int)),width_slider,
+            SLOT(setValue(int)));
 
-    // PhiEditor : création UNE SEULE FOIS
+
+    connect(height_shape_spin,SIGNAL(valueChanged(int)),this,
+            SLOT(shape_visu(int)));
+    connect(height_slider,SIGNAL(valueChanged(int)),height_shape_spin,
+            SLOT(setValue(int)));
+    connect(height_shape_spin,SIGNAL(valueChanged(int)),height_slider,
+            SLOT(setValue(int)));
+
+    connect(abscissa_spin,SIGNAL(valueChanged(int)),this,SLOT(shape_visu(int)));
+    connect(abscissa_slider,SIGNAL(valueChanged(int)),abscissa_spin,SLOT(setValue(int)));
+    connect(abscissa_spin,SIGNAL(valueChanged(int)),abscissa_slider,SLOT(setValue(int)));
+
+    connect(ordinate_spin,SIGNAL(valueChanged(int)),this,SLOT(shape_visu(int)));
+    connect(ordinate_slider,SIGNAL(valueChanged(int)),ordinate_spin,SLOT(setValue(int)));
+    connect(ordinate_spin,SIGNAL(valueChanged(int)),ordinate_slider,SLOT(setValue(int)));
+
+
+
+
+
+
+
+
+    //connect(gaussian_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(std_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(salt_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(proba_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(speckle_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(std_speckle_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(mean_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(klength_mean_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(gaussian_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(klength_gaussian_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    //connect(std_filter_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(median_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(klength_median_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    //connect(complex_radio1,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(complex_radio2,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(aniso_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(aniso1_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(aniso2_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(iteration_filter_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    //connect(lambda_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    //connect(kappa_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(open_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(klength_open_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(close_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(klength_close_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(tophat_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(whitetophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(blacktophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(klength_tophat_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+
+    //connect(complex1_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    //connect(complex2_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+
+        //connect(page3,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+
+        //connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    connect(outsidecolor_combobox,SIGNAL(activated(int)),this,SLOT(phi_visu(int)));
+    connect(insidecolor_combobox,SIGNAL(activated(int)),this,SLOT(phi_visu(int)));
+
+    connect(outsidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_out()));
+    connect(insidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_in()));
+
+
+    connect(add_button, &QPushButton::clicked,
+            this, &SettingsWindow::onAddShape);
+
+    connect(subtract_button, &QPushButton::clicked,
+            this, &SettingsWindow::onSubtractShape);
+
+    connect(clear_button, &QPushButton::clicked,
+            phiEditor.get(), &PhiEditor::clear);
+
+    connect(phiViewModel.get(),
+            &PhiViewModel::viewChanged,
+            this,
+            [this]() {
+                settingsView->displayImage(phiViewModel->phiImage());
+            });
+}
+
+void SettingsWindow::onAddShape()
+{
+    applyCurrentShape(true);   // true = add
+}
+
+void SettingsWindow::onSubtractShape()
+{
+    applyCurrentShape(false);  // false = subtract
+}
+
+void SettingsWindow::applyCurrentShape(bool add)
+{
     if (!phiEditor)
-    {
-        phiEditor = std::make_unique<PhiEditor>(img_width, img_height);
-    }
+        return;
+
+    // --- Type de shape ---
+    ShapeType shapeType = rectangle_radio->isChecked()
+                              ? ShapeType::Rectangle
+                              : ShapeType::Ellipse;
+
+    int canvasWidth = phiEditor->get_phi().width();
+    int canvasHeight = phiEditor->get_phi().height();
+
+    int widthPercentage = width_slider->value();
+    int heightPercentage = height_slider->value();
+
+    int widthInPixels = (widthPercentage * canvasWidth) / 100;
+    int heightInPixels = (heightPercentage * canvasHeight) / 100;
+
+    QRect shapeRect(-widthInPixels / 2, -heightInPixels / 2, widthInPixels, heightInPixels);
+
+    ShapeInfo info;
+    info.type = shapeType;
+    info.boundingBox = shapeRect;
+
+    if (add)
+        phiEditor->addShape(info);
     else
-    {
-        //phiEditor->resize(img_width, img_height); // si tu as une méthode
-        phiEditor->clear();
-    }
-
-    // ViewModel : UNE SEULE FOIS
-    if (!phiViewModel)
-    {
-        phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());
-
-        connect(phiViewModel.get(),
-                &PhiViewModel::viewChanged,
-                this,
-                [this]() {
-                    imageLabel_settings->set_qimage(
-                        phiViewModel->phiImage());
-                });
-    }
-
-    // Initialisation de φ depuis les settings
-
-    auto& config = AppSettings::instance();
-
-    //phiEditor.clear();
-
-    //phiEditor->setPhiFromLists(config.Lout_init,
-                               //config.Lin_init);
-
-    if (displayed_phi_shape != nullptr)
-    {
-        delete displayed_phi_shape;
-        displayed_phi_shape = nullptr;
-    }
-
-    displayed_phi_shape =
-        new ofeli_ip::Matrix<signed char>(img_width, img_height);
-
-    if (config.Lout_init.empty() ||
-        config.Lin_init.empty() ||
-        config.phi_width  <= 0 ||
-        config.phi_height <= 0)
-    {
-        config.phi_width  = img_width;
-        config.phi_height = img_height;
-
-        config.Lout_init.clear();
-        config.Lin_init.clear();
-
-        ofeli_ip::BoundaryBuilder lists_init(
-            config.phi_width,
-            config.phi_height,
-            config.Lout_init,
-            config.Lin_init);
-
-        lists_init.get_rectangle_points(0.05f, 0.05f, 0.95f, 0.95f);
-    }
-    else if (config.phi_width != img_width ||
-             config.phi_height != img_height)
-    {
-        ofeli_ip::Matrix<signed char> phi_temp(
-            config.phi_width,
-            config.phi_height);
-
-        do_flood_fill_from_lists(
-            config.Lout_init,
-            config.Lin_init,
-            phi_temp);
-
-        QImage img_phi(
-            reinterpret_cast<const unsigned char*>(
-                phi_temp.get_matrix_data()),
-            phi_temp.get_width(),
-            phi_temp.get_height(),
-            phi_temp.get_width(),
-            QImage::Format_Indexed8);
-
-        QVector<QRgb> table(256);
-        for (int i = 0; i < 256; ++i)
-            table[i] = qRgb(i, i, i);
-
-        img_phi.setColorTable(table);
-
-        QImage scaled_img_phi =
-            img_phi.scaled(img_width,
-                           img_height,
-                           Qt::IgnoreAspectRatio,
-                           Qt::SmoothTransformation)
-                .convertToFormat(QImage::Format_RGB32);
-
-        ofeli_ip::Matrix<signed char> scaled_phi(
-            img_width, img_height);
-
-        for (int y = 0; y < img_height; ++y)
-        {
-            for (int x = 0; x < img_width; ++x)
-            {
-                QRgb pix = scaled_img_phi.pixel(x, y);
-                scaled_phi(x, y) =
-                    (qRed(pix) > 127)
-                        ? ofeli_ip::PhiValue::INSIDE_REGION
-                        : ofeli_ip::PhiValue::OUTSIDE_REGION;
-            }
-        }
-
-        find_lists_from_phi(
-            scaled_phi,
-            config.Lout_init,
-            config.Lin_init);
-
-        config.phi_width  = img_width;
-        config.phi_height = img_height;
-    }
-
-    if (filters2 != nullptr)
-        delete filters2;
-
-    filters2 = new ofeli_ip::Filters(
-        img1,
-        img_width,
-        img_height,
-        4);
-
-    image_filter = QImage(img_width, img_height, QImage::Format_RGB32);
-    image_phi    = QImage(img_width, img_height, QImage::Format_RGB32);
-    image_shape  = QImage(img_width, img_height, QImage::Format_RGB32);
-
-    update_visu();
-
-    page2->setEnabled(true);
-    open_phi_button->setEnabled(true);
-    save_phi_button->setEnabled(true);
-    add_button->setEnabled(true);
-    subtract_button->setEnabled(true);
-    clean_button->setEnabled(true);
-
-    color_weights_groupbox->setHidden(!is_rgb1);
-}
-
-void SettingsWindow::update_visu()
-{
-    if( parent() != nullptr )
-    {
-        //scale_spin->setValue(static_cast<ImageWindow*>(parent())->get_zoom_factor());
-
-        if( tabs->currentIndex() == TabIndex::INITIALIZATION )
-        {
-            calculate_filtered_copy_visu_buffers();
-            phi_visu(true);
-            shape_visu();
-        }
-        else
-        {
-            calculate_filtered_copy_visu_buffers();
-            phi_visu(false);
-        }
-    }
+        phiEditor->subtractShape(info);
 }
 
 void SettingsWindow::accept()
@@ -1312,8 +1085,7 @@ void SettingsWindow::accept()
     config.center_x = float(abscissa_spin->value())/100.f;
     config.center_y = float(ordinate_spin->value())/100.f;
 
-    config.Lout_init = Lout33;
-    config.Lin_init = Lin33;
+    phiEditor->accept();
 
     ///////////////////////////////////
     //        Preprocessing          //
@@ -1362,11 +1134,6 @@ void SettingsWindow::accept()
     /////////////////////////////
     //        Display          //
     /////////////////////////////
-
-    if( parent() != nullptr )
-    {
-        //static_cast<ImageWindow*>(parent())->set_zoom_factor(scale_spin->value());
-    }
 
     config.has_histo_normaliz = histo_checkbox->isChecked();
     config.has_display_each = step_checkbox->isChecked();
@@ -1479,8 +1246,7 @@ void SettingsWindow::reject()
     abscissa_spin->setValue(int(config.center_x*100.0));
     ordinate_spin->setValue(int(config.center_y*100.0));
 
-    Lout33 = config.Lout_init;
-    Lin33 = config.Lin_init;
+    phiEditor->clear();
 
     ///////////////////////////////////
     //        Preprocessing          //
@@ -1558,11 +1324,6 @@ void SettingsWindow::reject()
     //        Display          //
     /////////////////////////////
 
-    if( parent() != nullptr )
-    {
-        //scale_spin->setValue(static_cast<ImageWindow*>(parent())->get_zoom_factor());
-    }
-
     histo_checkbox->setChecked(config.has_histo_normaliz);
     step_checkbox->setChecked(config.has_display_each);
 
@@ -1604,8 +1365,10 @@ void SettingsWindow::reject()
     fps_checkbox->setChecked(config.is_show_fps);
     mirrored_checkbox->setChecked(config.is_show_mirrored);
 
-    calculate_filtered_copy_visu_buffers();
-    tab_visu( tabs->currentIndex() );
+    //calculate_filtered_copy_visu_buffers();
+    //tab_visu( tabs->currentIndex() );
+
+    phiEditor->clear();
 
     QDialog::reject();
 }
@@ -1714,21 +1477,12 @@ void SettingsWindow::default_settings()
     fps_checkbox->setChecked( true );
     mirrored_checkbox->setChecked( true );
 
-    calculate_filtered_copy_visu_buffers();
-    tab_visu( tabs->currentIndex() );
-}
-
-// Fonction appelée pour le changement d 'echelle de l'image dans la fenêtre paramètre
-void SettingsWindow::do_scale(int value)
-{
-    if( img1 != nullptr )
-    {
-        imageLabel_settings->setZoomFactor( float(value)/100.f );
-    }
+    //calculate_filtered_copy_visu_buffers();
+    //tab_visu( tabs->currentIndex() );
 }
 
 // Fonction appelée dans l'onglet initalisation pour calculer et afficher l'image+phi(couleur foncé)+forme(couleur clair)
-void SettingsWindow::shape_visu()
+/*void SettingsWindow::shape_visu()
 {
     if (img.isNull())
         return;
@@ -1752,263 +1506,10 @@ void SettingsWindow::shape_visu()
 
     params.color = QColor(0, 255, 255); // cyan, par ex
 
-    QImage withShape =
-        ShapeOverlayRenderer::render(image_phi, params);
+    //QImage withShape =
+        //ShapeOverlayRenderer::render(image_phi, params);
 
     imageLabel_settings->set_qimage(withShape);
-}
-
-// Surcharge pour avoir une signature identique (memes paramètres) entre signaux et slots de Qt
-void SettingsWindow::shape_visu(int)
-{
-    shape_visu();
-}
-
-
-// Remet phi_init2_clean a zéro, c'est à dire tout correspond à l'extérieur
-void SettingsWindow::clean_phi_visu()
-{
-    if (!phiEditor) return;
-
-    phiEditor->clear();
-
-    Lout33 = phiEditor->Lout();
-    Lin33  = phiEditor->Lin();
-
-    phi_visu(true);
-    shape_visu();
-}
-
-// Soustrait une forme à phi_init2
-void SettingsWindow::phi_subtract_shape()
-{
-    if (    ( displayed_phi_shape != nullptr && !displayed_phi_shape->is_null() )
-         && ( phi2 != nullptr && !phi2->is_null() )
-         && !image_phi.isNull()
-         && !image_filter.isNull()
-         && !image_shape.isNull() )
-    {
-        do_flood_fill_from_lists(Lout_shape11,Lin_shape11,*displayed_phi_shape);
-
-        int offset;
-
-        bool phi_init2_modif = false;
-
-        for( offset = 0; offset < img_size; offset++ )
-        {
-            if(     (*displayed_phi_shape)[offset] == ofeli_ip::PhiValue::INSIDE_REGION
-                 && (*phi2)[offset] == ofeli_ip::PhiValue::INSIDE_REGION )
-            {
-                (*phi2)[offset] = ofeli_ip::PhiValue::OUTSIDE_REGION;
-                phi_init2_modif = true;
-            }
-        }
-
-        if( !phi_init2_modif )
-        {
-            bool has_one = false;
-            bool has_minus_one = false;
-
-            for( offset = 0; offset < img_size; offset++ )
-            {
-                if( (*displayed_phi_shape)[offset] == ofeli_ip::PhiValue::OUTSIDE_REGION )
-                {
-                    has_one = true;
-                }
-                else if( (*displayed_phi_shape)[offset] == ofeli_ip::PhiValue::INSIDE_REGION )
-                {
-                    has_minus_one = true;
-                }
-            }
-
-            if( has_one && has_minus_one )
-            {
-                phi_add_shape();
-            }
-        }
-        else
-        {
-            erase_list_to_img1_img2( Lout33,
-                                     image_filter.bits(),
-                                     image_phi.bits(),
-                                     image_shape.bits() );
-
-            erase_list_to_img1_img2( Lin33,
-                                     image_filter.bits(),
-                                     image_phi.bits(),
-                                     image_shape.bits() );
-
-            find_lists_from_phi(*phi2,Lout33,Lin33);
-        }
-    }
-}
-
-// Ajoute une forme à phi_init2
-void SettingsWindow::phi_add_shape()
-{
-    if (    ( displayed_phi_shape != nullptr && !displayed_phi_shape->is_null() )
-         && ( phi2 != nullptr && !phi2->is_null() )
-         && !image_phi.isNull()
-         && !image_filter.isNull()
-         && !image_shape.isNull() )
-    {
-        do_flood_fill_from_lists(Lout_shape11,Lin_shape11,*displayed_phi_shape);
-
-
-        int offset;
-
-        bool phi_init2_modif = false;
-
-        for( offset = 0; offset < img_size; offset++ )
-        {
-            if( (*displayed_phi_shape)[offset] == ofeli_ip::PhiValue::INSIDE_REGION
-                    && (*phi2)[offset] == ofeli_ip::PhiValue::OUTSIDE_REGION )
-            {
-                (*phi2)[offset] = ofeli_ip::PhiValue::INSIDE_REGION;
-                phi_init2_modif = true;
-            }
-        }
-
-        if( !phi_init2_modif )
-        {
-            bool has_one = false;
-            bool has_minus_one = false;
-
-            for( offset = 0; offset < img_size; offset++ )
-            {
-                if( (*displayed_phi_shape)[offset] == ofeli_ip::PhiValue::OUTSIDE_REGION )
-                {
-                    has_one = true;
-                }
-                else if( (*displayed_phi_shape)[offset] == ofeli_ip::PhiValue::INSIDE_REGION )
-                {
-                    has_minus_one = true;
-                }
-            }
-
-            if( has_one && has_minus_one )
-            {
-                phi_subtract_shape();
-            }
-        }
-        else
-        {
-            erase_list_to_img1_img2( Lout33,
-                                     image_filter.bits(),
-                                     image_phi.bits(),
-                                     image_shape.bits() );
-
-            erase_list_to_img1_img2( Lin33,
-                                     image_filter.bits(),
-                                     image_phi.bits(),
-                                     image_shape.bits() );
-
-            find_lists_from_phi(*phi2,Lout33,Lin33);
-        }
-    }
-}
-
-// affiche l'image+phi en clair dans la fenêtre de configuration
-// dans l'onglet initialisation, affiche l'image+phi en foncé (booléen d'entrée a true) lorsque qu'on clique sur l'image
-// ou qu'on appuie sur les bouttons add subtract
-void SettingsWindow::phi_visu(bool dark_color)
-{
-    if(    !image_phi.isNull()
-        && !image_shape.isNull() )
-    {
-        if( outsidecolor_combobox->currentIndex() == ComboBoxColorIndex::SELECTED )
-        {
-            color_out_disp = selected_out_disp;
-        }
-        else
-        {
-            get_color(outsidecolor_combobox->currentIndex(),
-                      color_out_disp);
-        }
-
-        if( insidecolor_combobox->currentIndex() == ComboBoxColorIndex::SELECTED )
-        {
-            color_in_disp = selected_in_disp;
-        }
-        else
-        {
-            get_color(insidecolor_combobox->currentIndex(),
-                      color_in_disp);
-        }
-
-        unsigned char color_factor;
-        if( dark_color )
-        {
-            color_factor = 2;
-        }
-        else
-        {
-            color_factor = 1;
-        }
-
-        const auto& Lout = phiEditor->Lout();
-        const auto& Lin  = phiEditor->Lin();
-
-        draw_list_to_img( Lout,
-                          color_out_disp.divide( color_factor ),
-                          outsidecolor_combobox->currentIndex(),
-                          image_phi.bits(),
-                          image_phi.width(),
-                          image_phi.height() );
-
-        draw_list_to_img( Lin,
-                          color_in_disp.divide( color_factor ),
-                          insidecolor_combobox->currentIndex(),
-                          image_phi.bits(),
-                          image_phi.width(),
-                          image_phi.height() );
-
-        if( has_contours_hidden && tabs->currentIndex() == TabIndex::PREPROCESSING )
-        {
-            // affiche l'ellipse ou le rectangle
-            imageLabel_settings->set_qimage(image_filter);
-        }
-        else
-        {
-           // affiche l'ellipse ou le rectangle
-           imageLabel_settings->set_qimage(image_phi);
-        }
-    }
-}
-
-// Surcharge de phi_visu pour que le signal et le slot de Qt aient la même signature (les memes types de paramètres)
-// pour les combo box couleurs
-void SettingsWindow::phi_visu(int)
-{
-    phi_visu(false);
-}
-
-// Fonction appelée quand on clique sur le boutton add dans l'onglet initialization
-// ou par clic gauche
-void SettingsWindow::add_visu()
-{
-    if (!phiEditor) return;
-
-    ofeli_ip::Matrix<signed char> shapePhi(img_width, img_height);
-    do_flood_fill_from_lists(Lout_shape11, Lin_shape11, shapePhi);
-
-    phiEditor->addShape(shapePhi);
-
-    phi_visu(true);
-}
-
-// Fonction appelée quand on clique sur le boutton subtract dans l'onglet initialization
-// ou par clic droit
-void SettingsWindow::subtract_visu()
-{
-    if (!phiEditor) return;
-
-    ofeli_ip::Matrix<signed char> shapePhi(img_width, img_height);
-    do_flood_fill_from_lists(Lout_shape11, Lin_shape11, shapePhi);
-
-    phiEditor->subtractShape(shapePhi);
-
-    phi_visu(true);
 }
 
 
@@ -2030,14 +1531,11 @@ void SettingsWindow::set_color_out()
 
         outsidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
     }
-    // affichage de l'image avec la nouvelle couleur sélectionnée
-    phi_visu(false);
-
-}
+}*/
 
 // Fonction appelée par le boutton selected de boundaries inside
 // sélection et affichage d'une couleure particulière
-void SettingsWindow::set_color_in()
+/*void SettingsWindow::set_color_in()
 {
     // Selection d'une QColor à partir d'une boîte de dialogue couleur
     QColor color_in = QColorDialog::getColor(Qt::white, this, tr("Select Lin color"));
@@ -2053,9 +1551,7 @@ void SettingsWindow::set_color_in()
 
         insidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
     }
-    // affichage de l'image avec la nouvelle couleur sélectionnée
-    phi_visu(false);
-}
+}*/
 
 const unsigned char* SettingsWindow::get_filtered_img_data()
 {
@@ -2193,1090 +1689,6 @@ float SettingsWindow::calculate_filtered_image()
     elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
 
     return elapsed_time;
-}
-
-// Fonction appelée par tous les widgets de l'onglet Preprocessing
-// Calcule l'image prétraitéé
-void SettingsWindow::calculate_filtered_copy_visu_buffers()
-{
-    if(                  img1 != nullptr
-        &&           filters2 != nullptr
-        && !image_filter.isNull()
-        && !image_phi.isNull()
-        && !image_shape.isNull() )
-    {
-        // récupération de tous les états des widgets de l'onglet preprocessing
-        if( page3->isChecked() )
-        {
-            has_preprocess2 = true;
-        }
-        else
-        {
-            has_preprocess2 = false;
-        }
-
-        if( gaussian_noise_groupbox->isChecked() )
-        {
-            has_gaussian_noise2 = true;
-        }
-        else
-        {
-            has_gaussian_noise2 = false;
-        }
-        std_noise2 = float( std_noise_spin->value() );
-
-        if( salt_noise_groupbox->isChecked() )
-        {
-            has_salt_noise2 = true;
-        }
-        else
-        {
-            has_salt_noise2 = false;
-        }
-        proba_noise2 = float( proba_noise_spin->value() ) / 100.f;
-
-        if( speckle_noise_groupbox->isChecked() )
-        {
-            has_speckle_noise2 = true;
-        }
-        else
-        {
-            has_speckle_noise2 = false;
-        }
-        std_speckle_noise2 = float( std_speckle_noise_spin->value() );
-
-        if( median_groupbox->isChecked() )
-        {
-            has_median_filt2 = true;
-        }
-        else
-        {
-            has_median_filt2 = false;
-        }
-        kernel_median_length2 = klength_median_spin->value();
-        if( complex_radio2->isChecked() )
-        {
-            has_O1_algo2 = true;
-        }
-        else
-        {
-            has_O1_algo2 = false;
-        }
-
-        if( mean_groupbox->isChecked() )
-        {
-            has_mean_filt2 = true;
-        }
-        else
-        {
-            has_mean_filt2 = false;
-        }
-        kernel_mean_length2 = klength_mean_spin->value();
-
-        if( gaussian_groupbox->isChecked() )
-        {
-            has_gaussian_filt2 = true;
-        }
-        else
-        {
-            has_gaussian_filt2 = false;
-        }
-        kernel_gaussian_length2 = klength_gaussian_spin->value();
-        sigma2 = float( std_filter_spin->value() );
-
-
-        if( aniso_groupbox->isChecked() )
-        {
-            has_aniso_diff2 = true;
-        }
-        else
-        {
-            has_aniso_diff2 = false;
-        }
-
-        max_itera2 = iteration_filter_spin->value();
-        lambda2 = float( lambda_spin->value() );
-        kappa2 = float( kappa_spin->value() );
-        if( aniso1_radio->isChecked() )
-        {
-            aniso_option2 = ofeli_ip::AnisoDiff::FUNCTION1;
-        }
-        else if( aniso2_radio->isChecked() )
-        {
-            aniso_option2 = ofeli_ip::AnisoDiff::FUNCTION2;
-        }
-
-        if( open_groupbox->isChecked() )
-        {
-            has_open_filt2 = true;
-        }
-        else
-        {
-            has_open_filt2 = false;
-        }
-        kernel_open_length2 = klength_open_spin->value();
-
-        if( close_groupbox->isChecked() )
-        {
-            has_close_filt2 = true;
-        }
-        else
-        {
-            has_close_filt2 = false;
-        }
-        kernel_close_length2 = klength_close_spin->value();
-
-        if( tophat_groupbox->isChecked() )
-        {
-            has_top_hat_filt2 = true;
-        }
-        else
-        {
-            has_top_hat_filt2 = false;
-        }
-        if( whitetophat_radio->isChecked() )
-        {
-            is_white_top_hat2 = true;
-        }
-        else
-        {
-            is_white_top_hat2 = false;
-        }
-        kernel_tophat_length2 = klength_tophat_spin->value();
-
-        if( complex2_morpho_radio->isChecked() )
-        {
-            has_O1_morpho2 = true;
-        }
-        else
-        {
-            has_O1_morpho2 = false;
-        }
-
-        if( chanvese_radio->isChecked() )
-        {
-            speed = SpeedModel::REGION_BASED;
-        }
-        else if( geodesic_radio->isChecked() )
-        {
-            speed = SpeedModel::EDGE_BASED;
-        }
-        kernel_gradient_length2 = klength_gradient_spin->value();
-
-        alpha2 = alpha_spin->value();
-        beta2 = beta_spin->value();
-        gamma2 = gamma_spin->value();
-
-        if( histo_checkbox->isChecked() )
-        {
-            has_histo_normaliz2 = true;
-        }
-        else
-        {
-            has_histo_normaliz2 = false;
-        }
-
-
-        if( has_open_filt2 || has_close_filt2 || has_top_hat_filt2 )
-        {
-            algo_groupbox->setEnabled(true);
-        }
-        else
-        {
-            algo_groupbox->setEnabled(false);
-        }
-
-        float elapsed_time = calculate_filtered_image();
-
-        time_filt->setText(tr("time = ")+QString::number(elapsed_time)+" s");
-
-
-
-        unsigned char I;
-        unsigned char* image_filter_uchar = image_filter.bits();
-        unsigned char* image_phi_uchar = image_phi.bits();
-        unsigned char* image_shape_uchar = image_shape.bits();
-
-        if( speed == SpeedModel::REGION_BASED )
-        {
-            if( is_rgb1 )
-            {
-                std::memcpy(image_filter.bits(),img2_filtered,4*img_size);
-                std::memcpy(image_phi.bits(),img2_filtered,4*img_size);
-                std::memcpy(image_shape.bits(),img2_filtered,4*img_size);
-            }
-            else
-            {
-                for( int offset = 0; offset < img_size; offset++ )
-                {
-                    I = img2_filtered[offset];
-
-                    image_filter_uchar[4*offset+2] = I;
-                    image_filter_uchar[4*offset+1] = I;
-                    image_filter_uchar[4*offset  ] = I;
-
-                    image_phi_uchar[4*offset+2] = I;
-                    image_phi_uchar[4*offset+1] = I;
-                    image_phi_uchar[4*offset  ] = I;
-
-                    image_shape_uchar[4*offset+2] = I;
-                    image_shape_uchar[4*offset+1] = I;
-                    image_shape_uchar[4*offset  ] = I;
-                }
-            }
-        }
-        else if( speed == SpeedModel::EDGE_BASED )
-        {
-            if( has_histo_normaliz2 )
-            {
-                unsigned char max = 0;
-                unsigned char min = 255;
-
-                for( int offset = 0; offset < img_size; offset++ )
-                {
-                    if( img2_filtered[offset] > max )
-                    {
-                        max = img2_filtered[offset];
-                    }
-                    if( img2_filtered[offset] < min )
-                    {
-                        min = img2_filtered[offset];
-                    }
-                }
-
-                for( int offset = 0; offset < img_size; offset++ )
-                {
-                    I = (unsigned char)(255.f*float(img2_filtered[offset]-min)/float(max-min));
-
-                    image_filter_uchar[4*offset+2] = I;
-                    image_filter_uchar[4*offset+1] = I;
-                    image_filter_uchar[4*offset  ] = I;
-
-                    image_phi_uchar[4*offset+2] = I;
-                    image_phi_uchar[4*offset+1] = I;
-                    image_phi_uchar[4*offset  ] = I;
-
-                    image_shape_uchar[4*offset+2] = I;
-                    image_shape_uchar[4*offset+1] = I;
-                    image_shape_uchar[4*offset  ] = I;
-                }
-            }
-            else
-            {
-                for( int offset = 0; offset < img_size; offset++ )
-                {
-                    I = img2_filtered[offset];
-
-                    image_filter_uchar[4*offset+2] = I;
-                    image_filter_uchar[4*offset+1] = I;
-                    image_filter_uchar[4*offset  ] = I;
-
-                    image_phi_uchar[4*offset+2] = I;
-                    image_phi_uchar[4*offset+1] = I;
-                    image_phi_uchar[4*offset  ] = I;
-
-                    image_shape_uchar[4*offset+2] = I;
-                    image_shape_uchar[4*offset+1] = I;
-                    image_shape_uchar[4*offset  ] = I;
-                }
-            }
-        }
-    }
-}
-
-void SettingsWindow::show_phi_with_filtered_image()
-{
-    calculate_filtered_copy_visu_buffers();
-    phi_visu(false);
-}
-
-// Fonction appelée lorsque on change de taille d'image dans l'onglet Display
-void SettingsWindow::change_display_size()
-{
-    if( img1 != nullptr )
-    {
-        phi_visu(false);
-    }
-}
-
-// Fonction appelée à chaque changement d'onglet
-void SettingsWindow::tab_visu(int value)
-{
-    if( img1 != nullptr )
-    {
-        if( value == TabIndex::INITIALIZATION )
-        {
-            imageLabel_settings->set_doWheelEvent(false);
-            // visualisation de la forme
-            phi_visu(true);
-            shape_visu();
-        }
-        else
-        {
-            imageLabel_settings->set_doWheelEvent(true);
-            // visualisation de phi
-            phi_visu(false);
-        }
-    }
-}
-
-// enlever des trucs de mainwindow
-// Filtre des événements pour avoir le tracking au niveau du widget image de la fenêtre principale et de la fenêtre de parametres et pour ne pas avoir le tracking/la position au niveau de l'ensemble de chaque fenêtre
-bool SettingsWindow::eventFilter(QObject* object, QEvent* event)
-{
-    if( object == imageLabel_settings )
-    {
-        if( event->type() == QEvent::DragEnter )
-        {
-            QDragEnterEvent* drag = static_cast<QDragEnterEvent*>(event);
-            drag_enter_event_phi(drag);
-        }
-        else if( event->type() == QEvent::DragMove )
-        {
-            QDragMoveEvent* drag = static_cast<QDragMoveEvent*>(event);
-            drag_move_event_phi(drag);
-        }
-        else if( event->type() == QEvent::Drop )
-        {
-            QDropEvent* drag = static_cast<QDropEvent*>(event);
-            drop_event_phi(drag);
-        }
-        else if( event->type() == QEvent::DragLeave )
-        {
-            QDragLeaveEvent* drag = static_cast<QDragLeaveEvent*>(event);
-            drag_leave_event_phi(drag);
-        }
-        else if( event->type() == QEvent::MouseMove )
-        {
-            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-            mouse_move_event_settings(mouseEvent);
-        }
-        else if( event->type() == QEvent::MouseButtonPress )
-        {
-            QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-            mouse_press_event_settings(mouseEvent);
-        }
-    }
-    else if( object == scale_spin || object == scale_slider )
-    {
-        if( event->type() == QEvent::MouseButtonPress )
-        {
-            if( img1 != nullptr )
-            {
-                imageLabel_settings->set_has_text(false);
-                imageLabel_settings->setBackgroundRole(QPalette::Dark);
-            }
-            positionX = img_width/2;
-            positionY = img_height/2;
-        }
-    }
-
-    return false;
-}
-
-// Evénement de déplacement de la souris dans le widget image de la fenêtre de paramètres
-void SettingsWindow::mouse_move_event_settings(QMouseEvent* event)
-{
-    // si l'image est chargée et si on est dans l'onglet initialisation
-    if( img1 != nullptr )
-    {
-        // position de la souris dans l'image
-        positionX = int(float(img_width)*float(   (  (event->pos()).x() -imageLabel_settings->get_xoffset()   ) /float(imageLabel_settings->getPixWidth())));
-        positionY = int(float(img_height)*float(   (  (event->pos()).y() -imageLabel_settings->get_yoffset()   ) /float(imageLabel_settings->getPixHeight())));
-
-        if( tabs->currentIndex() == TabIndex::INITIALIZATION )
-        {
-            // on en deduit les valeurs relatives des sliders en %
-
-            float a = (float(positionX)-float(img_width/2))/float(img_width);
-            float b = (float(positionY)-float(img_height/2))/float(img_height);
-
-            abscissa_spin->setValue(int(a*100.f));
-            ordinate_spin->setValue(int(b*100.f));
-        }
-    }
-
-}
-
-// Evénement clic souris dans le widget image de la fenêtre de paramètres
-void SettingsWindow::mouse_press_event_settings(QMouseEvent* event)
-{
-    if( (img1 != nullptr) && tabs->currentIndex() == TabIndex::INITIALIZATION )
-    {
-        if( event->button() == Qt::LeftButton )
-        {
-            add_visu();
-        }
-        else if( event->button() == Qt::RightButton )
-        {
-            subtract_visu();
-        }
-        /*
-        else if( event->button() == Qt::MidButton )
-        {
-            if( !rectangle_radio->isChecked() )
-            {
-                rectangle_radio->setChecked(true);
-            }
-            else
-            {
-                ellipse_radio->setChecked(true);
-            }
-            shape_visu();
-        }*/
-    }
-
-    if( img1 != nullptr && tabs->currentIndex() == TabIndex::PREPROCESSING )
-    {
-        if( event->button() == Qt::RightButton )
-        {
-            if( has_contours_hidden )
-            {
-                has_contours_hidden = false;
-            }
-            else
-            {
-                has_contours_hidden = true;
-            }
-            phi_visu(false);
-        }
-        else if( event->button() == Qt::LeftButton )
-        {
-            has_contours_hidden = true;
-            if( has_show_img1 )
-            {
-                has_show_img1 = false;
-                img1_visu();
-            }
-            else
-            {
-                has_show_img1 = true;
-                phi_visu(false);
-            }
-        }
-    }
- }
-
-// Fonction pour afficher l'image de départ par clic gauche dans l'onglet preprocessing
-void SettingsWindow::img1_visu()
-{
-    if( img1 != nullptr )
-    {
-        imageLabel_settings->set_qimage(img);
-    }
-}
-
-void SettingsWindow::drag_enter_event_phi(QDragEnterEvent* event)
-{
-    if( tabs->currentIndex() != TabIndex::INITIALIZATION )
-    {
-        tabs->setCurrentIndex(TabIndex::INITIALIZATION);
-    }
-    QString text(tr("<drop ϕ(t=0)>"));
-    imageLabel_settings->set_text(text);
-    imageLabel_settings->setBackgroundRole(QPalette::Highlight);
-    imageLabel_settings->set_has_text(true);
-
-    event->acceptProposedAction();
-    emit changed(event->mimeData());
-}
-
-void SettingsWindow::drag_move_event_phi(QDragMoveEvent* event)
-{
-    event->acceptProposedAction();
-}
-
-void SettingsWindow::drop_event_phi(QDropEvent* event)
-{
-    const QMimeData* mimeData = event->mimeData();
-
-    if( mimeData->hasUrls() )
-    {
-        QList<QUrl> urlList = mimeData->urls();
-        fileName_phi = urlList.first().toLocalFile();
-    }
-    imageLabel_settings->setBackgroundRole(QPalette::Dark);
-    open_phi();
-    event->acceptProposedAction();
-}
-
-void SettingsWindow::drag_leave_event_phi(QDragLeaveEvent* event)
-{
-    QString text(tr("<drag ϕ(t=0)>"));
-    imageLabel_settings->set_text(text);
-    imageLabel_settings->setBackgroundRole(QPalette::Dark);
-    imageLabel_settings->set_has_text(true);
-
-    emit changed();
-    event->accept();
-}
-
-void SettingsWindow::openFilenamePhi()
-{
-    fileName_phi = QFileDialog::getOpenFileName(this,
-                                            tr("Open File"),
-                                            last_directory_used,
-                                            tr("Image Files (%1)").arg(nameFilters.join(" ")));
-
-    open_phi();
-}
-
-void SettingsWindow::open_phi()
-{
-    if( img1 != nullptr )
-    {
-        if( !fileName_phi.isEmpty() )
-        {
-            QFileInfo fi(fileName_phi);
-            last_directory_used = fi.absolutePath();
-
-            QImage img_phi1(fileName_phi);
-
-            if( img_phi1.isNull() )
-            {
-                QMessageBox::information(this, tr("Opening error - Ofeli"),
-                                         tr("Cannot load %1.").arg(QDir::toNativeSeparators(fileName_phi)));
-                return;
-            }
-
-            img_phi1 = img_phi1.scaled(img_width, img_height, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-
-            int histogram[256];
-            for( unsigned int I = 0; I <= 255u; I++ )
-            {
-                histogram[I] = 0;
-            }
-
-            if( img_phi1.format() == QImage::Format_Indexed8 )
-            {
-
-                for( int y = 0; y < img_height; y++ )
-                {
-                    for( int x = 0; x < img_width; x++ )
-                    {
-                        histogram[ *( img_phi1.scanLine(y)+x ) ]++;
-                    }
-                }
-
-                const unsigned char threshold = otsu_method(histogram,img_size);
-
-                for( int y = 0; y < img_height; y++ )
-                {
-                    for( int x = 0; x < img_width; x++ )
-                    {
-                        if( *( img_phi1.scanLine(y)+x ) <= threshold )
-                        {
-                            (*phi2)(x,y) = ofeli_ip::PhiValue::OUTSIDE_REGION;
-                        }
-                        else
-                        {
-                            (*phi2)(x,y) = ofeli_ip::PhiValue::INSIDE_REGION;
-                        }
-                    }
-                }
-
-            }
-            else
-            {
-                QRgb pix;
-
-                for( int y = 0; y < img_height; y++ )
-                {
-                    for( int x = 0; x < img_width; x++ )
-                    {
-                        pix = img_phi1.pixel(x,y);
-
-                        histogram[ (unsigned char) ( 0.2989f*(float)(qRed(pix))
-                                                     + 0.5870f*(float)(qGreen(pix))
-                                                     + 0.1140f*(float)(qBlue(pix)) ) ]++;
-                    }
-                }
-
-                const unsigned char threshold = otsu_method(histogram,img_size);
-
-                for( int y = 0; y < img_height; y++ )
-                {
-                    for( int x = 0; x < img_width; x++ )
-                    {
-                        pix = img_phi1.pixel(x,y);
-
-                        if( (unsigned char) ( 0.2989f*(float)(qRed(pix))
-                                              + 0.5870f*(float)(qGreen(pix))
-                                              + 0.1140f*(float)(qBlue(pix)) ) <= threshold )
-                        {
-                            (*phi2)(x,y) = ofeli_ip::PhiValue::OUTSIDE_REGION;
-                        }
-                        else
-                        {
-                            (*phi2)(x,y) = ofeli_ip::PhiValue::INSIDE_REGION;
-                        }
-                    }
-                }
-            }
-
-            erase_list_to_img1_img2( Lout33,
-                                    image_filter.bits(),
-                                     image_phi.bits(),
-                                     image_shape.bits() );
-
-            erase_list_to_img1_img2( Lin33,
-                                     image_filter.bits(),
-                                     image_phi.bits(),
-                                     image_shape.bits() );
-
-            Lout33.clear();
-            Lin33.clear();
-
-            find_lists_from_phi(*phi2,Lout33,Lin33);
-            tab_visu( tabs->currentIndex() );
-        }
-    }
-}
-
-void SettingsWindow::save_phi_without_given_extension(const QString& img_str,
-                                                      const QString& selected_filter,
-                                                      const QString& fileName_save,
-                                                      const QImage& img_phi_save)
-{
-    if( selected_filter.contains(img_str) )
-    {
-        if( img_phi_save.save(fileName_save + ".png") )
-        {
-            QMessageBox::information(this, tr("Opening error - Ofeli"),
-                                     tr("Cannot save %1.").arg(QDir::toNativeSeparators(fileName_save)));
-        }
-        else
-        {
-            // error
-        }
-    }
-    else
-    {
-        int first_point = selected_filter.indexOf(".");
-
-        if( first_point != -1 )
-        {
-            QString selected_extension = selected_filter.right(first_point-1);
-
-            if( !img_phi_save.save(fileName_save + selected_extension) )
-            {
-                QMessageBox::information(this, tr("Opening error - Ofeli"),
-                                         tr("Cannot save %1.").arg(QDir::toNativeSeparators(fileName_save)));
-            }
-        }
-        else
-        {
-            std::cerr << "Error." << std::endl;
-        }
-    }
-}
-
-void SettingsWindow::save_phi()
-{
-    if( phi2 != nullptr && !phi2->is_null() )
-    {
-        QImage img_phi_save = QImage(img_width,img_height,QImage::Format_Indexed8);
-
-        for( int y = 0; y < img_height; y++ )
-        {
-            for( int x = 0; x < img_width; x++ )
-            {
-                if( (*phi2)(x,y) == ofeli_ip::PhiValue::OUTSIDE_REGION )
-                {
-                    *(img_phi_save.scanLine(y)+x) = 0;
-                }
-                else if( (*phi2)(x,y) == ofeli_ip::PhiValue::INSIDE_REGION )
-                {
-                    *(img_phi_save.scanLine(y)+x) = 255;
-                }
-                else
-                {
-                    std::cerr << "Error." << std::endl;
-                }
-            }
-        }
-
-        int y;
-
-        for( const auto& point : Lout33 )
-        {
-            y = point.get_offset()/img_width;
-            *(img_phi_save.scanLine(y)+point.get_x()) = 85;
-        }
-
-        for( const auto& point : Lin33 )
-        {
-            y = point.get_offset()/img_width;
-            *(img_phi_save.scanLine(y)+point.get_x()) = 170;
-        }
-
-
-
-
-        QVector<QRgb> table(256);
-        for( int I = 0; I < 256; I++ )
-        {
-            table[I] = qRgb(I,I,I);
-        }
-        img_phi_save.setColorTable(table);
-
-        QString img_str(tr("Images"));
-        QString filters = img_str + " (*.bmp *.jpg *.jpeg *.png *.ppm *.xbm *.xpm);;BMP (*.bmp);;JPG JPEG (*.jpg *.jpeg);;PNG (*.png);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm)";
-        QString selected_filter;
-        QString fileName_save = QFileDialog::getSaveFileName(this,
-                                                             tr("Save ϕ(t=0)"),
-                                                             last_directory_used + QString(tr("/initial_phi_data")),
-                                                             filters,
-                                                             &selected_filter);
-
-
-        int last_point = fileName_save.lastIndexOf(".");
-
-        if( last_point != -1 )
-        {
-            QString extension = fileName_save.right(last_point-1);
-
-            if( filters.contains(extension) )
-            {
-                if( !img_phi_save.save(fileName_save) )
-                {
-                    QMessageBox::information(this, tr("Opening error - Ofeli"),
-                                             tr("Cannot save %1.").arg(QDir::toNativeSeparators(fileName_save)));
-                }
-            }
-            else
-            {
-                save_phi_without_given_extension(img_str,
-                                                 selected_filter,
-                                                 fileName_save,
-                                                 img_phi_save);
-            }
-        }
-        else
-        {
-            save_phi_without_given_extension(img_str,
-                                             selected_filter,
-                                             fileName_save,
-                                             img_phi_save);
-        }
-    }
-}
-
-void SettingsWindow::adjustVerticalScroll_settings(int min, int max)
-{
-    if( img_height >= 1 )
-    {
-        scrollArea_settings->verticalScrollBar()->setValue( (max-min)*positionY/img_height );
-    }
-}
-
-void SettingsWindow::adjustHorizontalScroll_settings(int min, int max)
-{
-    if( img_width >= 1 )
-    {
-        scrollArea_settings->horizontalScrollBar()->setValue( (max-min)*positionX/img_width );
-    }
-}
-
-unsigned char SettingsWindow::otsu_method(const int histogram[], unsigned int img_size)
-{
-    unsigned int sum = 0;
-    for( unsigned int I = 0; I <= 255; I++ )
-    {
-        sum += I*histogram[I];
-    }
-
-    unsigned int weight1, weight2, sum1;
-    float mean1, mean2, var_t, var_max;
-
-    unsigned char threshold = 127; // value returned in the case of an totally homogeneous image
-
-    weight1 = 0;
-    sum1 = 0;
-    var_max = -1.f;
-
-    // 256 values ==> 255 thresholds t evaluated
-    // class1 <= t and class2 > t
-    for( unsigned char t = 0; t < 255; t++ )
-    {
-        weight1 += histogram[t];
-        if( weight1 == 0 )
-        {
-            continue;
-        }
-
-        weight2 = img_size-weight1;
-        if( weight2 == 0 )
-        {
-            break;
-        }
-
-        sum1 += t*histogram[t];
-
-        mean1 = float(sum1/weight1);
-        mean2 = float( (sum-sum1)/weight2 ); // sum2 = sum-sum1
-
-        var_t = float(weight1)*float(weight2)*(mean1-mean2)*(mean1-mean2);
-
-        if( var_t > var_max )
-        {
-            var_max = var_t;
-            threshold = t;
-        }
-    }
-
-    return threshold;
-}
-
-void SettingsWindow::wheel_zoom(int val, ScrollAreaWidget* obj)
-{
-    if( obj == scrollArea_settings && img1 != nullptr )
-    {
-        imageLabel_settings->set_has_text(false);
-        imageLabel_settings->setBackgroundRole(QPalette::Dark);
-
-        if( tabs->currentIndex() == TabIndex::INITIALIZATION )
-        {
-            // nombre de degré et de pas de la molette
-            int numDegrees = val / 8;
-            int numSteps = numDegrees / 15;
-
-            // récupération des valeurs des sliders concernant la taille de la forme
-            int width_ratio = width_shape_spin->value();
-            int height_ratio = height_shape_spin->value();
-
-            // correpondance par rapport à la taille réelle de la forme
-            float width = float(img_width)*float(width_ratio)/100.f;
-            float height = float(img_height)*float(height_ratio)/100.f;
-
-            // augmentation ou diminution de 15% à chaque pas de molette
-            width += 0.15f*float(numSteps)*width;
-            height += 0.15f*float(numSteps)*height;
-
-            width_ratio = int( 100.f*width/float(img_width) );
-            height_ratio = int( 100.f*height/float(img_height) );
-
-            if( (width_ratio > 3) && (height_ratio > 3) && (width_ratio < 150) && (height_ratio < 150) )
-            {
-                width_shape_spin->setValue(width_ratio);
-                height_shape_spin->setValue(height_ratio);
-            }
-        }
-        else
-        {
-            float value = 0.002f*float( val ) + imageLabel_settings->get_zoomFactor();
-
-            if( value < 32.f/float( imageLabel_settings->get_qimage().width() ) )
-            {
-                value = 32.f/float( imageLabel_settings->get_qimage().width() );
-            }
-
-            scale_spin->setValue( int(100.f*value) );
-        }
-    }
-}
-
-void SettingsWindow::do_flood_fill_from_lists(const std::vector<ofeli_ip::ContourPoint>& Lout,
-                                              const std::vector<ofeli_ip::ContourPoint>& Lin,
-                                              ofeli_ip::Matrix<signed char>& phi)
-{
-    phi.memset(ofeli_ip::PhiValue::OUTSIDE_REGION);
-
-    for( const auto& point : Lout )
-    {
-        phi[ point.get_offset() ] = ofeli_ip::PhiValue::EXTERIOR_BOUNDARY;
-    }
-
-    for( const auto& point : Lin )
-    {
-        do_flood_fill( phi,
-                       point.get_offset(),
-                       ofeli_ip::PhiValue::OUTSIDE_REGION,
-                       ofeli_ip::PhiValue::INSIDE_REGION );
-    }
-
-    for( const auto& point : Lout )
-    {
-        phi[ point.get_offset() ] = ofeli_ip::PhiValue::OUTSIDE_REGION;
-    }
-}
-
-void SettingsWindow::find_lists_from_phi(const ofeli_ip::Matrix<signed char>& phi,
-                                         std::vector<ofeli_ip::ContourPoint>& Lout,
-                                         std::vector<ofeli_ip::ContourPoint>& Lin)
-{
-    Lout.clear();
-    Lin.clear();
-// vite fait a optimiser ensuite
-    const int phi_size = phi.get_width()*phi.get_height();
-    int x, y;
-
-    for( int offset = 0; offset < phi_size; offset++ )
-    {
-        phi.get_position(offset, x, y);
-
-        if( phi[offset] < ofeli_ip::PhiValue::ZERO_LEVEL_SET )
-        {
-            if( !find_redundant_list_point(phi, offset) )
-            {
-                Lin.emplace_back(offset, x);
-            }
-        }
-        else
-        {
-            if( !find_redundant_list_point(phi, offset) )
-            {
-                Lout.emplace_back(offset, x);
-            }
-        }
-    }
-}
-
-bool SettingsWindow::find_redundant_list_point(const ofeli_ip::Matrix<signed char>& phi,
-                                               int offset) const
-{
-    int x, y;
-    phi.get_position(offset,x,y); // x and y passed by reference
-
-    if( x > 0 )
-    {
-        if( phi(x-1,y)*phi[offset] < 0 )
-        {
-            return false;
-        }
-    }
-    if( x < phi.get_width()-1 )
-    {
-        if( phi(x+1,y)*phi[offset] < 0 )
-        {
-            return false;
-        }
-    }
-
-    if( y > 0 )
-    {
-        if( phi(x,y-1)*phi[offset] < 0 )
-        {
-            return false;
-        }
-
-#ifdef ALGO_8_CONNEXITY
-        if( x > 0 )
-        {
-            if( phi(x-1,y-1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-        if( x < phi.get_width()-1 )
-        {
-            if( phi(x+1,y-1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-#endif
-
-    }
-
-    if( y < phi.get_height()-1 )
-    {
-        if( phi(x,y+1)*phi[offset] < 0 )
-        {
-            return false;
-        }
-
-#ifdef ALGO_8_CONNEXITY
-        if( x > 0 )
-        {
-            if( phi(x-1,y+1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-        if( x < phi.get_width()-1 )
-        {
-            if( phi(x+1,y+1)*phi[offset] < 0 )
-            {
-                return false;
-            }
-        }
-#endif
-
-    }
-
-    return true;
-}
-
-void SettingsWindow::do_flood_fill(ofeli_ip::Matrix<signed char>& phi, int offset_seed,
-                                   ofeli_ip::PhiValue target_value, ofeli_ip::PhiValue replacement_value)
-{
-    if( target_value != replacement_value &&
-        offset_seed < phi.get_width()*phi.get_height()-1 )
-    {
-        std::stack<int> offset_seeds;
-        // top seed coordinates (x_ts,y_ts) and x for scan the row
-        int x_ts, y_ts, x;
-        bool span_up, span_down;
-
-        offset_seeds.push(offset_seed);
-
-        while( !offset_seeds.empty() )
-        {
-            // unstack the top seed
-            phi.get_position(offset_seeds.top(),
-                             x_ts,y_ts); // x_ts and y_ts passed by reference
-            offset_seeds.pop();
-
-            // x initialization at the left-most point of the seed
-            x = x_ts;
-            while( x > 0 &&
-                   phi(x-1,y_ts) == target_value )
-            {
-                x--;
-            }
-
-            span_up = false;
-            span_down = false;
-
-            // pixels are treated row-wise
-            while( x < phi.get_width() &&
-                   phi(x,y_ts) == target_value )
-            {
-                phi(x,y_ts) = replacement_value;
-
-                if( !span_up &&
-                    y_ts > 0 &&
-                    phi(x,y_ts-1) == target_value )
-                {
-                    offset_seeds.push( phi.get_offset(x,y_ts-1) );
-                    span_up = true;
-                }
-                else if( span_up &&
-                           y_ts > 0 &&
-                           phi(x,y_ts-1) != target_value )
-                {
-                    span_up = false;
-                }
-
-                if( !span_down &&
-                    y_ts < phi.get_height()-1 &&
-                    phi(x,y_ts+1) == target_value )
-                {
-                    offset_seeds.push( phi.get_offset(x,y_ts+1) );
-                    span_down = true;
-                }
-                else if( span_down &&
-                           y_ts < phi.get_height()-1
-                           && phi(x,y_ts+1) != target_value )
-                {
-                    span_down = false;
-                }
-
-                x++;
-            }
-        }
-    }
 }
 
 void SettingsWindow::closeEvent(QCloseEvent* event)

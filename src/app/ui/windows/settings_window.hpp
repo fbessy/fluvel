@@ -51,6 +51,7 @@
 #include "contour_data.hpp"
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"
+#include "image_view.hpp"
 
 #include <QtWidgets>
 
@@ -87,14 +88,13 @@ protected:
 private :
 
     virtual void closeEvent(QCloseEvent* event) override;
+    void applyCurrentShape(bool add);
 
     //////////////////////////////////////////
     //   pour la fenêtre de configuration   //
     /////////////////////////////////////////
 
-    // image dans un scrollarea a droite dans la fenêtre
-    PixmapWidget* imageLabel_settings;
-    ScrollAreaWidget* scrollArea_settings;
+    ImageView* settingsView;
 
     // onglets a gauche
     QTabWidget* tabs;
@@ -107,6 +107,8 @@ private :
     /////////////////////////////////////////
 
     // widgets et variables liés à l'onglet algorithm :
+
+    QWidget* page1;
 
     QSpinBox* Na_spin;
     QSpinBox* Ns_spin;
@@ -168,7 +170,7 @@ private :
 
     QPushButton* add_button;
     QPushButton* subtract_button;
-    QPushButton* clean_button;
+    QPushButton* clear_button;
 
     static unsigned char otsu_method(const int histogram[], unsigned int img_size);
 
@@ -262,14 +264,16 @@ private :
 
     // widgets et variables liés à l'onglet display :
 
-    QSpinBox* scale_spin;
-    QSlider* scale_slider;
+    QWidget* page4;
     QCheckBox* histo_checkbox;
     bool has_histo_normaliz2;
 
 
     QCheckBox* step_checkbox;
     QComboBox* outsidecolor_combobox;
+
+    QPushButton* outsidecolor_select;
+    QPushButton* insidecolor_select;
 
     // colors to display contour in settings window
     // as a preview color settings before user acceptance
@@ -290,40 +294,11 @@ private :
     void calculate_filtered_copy_visu_buffers();
     const unsigned char* img2_filtered;
 
-    // phi avant nettoyage des frontières
-    ofeli_ip::Matrix<signed char>* phi2;
-    std::vector<ofeli_ip::ContourPoint> Lout33;
-    std::vector<ofeli_ip::ContourPoint> Lin33;
-
-    ofeli_ip::Matrix<signed char>* displayed_phi_shape;
-    std::vector<ofeli_ip::ContourPoint> Lout_shape11;
-    std::vector<ofeli_ip::ContourPoint> Lin_shape11;
-
-    void do_flood_fill_from_lists(const std::vector<ofeli_ip::ContourPoint>& Lout, const std::vector<ofeli_ip::ContourPoint>& Lin,
-                                  ofeli_ip::Matrix<signed char>& phi);
-
-    void do_flood_fill(ofeli_ip::Matrix<signed char>& phi, int offset_seed,
-                       ofeli_ip::PhiValue target_value, ofeli_ip::PhiValue replacement_value);
-
-    void find_lists_from_phi(const ofeli_ip::Matrix<signed char>& phi,
-                             std::vector<ofeli_ip::ContourPoint>& Lout,
-                             std::vector<ofeli_ip::ContourPoint>& Lin);
-
-    bool find_redundant_list_point(const ofeli_ip::Matrix<signed char>& phi, int offset) const;
-
     QImage img;
-
-    QImage image_filter;
-    QImage image_phi;
-    QImage image_shape;
 
     QString last_directory_used;
 
     QPixmap pixmap_settings;
-
-    void phi_add_shape();
-    void phi_subtract_shape();
-    void phi_visu(bool dark_color);
 
     /////////////////////////////////////////////////
     //        variables liés au slot open()        //
@@ -344,7 +319,6 @@ private :
     int img_size;
     int find_offset(int x, int y) const;
 
-    bool eventFilter(QObject* object, QEvent* event);
     // position du curseur souris
     int positionX;
     int positionY;
@@ -359,11 +333,6 @@ private :
     bool has_show_img1;
     void update_visu();
 
-    void drag_enter_event_phi(QDragEnterEvent* event);
-    void drag_move_event_phi(QDragMoveEvent* event);
-    void drop_event_phi(QDropEvent* event);
-    void drag_leave_event_phi(QDragLeaveEvent* event);
-
     void save_phi_without_given_extension(const QString& img_str,
                                           const QString& selected_filter,
                                           const QString& fileName_save,
@@ -375,45 +344,36 @@ private :
     std::unique_ptr<PhiEditor> phiEditor;
     std::unique_ptr<PhiViewModel> phiViewModel;
 
+    // --- Setup ---
+    void setupUiAlgoTab();
+    void setupUiInitTab();
+    void setupUiPreprocessingTab();
+    void setupUiDisplayTab();
+    void setupConnections();
+
 private slots :
 
     //void do_scale0(int value);
     void default_settings();
 
     // slot appelé à chaque changement d'onglet
-    void tab_visu(int value);
-
-    // slots appelés depuis l'onglet initialization
-    void openFilenamePhi();
-    void save_phi();
-    void clean_phi_visu();
-    void shape_visu(int value);
-    void phi_visu(int value);
-    void add_visu();
-    void subtract_visu();
-    void shape_visu();
+    //void tab_visu(int value);
 
     // slots appelés depuis l'onglet preprocessing
     // slot appelé aussi une fois dans l'onglet algorithm pour voir le gradient de l'image pour le contour geodesique
-    void show_phi_with_filtered_image();
+    //void show_phi_with_filtered_image();
 
-    // slots appelés depuis l'onglet Display
-    void do_scale(int value);
-    void change_display_size();
-    void set_color_out();
-    void set_color_in();
-
-    void adjustVerticalScroll_settings(int min, int max);
-    void adjustHorizontalScroll_settings(int min, int max);
-
-    void wheel_zoom(int,ScrollAreaWidget*);
+    //void change_display_size();
+    //void set_color_out();
+    //void set_color_in();
 
 signals :
 
     void changed(const QMimeData* mimeData = 0);
 
 public slots:
-    void init2(const QImage& img);
+    void onAddShape();
+    void onSubtractShape();
 };
 
 inline int SettingsWindow::find_offset(int x, int y) const

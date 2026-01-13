@@ -83,9 +83,9 @@ void ActiveContourWorker::initializeActiveContour()
     {
         const auto& config = AppSettings::instance();
 
-        ofeli_ip::ContourData initial_tmp_ctr(config.Lout_init,
-                                              config.Lin_init,
-                                              m_workImage.width(), m_workImage.height());
+        ofeli_ip::ContourData initial_tmp_ctr(config.initialPhi.bits(),
+                                              config.initialPhi.width(),
+                                              config.initialPhi.height());
 
         bool is_rgb = ( m_workImage.format() != QImage::Format_Grayscale8 );
 

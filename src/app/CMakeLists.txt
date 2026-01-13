@@ -107,6 +107,7 @@ else()
         core/preview_pipeline.hpp core/preview_pipeline.cpp
         core/shape_overlay_renderer.hpp core/shape_overlay_renderer.cpp
         ui/components/phi_view_model.hpp ui/components/phi_view_model.cpp
+        core/shape_type.hpp
     )
 endif()
 

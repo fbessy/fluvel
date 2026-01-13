@@ -275,6 +275,9 @@ RegionColorAc::RegionColorAc(ImageSpan32 image1,
     region_config(region_config1),
     pxl_nbr_total(image.get_size()), pxl_nbr_out(0)
 {
+    assert( image.get_width()  == cd.get_phi().get_width() &&
+            image.get_height() == cd.get_phi().get_height()   );
+
     initialize_sums();
     RegionColorAc::do_specific_cycle1();
 }

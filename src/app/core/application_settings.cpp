@@ -42,9 +42,14 @@
 #include "contour_rendering.hpp"
 
 #include <QSettings>
+#include <QPainter>
 
 namespace ofeli_app
 {
+
+namespace {
+static constexpr const char* kPhiInitFilename = "phi_init.png";
+}
 
 ApplicationSettings::ApplicationSettings()
 {
@@ -82,55 +87,19 @@ ApplicationSettings::ApplicationSettings()
     //////////////////////////////////////////////////
     // Initialization
 
-    phi_width = settings.value("Settings/Initialization/phi_width", 100).toInt();
-    phi_height = settings.value("Settings/Initialization/phi_height", 100).toInt();
-
-    int offset, x, y;
-
-    int Lout_init_size = settings.beginReadArray("Settings/Initialization/Lout_init");
-    for( int index = 0; index < Lout_init_size; index++ )
-    {
-        settings.setArrayIndex(index);
-        offset = settings.value("Offset").toInt();
-
-        y = offset/phi_width;
-        x = offset-y*phi_width;
-
-        Lout_init.emplace_back( offset, x );
-    }
-    settings.endArray();
-
-    int Lin_init_size = settings.beginReadArray("Settings/Initialization/Lin_init");
-    for( int index = 0; index < Lin_init_size; index++ )
-    {
-        settings.setArrayIndex(index);
-        offset = settings.value("Offset").toInt();
-
-        y = offset/phi_width;
-        x = offset-y*phi_width;
-
-        Lin_init.emplace_back( offset, x );
-    }
-    settings.endArray();
-
-    if( Lout_init.empty() || Lin_init.empty() )
-    {
-        Lout_init.clear();
-        Lin_init.clear();
-
-        ofeli_ip::BoundaryBuilder lists_init( phi_width,
-                                              phi_height,
-                                              Lout_init,
-                                              Lin_init );
-
-        lists_init.get_rectangle_points(0.05f, 0.05f, 0.95f, 0.95f);
-    }
-
     has_ellipse = settings.value("Settings/Initialization/has_ellipse", true).toBool();
     init_width = settings.value("Settings/Initialization/init_width", 0.65f).toFloat();
     init_height = settings.value("Settings/Initialization/init_height", 0.65f).toFloat();
     center_x = settings.value("Settings/Initialization/center_x", 0.f).toFloat();
     center_y = settings.value("Settings/Initialization/center_y", 0.f).toFloat();
+
+
+    bool isOk = load_initial_phi();
+
+    if ( !isOk )
+    {
+        load_default_initial_phi();
+    }
 
     //////////////////////////////////////////////////
     // Preprocessing
@@ -210,8 +179,6 @@ ApplicationSettings::ApplicationSettings()
 
 ApplicationSettings::~ApplicationSettings()
 {
-    Lout_init.clear();
-    Lin_init.clear();
 }
 
 
@@ -238,32 +205,13 @@ void ApplicationSettings::save()
     settings.setValue("Settings/Algorithm/downscale_factor", downscale_factor);
     settings.setValue("Settings/Algorithm/cycles_nbr", cycles_nbr);
 
-    settings.setValue("Settings/Initialization/phi_width", phi_width);
-    settings.setValue("Settings/Initialization/phi_height", phi_height);
-
-    settings.remove("Settings/Initialization/Lout_init");
-    settings.beginWriteArray("Settings/Initialization/Lout_init");
-    for( std::size_t index = 0; index < Lout_init.size(); index++ )
-    {
-        settings.setArrayIndex( int(index) );
-        settings.setValue( "Offset", Lout_init[index].get_offset() );
-    }
-    settings.endArray();
-
-    settings.remove("Settings/Initialization/Lin_init");
-    settings.beginWriteArray("Settings/Initialization/Lin_init");
-    for( std::size_t index = 0; index < Lin_init.size(); index++ )
-    {
-        settings.setArrayIndex( int(index) );
-        settings.setValue( "Offset", Lin_init[index].get_offset() );
-    }
-    settings.endArray();
-
     settings.setValue("Settings/Initialization/has_ellipse", has_ellipse);
     settings.setValue("Settings/Initialization/init_width", init_width);
     settings.setValue("Settings/Initialization/init_height", init_height);
     settings.setValue("Settings/Initialization/center_x", center_x);
     settings.setValue("Settings/Initialization/center_y", center_y);
+
+    save_initial_phi();
 
     settings.setValue("Settings/Preprocessing/has_preprocess", has_preprocess);
     settings.setValue("Settings/Preprocessing/has_gaussian_noise", has_gaussian_noise);
@@ -335,16 +283,13 @@ RuntimeSettings ApplicationSettings::snapshot() const
 
     /////////////////////////////////////////
 
-    rs.phi_width = phi_width;
-    rs.phi_height = phi_height;
-    rs.Lout_init = Lout_init;
-    rs.Lin_init = Lin_init;
-
     rs.has_ellipse = has_ellipse;
     rs.init_width = init_width;
     rs.init_height = init_height;
     rs.center_x = center_x;
     rs.center_y = center_y;
+
+    rs.initialPhi = initialPhi.copy();
 
     /////////////////////////////////////////
 
@@ -400,6 +345,84 @@ RuntimeSettings ApplicationSettings::snapshot() const
     rs.is_show_mirrored = is_show_mirrored;
 
     return rs;
+}
+
+QDir ApplicationSettings::settingsDirectory()
+{
+    QSettings settings;
+    QFileInfo info(settings.fileName());
+    return info.dir();
+}
+
+bool ApplicationSettings::load_initial_phi()
+{
+    bool isOk = false;
+
+    QDir dir = settingsDirectory();
+    QString phiPath = dir.filePath(kPhiInitFilename);
+
+    if (QFile::exists(phiPath))
+    {
+        initialPhi.load(phiPath);
+    }
+
+    if ( !initialPhi.isNull() &&
+         initialPhi.format() !=  QImage::Format_Grayscale8 )
+    {
+        initialPhi = initialPhi.convertToFormat(QImage::Format_Grayscale8);
+    }
+
+    if ( !initialPhi.isNull() &&
+         initialPhi.format() == QImage::Format_Grayscale8 )
+    {
+        isOk = true;
+    }
+
+    return isOk;
+}
+
+void ApplicationSettings::load_default_initial_phi()
+{
+    const int width  = 1280;
+    const int height = 720;
+
+    initialPhi = QImage(width, height, QImage::Format_Grayscale8);
+    initialPhi.fill(Qt::black);
+
+    QPainter painter(&initialPhi);
+
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    painter.setBrush(Qt::white);
+    painter.setPen(Qt::NoPen);
+
+    const int ellipseWidth  = static_cast<int>(0.85 * width);
+    const int ellipseHeight = static_cast<int>(0.85 * height);
+
+    QRect boundingBox(
+        width  / 2 - ellipseWidth  / 2,
+        height / 2 - ellipseHeight / 2,
+        ellipseWidth,
+        ellipseHeight
+        );
+
+    painter.drawEllipse(boundingBox);
+}
+
+bool ApplicationSettings::save_initial_phi()
+{
+    bool isOk = false;
+
+    if ( !initialPhi.isNull() &&
+         initialPhi.format() == QImage::Format_Grayscale8 )
+    {
+        QDir dir = settingsDirectory();
+        QString phiPath = dir.filePath(kPhiInitFilename);
+
+
+        isOk = initialPhi.save(phiPath, "PNG");
+    }
+
+    return isOk;
 }
 
 }

@@ -46,6 +46,8 @@
 #include "runtime_settings.hpp"
 
 #include <QObject>
+#include <QDir>
+#include <QImage>
 
 namespace ofeli_app
 {
@@ -63,6 +65,12 @@ public:
     void save();
     RuntimeSettings snapshot() const;
 
+    QDir settingsDirectory();
+
+    bool save_initial_phi();
+    void load_default_initial_phi();
+    bool load_initial_phi();
+
     Language app_language;
 
     ofeli_ip::AcConfig algo_config;
@@ -76,16 +84,13 @@ public:
 
     /////////////////////////////////////////
 
-    int phi_width;
-    int phi_height;
-    std::vector<ofeli_ip::ContourPoint> Lout_init;
-    std::vector<ofeli_ip::ContourPoint> Lin_init;
-
     bool has_ellipse;
     float init_width;
     float init_height;
     float center_x;
     float center_y;
+
+    QImage initialPhi;
 
     /////////////////////////////////////////
 

@@ -91,6 +91,8 @@ EdgeAc::EdgeAc(ImageSpan8 gradient_image1,
     global_speed_sign( get_global_speed_sign() ),
     threshold( do_otsu_method(gradient_image) )
 {
+    assert( gradient_image.get_width()  == cd.get_phi().get_width() &&
+            gradient_image.get_height() == cd.get_phi().get_height()   );
 }
 
 }
