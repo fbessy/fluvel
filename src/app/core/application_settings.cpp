@@ -410,13 +410,10 @@ void ApplicationSettings::resize_initial_phi(int width, int height)
 {
     if ( !initialPhi.isNull() )
     {
-        if ( width != initialPhi.width() || height != initialPhi.height() )
-        {
-            initialPhi = initialPhi.scaled( width,
-                                            height,
-                                            Qt::IgnoreAspectRatio,
-                                            Qt::FastTransformation);
-        }
+        initialPhi = initialPhi.scaled( width,
+                                        height,
+                                        Qt::IgnoreAspectRatio,
+                                        Qt::FastTransformation);
     }
 }
 
