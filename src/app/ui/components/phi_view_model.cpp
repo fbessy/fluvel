@@ -24,6 +24,9 @@ PhiViewModel::PhiViewModel(PhiEditor* editor,
     connect(editor_, &PhiEditor::phiChanged,
             this, &PhiViewModel::updateFromEditor);
 
+    connect(editor_, &PhiEditor::phiCleared,
+            this, &PhiViewModel::onClearFromEditor);
+
     connect(editor_, &PhiEditor::phiResized,
             this, &PhiViewModel::onPhiResized);
 }
@@ -57,6 +60,14 @@ void PhiViewModel::updateFromEditor()
     updatePhiFromLists();
 
     composeView(false);
+}
+
+void PhiViewModel::onClearFromEditor()
+{
+    updateLists();
+    updatePhiFromLists();
+
+    composeView(true);
 }
 
 void PhiViewModel::updateLists()

@@ -25,6 +25,7 @@ public:
 public slots:
     void onPhiResized(int width, int height);
     void updateFromEditor();
+    void onClearFromEditor();
     void setBackgroundWithUpdate(const QImage& image);
     void setBackground(const QImage& image);
 

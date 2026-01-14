@@ -55,7 +55,7 @@ void PhiEditor::subtractShape(const ShapeInfo& shapeInfo)
 void PhiEditor::clear()
 {
     current.fill(Qt::black);
-    emit phiChanged();
+    emit phiCleared();
 }
 
 void PhiEditor::accept()
