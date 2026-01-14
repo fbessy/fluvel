@@ -65,8 +65,11 @@ void PhiEditor::accept()
 
 void PhiEditor::reject()
 {
-    current = AppSettings::instance().initialPhi;
-    emit phiChanged();
+    if ( current != AppSettings::instance().initialPhi )
+    {
+        current = AppSettings::instance().initialPhi;
+        emit phiChanged();
+    }
 }
 
 bool PhiEditor::is_redundant(int x, int y)
