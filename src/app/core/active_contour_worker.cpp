@@ -17,7 +17,7 @@ namespace ofeli_app
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr), m_timer(new QTimer(this))
 {
-    m_timer->setInterval(4);
+    m_timer->setInterval(16);
     connect(m_timer, &QTimer::timeout,
             this, &ActiveContourWorker::onTimeout);
 }
