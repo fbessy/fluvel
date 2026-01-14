@@ -85,21 +85,25 @@ void PhiViewModel::updateLists()
     l_out.clear();
     l_in.clear();
 
-    for (int x = 0; x < w; ++x)
+    const auto phi = editor_->get_phi();
+
+    for ( int y = 0; y < h; ++y )
     {
-        for (int y = 0; y < h; ++y)
+        const uchar* line = phi.constScanLine(y);
+
+        for ( int x = 0; x < w; ++x )
         {
+            uchar I = line[x];
+
             if ( !editor_->is_redundant(x, y) )
             {
-                QPoint p(x, y);
-
-                if ( qGray(editor_->get_phi().pixel(x, y)) == 0 )
+                if ( I == 0 )
                 {
-                    l_out.emplace_back(x,y);
+                    l_out.emplace_back(x, y);
                 }
-                else if ( qGray(editor_->get_phi().pixel(x, y)) == 255 )
+                else if (I == 255)
                 {
-                    l_in.emplace_back(x,y);
+                    l_in.emplace_back(x, y);
                 }
             }
         }
@@ -130,7 +134,7 @@ void PhiViewModel::composeView(bool hasOverlay)
     if (hasOverlay)
     {
         QPainter p(&withOverlay);
-        p.setRenderHint(QPainter::Antialiasing, true);
+        p.setRenderHint(QPainter::Antialiasing, false);
         p.setPen(QPen(Qt::cyan, 2));
         p.setBrush(Qt::NoBrush);
 
