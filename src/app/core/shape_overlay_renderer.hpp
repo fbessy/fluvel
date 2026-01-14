@@ -1,32 +1,28 @@
 #ifndef SHAPE_OVERLAY_RENDERER_HPP
 #define SHAPE_OVERLAY_RENDERER_HPP
 
-#include <QImage>
-#include <QColor>
+#include <QWidget>
 
 #include "shape_type.hpp"
+#include "phi_editor.hpp"
 
 namespace ofeli_app
 {
 
-struct ShapeParams
+class ShapeOverlayRenderer : public QWidget
 {
-    ShapeType type;
-
-    float center_x;
-    float center_y;
-
-    float width;
-    float height;
-
-    QColor color;
-};
-
-class ShapeOverlayRenderer
-{
+    Q_OBJECT
 public:
-    static QImage render(const QImage& base,
-                         const ShapeParams& params);
+    explicit ShapeOverlayRenderer(QWidget* parent = nullptr);
+
+    void setShape(const ShapeInfo& shape);
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
+private:
+    ShapeInfo shape_;
+    QRect lastBoundingBox_;
 };
 
 }

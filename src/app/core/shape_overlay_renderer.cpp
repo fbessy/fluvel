@@ -1,47 +1,47 @@
 #include "shape_overlay_renderer.hpp"
-
-#include "shape_overlay_renderer.hpp"
 #include <QPainter>
 
 namespace ofeli_app
 {
 
-QImage ShapeOverlayRenderer::render(const QImage& base,
-                                    const ShapeParams& params)
+ShapeOverlayRenderer::ShapeOverlayRenderer(QWidget* parent)
+    : QWidget(parent)
 {
-    if (base.isNull())
-        return base;
+    setAttribute(Qt::WA_TransparentForMouseEvents);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_TranslucentBackground);
 
-    QImage result = base.copy();
+    setAutoFillBackground(false);
+}
 
-    QPainter painter(&result);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+void ShapeOverlayRenderer::setShape(const ShapeInfo& shape)
+{
+    QRect oldRect = lastBoundingBox_;
+    shape_ = shape;
+    lastBoundingBox_ = shape_.boundingBox;
 
-    QPen pen(params.color);
-    pen.setWidth(2);
-    painter.setPen(pen);
-    painter.setBrush(Qt::NoBrush);
+    // zone minimale à repeindre
+    QRect dirty = oldRect.united(lastBoundingBox_)
+                      .adjusted(-3, -3, 3, 3); // marge pour le pen
 
-    const int w = base.width();
-    const int h = base.height();
+    update(dirty);
+}
 
-    const float cx = (0.5f + params.center_x) * w;
-    const float cy = (0.5f + params.center_y) * h;
+void ShapeOverlayRenderer::paintEvent(QPaintEvent*)
+{
+    if (!shape_.boundingBox.isValid())
+        return;
 
-    const float rw = params.width  * w;
-    const float rh = params.height * h;
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing, true);
 
-    QRectF rect(cx - rw * 0.5f,
-                cy - rh * 0.5f,
-                rw,
-                rh);
+    p.setPen(QPen(Qt::cyan, 2));
+    p.setBrush(Qt::NoBrush);
 
-    if (params.type == ShapeType::Ellipse)
-        painter.drawEllipse(rect);
+    if (shape_.type == ShapeType::Rectangle)
+        p.drawRect(shape_.boundingBox);
     else
-        painter.drawRect(rect);
-
-    return result;
+        p.drawEllipse(shape_.boundingBox);
 }
 
 } // namespace ofeli_app
