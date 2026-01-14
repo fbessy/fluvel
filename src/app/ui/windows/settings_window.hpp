@@ -89,10 +89,10 @@ protected:
 
 private :
 
+
+    virtual void showEvent(QShowEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
     void applyCurrentShape(bool add);
-
-    void updateShapeParams();
 
     //////////////////////////////////////////
     //   pour la fenêtre de configuration   //

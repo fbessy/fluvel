@@ -285,14 +285,17 @@ void ImageWindow::setupConnections()
     connect(stepButton,   &QPushButton::clicked,
             acWorker.get(),     &ActiveContourWorker::stop);
 
-    connect(imageController, &ImageController::imageReady,
-            previewPipeline, &PreviewPipeline::setSourceImage);
+    connect(imageController, &ImageController::imageReadyWithoutResize,
+            phiViewModel.get(), &PhiViewModel::setBackgroundWithUpdate);
 
-    connect(imageController, &ImageController::imageSizeReady,
-            phiEditor.get(), &PhiEditor::onImageSizeReady);
-
-    connect(imageController, &ImageController::imageReady,
-            phiViewModel.get(), &PhiViewModel::setBackground);
+    connect(imageController,
+            &ImageController::imageReadyWithResize,
+            phiEditor.get(),
+            [this](const QImage &img)
+            {
+                phiViewModel->setBackground(img);
+                phiEditor->onImageSizeReady(img.width(), img.height());
+            });
 }
 
 QString ImageWindow::strippedName(const QString &fullFileName)

@@ -18,30 +18,57 @@ PhiViewModel::PhiViewModel(PhiEditor* editor,
 
     background_.fill(Qt::black);
 
+    updateLists();
+    updatePhiFromLists();
+
     connect(editor_, &PhiEditor::phiChanged,
             this, &PhiViewModel::updateFromEditor);
 
-    updateFromEditor();
-    composeView(true);
+    connect(editor_, &PhiEditor::phiResized,
+            this, &PhiViewModel::onPhiResized);
 }
 
 void PhiViewModel::setBackground(const QImage& image)
 {
     background_ = image.convertToFormat(QImage::Format_RGB32);
+}
 
-    updateFromEditor();
+void PhiViewModel::setBackgroundWithUpdate(const QImage& image)
+{
+    background_ = image.convertToFormat(QImage::Format_RGB32);
+
+    updatePhiFromLists();
     composeView(true);
+}
+
+void PhiViewModel::onPhiResized(int width, int height)
+{
+    assert( width  == background_.width() &&
+            height == background_.height() );
+
+    updateLists();
+    updatePhiFromLists();
+    composeView(false);
 }
 
 void PhiViewModel::updateFromEditor()
 {
+    updateLists();
+    updatePhiFromLists();
+
+    composeView(false);
+}
+
+void PhiViewModel::updateLists()
+{
     if (!editor_)
         return;
 
-    phiImage_ = background_;
-
     const int w = editor_->get_phi().width();
     const int h = editor_->get_phi().height();
+
+    l_out.clear();
+    l_in.clear();
 
     for (int x = 0; x < w; ++x)
     {
@@ -53,17 +80,32 @@ void PhiViewModel::updateFromEditor()
 
                 if ( qGray(editor_->get_phi().pixel(x, y)) == 0 )
                 {
-                    phiImage_.setPixel(p, qRgb(0, 0, 255));
+                    l_out.emplace_back(x,y);
                 }
                 else if ( qGray(editor_->get_phi().pixel(x, y)) == 255 )
                 {
-                    phiImage_.setPixel(p, qRgb(255, 0, 0));
+                    l_in.emplace_back(x,y);
                 }
             }
         }
     }
+}
 
-    composeView(false);
+void PhiViewModel::updatePhiFromLists()
+{
+    phiImage_ = background_;
+
+    for( const auto& p : l_out )
+    {
+        QPoint point(p.x, p.y);
+        phiImage_.setPixel(point, qRgb(0, 0, 255));
+    }
+
+    for( const auto& p : l_in )
+    {
+        QPoint point(p.x, p.y);
+        phiImage_.setPixel(point, qRgb(255, 0, 0));
+    }
 }
 
 void PhiViewModel::composeView(bool hasOverlay)

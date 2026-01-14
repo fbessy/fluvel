@@ -20,7 +20,7 @@ void PhiEditor::onImageSizeReady(int width, int height)
                                   Qt::IgnoreAspectRatio,
                                   Qt::FastTransformation);
 
-        emit phiResized(width, height);
+        emit phiResized( current.width(), current.height() );
     }
 }
 

@@ -959,9 +959,6 @@ void SettingsWindow::setupConnections()
             settingsView,
             &ImageView::displayImage);
 
-
-    phiViewModel_->setOverlay( computeShapeInfo() );
-
     auto updateOverlay = [this]()
     {
         phiViewModel_->setOverlay( computeShapeInfo() );
@@ -1687,38 +1684,12 @@ float SettingsWindow::calculate_filtered_image()
     return elapsed_time;
 }
 
-void SettingsWindow::updateShapeParams()
+void SettingsWindow::showEvent(QShowEvent* event)
 {
-    const int W = phiEditor_->get_phi().width();
-    const int H = phiEditor_->get_phi().height();
-
-    // centre de référence (fixe, UI)
-    const float X0 = W * 0.5f;
-    const float Y0 = H * 0.5f;
-
-    // taille de la shape
-    const float shapeW = (width_slider->value()  / 100.0f) * W;
-    const float shapeH = (height_slider->value() / 100.0f) * H;
-
-    // offsets UI ([-0.5, +0.5] de la taille)
-    const float offsetX = (abscissa_slider->value() / 100.0f) - 0.5f;
-    const float offsetY = (ordinate_slider->value()  / 100.0f) - 0.5f;
-
-    ShapeParams params;
-    params.type = rectangle_radio->isChecked()
-                      ? ShapeType::Rectangle
-                      : ShapeType::Ellipse;
-
-    // position FINALE (pixels)
-    params.center_x = X0 + offsetX * shapeW;
-    params.center_y = Y0 + offsetY * shapeH;
-
-    params.width  = shapeW;
-    params.height = shapeH;
-
-    params.color = QColor(0, 255, 255);
-
-    //phiViewModel_->setShapeParams(params);
+    if ( phiViewModel_ != nullptr )
+    {
+        phiViewModel_->setOverlay( computeShapeInfo() );
+    }
 }
 
 void SettingsWindow::closeEvent(QCloseEvent* event)
