@@ -19,7 +19,8 @@ public slots:
 
 signals:
     void imageReady(const QImage& image);
-    void imageSizeReady(int width, int height);
+    void imageReadyWithResize(const QImage& image);
+    oid imageReadyWithoutResize(const QImage& image);
     void contourReady(const QImage& image);
 
 private:

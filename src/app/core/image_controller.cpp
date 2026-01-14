@@ -35,6 +35,8 @@ void ImageController::loadImage(const QString& path)
 
     if ( isOk )
     {
+        bool isResize = false;
+
         if ( !AppSettings::instance().initialPhi.isNull() )
         {
             if ( AppSettings::instance().initialPhi.width()  != img.width() ||
@@ -43,8 +45,17 @@ void ImageController::loadImage(const QString& path)
                 AppSettings::instance().resize_initial_phi( img.width(),
                                                             img.height() );
 
-                emit imageSizeReady(img.width(), img.height());
+                isResize = true;
             }
+        }
+
+        if ( isResize )
+        {
+            emit imageReadyWithResize(img);
+        }
+        else
+        {
+            emit imageReadyWithoutResize(img);
         }
 
         emit imageReady(img);
