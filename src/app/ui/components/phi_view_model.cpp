@@ -64,8 +64,9 @@ void PhiViewModel::updateFromEditor()
 
 void PhiViewModel::onClearFromEditor()
 {
-    updateLists();
-    updatePhiFromLists();
+    l_out.clear();
+    l_in.clear();
+    phiImage_ = background_;
 
     composeView(true);
 }
