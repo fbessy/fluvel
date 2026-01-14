@@ -74,21 +74,30 @@ void PhiEditor::reject()
 
 bool PhiEditor::is_redundant(int x, int y)
 {
-    for (int dx = -1; dx <= 1; ++dx)
+    const int w = current.width();
+    const int h = current.height();
+
+    const uchar center = current.constScanLine(y)[x];
+
+    for (int dy = -1; dy <= 1; ++dy)
     {
-        for (int dy = -1; dy <= 1; ++dy)
+        const int ny = y + dy;
+        if (ny < 0 || ny >= h)
+            continue;
+
+        const uchar* line = current.constScanLine(ny);
+
+        for (int dx = -1; dx <= 1; ++dx)
         {
-            if ( !(dx == 0 && dy == 0) )
-            {
-                if ( x+dx >= 0 && x+dx < current.width() &&
-                     y+dy >= 0 && y+dy < current.height() )
-                {
-                    if ( qGray(current.pixel(x,y)) != qGray(current.pixel(x+dx,y+dy)) )
-                    {
-                        return false;
-                    }
-                }
-            }
+            if (dx == 0 && dy == 0)
+                continue;
+
+            const int nx = x + dx;
+            if (nx < 0 || nx >= w)
+                continue;
+
+            if (line[nx] != center)
+                return false;
         }
     }
 
