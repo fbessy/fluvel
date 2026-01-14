@@ -29,6 +29,16 @@ PhiViewModel::PhiViewModel(PhiEditor* editor,
 
     connect(editor_, &PhiEditor::phiResized,
             this, &PhiViewModel::onPhiResized);
+
+    updateTimer_.setSingleShot(true);
+    updateTimer_.setTimerType(Qt::CoarseTimer);
+
+    connect(&updateTimer_, &QTimer::timeout, this, [this]()
+            {
+                updateListsFloodFill();
+                updatePhiFromLists();
+                composeView(false);
+            });
 }
 
 // called after an image reload with size change
@@ -52,17 +62,13 @@ void PhiViewModel::onPhiResized(int width, int height)
     assert( width  == background_.width() &&
             height == background_.height() );
 
-    updateLists();
-    updatePhiFromLists();
-    composeView(false);
+
+    updateTimer_.start(0);
 }
 
 void PhiViewModel::updateFromEditor()
 {
-    updateLists();
-    updatePhiFromLists();
-
-    composeView(false);
+    updateTimer_.start(0);
 }
 
 void PhiViewModel::onClearFromEditor()
@@ -104,6 +110,124 @@ void PhiViewModel::updateLists()
                 else if (I == 255)
                 {
                     l_in.emplace_back(x, y);
+                }
+            }
+        }
+    }
+}
+
+void PhiViewModel::updateListsFloodFill()
+{
+    l_out.clear();
+    l_in.clear();
+
+    const QImage& phi = editor_->get_phi();
+    const int w = phi.width();
+    const int h = phi.height();
+
+    Q_ASSERT(phi.format() == QImage::Format_Grayscale8);
+
+    // Marqueur de pixels visités
+    QImage visited(w, h, QImage::Format_Grayscale8);
+    visited.fill(0);
+
+    auto inside = [&](int x, int y) {
+        return x >= 0 && x < w && y >= 0 && y < h;
+    };
+
+    auto pixel = [&](int x, int y) -> uchar {
+        return phi.constScanLine(y)[x];
+    };
+
+    std::vector<Span> stack;
+    stack.reserve(1024);
+
+    for (int y = 0; y < h; ++y)
+    {
+        const uchar* line = phi.constScanLine(y);
+        uchar* visitedLine = visited.scanLine(y);
+
+        for (int x = 0; x < w; ++x)
+        {
+            if (visitedLine[x])
+                continue;
+
+            if (editor_->is_redundant(x, y))
+                continue;
+
+            uchar value = line[x];
+            if (value != 0 && value != 255)
+                continue;
+
+            // Nouveau seed
+            stack.push_back({ y, x, x });
+
+            while (!stack.empty())
+            {
+                Span s = stack.back();
+                stack.pop_back();
+
+                int xl = s.xLeft;
+                int xr = s.xRight;
+
+                // Étendre à gauche
+                while (xl - 1 >= 0 &&
+                       !visitedLine[xl - 1] &&
+                       !editor_->is_redundant(xl - 1, s.y) &&
+                       pixel(xl - 1, s.y) == value)
+                {
+                    --xl;
+                }
+
+                // Étendre à droite
+                while (xr + 1 < w &&
+                       !visitedLine[xr + 1] &&
+                       !editor_->is_redundant(xr + 1, s.y) &&
+                       pixel(xr + 1, s.y) == value)
+                {
+                    ++xr;
+                }
+
+                // Marquer et stocker
+                for (int xi = xl; xi <= xr; ++xi)
+                {
+                    visited.scanLine(s.y)[xi] = 1;
+
+                    if (value == 0)
+                        l_out.emplace_back(xi, s.y);
+                    else
+                        l_in.emplace_back(xi, s.y);
+                }
+
+                // Examiner lignes au-dessus et en dessous
+                for (int ny : { s.y - 1, s.y + 1 })
+                {
+                    if (ny < 0 || ny >= h)
+                        continue;
+
+                    const uchar* nline = phi.constScanLine(ny);
+                    uchar* vline = visited.scanLine(ny);
+
+                    int xscan = xl;
+                    while (xscan <= xr)
+                    {
+                        if (!vline[xscan] &&
+                            !editor_->is_redundant(xscan, ny) &&
+                            nline[xscan] == value)
+                        {
+                            int xstart = xscan;
+                            while (xscan + 1 <= xr &&
+                                   !vline[xscan + 1] &&
+                                   !editor_->is_redundant(xscan + 1, ny) &&
+                                   nline[xscan + 1] == value)
+                            {
+                                ++xscan;
+                            }
+
+                            stack.push_back({ ny, xstart, xscan });
+                        }
+                        ++xscan;
+                    }
                 }
             }
         }

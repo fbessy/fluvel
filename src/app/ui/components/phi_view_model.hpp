@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QImage>
+#include <QTimer>
 
 #include <vector>
 
@@ -11,6 +12,13 @@
 #include "point.hpp"
 
 namespace ofeli_app {
+
+struct Span
+{
+    int y;
+    int xLeft;
+    int xRight;
+};
 
 class PhiViewModel : public QObject
 {
@@ -34,7 +42,10 @@ signals:
 
 private:
 
+    QTimer updateTimer_;
+
     void updateLists();
+    void updateListsFloodFill();
     void updatePhiFromLists();
     void composeView(bool hasOverlay);
 
