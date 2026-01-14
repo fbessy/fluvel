@@ -28,11 +28,16 @@ public:
 
     void addShape(const ShapeInfo& shape);
     void subtractShape(const ShapeInfo& shape);
-
-    void accept();
     void clear();
 
+    void accept();
+    void reject();
+
     const QImage& get_phi() const { return current; }
+    bool is_redundant(int x, int y);
+
+public slots:
+    void onImageSizeReady(int width, int height);
 
 signals:
     void phiChanged();

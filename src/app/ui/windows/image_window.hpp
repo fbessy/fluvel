@@ -48,6 +48,9 @@
 #include "about_window.hpp"
 #include "language_window.hpp"
 
+#include "phi_editor.hpp"
+#include "phi_view_model.hpp"
+
 namespace ofeli_app {
 
 class ImageView;
@@ -117,6 +120,8 @@ private:
     ImageController* imageController = nullptr;
     std::unique_ptr<ActiveContourWorker> acWorker;
     PreviewPipeline* previewPipeline = nullptr;
+    std::unique_ptr<PhiEditor> phiEditor;
+    std::unique_ptr<PhiViewModel> phiViewModel;
 
     // --- Setup ---
     void setupUi();

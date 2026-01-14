@@ -46,12 +46,6 @@ void ImageWindow::setupUi()
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
-    camera_window = new CameraWindow(this);
-    evaluation_window = new AnalysisWindow(this);
-    settings_window = new SettingsWindow(this);
-    about_window = new AboutWindow(this);
-    language_window = new LanguageWindow(this);
-
     startButton = new QPushButton( tr("Start") );
     pauseButton = new QPushButton( tr("Pause") );
     stepButton = new QPushButton( tr("Setp") );
@@ -209,6 +203,17 @@ void ImageWindow::setupActions()
     acWorker = std::make_unique<ActiveContourWorker>();
 
     previewPipeline = new PreviewPipeline(this);
+
+    phiEditor = std::make_unique<PhiEditor>();
+    phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());
+
+    settings_window = new SettingsWindow(this, phiEditor.get(),
+                                               phiViewModel.get());
+
+    camera_window = new CameraWindow(this);
+    evaluation_window = new AnalysisWindow(this);
+    about_window = new AboutWindow(this);
+    language_window = new LanguageWindow(this);
 }
 
 void ImageWindow::setupConnections()
@@ -282,6 +287,12 @@ void ImageWindow::setupConnections()
 
     connect(imageController, &ImageController::imageReady,
             previewPipeline, &PreviewPipeline::setSourceImage);
+
+    connect(imageController, &ImageController::imageSizeReady,
+            phiEditor.get(), &PhiEditor::onImageSizeReady);
+
+    connect(imageController, &ImageController::imageReady,
+            phiViewModel.get(), &PhiViewModel::setBackground);
 }
 
 QString ImageWindow::strippedName(const QString &fullFileName)

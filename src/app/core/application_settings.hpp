@@ -70,6 +70,7 @@ public:
     bool save_initial_phi();
     void load_default_initial_phi();
     bool load_initial_phi();
+    void resize_initial_phi(int width, int height);
 
     Language app_language;
 
@@ -83,12 +84,6 @@ public:
     unsigned int cycles_nbr;
 
     /////////////////////////////////////////
-
-    bool has_ellipse;
-    float init_width;
-    float init_height;
-    float center_x;
-    float center_y;
 
     QImage initialPhi;
 

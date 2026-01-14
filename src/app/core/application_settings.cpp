@@ -87,13 +87,6 @@ ApplicationSettings::ApplicationSettings()
     //////////////////////////////////////////////////
     // Initialization
 
-    has_ellipse = settings.value("Settings/Initialization/has_ellipse", true).toBool();
-    init_width = settings.value("Settings/Initialization/init_width", 0.65f).toFloat();
-    init_height = settings.value("Settings/Initialization/init_height", 0.65f).toFloat();
-    center_x = settings.value("Settings/Initialization/center_x", 0.f).toFloat();
-    center_y = settings.value("Settings/Initialization/center_y", 0.f).toFloat();
-
-
     bool isOk = load_initial_phi();
 
     if ( !isOk )
@@ -205,12 +198,6 @@ void ApplicationSettings::save()
     settings.setValue("Settings/Algorithm/downscale_factor", downscale_factor);
     settings.setValue("Settings/Algorithm/cycles_nbr", cycles_nbr);
 
-    settings.setValue("Settings/Initialization/has_ellipse", has_ellipse);
-    settings.setValue("Settings/Initialization/init_width", init_width);
-    settings.setValue("Settings/Initialization/init_height", init_height);
-    settings.setValue("Settings/Initialization/center_x", center_x);
-    settings.setValue("Settings/Initialization/center_y", center_y);
-
     save_initial_phi();
 
     settings.setValue("Settings/Preprocessing/has_preprocess", has_preprocess);
@@ -282,12 +269,6 @@ RuntimeSettings ApplicationSettings::snapshot() const
     rs.cycles_nbr = cycles_nbr;
 
     /////////////////////////////////////////
-
-    rs.has_ellipse = has_ellipse;
-    rs.init_width = init_width;
-    rs.init_height = init_height;
-    rs.center_x = center_x;
-    rs.center_y = center_y;
 
     rs.initialPhi = initialPhi.copy();
 
@@ -423,6 +404,20 @@ bool ApplicationSettings::save_initial_phi()
     }
 
     return isOk;
+}
+
+void ApplicationSettings::resize_initial_phi(int width, int height)
+{
+    if ( !initialPhi.isNull() )
+    {
+        if ( width != initialPhi.width() || height != initialPhi.height() )
+        {
+            initialPhi = initialPhi.scaled( width,
+                                            height,
+                                            Qt::IgnoreAspectRatio,
+                                            Qt::FastTransformation);
+        }
+    }
 }
 
 }

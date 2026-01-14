@@ -73,7 +73,9 @@ class SettingsWindow : public QDialog
 
 public :
 
-    SettingsWindow(QWidget* parent);
+    SettingsWindow(QWidget* parent,
+                   PhiEditor* phiEditor,
+                   PhiViewModel* phiViewModel);
 
     const unsigned char* get_filtered_img_data();
 
@@ -89,6 +91,8 @@ private :
 
     virtual void closeEvent(QCloseEvent* event) override;
     void applyCurrentShape(bool add);
+
+    void updateShapeParams();
 
     //////////////////////////////////////////
     //   pour la fenêtre de configuration   //
@@ -152,21 +156,14 @@ private :
 
     QRadioButton* rectangle_radio;
     QRadioButton* ellipse_radio;
-    bool has_ellipse2;
-
     QSpinBox* width_shape_spin;
     QSlider* width_slider;
-    float init_width2;
     QSpinBox* height_shape_spin;
     QSlider* height_slider;
-    float init_height2;
-
     QSpinBox* abscissa_spin;
     QSlider* abscissa_slider;
-    float center_x2;
     QSpinBox* ordinate_spin;
     QSlider* ordinate_slider;
-    float center_y2;
 
     QPushButton* add_button;
     QPushButton* subtract_button;
@@ -341,8 +338,8 @@ private :
     QStringList nameFilters;
 
 
-    std::unique_ptr<PhiEditor> phiEditor;
-    std::unique_ptr<PhiViewModel> phiViewModel;
+    PhiEditor* phiEditor_;
+    PhiViewModel* phiViewModel_;
 
     // --- Setup ---
     void setupUiAlgoTab();
@@ -350,6 +347,8 @@ private :
     void setupUiPreprocessingTab();
     void setupUiDisplayTab();
     void setupConnections();
+
+    ShapeInfo computeShapeInfo();
 
 private slots :
 

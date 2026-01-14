@@ -61,8 +61,12 @@
 namespace ofeli_app
 {
 
-SettingsWindow::SettingsWindow(QWidget* parent) :
+SettingsWindow::SettingsWindow(QWidget* parent,
+                               PhiEditor* phiEditor,
+                               PhiViewModel* phiViewModel) :
     QDialog(parent),
+    phiEditor_(phiEditor),
+    phiViewModel_(phiViewModel),
     filters2(nullptr),
     img2_filtered(nullptr),
     img1(nullptr)
@@ -96,9 +100,6 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
 
 
     settingsView = new ImageView(this);
-
-    phiEditor = std::make_unique<PhiEditor>();
-    phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());
 
     QGridLayout *settings_grid = new QGridLayout;
     settings_grid->addWidget(tabs,0,0);
@@ -327,6 +328,8 @@ void SettingsWindow::setupUiInitTab()
     ellipse_radio = new QRadioButton(tr("ellipse"));
     ellipse_radio->setToolTip(tr("or click on the middle mouse button when the cursor is in the image"));
 
+    rectangle_radio->setChecked(false);
+    ellipse_radio->setChecked(true);
 
     QHBoxLayout* shape_layout = new QHBoxLayout;
     shape_layout->addWidget(rectangle_radio);
@@ -341,8 +344,9 @@ void SettingsWindow::setupUiInitTab()
     width_shape_spin = new QSpinBox;
     width_shape_spin->setSingleStep(15);
     width_shape_spin->setMinimum(0);
-    width_shape_spin->setMaximum(1000);
+    width_shape_spin->setMaximum(200);
     width_shape_spin->setSuffix(tr(" % image width"));
+    width_shape_spin->setValue(65);
 
     QFormLayout* width_spin_layout = new QFormLayout;
     width_spin_layout->addRow(tr("width ="), width_shape_spin);
@@ -352,17 +356,19 @@ void SettingsWindow::setupUiInitTab()
     width_slider->setTickPosition(QSlider::TicksAbove);
 
     width_slider->setMinimum(0);
-    width_slider->setMaximum(150);
+    width_slider->setMaximum(200);
     width_slider->setTickInterval(25);
     width_slider->setSingleStep(15);
+    width_slider->setValue(65);
 
 
 
     height_shape_spin = new QSpinBox;
     height_shape_spin->setSingleStep(15);
     height_shape_spin->setMinimum(0);
-    height_shape_spin->setMaximum(1000);
+    height_shape_spin->setMaximum(200);
     height_shape_spin->setSuffix(tr((" % image height")));
+    height_shape_spin->setValue(65);
 
     QFormLayout* height_spin_layout = new QFormLayout;
     height_spin_layout->addRow(tr("height ="), height_shape_spin);
@@ -372,9 +378,10 @@ void SettingsWindow::setupUiInitTab()
     height_slider->setTickPosition(QSlider::TicksAbove);
 
     height_slider->setMinimum(0);
-    height_slider->setMaximum(150);
+    height_slider->setMaximum(200);
     height_slider->setTickInterval(25);
     height_slider->setSingleStep(15);
+    height_slider->setValue(65);
 
 
 
@@ -392,9 +399,10 @@ void SettingsWindow::setupUiInitTab()
 
     abscissa_spin = new QSpinBox;
     abscissa_spin->setSingleStep(15);
-    abscissa_spin->setMinimum(-500);
-    abscissa_spin->setMaximum(500);
+    abscissa_spin->setMinimum(-200);
+    abscissa_spin->setMaximum(200);
     abscissa_spin->setSuffix(tr(" % image width"));
+    abscissa_spin->setValue(0);
 
     QFormLayout* abscissa_spin_layout = new QFormLayout;
     abscissa_spin_layout->addRow("x = Xo +", abscissa_spin);
@@ -407,14 +415,16 @@ void SettingsWindow::setupUiInitTab()
     abscissa_slider->setMaximum(75);
     abscissa_slider->setTickInterval(25);
     abscissa_slider->setSingleStep(15);
+    abscissa_slider->setValue(0);
 
 
 
     ordinate_spin = new QSpinBox;
     ordinate_spin->setSingleStep(15);
-    ordinate_spin->setMinimum(-500);
-    ordinate_spin->setMaximum(500);
+    ordinate_spin->setMinimum(-200);
+    ordinate_spin->setMaximum(200);
     ordinate_spin->setSuffix(tr(" % image height"));
+    ordinate_spin->setValue(0);
 
     QFormLayout* ordinate_spin_layout = new QFormLayout;
     ordinate_spin_layout->addRow("y = Yo +", ordinate_spin);
@@ -427,6 +437,7 @@ void SettingsWindow::setupUiInitTab()
     ordinate_slider->setMaximum(75);
     ordinate_slider->setTickInterval(25);
     ordinate_slider->setSingleStep(15);
+    ordinate_slider->setValue(0);
 
 
 
@@ -856,38 +867,29 @@ void SettingsWindow::setupConnections()
     //connect(chanvese_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
     //connect(geodesic_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
+    connect(width_slider,      &QSlider::valueChanged,
+            width_shape_spin,  &QSpinBox::setValue);
 
+    connect(width_shape_spin,  QOverload<int>::of(&QSpinBox::valueChanged),
+            width_slider,      &QSlider::setValue);
 
-    connect(open_phi_button,SIGNAL(clicked()),this,SLOT(openFilenamePhi()));
-    connect(save_phi_button,SIGNAL(clicked()),this,SLOT(save_phi()));
-    connect(rectangle_radio,SIGNAL(clicked()),this,SLOT(shape_visu()));
-    connect(ellipse_radio,SIGNAL(clicked()),this,SLOT(shape_visu()));
+    connect(height_slider,      &QSlider::valueChanged,
+            height_shape_spin,  &QSpinBox::setValue);
 
-    connect(width_shape_spin,SIGNAL(valueChanged(int)),this,
-            SLOT(shape_visu(int)));
-    connect(width_slider,SIGNAL(valueChanged(int)),width_shape_spin,
-            SLOT(setValue(int)));
-    connect(width_shape_spin,SIGNAL(valueChanged(int)),width_slider,
-            SLOT(setValue(int)));
+    connect(height_shape_spin,  QOverload<int>::of(&QSpinBox::valueChanged),
+            height_slider,      &QSlider::setValue);
 
+    connect(ordinate_slider,      &QSlider::valueChanged,
+            ordinate_spin,  &QSpinBox::setValue);
 
-    connect(height_shape_spin,SIGNAL(valueChanged(int)),this,
-            SLOT(shape_visu(int)));
-    connect(height_slider,SIGNAL(valueChanged(int)),height_shape_spin,
-            SLOT(setValue(int)));
-    connect(height_shape_spin,SIGNAL(valueChanged(int)),height_slider,
-            SLOT(setValue(int)));
+    connect(ordinate_spin,  QOverload<int>::of(&QSpinBox::valueChanged),
+            ordinate_slider,      &QSlider::setValue);
 
-    connect(abscissa_spin,SIGNAL(valueChanged(int)),this,SLOT(shape_visu(int)));
-    connect(abscissa_slider,SIGNAL(valueChanged(int)),abscissa_spin,SLOT(setValue(int)));
-    connect(abscissa_spin,SIGNAL(valueChanged(int)),abscissa_slider,SLOT(setValue(int)));
+    connect(abscissa_slider,      &QSlider::valueChanged,
+            abscissa_spin,  &QSpinBox::setValue);
 
-    connect(ordinate_spin,SIGNAL(valueChanged(int)),this,SLOT(shape_visu(int)));
-    connect(ordinate_slider,SIGNAL(valueChanged(int)),ordinate_spin,SLOT(setValue(int)));
-    connect(ordinate_spin,SIGNAL(valueChanged(int)),ordinate_slider,SLOT(setValue(int)));
-
-
-
+    connect(abscissa_spin,  QOverload<int>::of(&QSpinBox::valueChanged),
+            abscissa_slider,      &QSlider::setValue);
 
 
 
@@ -938,8 +940,6 @@ void SettingsWindow::setupConnections()
         //connect(page3,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
         //connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    connect(outsidecolor_combobox,SIGNAL(activated(int)),this,SLOT(phi_visu(int)));
-    connect(insidecolor_combobox,SIGNAL(activated(int)),this,SLOT(phi_visu(int)));
 
     connect(outsidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_out()));
     connect(insidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_in()));
@@ -952,14 +952,60 @@ void SettingsWindow::setupConnections()
             this, &SettingsWindow::onSubtractShape);
 
     connect(clear_button, &QPushButton::clicked,
-            phiEditor.get(), &PhiEditor::clear);
+            phiEditor_, &PhiEditor::clear);
 
-    connect(phiViewModel.get(),
+    connect(phiViewModel_,
             &PhiViewModel::viewChanged,
-            this,
-            [this]() {
-                settingsView->displayImage(phiViewModel->phiImage());
-            });
+            settingsView,
+            &ImageView::displayImage);
+
+
+    phiViewModel_->setOverlay( computeShapeInfo() );
+
+    auto updateOverlay = [this]()
+    {
+        phiViewModel_->setOverlay( computeShapeInfo() );
+    };
+
+    connect(abscissa_spin,     &QSpinBox::valueChanged, this, updateOverlay);
+    connect(ordinate_spin,     &QSpinBox::valueChanged, this, updateOverlay);
+    connect(width_shape_spin,  &QSpinBox::valueChanged, this, updateOverlay);
+    connect(height_shape_spin, &QSpinBox::valueChanged, this, updateOverlay);
+    connect(rectangle_radio,   &QRadioButton::toggled, this,  updateOverlay);
+    connect(ellipse_radio,     &QRadioButton::toggled, this,  updateOverlay);
+}
+
+ShapeInfo SettingsWindow::computeShapeInfo()
+{
+    ShapeInfo info;
+
+    // --- Type de shape ---
+    info.type = rectangle_radio->isChecked()
+                    ? ShapeType::Rectangle
+                    : ShapeType::Ellipse;
+
+    const int canvasWidth = phiEditor_->get_phi().width();
+    const int canvasHeight = phiEditor_->get_phi().height();
+
+    // Récupération des valeurs des sliders (en pourcentage)
+    float centerXPercent = abscissa_spin->value() / 100.0f; // De -500 à +500, donc normalisé autour de 0
+    float centerYPercent = ordinate_spin->value() / 100.0f;
+
+    // Calcul de la position du centre en pixels
+    float centerX = (centerXPercent + 0.5f) * static_cast<float>(canvasWidth);
+    float centerY = (centerYPercent + 0.5f) * static_cast<float>(canvasHeight);
+
+    // Récupération des dimensions de la shape en pixels
+    float width = width_shape_spin->value() / 100.0f * static_cast<float>(canvasWidth);
+    float height = height_shape_spin->value() / 100.0f * static_cast<float>(canvasHeight);
+
+    // Calcul de la bounding box à partir du centre et des dimensions
+    float topLeftX = centerX - width / 2.0f;
+    float topLeftY = centerY - height / 2.0f;
+
+    info.boundingBox = QRect(topLeftX, topLeftY, width, height);
+
+    return info;
 }
 
 void SettingsWindow::onAddShape()
@@ -974,33 +1020,13 @@ void SettingsWindow::onSubtractShape()
 
 void SettingsWindow::applyCurrentShape(bool add)
 {
-    if (!phiEditor)
+    if (!phiEditor_)
         return;
 
-    // --- Type de shape ---
-    ShapeType shapeType = rectangle_radio->isChecked()
-                              ? ShapeType::Rectangle
-                              : ShapeType::Ellipse;
-
-    int canvasWidth = phiEditor->get_phi().width();
-    int canvasHeight = phiEditor->get_phi().height();
-
-    int widthPercentage = width_slider->value();
-    int heightPercentage = height_slider->value();
-
-    int widthInPixels = (widthPercentage * canvasWidth) / 100;
-    int heightInPixels = (heightPercentage * canvasHeight) / 100;
-
-    QRect shapeRect(-widthInPixels / 2, -heightInPixels / 2, widthInPixels, heightInPixels);
-
-    ShapeInfo info;
-    info.type = shapeType;
-    info.boundingBox = shapeRect;
-
     if (add)
-        phiEditor->addShape(info);
+        phiEditor_->addShape( computeShapeInfo() );
     else
-        phiEditor->subtractShape(info);
+        phiEditor_->subtractShape( computeShapeInfo() );
 }
 
 void SettingsWindow::accept()
@@ -1070,22 +1096,7 @@ void SettingsWindow::accept()
     //       Initialization          //
     ///////////////////////////////////
 
-    if( rectangle_radio->isChecked() )
-    {
-        config.has_ellipse = false;
-    }
-    if( ellipse_radio->isChecked() )
-    {
-        config.has_ellipse = true;
-    }
-
-    config.init_width = float(width_shape_spin->value())/100.f;
-    config.init_height = float(height_shape_spin->value())/100.f;
-
-    config.center_x = float(abscissa_spin->value())/100.f;
-    config.center_y = float(ordinate_spin->value())/100.f;
-
-    phiEditor->accept();
+    phiEditor_->accept();
 
     ///////////////////////////////////
     //        Preprocessing          //
@@ -1231,22 +1242,7 @@ void SettingsWindow::reject()
     //       Initialization          //
     ///////////////////////////////////
 
-    if( !config.has_ellipse )
-    {
-        rectangle_radio->setChecked(true);
-    }
-    else
-    {
-        ellipse_radio->setChecked(true);
-    }
-
-    width_shape_spin->setValue(int(config.init_width*100.0));
-    height_shape_spin->setValue(int(config.init_height*100.0));
-
-    abscissa_spin->setValue(int(config.center_x*100.0));
-    ordinate_spin->setValue(int(config.center_y*100.0));
-
-    phiEditor->clear();
+    phiEditor_->reject();
 
     ///////////////////////////////////
     //        Preprocessing          //
@@ -1368,7 +1364,7 @@ void SettingsWindow::reject()
     //calculate_filtered_copy_visu_buffers();
     //tab_visu( tabs->currentIndex() );
 
-    phiEditor->clear();
+    phiEditor_->reject();
 
     QDialog::reject();
 }
@@ -1689,6 +1685,40 @@ float SettingsWindow::calculate_filtered_image()
     elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
 
     return elapsed_time;
+}
+
+void SettingsWindow::updateShapeParams()
+{
+    const int W = phiEditor_->get_phi().width();
+    const int H = phiEditor_->get_phi().height();
+
+    // centre de référence (fixe, UI)
+    const float X0 = W * 0.5f;
+    const float Y0 = H * 0.5f;
+
+    // taille de la shape
+    const float shapeW = (width_slider->value()  / 100.0f) * W;
+    const float shapeH = (height_slider->value() / 100.0f) * H;
+
+    // offsets UI ([-0.5, +0.5] de la taille)
+    const float offsetX = (abscissa_slider->value() / 100.0f) - 0.5f;
+    const float offsetY = (ordinate_slider->value()  / 100.0f) - 0.5f;
+
+    ShapeParams params;
+    params.type = rectangle_radio->isChecked()
+                      ? ShapeType::Rectangle
+                      : ShapeType::Ellipse;
+
+    // position FINALE (pixels)
+    params.center_x = X0 + offsetX * shapeW;
+    params.center_y = Y0 + offsetY * shapeH;
+
+    params.width  = shapeW;
+    params.height = shapeH;
+
+    params.color = QColor(0, 255, 255);
+
+    //phiViewModel_->setShapeParams(params);
 }
 
 void SettingsWindow::closeEvent(QCloseEvent* event)

@@ -35,14 +35,11 @@ void ImageController::loadImage(const QString& path)
 
     if ( isOk )
     {
-        AppSettings::instance().initialPhi = AppSettings::instance().initialPhi.scaled(img.width(),
-                                                                                       img.height(),
-                                                                                       Qt::IgnoreAspectRatio,
-                                                                                       Qt::FastTransformation);
-
-        AppSettings::instance().save_initial_phi();
+        AppSettings::instance().resize_initial_phi( img.width(),
+                                                    img.height() );
 
         emit imageReady(img);
+        emit imageSizeReady(img.width(), img.height());
     }
 }
 

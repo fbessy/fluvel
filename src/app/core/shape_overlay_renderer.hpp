@@ -13,10 +13,10 @@ struct ShapeParams
 {
     ShapeType type;
 
-    float center_x;   // [-0.5 .. +0.5] relatif image
+    float center_x;
     float center_y;
 
-    float width;      // [0..1] relatif image
+    float width;
     float height;
 
     QColor color;
