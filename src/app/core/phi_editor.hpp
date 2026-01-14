@@ -41,6 +41,7 @@ public slots:
 
 signals:
     void phiChanged();
+    void phiResized(int width, int height);
 
 private:
 

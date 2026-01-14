@@ -15,15 +15,12 @@ void PhiEditor::onImageSizeReady(int width, int height)
 {
     if ( !current.isNull() )
     {
-        if ( width != current.width() || height != current.height() )
-        {
-            current = current.scaled( width,
-                                      height,
-                                      Qt::IgnoreAspectRatio,
-                                      Qt::FastTransformation);
+        current = current.scaled( width,
+                                  height,
+                                  Qt::IgnoreAspectRatio,
+                                  Qt::FastTransformation);
 
-            emit phiChanged();
-        }
+        emit phiResized(width, height);
     }
 }
 
