@@ -71,7 +71,7 @@ void ImageWindow::setupUi()
     // --- Image view ---
 
     imageView = new ImageView(central);
-    imageView->setMaxDisplayFps(60);
+    //imageView->setMaxDisplayFps(60);
 
     // Assemblage
     mainLayout->addWidget(controlBar);
@@ -273,8 +273,14 @@ void ImageWindow::setupConnections()
     connect(imageController, &ImageController::contourReady,
             acWorker.get(),  &ActiveContourWorker::setImage);
 
-    connect(acWorker.get(),  &ActiveContourWorker::resultReady,
-            imageView, &ImageView::displayImage);
+    //connect(acWorker.get(),  &ActiveContourWorker::resultReady,
+            //imageView, &ImageView::displayImage);
+
+    connect(acWorker.get(),
+            &ActiveContourWorker::contourUpdated,
+            imageView,
+            &ImageView::displayContour,
+            Qt::QueuedConnection);
 
     connect(startButton,   &QPushButton::clicked,
             acWorker.get(),      &ActiveContourWorker::start);

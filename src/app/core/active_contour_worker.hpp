@@ -31,6 +31,8 @@ public:
 
 signals:
     void resultReady(const QImage& img);
+    void contourUpdated(const QVector<QPoint>& out,
+                        const QVector<QPoint>& in);
 
 private slots:
     void onTimeout();
@@ -39,6 +41,7 @@ private:
 
     void initializeActiveContour();
     void drawAndEmitResult();
+    void emitContourOnly();
 
     WorkerState m_state;
     QTimer* m_timer;

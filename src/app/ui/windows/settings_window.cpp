@@ -1474,37 +1474,6 @@ void SettingsWindow::default_settings()
     //tab_visu( tabs->currentIndex() );
 }
 
-// Fonction appelée dans l'onglet initalisation pour calculer et afficher l'image+phi(couleur foncé)+forme(couleur clair)
-/*void SettingsWindow::shape_visu()
-{
-    if (img.isNull())
-        return;
-
-    // Base : image + φ déjà affichée par phi_visu()
-    QImage base = imageLabel_settings->get_qimage();
-    if (base.isNull())
-        return;
-
-    ShapeParams params;
-
-    params.type = rectangle_radio->isChecked()
-                      ? ShapeType::Rectangle
-                      : ShapeType::Ellipse;
-
-    params.center_x = float(abscissa_spin->value()) / 100.f;
-    params.center_y = float(ordinate_spin->value()) / 100.f;
-
-    params.width  = float(width_shape_spin->value())  / 100.f;
-    params.height = float(height_shape_spin->value()) / 100.f;
-
-    params.color = QColor(0, 255, 255); // cyan, par ex
-
-    //QImage withShape =
-        //ShapeOverlayRenderer::render(image_phi, params);
-
-    imageLabel_settings->set_qimage(withShape);
-}
-
 
 // Fonction appelée par le boutton selected de boundaries outside
 // sélection et affichage d'une couleur particulière
@@ -1524,11 +1493,11 @@ void SettingsWindow::set_color_out()
 
         outsidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
     }
-}*/
+}
 
 // Fonction appelée par le boutton selected de boundaries inside
 // sélection et affichage d'une couleure particulière
-/*void SettingsWindow::set_color_in()
+void SettingsWindow::set_color_in()
 {
     // Selection d'une QColor à partir d'une boîte de dialogue couleur
     QColor color_in = QColorDialog::getColor(Qt::white, this, tr("Select Lin color"));
@@ -1544,7 +1513,7 @@ void SettingsWindow::set_color_out()
 
         insidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
     }
-}*/
+}
 
 const unsigned char* SettingsWindow::get_filtered_img_data()
 {

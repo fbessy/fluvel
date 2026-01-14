@@ -363,8 +363,8 @@ private slots :
     //void show_phi_with_filtered_image();
 
     //void change_display_size();
-    //void set_color_out();
-    //void set_color_in();
+    void set_color_out();
+    void set_color_in();
 
 signals :
 

@@ -1,4 +1,5 @@
 #include "image_view.hpp"
+#include "application_settings.hpp"
 
 #include <QPainter>
 #include <QWheelEvent>
@@ -19,6 +20,18 @@ ImageView::ImageView(QWidget* parent)
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
+
+    //AppSettings.instance().color_in
+
+    contourOutItem = new ContourPointsItem;
+    contourOutItem->setColor( Qt::red );
+    contourOutItem->setZValue(100);
+    scene->addItem(contourOutItem);
+
+    contourInItem = new ContourPointsItem;
+    contourInItem->setColor( Qt::green );
+    contourInItem->setZValue(100);
+    scene->addItem(contourInItem);
 
     displayTimer.start();
 
@@ -44,12 +57,15 @@ void ImageView::setMaxDisplayFps(double fps)
 
 void ImageView::displayImage(const QImage& img)
 {
+    clearContour();
+
     // Toujours garder la dernière image
     pendingFrame = img;
     hasPendingFrame = true;
 
     // Pas de throttling
-    if (minDisplayIntervalMs == 0) {
+    if (minDisplayIntervalMs == 0)
+    {
         updatePixmap(pendingFrame);
         hasPendingFrame = false;
         displayTimer.restart();
@@ -58,16 +74,38 @@ void ImageView::displayImage(const QImage& img)
 
     const qint64 elapsed = displayTimer.elapsed();
 
-    if (elapsed >= minDisplayIntervalMs) {
+    if (elapsed >= minDisplayIntervalMs)
+    {
         updatePixmap(pendingFrame);
         hasPendingFrame = false;
         displayTimer.restart();
     }
-    else {
-        if (!throttleTimer->isActive()) {
+    else
+    {
+        if (!throttleTimer->isActive())
+        {
             throttleTimer->start(minDisplayIntervalMs - elapsed);
         }
     }
+}
+
+void ImageView::displayContour(const QVector<QPoint>& out,
+                               const QVector<QPoint>& in)
+{
+    if (!contourOutItem || !contourInItem)
+        return;
+
+    contourOutItem->setPoints(out);
+    contourInItem->setPoints(in);
+}
+
+void ImageView::clearContour()
+{
+    if (contourOutItem)
+        contourOutItem->setPoints({});
+
+    if (contourInItem)
+        contourInItem->setPoints({});
 }
 
 // ------------------------------------------------------------
@@ -103,8 +141,11 @@ void ImageView::updatePixmap(const QImage& img)
     }
     else
     {
+        pixmapItem->setZValue(0);
         pixmapItem->setPixmap(QPixmap::fromImage(img));
     }
+
+
 
     scene->setSceneRect(pixmapItem->boundingRect());
 

@@ -17,7 +17,7 @@ namespace ofeli_app
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr), m_timer(new QTimer(this))
 {
-    m_timer->setInterval(16);
+    m_timer->setInterval(1);
     connect(m_timer, &QTimer::timeout,
             this, &ActiveContourWorker::onTimeout);
 }
@@ -74,7 +74,8 @@ void ActiveContourWorker::onTimeout()
     }
 
     ac->evolve_one_iteration();
-    drawAndEmitResult();
+    //drawAndEmitResult();
+    emitContourOnly();
 }
 
 void ActiveContourWorker::initializeActiveContour()
@@ -142,6 +143,40 @@ void ActiveContourWorker::drawAndEmitResult()
                      result.bits(), result.width(), result.height());
 
     emit resultReady(result);
+}
+
+void ActiveContourWorker::emitContourOnly()
+{
+    if (!ac)
+        return;
+
+    int y;
+
+    const auto& l_out = ac->get_l_out();
+    const auto& l_in  = ac->get_l_in();
+
+    QVector<QPoint> outPts;
+    QVector<QPoint> inPts;
+
+    outPts.reserve(l_out.size());
+    inPts.reserve(l_in.size());
+
+    const int width = ac->get_phi().get_width();
+
+    for (const auto& p : l_out)
+    {
+        y = p.get_offset() / width;
+        outPts.emplace_back(p.get_x(), y);
+    }
+
+
+    for (const auto& p : l_in)
+    {
+        y = p.get_offset() / width;
+        inPts.emplace_back(p.get_x(), y);
+    }
+
+    emit contourUpdated(outPts, inPts);
 }
 
 }

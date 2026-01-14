@@ -8,6 +8,8 @@
 #include <QTimer>
 #include <QImage>
 
+#include "contour_point_item.hpp"
+
 namespace ofeli_app {
 
 class ImageView : public QGraphicsView
@@ -25,6 +27,10 @@ public:
 
     QImage currentImage() const;
 
+public slots:
+    void displayContour(const QVector<QPoint>& out,
+                        const QVector<QPoint>& in);
+
 protected:
     void wheelEvent(QWheelEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -36,11 +42,12 @@ private slots:
 
 private:
     void updatePixmap(const QImage& img);
+    void clearContour();
+
     void applyAutoView();
     void updateDragMode();
     double getCurrentZoom() const;
 
-private:
     QGraphicsScene*        scene = nullptr;
     QGraphicsPixmapItem*  pixmapItem = nullptr;
 
@@ -65,6 +72,13 @@ private:
     QTimer* throttleTimer = nullptr;
 
     QImage lastDisplayedImage;
+
+    QVector<QPoint> contourOut_;
+    QVector<QPoint> contourIn_;
+
+    ContourPointsItem* contourOutItem = nullptr;
+    ContourPointsItem* contourInItem  = nullptr;
+
 };
 
 } // namespace ofeli_app
