@@ -31,11 +31,14 @@ PhiViewModel::PhiViewModel(PhiEditor* editor,
             this, &PhiViewModel::onPhiResized);
 }
 
+// called after an image reload with size change
+// and juste before the callback onPhiResized
 void PhiViewModel::setBackground(const QImage& image)
 {
     background_ = image.convertToFormat(QImage::Format_RGB32);
 }
 
+// called after an image reload without size change
 void PhiViewModel::setBackgroundWithUpdate(const QImage& image)
 {
     background_ = image.convertToFormat(QImage::Format_RGB32);
