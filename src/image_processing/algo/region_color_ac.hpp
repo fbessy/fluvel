@@ -444,7 +444,7 @@ inline void RegionColorAc::do_specific_when_switch(int offset,
 {
     Rgb_uc rgb = image.pixel_rgb_at(offset);
 
-    if ( ctx_cfg == WayContextConfig::SWITCH_IN )
+    if ( ctx_cfg == WayContextConfig::SwitchIn )
     {
         sum_out.red   -= rgb.red;
         sum_out.green -= rgb.green;
@@ -452,7 +452,7 @@ inline void RegionColorAc::do_specific_when_switch(int offset,
 
         pxl_nbr_out--;
     }
-    else if ( ctx_cfg == WayContextConfig::SWITCH_OUT )
+    else if ( ctx_cfg == WayContextConfig::SwitchOut )
     {
         sum_out.red   += rgb.red;
         sum_out.green += rgb.green;

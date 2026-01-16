@@ -52,8 +52,8 @@ ActiveContour::ActiveContour(const ContourData& initial_contour,
                              const AcConfig& config1)
     : config(config1),
     cd( initial_contour ),
-    state( State::CYCLE_1 ),
-    stopping_status( StoppingStatus::NONE ),
+    state( State::Cycle1 ),
+    stopping_status( StoppingStatus::None ),
     ctx( cd ),
     ed( cd ),
     is_cycle2_condition( true )
@@ -78,8 +78,8 @@ ActiveContour::ActiveContour(ContourData&& initial_contour,
                              const AcConfig& config1)
     : config(config1),
     cd( std::move(initial_contour) ),
-    state( State::CYCLE_1 ),
-    stopping_status( StoppingStatus::NONE ),
+    state( State::Cycle1 ),
+    stopping_status( StoppingStatus::None ),
     ctx( cd ),
     ed( cd ),
     is_cycle2_condition(true)
@@ -104,15 +104,15 @@ void ActiveContour::evolve()
 {
     // Fast Two Cycle algorithm
 
-    while( state != State::STOPPED )
+    while( state != State::Stopped )
     {
-        while( state == State::CYCLE_1 )
+        while( state == State::Cycle1 )
         {
             evolve_one_time_in_cycle1();
         }
 
-        while(    state == State::CYCLE_2
-               || state == State::LAST_CYCLE_2 )
+        while(    state == State::Cycle2
+               || state == State::LastCycle2 )
         {
             evolve_one_time_in_cycle2();
         }
@@ -127,15 +127,15 @@ void ActiveContour::evolve_n_iterations(int n_iter)
     }
 
     for( int i = 0;
-         i < n_iter && state != State::STOPPED;
+         i < n_iter && state != State::Stopped;
          i++ )
     {
-        if ( state == CYCLE_1 )
+        if ( state == State::Cycle1 )
         {
             evolve_one_time_in_cycle1();
         }
-        else if (    state == State::CYCLE_2
-                  || state == State::LAST_CYCLE_2 )
+        else if (    state == State::Cycle2
+                  || state == State::LastCycle2 )
         {
             evolve_one_time_in_cycle2();
         }
@@ -163,8 +163,8 @@ void ActiveContour::evolve_one_time_in_cycle1()
 {
     do_specific_cycle1();
 
-    bool is_outward_moving = evolve_one_way( WayContextConfig::SWITCH_IN );
-    bool is_inward_moving  = evolve_one_way( WayContextConfig::SWITCH_OUT );
+    bool is_outward_moving = evolve_one_way( WayContextConfig::SwitchIn );
+    bool is_inward_moving  = evolve_one_way( WayContextConfig::SwitchOut );
 
     ed.total_iter++;
     ed.cycle_iter++;
@@ -177,8 +177,8 @@ void ActiveContour::evolve_one_time_in_cycle1()
 
 void ActiveContour::evolve_one_time_in_cycle2()
 {
-    evolve_one_way( WayContextConfig::SWITCH_IN );
-    evolve_one_way( WayContextConfig::SWITCH_OUT );
+    evolve_one_way( WayContextConfig::SwitchIn );
+    evolve_one_way( WayContextConfig::SwitchOut );
 
     ed.total_iter++;
     ed.cycle_iter++;
@@ -254,12 +254,12 @@ void ActiveContour::eliminate_redundant_points(ContourList& boundary,
 
 void ActiveContour::compute_speed(ContourList& boundary)
 {
-    if( state == State::CYCLE_1 )
+    if( state == State::Cycle1 )
     {
         compute_external_speed_Fd( boundary );
     }
-    else if( state == State::CYCLE_2 ||
-             state == State::LAST_CYCLE_2 )
+    else if( state == State::Cycle2 ||
+             state == State::LastCycle2 )
     {
         compute_internal_speed_Fint( boundary );
     }
@@ -278,7 +278,7 @@ void ActiveContour::compute_external_speed_Fd(ContourPoint& point)
 {
     // this class should never be instantiated
     // reimplement a better and data-dependent speed function in a child class
-    point.set_speed( GO_INWARD );
+    point.set_speed( SpeedValue::GoInward );
 }
 
 void ActiveContour::compute_internal_speed_Fint(ContourList& boundary)
@@ -301,7 +301,7 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
     const int radius = kernel.radius;
     const int offset = point.get_offset();
     const auto phi_center  = phi[offset];
-    const int center_sign = get_sign_opposite(phi_center);
+    const int center_sign = phiSign( phi_center );
 
     int Fint = 0;
 
@@ -319,7 +319,7 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 
         for (int i = 0; i < kernel.size; ++i)
         {
-            Fint += w[i] * get_sign_opposite(phi[offset + o[i]]);
+            Fint -=  w[i] * phiSign( phi[offset + o[i]] );
         }
     }
     // --- Chemin lent : bords ---
@@ -333,9 +333,9 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
             const int n = offset + o[i];
 
             if (n >= 0 && n < width * height)
-                Fint += w[i] * get_sign_opposite(phi[n]);
+                Fint -= w[i] * phiSign( phi[n] );
             else
-                Fint += w[i] * center_sign;
+                Fint -= w[i] * center_sign;
         }
     }
 
@@ -346,57 +346,57 @@ void ActiveContour::check_stopped_state()
 {
     if( cd.get_l_out().empty() || cd.get_l_in().empty() )
     {
-        state = State::STOPPED;
-        stopping_status = StoppingStatus::EMPTY_LIST;
+        state = State::Stopped;
+        stopping_status = StoppingStatus::EmptyList;
     }
     else if( ed.total_iter >= ed.total_iter_max )
     {
-        state = State::STOPPED;
-        stopping_status = StoppingStatus::MAX_ITERATION;
+        state = State::Stopped;
+        stopping_status = StoppingStatus::MaxIteration;
     }
 }
 
 void ActiveContour::calculate_state_cycle_1()
 {
-    if( state == State::CYCLE_1 )
+    if( state == State::Cycle1 )
     {
         if( !ed.is_moving )
         {
             if( config.is_cycle2 )
             {
                 ed.cycle_iter = 0;
-                state = State::LAST_CYCLE_2;
+                state = State::LastCycle2;
             }
             else
             {
-                state = State::STOPPED;
-                stopping_status = StoppingStatus::LISTS_STOPPED;
+                state = State::Stopped;
+                stopping_status = StoppingStatus::ListsStopped;
             }
         }
         else if( ed.cycle_iter >= config.Na &&
                  config.is_cycle2 )
         {
             ed.cycle_iter = 0;
-            state = State::CYCLE_2;
+            state = State::Cycle2;
         }
     }
 }
 
 void ActiveContour::calculate_state_cycle_2()
 {
-    if( state == State::CYCLE_2 ||
-        state == State::LAST_CYCLE_2 )
+    if( state == State::Cycle2 ||
+        state == State::LastCycle2 )
     {
         // if at the end of one cycle 2
         if( ed.cycle_iter >= config.Ns )
         {
-            if( state == State::LAST_CYCLE_2 )
+            if( state == State::LastCycle2 )
             {
-                state = State::STOPPED;
-                stopping_status = StoppingStatus::LISTS_STOPPED;
+                state = State::Stopped;
+                stopping_status = StoppingStatus::ListsStopped;
             }
             else if( is_cycle2_condition &&
-                     state == State::CYCLE_2 )
+                     state == State::Cycle2 )
             {
                 float diff_iter = float(ed.total_iter - ed.previous_total_iter);
 
@@ -436,8 +436,8 @@ void ActiveContour::calculate_state_cycle_2()
                            ed.hausdorff_quantile < 2.f &&
                            delta_quantile < 0.f ) )
                     {
-                        state = State::STOPPED;
-                        stopping_status = StoppingStatus::HAUSDORFF;
+                        state = State::Stopped;
+                        stopping_status = StoppingStatus::Hausdorff;
                     }
 
                     // swap the shapes in constant time, in complexity O(1)
@@ -448,10 +448,10 @@ void ActiveContour::calculate_state_cycle_2()
                 }
             }
 
-            if ( state != State::STOPPED )
+            if ( state != State::Stopped )
             {
                 ed.cycle_iter = 0;
-                state = State::CYCLE_1;
+                state = State::Cycle1;
             }
         }
     }
@@ -475,7 +475,7 @@ void ActiveContour::calculate_shapes_intersection()
     for( const auto& point : ed.previous_shape.get_points() )
     {
         // if a point of ed.previous_shape ∈ ed.l_out_shape
-        if( cd.get_phi()(point.x, point.y) == PhiValue::EXTERIOR_BOUNDARY )
+        if( cd.get_phi()(point.x, point.y) == PhiValue::ExteriorBoundary )
         {
             ed.intersection.insert( point );
         }
@@ -486,8 +486,8 @@ void ActiveContour::reinitialize()
 {
     cd.check_lists();
 
-    state = State::CYCLE_1;
-    stopping_status = StoppingStatus::NONE;
+    state = State::Cycle1;
+    stopping_status = StoppingStatus::None;
     is_cycle2_condition = false;
 
     ed.reinitialize();

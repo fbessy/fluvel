@@ -64,7 +64,7 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
             {
                 dd = std::abs( int( gradient_image.pixel_at(x,y) ) - int( gradient_image.pixel_at(x + dx, y + dy)  ) );
 
-                if( cd.get_phi()(x + dx, y + dy) > PhiValue::ZERO_LEVEL_SET )
+                if( isOutside( cd.get_phi()(x + dx, y + dy) ) )
                 {
                     max_out = std::max(max_out, dd);
                 }
@@ -93,7 +93,7 @@ int EdgeAc::get_global_speed_sign() const
 
     for( int offset = 0; offset < img_size; offset++ )
     {
-        if( cd.get_phi()[offset] < PhiValue::ZERO_LEVEL_SET )
+        if( isInside( cd.get_phi()[offset] ) )
         {
             sum_in += (unsigned int)(gradient_image.pixel_at(offset));
         }

@@ -140,11 +140,11 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
         {
             if ( phi_grayscale_img_data[offset] >= 128u )
             {
-                phi[offset] = PhiValue::INSIDE_REGION;
+                phi[offset] = PhiValue::InsideRegion;
             }
             else
             {
-                phi[offset] = PhiValue::OUTSIDE_REGION;
+                phi[offset] = PhiValue::OutsideRegion;
             }
         }
 
@@ -154,14 +154,14 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
 
             if ( !is_redundant( {offset, x} ) )
             {
-                if ( phi[offset] == PhiValue::INSIDE_REGION )
+                if ( phi[offset] == PhiValue::InsideRegion )
                 {
-                    phi[offset] = PhiValue::INTERIOR_BOUNDARY;
+                    phi[offset] = PhiValue::InteriorBoundary;
                     l_in.emplace_back( offset, x );
                 }
                 else
                 {
-                    phi[offset] = EXTERIOR_BOUNDARY;
+                    phi[offset] = PhiValue::ExteriorBoundary;
                     l_out.emplace_back( offset, x );
                 }
             }
@@ -218,20 +218,20 @@ ContourData::ContourData(ContourData&& contour) noexcept
 
 void ContourData::define_phi_with_boundary()
 {
-    phi.memset(PhiValue::OUTSIDE_REGION);
+    phi.memset(PhiValue::OutsideRegion);
 
     for( std::size_t i = 0; i < l_out.size(); i++ )
     {
-        phi[ l_out[i].get_offset() ] = PhiValue::EXTERIOR_BOUNDARY;
+        phi[ l_out[i].get_offset() ] = PhiValue::ExteriorBoundary;
     }
 
     for( std::size_t i = 0; i < l_in.size(); i++ )
     {
         do_flood_fill(l_in[i].get_offset(),
-                      PhiValue::OUTSIDE_REGION,
-                      PhiValue::INSIDE_REGION);
+                      PhiValue::OutsideRegion,
+                      PhiValue::InsideRegion);
 
-        phi[ l_in[i].get_offset() ] = PhiValue::INTERIOR_BOUNDARY;
+        phi[ l_in[i].get_offset() ] = PhiValue::InteriorBoundary;
     }
 }
 

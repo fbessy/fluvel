@@ -67,12 +67,12 @@ void ActiveContourWorker::step()
 
 bool ActiveContourWorker::stepOnce()
 {
-    if ( !ac || ac->get_state() == ofeli_ip::State::STOPPED )
+    if ( !ac || ac->get_state() == ofeli_ip::State::Stopped )
         return true;
 
     ac->evolve_one_iteration();
 
-    return ac->get_state() == ofeli_ip::State::STOPPED;
+    return ac->get_state() == ofeli_ip::State::Stopped;
 }
 
 void ActiveContourWorker::setImage(const QImage& img)

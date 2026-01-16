@@ -40,6 +40,8 @@
 #ifndef CONTOUR_DATA_HPP
 #define CONTOUR_DATA_HPP
 
+#include <cstdint>
+
 #include <vector>
 
 #include "matrix.hpp"
@@ -47,20 +49,19 @@
 namespace ofeli_ip
 {
 
-enum PhiValue : signed char
+enum class PhiValue : int8_t
 {
-    INSIDE_REGION = -3,
-    INTERIOR_BOUNDARY = -1,
-    ZERO_LEVEL_SET = 0,
-    EXTERIOR_BOUNDARY = 1,
-    OUTSIDE_REGION = 3
+    InsideRegion      = -3,
+    InteriorBoundary  = -1,
+    ExteriorBoundary  = 1,
+    OutsideRegion     = 3
 };
 
-enum SpeedValue : signed char
+enum class SpeedValue : int8_t
 {
-    GO_INWARD  = -1,
-    NO_MOVE    =  0,
-    GO_OUTWARD =  1
+    GoInward  = -1,
+    NoMove    =  0,
+    GoOutward =  1
 };
 
 class ContourPoint
@@ -162,6 +163,39 @@ private :
     size_t preallocation_size;
 };
 
+/// Discrete sign of level-set function.
+/// Returns -1 for interior side, +1 for exterior side.
+/// Note: zero level-set is conceptual and never stored.
+inline int phiSign(PhiValue v)
+{
+    switch (v)
+    {
+    case PhiValue::InsideRegion:
+    case PhiValue::InteriorBoundary:
+        return -1;
+
+    case PhiValue::ExteriorBoundary:
+    case PhiValue::OutsideRegion:
+        return 1;
+    }
+    return 0; // unreachable
+}
+
+inline bool isInside(PhiValue v)
+{
+    return phiSign(v) < 0;
+}
+
+inline bool isOutside(PhiValue v)
+{
+    return !isInside(v);
+}
+
+inline bool differentSide(PhiValue a, PhiValue b)
+{
+    return phiSign(a) * phiSign(b) < 0;
+}
+
 inline bool ContourData::is_redundant(const ContourPoint& point) const
 {
     int offset = point.get_offset();
@@ -176,26 +210,31 @@ inline bool ContourData::is_redundant(const ContourPoint& point) const
     if (x > 0)
     {
         int left_offset = offset - 1;
-        if (phi[left_offset] * phi_center < 0) return false;
+
+        if ( differentSide(phi[left_offset], phi_center) )
+            return false;
     }
 
     if (x < w - 1)
     {
         int right_offset = offset + 1;
-        if (phi[right_offset] * phi_center < 0) return false;
+        if ( differentSide(phi[right_offset], phi_center) )
+            return false;
     }
 
     // Voisins verticaux
     if (offset >= w) // Pas dans la première ligne
     {
         int up_offset = offset - w;
-        if (phi[up_offset] * phi_center < 0) return false;
+        if ( differentSide( phi[up_offset], phi_center ) )
+            return false;
     }
 
     if (offset < last_row_offset) // Pas dans la dernière ligne
     {
         int down_offset = offset + w;
-        if (phi[down_offset] * phi_center < 0) return false;
+        if ( differentSide( phi[down_offset], phi_center ) )
+            return false;
     }
 
 #ifdef ALGO_8_CONNEXITY
@@ -203,26 +242,30 @@ inline bool ContourData::is_redundant(const ContourPoint& point) const
     if (x > 0 && offset >= w)
     {
         int up_left_offset = offset - w - 1;
-        if (phi[up_left_offset] * phi_center < 0) return false;
+        if ( differentSide( phi[up_left_offset], phi_center ) )
+            return false;
     }
 
     if (x < w - 1 && offset >= w)
     {
         int up_right_offset = offset - w + 1;
-        if (phi[up_right_offset] * phi_center < 0) return false;
+        if ( differentSide( phi[up_right_offset], phi_center ) )
+            return false;
     }
 
     // Diagonaux inférieurs
     if (x > 0 && offset < last_row_offset)
     {
         int down_left_offset = offset + w - 1;
-        if (phi[down_left_offset] * phi_center < 0) return false;
+        if ( differentSide( phi[down_left_offset], phi_center ) )
+            return false;
     }
 
     if (x < w - 1 && offset < last_row_offset)
     {
         int down_right_offset = offset + w + 1;
-        if (phi[down_right_offset] * phi_center < 0) return false;
+        if ( differentSide(phi[down_right_offset], phi_center) )
+            return false;
     }
 #endif
 

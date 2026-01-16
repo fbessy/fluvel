@@ -54,28 +54,28 @@ namespace ofeli_ip
 
 constexpr size_t INITIAL_SPEED_ARRAY_ALLOC_SIZE = 10000u;
 
-enum State : unsigned char
+enum class State
 {
-    CYCLE_1      = 0,
-    CYCLE_2      = 1,
-    LAST_CYCLE_2 = 2,
-    STOPPED      = 3
+    Cycle1,
+    Cycle2,
+    LastCycle2,
+    Stopped
 };
 
 //! \enum Stopping condition status.
-enum StoppingStatus : unsigned char
+enum class StoppingStatus
 {
-    NONE          = 0,
-    EMPTY_LIST    = 1,
-    MAX_ITERATION = 2,
-    LISTS_STOPPED = 3,
-    HAUSDORFF     = 4
+    None,
+    EmptyList,
+    MaxIteration,
+    ListsStopped,
+    Hausdorff
 };
 
-enum WayContextConfig : unsigned char
+enum class WayContextConfig
 {
-    SWITCH_IN  = 0,
-    SWITCH_OUT = 1
+    SwitchIn,
+    SwitchOut
 };
 
 //! \class AcConfig
@@ -249,35 +249,35 @@ struct WayContext
 
     void set_context(WayContextConfig ctx_cfg)
     {
-        if ( ctx_cfg == WayContextConfig::SWITCH_IN )
+        if ( ctx_cfg == WayContextConfig::SwitchIn )
         {
-            config                    = WayContextConfig::SWITCH_IN;
+            config                    = WayContextConfig::SwitchIn;
 
             scanned_boundary          = &l_out;
             adjacent_boundary         = &l_in;
 
-            way                       = SpeedValue::GO_OUTWARD;
+            way                       = SpeedValue::GoOutward;
 
-            adjacent_phi_val          = PhiValue::INTERIOR_BOUNDARY;
-            neighbor_region_phi_val   = PhiValue::OUTSIDE_REGION;
-            neighbor_boundary_phi_val = PhiValue::EXTERIOR_BOUNDARY;
+            adjacent_phi_val          = PhiValue::InteriorBoundary;
+            neighbor_region_phi_val   = PhiValue::OutsideRegion;
+            neighbor_boundary_phi_val = PhiValue::ExteriorBoundary;
 
-            region_redundant_phi_val  = PhiValue::INSIDE_REGION;
+            region_redundant_phi_val  = PhiValue::InsideRegion;
         }
-        else if ( ctx_cfg == WayContextConfig::SWITCH_OUT )
+        else if ( ctx_cfg == WayContextConfig::SwitchOut )
         {
-            config                    = WayContextConfig::SWITCH_OUT;
+            config                    = WayContextConfig::SwitchOut;
 
             scanned_boundary          = &l_in;
             adjacent_boundary         = &l_out;
 
-            way                       = SpeedValue::GO_INWARD;
+            way                       = SpeedValue::GoInward;
 
-            adjacent_phi_val          = PhiValue::EXTERIOR_BOUNDARY;
-            neighbor_region_phi_val   = PhiValue::INSIDE_REGION;
-            neighbor_boundary_phi_val = PhiValue::INTERIOR_BOUNDARY;
+            adjacent_phi_val          = PhiValue::ExteriorBoundary;
+            neighbor_region_phi_val   = PhiValue::InsideRegion;
+            neighbor_boundary_phi_val = PhiValue::InteriorBoundary;
 
-            region_redundant_phi_val  = PhiValue::OUTSIDE_REGION;
+            region_redundant_phi_val  = PhiValue::OutsideRegion;
         }
         else
         {
@@ -485,7 +485,7 @@ private :
     virtual void do_specific_when_switch(int,
                                          WayContextConfig) { }
 
-    //! Checks generic condition at each iteration in both cycles to determine state STOPPED.
+    //! Checks generic condition at each iteration in both cycles to determine state Stopped.
     void check_stopped_state();
 
     //! Calculates the active contour state at the end of each iteration of a cycle 1.
@@ -515,7 +515,7 @@ private :
     LinearGaussianKernel kernel;
 
     //! Evolution state of the active contour given at a current iteration.
-    //!  There are 4 states : CYCLE_1, CYCLE_2, LAST_CYCLE_2 and STOPPED.
+    //!  There are 4 states : Cycle1, Cycle2, LastCycle2 and Stopped.
     State state;
 
     //! Stopping condition status.
@@ -542,16 +542,11 @@ inline T ActiveContour::square(const T& value)
     return value*value;
 }
 
-inline int ActiveContour::get_sign_opposite(PhiValue phi_val)
-{
-    return phi_val > PhiValue::ZERO_LEVEL_SET ? -1 : 1;
-}
-
 inline SpeedValue ActiveContour::get_discrete_speed(int speed)
 {
-    if (speed < 0) return SpeedValue::GO_INWARD;
-    if (speed > 0) return SpeedValue::GO_OUTWARD;
-    return SpeedValue::NO_MOVE;
+    if (speed < 0) return SpeedValue::GoInward;
+    if (speed > 0) return SpeedValue::GoOutward;
+    return SpeedValue::NoMove;
 }
 
 inline void ActiveContour::add_region_neighbor(int neighbor_offset,

@@ -214,12 +214,12 @@ inline void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 inline void RegionAc::do_specific_when_switch(int offset,
                                               WayContextConfig ctx_cfg)
 {
-    if ( ctx_cfg == WayContextConfig::SWITCH_IN )
+    if ( ctx_cfg == WayContextConfig::SwitchIn )
     {
         sum_out -= image.pixel_at(offset);
         pxl_nbr_out--;
     }
-    else if ( ctx_cfg == WayContextConfig::SWITCH_OUT )
+    else if ( ctx_cfg == WayContextConfig::SwitchOut )
     {
         sum_out += image.pixel_at(offset);
         pxl_nbr_out++;
