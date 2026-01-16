@@ -8,8 +8,10 @@
 #include "contour_rendering.hpp"
 #include "image_span.hpp"
 #include "image_adapters.hpp"
+#include "algo_stats.hpp"
 
 #include <QTimer>
+#include <QElapsedTimer>
 
 namespace ofeli_app
 {
@@ -17,15 +19,66 @@ namespace ofeli_app
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr), m_timer(new QTimer(this))
 {
-    m_timer->setInterval(1);
+    m_timer->setInterval(16);
     connect(m_timer, &QTimer::timeout,
             this, &ActiveContourWorker::onTimeout);
 }
 
+void ActiveContourWorker::restart()
+{
+    if (m_state == WorkerState::Restarting)
+        return;
+
+    setState( WorkerState::Restarting );
+
+    m_timer->stop();
+    ac.reset();
+    initializeActiveContour();
+
+    setState( WorkerState::Running );
+    m_timer->start();
+}
+
+void ActiveContourWorker::togglePause()
+{
+    if (m_state == WorkerState::Running)
+        suspend();
+    else if (m_state == WorkerState::Idle)
+        resume();
+}
+
+void ActiveContourWorker::step()
+{
+    if ( m_state == WorkerState::Running )
+        suspend();
+
+    if ( m_state == WorkerState::Idle )
+    {
+        if ( stepOnce() )
+        {
+            setState( WorkerState::Stopped );
+            emit finished();
+        }
+
+        updateStats();
+        emitContourOnly();
+    }
+}
+
+bool ActiveContourWorker::stepOnce()
+{
+    if ( !ac || ac->get_state() == ofeli_ip::State::STOPPED )
+        return true;
+
+    ac->evolve_one_iteration();
+
+    return ac->get_state() == ofeli_ip::State::STOPPED;
+}
+
 void ActiveContourWorker::setImage(const QImage& img)
 {
-    m_workImage = img;
-    m_state = WorkerState::Idle;
+    m_workImage = img.copy();
+    setState( WorkerState::Idle );
 }
 
 void ActiveContourWorker::start()
@@ -37,86 +90,141 @@ void ActiveContourWorker::start()
     restart();
 }
 
-void ActiveContourWorker::restart()
-{
-    if (m_state == WorkerState::Restarting)
-        return;
-
-    m_state = WorkerState::Restarting;
-
-    m_timer->stop();
-    ac.reset();
-    initializeActiveContour();
-
-    m_state = WorkerState::Running;
-    m_timer->start();
-}
-
 void ActiveContourWorker::stop()
 {
     if (m_state != WorkerState::Running)
         return;
 
     m_timer->stop();
-    m_state = WorkerState::Stopped;
+    setState( WorkerState::Stopped );
+}
+
+void ActiveContourWorker::suspend()
+{
+    if (m_state == WorkerState::Running)
+    {
+        m_timer->stop();
+        setState( WorkerState::Idle );
+    }
+}
+
+void ActiveContourWorker::resume()
+{
+    if (m_state == WorkerState::Idle)
+    {
+        m_timer->start();
+        setState( WorkerState::Running );
+    }
 }
 
 void ActiveContourWorker::onTimeout()
 {
-    if (m_state != WorkerState::Running || !ac )
+    if (m_state != WorkerState::Running || !ac)
         return;
 
-    if (ac->get_state() == ofeli_ip::State::STOPPED)
+    constexpr qint64 budgetMs = 10;
+    QElapsedTimer timer;
+    timer.start();
+
+    while (timer.elapsed() < budgetMs)
     {
-        m_timer->stop();
-        m_state = WorkerState::Stopped;
-        return;
+        if ( stepOnce() )
+        {
+            m_timer->stop();
+            m_state = WorkerState::Stopped;
+            emit finished();
+
+            updateStats();
+            emitContourOnly();
+
+            return;
+        }
     }
 
-    ac->evolve_one_iteration();
-    //drawAndEmitResult();
+    updateStats();
     emitContourOnly();
+}
+
+void ActiveContourWorker::updateStats()
+{
+    AlgoStats stats;
+    stats.iteration = ac ? ac->get_total_iter() : 0;
+
+    QMutexLocker lock(&m_statsMutex);
+    m_currentStats = stats;
 }
 
 void ActiveContourWorker::initializeActiveContour()
 {
-    if( !m_workImage.isNull() && !m_workImage.isNull() )
+    if( !m_workImage.isNull() )
     {
         const auto& config = AppSettings::instance();
+        unsigned int downscale_fctr = config.downscale_factor;
 
-        ofeli_ip::ContourData initial_tmp_ctr(config.initialPhi.bits(),
-                                              config.initialPhi.width(),
-                                              config.initialPhi.height());
+        workAlgo = m_workImage;
+        initialPhi = config.initialPhi.copy();
 
-        bool is_rgb = ( m_workImage.format() != QImage::Format_Grayscale8 );
+        int bpp = m_workImage.depth() / 8;  // ou 4 pour ARGB32
+        int expected = m_workImage.width() * bpp;
+
+        qDebug() << "bytesPerLine =" << m_workImage.bytesPerLine()
+                 << "expected =" << expected
+                 << "padding =" << m_workImage.bytesPerLine() - expected;
+
+        //downscale_fctr = 1;
+        if ( downscale_fctr >= 2 )
+        {
+            workAlgo = workAlgo.scaled(workAlgo.width()/downscale_fctr,
+                                       workAlgo.height()/downscale_fctr,
+                                       Qt::IgnoreAspectRatio,
+                                       Qt::FastTransformation);
+
+            initialPhi = initialPhi.scaled(workAlgo.width(),
+                                           workAlgo.height(),
+                                           Qt::IgnoreAspectRatio,
+                                           Qt::FastTransformation);
+        }
+
+        int bpp2 = workAlgo.depth() / 8;  // ou 4 pour ARGB32
+        int expected2 = workAlgo.width() * bpp2;
+
+        qDebug() << "bytesPerLine =" << workAlgo.bytesPerLine()
+                 << "expected =" << expected2
+                 << "padding =" << workAlgo.bytesPerLine() - expected2;
+
+        ofeli_ip::ContourData initialCD(initialPhi.constBits(),
+                                        initialPhi.width(),
+                                        initialPhi.height());
+
+        bool is_rgb = ( workAlgo.format() != QImage::Format_Grayscale8 );
 
         if( config.speed == SpeedModel::REGION_BASED )
         {
             if( is_rgb )
             {
-                ofeli_ip::ImageSpan32 image_rgb(image_span_32_from_qimage(m_workImage));
+                ofeli_ip::ImageSpan32 image_rgb(image_span_32_from_qimage(workAlgo));
 
                 ac = std::make_unique<ofeli_ip::RegionColorAc>(image_rgb,
-                                                               std::move(initial_tmp_ctr),
+                                                               std::move(initialCD),
                                                                config.algo_config,
                                                                config.region_ac_config);
             }
             else
             {
-                ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(m_workImage));
+                ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(workAlgo));
 
                 ac = std::make_unique<ofeli_ip::RegionAc>(image_grayscale,
-                                                          std::move(initial_tmp_ctr),
+                                                          std::move(initialCD),
                                                           config.algo_config,
                                                           config.region_ac_config);
             }
         }
         else if( config.speed == SpeedModel::EDGE_BASED )
         {
-            ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(m_workImage));
+            ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(workAlgo));
 
             ac = std::make_unique<ofeli_ip::EdgeAc>(image_grayscale,
-                                                    std::move(initial_tmp_ctr),
+                                                    std::move(initialCD),
                                                     config.algo_config);
         }
     }
@@ -165,18 +273,24 @@ void ActiveContourWorker::emitContourOnly()
 
     for (const auto& p : l_out)
     {
-        y = p.get_offset() / width;
-        outPts.emplace_back(p.get_x(), y);
+        y =  p.get_offset() / width;
+        outPts.emplace_back( p.get_x(), y );
     }
 
 
     for (const auto& p : l_in)
     {
-        y = p.get_offset() / width;
-        inPts.emplace_back(p.get_x(), y);
+        y =  p.get_offset() / width;
+        inPts.emplace_back( p.get_x(), y );
     }
 
     emit contourUpdated(outPts, inPts);
+}
+
+AlgoStats ActiveContourWorker::currentStats() const
+{
+    QMutexLocker lock(&m_statsMutex);
+    return m_currentStats;
 }
 
 }

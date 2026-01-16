@@ -4,6 +4,7 @@
 #include "image_controller.hpp"
 #include "active_contour_worker.hpp"
 #include "preview_pipeline.hpp"
+#include "algo_info_overlay.hpp"
 
 #include <QMenuBar>
 #include <QToolBar>
@@ -46,9 +47,9 @@ void ImageWindow::setupUi()
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
-    startButton = new QPushButton( tr("Start") );
-    pauseButton = new QPushButton( tr("Pause") );
-    stepButton = new QPushButton( tr("Setp") );
+    restartButton = new QPushButton( tr("Start / Restart") );
+    pauseButton = new QPushButton( tr("Pause / Resume") );
+    stepButton = new QPushButton( tr("Step") );
 
     // Widget central
     QWidget* central = new QWidget(this);
@@ -64,14 +65,17 @@ void ImageWindow::setupUi()
     controlLayout->setContentsMargins(8, 4, 8, 4);
     controlLayout->setSpacing(6);
 
-    controlLayout->addWidget(startButton);
+    controlLayout->addWidget(restartButton);
     controlLayout->addWidget(pauseButton);
     controlLayout->addWidget(stepButton);
     controlLayout->addStretch();
     // --- Image view ---
 
     imageView = new ImageView(central);
-    //imageView->setMaxDisplayFps(60);
+    imageView->setMaxDisplayFps(60.0);
+
+    imageOverlay = new AlgoInfoOverlay(this);
+    imageOverlay->raise();
 
     // Assemblage
     mainLayout->addWidget(controlBar);
@@ -266,9 +270,12 @@ void ImageWindow::setupConnections()
     connect(aboutAct, &QAction::triggered, about_window, &AboutWindow::show);
     connect(languageAct, &QAction::triggered, language_window, &LanguageWindow::show);
 
-
-    connect(imageController, &ImageController::imageReady,
-            imageView,       &ImageView::displayImage);
+    connect(imageController, &ImageController::imageReady, this,
+            [this](const QImage& img) {
+                imageView->clearOverlays();
+                imageView->displayImage(img);
+                imageView->updateSceneRectForImage();
+            });
 
     connect(imageController, &ImageController::contourReady,
             acWorker.get(),  &ActiveContourWorker::setImage);
@@ -282,16 +289,22 @@ void ImageWindow::setupConnections()
             &ImageView::displayContour,
             Qt::QueuedConnection);
 
-    connect(startButton,   &QPushButton::clicked,
-            acWorker.get(),      &ActiveContourWorker::start);
+    QTimer* m_statsTimer = new QTimer(this);
+    m_statsTimer->setInterval(30); // ~33 FPS
+    connect(m_statsTimer, &QTimer::timeout,
+            this, &ImageWindow::refreshAlgoOverlay);
+    m_statsTimer->start();
 
-    connect(pauseButton,  &QPushButton::clicked,
-            acWorker.get(),     &ActiveContourWorker::restart);
+    connect(restartButton,       &QPushButton::clicked,
+            acWorker.get(),  &ActiveContourWorker::restart);
 
-    connect(stepButton,   &QPushButton::clicked,
-            acWorker.get(),     &ActiveContourWorker::stop);
+    connect(pauseButton,    &QPushButton::clicked,
+            acWorker.get(), &ActiveContourWorker::togglePause);
 
-    connect(imageController, &ImageController::imageReadyWithoutResize,
+    connect(stepButton,     &QPushButton::clicked,
+            acWorker.get(), &ActiveContourWorker::step);
+
+    connect(imageController,    &ImageController::imageReadyWithoutResize,
             phiViewModel.get(), &PhiViewModel::setBackgroundWithUpdate);
 
     connect(imageController,
@@ -368,6 +381,12 @@ void ImageWindow::onStartCameraActionTriggered()
     {
         camera_window->show();
     }
+}
+
+void ImageWindow::refreshAlgoOverlay()
+{
+    if (imageOverlay)
+        imageOverlay->setStats(acWorker->currentStats());
 }
 
 void ImageWindow::closeEvent(QCloseEvent* event)

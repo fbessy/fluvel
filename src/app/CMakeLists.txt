@@ -110,6 +110,8 @@ else()
         core/shape_type.hpp
         ui/components/contour_point_item.hpp ui/components/contour_point_item.cpp
         ui/components/contour_point_item.cpp
+        ui/components/algo_info_overlay.hpp ui/components/algo_info_overlay.cpp
+        core/algo_stats.hpp
     )
 endif()
 

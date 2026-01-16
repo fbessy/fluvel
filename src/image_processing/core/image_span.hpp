@@ -13,8 +13,8 @@ class ImageSpan8 final
 public:
 
     ImageSpan8(const unsigned char* image_data1,
-                    int image_width1,
-                    int image_height1):
+               int image_width1,
+               int image_height1):
         image_data(image_data1),
         image_width(image_width1),
         image_height(image_height1)
@@ -76,8 +76,8 @@ class ImageSpan32 final
 {
 public:
     ImageSpan32(const unsigned char* data,
-                     int width,
-                     int height):
+                int width,
+                int height):
         image_data(data),
         image_width(width),
         image_height(height)

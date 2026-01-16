@@ -22,6 +22,9 @@ public:
     // Affichage image (thread-safe via event loop)
     void displayImage(const QImage& img);
 
+    void clearOverlays();
+    void updateSceneRectForImage();
+
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);
 
@@ -42,7 +45,6 @@ private slots:
 
 private:
     void updatePixmap(const QImage& img);
-    void clearContour();
 
     void applyAutoView();
     void updateDragMode();

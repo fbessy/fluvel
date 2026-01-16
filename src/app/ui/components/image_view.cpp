@@ -14,7 +14,7 @@ ImageView::ImageView(QWidget* parent)
 {
     setScene(scene);
 
-    setRenderHint(QPainter::SmoothPixmapTransform, true);
+    setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
 
     setTransformationAnchor(QGraphicsView::NoAnchor);
@@ -57,8 +57,6 @@ void ImageView::setMaxDisplayFps(double fps)
 
 void ImageView::displayImage(const QImage& img)
 {
-    clearContour();
-
     // Toujours garder la dernière image
     pendingFrame = img;
     hasPendingFrame = true;
@@ -95,17 +93,32 @@ void ImageView::displayContour(const QVector<QPoint>& out,
     if (!contourOutItem || !contourInItem)
         return;
 
+
+    const qreal factor = qreal( AppSettings::instance().downscale_factor );
+
     contourOutItem->setPoints(out);
     contourInItem->setPoints(in);
+
+    contourOutItem->setScale( factor );
+    contourInItem->setScale( factor );
 }
 
-void ImageView::clearContour()
+void ImageView::clearOverlays()
 {
-    if (contourOutItem)
-        contourOutItem->setPoints({});
+    if ( contourOutItem )
+    {
+        contourOutItem->clearPoints();
+    }
 
-    if (contourInItem)
-        contourInItem->setPoints({});
+    if ( contourInItem )
+    {
+        contourInItem->clearPoints();
+    }
+}
+
+void ImageView::updateSceneRectForImage()
+{
+    //viewport()->repaint();
 }
 
 // ------------------------------------------------------------
@@ -141,6 +154,7 @@ void ImageView::updatePixmap(const QImage& img)
     }
     else
     {
+        pixmapItem->setTransformationMode(Qt::FastTransformation);
         pixmapItem->setZValue(0);
         pixmapItem->setPixmap(QPixmap::fromImage(img));
     }

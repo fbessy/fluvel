@@ -54,9 +54,11 @@
 namespace ofeli_app {
 
 class ImageView;
+class AlgoInfoOverlay;
 class ImageController;
 class ActiveContourWorker;
 class PreviewPipeline;
+class AlgoStats;
 
 class ImageWindow : public QMainWindow
 {
@@ -65,6 +67,9 @@ class ImageWindow : public QMainWindow
 public:
     explicit ImageWindow(QWidget* parent = nullptr);
     ~ImageWindow() override;
+
+public slots:
+    void refreshAlgoOverlay();
 
 private:
     virtual void closeEvent(QCloseEvent* event) override;
@@ -76,11 +81,12 @@ private:
     AboutWindow* about_window = nullptr;
     LanguageWindow* language_window = nullptr;
 
-    QPushButton* startButton = nullptr;
+    QPushButton* restartButton = nullptr;
     QPushButton* pauseButton = nullptr;
     QPushButton* stepButton = nullptr;
 
     ImageView* imageView = nullptr;
+    AlgoInfoOverlay* imageOverlay = nullptr;
 
 
 

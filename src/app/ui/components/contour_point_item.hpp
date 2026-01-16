@@ -10,14 +10,19 @@ namespace ofeli_app {
 class ContourPointsItem : public QGraphicsItem
 {
 public:
+    ContourPointsItem();
+
     void setPoints(const QVector<QPoint>& pts);
-    void setColor(QColor color) { color_ = color; }
+    void clearPoints();
+
 
     QRectF boundingRect() const override;
 
     void paint(QPainter* painter,
                const QStyleOptionGraphicsItem*,
                QWidget*) override;
+
+    void setColor(QColor color) { color_ = color; }
 
 private:
     QVector<QPoint> points_;
