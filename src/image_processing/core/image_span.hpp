@@ -12,42 +12,42 @@ class ImageSpan8 final
 
 public:
 
-    ImageSpan8(const unsigned char* image_data1,
-               int image_width1,
-               int image_height1):
-        image_data(image_data1),
-        image_width(image_width1),
-        image_height(image_height1)
+    ImageSpan8(const unsigned char* img_data,
+               int img_width,
+               int img_height):
+        data_(img_data),
+        width_(img_width),
+        height_(img_height)
     {
-        assert( image_data != nullptr );
-        assert( image_width  > 0 );
-        assert( image_height > 0 );
+        assert( data_ != nullptr );
+        assert( width_  > 0 );
+        assert( height_ > 0 );
     }
 
     unsigned char pixel_at(int offset) const noexcept
     {
-        assert( offset >= 0 && offset < get_size() );
+        assert( offset >= 0 && offset < size() );
 
-        return image_data[offset];
+        return data_[offset];
     }
 
     unsigned char pixel_at(int x, int y) const noexcept
     {
-        assert( x >= 0 && x < image_width );
-        assert( y >= 0 && y < image_height );
+        assert( x >= 0 && x < width_ );
+        assert( y >= 0 && y < height_ );
 
-        return image_data[ x+y*image_width ];
+        return data_[ x+y*width_ ];
     }
 
-    int get_width()  const { return image_width; }
-    int get_height() const { return image_height; }
-    int get_size()   const { return image_width * image_height; }
+    int width()  const { return width_; }
+    int height() const { return height_; }
+    int size()   const { return width_ * height_; }
 
 private:
 
-    const unsigned char* image_data;
-    int image_width;
-    int image_height;
+    const unsigned char* data_;
+    int width_;
+    int height_;
 };
 
 // Colors
@@ -78,38 +78,38 @@ public:
     ImageSpan32(const unsigned char* data,
                 int width,
                 int height):
-        image_data(data),
-        image_width(width),
-        image_height(height)
+        data_(data),
+        width_(width),
+        height_(height)
     {
-        assert(image_data != nullptr);
-        assert(image_width  > 0);
-        assert(image_height > 0);
+        assert(data_ != nullptr);
+        assert(width_  > 0);
+        assert(height_ > 0);
     }
 
     // --- Accès par offset
     Bgra32 pixel_bgra_at(int offset) const noexcept
     {
-        assert( offset >= 0 && offset < get_size() );
+        assert( offset >= 0 && offset < size() );
 
-        const unsigned char* p = image_data + offset * 4;
+        const unsigned char* p = data_ + offset * 4;
         return { p[0], p[1], p[2], p[3] };
     }
 
     // --- Accès par coordonnées
     Bgra32 pixel_bgra_at(int x, int y) const noexcept
     {
-        assert( x >= 0 && x < image_width );
-        assert( y >= 0 && y < image_height );
+        assert( x >= 0 && x < width_ );
+        assert( y >= 0 && y < height_ );
 
-        const unsigned char* p = image_data + (x + y * image_width) * 4;
+        const unsigned char* p = data_ + (x + y * width_) * 4;
         return { p[0], p[1], p[2], p[3] };
     }
 
     // --- Accès logique RGB (indépendant endianness)
     Rgb_uc pixel_rgb_at(int offset) const noexcept
     {
-        assert( offset >= 0 && offset < get_size() );
+        assert( offset >= 0 && offset < size() );
 
         const auto px = pixel_bgra_at(offset);
         return { px.red, px.green, px.blue };
@@ -117,21 +117,21 @@ public:
 
     Rgb_uc pixel_rgb_at(int x, int y) const noexcept
     {
-        assert( x >= 0 && x < image_width );
-        assert( y >= 0 && y < image_height );
+        assert( x >= 0 && x < width_ );
+        assert( y >= 0 && y < height_ );
 
         const auto px = pixel_bgra_at(x, y);
         return { px.red, px.green, px.blue };
     }
 
-    int get_width()  const { return image_width; }
-    int get_height() const { return image_height; }
-    int get_size()   const { return image_width * image_height; }
+    int width()  const { return width_; }
+    int height() const { return height_; }
+    int size()   const { return width_ * height_; }
 
 private:
-    const unsigned char* image_data;
-    int image_width;
-    int image_height;
+    const unsigned char* data_;
+    int width_;
+    int height_;
 };
 
 }

@@ -50,53 +50,53 @@ namespace ofeli_ip
 // Definitions
 ActiveContour::ActiveContour(const ContourData& initial_contour,
                              const AcConfig& config1)
-    : config(config1),
-    cd( initial_contour ),
-    state( State::Cycle1 ),
-    stopping_status( StoppingStatus::None ),
-    ctx( cd ),
-    ed( cd ),
-    is_cycle2_condition( true )
+    : config_(config1),
+    cd_( initial_contour ),
+    state_( State::Cycle1 ),
+    stopping_status_( StoppingStatus::None ),
+    ctx_( cd_ ),
+    ed_( cd_ ),
+    is_cycle2_condition_( true )
 {
-    kernel = build_gaussian_kernel_linear(config.kernel_length,
-                                          config.sigma,
-                                          cd.get_phi().get_width());
+    kernel_ = build_gaussian_kernel_linear(config_.kernel_length,
+                                           config_.sigma,
+                                           cd_.phi().width());
 
-    points_to_append.reserve( cd.get_preallocation_size() );
+    points_to_append_.reserve( cd_.preallocation_size() );
 
-    if ( config.is_cycle2 )
+    if ( config_.is_cycle2 )
     {
-        n_iter_by_cycle = config.Na + config.Ns;
+        n_iter_by_cycle_ = config_.Na + config_.Ns;
     }
     else
     {
-        n_iter_by_cycle = config.Na;
+        n_iter_by_cycle_ = config_.Na;
     }
 }
 
 ActiveContour::ActiveContour(ContourData&& initial_contour,
                              const AcConfig& config1)
-    : config(config1),
-    cd( std::move(initial_contour) ),
-    state( State::Cycle1 ),
-    stopping_status( StoppingStatus::None ),
-    ctx( cd ),
-    ed( cd ),
-    is_cycle2_condition(true)
+    : config_(config1),
+    cd_( std::move(initial_contour) ),
+    state_( State::Cycle1 ),
+    stopping_status_( StoppingStatus::None ),
+    ctx_( cd_ ),
+    ed_( cd_ ),
+    is_cycle2_condition_(true)
 {
-    kernel = build_gaussian_kernel_linear(config.kernel_length,
-                                          config.sigma,
-                                          cd.get_phi().get_width());
+    kernel_ = build_gaussian_kernel_linear(config_.kernel_length,
+                                           config_.sigma,
+                                           cd_.phi().width());
 
-    points_to_append.reserve( cd.get_preallocation_size() );
+    points_to_append_.reserve( cd_.preallocation_size() );
 
-    if ( config.is_cycle2 )
+    if ( config_.is_cycle2 )
     {
-        n_iter_by_cycle = config.Na + config.Ns;
+        n_iter_by_cycle_ = config_.Na + config_.Ns;
     }
     else
     {
-        n_iter_by_cycle = config.Na;
+        n_iter_by_cycle_ = config_.Na;
     }
 }
 
@@ -104,15 +104,15 @@ void ActiveContour::evolve()
 {
     // Fast Two Cycle algorithm
 
-    while( state != State::Stopped )
+    while( state_ != State::Stopped )
     {
-        while( state == State::Cycle1 )
+        while( state_ == State::Cycle1 )
         {
             evolve_one_time_in_cycle1();
         }
 
-        while(    state == State::Cycle2
-               || state == State::LastCycle2 )
+        while(    state_ == State::Cycle2
+               || state_ == State::LastCycle2 )
         {
             evolve_one_time_in_cycle2();
         }
@@ -127,15 +127,15 @@ void ActiveContour::evolve_n_iterations(int n_iter)
     }
 
     for( int i = 0;
-         i < n_iter && state != State::Stopped;
+         i < n_iter && state_ != State::Stopped;
          i++ )
     {
-        if ( state == State::Cycle1 )
+        if ( state_ == State::Cycle1 )
         {
             evolve_one_time_in_cycle1();
         }
-        else if (    state == State::Cycle2
-                  || state == State::LastCycle2 )
+        else if (    state_ == State::Cycle2
+                  || state_ == State::LastCycle2 )
         {
             evolve_one_time_in_cycle2();
         }
@@ -154,7 +154,7 @@ void ActiveContour::evolve_n_cycles(int n_cycles)
         n_cycles = 1;
     }
 
-    int n_iter = n_cycles * n_iter_by_cycle;
+    int n_iter = n_cycles * n_iter_by_cycle_;
 
     evolve_n_iterations( n_iter );
 }
@@ -166,10 +166,10 @@ void ActiveContour::evolve_one_time_in_cycle1()
     bool is_outward_moving = evolve_one_way( WayContextConfig::SwitchIn );
     bool is_inward_moving  = evolve_one_way( WayContextConfig::SwitchOut );
 
-    ed.total_iter++;
-    ed.cycle_iter++;
+    ed_.total_iter++;
+    ed_.cycle_iter++;
 
-    ed.is_moving = is_outward_moving || is_inward_moving;
+    ed_.is_moving = is_outward_moving || is_inward_moving;
 
     check_stopped_state();
     calculate_state_cycle_1();
@@ -180,8 +180,8 @@ void ActiveContour::evolve_one_time_in_cycle2()
     evolve_one_way( WayContextConfig::SwitchIn );
     evolve_one_way( WayContextConfig::SwitchOut );
 
-    ed.total_iter++;
-    ed.cycle_iter++;
+    ed_.total_iter++;
+    ed_.cycle_iter++;
 
     check_stopped_state();
     calculate_state_cycle_2();
@@ -191,12 +191,12 @@ bool ActiveContour::evolve_one_way(WayContextConfig ctx_cfg)
 {
     bool is_moving = false;
 
-    ctx.set_context( ctx_cfg );
+    ctx_.set_context( ctx_cfg );
 
-    auto& scanned  = *ctx.scanned_boundary;
-    auto& adjacent = *ctx.adjacent_boundary;
+    auto& scanned  = *ctx_.scanned_boundary;
+    auto& adjacent = *ctx_.adjacent_boundary;
 
-    points_to_append.clear();
+    points_to_append_.clear();
 
     compute_speed( scanned );
 
@@ -204,12 +204,12 @@ bool ActiveContour::evolve_one_way(WayContextConfig ctx_cfg)
     {
         auto& point = scanned[i];
 
-        if( point.get_speed() == ctx.way )
+        if( point.speed() == ctx_.way )
         {
             is_moving = true;
 
-            do_specific_when_switch( point.get_offset(),
-                                     ctx.config );
+            do_specific_when_switch( point.offset(),
+                                     ctx_.config );
 
             switch_one_way( point );
         }
@@ -220,13 +220,13 @@ bool ActiveContour::evolve_one_way(WayContextConfig ctx_cfg)
     }
 
     scanned.insert( scanned.end(),
-                    points_to_append.begin(),
-                    points_to_append.end() );
+                    points_to_append_.begin(),
+                    points_to_append_.end() );
 
     if( is_moving )
     {
         eliminate_redundant_points( adjacent,
-                                    ctx.region_redundant_phi_val );
+                                    ctx_.region_redundant_phi_val );
     }
 
     return is_moving;
@@ -239,9 +239,9 @@ void ActiveContour::eliminate_redundant_points(ContourList& boundary,
     {
         auto& point = boundary[i];
 
-        if( cd.is_redundant(point) )
+        if( cd_.is_redundant(point) )
         {
-            cd.get_phi()[ point.get_offset() ] = region_value;
+            cd_.phi()[ point.offset() ] = region_value;
             point = boundary.back();
             boundary.pop_back();
         }
@@ -254,12 +254,12 @@ void ActiveContour::eliminate_redundant_points(ContourList& boundary,
 
 void ActiveContour::compute_speed(ContourList& boundary)
 {
-    if( state == State::Cycle1 )
+    if( state_ == State::Cycle1 )
     {
         compute_external_speed_Fd( boundary );
     }
-    else if( state == State::Cycle2 ||
-             state == State::LastCycle2 )
+    else if( state_ == State::Cycle2 ||
+             state_ == State::LastCycle2 )
     {
         compute_internal_speed_Fint( boundary );
     }
@@ -291,21 +291,21 @@ void ActiveContour::compute_internal_speed_Fint(ContourList& boundary)
 
 void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 {
-    assert( kernel.weights.size() == kernel.offsets.size() );
-    assert( kernel.size == config.kernel_length * config.kernel_length );
+    assert( kernel_.weights.size() == kernel_.offsets.size() );
+    assert( kernel_.size == config_.kernel_length * config_.kernel_length );
 
-    const auto& phi = cd.get_phi();
-    const int width  = phi.get_width();
-    const int height = phi.get_height();
+    const auto& phi = cd_.phi();
+    const int width  = phi.width();
+    const int height = phi.height();
 
-    const int radius = kernel.radius;
-    const int offset = point.get_offset();
+    const int radius = kernel_.radius;
+    const int offset = point.offset();
     const auto phi_center  = phi[offset];
     const int center_sign = phiSign( phi_center );
 
     int Fint = 0;
 
-    const int x = point.get_x();
+    const int x = point.x();
     const int y = offset / width;
 
     // --- Chemin rapide : entièrement dans l'image ---
@@ -314,10 +314,10 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
         && y >= radius
         && y <  height - radius)
     {
-        const int* w = kernel.weights.data();
-        const int* o = kernel.offsets.data();
+        const int* w = kernel_.weights.data();
+        const int* o = kernel_.offsets.data();
 
-        for (int i = 0; i < kernel.size; ++i)
+        for (int i = 0; i < kernel_.size; ++i)
         {
             Fint -=  w[i] * phiSign( phi[offset + o[i]] );
         }
@@ -325,10 +325,10 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
     // --- Chemin lent : bords ---
     else
     {
-        const int* w = kernel.weights.data();
-        const int* o = kernel.offsets.data();
+        const int* w = kernel_.weights.data();
+        const int* o = kernel_.offsets.data();
 
-        for (int i = 0; i < kernel.size; ++i)
+        for (int i = 0; i < kernel_.size; ++i)
         {
             const int n = offset + o[i];
 
@@ -344,153 +344,153 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 
 void ActiveContour::check_stopped_state()
 {
-    if( cd.get_l_out().empty() || cd.get_l_in().empty() )
+    if( cd_.l_out().empty() || cd_.l_in().empty() )
     {
-        state = State::Stopped;
-        stopping_status = StoppingStatus::EmptyList;
+        state_ = State::Stopped;
+        stopping_status_ = StoppingStatus::EmptyList;
     }
-    else if( ed.total_iter >= ed.total_iter_max )
+    else if( ed_.total_iter >= ed_.total_iter_max )
     {
-        state = State::Stopped;
-        stopping_status = StoppingStatus::MaxIteration;
+        state_ = State::Stopped;
+        stopping_status_ = StoppingStatus::MaxIteration;
     }
 }
 
 void ActiveContour::calculate_state_cycle_1()
 {
-    if( state == State::Cycle1 )
+    if( state_ == State::Cycle1 )
     {
-        if( !ed.is_moving )
+        if( !ed_.is_moving )
         {
-            if( config.is_cycle2 )
+            if( config_.is_cycle2 )
             {
-                ed.cycle_iter = 0;
-                state = State::LastCycle2;
+                ed_.cycle_iter = 0;
+                state_ = State::LastCycle2;
             }
             else
             {
-                state = State::Stopped;
-                stopping_status = StoppingStatus::ListsStopped;
+                state_ = State::Stopped;
+                stopping_status_ = StoppingStatus::ListsStopped;
             }
         }
-        else if( ed.cycle_iter >= config.Na &&
-                 config.is_cycle2 )
+        else if( ed_.cycle_iter >= config_.Na &&
+                 config_.is_cycle2 )
         {
-            ed.cycle_iter = 0;
-            state = State::Cycle2;
+            ed_.cycle_iter = 0;
+            state_ = State::Cycle2;
         }
     }
 }
 
 void ActiveContour::calculate_state_cycle_2()
 {
-    if( state == State::Cycle2 ||
-        state == State::LastCycle2 )
+    if( state_ == State::Cycle2 ||
+        state_ == State::LastCycle2 )
     {
         // if at the end of one cycle 2
-        if( ed.cycle_iter >= config.Ns )
+        if( ed_.cycle_iter >= config_.Ns )
         {
-            if( state == State::LastCycle2 )
+            if( state_ == State::LastCycle2 )
             {
-                state = State::Stopped;
-                stopping_status = StoppingStatus::ListsStopped;
+                state_ = State::Stopped;
+                stopping_status_ = StoppingStatus::ListsStopped;
             }
-            else if( is_cycle2_condition &&
-                     state == State::Cycle2 )
+            else if( is_cycle2_condition_ &&
+                     state_ == State::Cycle2 )
             {
-                float diff_iter = float(ed.total_iter - ed.previous_total_iter);
+                float diff_iter = float(ed_.total_iter - ed_.previous_total_iter);
 
-                const int w = cd.get_phi().get_width();
-                const int h = cd.get_phi().get_height();
+                const int w = cd_.phi().width();
+                const int h = cd_.phi().height();
                 const int diagonal = Shape::get_grid_diagonal(w, h);
 
                 // normalize in function of l_outshape/phi size
                 // to handle different images sizes.
                 if( diff_iter >= diagonal / 20.f )
                 {
-                    ed.l_out_shape.clear();
+                    ed_.l_out_shape.clear();
 
-                    for( const auto& point : cd.get_l_out() )
+                    for( const auto& point : cd_.l_out() )
                     {
-                        Point_i p = from_ContourPoint( point,
-                                                       cd.get_phi().get_width() );
+                        Point2D_i p = from_ContourPoint( point,
+                                                         cd_.phi().width() );
 
-                        ed.l_out_shape.push_back( p );
+                        ed_.l_out_shape.push_back( p );
                     }
-                    ed.l_out_shape.calculate_centroid();
+                    ed_.l_out_shape.calculate_centroid();
 
                     calculate_shapes_intersection();
 
-                    HausdorffDistance hd( ed.l_out_shape,
-                                          ed.previous_shape,
-                                          ed.intersection );
+                    HausdorffDistance hd( ed_.l_out_shape,
+                                          ed_.previous_shape,
+                                          ed_.intersection );
 
                     float size_factor = 100.f / diagonal;
-                    ed.hausdorff_quantile = size_factor * hd.get_hausdorff_quantile(80);
-                    ed.centroids_distance = size_factor * hd.get_centroids_distance();
-                    float delta_quantile = ed.previous_quantile - ed.hausdorff_quantile;
+                    ed_.hausdorff_quantile = size_factor * hd.get_hausdorff_quantile(80);
+                    ed_.centroids_distance = size_factor * hd.get_centroids_distance();
+                    float delta_quantile = ed_.previous_quantile - ed_.hausdorff_quantile;
 
-                    if ( ( ed.centroids_distance < 1.f &&
-                           ed.hausdorff_quantile < 1.f ) ||
-                         ( ed.centroids_distance < 1.f &&
-                           ed.hausdorff_quantile < 2.f &&
+                    if ( ( ed_.centroids_distance < 1.f &&
+                           ed_.hausdorff_quantile < 1.f ) ||
+                         ( ed_.centroids_distance < 1.f &&
+                           ed_.hausdorff_quantile < 2.f &&
                            delta_quantile < 0.f ) )
                     {
-                        state = State::Stopped;
-                        stopping_status = StoppingStatus::Hausdorff;
+                        state_ = State::Stopped;
+                        stopping_status_ = StoppingStatus::Hausdorff;
                     }
 
                     // swap the shapes in constant time, in complexity O(1)
                     // to prepare data for the next cycle 2 stopping condition iteration.
-                    ed.l_out_shape.swap(ed.previous_shape);
-                    ed.previous_total_iter = ed.total_iter;
-                    ed.previous_quantile = ed.hausdorff_quantile;
+                    ed_.l_out_shape.swap(ed_.previous_shape);
+                    ed_.previous_total_iter = ed_.total_iter;
+                    ed_.previous_quantile = ed_.hausdorff_quantile;
                 }
             }
 
-            if ( state != State::Stopped )
+            if ( state_ != State::Stopped )
             {
-                ed.cycle_iter = 0;
-                state = State::Cycle1;
+                ed_.cycle_iter = 0;
+                state_ = State::Cycle1;
             }
         }
     }
 }
 
-Point_i ActiveContour::from_ContourPoint(const ContourPoint& point,
-                                         int grid_width)
+Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point,
+                                           int grid_width)
 {
-    Point_i p;
+    Point2D_i p;
 
-    p.x = point.get_x();
-    p.y = point.get_offset() / grid_width;
+    p.x = point.x();
+    p.y = point.offset() / grid_width;
 
     return p;
 }
 
 void ActiveContour::calculate_shapes_intersection()
 {
-    ed.intersection.clear();
+    ed_.intersection.clear();
 
-    for( const auto& point : ed.previous_shape.get_points() )
+    for( const auto& point : ed_.previous_shape.get_points() )
     {
         // if a point of ed.previous_shape ∈ ed.l_out_shape
-        if( cd.get_phi()(point.x, point.y) == PhiValue::ExteriorBoundary )
+        if( cd_.phi().at(point.x, point.y) == PhiValue::ExteriorBoundary )
         {
-            ed.intersection.insert( point );
+            ed_.intersection.insert( point );
         }
     }
 }
 
 void ActiveContour::reinitialize()
 {
-    cd.check_lists();
+    cd_.check_lists();
 
-    state = State::Cycle1;
-    stopping_status = StoppingStatus::None;
-    is_cycle2_condition = false;
+    state_ = State::Cycle1;
+    stopping_status_ = StoppingStatus::None;
+    is_cycle2_condition_ = false;
 
-    ed.reinitialize();
+    ed_.reinitialize();
 }
 
 }

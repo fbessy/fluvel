@@ -40,131 +40,91 @@
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
-#include <iostream> // operator<< overloading
+#include <vector>
+#include <cassert>
 
 #include "point.hpp"
 
 namespace ofeli_ip
 {
 
-template <typename T>
-class Matrix
+template<typename T>
+class Matrix2D
 {
+public:
+    Matrix2D() = default;
 
-public :
+    Matrix2D(int width, int height)
+        : width_(width)
+        , height_(height)
+        , data_(static_cast<size_t>(width * height))
+    {
+    }
 
-    //! Constructor.
-    explicit Matrix(T* matrix_data1, int width1, int height1);
+    //! Matrix2D methods
+    int width()  const noexcept { return width_;  }
+    int height() const noexcept { return height_; }
 
-    //! Constructor.
-    template <typename U>
-    explicit Matrix(const U* matrix_data1, int width1, int height1);
+    T& at(int x, int y)
+    {
+        assert(valid(x, y));
+        return data_[offset(x, y)];
+    }
 
-    //! Constructor.
-    explicit Matrix(int width1, int height1);
+    const T& at(int x, int y) const
+    {
+        assert(valid(x, y));
+        return data_[offset(x, y)];
+    }
 
-    //! Constructor.
-    explicit Matrix(int width1, int height1, const T& value);
+    //! Wrappers of std::vector<T>
+    T& operator[](size_t offset) noexcept { return data_[offset]; }
+    const T& operator[](size_t offset) const noexcept { return data_[offset]; }
+    bool empty() const noexcept { return data_.empty(); }
+    size_t size() const noexcept { return data_.size(); }
+    T* data() noexcept { return data_.data(); }
+    const T* data() const noexcept { return data_.data(); }
 
-    //! Creates a normalised gaussian kernel without to divide by \a π.
-    explicit Matrix(int kernel_length, float standard_deviation);
+    //! Wrappers to allow loop for ( auto offset : phi_ )
+    auto begin() noexcept { return data_.begin(); }
+    auto end()   noexcept { return data_.end(); }
+    auto begin() const noexcept { return data_.begin(); }
+    auto end()   const noexcept { return data_.end(); }
 
-    //! Copy constructor.
-    Matrix(const Matrix& copied);
+    void fill(const T& value)
+    {
+        std::fill(data_.begin(), data_.end(), value);
+    }
 
-    //! Move constructor.
-    Matrix(Matrix&& moved) noexcept;
+    Point2D_i coord(size_t offset) const noexcept
+    {
+        return {
+            static_cast<int>(offset % width_),
+            static_cast<int>(offset / width_)
+        };
+    }
 
-    //! Destructor.
-    ~Matrix();
+    size_t offset(int x, int y) const noexcept
+    {
+        return static_cast<size_t>(y * width_ + x);
+    }
 
-    //! Assignment operator overloading.
-    Matrix& operator=(const Matrix& rhs);
+    size_t offset(Point2D<int> p) const noexcept
+    {
+        return static_cast<size_t>(p.y * width_ + p.x);
+    }
 
-    //! Returns if the encapsulated pointer is allocated or not.
-    bool is_null() const;
+    bool valid(int x, int y) const noexcept
+    {
+        return x >= 0 && y >= 0 && x < width_ && y < height_;
+    }
 
-    //! Assign each value of the internal buffer by the input value.
-    void memset(const T& value);
-
-    //! Gets offset for a given position (x,y).
-    int get_offset(int x, int y) const;
-    //! Gets offset for a given position.
-    int get_offset(const Point_i& point) const;
-
-    //! Gets position (x,y) for a given offset.
-    void get_position(int offset,
-                      int& x, int& y) const;
-    //! Gets position for a given offset.
-    Point_i get_position(int offset) const;
-
-    //! Gets the element for a given offset.
-    const T& get_element(int offset) const;
-    //! Gets the element for a given position (x,y).
-    const T& get_element(int x, int y) const;
-    const T& get_element(const Point_i& point) const;
-
-    //! Sets the element at the given offset.
-    void set_element(int offset, const T& element);
-    //! Sets the element at the given position (x,y).
-    void set_element(int x, int y, const T& element);
-    //! Sets the element at the given position.
-    void set_element(const Point_i& point, const T& element);
-
-    //! \a Equal \a to operator overloading.
-    template <typename U>
-    friend bool operator==(const Matrix<U>& lhs, const Matrix<U>& rhs);
-
-    //! \a Not \a equal \a to operator overloading.
-    template <typename U>
-    friend bool operator!=(const Matrix<U>& lhs, const Matrix<U>& rhs);
-
-    T& operator[](int offset);
-    const T& operator[](int offset) const;
-    T& operator()(int x, int y);
-    const T& operator()(int x, int y) const;
-
-    //! Overloading of cout <<. It displays a linked list in the same way as integral-type variable.
-    template <typename U>
-    friend std::ostream& operator<<(std::ostream& os, const Matrix<U>& displayed);
-
-    //! A second way to display a linked list.
-    void display() const;
-
-    const T* get_matrix_data() const { return matrix_data; }
-    int get_width() const { return width; }
-    int get_height() const { return height; }
-
-private :
-
-    //! Matrix data.
-    T* matrix_data;
-
-    //! Width of the matrix, i.e. number of columns.
-    const int width;
-
-    //! Height of the matrix, i.e. number of rows.
-    const int height;
-
-    bool is_memory_ownership;
-
-    //! Gives the square of a value.
-    template <typename U>
-    static U square(const U& value);
-
-    static int check_kernel_length(int value);
+private:
+    int width_  = 0;
+    int height_ = 0;
+    std::vector<T> data_;
 };
 
-template <typename T>
-template <typename U>
-inline U Matrix<T>::square(const U& value)
-{
-    return value*value;
 }
-
-}
-
-// list definitions
-#include "matrix.txx"
 
 #endif // MATRIX_HPP

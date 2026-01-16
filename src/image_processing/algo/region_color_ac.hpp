@@ -273,10 +273,10 @@ RegionColorAc::RegionColorAc(ImageSpan32 image1,
     : ActiveContour(std::forward<T>(initial_contour1), general_config1),
     image(image1),
     region_config(region_config1),
-    pxl_nbr_total(image.get_size()), pxl_nbr_out(0)
+    pxl_nbr_total(image.size()), pxl_nbr_out(0)
 {
-    assert( image.get_width()  == cd.get_phi().get_width() &&
-            image.get_height() == cd.get_phi().get_height()   );
+    assert( image.width()  == cd_.phi().width() &&
+            image.height() == cd_.phi().height()   );
 
     initialize_sums();
     RegionColorAc::do_specific_cycle1();
@@ -412,7 +412,7 @@ inline void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
 {
     int color[CHANNELS_NBR];
 
-    const Rgb_uc rgb = image.pixel_rgb_at( point.get_offset() );
+    const Rgb_uc rgb = image.pixel_rgb_at( point.offset() );
     rgb_to_color(rgb, color);
 
     const int lambda_out = region_config.lambda_out;

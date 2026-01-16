@@ -67,20 +67,20 @@ enum class SpeedValue : int8_t
 class ContourPoint
 {
 public:
-    ContourPoint(int offset1, int x1): offset(offset1), x(x1)
+    ContourPoint(int offset1, int x1): offset_(offset1), x_(x1)
     {}
 
-    int get_offset() const { return offset; }
-    int get_x() const { return x; }
-    SpeedValue get_speed() const { return speed; }
-    void set_speed(SpeedValue speed1) { speed = speed1; }
+    int offset() const { return offset_; }
+    int x() const { return x_; }
+    SpeedValue speed() const { return speed_; }
+    void set_speed(SpeedValue speed) { speed_ = speed; }
 
 private:
-    int offset;
-    int x; // in order to check fastly neighborhood existence (border cases to handle)
+    int offset_;
+    int x_; // in order to check fastly neighborhood existence (border cases to handle)
 
     //! Internal speed Fint or external speed Fd to evolve the active contour in one direction locally.
-    SpeedValue speed;
+    SpeedValue speed_;
 };
 
 using ContourList = std::vector<ContourPoint>;
@@ -98,8 +98,8 @@ public :
                 int phi_width, int phi_height);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of #l_out and #l_in.
-    ContourData(const ContourList& l_out1,
-                const ContourList& l_in1,
+    ContourData(const ContourList& l_out,
+                const ContourList& l_in,
                 int phi_width, int phi_height);
 
     //! Copy constructor.
@@ -118,22 +118,22 @@ public :
     void allocate_lists();
 
     //! Wrapper to use directly with offset lists without the need to get the variable #phi.
-    Point_i get_position(int offet) const
+    Point2D_i coord(int offet) const
     {
-        return phi.get_position( offet );
+        return phi_.coord( offet );
     }
 
     //! Getter function for the discrete level-set function #phi.
-    Matrix<PhiValue>& get_phi() { return phi; }
-    const Matrix<PhiValue>& get_phi() const { return phi; }
+    Matrix2D<PhiValue>& phi() { return phi_; }
+    const Matrix2D<PhiValue>& phi() const { return phi_; }
     //! Getter function for the exterior boundary #l_out.
-    ContourList& get_l_out() { return l_out; }
-    const ContourList& get_l_out() const { return l_out; }
+    ContourList& l_out() { return l_out_; }
+    const ContourList& l_out() const { return l_out_; }
     //! Getter function for the interior boundary #l_in.
-    ContourList& get_l_in() { return l_in; }
-    const ContourList& get_l_in() const { return l_in; }
+    ContourList& l_in() { return l_in_; }
+    const ContourList& l_in() const { return l_in_; }
 
-    size_t get_preallocation_size() const { return preallocation_size; }
+    size_t preallocation_size() const { return preallocation_size_; }
 
 private :
 
@@ -152,15 +152,15 @@ private :
     static bool is_ok_phi_dimension(int dimension);
 
     //! Discrete level-set function with only 4 PhiValue possible.
-    Matrix<PhiValue> phi;
+    Matrix2D<PhiValue> phi_;
 
     //! List of offset points representing the exterior boundary.
-    ContourList l_out;
+    ContourList l_out_;
     //! List of offset points representing the interior boundary.
-    ContourList l_in;
+    ContourList l_in_;
 
     //! Preallocation size for each list.
-    size_t preallocation_size;
+    size_t preallocation_size_;
 };
 
 /// Discrete sign of level-set function.
@@ -198,27 +198,27 @@ inline bool differentSide(PhiValue a, PhiValue b)
 
 inline bool ContourData::is_redundant(const ContourPoint& point) const
 {
-    int offset = point.get_offset();
-    int x = point.get_x();
-    int w = phi.get_width();
-    int h = phi.get_height();
-    int last_row_offset = w * (h - 1);
+    const int offset = point.offset();
+    const int x = point.x();
+    const int w = phi_.width();
+    const int h = phi_.height();
+    const int last_row_offset = w * (h - 1);
 
-    const auto phi_center = phi[offset];
+    const auto phi_center = phi_[offset];
 
     // Voisins horizontaux
     if (x > 0)
     {
         int left_offset = offset - 1;
 
-        if ( differentSide(phi[left_offset], phi_center) )
+        if ( differentSide(phi_[left_offset], phi_center) )
             return false;
     }
 
     if (x < w - 1)
     {
         int right_offset = offset + 1;
-        if ( differentSide(phi[right_offset], phi_center) )
+        if ( differentSide(phi_[right_offset], phi_center) )
             return false;
     }
 
@@ -226,14 +226,14 @@ inline bool ContourData::is_redundant(const ContourPoint& point) const
     if (offset >= w) // Pas dans la première ligne
     {
         int up_offset = offset - w;
-        if ( differentSide( phi[up_offset], phi_center ) )
+        if ( differentSide( phi_[up_offset], phi_center ) )
             return false;
     }
 
     if (offset < last_row_offset) // Pas dans la dernière ligne
     {
         int down_offset = offset + w;
-        if ( differentSide( phi[down_offset], phi_center ) )
+        if ( differentSide( phi_[down_offset], phi_center ) )
             return false;
     }
 
@@ -242,14 +242,14 @@ inline bool ContourData::is_redundant(const ContourPoint& point) const
     if (x > 0 && offset >= w)
     {
         int up_left_offset = offset - w - 1;
-        if ( differentSide( phi[up_left_offset], phi_center ) )
+        if ( differentSide( phi_[up_left_offset], phi_center ) )
             return false;
     }
 
     if (x < w - 1 && offset >= w)
     {
         int up_right_offset = offset - w + 1;
-        if ( differentSide( phi[up_right_offset], phi_center ) )
+        if ( differentSide( phi_[up_right_offset], phi_center ) )
             return false;
     }
 
@@ -257,14 +257,14 @@ inline bool ContourData::is_redundant(const ContourPoint& point) const
     if (x > 0 && offset < last_row_offset)
     {
         int down_left_offset = offset + w - 1;
-        if ( differentSide( phi[down_left_offset], phi_center ) )
+        if ( differentSide( phi_[down_left_offset], phi_center ) )
             return false;
     }
 
     if (x < w - 1 && offset < last_row_offset)
     {
         int down_right_offset = offset + w + 1;
-        if ( differentSide(phi[down_right_offset], phi_center) )
+        if ( differentSide(phi_[down_right_offset], phi_center) )
             return false;
     }
 #endif

@@ -64,10 +64,10 @@ public:
     void push_back(int x, int y);
 
     //! Push back a point into the shape.
-    void push_back(const Point_i& p);
+    void push_back(const Point2D_i& p);
 
     //! Push back a point into the shape.
-    void push_back(Point_i&& p);
+    void push_back(Point2D_i&& p);
 
     //! Swap the shape *this with an other shape in constant time, i.e. O(1) complexity.
     void swap(Shape& other);
@@ -82,20 +82,20 @@ public:
     bool is_valid() const;
 
     //! Gets the vector of points.
-    const std::vector<Point_i>& get_points() const { return points; }
+    const std::vector<Point2D_i>& get_points() const { return points; }
 
     //! Gets the centroid of the shape.
-    const Point_f& get_centroid() const { return centroid; }
+    const Point2D_f& get_centroid() const { return centroid; }
 
     //! Gets grid diagonal.
     static float get_grid_diagonal(int grid_width, int grid_height);
 
 private:
 
-    std::vector<Point_i> points;
+    std::vector<Point2D_i> points;
 
     //! Position of the shape's centroid.
-    Point_f centroid;
+    Point2D_f centroid;
 };
 
 }

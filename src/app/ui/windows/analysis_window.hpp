@@ -73,7 +73,7 @@ private :
     AnalysisWidget* widget2;
     QPushButton* compute_button;
 
-    std::unordered_set<ofeli_ip::Point_i> intersection;
+    std::unordered_set<ofeli_ip::Point2D_i> intersection;
 
     QDialog* result_popup;
     QLabel* hausdorff_label;

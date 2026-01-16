@@ -12,8 +12,8 @@ PhiViewModel::PhiViewModel(PhiEditor* editor,
 {
     Q_ASSERT(editor_);
 
-    background_ = QImage(editor_->get_phi().width(),
-                         editor_->get_phi().height(),
+    background_ = QImage(editor_->phi().width(),
+                         editor_->phi().height(),
                          QImage::Format_RGB32);
 
     background_.fill(Qt::black);
@@ -85,13 +85,13 @@ void PhiViewModel::updateLists()
     if (!editor_)
         return;
 
-    const int w = editor_->get_phi().width();
-    const int h = editor_->get_phi().height();
+    const int w = editor_->phi().width();
+    const int h = editor_->phi().height();
 
     l_out.clear();
     l_in.clear();
 
-    const auto phi = editor_->get_phi();
+    const auto phi = editor_->phi();
 
     for ( int y = 0; y < h; ++y )
     {
@@ -121,7 +121,7 @@ void PhiViewModel::updateListsFloodFill()
     l_out.clear();
     l_in.clear();
 
-    const QImage& phi = editor_->get_phi();
+    const QImage& phi = editor_->phi();
     const int w = phi.width();
     const int h = phi.height();
 

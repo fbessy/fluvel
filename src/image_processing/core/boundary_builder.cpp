@@ -293,7 +293,7 @@ void BoundaryBuilder::build_inner_contiguous(
 
     for( std::size_t i = 0; i < l_out.size(); i++ )
     {
-        get_position( l_out[i].get_offset(), x, y);
+        get_position( l_out[i].offset(), x, y);
 
         dx = x0 - x;
         dy = y0 - y;

@@ -53,8 +53,8 @@ private:
     QImage phiImage_;
     QImage background_;
 
-    std::vector<ofeli_ip::Point_i> l_out;
-    std::vector<ofeli_ip::Point_i> l_in;
+    std::vector<ofeli_ip::Point2D_i> l_out;
+    std::vector<ofeli_ip::Point2D_i> l_in;
 
     ShapeInfo overlayShape_;
 };

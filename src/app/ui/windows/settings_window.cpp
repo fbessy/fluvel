@@ -981,8 +981,8 @@ ShapeInfo SettingsWindow::computeShapeInfo()
                     ? ShapeType::Rectangle
                     : ShapeType::Ellipse;
 
-    const int canvasWidth = phiEditor_->get_phi().width();
-    const int canvasHeight = phiEditor_->get_phi().height();
+    const int canvasWidth = phiEditor_->phi().width();
+    const int canvasHeight = phiEditor_->phi().height();
 
     // Récupération des valeurs des sliders (en pourcentage)
     float centerXPercent = abscissa_spin->value() / 100.0f; // De -500 à +500, donc normalisé autour de 0

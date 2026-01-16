@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include <stack>
+#include <iostream>
 
 #include "contour_data.hpp"
 #include "boundary_builder.hpp"
@@ -65,7 +66,7 @@ bool ContourData::check_lists()
 {
     bool is_ok = true;
 
-    if( l_out.empty() )
+    if( l_out_.empty() )
     {
         std::cerr << std::endl <<
             " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
@@ -74,7 +75,7 @@ bool ContourData::check_lists()
         is_ok = false;
     }
 
-    if( l_in.empty() )
+    if( l_in_.empty() )
     {
         std::cerr << std::endl <<
             " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
@@ -93,15 +94,15 @@ bool ContourData::check_lists()
 
 void ContourData::allocate_lists()
 {
-    size_t perimeter = 2*( phi.get_width() + phi.get_height() );
-    preallocation_size = 3 * perimeter;
+    size_t perimeter = 2*( phi_.width() + phi_.height() );
+    preallocation_size_ = 3 * perimeter;
 
-    l_out.reserve( preallocation_size );
-    l_in.reserve( preallocation_size );
+    l_out_.reserve( preallocation_size_ );
+    l_in_.reserve( preallocation_size_ );
 }
 
 ContourData::ContourData(int phi_width, int phi_height)
-    : phi(phi_width, phi_height)
+    : phi_(phi_width, phi_height)
 {
     allocate_lists();
 
@@ -114,12 +115,11 @@ ContourData::ContourData(int phi_width, int phi_height)
 
 ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
                          int phi_width, int phi_height)
-    : phi(phi_width, phi_height)
+    : phi_(phi_width, phi_height)
 {
     allocate_lists();
 
     bool is_ok_ptr = true;
-    int x, y;
 
     if( phi_grayscale_img_data == nullptr )
     {
@@ -134,36 +134,38 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
          && is_ok_phi_dimension( phi_width )
          && is_ok_phi_dimension( phi_height ) )
     {
-        int phi_size = phi_width*phi_height;
-
-        for( int offset = 0; offset < phi_size; offset++ )
+        for( int offset = 0; offset < phi_.size(); offset++ )
         {
             if ( phi_grayscale_img_data[offset] >= 128u )
             {
-                phi[offset] = PhiValue::InsideRegion;
+                phi_[offset] = PhiValue::InsideRegion;
             }
             else
             {
-                phi[offset] = PhiValue::OutsideRegion;
+                phi_[offset] = PhiValue::OutsideRegion;
             }
         }
 
-        for( int offset = 0; offset < phi_size; offset++ )
-        {
-            phi.get_position(offset, x, y);
+        const int n = static_cast<int>(phi_.size());
 
-            if ( !is_redundant( {offset, x} ) )
+        for (int offset = 0; offset < n; ++offset)
+        {
+            const Point2D_i p = phi_.coord(offset);
+
+            if ( is_redundant( { offset, p.x } ) )
+                continue;
+
+            PhiValue& v = phi_[offset];
+
+            if (v == PhiValue::InsideRegion)
             {
-                if ( phi[offset] == PhiValue::InsideRegion )
-                {
-                    phi[offset] = PhiValue::InteriorBoundary;
-                    l_in.emplace_back( offset, x );
-                }
-                else
-                {
-                    phi[offset] = PhiValue::ExteriorBoundary;
-                    l_out.emplace_back( offset, x );
-                }
+                v = PhiValue::InteriorBoundary;
+                l_in_.emplace_back(offset, p.x);
+            }
+            else
+            {
+                v = PhiValue::ExteriorBoundary;
+                l_out_.emplace_back(offset, p.x);
             }
         }
 
@@ -173,20 +175,20 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
 
 void ContourData::initialize_with_one_ellipse()
 {
-    l_out.clear();
-    l_in.clear();
+    l_out_.clear();
+    l_in_.clear();
 
-    BoundaryBuilder init( phi.get_width(), phi.get_height(),
-                          l_out, l_in );
+    BoundaryBuilder init( phi_.width(), phi_.height(),
+                          l_out_, l_in_ );
 
     init.get_ellipse_points( 0.5f, 0.5f, 0.4f, 0.4f );
     define_phi_with_boundary();
 }
 
-ContourData::ContourData(const ContourList& l_out1,
-                         const ContourList& l_in1,
+ContourData::ContourData(const ContourList& l_out,
+                         const ContourList& l_in,
                          int phi_width, int phi_height)
-    : phi(phi_width, phi_height), l_out(l_out1), l_in(l_in1)
+    : phi_(phi_width, phi_height), l_out_(l_out), l_in_(l_in)
 {
     allocate_lists();
 
@@ -201,37 +203,37 @@ ContourData::ContourData(const ContourList& l_out1,
 }
 
 ContourData::ContourData(const ContourData& contour)
-    : phi( contour.phi ),
-    l_out( contour.l_out ),
-    l_in( contour.l_in )
+    : phi_( contour.phi_ ),
+    l_out_( contour.l_out_ ),
+    l_in_( contour.l_in_ )
 {
     allocate_lists();
 }
 
 ContourData::ContourData(ContourData&& contour) noexcept
-    : phi( std::move(contour.phi) ),
-    l_out( std::move(contour.l_out) ),
-    l_in( std::move(contour.l_in) )
+    : phi_( std::move(contour.phi_) ),
+    l_out_( std::move(contour.l_out_) ),
+    l_in_( std::move(contour.l_in_) )
 {
     allocate_lists();
 }
 
 void ContourData::define_phi_with_boundary()
 {
-    phi.memset(PhiValue::OutsideRegion);
+    phi_.fill(PhiValue::OutsideRegion);
 
-    for( std::size_t i = 0; i < l_out.size(); i++ )
+    for( const auto& p : l_out_ )
     {
-        phi[ l_out[i].get_offset() ] = PhiValue::ExteriorBoundary;
+        phi_[ p.offset() ] = PhiValue::ExteriorBoundary;
     }
 
-    for( std::size_t i = 0; i < l_in.size(); i++ )
+    for( const auto& p : l_in_ )
     {
-        do_flood_fill(l_in[i].get_offset(),
-                      PhiValue::OutsideRegion,
-                      PhiValue::InsideRegion);
+        do_flood_fill( p.offset(),
+                       PhiValue::OutsideRegion,
+                       PhiValue::InsideRegion );
 
-        phi[ l_in[i].get_offset() ] = PhiValue::InteriorBoundary;
+        phi_[ p.offset() ] = PhiValue::InteriorBoundary;
     }
 }
 
@@ -240,11 +242,11 @@ void ContourData::do_flood_fill(int offset_seed,
                                 PhiValue replacement_value)
 {
     if( target_value != replacement_value &&
-        offset_seed < phi.get_width()*phi.get_height()-1 )
+        offset_seed < phi_.width()*phi_.height()-1 )
     {
-        std::stack<int> offset_seeds;
+        std::stack<size_t> offset_seeds;
         // top seed coordinates (x_ts,y_ts) and x for scan the row
-        int x_ts, y_ts, x;
+        int x;
         bool span_up, span_down;
 
         offset_seeds.push(offset_seed);
@@ -252,13 +254,13 @@ void ContourData::do_flood_fill(int offset_seed,
         while( !offset_seeds.empty() )
         {
             // unstack the top seed
-            phi.get_position(offset_seeds.top(),
-                             x_ts,y_ts); // x_ts and y_ts passed by reference
+            const auto [x_ts, y_ts] = phi_.coord( offset_seeds.top() );
+
             offset_seeds.pop();
 
             // x initialization at the left-most point of the seed
             x = x_ts;
-            while( x > 0 && phi(x-1,y_ts) == target_value )
+            while( x > 0 && phi_.at(x-1,y_ts) == target_value )
             {
                 x--;
             }
@@ -267,35 +269,35 @@ void ContourData::do_flood_fill(int offset_seed,
             span_down = false;
 
             // pixels are treated row-wise
-            while( x < phi.get_width() &&
-                   phi(x,y_ts) == target_value )
+            while( x < phi_.width() &&
+                   phi_.at(x,y_ts) == target_value )
             {
-                phi(x,y_ts) = replacement_value;
+                phi_.at(x,y_ts) = replacement_value;
 
                 if( !span_up &&
                     y_ts > 0
-                    && phi(x,y_ts-1) == target_value )
+                    && phi_.at(x,y_ts-1) == target_value )
                 {
-                    offset_seeds.push( phi.get_offset(x,y_ts-1) );
+                    offset_seeds.push( phi_.offset(x,y_ts-1) );
                     span_up = true;
                 }
                 else if( span_up &&
                          y_ts > 0 &&
-                         phi(x,y_ts-1) != target_value )
+                         phi_.at(x,y_ts-1) != target_value )
                 {
                     span_up = false;
                 }
 
                 if( !span_down &&
-                    y_ts < phi.get_height()-1 &&
-                    phi(x,y_ts+1) == target_value )
+                    y_ts < phi_.height()-1 &&
+                    phi_.at(x,y_ts+1) == target_value )
                 {
-                    offset_seeds.push( phi.get_offset(x,y_ts+1) );
+                    offset_seeds.push( phi_.offset(x,y_ts+1) );
                     span_down = true;
                 }
                 else if( span_down &&
-                         y_ts < phi.get_height()-1 &&
-                         phi(x,y_ts+1) != target_value )
+                         y_ts < phi_.height()-1 &&
+                         phi_.at(x,y_ts+1) != target_value )
                 {
                     span_down = false;
                 }

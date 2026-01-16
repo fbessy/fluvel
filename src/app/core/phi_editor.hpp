@@ -33,7 +33,7 @@ public:
     void accept();
     void reject();
 
-    const QImage& get_phi() const { return current; }
+    const QImage& phi() const { return current; }
     bool is_redundant(int x, int y);
 
 public slots:

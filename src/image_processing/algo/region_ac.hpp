@@ -188,11 +188,11 @@ RegionAc::RegionAc(ImageSpan8 image1,
     image(image1),
     region_config(region_config1),
     average_in(255), average_out(0),
-    sum_total(0), pxl_nbr_total(image.get_size()),
+    sum_total(0), pxl_nbr_total(image.size()),
     sum_out(0), pxl_nbr_out(0)
 {
-    assert( image.get_width()  == cd.get_phi().get_width() &&
-            image.get_height() == cd.get_phi().get_height()   );
+    assert( image.width()  == cd_.phi().width() &&
+            image.height() == cd_.phi().height()   );
 
     initialize_sums();
     RegionAc::do_specific_cycle1();
@@ -200,7 +200,7 @@ RegionAc::RegionAc(ImageSpan8 image1,
 
 inline void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    const int pxl = int( image.pixel_at( point.get_offset() ) );
+    const int pxl = int( image.pixel_at( point.offset() ) );
 
     const int diff_out = pxl - int(average_out);
     const int diff_in  = pxl - int(average_in);

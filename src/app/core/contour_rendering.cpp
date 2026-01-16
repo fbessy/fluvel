@@ -118,7 +118,7 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
 
         for( const auto& point : list )
         {
-            offset = point.get_offset();
+            offset = point.offset();
 
             assert(offset >= 0 && offset < img_rgb32_width*img_rgb32_height );
 
@@ -152,7 +152,7 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
 
             for( const auto& point : list )
             {
-                offset = point.get_offset();
+                offset = point.offset();
 
                 y = offset/small_img_width;
                 x = offset-y*small_img_width;
@@ -213,7 +213,7 @@ void draw_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
 
     for( const auto& point : list )
     {
-        offset = point.get_offset() * 4;
+        offset = point.offset() * 4;
 
         img1_rgb_data[ offset+2 ] = color1.red;
         img1_rgb_data[ offset+1 ] = color1.green;
@@ -233,7 +233,7 @@ void erase_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
 
     for( const auto& point : list )
     {
-        offset = point.get_offset() * 4;
+        offset = point.offset() * 4;
 
         img_rgb_data[ offset+2 ] = img_to_copy[ offset+2 ];
         img_rgb_data[ offset+1 ] = img_to_copy[ offset+1 ];
@@ -250,7 +250,7 @@ void erase_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
 
     for( const auto& point : list )
     {
-        offset = point.get_offset() * 4;
+        offset = point.offset() * 4;
 
         img1_rgb_data[ offset+2 ] = img_to_copy[ offset+2 ];
         img1_rgb_data[ offset+1 ] = img_to_copy[ offset+1 ];
@@ -271,7 +271,7 @@ void erase_list_to_img_grayscale(const std::vector<ofeli_ip::ContourPoint>& list
 
     for( const auto& point : list )
     {
-        offset = point.get_offset();
+        offset = point.offset();
         intensity = img_grayscale_to_copy[ offset ];
 
         img_rgb_data[ 4*offset+2 ] = intensity;

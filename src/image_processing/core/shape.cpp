@@ -68,12 +68,12 @@ void Shape::push_back(int x, int y)
     points.emplace_back( x, y );
 }
 
-void Shape::push_back(const Point_i& p)
+void Shape::push_back(const Point2D_i& p)
 {
     points.push_back( p );
 }
 
-void Shape::push_back(Point_i&& p)
+void Shape::push_back(Point2D_i&& p)
 {
     points.emplace_back( std::move(p) );
 }
@@ -99,7 +99,7 @@ void Shape::calculate_centroid()
 
     if( points.size() >= 1 )
     {
-        Point_i sum( 0, 0 );
+        Point2D_i sum( 0, 0 );
 
         for( const auto& p : points )
         {

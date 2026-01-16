@@ -91,7 +91,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         if ( !region_ac || configChanged )
         {
             region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
-                                                                  ofeli_ip::ContourData(img_algo.get_width(), img_algo.get_height()),
+                                                                  ofeli_ip::ContourData(img_algo.width(), img_algo.height()),
                                                                   config.algo_config,
                                                                   config.region_ac_config);
 
@@ -108,15 +108,15 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         {
             if (downscale_fctr == 1)
             {
-                draw_list_to_img(region_ac->get_l_out(), config.color_out, config.outside_combo,
+                draw_list_to_img(region_ac->l_out(), config.color_out, config.outside_combo,
                                  result.bits(), result.width(), result.height());
-                draw_list_to_img(region_ac->get_l_in(), config.color_in, config.inside_combo,
+                draw_list_to_img(region_ac->l_in(), config.color_in, config.inside_combo,
                                  result.bits(), result.width(), result.height());
             }
             else
             {
-                draw_upscale_list(region_ac->get_l_out(), config.color_out, config.outside_combo, downscale_fctr, result);
-                draw_upscale_list(region_ac->get_l_in(), config.color_in, config.inside_combo, downscale_fctr, result);
+                draw_upscale_list(region_ac->l_out(), config.color_out, config.outside_combo, downscale_fctr, result);
+                draw_upscale_list(region_ac->l_in(), config.color_in, config.inside_combo, downscale_fctr, result);
             }
         }
     }

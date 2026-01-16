@@ -39,6 +39,8 @@
 
 #include "edge_ac.hpp"
 
+#include <cstring>
+
 namespace ofeli_ip
 {
 
@@ -46,9 +48,7 @@ constexpr auto GRAYSCALE_DEPTH = 256u;
 
 void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    int x, y;
-    cd.get_phi().get_position( point.get_offset(),
-                               x,y ); // ux and uy passed by reference
+    const auto [x, y] = cd_.phi().coord( point.offset() );
 
     int max_out = 0;
     int max_in = 0;
@@ -59,12 +59,12 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
     {
         for( int dy = -1; dy <= 1; dy++ )
         {
-            if(    x+dx >= 0 && x+dx < cd.get_phi().get_width()
-                && y+dy >= 0 && y+dy < cd.get_phi().get_height() )
+            if(    x+dx >= 0 && x+dx < cd_.phi().width()
+                && y+dy >= 0 && y+dy < cd_.phi().height() )
             {
                 dd = std::abs( int( gradient_image.pixel_at(x,y) ) - int( gradient_image.pixel_at(x + dx, y + dy)  ) );
 
-                if( isOutside( cd.get_phi()(x + dx, y + dy) ) )
+                if( isOutside( cd_.phi().at(x + dx, y + dy) ) )
                 {
                     max_out = std::max(max_out, dd);
                 }
@@ -89,11 +89,11 @@ int EdgeAc::get_global_speed_sign() const
     unsigned int sum_in = 0;
     unsigned int sum_out = 0;
 
-    const int img_size = gradient_image.get_size();
+    const int img_size = gradient_image.size();
 
     for( int offset = 0; offset < img_size; offset++ )
     {
-        if( isInside( cd.get_phi()[offset] ) )
+        if( isInside( cd_.phi()[offset] ) )
         {
             sum_in += (unsigned int)(gradient_image.pixel_at(offset));
         }
@@ -124,7 +124,7 @@ unsigned char EdgeAc::do_otsu_method(const ImageSpan8& image)
     std::memset( (void*)histogram, 0, GRAYSCALE_DEPTH * sizeof( unsigned int ) );
 
     for( int offset = 0;
-         offset < image.get_size();
+         offset < image.size();
          offset++ )
     {
         histogram[ image.pixel_at(offset) ]++;
@@ -150,13 +150,13 @@ unsigned char EdgeAc::do_otsu_method(const ImageSpan8& image)
     // class1 <= t and class2 > t
 
     t = 0;
-    weight2 = image.get_size();
+    weight2 = image.size();
 
     while( t < (GRAYSCALE_DEPTH-1) &&
            weight2 != 0 )
     {
         weight1 += histogram[t];
-        weight2 = image.get_size()-weight1;
+        weight2 = image.size()-weight1;
 
         if( weight1 != 0 &&
             weight2 != 0 )

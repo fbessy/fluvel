@@ -70,7 +70,7 @@ constexpr size_t INITIAL_ARRAY_ALLOC_SIZE = 10000u;
 //! to compute in constant time ( complexity in 0(1) ), with an image or a matrix.
 HausdorffDistance::HausdorffDistance(Shape& shape_a1,
                                      Shape& shape_b1,
-                                     const std::unordered_set<Point_i>& intersection1):
+                                     const std::unordered_set<Point2D_i>& intersection1):
     shape_a(shape_a1),
     shape_b(shape_b1),
     intersection_a_b(intersection1),
@@ -109,7 +109,7 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
                                             float& directed_hd,
                                             std::vector<float>& directed_min_dists)
 {
-    Point_f relative_p1, relative_p2;
+    Point2D_f relative_p1, relative_p2;
 
     float euclidean_dist, min_dist, sq;
 
@@ -281,7 +281,7 @@ float HausdorffDistance::get_centroids_distance() const
     if( shape_a.is_valid() &&
         shape_b.is_valid() )
     {
-        Point_f gap( shape_b.get_centroid().x - shape_a.get_centroid().x,
+        Point2D_f gap( shape_b.get_centroid().x - shape_a.get_centroid().x,
                      shape_b.get_centroid().y - shape_a.get_centroid().y );
 
         float sq_val = square( gap.x ) + square( gap.y );

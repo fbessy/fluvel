@@ -67,12 +67,12 @@ void ActiveContourWorker::step()
 
 bool ActiveContourWorker::stepOnce()
 {
-    if ( !ac || ac->get_state() == ofeli_ip::State::Stopped )
+    if ( !ac || ac->state() == ofeli_ip::State::Stopped )
         return true;
 
     ac->evolve_one_iteration();
 
-    return ac->get_state() == ofeli_ip::State::Stopped;
+    return ac->state() == ofeli_ip::State::Stopped;
 }
 
 void ActiveContourWorker::setImage(const QImage& img)
@@ -148,7 +148,7 @@ void ActiveContourWorker::onTimeout()
 void ActiveContourWorker::updateStats()
 {
     AlgoStats stats;
-    stats.iteration = ac ? ac->get_total_iter() : 0;
+    stats.iteration = ac ? ac->total_iter() : 0;
 
     QMutexLocker lock(&m_statsMutex);
     m_currentStats = stats;
@@ -242,8 +242,8 @@ void ActiveContourWorker::drawAndEmitResult()
     if ( ac == nullptr )
         return;
 
-    ofeli_ip::ContourList l_out = ac->get_l_out();
-    ofeli_ip::ContourList l_in  = ac->get_l_in();
+    ofeli_ip::ContourList l_out = ac->l_out();
+    ofeli_ip::ContourList l_in  = ac->l_in();
 
     draw_list_to_img(l_out, config.color_out, config.outside_combo,
                      result.bits(), result.width(), result.height());
@@ -260,8 +260,8 @@ void ActiveContourWorker::emitContourOnly()
 
     int y;
 
-    const auto& l_out = ac->get_l_out();
-    const auto& l_in  = ac->get_l_in();
+    const auto& l_out = ac->l_out();
+    const auto& l_in  = ac->l_in();
 
     QVector<QPoint> outPts;
     QVector<QPoint> inPts;
@@ -269,19 +269,19 @@ void ActiveContourWorker::emitContourOnly()
     outPts.reserve(l_out.size());
     inPts.reserve(l_in.size());
 
-    const int width = ac->get_phi().get_width();
+    const int width = ac->phi().width();
 
     for (const auto& p : l_out)
     {
-        y =  p.get_offset() / width;
-        outPts.emplace_back( p.get_x(), y );
+        y =  p.offset() / width;
+        outPts.emplace_back( p.x(), y );
     }
 
 
     for (const auto& p : l_in)
     {
-        y =  p.get_offset() / width;
-        inPts.emplace_back( p.get_x(), y );
+        y =  p.offset() / width;
+        inPts.emplace_back( p.x(), y );
     }
 
     emit contourUpdated(outPts, inPts);

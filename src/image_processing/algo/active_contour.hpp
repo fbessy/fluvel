@@ -43,6 +43,8 @@
 #include <vector>
 #include <unordered_set>
 #include <cstddef>
+#include <iostream>
+#include <cmath>
 
 #include "contour_data.hpp"
 #include "shape.hpp"
@@ -243,7 +245,7 @@ build_gaussian_kernel_linear(int kernel_length,
 struct WayContext
 {
     WayContext(ContourData& contour)
-        : l_out(contour.get_l_out()), l_in(contour.get_l_in())
+        : l_out(contour.l_out()), l_in(contour.l_in())
     {
     }
 
@@ -342,24 +344,24 @@ struct EvolutionData
     float centroids_distance;
 
     //! Intersection, i.e common points between #l_out_shape and #previous_shape.
-    std::unordered_set<Point_i>intersection;
+    std::unordered_set<Point2D_i>intersection;
 
     //! Constructor.
     EvolutionData(const ContourData& cd)
         : cycle_iter( 0 ),
           total_iter( 0 ),
-          total_iter_max( 5*std::max(cd.get_phi().get_width(),
-                                     cd.get_phi().get_height()) ),
+          total_iter_max( 5*std::max(cd.phi().width(),
+                                     cd.phi().height()) ),
           is_moving( true ),
 
-          l_out_shape( cd.get_preallocation_size() ),
-          previous_shape( cd.get_preallocation_size() ),
+          l_out_shape( cd.preallocation_size() ),
+          previous_shape( cd.preallocation_size() ),
           previous_total_iter(0),
           previous_quantile(0.f),
           hausdorff_quantile(std::numeric_limits<float>().max()),
           centroids_distance(std::numeric_limits<float>().max())
     {
-        intersection.reserve( cd.get_preallocation_size() );
+        intersection.reserve( cd.preallocation_size() );
     }
 
     //! Reinitialize evolution data. Used for video tracking.
@@ -398,27 +400,27 @@ public :
     void evolve_n_cycles(int n_cycles);
 
     //! Getter for the discrete level-set function with only 4 PhiValue possible.
-    const Matrix<PhiValue>& get_phi() const { return cd.get_phi(); }
+    const Matrix2D<PhiValue>& phi() const { return cd_.phi(); }
 
     //! Getter for the list of offset points representing the exterior boundary.
-    const ContourList& get_l_out() const { return cd.get_l_out(); }
+    const ContourList& l_out() const { return cd_.l_out(); }
     //! Getter for the list of offset points representing the interior boundary.
-    const ContourList& get_l_in() const { return cd.get_l_in(); }
+    const ContourList& l_in() const { return cd_.l_in(); }
 
     //! Getter method for #state.
-    State get_state() const { return state; }
+    State state() const { return state_; }
 
     //! Getter method for #stopping_status.
-    StoppingStatus get_stopping_status() const { return stopping_status; }
+    StoppingStatus stopping_status() const { return stopping_status_; }
 
     //! Getter method for #total_iter.
-    int get_total_iter() const { return ed.total_iter; }
+    int total_iter() const { return ed_.total_iter; }
 
     //! Getter method for #hausdorff_quantile.
-    float get_hausdorff_quantile() const { return ed.hausdorff_quantile; }
+    float hausdorff_quantile() const { return ed_.hausdorff_quantile; }
 
     //! Getter method for #centroids_distance.
-    float get_centroids_distance() const { return ed.centroids_distance; }
+    float centroids_distance() const { return ed_.centroids_distance; }
 
 protected :
 
@@ -434,7 +436,7 @@ protected :
 
     //! Representation data of the active contour
     //! (discret level-set function phi, Lin and Lout)
-    ContourData cd;
+    ContourData cd_;
 
 private :
 
@@ -502,38 +504,38 @@ private :
     static int get_sign_opposite(PhiValue phi_val);
 
     //! To transformate active contour data point to the points for the Hausdorff distance.
-    static Point_i from_ContourPoint(const ContourPoint& point,
+    static Point2D_i from_ContourPoint(const ContourPoint& point,
                                      int grid_width);
 
     //! Generic configuration of the active contour.
-    const AcConfig config;
+    const AcConfig config_;
 
     //! Number of iterations in one cycle1-cycle2.
-    int n_iter_by_cycle;
+    int n_iter_by_cycle_;
 
     //! Linear gaussian kernel used to calculate Fint.
-    LinearGaussianKernel kernel;
+    LinearGaussianKernel kernel_;
 
     //! Evolution state of the active contour given at a current iteration.
     //!  There are 4 states : Cycle1, Cycle2, LastCycle2 and Stopped.
-    State state;
+    State state_;
 
     //! Stopping condition status.
-    StoppingStatus stopping_status;
+    StoppingStatus stopping_status_;
 
     //! A waycontext to perform a switch_in or a switch_out generically.
-    WayContext ctx;
+    WayContext ctx_;
 
     //! Evolution data of the active contour used by #calculate_state_cycle_1() and
     //! #calculate_state_cycle_2() to calculate #state.
-    EvolutionData ed;
+    EvolutionData ed_;
 
     //! Boolean egals to true if the cycle 2 stopping condition (based on hausdorff distance)
     //! is performed.
-    bool is_cycle2_condition;
+    bool is_cycle2_condition_;
 
     //! Temporary points to add after each scan of the list #l_in or #l_out.
-    ContourList points_to_append;
+    ContourList points_to_append_;
 };
 
 template <typename T>
@@ -553,22 +555,22 @@ inline void ActiveContour::add_region_neighbor(int neighbor_offset,
                                                int neighbor_x)
 {
     // if a neighbor ∈ one region
-    if( cd.get_phi()[ neighbor_offset ] == ctx.neighbor_region_phi_val )
+    if( cd_.phi()[ neighbor_offset ] == ctx_.neighbor_region_phi_val )
     {
-        cd.get_phi()[ neighbor_offset ] = ctx.neighbor_boundary_phi_val;
+        cd_.phi()[ neighbor_offset ] = ctx_.neighbor_boundary_phi_val;
 
         // neighbor ∈ region ==> ∈ neighbor list
-        points_to_append.emplace_back( neighbor_offset, neighbor_x );
+        points_to_append_.emplace_back( neighbor_offset, neighbor_x );
     }
 }
 
 //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one scanned boundary list to the other adjacent.
 inline void ActiveContour::switch_one_way(ContourPoint& point)
 {
-    int offset = point.get_offset();
-    int x = point.get_x();
-    int w = cd.get_phi().get_width();
-    int h = cd.get_phi().get_height();
+    int offset = point.offset();
+    int x = point.x();
+    int w = cd_.phi().width();
+    int h = cd_.phi().height();
     int last_row_offset = w * (h - 1);
 
     // Voisins horizontaux
@@ -627,13 +629,13 @@ inline void ActiveContour::switch_one_way(ContourPoint& point)
 
     // change the phi value of the current point
     // according to the phi value of the adjacent list
-    cd.get_phi()[ offset ] = ctx.adjacent_phi_val;
+    cd_.phi()[ offset ] = ctx_.adjacent_phi_val;
 
     // switch the current point to the adjacent boundary list
-    ctx.adjacent_boundary->emplace_back( offset, x );
+    ctx_.adjacent_boundary->emplace_back( offset, x );
 
-    point = ctx.scanned_boundary->back();
-    ctx.scanned_boundary->pop_back();
+    point = ctx_.scanned_boundary->back();
+    ctx_.scanned_boundary->pop_back();
 }
 
 }
@@ -753,8 +755,8 @@ inline void ActiveContour::switch_one_way(ContourPoint& point)
  *
  * -----------------------------   Display the initial active contour   -----------------------------
  *
- * const ofeli::list<int>* Lout = &ac.get_l_out();
- * const ofeli::list<int>* Lin = &ac.get_l_in();
+ * const ofeli::list<int>* Lout = &ac.l_out();
+ * const ofeli::list<int>* Lin = &ac.l_in();
  *
  * // put the color of lists into the displayed buffer
  * for( auto it = Lout->get_begin(); it != Lout->get_end(); ++it )
@@ -814,8 +816,8 @@ inline void ActiveContour::switch_one_way(ContourPoint& point)
  *     ++ac;
  *
  *     // to get the temporary result
- *     Lout = &ac.get_l_out();
- *     Lin = &ac.get_l_in();
+ *     Lout = &ac.l_out();
+ *     Lin = &ac.l_in();
  *
  *     // put the color of lists into the displayed buffer
  *     for( auto it = Lout->get_begin(); it != Lout->get_end(); ++it )
