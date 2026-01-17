@@ -100,35 +100,17 @@ struct AcConfig
     //! Maximum number of times the active contour can evolve in a cycle 2 with \a Fint speed.
     int Ns;
 
-    //! Check values of a configuration.
-    void check()
+    //! Normalize values of a configuration.
+    void normalize()
     {
         if( disk_radius < 1 )
-        {
-            std::cerr << std::endl <<
-                " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-                "Precondition, kernel_length must not be less than 3. It is set to 3.";
-
             disk_radius = 1;
-        }
 
         if( Na < 1 )
-        {
-            std::cerr << std::endl <<
-                " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-                "Precondition, Na is positive and must not equal to zero. It is set to 1.";
-
             Na = 1;
-        }
 
         if( Ns < 1 )
-        {
-            std::cerr << std::endl <<
-                " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-                "Precondition, Ns is positive and must not equal to zero. It is set to 1.";
-
             Ns = 1;
-        }
     }
 
     //! Default constructor.
@@ -144,7 +126,7 @@ struct AcConfig
         disk_radius( copied.disk_radius ),
         Na( copied.Na ), Ns( copied.Ns )
     {
-        this->check();
+        this->normalize();
     }
 
     //! Copy assignement operator.
@@ -155,7 +137,7 @@ struct AcConfig
         this->Na = rhs.Na;
         this->Ns = rhs.Ns;
 
-        this->check();
+        this->normalize();
 
         return *this;
     }
@@ -217,10 +199,6 @@ struct BoundarySwitchContext
             neighbor_boundary_phi_val = PhiValue::InteriorBoundary;
 
             region_redundant_phi_val  = PhiValue::OutsideRegion;
-        }
-        else
-        {
-            std::cerr << "Error BoundarySwitch value" << std::endl;
         }
     }
 
