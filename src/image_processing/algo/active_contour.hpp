@@ -434,13 +434,13 @@ private :
     StoppingStatus stopping_status_;
 
     //! BoundarySwitchContext for the procedure switch_in.
-    BoundarySwitchContext ctx_in_;
+    const BoundarySwitchContext ctx_in_;
 
     //! BoundarySwitchContext for the procedure switch_out.
-    BoundarySwitchContext ctx_out_;
+    const BoundarySwitchContext ctx_out_;
 
     //! A selector (pointer) to perform a switch generically. It pointes to ctx_in_ or ctx_out_.
-    BoundarySwitchContext* ctx_;
+    const BoundarySwitchContext* ctx_;
 
     //! Evolution data of the active contour used by #check_state_step1() and
     //! #update_state_cycle2() to calculate #state.
