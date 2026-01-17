@@ -160,65 +160,41 @@ struct AcConfig
     }
 };
 
-//! \class BoundarySwitchContext to perform a switch generically for both procedures switch in and switch out.
 struct BoundarySwitchContext
 {
-    BoundarySwitchContext(ContourData& contour)
-        : l_out(contour.l_out()), l_in(contour.l_in())
-    {
-    }
-
-    void set_context(BoundarySwitch ctx_cfg)
-    {
-        if ( ctx_cfg == BoundarySwitch::In )
-        {
-            mode                      = BoundarySwitch::In;
-
-            scanned_boundary          = &l_out;
-            adjacent_boundary         = &l_in;
-
-            way                       = SpeedValue::GoOutward;
-
-            adjacent_phi_val          = PhiValue::InteriorBoundary;
-            neighbor_region_phi_val   = PhiValue::OutsideRegion;
-            neighbor_boundary_phi_val = PhiValue::ExteriorBoundary;
-
-            region_redundant_phi_val  = PhiValue::InsideRegion;
-        }
-        else if ( ctx_cfg == BoundarySwitch::Out )
-        {
-            mode                      = BoundarySwitch::Out;
-
-            scanned_boundary          = &l_in;
-            adjacent_boundary         = &l_out;
-
-            way                       = SpeedValue::GoInward;
-
-            adjacent_phi_val          = PhiValue::ExteriorBoundary;
-            neighbor_region_phi_val   = PhiValue::InsideRegion;
-            neighbor_boundary_phi_val = PhiValue::InteriorBoundary;
-
-            region_redundant_phi_val  = PhiValue::OutsideRegion;
-        }
-    }
-
-    BoundarySwitch mode;
-
-    ContourList& l_out;
-    ContourList& l_in;
-
-    ContourList* scanned_boundary;
-    ContourList* adjacent_boundary;
-
+    ContourList& scanned_boundary;
+    ContourList& adjacent_boundary;
     SpeedValue way;
-
-    // for switch_in / switch_out step
     PhiValue adjacent_phi_val;
     PhiValue neighbor_region_phi_val;
     PhiValue neighbor_boundary_phi_val;
-
-    // for eliminate step
     PhiValue region_redundant_phi_val;
+
+    static BoundarySwitchContext make_switch_in(ContourData& cd)
+    {
+        return {
+            cd.l_out(),
+            cd.l_in(),
+            SpeedValue::GoOutward,
+            PhiValue::InteriorBoundary,
+            PhiValue::OutsideRegion,
+            PhiValue::ExteriorBoundary,
+            PhiValue::InsideRegion
+        };
+    }
+
+    static BoundarySwitchContext make_switch_out(ContourData& cd)
+    {
+        return {
+            cd.l_in(),
+            cd.l_out(),
+            SpeedValue::GoInward,
+            PhiValue::ExteriorBoundary,
+            PhiValue::InsideRegion,
+            PhiValue::InteriorBoundary,
+            PhiValue::OutsideRegion
+        };
+    }
 };
 
 //! \class EvolutionData
@@ -372,10 +348,13 @@ private :
     //! Performs one elementary step in Cycle1 (external / data-dependent evolution, speed Fd).
     void step_cycle2();
 
+    //! It selects the context.
+    void select_context(BoundarySwitch ctx_choice);
+
     //! Performs one directional topological update step (in or out).
     //! The step includes velocity computation, boundary switching,
     //! and adjacent boundary cleanup.
-    bool directional_substep(BoundarySwitch ctx_cfg);
+    bool directional_substep(BoundarySwitch ctx_choice);
 
     //! Computes the speed for all points of a boundary list #l_out or #l_in.
     void compute_speed(ContourList& boundary);
@@ -450,8 +429,14 @@ private :
     //! Stopping condition status.
     StoppingStatus stopping_status_;
 
-    //! A BoundarySwitchContext to perform a switch_in or a switch_out generically.
-    BoundarySwitchContext ctx_;
+    //! BoundarySwitchContext for the procedure switch_in.
+    BoundarySwitchContext ctx_in_;
+
+    //! BoundarySwitchContext for the procedure switch_out.
+    BoundarySwitchContext ctx_out_;
+
+    //! A BoundarySwitchContext selector to perform a switch generically.
+    BoundarySwitchContext* ctx_;
 
     //! Evolution data of the active contour used by #check_state_step1() and
     //! #update_state_cycle2() to calculate #state.

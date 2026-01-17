@@ -154,7 +154,7 @@ private :
 
     //! Updates variables #sum_in, #sum_out and #pxl_nbr_out in order to calculate the means #average_out and #average_in in constant time ( complexity 0(1) ).
     virtual void do_specific_when_switch(int offset,
-                                         BoundarySwitch ctx_cfg) override;
+                                         BoundarySwitch ctx_choice) override;
 
     //! Image wrapper.
     ImageSpan8 image;
@@ -212,14 +212,14 @@ inline void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 }
 
 inline void RegionAc::do_specific_when_switch(int offset,
-                                              BoundarySwitch ctx_cfg)
+                                              BoundarySwitch ctx_choice)
 {
-    if ( ctx_cfg == BoundarySwitch::In )
+    if ( ctx_choice == BoundarySwitch::In )
     {
         sum_out -= image.pixel_at(offset);
         pxl_nbr_out--;
     }
-    else if ( ctx_cfg == BoundarySwitch::Out )
+    else if ( ctx_choice == BoundarySwitch::Out )
     {
         sum_out += image.pixel_at(offset);
         pxl_nbr_out++;

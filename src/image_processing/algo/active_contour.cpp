@@ -54,7 +54,9 @@ ActiveContour::ActiveContour(const ContourData& initial_contour,
     cd_( initial_contour ),
     state_( PhaseState::Cycle1 ),
     stopping_status_( StoppingStatus::None ),
-    ctx_( cd_ ),
+    ctx_in_(BoundarySwitchContext::make_switch_in(cd_)),
+    ctx_out_(BoundarySwitchContext::make_switch_out(cd_)),
+    ctx_(&ctx_in_),
     ed_( cd_ ),
     is_cycle2_condition_( true )
 {
@@ -78,7 +80,9 @@ ActiveContour::ActiveContour(ContourData&& initial_contour,
     cd_( std::move(initial_contour) ),
     state_( PhaseState::Cycle1 ),
     stopping_status_( StoppingStatus::None ),
-    ctx_( cd_ ),
+    ctx_in_(BoundarySwitchContext::make_switch_in(cd_)),
+    ctx_out_(BoundarySwitchContext::make_switch_out(cd_)),
+    ctx_(&ctx_in_),
     ed_( cd_ ),
     is_cycle2_condition_(true)
 {
@@ -194,14 +198,25 @@ bool ActiveContour::converged() const
            || stopping_status_ == StoppingStatus::Hausdorff;
 }
 
-bool ActiveContour::directional_substep(BoundarySwitch ctx_cfg)
+void ActiveContour::select_context(BoundarySwitch ctx_choice)
+{
+    if( ctx_choice == BoundarySwitch::In )
+    {
+        ctx_ = &ctx_in_;
+    }
+    else if ( ctx_choice == BoundarySwitch::Out )
+    {
+        ctx_ = &ctx_out_;
+    }
+}
+
+bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
 {
     bool is_moving = false;
+    select_context( ctx_choice );
 
-    ctx_.set_context( ctx_cfg );
-
-    auto& scanned  = *ctx_.scanned_boundary;
-    auto& adjacent = *ctx_.adjacent_boundary;
+    auto& scanned  = ctx_->scanned_boundary;
+    auto& adjacent = ctx_->adjacent_boundary;
 
     points_to_append_.clear();
 
@@ -211,12 +226,12 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_cfg)
     {
         auto& point = scanned[i];
 
-        if( point.speed() == ctx_.way )
+        if( point.speed() == ctx_->way )
         {
             is_moving = true;
 
             do_specific_when_switch( point.offset(),
-                                     ctx_.mode );
+                                     ctx_choice );
 
             switch_boundary_point( point );
         }
@@ -233,7 +248,7 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_cfg)
     if( is_moving )
     {
         eliminate_redundant_points( adjacent,
-                                    ctx_.region_redundant_phi_val );
+                                    ctx_->region_redundant_phi_val );
     }
 
     return is_moving;
@@ -303,22 +318,22 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
 
     // change the phi value of the current point
     // according to the phi value of the adjacent list
-    cd_.phi()[ offset ] = ctx_.adjacent_phi_val;
+    cd_.phi()[ offset ] = ctx_->adjacent_phi_val;
 
     // switch the current point to the adjacent boundary list
-    ctx_.adjacent_boundary->emplace_back( offset, x );
+    ctx_->adjacent_boundary.emplace_back( offset, x );
 
-    point = ctx_.scanned_boundary->back();
-    ctx_.scanned_boundary->pop_back();
+    point = ctx_->scanned_boundary.back();
+    ctx_->scanned_boundary.pop_back();
 }
 
 void ActiveContour::add_region_neighbor(int neighbor_offset,
                                         int neighbor_x)
 {
     // if a neighbor ∈ one region
-    if( cd_.phi()[ neighbor_offset ] == ctx_.neighbor_region_phi_val )
+    if( cd_.phi()[ neighbor_offset ] == ctx_->neighbor_region_phi_val )
     {
-        cd_.phi()[ neighbor_offset ] = ctx_.neighbor_boundary_phi_val;
+        cd_.phi()[ neighbor_offset ] = ctx_->neighbor_boundary_phi_val;
 
         // neighbor ∈ region ==> ∈ neighbor list
         points_to_append_.emplace_back( neighbor_offset, neighbor_x );
