@@ -352,6 +352,9 @@ private :
     //! It selects the context.
     void select_context(BoundarySwitch ctx_choice);
 
+    //! Get the selected context.
+    const BoundarySwitchContext& context() { return *ctx_; }
+
     //! Performs one directional topological update step (in or out).
     //! The step includes velocity computation, boundary switching,
     //! and adjacent boundary cleanup.

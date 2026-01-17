@@ -213,10 +213,12 @@ void ActiveContour::select_context(BoundarySwitch ctx_choice)
 bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
 {
     bool is_moving = false;
-    select_context( ctx_choice );
 
-    auto& scanned  = ctx_->scanned_boundary;
-    auto& adjacent = ctx_->adjacent_boundary;
+    select_context( ctx_choice );
+    const auto& ctx = context();
+
+    auto& scanned  = ctx.scanned_boundary;
+    auto& adjacent = ctx.adjacent_boundary;
 
     points_to_append_.clear();
 
@@ -226,7 +228,7 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
     {
         auto& point = scanned[i];
 
-        if( point.speed() == ctx_->target_direction )
+        if( point.speed() == ctx.target_direction )
         {
             is_moving = true;
 
@@ -248,7 +250,7 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
     if( is_moving )
     {
         eliminate_redundant_points( adjacent,
-                                    ctx_->region_redundant_phi_val );
+                                    ctx.region_redundant_phi_val );
     }
 
     return is_moving;
@@ -316,24 +318,28 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
     }
 #endif
 
+    const auto& ctx = context();
+
     // change the phi value of the current point
     // according to the phi value of the adjacent list
-    cd_.phi()[ offset ] = ctx_->adjacent_phi_val;
+    cd_.phi()[ offset ] = ctx.adjacent_phi_val;
 
     // switch the current point to the adjacent boundary list
-    ctx_->adjacent_boundary.emplace_back( offset, x );
+    ctx.adjacent_boundary.emplace_back( offset, x );
 
-    point = ctx_->scanned_boundary.back();
-    ctx_->scanned_boundary.pop_back();
+    point = ctx.scanned_boundary.back();
+    ctx.scanned_boundary.pop_back();
 }
 
 void ActiveContour::add_region_neighbor(int neighbor_offset,
                                         int neighbor_x)
 {
+    const auto& ctx = context();
+
     // if a neighbor ∈ one region
-    if( cd_.phi()[ neighbor_offset ] == ctx_->neighbor_region_phi_val )
+    if( cd_.phi()[ neighbor_offset ] == ctx.neighbor_region_phi_val )
     {
-        cd_.phi()[ neighbor_offset ] = ctx_->neighbor_boundary_phi_val;
+        cd_.phi()[ neighbor_offset ] = ctx.neighbor_boundary_phi_val;
 
         // neighbor ∈ region ==> ∈ neighbor list
         points_to_append_.emplace_back( neighbor_offset, neighbor_x );
@@ -441,7 +447,7 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
         {
             PhiValue v = cd_.phi()[ neighbor_offset ];
 
-            if (phi_value::isInside(v))
+            if ( phi_value::isInside(v) )
                 ++inside;
             else
                 ++outside;
