@@ -226,7 +226,7 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
     {
         auto& point = scanned[i];
 
-        if( point.speed() == ctx_->way )
+        if( point.speed() == ctx_->target_direction )
         {
             is_moving = true;
 

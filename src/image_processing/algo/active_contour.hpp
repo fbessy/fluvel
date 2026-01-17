@@ -160,11 +160,12 @@ struct AcConfig
     }
 };
 
+//! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
 struct BoundarySwitchContext
 {
     ContourList& scanned_boundary;
     ContourList& adjacent_boundary;
-    SpeedValue way;
+    SpeedValue target_direction;
     PhiValue adjacent_phi_val;
     PhiValue neighbor_region_phi_val;
     PhiValue neighbor_boundary_phi_val;
@@ -435,7 +436,7 @@ private :
     //! BoundarySwitchContext for the procedure switch_out.
     BoundarySwitchContext ctx_out_;
 
-    //! A BoundarySwitchContext selector to perform a switch generically.
+    //! A selector (pointer) to perform a switch generically. It pointes to ctx_in_ or ctx_out_.
     BoundarySwitchContext* ctx_;
 
     //! Evolution data of the active contour used by #check_state_step1() and
