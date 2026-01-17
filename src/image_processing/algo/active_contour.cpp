@@ -52,25 +52,23 @@ ActiveContour::ActiveContour(const ContourData& initial_contour,
                              const AcConfig& config1)
     : config_(config1),
     cd_( initial_contour ),
-    state_( State::Cycle1 ),
+    state_( PhaseState::Cycle1 ),
     stopping_status_( StoppingStatus::None ),
     ctx_( cd_ ),
     ed_( cd_ ),
     is_cycle2_condition_( true )
 {
-    kernel_ = build_gaussian_kernel_linear(config_.kernel_length,
-                                           config_.sigma,
-                                           cd_.phi().width());
+    build_internal_kernel_offsets();
 
     points_to_append_.reserve( cd_.preallocation_size() );
 
     if ( config_.is_cycle2 )
     {
-        n_iter_by_cycle_ = config_.Na + config_.Ns;
+        steps_per_cycle_ = config_.Na + config_.Ns;
     }
     else
     {
-        n_iter_by_cycle_ = config_.Na;
+        steps_per_cycle_ = config_.Na;
     }
 }
 
@@ -78,116 +76,125 @@ ActiveContour::ActiveContour(ContourData&& initial_contour,
                              const AcConfig& config1)
     : config_(config1),
     cd_( std::move(initial_contour) ),
-    state_( State::Cycle1 ),
+    state_( PhaseState::Cycle1 ),
     stopping_status_( StoppingStatus::None ),
     ctx_( cd_ ),
     ed_( cd_ ),
     is_cycle2_condition_(true)
 {
-    kernel_ = build_gaussian_kernel_linear(config_.kernel_length,
-                                           config_.sigma,
-                                           cd_.phi().width());
+    build_internal_kernel_offsets();
 
     points_to_append_.reserve( cd_.preallocation_size() );
 
     if ( config_.is_cycle2 )
     {
-        n_iter_by_cycle_ = config_.Na + config_.Ns;
+        steps_per_cycle_ = config_.Na + config_.Ns;
     }
     else
     {
-        n_iter_by_cycle_ = config_.Na;
+        steps_per_cycle_ = config_.Na;
     }
 }
 
-void ActiveContour::evolve()
+void ActiveContour::converge()
 {
     // Fast Two Cycle algorithm
 
-    while( state_ != State::Stopped )
+    while( state_ != PhaseState::Stopped )
     {
-        while( state_ == State::Cycle1 )
+        while( state_ == PhaseState::Cycle1 )
         {
-            evolve_one_time_in_cycle1();
+            step_cycle1();
         }
 
-        while(    state_ == State::Cycle2
-               || state_ == State::LastCycle2 )
+        while(    state_ == PhaseState::Cycle2
+               || state_ == PhaseState::FinalCycle2 )
         {
-            evolve_one_time_in_cycle2();
+            step_cycle2();
         }
     }
 }
 
-void ActiveContour::evolve_n_iterations(int n_iter)
+void ActiveContour::run_steps(int n_steps)
 {
-    if( n_iter < 1 )
+    if( n_steps < 1 )
     {
-        n_iter = 1;
+        n_steps = 1;
     }
 
     for( int i = 0;
-         i < n_iter && state_ != State::Stopped;
+         i < n_steps && state_ != PhaseState::Stopped;
          i++ )
     {
-        if ( state_ == State::Cycle1 )
+        if ( state_ == PhaseState::Cycle1 )
         {
-            evolve_one_time_in_cycle1();
+            step_cycle1();
         }
-        else if (    state_ == State::Cycle2
-                  || state_ == State::LastCycle2 )
+        else if (    state_ == PhaseState::Cycle2
+                  || state_ == PhaseState::FinalCycle2 )
         {
-            evolve_one_time_in_cycle2();
+            step_cycle2();
         }
     }
 }
 
-void ActiveContour::evolve_one_iteration()
+void ActiveContour::step()
 {
-    evolve_n_iterations( 1 );
+    run_steps( 1 );
 }
 
-void ActiveContour::evolve_n_cycles(int n_cycles)
+void ActiveContour::run_cycles(int n_cycles)
 {
     if ( n_cycles < 1 )
     {
         n_cycles = 1;
     }
 
-    int n_iter = n_cycles * n_iter_by_cycle_;
+    int n_steps = n_cycles * steps_per_cycle_;
 
-    evolve_n_iterations( n_iter );
+    run_steps( n_steps );
 }
 
-void ActiveContour::evolve_one_time_in_cycle1()
+void ActiveContour::step_cycle1()
 {
     do_specific_cycle1();
 
-    bool is_outward_moving = evolve_one_way( WayContextConfig::SwitchIn );
-    bool is_inward_moving  = evolve_one_way( WayContextConfig::SwitchOut );
+    bool is_outward_moving = directional_substep( BoundarySwitch::In );
+    bool is_inward_moving  = directional_substep( BoundarySwitch::Out );
 
-    ed_.total_iter++;
-    ed_.cycle_iter++;
+    ed_.step_count++;
+    ed_.phase_step_count++;
 
     ed_.is_moving = is_outward_moving || is_inward_moving;
 
-    check_stopped_state();
-    calculate_state_cycle_1();
+    check_stopping_condition();
+    check_state_step1();
 }
 
-void ActiveContour::evolve_one_time_in_cycle2()
+void ActiveContour::step_cycle2()
 {
-    evolve_one_way( WayContextConfig::SwitchIn );
-    evolve_one_way( WayContextConfig::SwitchOut );
+    directional_substep( BoundarySwitch::In );
+    directional_substep( BoundarySwitch::Out );
 
-    ed_.total_iter++;
-    ed_.cycle_iter++;
+    ed_.step_count++;
+    ed_.phase_step_count++;
 
-    check_stopped_state();
-    calculate_state_cycle_2();
+    check_stopping_condition();
+    update_state_cycle2();
 }
 
-bool ActiveContour::evolve_one_way(WayContextConfig ctx_cfg)
+bool ActiveContour::stopped() const
+{
+    return state_ == PhaseState::Stopped;
+}
+
+bool ActiveContour::converged() const
+{
+    return    stopping_status_ == StoppingStatus::ListsStopped
+           || stopping_status_ == StoppingStatus::Hausdorff;
+}
+
+bool ActiveContour::directional_substep(BoundarySwitch ctx_cfg)
 {
     bool is_moving = false;
 
@@ -209,9 +216,9 @@ bool ActiveContour::evolve_one_way(WayContextConfig ctx_cfg)
             is_moving = true;
 
             do_specific_when_switch( point.offset(),
-                                     ctx_.config );
+                                     ctx_.mode );
 
-            switch_one_way( point );
+            switch_boundary_point( point );
         }
         else
         {
@@ -230,6 +237,92 @@ bool ActiveContour::evolve_one_way(WayContextConfig ctx_cfg)
     }
 
     return is_moving;
+}
+
+void ActiveContour::switch_boundary_point(ContourPoint& point)
+{
+    int offset = point.offset();
+    int x = point.x();
+    int w = cd_.phi().width();
+    int h = cd_.phi().height();
+    int last_row_offset = w * (h - 1);
+
+    // Voisins horizontaux
+    if (x > 0)
+    {
+        int left_offset = offset - 1;
+        add_region_neighbor(left_offset, x-1);
+    }
+
+    if (x < w - 1)
+    {
+        int right_offset = offset + 1;
+        add_region_neighbor(right_offset, x+1);
+    }
+
+    // Voisins verticaux
+    if (offset >= w) // Pas dans la première ligne
+    {
+        int up_offset = offset - w;
+        add_region_neighbor(up_offset, x);
+    }
+
+    if (offset < last_row_offset) // Pas dans la dernière ligne
+    {
+        int down_offset = offset + w;
+        add_region_neighbor(down_offset, x);
+    }
+
+#ifdef ALGO_8_CONNEXITY
+    // Diagonaux supérieurs
+    if (x > 0 && offset >= w)
+    {
+        int up_left_offset = offset - w - 1;
+        add_region_neighbor(up_left_offset, x-1);
+    }
+
+    if (x < w - 1 && offset >= w)
+    {
+        int up_right_offset = offset - w + 1;
+        add_region_neighbor(up_right_offset, x+1);
+    }
+
+    // Diagonaux inférieurs
+    if (x > 0 && offset < last_row_offset)
+    {
+        int down_left_offset = offset + w - 1;
+        add_region_neighbor(down_left_offset, x-1);
+    }
+
+    if (x < w - 1 && offset < last_row_offset)
+    {
+        int down_right_offset = offset + w + 1;
+        add_region_neighbor(down_right_offset, x+1);
+    }
+#endif
+
+    // change the phi value of the current point
+    // according to the phi value of the adjacent list
+    cd_.phi()[ offset ] = ctx_.adjacent_phi_val;
+
+    // switch the current point to the adjacent boundary list
+    ctx_.adjacent_boundary->emplace_back( offset, x );
+
+    point = ctx_.scanned_boundary->back();
+    ctx_.scanned_boundary->pop_back();
+}
+
+void ActiveContour::add_region_neighbor(int neighbor_offset,
+                                        int neighbor_x)
+{
+    // if a neighbor ∈ one region
+    if( cd_.phi()[ neighbor_offset ] == ctx_.neighbor_region_phi_val )
+    {
+        cd_.phi()[ neighbor_offset ] = ctx_.neighbor_boundary_phi_val;
+
+        // neighbor ∈ region ==> ∈ neighbor list
+        points_to_append_.emplace_back( neighbor_offset, neighbor_x );
+    }
 }
 
 void ActiveContour::eliminate_redundant_points(ContourList& boundary,
@@ -254,12 +347,12 @@ void ActiveContour::eliminate_redundant_points(ContourList& boundary,
 
 void ActiveContour::compute_speed(ContourList& boundary)
 {
-    if( state_ == State::Cycle1 )
+    if( state_ == PhaseState::Cycle1 )
     {
         compute_external_speed_Fd( boundary );
     }
-    else if( state_ == State::Cycle2 ||
-             state_ == State::LastCycle2 )
+    else if( state_ == PhaseState::Cycle2 ||
+             state_ == PhaseState::FinalCycle2 )
     {
         compute_internal_speed_Fint( boundary );
     }
@@ -289,116 +382,125 @@ void ActiveContour::compute_internal_speed_Fint(ContourList& boundary)
     }
 }
 
-void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
+void ActiveContour::build_internal_kernel_offsets()
 {
-    assert( kernel_.weights.size() == kernel_.offsets.size() );
-    assert( kernel_.size == config_.kernel_length * config_.kernel_length );
+    internal_kernel_offsets_.clear();
 
-    const auto& phi = cd_.phi();
-    const int width  = phi.width();
-    const int height = phi.height();
+    const int r = config_.disk_radius;
+    const int w = cd_.phi().width();
 
-    const int radius = kernel_.radius;
-    const int offset = point.offset();
-    const auto phi_center  = phi[offset];
-    const int center_sign = phiSign( phi_center );
-
-    int Fint = 0;
-
-    const int x = point.x();
-    const int y = offset / width;
-
-    // --- Chemin rapide : entièrement dans l'image ---
-    if (   x >= radius
-        && x <  width  - radius
-        && y >= radius
-        && y <  height - radius)
+    for ( int dy = -r; dy <= r; ++dy )
     {
-        const int* w = kernel_.weights.data();
-        const int* o = kernel_.offsets.data();
-
-        for (int i = 0; i < kernel_.size; ++i)
+        for ( int dx = -r; dx <= r; ++dx )
         {
-            Fint -=  w[i] * phiSign( phi[offset + o[i]] );
+            if ( dx*dx + dy*dy <= r*r )
+                internal_kernel_offsets_.push_back( dy * w + dx );
         }
     }
-    // --- Chemin lent : bords ---
-    else
-    {
-        const int* w = kernel_.weights.data();
-        const int* o = kernel_.offsets.data();
-
-        for (int i = 0; i < kernel_.size; ++i)
-        {
-            const int n = offset + o[i];
-
-            if (n >= 0 && n < width * height)
-                Fint -= w[i] * phiSign( phi[n] );
-            else
-                Fint -= w[i] * center_sign;
-        }
-    }
-
-    point.set_speed( get_discrete_speed(Fint) );
 }
 
-void ActiveContour::check_stopped_state()
+void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
+{
+    // Internal speed Fint is computed using a local majority vote
+    // on the interior/exterior labeling of neighboring pixels.
+    // This is equivalent to a smoothed Heaviside convolution
+    // described in the reference paper, but implemented in a
+    // simpler and more robust discrete form.
+
+    // Note: the direction is intentionally inverted.
+    // If the neighborhood is mostly inside, the boundary locally
+    // protrudes outward and must be pushed outward to smooth curvature.
+
+    const int base = point.offset();
+
+    int neighbor_offset;
+
+    int inside = 0;
+    int outside = 0;
+
+    for (int delta : internal_kernel_offsets_)
+    {
+        neighbor_offset = base + delta;
+
+        if ( cd_.phi().valid( neighbor_offset ) )
+        {
+            PhiValue v = cd_.phi()[ neighbor_offset ];
+
+            if (phi_value::isInside(v))
+                ++inside;
+            else
+                ++outside;
+        }
+    }
+
+    // intentionally inverted, here.
+    if (inside > outside)
+        point.set_speed(SpeedValue::GoOutward);
+    else if (outside > inside)
+        point.set_speed(SpeedValue::GoInward);
+    else
+        point.set_speed(SpeedValue::NoMove);
+}
+
+void ActiveContour::stop(StoppingStatus reason)
+{
+    state_ = PhaseState::Stopped;
+    stopping_status_ = reason;
+}
+
+void ActiveContour::check_stopping_condition()
 {
     if( cd_.l_out().empty() || cd_.l_in().empty() )
     {
-        state_ = State::Stopped;
-        stopping_status_ = StoppingStatus::EmptyList;
+        stop( StoppingStatus::EmptyList );
     }
-    else if( ed_.total_iter >= ed_.total_iter_max )
+    else if( ed_.step_count >= ed_.max_step_count )
     {
-        state_ = State::Stopped;
-        stopping_status_ = StoppingStatus::MaxIteration;
+        stop( StoppingStatus::MaxIteration );
     }
 }
 
-void ActiveContour::calculate_state_cycle_1()
+void ActiveContour::check_state_step1()
 {
-    if( state_ == State::Cycle1 )
+    if( state_ == PhaseState::Cycle1 )
     {
         if( !ed_.is_moving )
         {
             if( config_.is_cycle2 )
             {
-                ed_.cycle_iter = 0;
-                state_ = State::LastCycle2;
+                ed_.phase_step_count = 0;
+                state_ = PhaseState::FinalCycle2;
             }
             else
             {
-                state_ = State::Stopped;
-                stopping_status_ = StoppingStatus::ListsStopped;
+                stop( StoppingStatus::ListsStopped );
             }
         }
-        else if( ed_.cycle_iter >= config_.Na &&
+        else if( ed_.phase_step_count >= config_.Na &&
                  config_.is_cycle2 )
         {
-            ed_.cycle_iter = 0;
-            state_ = State::Cycle2;
+            ed_.phase_step_count = 0;
+            state_ = PhaseState::Cycle2;
         }
     }
 }
 
-void ActiveContour::calculate_state_cycle_2()
+void ActiveContour::update_state_cycle2()
 {
-    if( state_ == State::Cycle2 ||
-        state_ == State::LastCycle2 )
+    if( state_ == PhaseState::Cycle2 ||
+        state_ == PhaseState::FinalCycle2 )
     {
         // if at the end of one cycle 2
-        if( ed_.cycle_iter >= config_.Ns )
+        if( ed_.phase_step_count >= config_.Ns )
         {
-            if( state_ == State::LastCycle2 )
+            if( state_ == PhaseState::FinalCycle2 )
             {
-                state_ = State::Stopped;
-                stopping_status_ = StoppingStatus::ListsStopped;
+                stop( StoppingStatus::ListsStopped );
             }
             else if( is_cycle2_condition_ &&
-                     state_ == State::Cycle2 )
+                     state_ == PhaseState::Cycle2 )
             {
-                float diff_iter = float(ed_.total_iter - ed_.previous_total_iter);
+                float step_delta = float(ed_.step_count - ed_.previous_step_count);
 
                 const int w = cd_.phi().width();
                 const int h = cd_.phi().height();
@@ -406,7 +508,7 @@ void ActiveContour::calculate_state_cycle_2()
 
                 // normalize in function of l_outshape/phi size
                 // to handle different images sizes.
-                if( diff_iter >= diagonal / 20.f )
+                if( step_delta >= diagonal / 20.f )
                 {
                     ed_.l_out_shape.clear();
 
@@ -436,22 +538,21 @@ void ActiveContour::calculate_state_cycle_2()
                            ed_.hausdorff_quantile < 2.f &&
                            delta_quantile < 0.f ) )
                     {
-                        state_ = State::Stopped;
-                        stopping_status_ = StoppingStatus::Hausdorff;
+                        stop( StoppingStatus::Hausdorff );
                     }
 
                     // swap the shapes in constant time, in complexity O(1)
                     // to prepare data for the next cycle 2 stopping condition iteration.
                     ed_.l_out_shape.swap(ed_.previous_shape);
-                    ed_.previous_total_iter = ed_.total_iter;
+                    ed_.previous_step_count = ed_.step_count;
                     ed_.previous_quantile = ed_.hausdorff_quantile;
                 }
             }
 
-            if ( state_ != State::Stopped )
+            if ( state_ != PhaseState::Stopped )
             {
-                ed_.cycle_iter = 0;
-                state_ = State::Cycle1;
+                ed_.phase_step_count = 0;
+                state_ = PhaseState::Cycle1;
             }
         }
     }
@@ -486,7 +587,7 @@ void ActiveContour::reinitialize()
 {
     cd_.check_lists();
 
-    state_ = State::Cycle1;
+    state_ = PhaseState::Cycle1;
     stopping_status_ = StoppingStatus::None;
     is_cycle2_condition_ = false;
 

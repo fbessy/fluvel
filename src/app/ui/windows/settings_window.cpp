@@ -125,14 +125,14 @@ void SettingsWindow::setupUiAlgoTab()
     /// Algorithm tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    QGroupBox* externalspeed_groupbox = new QGroupBox(tr("Cycle 1 : data dependant evolution"));
+    QGroupBox* externalspeed_groupbox = new QGroupBox(tr("Cycle 1 – Data-driven evolution"));
 
     Na_spin = new QSpinBox;
     Na_spin->setSingleStep(1);
     Na_spin->setMinimum(1);
     Na_spin->setMaximum(999);
     Na_spin->setSuffix(tr(" iterations"));
-    Na_spin->setToolTip(tr("iterations in the cycle 1, active contour penetrability"));
+    Na_spin->setToolTip(tr("Number of iterations of the data-driven evolution (Cycle 1)."));
     QFormLayout *Na_layout = new QFormLayout;
     Na_layout->addRow("Na =", Na_spin);
 
@@ -240,7 +240,7 @@ void SettingsWindow::setupUiAlgoTab()
 
     ////////////////////////////////////////////
 
-    internalspeed_groupbox = new QGroupBox(tr("Cycle 2 - smoothing via gaussian filtring"));
+    internalspeed_groupbox = new QGroupBox(tr("Cycle 2 - Internal smoothing"));
     internalspeed_groupbox->setCheckable(true);
     internalspeed_groupbox->setChecked(true);
 
@@ -249,23 +249,17 @@ void SettingsWindow::setupUiAlgoTab()
     Ns_spin->setMinimum(1);
     Ns_spin->setMaximum(999);
     Ns_spin->setSuffix(tr(" iterations"));
-    Ns_spin->setToolTip(tr("iterations in the cycle 2, active contour regularization"));
+    Ns_spin->setToolTip(tr("Number of internal smoothing iterations (Cycle 2)."));
 
-    klength_spin = new KernelSizeSpinBox;
-    klength_spin->setSingleStep(2);
-    klength_spin->setMinimum(3);
-    klength_spin->setMaximum(499);
-    klength_spin->setToolTip(tr("gaussian kernel size = Ng × Ng "));
-    std_spin = new QDoubleSpinBox;
-    std_spin->setSingleStep(0.1);
-    std_spin->setMinimum(0.0);
-    std_spin->setMaximum(1000000.0);
-    std_spin->setToolTip(tr("standard deviation of the gaussian kernel"));
+    disk_radius_spin = new QSpinBox;
+    disk_radius_spin->setSingleStep(1);
+    disk_radius_spin->setMinimum(1);
+    disk_radius_spin->setMaximum(999);
+    disk_radius_spin->setToolTip(tr("Radius of the disk-shaped neighborhood used for the majority vote during internal smoothing."));
 
     QFormLayout* internalspeed_layout = new QFormLayout;
     internalspeed_layout->addRow("Ns =", Ns_spin);
-    internalspeed_layout->addRow("Ng =", klength_spin);
-    internalspeed_layout->addRow("σ =", std_spin);
+    internalspeed_layout->addRow("R =", disk_radius_spin);
 
     internalspeed_groupbox->setLayout(internalspeed_layout);
 
@@ -1048,8 +1042,7 @@ void SettingsWindow::accept()
     ofeli_ip::AcConfig previous_algo_config = config.algo_config;
 
     config.algo_config.is_cycle2 = internalspeed_groupbox->isChecked();
-    config.algo_config.kernel_length = klength_spin->value();
-    config.algo_config.sigma = float( std_spin->value() );
+    config.algo_config.disk_radius = disk_radius_spin->value();
     config.algo_config.Na = Na_spin->value();
     config.algo_config.Ns = Ns_spin->value();
 
@@ -1232,8 +1225,7 @@ void SettingsWindow::reject()
 
     Ns_spin->setValue(config.algo_config.Ns);
     internalspeed_groupbox->setChecked(config.algo_config.is_cycle2);
-    klength_spin->setValue(config.algo_config.kernel_length);
-    std_spin->setValue( double( config.algo_config.sigma ) );
+    disk_radius_spin->setValue(config.algo_config.disk_radius);
 
     ///////////////////////////////////
     //       Initialization          //
@@ -1392,8 +1384,7 @@ void SettingsWindow::default_settings()
 
     internalspeed_groupbox->setChecked( true );
     Ns_spin->setValue( 3 );
-    klength_spin->setValue( 5 );
-    std_spin->setValue( 2.0 );
+    disk_radius_spin->setValue( 2 );
 
     ///////////////////////////////////
     //       Initialization          //

@@ -208,7 +208,7 @@ private :
 
     //! Updates the six sums, #n_in and #n_out, before each #switch_in, in the cycle 1, in order to calculate means #CoutYUV and #CinYUV.
     virtual void do_specific_when_switch(int offset,
-                                         WayContextConfig ctx_cfg) override;
+                                         BoundarySwitch ctx_cfg) override;
 
 
     //! Color space conversion functions.
@@ -440,11 +440,11 @@ inline void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
 }
 
 inline void RegionColorAc::do_specific_when_switch(int offset,
-                                                   WayContextConfig ctx_cfg)
+                                                   BoundarySwitch ctx_cfg)
 {
     Rgb_uc rgb = image.pixel_rgb_at(offset);
 
-    if ( ctx_cfg == WayContextConfig::SwitchIn )
+    if ( ctx_cfg == BoundarySwitch::In )
     {
         sum_out.red   -= rgb.red;
         sum_out.green -= rgb.green;
@@ -452,7 +452,7 @@ inline void RegionColorAc::do_specific_when_switch(int offset,
 
         pxl_nbr_out--;
     }
-    else if ( ctx_cfg == WayContextConfig::SwitchOut )
+    else if ( ctx_cfg == BoundarySwitch::Out )
     {
         sum_out.red   += rgb.red;
         sum_out.green += rgb.green;

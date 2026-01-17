@@ -80,7 +80,7 @@ void RegionAc::initialize_sums()
     {
         sum_total += image.pixel_at(offset);
 
-        if( isOutside( cd_.phi()[offset] ) )
+        if( phi_value::isOutside( cd_.phi()[offset] ) )
         {
             sum_out += image.pixel_at(offset);
             pxl_nbr_out++;

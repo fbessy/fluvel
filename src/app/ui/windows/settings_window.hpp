@@ -133,8 +133,7 @@ private :
     unsigned int gamma2;
 
     QGroupBox* internalspeed_groupbox;
-    KernelSizeSpinBox* klength_spin;
-    QDoubleSpinBox* std_spin;
+    QSpinBox* disk_radius_spin;
 
     QComboBox* downscale_factor_cb;
     QSpinBox* cycles_nbr_sb;

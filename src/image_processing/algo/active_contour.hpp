@@ -56,28 +56,32 @@ namespace ofeli_ip
 
 constexpr size_t INITIAL_SPEED_ARRAY_ALLOC_SIZE = 10000u;
 
-enum class State
+//! Internal phase state of the active contour.
+//! A logical cycle consists of Phase Cycle1 followed by Phase Cycle2,
+//! as described in the reference paper.
+enum class PhaseState
 {
-    Cycle1,
-    Cycle2,
-    LastCycle2,
+    Cycle1,       //!< Phase 1 (called "Cycle 1" in the reference paper)
+    Cycle2,       //!< Phase 2 (called "Cycle 2" in the reference paper)
+    FinalCycle2,  //!< Final Phase 2 before termination
     Stopped
 };
 
 //! \enum Stopping condition status.
 enum class StoppingStatus
 {
-    None,
-    EmptyList,
-    MaxIteration,
-    ListsStopped,
-    Hausdorff
+    None,           //!< Maximum number of elementary steps reached.
+    EmptyList,      //!< One or the both lists is/are empty. The definition of both contiguous lists
+                    //!  as a boundary is not respected.
+    MaxIteration,   //!< Maximum number of elementary steps reached.
+    ListsStopped,   //!< speed <= 0 for all points of l_out and speed >= 0 for all points of l_in
+    Hausdorff       //!< Hausorff distance convergence.
 };
 
-enum class WayContextConfig
+enum class BoundarySwitch
 {
-    SwitchIn,
-    SwitchOut
+    In,
+    Out
 };
 
 //! \class AcConfig
@@ -87,11 +91,8 @@ struct AcConfig
     //! Boolean egals to \c true to have the curve smoothing, evolutions in the cycle 2 with the internal speed Fint.
     bool is_cycle2;
 
-    //!  Kernel length of the gaussian filter for the curve smoothing.
-    int kernel_length;
-
-    //! Standard deviation of the gaussian kernel for the curve smoothing.
-    float sigma;
+    //!  Disk radius for the curve smoothing.
+    int disk_radius;
 
     //! Maximum number of times the active contour can evolve in a cycle 1 with \a Fd speed.
     int Na;
@@ -102,30 +103,13 @@ struct AcConfig
     //! Check values of a configuration.
     void check()
     {
-        if( kernel_length < 3 )
+        if( disk_radius < 1 )
         {
             std::cerr << std::endl <<
                 " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
                 "Precondition, kernel_length must not be less than 3. It is set to 3.";
 
-            kernel_length = 3;
-        }
-        else if( kernel_length % 2 == 0 )
-        {
-            std::cerr << std::endl <<
-                " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-                "Precondition, kernel_length must be odd. It is decremented.";
-
-            kernel_length--;
-        }
-
-        if( sigma < 0.000000001f )
-        {
-            std::cerr << std::endl <<
-                " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-                "Precondition, sigma is positive and must not equal to zero. It is set to 0.000000001.";
-
-            sigma = 0.000000001f;
+            disk_radius = 1;
         }
 
         if( Na < 1 )
@@ -149,7 +133,7 @@ struct AcConfig
 
     //! Default constructor.
     AcConfig() : is_cycle2(true),
-                 kernel_length(5), sigma(2.f),
+                 disk_radius(2),
                  Na(30), Ns(3)
     {
     }
@@ -157,7 +141,7 @@ struct AcConfig
     //! Copy constructor.
     AcConfig(const AcConfig& copied) :
         is_cycle2( copied.is_cycle2 ),
-        kernel_length( copied.kernel_length ), sigma( copied.sigma ),
+        disk_radius( copied.disk_radius ),
         Na( copied.Na ), Ns( copied.Ns )
     {
         this->check();
@@ -167,8 +151,7 @@ struct AcConfig
     AcConfig& operator=(const AcConfig& rhs)
     {
         this->is_cycle2 = rhs.is_cycle2;
-        this->kernel_length = rhs.kernel_length;
-        this->sigma = rhs.sigma;
+        this->disk_radius = rhs.disk_radius;
         this->Na = rhs.Na;
         this->Ns = rhs.Ns;
 
@@ -182,8 +165,7 @@ struct AcConfig
                            const AcConfig& rhs)
     {
         return (    lhs.is_cycle2     == rhs.is_cycle2
-                 && lhs.kernel_length == rhs.kernel_length
-                 && lhs.sigma         == rhs.sigma
+                 && lhs.disk_radius   == rhs.disk_radius
                  && lhs.Na            == rhs.Na
                  && lhs.Ns            == rhs.Ns );
     }
@@ -196,64 +178,19 @@ struct AcConfig
     }
 };
 
-struct LinearGaussianKernel
+//! \class BoundarySwitchContext to perform a switch generically for both procedures switch in and switch out.
+struct BoundarySwitchContext
 {
-    int radius;
-    int size;
-    std::vector<int> weights;
-    std::vector<int> offsets;
-};
-
-inline LinearGaussianKernel
-build_gaussian_kernel_linear(int kernel_length,
-                             float sigma,
-                             int image_width)
-{
-    LinearGaussianKernel k;
-
-    const int width = kernel_length;
-    const int radius = (width - 1) / 2;
-
-    k.radius = radius;
-    k.size   = width * width;
-    k.weights.reserve(k.size);
-    k.offsets.reserve(k.size);
-
-    const float sigma2 = 2.f * sigma * sigma;
-
-    for (int dy = -radius; dy <= radius; ++dy)
-    {
-        for (int dx = -radius; dx <= radius; ++dx)
-        {
-            // poids gaussien (même formule que toi)
-            float g =
-                0.5f +
-                100000.f *
-                    std::exp(-(float(dx*dx + dy*dy)) / sigma2);
-
-            k.weights.push_back(static_cast<int>(g));
-
-            // offset linéaire
-            k.offsets.push_back(dy * image_width + dx);
-        }
-    }
-
-    return k;
-}
-
-//! \class WayContext to perform a switch generically for both procedures switch in and switch out.
-struct WayContext
-{
-    WayContext(ContourData& contour)
+    BoundarySwitchContext(ContourData& contour)
         : l_out(contour.l_out()), l_in(contour.l_in())
     {
     }
 
-    void set_context(WayContextConfig ctx_cfg)
+    void set_context(BoundarySwitch ctx_cfg)
     {
-        if ( ctx_cfg == WayContextConfig::SwitchIn )
+        if ( ctx_cfg == BoundarySwitch::In )
         {
-            config                    = WayContextConfig::SwitchIn;
+            mode                      = BoundarySwitch::In;
 
             scanned_boundary          = &l_out;
             adjacent_boundary         = &l_in;
@@ -266,9 +203,9 @@ struct WayContext
 
             region_redundant_phi_val  = PhiValue::InsideRegion;
         }
-        else if ( ctx_cfg == WayContextConfig::SwitchOut )
+        else if ( ctx_cfg == BoundarySwitch::Out )
         {
-            config                    = WayContextConfig::SwitchOut;
+            mode                      = BoundarySwitch::Out;
 
             scanned_boundary          = &l_in;
             adjacent_boundary         = &l_out;
@@ -283,11 +220,11 @@ struct WayContext
         }
         else
         {
-            std::cerr << "Error WayContextConfig value" << std::endl;
+            std::cerr << "Error BoundarySwitch value" << std::endl;
         }
     }
 
-    WayContextConfig config;
+    BoundarySwitch mode;
 
     ContourList& l_out;
     ContourList& l_in;
@@ -311,13 +248,13 @@ struct WayContext
 struct EvolutionData
 {
     //! Iterations number in a cycle (cycle 1 or cycle 2). It is set to 0 at the end of one cycle.
-    int cycle_iter;
+    int phase_step_count;
 
     //! Total number of iterations the active contour has evolved from the initial contour.
-    int total_iter;
+    int step_count;
 
     //! Maximum number of times the active contour can evolve.
-    const int total_iter_max;
+    const int max_step_count;
 
     //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
     bool is_moving;
@@ -330,7 +267,7 @@ struct EvolutionData
 
     //! Total number of iterations the active contour has evolved from the initial contour
     //! at the end of the previous cycle 2.
-    int previous_total_iter;
+    int previous_step_count;
 
     //! Hausdorff quantile
     //! at the end of the previous cycle 2.
@@ -348,15 +285,15 @@ struct EvolutionData
 
     //! Constructor.
     EvolutionData(const ContourData& cd)
-        : cycle_iter( 0 ),
-          total_iter( 0 ),
-          total_iter_max( 5*std::max(cd.phi().width(),
+        : phase_step_count( 0 ),
+          step_count( 0 ),
+          max_step_count( 5*std::max(cd.phi().width(),
                                      cd.phi().height()) ),
           is_moving( true ),
 
           l_out_shape( cd.preallocation_size() ),
           previous_shape( cd.preallocation_size() ),
-          previous_total_iter(0),
+          previous_step_count(0),
           previous_quantile(0.f),
           hausdorff_quantile(std::numeric_limits<float>().max()),
           centroids_distance(std::numeric_limits<float>().max())
@@ -367,8 +304,8 @@ struct EvolutionData
     //! Reinitialize evolution data. Used for video tracking.
     void reinitialize()
     {
-        cycle_iter = 0;
-        total_iter = 0;
+        phase_step_count = 0;
+        step_count = 0;
     }
 };
 
@@ -390,17 +327,18 @@ public :
     //! Destructor.
     virtual ~ActiveContour() {}
 
-    //! The active contour evolves to the final state.
-    void evolve();
+    //! Runs or evolves the active contour until it reaches a terminal state.
+    void converge();
 
-    //! The active contour evolves one iteration.
-    void evolve_one_iteration();
+    //! The active contour evolves to one iteration.
+    void step();
 
-    //! The active contour evolves while few cycles cycle1-cycle2. It is used for video tracking.
-    void evolve_n_cycles(int n_cycles);
+    //! Runs the active contour for a fixed number of full cycles (cycle1 + cycle2).
+    //! Ensures the contour is geometrically stable at the end of each cycle2 (used for video tracking).
+    void run_cycles(int n_cycles);
 
     //! Getter for the discrete level-set function with only 4 PhiValue possible.
-    const Matrix2D<PhiValue>& phi() const { return cd_.phi(); }
+    const DiscreteLevelSet& phi() const { return cd_.phi(); }
 
     //! Getter for the list of offset points representing the exterior boundary.
     const ContourList& l_out() const { return cd_.l_out(); }
@@ -408,13 +346,19 @@ public :
     const ContourList& l_in() const { return cd_.l_in(); }
 
     //! Getter method for #state.
-    State state() const { return state_; }
+    PhaseState state() const { return state_; }
+
+    //! Gets if the active contour reaches the final state.
+    bool stopped() const;
+
+    //! Gets if the active contour reaches the final state successfully.
+    bool converged() const;
 
     //! Getter method for #stopping_status.
-    StoppingStatus stopping_status() const { return stopping_status_; }
+    StoppingStatus stop_reason() const { return stopping_status_; }
 
-    //! Getter method for #total_iter.
-    int total_iter() const { return ed_.total_iter; }
+    //! Getter method for #step_count.
+    int step_count() const { return ed_.step_count; }
 
     //! Getter method for #hausdorff_quantile.
     float hausdorff_quantile() const { return ed_.hausdorff_quantile; }
@@ -440,30 +384,20 @@ protected :
 
 private :
 
-    //! The active contour evolves n_iter times. It is used for video tracking.
-    void evolve_n_iterations(int n_iter);
+    //! Runs the active contour for a fixed number of elementary steps.
+    //! Intended for incremental updates (e.g. video tracking).
+    void run_steps(int n_steps);
 
-    //! Evolve one time with the external or data dependant evolution speed \a Fd.
-    void evolve_one_time_in_cycle1();
+    //! Performs one elementary step in Cycle1 (external / data-dependent evolution, speed Fd).
+    void step_cycle1();
 
-    //! Evolve one time for a curve smoothing or internal evolution with speed \a Fint.
-    void evolve_one_time_in_cycle2();
+    //! Performs one elementary step in Cycle1 (external / data-dependent evolution, speed Fd).
+    void step_cycle2();
 
-    //! Evolve onetime in one way (outwardly with a switch in procedure or inwardly with a switch out procedure)
-    //! and eliminate redundant points in adjacent boundary list
-    //! in function of a way context to handle generically this both steps and this both ways.
-    bool evolve_one_way(WayContextConfig ctx_cfg);
-
-    //! Eliminates generically redundant points in one boundary list. Each point of one boundary list must be connected at least by one point of the adjacent boundary list.
-    void eliminate_redundant_points(ContourList& boundary,
-                                    PhiValue region_value);
-
-    //! Second procedure for generic method switch_one_way.
-    void add_region_neighbor(int neighbor_offset,
-                             int neighbor_x);
-
-    //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one boundary list to the other.
-    void switch_one_way(ContourPoint& point);
+    //! Performs one directional topological update step (in or out).
+    //! The step includes velocity computation, boundary switching,
+    //! and adjacent boundary cleanup.
+    bool directional_substep(BoundarySwitch ctx_cfg);
 
     //! Computes the speed for all points of a boundary list #l_out or #l_in.
     void compute_speed(ContourList& boundary);
@@ -480,28 +414,43 @@ private :
     //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
     void compute_internal_speed_Fint(ContourPoint& point);
 
+    //! Build precomputed disk-shaped kernel offsets for internal smoothing (Fint).
+    void build_internal_kernel_offsets();
+
+    //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one boundary list to the other.
+    void switch_boundary_point(ContourPoint& point);
+
+    //! Second procedure for generic method switch_boundary_point.
+    void add_region_neighbor(int neighbor_offset,
+                             int neighbor_x);
+
+    //! Eliminates redundant points to maintain a contiguous boundary.
+    void eliminate_redundant_points(ContourList& boundary,
+                                    PhiValue region_value);
+
     //! Specific step for each iteration in cycle 1.
     virtual void do_specific_cycle1() { }
 
     //! Specific step when switch in or a switch out procedure is performed.
     virtual void do_specific_when_switch(int,
-                                         WayContextConfig) { }
+                                         BoundarySwitch) { }
+
+    //! Stops the active contour and puts it in a terminal state.
+    //! After this call, step(), converge(), and run_cycles() have no effect.
+    void stop(StoppingStatus reason);
 
     //! Checks generic condition at each iteration in both cycles to determine state Stopped.
-    void check_stopped_state();
+    void check_stopping_condition();
 
     //! Calculates the active contour state at the end of each iteration of a cycle 1.
-    void calculate_state_cycle_1();
+    void check_state_step1();
 
-    //! Calculates the active contour state at the end of a cycle 2.
-    void calculate_state_cycle_2();
+    //! Updates the active contour state at the end of a cycle 2.
+    void update_state_cycle2();
 
     //! Computes the shapes intersection between #ed.l_out_shape and #ed.previous_shape
     //! to speed up the hausdorff distance computation.
     void calculate_shapes_intersection();
-
-    //! Gives the sign of the opposite of phi_val. Return the integer value -1 or 1.
-    static int get_sign_opposite(PhiValue phi_val);
 
     //! To transformate active contour data point to the points for the Hausdorff distance.
     static Point2D_i from_ContourPoint(const ContourPoint& point,
@@ -511,23 +460,23 @@ private :
     const AcConfig config_;
 
     //! Number of iterations in one cycle1-cycle2.
-    int n_iter_by_cycle_;
+    int steps_per_cycle_;
 
-    //! Linear gaussian kernel used to calculate Fint.
-    LinearGaussianKernel kernel_;
+    //! Precomputed disk-shaped kernel offsets for internal smoothing (Fint).
+    std::vector<int> internal_kernel_offsets_;
 
     //! Evolution state of the active contour given at a current iteration.
-    //!  There are 4 states : Cycle1, Cycle2, LastCycle2 and Stopped.
-    State state_;
+    //!  There are 4 states : Cycle1, Cycle2, FinalCycle2 and Stopped.
+    PhaseState state_;
 
     //! Stopping condition status.
     StoppingStatus stopping_status_;
 
-    //! A waycontext to perform a switch_in or a switch_out generically.
-    WayContext ctx_;
+    //! A BoundarySwitchContext to perform a switch_in or a switch_out generically.
+    BoundarySwitchContext ctx_;
 
-    //! Evolution data of the active contour used by #calculate_state_cycle_1() and
-    //! #calculate_state_cycle_2() to calculate #state.
+    //! Evolution data of the active contour used by #check_state_step1() and
+    //! #update_state_cycle2() to calculate #state.
     EvolutionData ed_;
 
     //! Boolean egals to true if the cycle 2 stopping condition (based on hausdorff distance)
@@ -549,93 +498,6 @@ inline SpeedValue ActiveContour::get_discrete_speed(int speed)
     if (speed < 0) return SpeedValue::GoInward;
     if (speed > 0) return SpeedValue::GoOutward;
     return SpeedValue::NoMove;
-}
-
-inline void ActiveContour::add_region_neighbor(int neighbor_offset,
-                                               int neighbor_x)
-{
-    // if a neighbor ∈ one region
-    if( cd_.phi()[ neighbor_offset ] == ctx_.neighbor_region_phi_val )
-    {
-        cd_.phi()[ neighbor_offset ] = ctx_.neighbor_boundary_phi_val;
-
-        // neighbor ∈ region ==> ∈ neighbor list
-        points_to_append_.emplace_back( neighbor_offset, neighbor_x );
-    }
-}
-
-//! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one scanned boundary list to the other adjacent.
-inline void ActiveContour::switch_one_way(ContourPoint& point)
-{
-    int offset = point.offset();
-    int x = point.x();
-    int w = cd_.phi().width();
-    int h = cd_.phi().height();
-    int last_row_offset = w * (h - 1);
-
-    // Voisins horizontaux
-    if (x > 0)
-    {
-        int left_offset = offset - 1;
-        add_region_neighbor(left_offset, x-1);
-    }
-
-    if (x < w - 1)
-    {
-        int right_offset = offset + 1;
-        add_region_neighbor(right_offset, x+1);
-    }
-
-    // Voisins verticaux
-    if (offset >= w) // Pas dans la première ligne
-    {
-        int up_offset = offset - w;
-        add_region_neighbor(up_offset, x);
-    }
-
-    if (offset < last_row_offset) // Pas dans la dernière ligne
-    {
-        int down_offset = offset + w;
-        add_region_neighbor(down_offset, x);
-    }
-
-#ifdef ALGO_8_CONNEXITY
-    // Diagonaux supérieurs
-    if (x > 0 && offset >= w)
-    {
-        int up_left_offset = offset - w - 1;
-        add_region_neighbor(up_left_offset, x-1);
-    }
-
-    if (x < w - 1 && offset >= w)
-    {
-        int up_right_offset = offset - w + 1;
-        add_region_neighbor(up_right_offset, x+1);
-    }
-
-    // Diagonaux inférieurs
-    if (x > 0 && offset < last_row_offset)
-    {
-        int down_left_offset = offset + w - 1;
-        add_region_neighbor(down_left_offset, x-1);
-    }
-
-    if (x < w - 1 && offset < last_row_offset)
-    {
-        int down_right_offset = offset + w + 1;
-        add_region_neighbor(down_right_offset, x+1);
-    }
-#endif
-
-    // change the phi value of the current point
-    // according to the phi value of the adjacent list
-    cd_.phi()[ offset ] = ctx_.adjacent_phi_val;
-
-    // switch the current point to the adjacent boundary list
-    ctx_.adjacent_boundary->emplace_back( offset, x );
-
-    point = ctx_.scanned_boundary->back();
-    ctx_.scanned_boundary->pop_back();
 }
 
 }

@@ -102,7 +102,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
             region_ac->reinitialize(img_algo);
         }
 
-        region_ac->evolve_n_cycles(config.cycles_nbr);
+        region_ac->run_cycles(config.cycles_nbr);
 
         if (region_ac)
         {

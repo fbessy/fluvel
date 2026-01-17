@@ -62,8 +62,7 @@ ApplicationSettings::ApplicationSettings()
     // Algorithm
 
     algo_config.is_cycle2 = settings.value("Settings/Algorithm/has_smoothing_cycle", true).toBool();
-    algo_config.kernel_length = settings.value("Settings/Algorithm/kernel_curve", 5).toInt();
-    algo_config.sigma = settings.value("Settings/Algorithm/std_curve", 2.f).toFloat();
+    algo_config.disk_radius = settings.value("Settings/Algorithm/disk_radius", 2).toInt();
     algo_config.Na = settings.value("Settings/Algorithm/Na", 30).toInt();
     algo_config.Ns = settings.value("Settings/Algorithm/Ns", 3).toInt();
 
@@ -192,8 +191,7 @@ void ApplicationSettings::save()
     settings.setValue("Settings/Algorithm/beta", region_ac_config.weights[1]);
     settings.setValue("Settings/Algorithm/gamma", region_ac_config.weights[2]);
     settings.setValue("Settings/Algorithm/has_smoothing_cycle", algo_config.is_cycle2);
-    settings.setValue("Settings/Algorithm/kernel_curve", algo_config.kernel_length);
-    settings.setValue("Settings/Algorithm/std_curve", algo_config.sigma);
+    settings.setValue("Settings/Algorithm/disk_radius", algo_config.disk_radius);
 
     settings.setValue("Settings/Algorithm/downscale_factor", downscale_factor);
     settings.setValue("Settings/Algorithm/cycles_nbr", cycles_nbr);

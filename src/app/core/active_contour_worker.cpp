@@ -67,12 +67,12 @@ void ActiveContourWorker::step()
 
 bool ActiveContourWorker::stepOnce()
 {
-    if ( !ac || ac->state() == ofeli_ip::State::Stopped )
+    if ( !ac || ac->stopped() )
         return true;
 
-    ac->evolve_one_iteration();
+    ac->step();
 
-    return ac->state() == ofeli_ip::State::Stopped;
+    return ac->stopped();
 }
 
 void ActiveContourWorker::setImage(const QImage& img)
@@ -148,7 +148,7 @@ void ActiveContourWorker::onTimeout()
 void ActiveContourWorker::updateStats()
 {
     AlgoStats stats;
-    stats.iteration = ac ? ac->total_iter() : 0;
+    stats.iteration = ac ? ac->step_count() : 0;
 
     QMutexLocker lock(&m_statsMutex);
     m_currentStats = stats;

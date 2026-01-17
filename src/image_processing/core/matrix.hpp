@@ -62,6 +62,7 @@ public:
     }
 
     //! Matrix2D methods
+
     int width()  const noexcept { return width_;  }
     int height() const noexcept { return height_; }
 
@@ -117,6 +118,11 @@ public:
     bool valid(int x, int y) const noexcept
     {
         return x >= 0 && y >= 0 && x < width_ && y < height_;
+    }
+
+    bool valid(int offset) const noexcept
+    {
+        return offset >= 0 && offset < int( size() );
     }
 
 private:

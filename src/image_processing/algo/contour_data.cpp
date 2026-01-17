@@ -308,4 +308,80 @@ void ContourData::do_flood_fill(int offset_seed,
     }
 }
 
+bool ContourData::is_redundant(const ContourPoint& point) const
+{
+    const int offset = point.offset();
+    const int x = point.x();
+    const int w = phi_.width();
+    const int h = phi_.height();
+    const int last_row_offset = w * (h - 1);
+
+    const auto phi_center = phi_[offset];
+
+    // Voisins horizontaux
+    if (x > 0)
+    {
+        int left_offset = offset - 1;
+
+        if ( phi_value::differentSide(phi_[left_offset], phi_center) )
+            return false;
+    }
+
+    if (x < w - 1)
+    {
+        int right_offset = offset + 1;
+        if ( phi_value::differentSide(phi_[right_offset], phi_center) )
+            return false;
+    }
+
+    // Voisins verticaux
+    if (offset >= w) // Pas dans la première ligne
+    {
+        int up_offset = offset - w;
+        if ( phi_value::differentSide( phi_[up_offset], phi_center ) )
+            return false;
+    }
+
+    if (offset < last_row_offset) // Pas dans la dernière ligne
+    {
+        int down_offset = offset + w;
+        if ( phi_value::differentSide( phi_[down_offset], phi_center ) )
+            return false;
+    }
+
+#ifdef ALGO_8_CONNEXITY
+    // Diagonaux supérieurs
+    if (x > 0 && offset >= w)
+    {
+        int up_left_offset = offset - w - 1;
+        if ( differentSide( phi_[up_left_offset], phi_center ) )
+            return false;
+    }
+
+    if (x < w - 1 && offset >= w)
+    {
+        int up_right_offset = offset - w + 1;
+        if ( differentSide( phi_[up_right_offset], phi_center ) )
+            return false;
+    }
+
+    // Diagonaux inférieurs
+    if (x > 0 && offset < last_row_offset)
+    {
+        int down_left_offset = offset + w - 1;
+        if ( differentSide( phi_[down_left_offset], phi_center ) )
+            return false;
+    }
+
+    if (x < w - 1 && offset < last_row_offset)
+    {
+        int down_right_offset = offset + w + 1;
+        if ( differentSide(phi_[down_right_offset], phi_center) )
+            return false;
+    }
+#endif
+
+    return true;
+}
+
 }

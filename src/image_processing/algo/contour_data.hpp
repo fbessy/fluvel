@@ -57,6 +57,8 @@ enum class PhiValue : int8_t
     OutsideRegion     = 3
 };
 
+using DiscreteLevelSet = Matrix2D<PhiValue>;
+
 enum class SpeedValue : int8_t
 {
     GoInward  = -1,
@@ -124,8 +126,8 @@ public :
     }
 
     //! Getter function for the discrete level-set function #phi.
-    Matrix2D<PhiValue>& phi() { return phi_; }
-    const Matrix2D<PhiValue>& phi() const { return phi_; }
+    DiscreteLevelSet& phi() { return phi_; }
+    const DiscreteLevelSet& phi() const { return phi_; }
     //! Getter function for the exterior boundary #l_out.
     ContourList& l_out() { return l_out_; }
     const ContourList& l_out() const { return l_out_; }
@@ -152,21 +154,29 @@ private :
     static bool is_ok_phi_dimension(int dimension);
 
     //! Discrete level-set function with only 4 PhiValue possible.
-    Matrix2D<PhiValue> phi_;
+    DiscreteLevelSet phi_;
 
-    //! List of offset points representing the exterior boundary.
+    //! List of points representing the exterior boundary (called Lout in the reference paper).
     ContourList l_out_;
-    //! List of offset points representing the interior boundary.
+    //! List of points representing the interior boundary (called Lin in the reference paper).
     ContourList l_in_;
 
     //! Preallocation size for each list.
     size_t preallocation_size_;
 };
 
+namespace phi_value
+{
+
+constexpr int phiSign(PhiValue v);
+constexpr bool isInside(PhiValue v);
+constexpr bool isOutside(PhiValue v);
+constexpr bool differentSide(PhiValue a, PhiValue b);
+
 /// Discrete sign of level-set function.
 /// Returns -1 for interior side, +1 for exterior side.
 /// Note: zero level-set is conceptual and never stored.
-inline int phiSign(PhiValue v)
+constexpr int phiSign(PhiValue v)
 {
     switch (v)
     {
@@ -181,95 +191,21 @@ inline int phiSign(PhiValue v)
     return 0; // unreachable
 }
 
-inline bool isInside(PhiValue v)
+constexpr bool isInside(PhiValue v)
 {
     return phiSign(v) < 0;
 }
 
-inline bool isOutside(PhiValue v)
+constexpr bool isOutside(PhiValue v)
 {
     return !isInside(v);
 }
 
-inline bool differentSide(PhiValue a, PhiValue b)
+constexpr bool differentSide(PhiValue a, PhiValue b)
 {
     return phiSign(a) * phiSign(b) < 0;
 }
 
-inline bool ContourData::is_redundant(const ContourPoint& point) const
-{
-    const int offset = point.offset();
-    const int x = point.x();
-    const int w = phi_.width();
-    const int h = phi_.height();
-    const int last_row_offset = w * (h - 1);
-
-    const auto phi_center = phi_[offset];
-
-    // Voisins horizontaux
-    if (x > 0)
-    {
-        int left_offset = offset - 1;
-
-        if ( differentSide(phi_[left_offset], phi_center) )
-            return false;
-    }
-
-    if (x < w - 1)
-    {
-        int right_offset = offset + 1;
-        if ( differentSide(phi_[right_offset], phi_center) )
-            return false;
-    }
-
-    // Voisins verticaux
-    if (offset >= w) // Pas dans la première ligne
-    {
-        int up_offset = offset - w;
-        if ( differentSide( phi_[up_offset], phi_center ) )
-            return false;
-    }
-
-    if (offset < last_row_offset) // Pas dans la dernière ligne
-    {
-        int down_offset = offset + w;
-        if ( differentSide( phi_[down_offset], phi_center ) )
-            return false;
-    }
-
-#ifdef ALGO_8_CONNEXITY
-    // Diagonaux supérieurs
-    if (x > 0 && offset >= w)
-    {
-        int up_left_offset = offset - w - 1;
-        if ( differentSide( phi_[up_left_offset], phi_center ) )
-            return false;
-    }
-
-    if (x < w - 1 && offset >= w)
-    {
-        int up_right_offset = offset - w + 1;
-        if ( differentSide( phi_[up_right_offset], phi_center ) )
-            return false;
-    }
-
-    // Diagonaux inférieurs
-    if (x > 0 && offset < last_row_offset)
-    {
-        int down_left_offset = offset + w - 1;
-        if ( differentSide( phi_[down_left_offset], phi_center ) )
-            return false;
-    }
-
-    if (x < w - 1 && offset < last_row_offset)
-    {
-        int down_right_offset = offset + w + 1;
-        if ( differentSide(phi_[down_right_offset], phi_center) )
-            return false;
-    }
-#endif
-
-    return true;
 }
 
 }

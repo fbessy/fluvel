@@ -113,7 +113,7 @@ void RegionColorAc::initialize_sums()
         sum_total.green += rgb.green;
         sum_total.blue  += rgb.blue;
 
-        if( isOutside( cd_.phi()[offset] ) )
+        if( phi_value::isOutside( cd_.phi()[offset] ) )
         {
             sum_out.red   += rgb.red;
             sum_out.green += rgb.green;
