@@ -143,14 +143,14 @@ private :
     void initialize_sums();
 
     //! Calculates means #Cout and #Cin in \a O(1) or accounting for the previous updates of #sum_out and #sum_in, in \a O(#lists_length) and not in \a O(#img_size).
-    virtual void do_specific_cycle1() override;
+    void do_specific_cycle1() override;
 
     //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of #l_out or #l_in.
-    virtual void compute_external_speed_Fd(ContourPoint& point) override;
+    void compute_external_speed_Fd(ContourPoint& point) override;
 
     //! Updates variables #sum_in, #sum_out and #pxl_nbr_out in order to calculate the means #average_out and #average_in in constant time ( complexity 0(1) ).
-    virtual void do_specific_when_switch(int offset,
-                                         BoundarySwitch ctx_choice) override;
+    void do_specific_when_switch(int offset,
+                                 BoundarySwitch ctx_choice) override;
 
     //! Image wrapper.
     ImageSpan8 image_;

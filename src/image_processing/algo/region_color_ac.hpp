@@ -149,14 +149,14 @@ private :
     void initialize_sums();
 
     //! Calculates means #CoutYUV and #CinYUV in \a O(1) or accounting for the previous updates of (#sum_out_R, #sum_out_G, #sum_out_B) and (#sum_in_R, #sum_in_G, #sum_in_B), in \a O(#lists_length) and not in \a O(#img_size).
-    virtual void do_specific_cycle1() override;
+    void do_specific_cycle1() override;
 
     //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of #l_out or #l_in.
-    virtual void compute_external_speed_Fd(ContourPoint& point) override;
+    void compute_external_speed_Fd(ContourPoint& point) override;
 
     //! Updates the six sums, #n_in and #n_out, before each #switch_in, in the cycle 1, in order to calculate means #CoutYUV and #CinYUV.
-    virtual void do_specific_when_switch(int offset,
-                                         BoundarySwitch ctx_choice) override;
+    void do_specific_when_switch(int offset,
+                                 BoundarySwitch ctx_choice) override;
 
     //! Calculates components \a of a color space (in function of the color space option) with a rgb value.
     inline Color_3i rgb_to_color(const Rgb_uc& rgb) const;

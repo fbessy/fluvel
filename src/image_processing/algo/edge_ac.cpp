@@ -81,7 +81,7 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
 
     int global_speed = global_speed_sign * (int(threshold) - int(gradient_image.pixel_at(x,y)));
 
-    point.set_speed( get_discrete_speed( 3*local_speed + global_speed ) );
+    point.set_speed( speed_value::get_discrete_speed( 3*local_speed + global_speed ) );
 }
 
 int EdgeAc::get_global_speed_sign() const

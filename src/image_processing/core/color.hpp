@@ -62,6 +62,15 @@ struct Rgb
         return *this;
     }
 
+    template <Arithmetic U>
+    Rgb& operator*=(const Rgb<U>& rhs)
+    {
+        red   *= static_cast<T>(rhs.red);
+        green *= static_cast<T>(rhs.green);
+        blue  *= static_cast<T>(rhs.blue);
+        return *this;
+    }
+
     // ---- opérateurs non-mutants ----
     template <Arithmetic U>
     Rgb operator+(const Rgb<U>& rhs) const
@@ -76,6 +85,14 @@ struct Rgb
     {
         Rgb result = *this;
         result -= rhs;
+        return result;
+    }
+
+    template <Arithmetic U>
+    Rgb operator*(const Rgb<U>& rhs) const
+    {
+        Rgb result = *this;
+        result *= rhs;
         return result;
     }
 
@@ -97,6 +114,11 @@ struct Rgb
             static_cast<I>(std::llround(green)),
             static_cast<I>(std::llround(blue))
         };
+    }
+
+    T scalar() const
+    {
+        return red+green+blue;
     }
 };
 
@@ -158,6 +180,11 @@ struct Components_3i
         c2 *= rhs.c2;
         c3 *= rhs.c3;
         return *this;
+    }
+
+    int scalar() const
+    {
+        return c1 + c2 + c3;
     }
 
     friend Components_3i operator+(Components_3i lhs,

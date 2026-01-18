@@ -325,9 +325,6 @@ protected :
     //! Reinitialize the active contour, used for video tracking.
     void reinitialize();
 
-    //! Gets a discrete speed.
-    static SpeedValue get_discrete_speed(int speed);
-
     //! Representation data of the active contour
     //! (discret level-set function phi, Lin and Lout)
     ContourData cd_;
@@ -455,11 +452,19 @@ private :
     bool is_cycle2_condition_;
 };
 
-inline SpeedValue ActiveContour::get_discrete_speed(int speed)
+namespace speed_value
+{
+
+//! Gets a discrete speed.
+constexpr SpeedValue get_discrete_speed(int speed);
+
+constexpr SpeedValue get_discrete_speed(int speed)
 {
     if (speed < 0) return SpeedValue::GoInward;
     if (speed > 0) return SpeedValue::GoOutward;
     return SpeedValue::NoMove;
+}
+
 }
 
 }

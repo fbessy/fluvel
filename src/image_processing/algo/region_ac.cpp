@@ -87,7 +87,7 @@ void RegionAc::compute_external_speed_Fd(ContourPoint& point)
     const int speed =   region_config_.lambda_out * ( math::square(diff_out) )
                       - region_config_.lambda_in  * ( math::square(diff_in) );
 
-    point.set_speed( get_discrete_speed( speed ) );
+    point.set_speed( speed_value::get_discrete_speed( speed ) );
 }
 
 void RegionAc::do_specific_when_switch(int offset,
