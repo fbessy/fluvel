@@ -49,19 +49,20 @@ namespace ofeli_ip
 
 // Definitions
 ActiveContour::ActiveContour(const ContourData& initial_contour,
-                             const AcConfig& config1)
-    : config_(config1),
-    cd_( initial_contour ),
-    state_( PhaseState::Cycle1 ),
-    stopping_status_( StoppingStatus::None ),
+                             const AcConfig& config)
+    : cd_(initial_contour),
+    config_(config),
+    internal_kernel_offsets_(make_internal_kernel_offsets(config.disk_radius,
+                                                          initial_contour.phi().width())),
     ctx_in_(BoundarySwitchContext::make_switch_in(cd_)),
     ctx_out_(BoundarySwitchContext::make_switch_out(cd_)),
     ctx_(&ctx_in_),
+    state_( PhaseState::Cycle1 ),
+    stopping_status_( StoppingStatus::None ),
+
     ed_( cd_ ),
     is_cycle2_condition_( true )
 {
-    build_internal_kernel_offsets();
-
     points_to_append_.reserve( cd_.preallocation_size() );
 
     if ( config_.is_cycle2 )
@@ -75,19 +76,19 @@ ActiveContour::ActiveContour(const ContourData& initial_contour,
 }
 
 ActiveContour::ActiveContour(ContourData&& initial_contour,
-                             const AcConfig& config1)
-    : config_(config1),
-    cd_( std::move(initial_contour) ),
-    state_( PhaseState::Cycle1 ),
-    stopping_status_( StoppingStatus::None ),
+                             const AcConfig& config)
+    : cd_( std::move(initial_contour) ),
+    config_(config),
+    internal_kernel_offsets_(make_internal_kernel_offsets(config.disk_radius,
+                                                          cd_.phi().width())),
     ctx_in_(BoundarySwitchContext::make_switch_in(cd_)),
     ctx_out_(BoundarySwitchContext::make_switch_out(cd_)),
     ctx_(&ctx_in_),
+    state_( PhaseState::Cycle1 ),
+    stopping_status_( StoppingStatus::None ),
     ed_( cd_ ),
     is_cycle2_condition_(true)
 {
-    build_internal_kernel_offsets();
-
     points_to_append_.reserve( cd_.preallocation_size() );
 
     if ( config_.is_cycle2 )
@@ -403,21 +404,25 @@ void ActiveContour::compute_internal_speed_Fint(ContourList& boundary)
     }
 }
 
-void ActiveContour::build_internal_kernel_offsets()
+std::vector<int> ActiveContour::make_internal_kernel_offsets(int disk_radius,
+                                                             int grid_width)
 {
-    internal_kernel_offsets_.clear();
+    const int r = disk_radius;
+    const int w = grid_width;
 
-    const int r = config_.disk_radius;
-    const int w = cd_.phi().width();
+    std::vector<int> offsets;
+    offsets.reserve( (2 * r + 1) * (2 * r + 1) );
 
     for ( int dy = -r; dy <= r; ++dy )
     {
         for ( int dx = -r; dx <= r; ++dx )
         {
             if ( dx*dx + dy*dy <= r*r )
-                internal_kernel_offsets_.push_back( dy * w + dx );
+                offsets.push_back( dy * w + dx );
         }
     }
+
+    return offsets;
 }
 
 void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)

@@ -271,12 +271,12 @@ public :
     //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and #l_out)
     //! with a copy semantic.
     ActiveContour(const ContourData& initial_contour,
-                  const AcConfig& config1);
+                  const AcConfig& config);
 
     //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and #l_out)
     //! with a move semantic.
     ActiveContour(ContourData&& initial_contour,
-                  const AcConfig& config1);
+                  const AcConfig& config);
 
     //! Destructor.
     virtual ~ActiveContour() {}
@@ -408,6 +408,10 @@ private :
     //! to speed up the hausdorff distance computation.
     void calculate_shapes_intersection();
 
+    //! Build kernel offsets.
+    static std::vector<int> make_internal_kernel_offsets(int disk_radius,
+                                                         int grid_width);
+
     //! To transformate active contour data point to the points for the Hausdorff distance.
     static Point2D_i from_ContourPoint(const ContourPoint& point,
                                      int grid_width);
@@ -415,18 +419,8 @@ private :
     //! Generic configuration of the active contour.
     const AcConfig config_;
 
-    //! Number of iterations in one cycle1-cycle2.
-    int steps_per_cycle_;
-
     //! Precomputed disk-shaped kernel offsets for internal smoothing (Fint).
-    std::vector<int> internal_kernel_offsets_;
-
-    //! Evolution state of the active contour given at a current iteration.
-    //!  There are 4 states : Cycle1, Cycle2, FinalCycle2 and Stopped.
-    PhaseState state_;
-
-    //! Stopping condition status.
-    StoppingStatus stopping_status_;
+    const std::vector<int> internal_kernel_offsets_;
 
     //! BoundarySwitchContext for the procedure switch_in.
     const BoundarySwitchContext ctx_in_;
@@ -437,6 +431,21 @@ private :
     //! A selector (pointer) to perform a switch generically. It pointes to ctx_in_ or ctx_out_.
     const BoundarySwitchContext* ctx_;
 
+    //! Temporary points to add after each scan of the list #l_in or #l_out.
+    ContourList points_to_append_;
+
+    //! Number of iterations in one cycle1-cycle2.
+    int steps_per_cycle_;
+
+    //! Evolution state of the active contour given at a current iteration.
+    //!  There are 4 states : Cycle1, Cycle2, FinalCycle2 and Stopped.
+    PhaseState state_;
+
+    //! Stopping condition status.
+    StoppingStatus stopping_status_;
+
+
+
     //! Evolution data of the active contour used by #check_state_step1() and
     //! #update_state_cycle2() to calculate #state.
     EvolutionData ed_;
@@ -444,9 +453,6 @@ private :
     //! Boolean egals to true if the cycle 2 stopping condition (based on hausdorff distance)
     //! is performed.
     bool is_cycle2_condition_;
-
-    //! Temporary points to add after each scan of the list #l_in or #l_out.
-    ContourList points_to_append_;
 };
 
 inline SpeedValue ActiveContour::get_discrete_speed(int speed)
