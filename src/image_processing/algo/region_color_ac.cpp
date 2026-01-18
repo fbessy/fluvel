@@ -135,7 +135,7 @@ void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
     const int speed_out = veloc_out.c1 + veloc_out.c2 + veloc_out.c3;
     const int speed_in  = veloc_in.c1  + veloc_in.c2  + veloc_in.c3;
 
-    point.set_speed( get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in) );
+    point.set_speed( speed_value::get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in) );
 }
 
 void RegionColorAc::do_specific_when_switch(int offset,
