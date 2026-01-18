@@ -43,8 +43,7 @@
 #include <vector>
 #include <unordered_set>
 #include <cstddef>
-#include <iostream>
-#include <cmath>
+#include <limits>
 
 #include "contour_data.hpp"
 #include "shape.hpp"
@@ -329,10 +328,6 @@ protected :
     //! Gets a discrete speed.
     static SpeedValue get_discrete_speed(int speed);
 
-    //! Gives the square of a value.
-    template <typename T>
-    static T square(const T& value);
-
     //! Representation data of the active contour
     //! (discret level-set function phi, Lin and Lout)
     ContourData cd_;
@@ -453,12 +448,6 @@ private :
     //! Temporary points to add after each scan of the list #l_in or #l_out.
     ContourList points_to_append_;
 };
-
-template <typename T>
-inline T ActiveContour::square(const T& value)
-{
-    return value*value;
-}
 
 inline SpeedValue ActiveContour::get_discrete_speed(int speed)
 {

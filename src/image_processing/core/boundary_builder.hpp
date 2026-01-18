@@ -132,10 +132,6 @@ private :
     void get_position(int offset,
                       int& x, int& y) const;
 
-    //! Gives the square of a value.
-    template <typename T>
-    static T square(const T& value);
-
     inline bool inside_image(int x, int y) {
         return x >= 0 && x < phi_width &&
                y >= 0 && y < phi_height;
@@ -211,12 +207,6 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(ContourList& list,
     {
         list.emplace_back( get_offset(x0+x,y0+y), x0+x );
     }
-}
-
-template <typename T>
-inline T BoundaryBuilder::square(const T& value)
-{
-    return value*value;
 }
 
 }

@@ -38,53 +38,72 @@
 ****************************************************************************/
 
 #include "region_ac.hpp"
+#include "ofeli_math.hpp"
 
 namespace ofeli_ip
 {
 
-void RegionAc::do_specific_cycle1()
-{
-    if( pxl_nbr_out >= 1 )
-    {
-        average_out = (unsigned char)( sum_out /
-                                       (unsigned int)pxl_nbr_out );
-    }
-    else
-    {
-        std::cerr << std::endl <<
-            " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-            "Impossible to calculate average_out without outside points.";
-    }
-
-    if( pxl_nbr_total - pxl_nbr_out >= 1 )
-    {
-        average_in = (unsigned char)( (sum_total - sum_out) /
-                                      (unsigned int)(pxl_nbr_total - pxl_nbr_out) );
-    }
-    else
-    {
-        std::cerr << std::endl <<
-            " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-            "Impossible to calculate average_in without inside points.";
-    }
-}
-
 void RegionAc::initialize_sums()
 {
-    sum_total = 0;
+    sum_total_ = 0;
 
-    sum_out = 0;
-    pxl_nbr_out = 0;
+    sum_out_ = 0;
+    pxl_nbr_out_ = 0;
 
-    for( int offset = 0; offset < pxl_nbr_total; offset++ )
+    for( int offset = 0; offset < pxl_nbr_total_; ++offset )
     {
-        sum_total += image.pixel_at(offset);
+        const int64_t intensity = static_cast<int64_t>( image_.pixel_at(offset) );
+
+        sum_total_ += intensity;
 
         if( phi_value::isOutside( cd_.phi()[offset] ) )
         {
-            sum_out += image.pixel_at(offset);
-            pxl_nbr_out++;
+            sum_out_ += intensity;
+            ++pxl_nbr_out_;
         }
+    }
+}
+
+void RegionAc::do_specific_cycle1()
+{
+    if( pxl_nbr_out_ >= 1 )
+        average_out_ = lround( static_cast<float>(sum_out_) / pxl_nbr_out_ );
+
+
+    const int64_t sum_in = sum_total_ - sum_out_;
+    const int64_t pxl_nbr_in = pxl_nbr_total_ - pxl_nbr_out_;
+
+    if( pxl_nbr_in >= 1 )
+        average_in_ = lround( static_cast<float>(sum_in) / pxl_nbr_in );
+}
+
+void RegionAc::compute_external_speed_Fd(ContourPoint& point)
+{
+    const int pxl = static_cast<int>( image_.pixel_at( point.offset() ) );
+
+    const int diff_out = pxl - average_out_;
+    const int diff_in  = pxl - average_in_;
+
+    const int speed =   region_config_.lambda_out * ( math::square(diff_out) )
+                      - region_config_.lambda_in  * ( math::square(diff_in) );
+
+    point.set_speed( get_discrete_speed( speed ) );
+}
+
+void RegionAc::do_specific_when_switch(int offset,
+                                       BoundarySwitch ctx_choice)
+{
+    const int64_t intensity = static_cast<int64_t>( image_.pixel_at(offset) );
+
+    if ( ctx_choice == BoundarySwitch::In )
+    {
+        sum_out_ -= intensity;
+        --pxl_nbr_out_;
+    }
+    else if ( ctx_choice == BoundarySwitch::Out )
+    {
+        sum_out_ += intensity;
+        ++pxl_nbr_out_;
     }
 }
 

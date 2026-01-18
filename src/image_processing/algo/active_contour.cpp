@@ -425,8 +425,7 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
     // Internal speed Fint is computed using a local majority vote
     // on the interior/exterior labeling of neighboring pixels.
     // This is equivalent to a smoothed Heaviside convolution
-    // described in the reference paper, but implemented in a
-    // simpler and more robust discrete form.
+    // described in the reference paper.
 
     // Note: the direction is intentionally inverted.
     // If the neighborhood is mostly inside, the boundary locally

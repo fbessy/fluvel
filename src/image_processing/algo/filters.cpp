@@ -47,6 +47,8 @@
 #include <cmath>      // std::exp
 #include <cstring>    // std::memcpy
 
+#include "ofeli_math.hpp"
+
 namespace ofeli_ip
 {
 
@@ -201,7 +203,7 @@ void Filters::anisotropic_diffusion(int max_itera,
                     sigma = 0.f;
                     for( index = 0; index < 8; index++ )
                     {
-                        c = std::exp( -square(nabla[index]/kappa) );
+                        c = std::exp( -math::square(nabla[index]/kappa) );
 
                         sigma += ( 1.f/(dist_sqr[index]) )*c*nabla[index];
                     }
@@ -276,7 +278,7 @@ void Filters::anisotropic_diffusion(int max_itera,
                     sigma = 0.0;
                     for( index = 0; index < 8; index++ )
                     {
-                        c = 1.f/( 1.f+square(nabla[index]/kappa) );
+                        c = 1.f/( 1.f+math::square(nabla[index]/kappa) );
 
                         sigma += ( 1.f/(dist_sqr[index]) )*c*nabla[index];
                     }
@@ -2508,7 +2510,7 @@ void Filters::nagao_filtering(int kernel_length)
 
     int min_var;
 
-    int nagao_size_init = square(kernel_radius+1);
+    int nagao_size_init = math::square(kernel_radius+1);
     if( nagao_size_init <= 0 )
     {
         nagao_size_init = 1;
@@ -2605,28 +2607,28 @@ void Filters::nagao_filtering(int kernel_length)
                 {
                     for( int dx = dy; dx <= -dy; dx++ )
                     {
-                        var[0] += square( sum[0]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[0] += math::square( sum[0]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
                     }
                 }
                 for( int dx = 0; dx <= kernel_radius; dx++ )
                 {
                     for( int dy = -dx; dy <= dx; dy++ )
                     {
-                        var[1] += square( sum[1]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[1] += math::square( sum[1]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for(int dx = -dy; dx <= dy; dx++ )
                     {
-                        var[2] += square( sum[2]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] ) );
+                        var[2] += math::square( sum[2]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] ) );
                     }
                 }
                 for( int dx = 0; dx >= -kernel_radius; dx-- )
                 {
                     for( int dy = dx; dy <= -dx; dy++ )
                     {
-                        var[3] += square( sum[3]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] ) );
+                        var[3] += math::square( sum[3]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] ) );
                     }
                 }
 
@@ -2634,28 +2636,28 @@ void Filters::nagao_filtering(int kernel_length)
                 {
                     for( int dx = 0; dx <= kernel_radius; dx++ )
                     {
-                        var[4] += square( sum[4]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[4] += math::square( sum[4]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = 0; dx <= kernel_radius; dx++ )
                     {
-                        var[5] += square( sum[5]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[5] += math::square( sum[5]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= 0; dx++ )
                     {
-                        var[6] += square( sum[6]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[6] += math::square( sum[6]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
                     }
                 }
                 for( int dy = -kernel_radius; dy <= 0; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= 0; dx++ )
                     {
-                        var[7] += square( sum[7]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[7] += math::square( sum[7]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
                     }
                 }
 
@@ -2663,7 +2665,7 @@ void Filters::nagao_filtering(int kernel_length)
                 {
                     for( int dx = -kernel_radius+1; dx <= kernel_radius-1; dx++ )
                     {
-                        var[8] += square(sum[8]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]));
+                        var[8] += math::square(sum[8]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]));
                     }
                 }
             }

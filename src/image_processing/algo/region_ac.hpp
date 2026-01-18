@@ -43,6 +43,8 @@
 #include "active_contour.hpp"
 #include "image_span.hpp"
 
+#include <iostream>
+
 namespace ofeli_ip
 {
 
@@ -59,10 +61,10 @@ struct RegionConfig
     int lambda_out;
 
     //! Check values of a configuration.
-    void check()
+    void normalize()
     {
-        lambda_in  = check( lambda_in );
-        lambda_out = check( lambda_out );
+        lambda_in  = normalize( lambda_in );
+        lambda_out = normalize( lambda_out );
     }
 
     //! Default constructor.
@@ -77,7 +79,7 @@ struct RegionConfig
     RegionConfig(const RegionConfig& copied) :
     lambda_in(copied.lambda_in), lambda_out(copied.lambda_out)
     {
-        this->check();
+        this->normalize();
     }
 
     //! Copy assignement operator.
@@ -86,7 +88,7 @@ struct RegionConfig
         this->lambda_in = rhs.lambda_in;
         this->lambda_out = rhs.lambda_out;
 
-        this->check();
+        this->normalize();
 
         return *this;
     }
@@ -108,17 +110,11 @@ struct RegionConfig
 
 protected:
 
-    //! Checks value weight and returns the same value or a default value.
-    static int check(int weight)
+    //! Normalize value weight and returns the same value or a default value.
+    static int normalize(int weight)
     {
         if( weight < 1 )
-        {
-            std::cerr << std::endl <<
-                " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-                "Precondition, weight is positive and must not equal to zero. It is set to default_val.";
-
             weight = 1;
-        }
 
         return weight;
     }
@@ -131,15 +127,15 @@ public :
 
     //! Constructor to initialize with an initial contour.
     template<typename T>
-    RegionAc(ImageSpan8 image1,
-             T&& initial_contour1,
-             const AcConfig& general_config1 = AcConfig(),              /* optional parameter */
-             const RegionConfig& region_config1 = RegionConfig());  /* optional parameter */
+    RegionAc(ImageSpan8 image,
+             T&& initial_contour,
+             const AcConfig& general_config = AcConfig(),              /* optional parameter */
+             const RegionConfig& region_config = RegionConfig());  /* optional parameter */
 
     //! Getter function for #Cout.
-    unsigned char get_Cout() const { return average_out; }
+    int get_Cout() const { return average_out_; }
     //! Getter function for #Cin.
-    unsigned char get_Cin() const { return average_in; }
+    int get_Cin() const { return average_in_; }
 
 private :
 
@@ -157,73 +153,45 @@ private :
                                          BoundarySwitch ctx_choice) override;
 
     //! Image wrapper.
-    ImageSpan8 image;
+    ImageSpan8 image_;
 
     //! Specific configuration for region based active contour.
-    const RegionConfig region_config;
+    const RegionConfig region_config_;
 
     //! Average or mean of the intensities or grey-levels of the pixels outside the curve, called C2 in the Chan-Vese article.
-    unsigned char average_out;
+    int average_out_;
 
     //! Average or mean of the intensities or grey-levels of the pixels inside the curve, called C1 in the Chan-Vese article.
-    unsigned char average_in;
+    int average_in_;
 
     //! Sum of the intensities or grey-levels of the whole image's pixels.
-    unsigned int sum_total;
+    int64_t sum_total_;
     //! Number of pixels or bytes of #img_data.
-    const int pxl_nbr_total;
+    const int64_t pxl_nbr_total_;
 
     //! Sum of the intensities or grey-levels of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    unsigned int sum_out;
+    int64_t sum_out_;
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    int pxl_nbr_out;
+    int64_t pxl_nbr_out_;
 };
 
 template<typename T>
-RegionAc::RegionAc(ImageSpan8 image1,
-                   T&& initial_contour1,
-                   const AcConfig& general_config1,      /* optional parameter with AcConfig() */
-                   const RegionConfig& region_config1) /* optional parameter with RegionConfig() */
-    : ActiveContour(std::forward<T>(initial_contour1), general_config1),
-    image(image1),
-    region_config(region_config1),
-    average_in(255), average_out(0),
-    sum_total(0), pxl_nbr_total(image.size()),
-    sum_out(0), pxl_nbr_out(0)
+RegionAc::RegionAc(ImageSpan8 image,
+                   T&& initial_contour,
+                   const AcConfig& general_config,      /* optional parameter with AcConfig() */
+                   const RegionConfig& region_config) /* optional parameter with RegionConfig() */
+    : ActiveContour(std::forward<T>(initial_contour), general_config),
+    image_(image),
+    region_config_(region_config),
+    average_in_(255), average_out_(0),
+    sum_total_(0), pxl_nbr_total_(image.size()),
+    sum_out_(0), pxl_nbr_out_(0)
 {
     assert( image.width()  == cd_.phi().width() &&
             image.height() == cd_.phi().height()   );
 
     initialize_sums();
     RegionAc::do_specific_cycle1();
-}
-
-inline void RegionAc::compute_external_speed_Fd(ContourPoint& point)
-{
-    const int pxl = int( image.pixel_at( point.offset() ) );
-
-    const int diff_out = pxl - int(average_out);
-    const int diff_in  = pxl - int(average_in);
-
-    const int speed =   region_config.lambda_out * ( square(diff_out) )
-                      - region_config.lambda_in  * ( square(diff_in) );
-
-    point.set_speed( get_discrete_speed( speed ) );
-}
-
-inline void RegionAc::do_specific_when_switch(int offset,
-                                              BoundarySwitch ctx_choice)
-{
-    if ( ctx_choice == BoundarySwitch::In )
-    {
-        sum_out -= image.pixel_at(offset);
-        pxl_nbr_out--;
-    }
-    else if ( ctx_choice == BoundarySwitch::Out )
-    {
-        sum_out += image.pixel_at(offset);
-        pxl_nbr_out++;
-    }
 }
 
 }

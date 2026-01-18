@@ -4,6 +4,8 @@
 #include <cassert>
 #include <bit>
 
+#include "color.hpp"
+
 namespace ofeli_ip
 {
 
@@ -50,28 +52,6 @@ private:
     int height_;
 };
 
-// Colors
-
-struct Bgra32
-{
-    unsigned char blue;
-    unsigned char green;
-    unsigned char red;
-    unsigned char alpha;
-};
-
-template <typename T>
-struct Rgb
-{
-    T red;
-    T green;
-    T blue;
-};
-
-using Rgb_uc = Rgb<unsigned char>;
-using Rgb_i = Rgb<int>;
-using Rgb_ui = Rgb<unsigned int>;
-
 class ImageSpan32 final
 {
 public:
@@ -112,7 +92,7 @@ public:
         assert( offset >= 0 && offset < size() );
 
         const auto px = pixel_bgra_at(offset);
-        return { px.red, px.green, px.blue };
+        return Rgb_uc{ px.red, px.green, px.blue };
     }
 
     Rgb_uc pixel_rgb_at(int x, int y) const noexcept
@@ -121,7 +101,7 @@ public:
         assert( y >= 0 && y < height_ );
 
         const auto px = pixel_bgra_at(x, y);
-        return { px.red, px.green, px.blue };
+        return Rgb_uc{ px.red, px.green, px.blue };
     }
 
     int width()  const { return width_; }

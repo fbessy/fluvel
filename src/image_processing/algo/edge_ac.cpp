@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include "edge_ac.hpp"
+#include "ofeli_math.hpp"
 
 #include <cstring>
 
@@ -166,7 +167,7 @@ unsigned char EdgeAc::do_otsu_method(const ImageSpan8& image)
             mean1 = (unsigned char) (sum1 / weight1);
             mean2 = (unsigned char) ( (sum-sum1) / weight2 ); // sum2 = sum-sum1
 
-            var_t = (float)weight1 * (float)weight2 * (float)square( int(mean1)-int(mean2) );
+            var_t = (float)weight1 * (float)weight2 * (float)math::square( int(mean1)-int(mean2) );
 
             if( var_t > var_max )
             {

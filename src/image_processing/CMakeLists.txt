@@ -42,10 +42,11 @@ set(ip_src
     ${CORE_DIR}/image_span.hpp
     ${CORE_DIR}/point.hpp
     ${CORE_DIR}/point_hash.hpp
-    ${CORE_DIR}/math.hpp
+    ${CORE_DIR}/ofeli_math.hpp
 )
 
-add_library(${TARGET_NAME} STATIC ${ip_src})
+add_library(${TARGET_NAME} STATIC ${ip_src}
+    core/color.hpp)
 add_library(ofeli::image_processing ALIAS ${TARGET_NAME})
 
 

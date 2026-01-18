@@ -73,9 +73,9 @@ ApplicationSettings::ApplicationSettings()
 
     region_ac_config.color_space = ofeli_ip::ColorSpaceOption(settings.value("Settings/Algorithm/color_space", ofeli_ip::ColorSpaceOption::RGB).toUInt());
 
-    region_ac_config.weights[0] = settings.value("Settings/Algorithm/alpha", 1).toInt();
-    region_ac_config.weights[1] = settings.value("Settings/Algorithm/beta", 1).toInt();
-    region_ac_config.weights[2] = settings.value("Settings/Algorithm/gamma", 1).toInt();
+    region_ac_config.weights.c1 = settings.value("Settings/Algorithm/alpha", 1).toInt();
+    region_ac_config.weights.c2 = settings.value("Settings/Algorithm/beta",  1).toInt();
+    region_ac_config.weights.c3 = settings.value("Settings/Algorithm/gamma", 1).toInt();
 
     kernel_gradient_length = settings.value("Settings/Algorithm/kernel_gradient_length", 5).toInt();
 
@@ -187,9 +187,9 @@ void ApplicationSettings::save()
     settings.setValue("Settings/Algorithm/lambda_in", region_ac_config.lambda_in);
     settings.setValue("Settings/Algorithm/kernel_gradient_length", kernel_gradient_length);
     settings.setValue("Settings/Algorithm/color_space", region_ac_config.color_space);
-    settings.setValue("Settings/Algorithm/alpha", region_ac_config.weights[0]);
-    settings.setValue("Settings/Algorithm/beta", region_ac_config.weights[1]);
-    settings.setValue("Settings/Algorithm/gamma", region_ac_config.weights[2]);
+    settings.setValue("Settings/Algorithm/alpha", region_ac_config.weights.c1);
+    settings.setValue("Settings/Algorithm/beta", region_ac_config.weights.c2);
+    settings.setValue("Settings/Algorithm/gamma", region_ac_config.weights.c3);
     settings.setValue("Settings/Algorithm/has_smoothing_cycle", algo_config.is_cycle2);
     settings.setValue("Settings/Algorithm/disk_radius", algo_config.disk_radius);
 

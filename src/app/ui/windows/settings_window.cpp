@@ -1053,9 +1053,9 @@ void SettingsWindow::accept()
 
     config.region_ac_config.color_space = ofeli_ip::ColorSpaceOption( color_space_cb->currentIndex() );
 
-    config.region_ac_config.weights[0] = alpha_spin->value();
-    config.region_ac_config.weights[1] = beta_spin->value();
-    config.region_ac_config.weights[2] = gamma_spin->value();
+    config.region_ac_config.weights.c1 = alpha_spin->value();
+    config.region_ac_config.weights.c2 = beta_spin->value();
+    config.region_ac_config.weights.c3 = gamma_spin->value();
 
     if(    previous_algo_config != config.algo_config
         || previous_region_config != config.region_ac_config )
@@ -1201,9 +1201,9 @@ void SettingsWindow::reject()
 
     color_space_cb->setCurrentIndex( int(config.region_ac_config.color_space) );
 
-    alpha_spin->setValue(config.region_ac_config.weights[0]);
-    beta_spin->setValue(config.region_ac_config.weights[1]);
-    gamma_spin->setValue(config.region_ac_config.weights[2]);
+    alpha_spin->setValue(config.region_ac_config.weights.c1);
+    beta_spin->setValue(config.region_ac_config.weights.c2);
+    gamma_spin->setValue(config.region_ac_config.weights.c3);
 
     klength_gradient_spin->setValue(config.kernel_gradient_length);
 

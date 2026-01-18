@@ -59,6 +59,8 @@
 #include <numeric>
 #include <cstddef>
 
+#include "ofeli_math.hpp"
+
 namespace ofeli_ip
 {
 
@@ -142,8 +144,8 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
                 relative_p2.y = float(p2.y) - shape_2.get_centroid().y;
 
                 // computes the square and the euclidean distance
-                sq = ( square(relative_p2.x-relative_p1.x) +
-                       square(relative_p2.y-relative_p1.y)   );
+                sq = ( math::square(relative_p2.x-relative_p1.x) +
+                       math::square(relative_p2.y-relative_p1.y)   );
 
                 if( sq > 0.f )
                 {
@@ -284,7 +286,7 @@ float HausdorffDistance::get_centroids_distance() const
         Point2D_f gap( shape_b.get_centroid().x - shape_a.get_centroid().x,
                      shape_b.get_centroid().y - shape_a.get_centroid().y );
 
-        float sq_val = square( gap.x ) + square( gap.y );
+        float sq_val = math::square( gap.x ) + math::square( gap.y );
 
         if( sq_val > 0.f )
         {

@@ -38,90 +38,131 @@
 ****************************************************************************/
 
 #include "region_color_ac.hpp"
+#include "ofeli_math.hpp"
 
 namespace ofeli_ip
 {
 
-void RegionColorAc::reinitialize(ImageSpan32 image1)
+void RegionColorAc::initialize_sums()
 {
-    ActiveContour::reinitialize();
+    sum_total_ = { 0, 0, 0 };
 
-    image = image1;
+    sum_out_   = { 0, 0, 0 };
+    pxl_nbr_out_ = 0;
 
-    initialize_sums();
-    do_specific_cycle1();
+    for( int offset = 0; offset < pxl_nbr_total_; ++offset )
+    {
+        const Rgb_64i rgb = static_cast<Rgb_64i>( image_.pixel_rgb_at(offset) );
+
+        sum_total_ += rgb;
+
+        if( phi_value::isOutside( cd_.phi()[offset] ) )
+        {
+            sum_out_ += rgb;
+            ++pxl_nbr_out_;
+        }
+    }
 }
 
 void RegionColorAc::do_specific_cycle1()
 {
-    if( pxl_nbr_out >= 1 )
+    if( pxl_nbr_out_ >= 1 )
     {
-        average_out.red = (unsigned char)( sum_out.red /
-                                           (unsigned int) pxl_nbr_out );
-
-        average_out.green = (unsigned char)( sum_out.green /
-                                             (unsigned int) pxl_nbr_out );
-
-        average_out.blue = (unsigned char)( sum_out.blue /
-                                            (unsigned int) pxl_nbr_out );
-    }
-    else
-    {
-        std::cerr << std::endl <<
-        " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-        "Impossible to calculate mean Cout without outside points.";
+        const auto rgb_f = sum_out_ / pxl_nbr_out_;
+        average_out_ = rgb_f.rounded<unsigned char>();
+        average_color_out_ = rgb_to_color(average_out_);
     }
 
-    int pxl_nbr_in = pxl_nbr_total - pxl_nbr_out;
+    const Rgb_64i sum_in = sum_total_ - sum_out_;
+    const int64_t pxl_nbr_in = pxl_nbr_total_ - pxl_nbr_out_;
 
     if( pxl_nbr_in >= 1 )
     {
-        average_in.red = (unsigned char)( (sum_total.red - sum_out.red) /
-                                          (unsigned int) pxl_nbr_in );
+        const auto rgb_f = sum_in / pxl_nbr_in;
+        average_in_ = rgb_f.rounded<unsigned char>();
+        average_color_in_ = rgb_to_color(average_in_);
+    }
+}
 
-        average_in.green = (unsigned char)( (sum_total.green - sum_out.green) /
-                                             (unsigned int) pxl_nbr_in );
+Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
+{
+    const auto cs = region_config_.color_space;
 
-        average_in.blue = (unsigned char)( (sum_total.blue - sum_out.blue) /
-                                            (unsigned int) pxl_nbr_in );
+    if( cs == ColorSpaceOption::YUV )
+    {
+        return color::rgb_to_yuv(rgb);
+    }
+    else if ( cs == ColorSpaceOption::Lab )
+    {
+        const auto col = color::rgb_to_Lab(rgb);
+
+        return { static_cast<int>(255.f * col.L),
+                 static_cast<int>(255.f * col.a),
+                 static_cast<int>(255.f * col.b) };
+    }
+    else if ( cs == ColorSpaceOption::Luv )
+    {
+        const auto col = color::rgb_to_Luv(rgb);
+
+        return { static_cast<int>(255.f * col.L),
+                 static_cast<int>(255.f * col.u),
+                 static_cast<int>(255.f * col.v) };
     }
     else
     {
-        std::cerr << std::endl <<
-        " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-        "Impossible to calculate mean Cin without inside points.";
+        return { static_cast<int>( rgb.red ),
+                 static_cast<int>( rgb.green ),
+                 static_cast<int>( rgb.blue ) };
     }
-
-    rgb_to_color(average_out, average_color_out);
-    rgb_to_color(average_in, average_color_in);
 }
 
-void RegionColorAc::initialize_sums()
+void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    Rgb_uc rgb;
+    const Rgb_uc rgb = image_.pixel_rgb_at( point.offset() );
 
-    sum_total = { 0u, 0u, 0u };
-    sum_out   = { 0u, 0u, 0u };
+    const auto col = rgb_to_color(rgb);
 
-    pxl_nbr_out = 0;
+    const int lambda_out = region_config_.lambda_out;
+    const int lambda_in  = region_config_.lambda_in;
 
-    for( int offset = 0; offset < pxl_nbr_total; offset++ )
+    const auto weights   = region_config_.weights;
+    const auto avg_out   = average_color_out_;
+    const auto avg_in    = average_color_in_;
+
+    const Color_3i veloc_out = weights * math::square( col - avg_out );
+    const Color_3i veloc_in  = weights * math::square( col - avg_in );
+
+    const int speed_out = veloc_out.c1 + veloc_out.c2 + veloc_out.c3;
+    const int speed_in  = veloc_in.c1  + veloc_in.c2  + veloc_in.c3;
+
+    point.set_speed( get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in) );
+}
+
+void RegionColorAc::do_specific_when_switch(int offset,
+                                            BoundarySwitch ctx_choice)
+{
+    const Rgb_64i rgb = static_cast<Rgb_64i>( image_.pixel_rgb_at(offset) );
+
+    if ( ctx_choice == BoundarySwitch::In )
     {
-        rgb = image.pixel_rgb_at(offset);
-
-        sum_total.red   += rgb.red;
-        sum_total.green += rgb.green;
-        sum_total.blue  += rgb.blue;
-
-        if( phi_value::isOutside( cd_.phi()[offset] ) )
-        {
-            sum_out.red   += rgb.red;
-            sum_out.green += rgb.green;
-            sum_out.blue  += rgb.blue;
-
-            pxl_nbr_out++;
-        }
+        sum_out_ -= rgb;
+        --pxl_nbr_out_;
     }
+    else if ( ctx_choice == BoundarySwitch::Out )
+    {
+        sum_out_ += rgb;
+        ++pxl_nbr_out_;
+    }
+}
+
+void RegionColorAc::reinitialize(ImageSpan32 image)
+{
+    ActiveContour::reinitialize();
+
+    image_ = image;
+
+    initialize_sums();
+    do_specific_cycle1();
 }
 
 }

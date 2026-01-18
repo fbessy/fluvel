@@ -188,10 +188,6 @@ private :
     //! Sorts an array with the quick sort algorithm.
     static void quick_sort(unsigned char* array, int begin, int end);
 
-    //! Gives the square of a value.
-    template <typename T>
-    static T square(const T& value);
-
 };
 
 inline int Filters::find_offset(int x, int y, int color_channel) const
@@ -205,13 +201,6 @@ inline void Filters::swap(unsigned char* const array, int a, int b)
     array[a] = array[b];
     array[b] = temp;
 }
-
-template <typename T>
-inline T Filters::square(const T& value)
-{
-    return value*value;
-}
-
 
 }
 

@@ -85,10 +85,6 @@ private:
                              float& directed_hd,
                              std::vector<float>& directed_min_dists);
 
-    //! Gives the square of a value.
-    template <typename T>
-    static T square(const T& value);
-
     //! Mean or average of the directed/relative minimum distances.
     static float calculate_mean(const std::vector<float>& min_dists);
 
@@ -130,12 +126,6 @@ private:
     //! Boolean to know if min_dists are already sorted.
     bool is_sorted;
 };
-
-template <typename T>
-inline T HausdorffDistance::square(const T& value)
-{
-    return value*value;
-}
 
 }
 

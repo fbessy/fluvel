@@ -43,40 +43,12 @@
 #include "active_contour.hpp"
 #include "region_ac.hpp"
 #include "image_span.hpp"
+#include "color.hpp"
+
+#include <cstdint>
 
 namespace ofeli_ip
 {
-
-constexpr int CHANNELS_NBR = 3;
-
-/**
- * @brief Inverse sRGB gamma correction, transforms R' to R
- */
-constexpr float INV_GAMMA_CORRECTION(float val)
-{
-    return val <= 0.0404482362771076f ?
-               val/12.92f : std::pow(((val) + 0.055f)/1.055f, 2.4f);
-}
-
-/** @brief XYZ color of the D65 white point */
-constexpr auto WHITE_POINT_X = 0.950456f;
-constexpr auto WHITE_POINT_Y = 1.f;
-constexpr auto WHITE_POINT_Z = 1.088754f;
-
-/** @brief *u*v color of the D65 white point */
-constexpr auto WHITE_POINT_DENOM = WHITE_POINT_X + 15.f*WHITE_POINT_Y + 3.f*WHITE_POINT_Z;
-constexpr auto WHITE_POINT_U     = 4.f*WHITE_POINT_X / WHITE_POINT_DENOM;
-constexpr auto WHITE_POINT_V     = 9.f*WHITE_POINT_Y / WHITE_POINT_DENOM;
-
-/**
- * @brief CIE L*a*b* f function (used to convert XYZ to L*a*b*)
- * http://en.wikipedia.org/wiki/Lab_color_space
- */
-constexpr float LAB_FUNC(float val)
-{
-    return val >= float(8.85645167903563082e-3) ?
-               std::cbrtf(val) : (841.f/108.f)*(val) + (4.f/29.f);
-}
 
 enum ColorSpaceOption : unsigned int
 {
@@ -94,37 +66,29 @@ struct RegionColorConfig : public RegionConfig
     ColorSpaceOption color_space;
 
     //! Weights \a to calculate external speed \a Fd.
-    int weights[CHANNELS_NBR];
+    Components_3i weights;
 
-    //! Check values of a configuration.
-    void check_region_color()
+    //! Normalize values of a configuration.
+    void normalize_region_color()
     {
-        for( int chl_idx = 0; chl_idx < CHANNELS_NBR; chl_idx++ )
-        {
-            weights[chl_idx] = check( weights[chl_idx] );
-        }
+        weights.c1 = normalize( weights.c1 );
+        weights.c2 = normalize( weights.c2 );
+        weights.c3 = normalize( weights.c3 );
     }
 
     //! Default constructor.
     RegionColorConfig() : RegionConfig(),
-        color_space(ColorSpaceOption::RGB)
+        color_space(ColorSpaceOption::RGB),
+        weights { 1, 1, 1 }
     {
-        for( int chl_idx = 0; chl_idx < CHANNELS_NBR; chl_idx++ )
-        {
-            weights[chl_idx] = 1;
-        }
     }
 
     //! Copy constructor.
     RegionColorConfig(const RegionColorConfig& copied) : RegionConfig(copied),
-        color_space(copied.color_space)
+        color_space(copied.color_space),
+        weights(copied.weights)
     {
-        for( int chl_idx = 0; chl_idx < CHANNELS_NBR; chl_idx++ )
-        {
-            weights[chl_idx] = copied.weights[chl_idx];
-        }
-
-        this->check_region_color();
+        this->normalize_region_color();
     }
 
     //! Copy assignement operator.
@@ -133,13 +97,9 @@ struct RegionColorConfig : public RegionConfig
         RegionConfig::operator=(rhs);
 
         this->color_space = rhs.color_space;
+        this->weights     = rhs.weights;
 
-        for( int chl_idx = 0; chl_idx < CHANNELS_NBR; chl_idx++ )
-        {
-            this->weights[chl_idx] = rhs.weights[chl_idx];
-        }
-
-        this->check_region_color();
+        this->normalize_region_color();
 
         return *this;
     }
@@ -148,22 +108,10 @@ struct RegionColorConfig : public RegionConfig
     friend bool operator==(const RegionColorConfig& lhs,
                            const RegionColorConfig& rhs)
     {
-        bool is_same_weight = true;
-
-        for( int chl_idx = 0;
-             chl_idx < CHANNELS_NBR && is_same_weight;
-             chl_idx++ )
-        {
-            if( lhs.weights[chl_idx] != rhs.weights[chl_idx] )
-            {
-                is_same_weight = false;
-            }
-        }
-
         return (    lhs.color_space == rhs.color_space
                  && lhs.lambda_in   == rhs.lambda_in
                  && lhs.lambda_out  == rhs.lambda_out
-                 && is_same_weight );
+                 && lhs.weights     == rhs.weights );
     }
 
     //! \a Not equal operator overloading.
@@ -181,19 +129,19 @@ public :
 
     ///! Constructor to initialize with an initial contour.
     template<typename T>
-    RegionColorAc(ImageSpan32 image1,
-                 T&& initial_contour1,
-                 const AcConfig& general_config1 = AcConfig(),                       /* optional parameter */
-                 const RegionColorConfig& region_config1 = RegionColorConfig()); /* optional parameter */
+    RegionColorAc(ImageSpan32 image,
+                 T&& initial_contour,
+                 const AcConfig& general_config = AcConfig(),                       /* optional parameter */
+                 const RegionColorConfig& region_config = RegionColorConfig()); /* optional parameter */
 
     //! Reinitializes the active contour with a new image buffer. Used for video tracking.
-    void reinitialize(ImageSpan32 image1);
+    void reinitialize(ImageSpan32 image);
 
     //! Getter function for #average_rgb_out
-    const Rgb_uc& get_Cout() const { return average_out; }
+    const Rgb_uc& get_Cout() const { return average_out_; }
 
     //! Getter function for #average_rgb_in
-    const Rgb_uc& get_Cin() const { return average_in; }
+    const Rgb_uc& get_Cin() const { return average_in_; }
 
 private :
 
@@ -210,256 +158,59 @@ private :
     virtual void do_specific_when_switch(int offset,
                                          BoundarySwitch ctx_choice) override;
 
-
-    //! Color space conversion functions.
-    static void rgb_to_xyz(float R, float G, float B,
-                           float *X, float *Y, float *Z);
-
-    static void xyz_to_Lab(float X, float Y, float Z,
-                           float *L, float *a, float *b);
-
-    static void xyz_to_Luv(float X, float Y, float Z,
-                           float *L, float *u, float *v);
-
-    static void rgb_to_Lab(float R, float G, float B,
-                           float *L, float *a, float *b);
-
-    static void rgb_to_Luv(float R, float G, float B,
-                           float *L, float *u, float *v);
-
-
-
     //! Calculates components \a of a color space (in function of the color space option) with a rgb value.
-    void rgb_to_color(const Rgb_uc& rgb,
-                      int color[]) const;
+    inline Color_3i rgb_to_color(const Rgb_uc& rgb) const;
 
     //! Image wrapper.
-    ImageSpan32 image;
+    ImageSpan32 image_;
 
     //! Specific configuration for YUV region based active contour.
-    const RegionColorConfig region_config;
+    const RegionColorConfig region_config_;
 
 
     //! Mean of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    int average_color_out[CHANNELS_NBR];
+    Color_3i average_color_out_;
 
     //! Mean of the pixels inside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) <0\f$ .
-    int average_color_in[CHANNELS_NBR];
+    Color_3i average_color_in_;
 
     //! RGB mean of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    Rgb_uc average_out;
+    Rgb_uc average_out_;
 
     //! RGB mean of the pixels inside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) <0\f$ .
-    Rgb_uc average_in;
+    Rgb_uc average_in_;
 
     //! Sum of component #R, #G, #B of the pixels intside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) <0\f$ .
-    Rgb_ui sum_total;
+    Rgb_64i sum_total_;
     //! Number of pixels or bytes of #phi.
-    const int pxl_nbr_total;
+    const int64_t pxl_nbr_total_;
 
     //! Sum of component #R, #G, #B of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    Rgb_ui sum_out;
+    Rgb_64i sum_out_;
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    int pxl_nbr_out;
+    int64_t pxl_nbr_out_;
+
+    Rgb_64i sum2_out_;
+    Rgb_64i sum2_total_;
 };
 
 // Definitions
 
 template<typename T>
-RegionColorAc::RegionColorAc(ImageSpan32 image1,
-                             T&& initial_contour1,
-                             const AcConfig& general_config1,           /* optional parameter with AcConfig() */
-                             const RegionColorConfig& region_config1) /* optional parameter with RegionColorConfig() */
-    : ActiveContour(std::forward<T>(initial_contour1), general_config1),
-    image(image1),
-    region_config(region_config1),
-    pxl_nbr_total(image.size()), pxl_nbr_out(0)
+RegionColorAc::RegionColorAc(ImageSpan32 image,
+                             T&& initial_contour,
+                             const AcConfig& general_config,           /* optional parameter with AcConfig() */
+                             const RegionColorConfig& region_config) /* optional parameter with RegionColorConfig() */
+    : ActiveContour(std::forward<T>(initial_contour), general_config),
+    image_(image),
+    region_config_(region_config),
+    pxl_nbr_total_(image.size()), pxl_nbr_out_(0)
 {
     assert( image.width()  == cd_.phi().width() &&
             image.height() == cd_.phi().height()   );
 
     initialize_sums();
     RegionColorAc::do_specific_cycle1();
-}
-
-inline void RegionColorAc::rgb_to_xyz(float R, float G, float B,
-                                      float *X, float *Y, float *Z)
-{
-    R = INV_GAMMA_CORRECTION(R);
-    G = INV_GAMMA_CORRECTION(G);
-    B = INV_GAMMA_CORRECTION(B);
-    *X = (float)(0.4123955889674142161*R + 0.3575834307637148171*G + 0.1804926473817015735*B);
-    *Y = (float)(0.2125862307855955516*R + 0.7151703037034108499*G + 0.07220049864333622685*B);
-    *Z = (float)(0.01929721549174694484*R + 0.1191838645808485318*G + 0.9504971251315797660*B);
-}
-
-inline void RegionColorAc::xyz_to_Lab(float X, float Y, float Z,
-                                      float *L, float *a, float *b)
-{
-    X /= WHITE_POINT_X;
-    Y /= WHITE_POINT_Y;
-    Z /= WHITE_POINT_Z;
-    X = LAB_FUNC(X);
-    Y = LAB_FUNC(Y);
-    Z = LAB_FUNC(Z);
-    *L = 116.f*Y - 16.f;
-    *a = 500.f*(X - Y);
-    *b = 200.f*(Y - Z);
-}
-
-/**
- * Convert CIE XYZ to CIE L*u*v* (CIELUV) with the D65 white point
- *
- * @param L, u, v pointers to hold the result
- * @param X, Y, Z the input XYZ values
- *
- * Wikipedia: http://en.wikipedia.org/wiki/CIELUV_color_space
- */
-inline void RegionColorAc::xyz_to_Luv(float X, float Y, float Z,
-                                      float *L, float *u, float *v)
-{
-    float u1, v1, denom;
-
-    denom = X + 15.f*Y + 3.f*Z;
-
-    if( denom > 0.f )
-    {
-        u1 = (4.f*X) / denom;
-        v1 = (9.f*Y) / denom;
-    }
-    else
-    {
-        u1 = 0.f;
-        v1 = 0.f;
-    }
-
-    Y /= WHITE_POINT_Y;
-    Y = LAB_FUNC(Y);
-    *L = 116.f*Y - 16.f;
-    *u = 13.f*(*L)*(u1 - WHITE_POINT_U);
-    *v = 13.f*(*L)*(v1 - WHITE_POINT_V);
-}
-
-inline void RegionColorAc::rgb_to_Lab(float R, float G, float B,
-                                      float *L, float *a, float *b)
-{
-    float X, Y, Z;
-    rgb_to_xyz(R, G, B, &X, &Y, &Z);
-    xyz_to_Lab(X, Y, Z, L, a, b);
-}
-
-inline void RegionColorAc::rgb_to_Luv(float R, float G, float B,
-                                      float *L, float *u, float *v)
-{
-    float X, Y, Z;
-    rgb_to_xyz(R, G, B, &X, &Y, &Z);
-    xyz_to_Luv(X, Y, Z, L, u, v);
-}
-
-inline void RegionColorAc::rgb_to_color(const Rgb_uc& rgb,
-                                        int color[]) const
-{
-    float cie_color[CHANNELS_NBR];
-    const auto cs = region_config.color_space;
-
-    if( cs == ColorSpaceOption::YUV )
-    {
-        color[0] = ( (  66 * int(rgb.red) + 129 * int(rgb.green) +  25 * int(rgb.blue) + 128) >> 8) +  16; // Y
-        color[1] = ( ( -38 * int(rgb.red) -  74 * int(rgb.green) + 112 * int(rgb.blue) + 128) >> 8) + 128; // U
-        color[2] = ( ( 112 * int(rgb.red) -  94 * int(rgb.green) -  18 * int(rgb.blue) + 128) >> 8) + 128; // V
-    }
-    else if ( cs == ColorSpaceOption::Lab )
-    {
-        rgb_to_Lab(float(rgb.red)/255.f,
-                   float(rgb.green)/255.f,
-                   float(rgb.blue)/255.f,
-                   &cie_color[0],
-                   &cie_color[1],
-                   &cie_color[2]);
-
-        for( int chl_idx = 0;
-             chl_idx < CHANNELS_NBR;
-             chl_idx++ )
-        {
-            color[chl_idx] = int( 255.f * cie_color[chl_idx] );
-        }
-    }
-    else if ( cs == ColorSpaceOption::Luv )
-    {
-        rgb_to_Luv(float(rgb.red)/255.f,
-                   float(rgb.green)/255.f,
-                   float(rgb.blue)/255.f,
-                   &cie_color[0],
-                   &cie_color[1],
-                   &cie_color[2]);
-
-        for( int chl_idx = 0;
-             chl_idx < CHANNELS_NBR;
-             chl_idx++ )
-        {
-            color[chl_idx] = int( 255.f * cie_color[chl_idx] );
-        }
-    }
-    else
-    {
-        color[0] = int( rgb.red );
-        color[1] = int( rgb.green );
-        color[2] = int( rgb.blue );
-    }
-}
-
-inline void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
-{
-    int color[CHANNELS_NBR];
-
-    const Rgb_uc rgb = image.pixel_rgb_at( point.offset() );
-    rgb_to_color(rgb, color);
-
-    const int lambda_out = region_config.lambda_out;
-    const int lambda_in  = region_config.lambda_in;
-
-    const int* weights   = region_config.weights;
-    const int* avg_out   = average_color_out;
-    const int* avg_in    = average_color_in;
-
-    int speed_out = 0;
-    int speed_in  = 0;
-
-    for (int chl_idx = 0; chl_idx < CHANNELS_NBR; ++chl_idx)
-    {
-        const int diff_out = color[chl_idx] - avg_out[chl_idx];
-        const int diff_in  = color[chl_idx] - avg_in[chl_idx];
-
-        const int w = weights[chl_idx];
-
-        speed_out += w * square(diff_out);
-        speed_in  += w * square(diff_in);
-    }
-
-    point.set_speed( get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in) );
-}
-
-inline void RegionColorAc::do_specific_when_switch(int offset,
-                                                   BoundarySwitch ctx_choice)
-{
-    Rgb_uc rgb = image.pixel_rgb_at(offset);
-
-    if ( ctx_choice == BoundarySwitch::In )
-    {
-        sum_out.red   -= rgb.red;
-        sum_out.green -= rgb.green;
-        sum_out.blue  -= rgb.blue;
-
-        pxl_nbr_out--;
-    }
-    else if ( ctx_choice == BoundarySwitch::Out )
-    {
-        sum_out.red   += rgb.red;
-        sum_out.green += rgb.green;
-        sum_out.blue  += rgb.blue;
-
-        pxl_nbr_out++;
-    }
 }
 
 }
