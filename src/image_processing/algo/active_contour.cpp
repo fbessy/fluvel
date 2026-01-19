@@ -102,21 +102,19 @@ void ActiveContour::handle_failure()
         return;
 
 
-    if ( config_.failure_mode == FailureHandlingMode::StopOnFailure )
-    {
-        // for image segmentation
-        ed_.stopping_status = StoppingStatus::EmptyListFailure;
-        stop();
-    }
-    else if ( config_.failure_mode == FailureHandlingMode::RecoverOnFailure )
-    {
-        // for video tracking
+    ed_.stopping_status = StoppingStatus::EmptyListFailure;
+    stop();
+
+    // Recovery mode: the failure stops the current iteration,
+    // but contour data are repaired to allow a future restart.
+    if ( config_.failure_mode == FailureHandlingMode::RecoverOnFailure )
         cd_.repair_lists_if_needed();
-    }
 }
 
 void ActiveContour::enforce_iteration_limit()
 {
+    assert( state_ == PhaseState::Cycle1 );
+
     // Condition to handle and avoid infinite loop of the method converge(),
     // The convergence is data-dependent and therefore not guaranteed.
     if( ed_.step_count >= ed_.max_step_count )
@@ -199,11 +197,11 @@ void ActiveContour::step_cycle1()
     assert( state_ == PhaseState::Cycle1 );
 
     handle_failure();
-    if( !is_valid() )
+    if( is_stopped() )
         return;
 
     enforce_iteration_limit();
-    if( state_ != PhaseState::Cycle1 )
+    if( is_stopped() )
         return;
 
 
@@ -226,7 +224,7 @@ void ActiveContour::step_cycle2()
             || state_ == PhaseState::FinalCycle2 );
 
     handle_failure();
-    if( !is_valid() )
+    if( is_stopped() )
         return;
 
     directional_substep( BoundarySwitch::In );
@@ -526,6 +524,8 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 
 void ActiveContour::stop()
 {
+    assert( state_ != PhaseState::Stopped );
+
     state_ = PhaseState::Stopped;
 }
 
@@ -663,7 +663,7 @@ void ActiveContour::calculate_shapes_intersection()
     }
 }
 
-void ActiveContour::reinitialize()
+void ActiveContour::restart()
 {
     // Intended to be used in RecoverOnFailure mode (video tracking).
 

@@ -159,11 +159,10 @@ void ContourData::initialize_with_one_ellipse()
     l_out_.clear();
     l_in_.clear();
 
-    BoundaryBuilder init( phi_.width(), phi_.height(),
-                          l_out_, l_in_ );
+    BoundaryBuilder lists_init( phi_.width(), phi_.height(),
+                                l_out_, l_in_ );
 
-    init.get_ellipse_points( Point2D_f{ 0.5f, 0.5f },
-                             0.4f, 0.4f );
+    lists_init.get_ellipse_points( 0.8f, 0.8f );
 
     define_phi_from_lists();
 

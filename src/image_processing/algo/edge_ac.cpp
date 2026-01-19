@@ -60,8 +60,7 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
     {
         for( int dy = -1; dy <= 1; dy++ )
         {
-            if(    x+dx >= 0 && x+dx < cd_.phi().width()
-                && y+dy >= 0 && y+dy < cd_.phi().height() )
+            if( cd_.phi().valid(x+dx, y+dy) )
             {
                 dd = std::abs( int( gradient_image_.pixel_at(x,y) ) - int( gradient_image_.pixel_at(x + dx, y + dy)  ) );
 

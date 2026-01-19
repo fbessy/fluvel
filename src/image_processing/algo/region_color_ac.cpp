@@ -159,7 +159,7 @@ void RegionColorAc::do_specific_when_switch(int offset,
 
 void RegionColorAc::resetExecutionState(ImageSpan32 image)
 {
-    reinitialize();
+    restart();
 
     image_ = image;
 

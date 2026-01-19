@@ -346,8 +346,8 @@ public :
 
 protected :
 
-    //! Reinitialize the active contour, used for video tracking.
-    void reinitialize();
+    //! restart the active contour, used for video tracking.
+    void restart();
 
     //! Representation data of the active contour
     //! (discret level-set function phi, Lin and Lout)

@@ -13,8 +13,19 @@ constexpr T square(T v) noexcept
     return v * v;
 }
 
+constexpr int sign(int v) noexcept
+{
+    if ( v > 0 )
+        return  1;
+
+    if ( v < 0 )
+        return -1;
+
+    return 0;
 }
 
 }
 
-#endif // OFELI_MATH_H
+}
+
+#endif // OFELI_MATH_HPP

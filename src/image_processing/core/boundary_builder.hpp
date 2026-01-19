@@ -44,15 +44,6 @@
 #include "contour_data.hpp"
 #include "point.hpp"
 
-// false or true below, respectively,
-// if you want to use a matrix with a row/column wise data buffer
-#ifndef IS_COLUMN_WISE
-#define IS_COLUMN_WISE false
-#endif
-// functions affected by the define :
-// - unsigned int get_offset(unsigned int x, unsigned int y) const
-// - void get_position(unsigned int offset, unsigned int& x, unsigned int& y) const
-
 namespace ofeli_ip
 {
 
@@ -81,13 +72,13 @@ public :
                               BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     //! Gets ellipse points with center point and width and height.
-    void get_ellipse_points(Point2D_i center,
-                            int a, int b,
+    void get_ellipse_points(int width, int height,
+                            Point2D_i center,
                             BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     //! Gets ellipse points with normalized center point and width and height.
-    void get_ellipse_points(Point2D_f center,
-                            float a, float b,
+    void get_ellipse_points(float width_ratio,  float height_ratio,
+                            Point2D_f center = {}, // value-initialized to (0.f, 0.f)
                             BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
 private :
@@ -101,6 +92,12 @@ private :
                                            int x1, int y1,
                                            int x2, int y2);
 
+    //! Gets ellipse points with center point and width and height.
+    void get_ellipse_points(int x0, int y0,
+                            int a,  int b,
+                            ContourList& list_out,
+                            ContourList& list_in);
+
     void build_ellipse_midpoint_connected(int x0, int y0,
                                           int a, int b,
                                           ContourList& list_out);
@@ -109,29 +106,20 @@ private :
                                 const ContourList& l_out,
                                 ContourList& l_in);
 
-    //! Gets ellipse points with center point and width and height.
-    void get_ellipse_points(int x0, int y0,
-                            unsigned int a, unsigned int b,
-                            ContourList& list_out,
-                            ContourList& list_in);
-
     void add_4_points_in_ellipse(ContourList& list_init,
                                  int x, int y,
                                  int x0, int y0);
 
     int get_offset(int x, int y) const;
+    int get_offset(const Point2D_i& p) const;
 
-    void get_position(int offset,
-                      int& x, int& y) const;
+    Point2D_i get_position(int offset) const;
 
-    inline bool inside_image(int x, int y) {
-        return x >= 0 && x < phi_width_ &&
-               y >= 0 && y < phi_height_;
-    }
+    bool inside_grid(int x, int y) const;
+    inline bool inside_grid(const Point2D_i& p) const;
 
-
-    int phi_width_;
-    int phi_height_;
+    int grid_width_;
+    int grid_height_;
 
     ContourList& Lout_init_;
     ContourList& Lin_init_;
@@ -139,66 +127,46 @@ private :
 
 inline int BoundaryBuilder::get_offset(int x, int y) const
 {
-    if( IS_COLUMN_WISE )
-    {
-        return x*phi_height_+y;
-    }
-    else
-    {
-        return x+y*phi_width_;
-    }
+    return x+y*grid_width_;
 }
 
-inline void BoundaryBuilder::get_position(int offset,
-                                          int& x, int& y) const
+inline int BoundaryBuilder::get_offset(const Point2D_i& p) const
 {
-    if( IS_COLUMN_WISE )
-    {
-        x = offset/phi_height_;
-        y = offset-x*phi_height_;
-    }
-    else
-    {
-        y = offset/phi_width_;
-        x = offset-y*phi_width_;
-    }
+    return get_offset(p.x, p.y);
+}
+
+inline Point2D_i BoundaryBuilder::get_position(int offset) const
+{
+    int y = offset / grid_width_;
+    return { offset - y*grid_width_, y };
+}
+
+inline bool BoundaryBuilder::inside_grid(int x, int y) const
+{
+    return      x >= 0 && x < grid_width_
+             && y >= 0 && y < grid_height_ ;
+}
+
+inline bool BoundaryBuilder::inside_grid(const Point2D_i& p) const
+{
+    return inside_grid( p.x, p.y ) ;
 }
 
 inline void BoundaryBuilder::add_4_points_in_ellipse(ContourList& list,
                                                      int x, int y,
                                                      int x0, int y0)
 {
-    if( x0-x >= 0 &&
-        x0-x < phi_width_ &&
-        y0-y >= 0 &&
-        y0-y < phi_height_ )
-    {
+    if( inside_grid(x0-x, y0-y) )
         list.emplace_back( get_offset(x0-x,y0-y), x0-x );
-    }
 
-    if( x0-x >= 0 &&
-        x0-x < phi_width_ &&
-        y0+y >= 0 &&
-        y0+y < phi_height_ )
-    {
+    if( inside_grid(x0-x, y0+y) )
         list.emplace_back( get_offset(x0-x,y0+y), x0-x );
-    }
 
-    if( x0+x >= 0 &&
-        x0+x < phi_width_ &&
-        y0-y >= 0 &&
-        y0-y < phi_height_ )
-    {
+    if( inside_grid(x0+x, y0-y) )
         list.emplace_back( get_offset(x0+x,y0-y), x0+x );
-    }
 
-    if( x0+x >= 0 &&
-        x0+x < phi_width_ &&
-        y0+y >= 0 &&
-        y0+y < phi_height_ )
-    {
+    if( inside_grid(x0+x, y0+y) )
         list.emplace_back( get_offset(x0+x,y0+y), x0+x );
-    }
 }
 
 }

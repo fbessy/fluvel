@@ -57,6 +57,11 @@ struct Point2D
         return x == other.x && y == other.y;
     }
 
+    bool operator!=(const Point2D& other) const noexcept
+    {
+        return !( *this == other );
+    }
+
     Point2D& operator+=(const Point2D& rhs) noexcept
     {
         x += rhs.x;
