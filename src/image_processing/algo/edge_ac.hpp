@@ -53,12 +53,12 @@ public :
 
     //! Constructor to initialize with an initial contour.
     template<typename T>
-    EdgeAc(ImageSpan8 gradient_image1,
-           T&& initial_contour1,
-           const AcConfig& config1 = AcConfig()); /* optional parameter */
+    EdgeAc(ImageSpan8 gradient_image,
+           T&& initial_contour,
+           const AcConfig& config = AcConfig()); /* optional parameter */
 
     //! Getter function for #threshold
-    unsigned char get_threshold() const { return threshold; }
+    unsigned char get_threshold() const { return threshold_; }
 
 private :
 
@@ -72,27 +72,27 @@ private :
     static unsigned char do_otsu_method(const ImageSpan8& image);
 
     //! Image wrapper.
-    ImageSpan8 gradient_image;
+    ImageSpan8 gradient_image_;
 
     //! Global speed sign (1 or -1).
-    const int global_speed_sign;
+    const int global_speed_sign_;
 
     //! Global optimal threshold of #img_gradient_data.
-    const unsigned char threshold;
+    const unsigned char threshold_;
 };
 
 
 template<typename T>
-EdgeAc::EdgeAc(ImageSpan8 gradient_image1,
-               T&& initial_contour1,
-               const AcConfig& config1) /* optional parameter with AcConfig() */
-    : ActiveContour(std::forward<T>(initial_contour1), config1),
-    gradient_image(gradient_image1),
-    global_speed_sign( get_global_speed_sign() ),
-    threshold( do_otsu_method(gradient_image) )
+EdgeAc::EdgeAc(ImageSpan8 gradient_image,
+               T&& initial_contour,
+               const AcConfig& config) /* optional parameter with AcConfig() */
+    : ActiveContour(std::forward<T>(initial_contour), config),
+    gradient_image_(gradient_image),
+    global_speed_sign_( get_global_speed_sign() ),
+    threshold_( do_otsu_method(gradient_image) )
 {
-    assert( gradient_image.width()  == cd_.phi().width() &&
-            gradient_image.height() == cd_.phi().height()   );
+    assert( gradient_image_.width()  == cd_.phi().width() &&
+            gradient_image_.height() == cd_.phi().height()   );
 }
 
 }

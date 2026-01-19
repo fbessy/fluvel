@@ -110,14 +110,14 @@ public :
     //! Move constructor.
     ContourData(ContourData&& contour) noexcept;
 
-    //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
-    bool is_redundant(const ContourPoint& point) const;
-
-    //! Checks lists.
-    bool check_lists();
-
     //! Allocate lists.
     void allocate_lists();
+
+    //! Repair lists.
+    void repair_lists_if_needed();
+
+    //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
+    bool is_redundant(const ContourPoint& point) const;
 
     //! Wrapper to use directly with offset lists without the need to get the variable #phi.
     Point2D_i coord(int offet) const
@@ -135,7 +135,7 @@ public :
     ContourList& l_in() { return l_in_; }
     const ContourList& l_in() const { return l_in_; }
 
-    size_t preallocation_size() const { return preallocation_size_; }
+    bool empty() const { return l_out_.empty() || l_in_.empty(); }
 
 private :
 
@@ -143,15 +143,12 @@ private :
     void initialize_with_one_ellipse();
 
     //! Defines the #phi level-set function from the boundary lists #l_out and #l_in.
-    void define_phi_with_boundary();
+    void define_phi_from_lists();
 
-    //! Performs a flood fill algorithm for the method #define_phi_with_boundary().
-    void do_flood_fill(int offset_seed,
+    //! Performs a flood fill algorithm for the method #define_phi_from_lists().
+    void flood_fill(int offset_seed,
                        PhiValue target_value,
                        PhiValue replacement_value);
-
-    //! Checks phi dimension.
-    static bool is_ok_phi_dimension(int dimension);
 
     //! Discrete level-set function with only 4 PhiValue possible.
     DiscreteLevelSet phi_;
@@ -160,9 +157,6 @@ private :
     ContourList l_out_;
     //! List of points representing the interior boundary (called Lin in the reference paper).
     ContourList l_in_;
-
-    //! Preallocation size for each list.
-    size_t preallocation_size_;
 };
 
 namespace phi_value

@@ -130,12 +130,12 @@ public :
     ///! Constructor to initialize with an initial contour.
     template<typename T>
     RegionColorAc(ImageSpan32 image,
-                 T&& initial_contour,
-                 const AcConfig& general_config = AcConfig(),                       /* optional parameter */
-                 const RegionColorConfig& region_config = RegionColorConfig()); /* optional parameter */
+                  T&& initial_contour,
+                  const AcConfig& general_config = AcConfig(),                       /* optional parameter */
+                  const RegionColorConfig& region_config = RegionColorConfig());     /* optional parameter */
 
-    //! Reinitializes the active contour with a new image buffer. Used for video tracking.
-    void reinitialize(ImageSpan32 image);
+    //! Reset the execution state with a new image buffer. Used for video tracking.
+    void resetExecutionState(ImageSpan32 image);
 
     //! Getter function for #average_rgb_out
     const Rgb_uc& get_Cout() const { return average_out_; }
@@ -199,8 +199,8 @@ private :
 template<typename T>
 RegionColorAc::RegionColorAc(ImageSpan32 image,
                              T&& initial_contour,
-                             const AcConfig& general_config,           /* optional parameter with AcConfig() */
-                             const RegionColorConfig& region_config) /* optional parameter with RegionColorConfig() */
+                             const AcConfig& general_config,            /* optional parameter with AcConfig() */
+                             const RegionColorConfig& region_config)    /* optional parameter with RegionColorConfig() */
     : ActiveContour(std::forward<T>(initial_contour), general_config),
     image_(image),
     region_config_(region_config),

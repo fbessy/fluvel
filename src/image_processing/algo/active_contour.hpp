@@ -55,6 +55,26 @@ namespace ofeli_ip
 
 constexpr size_t INITIAL_SPEED_ARRAY_ALLOC_SIZE = 10000u;
 
+//! Defines how the algorithm handles degraded or failure cases.
+//! Typically used for image segmentation (StopOnFailure)
+//! and video tracking (RecoverOnFailure).
+enum class FailureHandlingMode {
+    StopOnFailure,    //!< Intended for image segmentation.
+    RecoverOnFailure  //!< Intended for video tracking.
+};
+
+//! \enum Stopping condition status.
+enum class StoppingStatus
+{
+    None,              //!< the active contour is not stopped.
+    ListsConverged,    //!< speed <= 0 for all points of Lout and speed >= 0 for all points of Lin
+    Hausdorff,         //!< Hausorff distance fallback, available only in StopOnFailure mode.
+    MaxIteration,      //!< Maximum number of elementary steps reached, last fallback to avoid
+                       //!  infinite loop of the method converge().
+    EmptyListFailure   //!< One or the both lists is/are empty. The definition of both contiguous lists
+                       //!  as a boundary is not respected.
+};
+
 //! Internal phase state of the active contour.
 //! A logical cycle consists of Phase Cycle1 followed by Phase Cycle2,
 //! as described in the reference paper.
@@ -66,17 +86,7 @@ enum class PhaseState
     Stopped
 };
 
-//! \enum Stopping condition status.
-enum class StoppingStatus
-{
-    None,           //!< Maximum number of elementary steps reached.
-    EmptyList,      //!< One or the both lists is/are empty. The definition of both contiguous lists
-                    //!  as a boundary is not respected.
-    MaxIteration,   //!< Maximum number of elementary steps reached.
-    ListsStopped,   //!< speed <= 0 for all points of l_out and speed >= 0 for all points of l_in
-    Hausdorff       //!< Hausorff distance convergence.
-};
-
+//! BoundarySwitch to perform switch_in or switch_out procedures generically.
 enum class BoundarySwitch
 {
     In,
@@ -99,6 +109,9 @@ struct AcConfig
     //! Maximum number of times the active contour can evolve in a cycle 2 with \a Fint speed.
     int Ns;
 
+    ///! Defines how the algorithm handles degraded or failure cases.
+    FailureHandlingMode failure_mode;
+
     //! Normalize values of a configuration.
     void normalize()
     {
@@ -115,7 +128,8 @@ struct AcConfig
     //! Default constructor.
     AcConfig() : is_cycle2(true),
                  disk_radius(2),
-                 Na(30), Ns(3)
+                 Na(30), Ns(3),
+                 failure_mode(FailureHandlingMode::StopOnFailure)
     {
     }
 
@@ -123,7 +137,8 @@ struct AcConfig
     AcConfig(const AcConfig& copied) :
         is_cycle2( copied.is_cycle2 ),
         disk_radius( copied.disk_radius ),
-        Na( copied.Na ), Ns( copied.Ns )
+        Na( copied.Na ), Ns( copied.Ns ),
+        failure_mode( copied.failure_mode )
     {
         this->normalize();
     }
@@ -135,6 +150,7 @@ struct AcConfig
         this->disk_radius = rhs.disk_radius;
         this->Na = rhs.Na;
         this->Ns = rhs.Ns;
+        this->failure_mode = rhs.failure_mode;
 
         this->normalize();
 
@@ -148,7 +164,8 @@ struct AcConfig
         return (    lhs.is_cycle2     == rhs.is_cycle2
                  && lhs.disk_radius   == rhs.disk_radius
                  && lhs.Na            == rhs.Na
-                 && lhs.Ns            == rhs.Ns );
+                 && lhs.Ns            == rhs.Ns
+                 && lhs.failure_mode  == rhs.failure_mode );
     }
 
     //! \a Not equal operator overloading.
@@ -237,6 +254,9 @@ struct EvolutionData
     //! Intersection, i.e common points between #l_out_shape and #previous_shape.
     std::unordered_set<Point2D_i>intersection;
 
+    //! Stopping condition status.
+    StoppingStatus stopping_status;
+
     //! Constructor.
     EvolutionData(const ContourData& cd)
         : phase_step_count( 0 ),
@@ -244,22 +264,23 @@ struct EvolutionData
           max_step_count( 5*std::max(cd.phi().width(),
                                      cd.phi().height()) ),
           is_moving( true ),
-
-          l_out_shape( cd.preallocation_size() ),
-          previous_shape( cd.preallocation_size() ),
           previous_step_count(0),
           previous_quantile(0.f),
           hausdorff_quantile(std::numeric_limits<float>().max()),
-          centroids_distance(std::numeric_limits<float>().max())
+          centroids_distance(std::numeric_limits<float>().max()),
+          stopping_status( StoppingStatus::None )
     {
-        intersection.reserve( cd.preallocation_size() );
+        l_out_shape.reserve( cd.l_out().capacity() );
+        previous_shape.reserve( cd.l_out().capacity() );
+        intersection.reserve( cd.l_out().capacity() );
     }
 
-    //! Reinitialize evolution data. Used for video tracking.
-    void reinitialize()
+    //! Reset execution state of evolution data. Used for video tracking.
+    void resetExecutionState()
     {
         phase_step_count = 0;
         step_count = 0;
+        stopping_status = StoppingStatus::None;
     }
 };
 
@@ -270,16 +291,19 @@ public :
 
     //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and #l_out)
     //! with a copy semantic.
-    ActiveContour(const ContourData& initial_contour,
+    ActiveContour(const ContourData& initial_state,
                   const AcConfig& config);
 
     //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and #l_out)
     //! with a move semantic.
-    ActiveContour(ContourData&& initial_contour,
+    ActiveContour(ContourData&& initial_state,
                   const AcConfig& config);
 
     //! Destructor.
     virtual ~ActiveContour() {}
+
+    //! Handles a failure case.
+    void handle_failure();
 
     //! Runs or evolves the active contour until it reaches a terminal state.
     void converge();
@@ -303,13 +327,13 @@ public :
     PhaseState state() const { return state_; }
 
     //! Gets if the active contour reaches the final state.
-    bool stopped() const;
+    bool is_stopped() const { return state_ == PhaseState::Stopped; }
 
-    //! Gets if the active contour reaches the final state successfully.
-    bool converged() const;
+    //! Gets if the active contour is valid.
+    bool is_valid() const { return !cd_.empty(); }
 
     //! Getter method for #stopping_status.
-    StoppingStatus stop_reason() const { return stopping_status_; }
+    StoppingStatus stop_reason() const { return ed_.stopping_status; }
 
     //! Getter method for #step_count.
     int step_count() const { return ed_.step_count; }
@@ -367,9 +391,6 @@ private :
     //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
     void compute_internal_speed_Fint(ContourPoint& point);
 
-    //! Build precomputed disk-shaped kernel offsets for internal smoothing (Fint).
-    void build_internal_kernel_offsets();
-
     //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one boundary list to the other.
     void switch_boundary_point(ContourPoint& point);
 
@@ -390,16 +411,20 @@ private :
 
     //! Stops the active contour and puts it in a terminal state.
     //! After this call, step(), converge(), and run_cycles() have no effect.
-    void stop(StoppingStatus reason);
+    void stop();
 
-    //! Checks generic condition at each iteration in both cycles to determine state Stopped.
-    void check_stopping_condition();
+    //! Check if iteration limit is not reached.
+    void enforce_iteration_limit();
 
     //! Calculates the active contour state at the end of each iteration of a cycle 1.
     void check_state_step1();
 
     //! Updates the active contour state at the end of a cycle 2.
     void update_state_cycle2();
+
+    //! Check an internal condition, based on the contour state rather than image data,
+    //! to stop the algorithm if the nominal convergence condition is not reached.
+    void check_hausdorff_stopping_condition();
 
     //! Computes the shapes intersection between #ed.l_out_shape and #ed.previous_shape
     //! to speed up the hausdorff distance computation.
@@ -438,18 +463,9 @@ private :
     //!  There are 4 states : Cycle1, Cycle2, FinalCycle2 and Stopped.
     PhaseState state_;
 
-    //! Stopping condition status.
-    StoppingStatus stopping_status_;
-
-
-
     //! Evolution data of the active contour used by #check_state_step1() and
     //! #update_state_cycle2() to calculate #state.
     EvolutionData ed_;
-
-    //! Boolean egals to true if the cycle 2 stopping condition (based on hausdorff distance)
-    //! is performed.
-    bool is_cycle2_condition_;
 };
 
 namespace speed_value

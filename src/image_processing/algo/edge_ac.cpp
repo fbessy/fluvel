@@ -63,7 +63,7 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
             if(    x+dx >= 0 && x+dx < cd_.phi().width()
                 && y+dy >= 0 && y+dy < cd_.phi().height() )
             {
-                dd = std::abs( int( gradient_image.pixel_at(x,y) ) - int( gradient_image.pixel_at(x + dx, y + dy)  ) );
+                dd = std::abs( int( gradient_image_.pixel_at(x,y) ) - int( gradient_image_.pixel_at(x + dx, y + dy)  ) );
 
                 if( phi_value::isOutside( cd_.phi().at(x + dx, y + dy) ) )
                 {
@@ -79,7 +79,7 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
 
     int local_speed = max_out - max_in;
 
-    int global_speed = global_speed_sign * (int(threshold) - int(gradient_image.pixel_at(x,y)));
+    int global_speed = global_speed_sign_ * (int(threshold_) - int(gradient_image_.pixel_at(x,y)));
 
     point.set_speed( speed_value::get_discrete_speed( 3*local_speed + global_speed ) );
 }
@@ -90,17 +90,17 @@ int EdgeAc::get_global_speed_sign() const
     unsigned int sum_in = 0;
     unsigned int sum_out = 0;
 
-    const int img_size = gradient_image.size();
+    const int img_size = gradient_image_.size();
 
     for( int offset = 0; offset < img_size; offset++ )
     {
         if( phi_value::isInside( cd_.phi()[offset] ) )
         {
-            sum_in += (unsigned int)(gradient_image.pixel_at(offset));
+            sum_in += (unsigned int)(gradient_image_.pixel_at(offset));
         }
         else
         {
-            sum_out += (unsigned int)(gradient_image.pixel_at(offset));
+            sum_out += (unsigned int)(gradient_image_.pixel_at(offset));
         }
     }
 

@@ -46,16 +46,14 @@
 namespace ofeli_ip
 {
 
-Shape::Shape(): Shape(100u)
+Shape::Shape() : centroid( std::numeric_limits<float>::min(),
+                           std::numeric_limits<float>::min() )
 {
 }
 
-Shape::Shape(size_t initial_array_alloc_size):
-    centroid(std::numeric_limits<float>::min(),
-             std::numeric_limits<float>::min())
-
+void Shape::reserve(size_t elem_alloc_size)
 {
-    points.reserve( initial_array_alloc_size );
+    points.reserve( elem_alloc_size );
 }
 
 void Shape::clear()

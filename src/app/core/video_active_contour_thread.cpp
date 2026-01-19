@@ -3,6 +3,7 @@
 #include "frame_clock.hpp"
 #include "application_settings.hpp"
 #include "contour_rendering.hpp"
+#include "active_contour.hpp"
 
 namespace ofeli_app {
 
@@ -70,10 +71,10 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
     QImage result = frame.toImage().convertToFormat(QImage::Format_RGB32);
 
-    const auto& config = runtime_settings;
-
-    if (!result.isNull())
+    if ( !result.isNull() )
     {
+        const auto& config = runtime_settings;
+
         if (config.is_show_mirrored)
             result = result.flipped(Qt::Horizontal);
 
@@ -90,16 +91,21 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         if ( !region_ac || configChanged )
         {
+            ofeli_ip::AcConfig conf = config.algo_config;
+
+            // a specific configuration for video tracking
+            conf.failure_mode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
+
             region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
                                                                   ofeli_ip::ContourData(img_algo.width(), img_algo.height()),
-                                                                  config.algo_config,
+                                                                  conf,
                                                                   config.region_ac_config);
 
             configChanged = false;
         }
         else
         {
-            region_ac->reinitialize(img_algo);
+            region_ac->resetExecutionState(img_algo);
         }
 
         region_ac->run_cycles(config.cycles_nbr);

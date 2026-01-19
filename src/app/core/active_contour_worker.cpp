@@ -67,12 +67,12 @@ void ActiveContourWorker::step()
 
 bool ActiveContourWorker::stepOnce()
 {
-    if ( !ac || ac->stopped() )
+    if ( !ac || ac->is_stopped() )
         return true;
 
     ac->step();
 
-    return ac->stopped();
+    return ac->is_stopped();
 }
 
 void ActiveContourWorker::setImage(const QImage& img)

@@ -54,8 +54,8 @@ public:
     //! Constructor.
     Shape();
 
-    //! Constructor.
-    Shape(size_t initial_array_alloc_size);
+    //! Increase the capacity of the vector points.
+    void reserve(size_t elem_alloc_size);
 
     //! Clear all the points of the shape.
     void clear();

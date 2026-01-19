@@ -40,14 +40,16 @@
 #include "region_color_ac.hpp"
 #include "ofeli_math.hpp"
 
+#include <cassert>
+
 namespace ofeli_ip
 {
 
 void RegionColorAc::initialize_sums()
 {
-    sum_total_ = { 0, 0, 0 };
+    sum_total_   = { 0, 0, 0 };
 
-    sum_out_   = { 0, 0, 0 };
+    sum_out_     = { 0, 0, 0 };
     pxl_nbr_out_ = 0;
 
     for( int offset = 0; offset < pxl_nbr_total_; ++offset )
@@ -155,9 +157,9 @@ void RegionColorAc::do_specific_when_switch(int offset,
     }
 }
 
-void RegionColorAc::reinitialize(ImageSpan32 image)
+void RegionColorAc::resetExecutionState(ImageSpan32 image)
 {
-    ActiveContour::reinitialize();
+    reinitialize();
 
     image_ = image;
 
