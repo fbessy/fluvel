@@ -37,56 +37,89 @@
 **
 ****************************************************************************/
 
-#include <iostream>
+#include <cmath>
+#include <cassert>
 #include "boundary_builder.hpp"
 
 namespace ofeli_ip
 {
 
-BoundaryBuilder::BoundaryBuilder(int phi_width1, int phi_height1,
-                                 ContourList& l_out_init1,
-                                 ContourList& l_in_init1)
-    : phi_width(phi_width1), phi_height(phi_height1),
-    Lout_init(l_out_init1), Lin_init(l_in_init1)
+BoundaryBuilder::BoundaryBuilder(int phi_width, int phi_height,
+                                 ContourList& Lout_init,
+                                 ContourList& Lin_init)
+    : phi_width_(phi_width), phi_height_(phi_height),
+    Lout_init_(Lout_init), Lin_init_(Lin_init)
 {
+    assert( phi_width >= 1 );
+    assert( phi_height >= 1 );
 }
 
-void BoundaryBuilder::clear_lists()
+void BoundaryBuilder::get_rectangle_points(Point2D_i top_left,
+                                           Point2D_i bottom_right,
+                                           BoundaryOrientation orientation)
 {
-    Lout_init.clear();
-    Lin_init.clear();
+    auto* list1 = &Lout_init_;
+    auto* list2 = &Lin_init_;
+
+    if ( orientation == BoundaryOrientation::Reversed )
+    {
+        std::swap(list1, list2);
+    }
+
+    get_rectangle_points( top_left.x, top_left.y,
+                          bottom_right.x, bottom_right.y,
+                          *list1, *list2 );
 }
 
-void BoundaryBuilder::get_rectangle_points(int x1, int y1,
-                                           int x2, int y2)
+void BoundaryBuilder::get_rectangle_points(Point2D_f top_left,
+                                           Point2D_f bottom_right,
+                                           BoundaryOrientation orientation)
 {
-    get_rectangle_points( x1, y1,
-                          x2, y2,
-                          Lout_init, Lin_init );
+    auto* list1 = &Lout_init_;
+    auto* list2 = &Lin_init_;
+
+    if ( orientation == BoundaryOrientation::Reversed )
+    {
+        std::swap(list1, list2);
+    }
+
+    get_rectangle_points( std::lround(top_left.x*phi_width_), std::lround(top_left.y*phi_height_),
+                          std::lround(bottom_right.x*phi_width_), std::lround(bottom_right.y*phi_height_),
+                          *list1, *list2 );
 }
 
-void BoundaryBuilder::get_rectangle_points(float x1, float y1,
-                                           float x2, float y2)
+void BoundaryBuilder::get_ellipse_points(Point2D_i center,
+                                         int a, int b,
+                                         BoundaryOrientation orientation)
 {
-    get_rectangle_points( int(x1*phi_width), int(y1*phi_height),
-                          int(x2*phi_width), int(y2*phi_height),
-                          Lout_init, Lin_init );
+    auto* list1 = &Lout_init_;
+    auto* list2 = &Lin_init_;
+
+    if ( orientation == BoundaryOrientation::Reversed )
+    {
+        std::swap(list1, list2);
+    }
+
+    get_ellipse_points( center.x, center.y,
+                        a, b,
+                        *list1, *list2 );
 }
 
-void BoundaryBuilder::get_reversed_rectangle_points(int x1, int y1,
-                                                    int x2, int y2)
+void BoundaryBuilder::get_ellipse_points(Point2D_f center,
+                                         float a,  float b,
+                                         BoundaryOrientation orientation)
 {
-    get_rectangle_points( x1, y1,
-                          x2, y2,
-                          Lin_init, Lout_init);
-}
+    auto* list1 = &Lout_init_;
+    auto* list2 = &Lin_init_;
 
-void BoundaryBuilder::get_reversed_rectangle_points(float x1, float y1,
-                                                    float x2, float y2)
-{
-    get_rectangle_points( int(x1*phi_width), int(y1*phi_height),
-                          int(x2*phi_width), int(y2*phi_height),
-                          Lout_init, Lin_init);
+    if ( orientation == BoundaryOrientation::Reversed )
+    {
+        std::swap(list1, list2);
+    }
+
+    get_ellipse_points( std::lround(center.x*phi_width_), std::lround(center.y*phi_height_),
+                        (unsigned int)(a*phi_width_), (unsigned int)(b*phi_height_),
+                        *list1, *list2 );
 }
 
 void BoundaryBuilder::get_rectangle_points(int x1, int y1,
@@ -94,62 +127,53 @@ void BoundaryBuilder::get_rectangle_points(int x1, int y1,
                                            ContourList& list_out,
                                            ContourList& list_in)
 {
-    if( phi_width != 0 && phi_height != 0 )
+    if( x1 > x2 )
     {
-        if( x1 > x2 )
-        {
-            std::swap(x1,x2);
-        }
-        if( y1 > y2 )
-        {
-            std::swap(y1,y2);
-        }
+        std::swap(x1,x2);
+    }
+    if( y1 > y2 )
+    {
+        std::swap(y1,y2);
+    }
 
-        if( x1 != x2 && y1 != y2 )
-        {
-            get_rectangle_points_for_one_list( list_in, x1, y1, x2, y2 );
+    if( x1 != x2 && y1 != y2 )
+    {
+        get_rectangle_points_for_one_list( list_in, x1, y1, x2, y2 );
 
 #ifdef ALGO_8_CONNEXITY
-            get_rectangle_points_for_one_list( list_out, x1-1, y1-1, x2+1, y2+1 );
+        get_rectangle_points_for_one_list( list_out, x1-1, y1-1, x2+1, y2+1 );
 #else
-            for( int x = x1; x <= x2; x++ )
-            {
-                if( x >= 0 && x < int(phi_width) )
-                {
-                    if( y1-1 >= 0 && y1-1 < int(phi_height) )
-                    {
-                        list_out.emplace_back( get_offset(x,y1-1), x );
-                    }
-                    if( y2+1 >= 0 && y2+1 < int(phi_height) )
-                    {
-                        list_out.emplace_back( get_offset(x,y2+1), x );
-                    }
-                }
-            }
-
-            for( int y = y1; y <= y2; y++ )
-            {
-                if( y >= 0 && y < int(phi_height) )
-                {
-                    if( x1-1 >= 0 && x1-1 < int(phi_width) )
-                    {
-                        list_out.emplace_back( get_offset(x1-1,y), x1-1 );
-                    }
-
-                    if( x2+1 >= 0 && x2+1 < int(phi_width) )
-                    {
-                        list_out.emplace_back( get_offset(x2+1,y), x2+1 );
-                    }
-                }
-            }
-#endif
-        }
-        else
+        for( int x = x1; x <= x2; ++x )
         {
-            std::cerr << std::endl <<
-            " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
-            "Point 1 and 2 should not be the same.";
+            if( x >= 0 && x < phi_width_ )
+            {
+                if( y1-1 >= 0 && y1-1 < phi_height_ )
+                {
+                    list_out.emplace_back( get_offset(x,y1-1), x );
+                }
+                if( y2+1 >= 0 && y2+1 < phi_height_ )
+                {
+                    list_out.emplace_back( get_offset(x,y2+1), x );
+                }
+            }
         }
+
+        for( int y = y1; y <= y2; ++y )
+        {
+            if( y >= 0 && y < phi_height_ )
+            {
+                if( x1-1 >= 0 && x1-1 < phi_width_ )
+                {
+                    list_out.emplace_back( get_offset(x1-1,y), x1-1 );
+                }
+
+                if( x2+1 >= 0 && x2+1 < phi_width_ )
+                {
+                    list_out.emplace_back( get_offset(x2+1,y), x2+1 );
+                }
+            }
+        }
+#endif
     }
 }
 
@@ -157,15 +181,15 @@ void BoundaryBuilder::get_rectangle_points_for_one_list(ContourList& list_init,
                                                         int x1, int y1,
                                                         int x2, int y2)
 {
-    for( int x = x1; x <= x2; x++ )
+    for( int x = x1; x <= x2; ++x )
     {
-        if( x >= 0 && x < int(phi_width) )
+        if( x >= 0 && x < phi_width_ )
         {
-            if( y1 >= 0 && y1 < int(phi_height) )
+            if( y1 >= 0 && y1 < phi_height_ )
             {
                 list_init.emplace_back( get_offset(x,y1), x );
             }
-            if( y2 >= 0 && y2 < int(phi_height) )
+            if( y2 >= 0 && y2 < phi_height_ )
             {
                 list_init.emplace_back( get_offset(x,y2), x );
             }
@@ -174,14 +198,14 @@ void BoundaryBuilder::get_rectangle_points_for_one_list(ContourList& list_init,
 
     for( int y = y1+1; y < y2; y++ )
     {
-        if( y >= 0 && y < int(phi_height) )
+        if( y >= 0 && y < phi_height_ )
         {
-            if( x1 >= 0 && x1 < int(phi_width) )
+            if( x1 >= 0 && x1 < phi_width_ )
             {
                 list_init.emplace_back( get_offset(x1,y), x1 );
             }
 
-            if( x2 >= 0 && x2 < int(phi_width) )
+            if( x2 >= 0 && x2 < phi_width_ )
             {   
                 list_init.emplace_back( get_offset(x2,y), x2 );
             }
@@ -191,21 +215,21 @@ void BoundaryBuilder::get_rectangle_points_for_one_list(ContourList& list_init,
 
 void BoundaryBuilder::build_ellipse_midpoint_connected(
     int x0, int y0,
-    unsigned int a, unsigned int b,
+    int a, int b,
     ContourList& list_out)
 {
     int x = 0;
     int y = b;
 
     // Carrés
-    long a2 = (long)a * a;
-    long b2 = (long)b * b;
+    int64_t a2 = a * a;
+    int64_t b2 = b * b;
 
-    long dx = 0;
-    long dy = 2 * a2 * y;
+    int64_t dx = 0;
+    int64_t dy = 2 * a2 * y;
 
     // Paramètre de décision région 1
-    long d1 = b2 - a2 * b + a2 / 4;
+    int64_t d1 = b2 - a2 * b + a2 / 4;
 
     int prev_x = x;
     int prev_y = y;
@@ -241,9 +265,9 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(
     }
 
     // Paramètre région 2
-    long d2 = b2 * (x + 0.5) * (x + 0.5)
-              + a2 * (y - 1) * (y - 1)
-              - a2 * b2;
+    int64_t d2 = b2 * (x + 0.5) * (x + 0.5)
+                 + a2 * (y - 1) * (y - 1)
+                 - a2 * b2;
 
     // -------- Région 2 --------
     while (y >= 0)
@@ -312,38 +336,6 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
 
     build_ellipse_midpoint_connected(x0, y0, a, b, list_out);
     build_inner_contiguous(x0, y0, list_out, list_in);
-}
-
-void BoundaryBuilder::get_ellipse_points(int x0, int y0,
-                                         unsigned int a, unsigned int b)
-{
-    get_ellipse_points( x0, y0,
-                        a, b,
-                        Lout_init, Lin_init );
-}
-
-void BoundaryBuilder::get_reversed_ellipse_points(int x0, int y0,
-                                                  unsigned int a, unsigned int b)
-{
-    get_ellipse_points( x0, y0,
-                        a, b,
-                        Lin_init, Lout_init );
-}
-
-void BoundaryBuilder::get_ellipse_points(float x0, float y0,
-                                         float a,  float b)
-{
-    get_ellipse_points( int(x0*phi_width), int(y0*phi_height),
-                        (unsigned int)(a*phi_width), (unsigned int)(b*phi_height),
-                        Lout_init, Lin_init );
-}
-
-void BoundaryBuilder::get_reversed_ellipse_points(float x0, float y0,
-                                                  float a, float b)
-{
-    get_ellipse_points( int(x0*phi_width), int(y0*phi_height),
-                        (unsigned int)(a*phi_width), (unsigned int)(b*phi_height),
-                        Lin_init, Lout_init );
 }
 
 }

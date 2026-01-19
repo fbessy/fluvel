@@ -105,8 +105,8 @@ void ActiveContour::handle_failure()
     if ( config_.failure_mode == FailureHandlingMode::StopOnFailure )
     {
         // for image segmentation
-        stop();
         ed_.stopping_status = StoppingStatus::EmptyListFailure;
+        stop();
     }
     else if ( config_.failure_mode == FailureHandlingMode::RecoverOnFailure )
     {

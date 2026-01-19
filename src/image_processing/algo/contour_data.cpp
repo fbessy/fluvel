@@ -162,7 +162,9 @@ void ContourData::initialize_with_one_ellipse()
     BoundaryBuilder init( phi_.width(), phi_.height(),
                           l_out_, l_in_ );
 
-    init.get_ellipse_points( 0.5f, 0.5f, 0.4f, 0.4f );
+    init.get_ellipse_points( Point2D_f{ 0.5f, 0.5f },
+                             0.4f, 0.4f );
+
     define_phi_from_lists();
 
     assert( !l_out_.empty() );
