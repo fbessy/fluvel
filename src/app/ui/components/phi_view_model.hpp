@@ -36,6 +36,7 @@ public slots:
     void onClearFromEditor();
     void setBackgroundWithUpdate(const QImage& image);
     void setBackground(const QImage& image);
+    void onConnectivityChanged(int index);
 
 signals:
     void viewChanged(const QImage& image);
@@ -48,6 +49,7 @@ private:
     void updateListsFloodFill();
     void updatePhiFromLists();
     void composeView(bool hasOverlay);
+    bool point_is_redundant(int x, int y);
 
     PhiEditor* editor_;   // non owning
     QImage phiImage_;
@@ -57,6 +59,8 @@ private:
     std::vector<ofeli_ip::Point2D_i> l_in;
 
     ShapeInfo overlayShape_;
+
+    ofeli_ip::Connectivity connectivity_;
 };
 
 } // namespace ofeli_app

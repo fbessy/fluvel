@@ -72,36 +72,4 @@ void PhiEditor::reject()
     }
 }
 
-bool PhiEditor::is_redundant(int x, int y)
-{
-    const int w = current.width();
-    const int h = current.height();
-
-    const uchar center = current.constScanLine(y)[x];
-
-    for (int dy = -1; dy <= 1; ++dy)
-    {
-        const int ny = y + dy;
-        if (ny < 0 || ny >= h)
-            continue;
-
-        const uchar* line = current.constScanLine(ny);
-
-        for (int dx = -1; dx <= 1; ++dx)
-        {
-            if (dx == 0 && dy == 0)
-                continue;
-
-            const int nx = x + dx;
-            if (nx < 0 || nx >= w)
-                continue;
-
-            if (line[nx] != center)
-                return false;
-        }
-    }
-
-    return true;
-}
-
 } // namespace ofeli_app

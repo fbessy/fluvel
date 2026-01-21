@@ -48,6 +48,15 @@ void PhiViewModel::setBackground(const QImage& image)
     background_ = image.convertToFormat(QImage::Format_RGB32);
 }
 
+void PhiViewModel::onConnectivityChanged(int index)
+{
+    connectivity_ = static_cast<ofeli_ip::Connectivity>(index);
+
+    updateLists();
+    updatePhiFromLists();
+    composeView(true);
+}
+
 // called after an image reload without size change
 void PhiViewModel::setBackgroundWithUpdate(const QImage& image)
 {
@@ -101,7 +110,7 @@ void PhiViewModel::updateLists()
         {
             uchar I = line[x];
 
-            if ( !editor_->is_redundant(x, y) )
+            if ( !point_is_redundant(x, y) )
             {
                 if ( I == 0 )
                 {
@@ -114,6 +123,47 @@ void PhiViewModel::updateLists()
             }
         }
     }
+}
+
+bool PhiViewModel::point_is_redundant(int x, int y)
+{
+    const int w = editor_->phi().width();
+    const int h = editor_->phi().height();
+
+    const uchar center = editor_->phi().constScanLine(y)[x];
+
+    auto same_value = [&](int nx, int ny) -> bool
+    {
+        if (nx < 0 || nx >= w || ny < 0 || ny >= h)
+            return true; // hors image = neutre
+
+        return editor_->phi().constScanLine(ny)[nx] == center;
+    };
+
+    // 4-connectivity
+    //connectivity_ == Connectivity::Four
+    if ( connectivity_ == ofeli_ip::Connectivity::Four )
+    {
+        return same_value(x - 1, y) &&
+               same_value(x + 1, y) &&
+               same_value(x, y - 1) &&
+               same_value(x, y + 1);
+    }
+
+    // 8-connectivity
+    for (int dy = -1; dy <= 1; ++dy)
+    {
+        for (int dx = -1; dx <= 1; ++dx)
+        {
+            if (dx == 0 && dy == 0)
+                continue;
+
+            if (!same_value(x + dx, y + dy))
+                return false;
+        }
+    }
+
+    return true;
 }
 
 void PhiViewModel::updateListsFloodFill()
@@ -152,7 +202,7 @@ void PhiViewModel::updateListsFloodFill()
             if (visitedLine[x])
                 continue;
 
-            if (editor_->is_redundant(x, y))
+            if (point_is_redundant(x, y))
                 continue;
 
             uchar value = line[x];
@@ -173,7 +223,7 @@ void PhiViewModel::updateListsFloodFill()
                 // Étendre à gauche
                 while (xl - 1 >= 0 &&
                        !visitedLine[xl - 1] &&
-                       !editor_->is_redundant(xl - 1, s.y) &&
+                       !point_is_redundant(xl - 1, s.y) &&
                        pixel(xl - 1, s.y) == value)
                 {
                     --xl;
@@ -182,7 +232,7 @@ void PhiViewModel::updateListsFloodFill()
                 // Étendre à droite
                 while (xr + 1 < w &&
                        !visitedLine[xr + 1] &&
-                       !editor_->is_redundant(xr + 1, s.y) &&
+                       !point_is_redundant(xr + 1, s.y) &&
                        pixel(xr + 1, s.y) == value)
                 {
                     ++xr;
@@ -212,13 +262,13 @@ void PhiViewModel::updateListsFloodFill()
                     while (xscan <= xr)
                     {
                         if (!vline[xscan] &&
-                            !editor_->is_redundant(xscan, ny) &&
+                            !point_is_redundant(xscan, ny) &&
                             nline[xscan] == value)
                         {
                             int xstart = xscan;
                             while (xscan + 1 <= xr &&
                                    !vline[xscan + 1] &&
-                                   !editor_->is_redundant(xscan + 1, ny) &&
+                                   !point_is_redundant(xscan + 1, ny) &&
                                    nline[xscan + 1] == value)
                             {
                                 ++xscan;

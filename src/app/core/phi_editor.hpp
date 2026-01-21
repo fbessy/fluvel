@@ -34,7 +34,6 @@ public:
     void reject();
 
     const QImage& phi() const { return current; }
-    bool is_redundant(int x, int y);
 
 public slots:
     void onImageSizeReady(int width, int height);

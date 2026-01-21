@@ -965,6 +965,13 @@ void SettingsWindow::setupConnections()
             settingsView,
             &ImageView::displayImage);
 
+    phiViewModel_->onConnectivityChanged( connectivity_cb->currentIndex() );
+
+    connect(connectivity_cb,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            phiViewModel_,
+            &PhiViewModel::onConnectivityChanged);
+
     auto updateOverlay = [this]()
     {
         phiViewModel_->setOverlay( computeShapeInfo() );
