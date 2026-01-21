@@ -49,6 +49,15 @@ set(app_src
     ${UI_COMP_DIR}/frame_stats_view.cpp
     ${UI_COMP_DIR}/frame_stats_view.hpp
 
+    ${UI_COMP_DIR}/phi_view_model.cpp
+    ${UI_COMP_DIR}/phi_view_model.hpp
+
+    ${UI_COMP_DIR}/contour_point_item.cpp
+    ${UI_COMP_DIR}/contour_point_item.hpp
+
+    ${UI_COMP_DIR}/algo_info_overlay.cpp
+    ${UI_COMP_DIR}/algo_info_overlay.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 
@@ -70,6 +79,18 @@ set(app_src
     ${CORE_DIR}/runtime_settings.hpp
     ${CORE_DIR}/image_adapters.hpp
     ${CORE_DIR}/common_settings.hpp
+
+    ${CORE_DIR}/phi_editor.cpp
+    ${CORE_DIR}/phi_editor.hpp
+
+    ${CORE_DIR}/preview_pipeline.cpp
+    ${CORE_DIR}/preview_pipeline.hpp
+
+    ${CORE_DIR}/shape_overlay_renderer.cpp
+    ${CORE_DIR}/shape_overlay_renderer.hpp
+
+    ${CORE_DIR}/shape_type.hpp
+    ${CORE_DIR}/algo_stats.hpp
 )
 
 if(APPLE)
@@ -103,15 +124,6 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
-        core/phi_editor.hpp core/phi_editor.cpp
-        core/preview_pipeline.hpp core/preview_pipeline.cpp
-        core/shape_overlay_renderer.hpp core/shape_overlay_renderer.cpp
-        ui/components/phi_view_model.hpp ui/components/phi_view_model.cpp
-        core/shape_type.hpp
-        ui/components/contour_point_item.hpp ui/components/contour_point_item.cpp
-        ui/components/contour_point_item.cpp
-        ui/components/algo_info_overlay.hpp ui/components/algo_info_overlay.cpp
-        core/algo_stats.hpp
     )
 endif()
 

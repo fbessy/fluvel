@@ -277,11 +277,13 @@ void ImageWindow::setupConnections()
                 imageView->updateSceneRectForImage();
             });
 
+    // new display with contour item in the image view
     connect(imageController, &ImageController::contourReady,
             acWorker.get(),  &ActiveContourWorker::setImage);
 
-    //connect(acWorker.get(),  &ActiveContourWorker::resultReady,
-            //imageView, &ImageView::displayImage);
+    // former display with a qimage with the contour
+    connect(acWorker.get(),  &ActiveContourWorker::resultReady,
+            imageView, &ImageView::displayImage);
 
     connect(acWorker.get(),
             &ActiveContourWorker::contourUpdated,

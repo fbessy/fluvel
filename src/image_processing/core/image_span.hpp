@@ -8,7 +8,60 @@
 
 namespace ofeli_ip
 {
+/*
+class ImageSpan final
+{
+    ImageSpan(const unsigned char* data,
+              int width, int height,
+              int channels = 1,
+              int stride = 0)
+        : data_(data),
+        width_(width), height_(height), channels_(channels)
+    {
+        assert( data != nullptr );
+        assert( width  > 0 );
+        assert( height > 0 );
+        assert( channels > 0 );
+        assert( stride >= 0 );
 
+        if ( stride == 0 )
+            stride_ = width_;
+        else
+            stride_ = stride;
+
+
+        assert( stride_ > 0 );
+    }
+
+    // to do ??
+    unsigned char pixel_at(int offset) const noexcept
+    {
+        assert( offset >= 0 && offset < size() );
+
+        return data_[offset];
+    }
+
+    // to do ??
+    unsigned char pixel_at(int x, int y) const noexcept
+    {
+        assert( x >= 0 && x < width_ );
+        assert( y >= 0 && y < height_ );
+
+        return data_[ x+y*width_ ];
+    }
+
+    int width()  const { return width_; }
+    int height() const { return height_; }
+    int size()   const { return width_ * height_; }
+
+private:
+    const unsigned char* data_;
+    int widthPixels;
+    int heightPixels;
+    int channelsPerPixel_;  // 1 = gray, 3 = RGB, 4 = RGBA
+    int strideBytes_;       // bytes per row
+};
+*/
 class ImageSpan8 final
 {
 

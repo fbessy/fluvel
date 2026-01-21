@@ -60,7 +60,7 @@ ActiveContour::ActiveContour(const ContourData& initial_state,
     state_( PhaseState::Cycle1 ),
     ed_( cd_ )
 {
-    points_to_append_.reserve( cd_.l_out().capacity() );
+    points_to_append_.reserve( cd_.l_out_raw().capacity() );
 
     if ( config_.is_cycle2 )
     {
@@ -84,7 +84,7 @@ ActiveContour::ActiveContour(ContourData&& initial_state,
     state_( PhaseState::Cycle1 ),
     ed_( cd_ )
 {
-    points_to_append_.reserve( cd_.l_out().capacity() );
+    points_to_append_.reserve( cd_.l_out_raw().capacity() );
 
     if ( config_.is_cycle2 )
     {
@@ -98,7 +98,7 @@ ActiveContour::ActiveContour(ContourData&& initial_state,
 
 void ActiveContour::handle_failure()
 {
-    if ( is_valid() )
+    if ( !cd_.empty() )
         return;
 
 
@@ -108,7 +108,7 @@ void ActiveContour::handle_failure()
     // Recovery mode: the failure stops the current iteration,
     // but contour data are repaired to allow a future restart.
     if ( config_.failure_mode == FailureHandlingMode::RecoverOnFailure )
-        cd_.repair_lists_if_needed();
+        cd_.define_from_ellipse();
 }
 
 void ActiveContour::enforce_iteration_limit()
@@ -277,7 +277,7 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
         }
         else
         {
-            i++;
+            ++i;
         }
     }
 
@@ -287,8 +287,8 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
 
     if( is_moving )
     {
-        eliminate_redundant_points( adjacent,
-                                    ctx.region_redundant_phi_val );
+        cd_.eliminate_redundant_points( adjacent,
+                                        ctx.region_redundant_phi_val );
     }
 
     return is_moving;
@@ -298,35 +298,35 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
 {
     assert( !is_stopped() );
 
-    int offset = point.offset();
-    int x = point.x();
-    int w = cd_.phi().width();
-    int h = cd_.phi().height();
-    int last_row_offset = w * (h - 1);
+    const int offset = point.offset();
+    const int x = point.x();
+    const int w = cd_.phi().width();
+    const int h = cd_.phi().height();
+    const int last_row_offset = w * (h - 1);
 
     // Voisins horizontaux
     if (x > 0)
     {
-        int left_offset = offset - 1;
+        const int left_offset = offset - 1;
         add_region_neighbor(left_offset, x-1);
     }
 
     if (x < w - 1)
     {
-        int right_offset = offset + 1;
+        const int right_offset = offset + 1;
         add_region_neighbor(right_offset, x+1);
     }
 
     // Voisins verticaux
     if (offset >= w) // Pas dans la première ligne
     {
-        int up_offset = offset - w;
+        const int up_offset = offset - w;
         add_region_neighbor(up_offset, x);
     }
 
     if (offset < last_row_offset) // Pas dans la dernière ligne
     {
-        int down_offset = offset + w;
+        const int down_offset = offset + w;
         add_region_neighbor(down_offset, x);
     }
 
@@ -334,26 +334,26 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
     // Diagonaux supérieurs
     if (x > 0 && offset >= w)
     {
-        int up_left_offset = offset - w - 1;
+        const int up_left_offset = offset - w - 1;
         add_region_neighbor(up_left_offset, x-1);
     }
 
     if (x < w - 1 && offset >= w)
     {
-        int up_right_offset = offset - w + 1;
+        const int up_right_offset = offset - w + 1;
         add_region_neighbor(up_right_offset, x+1);
     }
 
     // Diagonaux inférieurs
     if (x > 0 && offset < last_row_offset)
     {
-        int down_left_offset = offset + w - 1;
+        const int down_left_offset = offset + w - 1;
         add_region_neighbor(down_left_offset, x-1);
     }
 
     if (x < w - 1 && offset < last_row_offset)
     {
-        int down_right_offset = offset + w + 1;
+        const int down_right_offset = offset + w + 1;
         add_region_neighbor(down_right_offset, x+1);
     }
 #endif
@@ -388,29 +388,7 @@ void ActiveContour::add_region_neighbor(int neighbor_offset,
     }
 }
 
-void ActiveContour::eliminate_redundant_points(ContourList& boundary,
-                                               PhiValue region_value)
-{
-    assert( !is_stopped() );
-
-    for( std::size_t i = 0; i < boundary.size(); )
-    {
-        auto& point = boundary[i];
-
-        if( cd_.is_redundant(point) )
-        {
-            cd_.phi()[ point.offset() ] = region_value;
-            point = boundary.back();
-            boundary.pop_back();
-        }
-        else
-        {
-            i++;
-        }
-    }
-}
-
-void ActiveContour::compute_speed(ContourList& boundary)
+void ActiveContour::compute_speed(RawContour& boundary)
 {
     assert( !is_stopped() );
 
@@ -425,7 +403,7 @@ void ActiveContour::compute_speed(ContourList& boundary)
     }
 }
 
-void ActiveContour::compute_external_speed_Fd(ContourList& boundary)
+void ActiveContour::compute_external_speed_Fd(RawContour& boundary)
 {
     assert( state_ == PhaseState::Cycle1 );
 
@@ -445,7 +423,7 @@ void ActiveContour::compute_external_speed_Fd(ContourPoint& point)
     point.set_speed( SpeedValue::GoInward );
 }
 
-void ActiveContour::compute_internal_speed_Fint(ContourList& boundary)
+void ActiveContour::compute_internal_speed_Fint(RawContour& boundary)
 {
     assert(    state_ == PhaseState::Cycle2
             || state_ == PhaseState::FinalCycle2 );
@@ -586,7 +564,7 @@ void ActiveContour::check_hausdorff_stopping_condition()
     assert(    state_ == PhaseState::Cycle2
             && config_.failure_mode == FailureHandlingMode::StopOnFailure );
 
-    float step_delta = float(ed_.step_count - ed_.previous_step_count);
+    const float step_delta = float(ed_.step_count - ed_.previous_step_count);
 
     const int w = cd_.phi().width();
     const int h = cd_.phi().height();
@@ -598,31 +576,31 @@ void ActiveContour::check_hausdorff_stopping_condition()
     {
         ed_.l_out_shape.clear();
 
-        for( const auto& point : cd_.l_out() )
+        for( const auto& point : cd_.l_out_raw() )
         {
-            Point2D_i p = from_ContourPoint( point,
-                                            cd_.phi().width() );
-
-            ed_.l_out_shape.push_back( p );
+            ed_.l_out_shape.push_back( from_ContourPoint( point,
+                                                          cd_.phi().width() ) );
         }
+
         ed_.l_out_shape.calculate_centroid();
 
         calculate_shapes_intersection();
 
         HausdorffDistance hd( ed_.l_out_shape,
-                             ed_.previous_shape,
-                             ed_.intersection );
+                              ed_.previous_shape,
+                              ed_.intersection );
 
-        float size_factor = 100.f / diagonal;
+        const float size_factor = 100.f / diagonal;
         ed_.hausdorff_quantile = size_factor * hd.get_hausdorff_quantile(80);
         ed_.centroids_distance = size_factor * hd.get_centroids_distance();
-        float delta_quantile = ed_.previous_quantile - ed_.hausdorff_quantile;
+        const float delta_quantile = ed_.previous_quantile - ed_.hausdorff_quantile;
 
         if ( ( ed_.centroids_distance < 1.f &&
-             ed_.hausdorff_quantile < 1.f ) ||
-            ( ed_.centroids_distance < 1.f &&
-             ed_.hausdorff_quantile < 2.f &&
-             delta_quantile < 0.f ) )
+               ed_.hausdorff_quantile < 1.f )
+             ||
+             ( ed_.centroids_distance < 1.f &&
+               ed_.hausdorff_quantile < 2.f &&
+               delta_quantile < 0.f ) )
         {
             ed_.stopping_status = StoppingStatus::Hausdorff;
             stop();
@@ -639,12 +617,7 @@ void ActiveContour::check_hausdorff_stopping_condition()
 Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point,
                                            int grid_width)
 {
-    Point2D_i p;
-
-    p.x = point.x();
-    p.y = point.offset() / grid_width;
-
-    return p;
+    return { point.x(), point.offset() / grid_width };
 }
 
 void ActiveContour::calculate_shapes_intersection()

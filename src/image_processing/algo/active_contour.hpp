@@ -179,8 +179,8 @@ struct AcConfig
 //! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
 struct BoundarySwitchContext
 {
-    ContourList& scanned_boundary;
-    ContourList& adjacent_boundary;
+    RawContour& scanned_boundary;
+    RawContour& adjacent_boundary;
     SpeedValue target_direction;
     PhiValue adjacent_phi_val;
     PhiValue neighbor_region_phi_val;
@@ -190,8 +190,8 @@ struct BoundarySwitchContext
     static BoundarySwitchContext make_switch_in(ContourData& cd)
     {
         return {
-            cd.l_out(),
-            cd.l_in(),
+            cd.l_out_raw(),
+            cd.l_in_raw(),
             SpeedValue::GoOutward,
             PhiValue::InteriorBoundary,
             PhiValue::OutsideRegion,
@@ -203,8 +203,8 @@ struct BoundarySwitchContext
     static BoundarySwitchContext make_switch_out(ContourData& cd)
     {
         return {
-            cd.l_in(),
-            cd.l_out(),
+            cd.l_in_raw(),
+            cd.l_out_raw(),
             SpeedValue::GoInward,
             PhiValue::ExteriorBoundary,
             PhiValue::InsideRegion,
@@ -270,9 +270,9 @@ struct EvolutionData
           centroids_distance(std::numeric_limits<float>().max()),
           stopping_status( StoppingStatus::None )
     {
-        l_out_shape.reserve( cd.l_out().capacity() );
-        previous_shape.reserve( cd.l_out().capacity() );
-        intersection.reserve( cd.l_out().capacity() );
+        l_out_shape.reserve( cd.l_out_raw().capacity() );
+        previous_shape.reserve( cd.l_out_raw().capacity() );
+        intersection.reserve( cd.l_out_raw().capacity() );
     }
 
     //! Reset execution state of evolution data. Used for video tracking.
@@ -315,22 +315,26 @@ public :
     //! Ensures the contour is geometrically stable at the end of each cycle2 (used for video tracking).
     void run_cycles(int n_cycles);
 
+
+    //! Export the boundary list l_out_ as a copied geometric representation.
+    ExportedContour export_l_out() const { return cd_.export_l_out(); }
+
+    //! Export the boundary list l_in_ as a copied geometric representation.
+    ExportedContour export_l_in() const  { return cd_.export_l_in(); }
+
     //! Getter for the discrete level-set function with only 4 PhiValue possible.
     const DiscreteLevelSet& phi() const { return cd_.phi(); }
 
     //! Getter for the list of offset points representing the exterior boundary.
-    const ContourList& l_out() const { return cd_.l_out(); }
+    const RawContour& l_out_raw() const { return cd_.l_out_raw(); }
     //! Getter for the list of offset points representing the interior boundary.
-    const ContourList& l_in() const { return cd_.l_in(); }
+    const RawContour& l_in_raw() const { return cd_.l_in_raw(); }
 
     //! Getter method for #state.
     PhaseState state() const { return state_; }
 
     //! Gets if the active contour reaches the final state.
     bool is_stopped() const { return state_ == PhaseState::Stopped; }
-
-    //! Gets if the active contour is valid.
-    bool is_valid() const { return !cd_.empty(); }
 
     //! Getter method for #stopping_status.
     StoppingStatus stop_reason() const { return ed_.stopping_status; }
@@ -377,16 +381,16 @@ private :
     bool directional_substep(BoundarySwitch ctx_choice);
 
     //! Computes the speed for all points of a boundary list #l_out or #l_in.
-    void compute_speed(ContourList& boundary);
+    void compute_speed(RawContour& boundary);
 
     //! Computes the external speed Fd for all points of a boundary list #l_out or #l_in.
-    void compute_external_speed_Fd(ContourList& boundary);
+    void compute_external_speed_Fd(RawContour& boundary);
 
     //! Computes the external speed \a Fd for a current point (\a x,\a y) of #l_out or #l_in.
     virtual void compute_external_speed_Fd(ContourPoint& point);
 
     //! Computes the internal speed  Fint for all points of a boundary list #l_out or #l_in.
-    void compute_internal_speed_Fint(ContourList& boundary);
+    void compute_internal_speed_Fint(RawContour& boundary);
 
     //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
     void compute_internal_speed_Fint(ContourPoint& point);
@@ -397,10 +401,6 @@ private :
     //! Second procedure for generic method switch_boundary_point.
     void add_region_neighbor(int neighbor_offset,
                              int neighbor_x);
-
-    //! Eliminates redundant points to maintain a contiguous boundary.
-    void eliminate_redundant_points(ContourList& boundary,
-                                    PhiValue region_value);
 
     //! Specific step for each iteration in cycle 1.
     virtual void do_specific_cycle1() { }
@@ -454,7 +454,7 @@ private :
     const BoundarySwitchContext* ctx_;
 
     //! Temporary points to add after each scan of the list #l_in or #l_out.
-    ContourList points_to_append_;
+    RawContour points_to_append_;
 
     //! Number of iterations in one cycle1-cycle2.
     int steps_per_cycle_;
@@ -600,8 +600,8 @@ constexpr SpeedValue get_discrete_speed(int speed)
  *
  * -----------------------------   Display the initial active contour   -----------------------------
  *
- * const ofeli::list<int>* Lout = &ac.l_out();
- * const ofeli::list<int>* Lin = &ac.l_in();
+ * const ofeli::list<int>* Lout = &ac.l_out_raw();
+ * const ofeli::list<int>* Lin = &ac.l_in_raw();
  *
  * // put the color of lists into the displayed buffer
  * for( auto it = Lout->get_begin(); it != Lout->get_end(); ++it )
@@ -661,8 +661,8 @@ constexpr SpeedValue get_discrete_speed(int speed)
  *     ++ac;
  *
  *     // to get the temporary result
- *     Lout = &ac.l_out();
- *     Lin = &ac.l_in();
+ *     Lout = &ac.l_out_raw();
+ *     Lin = &ac.l_in_raw();
  *
  *     // put the color of lists into the displayed buffer
  *     for( auto it = Lout->get_begin(); it != Lout->get_end(); ++it )

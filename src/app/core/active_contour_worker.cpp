@@ -242,8 +242,8 @@ void ActiveContourWorker::drawAndEmitResult()
     if ( ac == nullptr )
         return;
 
-    ofeli_ip::ContourList l_out = ac->l_out();
-    ofeli_ip::ContourList l_in  = ac->l_in();
+    const auto& l_out = ac->l_out_raw();
+    const auto& l_in  = ac->l_in_raw();
 
     draw_list_to_img(l_out, config.color_out, config.outside_combo,
                      result.bits(), result.width(), result.height());
@@ -255,13 +255,17 @@ void ActiveContourWorker::drawAndEmitResult()
 
 void ActiveContourWorker::emitContourOnly()
 {
+    // to test the former display
+    //drawAndEmitResult();
+        //return;
+
     if (!ac)
         return;
 
     int y;
 
-    const auto& l_out = ac->l_out();
-    const auto& l_in  = ac->l_in();
+    const auto& l_out = ac->l_out_raw();
+    const auto& l_in  = ac->l_in_raw();
 
     QVector<QPoint> outPts;
     QVector<QPoint> inPts;

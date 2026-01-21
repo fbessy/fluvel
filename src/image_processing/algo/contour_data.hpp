@@ -77,6 +77,16 @@ public:
     SpeedValue speed() const { return speed_; }
     void set_speed(SpeedValue speed) { speed_ = speed; }
 
+    bool operator==(const ContourPoint& other) const noexcept
+    {
+        return offset_ == other.offset_;
+    }
+
+    bool operator!=(const ContourPoint& other) const noexcept
+    {
+        return !(*this == other);
+    }
+
 private:
     int offset_;
     int x_; // in order to check fastly neighborhood existence (border cases to handle)
@@ -85,7 +95,8 @@ private:
     SpeedValue speed_;
 };
 
-using ContourList = std::vector<ContourPoint>;
+using RawContour      = std::vector<ContourPoint>;
+using ExportedContour = std::vector<Point2D_i>;
 
 class ContourData
 {
@@ -100,8 +111,8 @@ public :
                 int phi_width, int phi_height);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of #l_out and #l_in.
-    ContourData(const ContourList& l_out,
-                const ContourList& l_in,
+    ContourData(const RawContour& l_out,
+                const RawContour& l_in,
                 int phi_width, int phi_height);
 
     //! Copy constructor.
@@ -110,11 +121,12 @@ public :
     //! Move constructor.
     ContourData(ContourData&& contour) noexcept;
 
-    //! Allocate lists.
-    void allocate_lists();
+    //! Initializes the contour *this with one ellipse. It is performed when the simplest constructor is called or when one or both boundary lists is/are empty.
+    void define_from_ellipse();
 
-    //! Repair lists.
-    void repair_lists_if_needed();
+    //! Eliminates redundant points to maintain a contiguous boundary.
+    void eliminate_redundant_points(RawContour& boundary,
+                                    PhiValue region_value);
 
     //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
     bool is_redundant(const ContourPoint& point) const;
@@ -125,22 +137,33 @@ public :
         return phi_.coord( offet );
     }
 
+    //! Export the boundary list l_out_ as a copied geometric representation.
+    ExportedContour export_l_out() const { return export_contour(l_out_); }
+
+    //! Export the boundary list l_in_ as a copied geometric representation.
+    ExportedContour export_l_in() const  { return export_contour(l_in_); }
+
     //! Getter function for the discrete level-set function #phi.
     DiscreteLevelSet& phi() { return phi_; }
     const DiscreteLevelSet& phi() const { return phi_; }
     //! Getter function for the exterior boundary #l_out.
-    ContourList& l_out() { return l_out_; }
-    const ContourList& l_out() const { return l_out_; }
+    RawContour& l_out_raw() { return l_out_; }
+    const RawContour& l_out_raw() const { return l_out_; }
     //! Getter function for the interior boundary #l_in.
-    ContourList& l_in() { return l_in_; }
-    const ContourList& l_in() const { return l_in_; }
+    RawContour& l_in_raw() { return l_in_; }
+    const RawContour& l_in_raw() const { return l_in_; }
 
     bool empty() const { return l_out_.empty() || l_in_.empty(); }
 
+    bool is_valid() const;
+
 private :
 
-    //! Initializes the contour *this with one ellipse. It is performed when the simplest constructor is called or when one or both boundary lists is/are empty.
-    void initialize_with_one_ellipse();
+    //! Allocate lists.
+    void allocate_lists();
+
+    //! Defines the boundary lists and phi from a binary phi.
+    void define_lists_and_phi_from_binary_phi();
 
     //! Defines the #phi level-set function from the boundary lists #l_out and #l_in.
     void define_phi_from_lists();
@@ -150,14 +173,34 @@ private :
                        PhiValue target_value,
                        PhiValue replacement_value);
 
+    //! Eliminates redundant points for the both lists to maintain a contiguous boundary.
+    void eliminate_redundant_points_if_needed();
+
+    //! Export a boundary list as a copied geometric representation.
+    std::vector<Point2D_i> export_contour(const RawContour& boundary) const;
+
+    template<typename T>
+    static bool has_duplicates(const std::vector<T>& v);
+
     //! Discrete level-set function with only 4 PhiValue possible.
     DiscreteLevelSet phi_;
 
     //! List of points representing the exterior boundary (called Lout in the reference paper).
-    ContourList l_out_;
+    RawContour l_out_;
     //! List of points representing the interior boundary (called Lin in the reference paper).
-    ContourList l_in_;
+    RawContour l_in_;
 };
+
+
+template<typename T>
+bool ContourData::has_duplicates(const std::vector<T>& v)
+{
+    for (std::size_t i = 0; i < v.size(); ++i)
+        for (std::size_t j = i + 1; j < v.size(); ++j)
+            if (v[i] == v[j])
+                return true;
+    return false;
+}
 
 namespace phi_value
 {

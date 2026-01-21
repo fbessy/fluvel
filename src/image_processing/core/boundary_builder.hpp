@@ -58,57 +58,62 @@ class BoundaryBuilder
 public :
 
     BoundaryBuilder(int phi_width1, int phi_height1,
-                    ContourList& l_out_init1,
-                    ContourList& l_in_init1);
+                    RawContour& l_out_init1,
+                    RawContour& l_in_init1);
 
     //! Gets rectangle points with boundary box (x1,y1) and (x2,y2).
-    void get_rectangle_points(Point2D_i top_left,
+    void generate_rectangle_points(Point2D_i top_left,
                               Point2D_i bottom_right,
                               BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     //! Gets rectangle points with normalized boundary box (x1,y1) and (x2,y2).
-    void get_rectangle_points(Point2D_f top_left,
+    void generate_rectangle_points(Point2D_f top_left,
                               Point2D_f bottom_right,
                               BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     //! Gets ellipse points with center point and width and height.
-    void get_ellipse_points(int width, int height,
+    void generate_ellipse_points(int width, int height,
                             Point2D_i center,
                             BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     //! Gets ellipse points with normalized center point and width and height.
-    void get_ellipse_points(float width_ratio,  float height_ratio,
+    void generate_ellipse_points(float width_ratio,  float height_ratio,
                             Point2D_f center = {}, // value-initialized to (0.f, 0.f)
                             BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
 private :
 
-    void get_rectangle_points(int x1, int y1,
+    void generate_rectangle_points(int x1, int y1,
                               int x2, int y2,
-                              ContourList& list_out,
-                              ContourList& list_in);
+                              RawContour& list_out,
+                              RawContour& list_in);
 
-    void get_rectangle_points_for_one_list(ContourList& list_init,
+    void generate_rectangle_points_for_one_list(RawContour& list_init,
                                            int x1, int y1,
                                            int x2, int y2);
 
     //! Gets ellipse points with center point and width and height.
-    void get_ellipse_points(int x0, int y0,
+    void generate_ellipse_points(int x0, int y0,
                             int a,  int b,
-                            ContourList& list_out,
-                            ContourList& list_in);
+                            RawContour& list_out,
+                            RawContour& list_in);
 
     void build_ellipse_midpoint_connected(int x0, int y0,
                                           int a, int b,
-                                          ContourList& list_out);
+                                          RawContour& list_out);
 
     void build_inner_contiguous(int x0, int y0,
-                                const ContourList& l_out,
-                                ContourList& l_in);
+                                const RawContour& l_out,
+                                RawContour& l_in);
 
-    void add_4_points_in_ellipse(ContourList& list_init,
+    void check_duplicates(const RawContour& contour);
+
+    void add_4_points_in_ellipse(RawContour& list_init,
                                  int x, int y,
                                  int x0, int y0);
+
+    void add_point_unique(RawContour& out,
+                          int x, int y);
 
     int get_offset(int x, int y) const;
     int get_offset(const Point2D_i& p) const;
@@ -121,8 +126,8 @@ private :
     int grid_width_;
     int grid_height_;
 
-    ContourList& Lout_init_;
-    ContourList& Lin_init_;
+    RawContour& Lout_init_;
+    RawContour& Lin_init_;
 };
 
 inline int BoundaryBuilder::get_offset(int x, int y) const
@@ -152,21 +157,38 @@ inline bool BoundaryBuilder::inside_grid(const Point2D_i& p) const
     return inside_grid( p.x, p.y ) ;
 }
 
-inline void BoundaryBuilder::add_4_points_in_ellipse(ContourList& list,
+inline void BoundaryBuilder::add_4_points_in_ellipse(RawContour& list,
                                                      int x, int y,
                                                      int x0, int y0)
 {
-    if( inside_grid(x0-x, y0-y) )
-        list.emplace_back( get_offset(x0-x,y0-y), x0-x );
+    if( inside_grid( x0 - x, y0 - y ) )
+        add_point_unique(list,  x0 - x, y0 - y);
 
-    if( inside_grid(x0-x, y0+y) )
-        list.emplace_back( get_offset(x0-x,y0+y), x0-x );
+    if( inside_grid( x0 - x, y0 + y ) )
+        add_point_unique(list,  x0 - x, y0 + y );
 
-    if( inside_grid(x0+x, y0-y) )
-        list.emplace_back( get_offset(x0+x,y0-y), x0+x );
+    if( inside_grid(x0 + x, y0 - y) )
+        add_point_unique(list,  x0 + x, y0 - y);
 
-    if( inside_grid(x0+x, y0+y) )
-        list.emplace_back( get_offset(x0+x,y0+y), x0+x );
+    if( inside_grid(x0 + x, y0 + y) )
+        add_point_unique(list,  x0 + x, y0 + y);
+}
+
+inline void BoundaryBuilder::add_point_unique(RawContour& out,
+                                              int x, int y)
+{
+    int current_offset = get_offset(x, y);
+
+    constexpr int WINDOW = 4; // ou 6 si correcteurs multiples
+
+    const int n = static_cast<int>(out.size());
+    for (int i = std::max(0, n - WINDOW); i < n; ++i)
+    {
+        if (out[i].offset() == current_offset)
+            return;
+    }
+
+    out.emplace_back(current_offset, x);
 }
 
 }

@@ -53,7 +53,11 @@ ContourData::ContourData(int phi_width, int phi_height)
     assert( phi_height >= 1 );
 
     allocate_lists();
-    initialize_with_one_ellipse();
+    define_from_ellipse();
+
+
+    // post condition
+    assert( is_valid() );
 }
 
 ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
@@ -65,46 +69,32 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
     assert( phi_height >= 1 );
 
 
-    for( int offset = 0; offset < phi_.size(); ++offset )
+    for( size_t offset = 0; offset < phi_.size(); ++offset )
     {
-        if ( phi_grayscale_img_data[offset] >= 128u )
+        if ( phi_grayscale_img_data[ offset ] >= 128u )
         {
-            phi_[offset] = PhiValue::InsideRegion;
+            phi_[offset] = PhiValue::InteriorBoundary;
         }
         else
         {
-            phi_[offset] = PhiValue::OutsideRegion;
+            phi_[offset] = PhiValue::ExteriorBoundary;
         }
     }
 
-    const int n = static_cast<int>(phi_.size());
+    define_lists_and_phi_from_binary_phi();
 
-    for ( int offset = 0; offset < n; ++offset )
-    {
-        const Point2D_i p = phi_.coord(offset);
+    if ( empty() )
+        define_from_ellipse();
+    else
+        eliminate_redundant_points_if_needed();
 
-        if ( is_redundant( { offset, p.x } ) )
-            continue;
 
-        PhiValue& v = phi_[offset];
-
-        if ( v == PhiValue::InsideRegion )
-        {
-            v = PhiValue::InteriorBoundary;
-            l_in_.emplace_back(offset, p.x);
-        }
-        else
-        {
-            v = PhiValue::ExteriorBoundary;
-            l_out_.emplace_back(offset, p.x);
-        }
-    }
-
-    repair_lists_if_needed();
+    // post condition
+    assert( is_valid() );
 }
 
-ContourData::ContourData(const ContourList& l_out,
-                         const ContourList& l_in,
+ContourData::ContourData(const RawContour& l_out,
+                         const RawContour& l_in,
                          int phi_width, int phi_height)
     : phi_(phi_width, phi_height), l_out_(l_out), l_in_(l_in)
 {
@@ -114,8 +104,15 @@ ContourData::ContourData(const ContourList& l_out,
     assert( phi_height >= 1 );
 
     allocate_lists();
-    repair_lists_if_needed();
-    define_phi_from_lists();
+
+    if ( empty() )
+        define_from_ellipse();
+    else
+        define_phi_from_lists();
+
+
+    // post condition
+    assert( is_valid() );
 }
 
 ContourData::ContourData(const ContourData& contour)
@@ -143,18 +140,7 @@ void ContourData::allocate_lists()
     l_in_.reserve( elem_alloc_size_ );
 }
 
-void ContourData::repair_lists_if_needed()
-{
-    if ( !l_out_.empty() && !l_in_.empty() )
-        return;
-
-    std::cerr << "\n ==> " << __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__
-              << "\nInvalid contour lists, rebuilding with ellipse.";
-
-    initialize_with_one_ellipse();
-}
-
-void ContourData::initialize_with_one_ellipse()
+void ContourData::define_from_ellipse()
 {
     l_out_.clear();
     l_in_.clear();
@@ -162,12 +148,45 @@ void ContourData::initialize_with_one_ellipse()
     BoundaryBuilder lists_init( phi_.width(), phi_.height(),
                                 l_out_, l_in_ );
 
-    lists_init.get_ellipse_points( 0.8f, 0.8f );
+    lists_init.generate_ellipse_points( 0.8f, 0.8f );
 
     define_phi_from_lists();
+}
 
-    assert( !l_out_.empty() );
-    assert( !l_in_.empty() );
+void ContourData::define_lists_and_phi_from_binary_phi()
+{
+    for ( size_t offset = 0; offset < phi_.size(); ++offset )
+    {
+        PhiValue& current_phi = phi_[offset];
+        PhiValue region_val;
+        RawContour* boundary = nullptr;
+        bool is_boundary = false;
+
+        // get the generic context to eliminate redundant points
+        if ( current_phi == PhiValue::ExteriorBoundary )
+        {
+            region_val = PhiValue::OutsideRegion;
+            boundary = &l_out_;
+            is_boundary = true;
+        }
+        else if ( current_phi == PhiValue::InteriorBoundary )
+        {
+            region_val = PhiValue::InsideRegion;
+            boundary = &l_in_;
+            is_boundary = true;
+        }
+
+        if ( is_boundary )
+        {
+            const Point2D_i current_point = phi_.coord(offset);
+            const ContourPoint point{ int(offset), current_point.x };
+
+            if ( is_redundant( point ) )
+                current_phi = region_val;
+            else
+                boundary->push_back( point );
+        }
+    }
 }
 
 void ContourData::define_phi_from_lists()
@@ -182,11 +201,13 @@ void ContourData::define_phi_from_lists()
     for( const auto& p : l_in_ )
     {
         flood_fill( p.offset(),
-                       PhiValue::OutsideRegion,
-                       PhiValue::InsideRegion );
+                    PhiValue::OutsideRegion,
+                    PhiValue::InsideRegion );
 
         phi_[ p.offset() ] = PhiValue::InteriorBoundary;
     }
+
+    eliminate_redundant_points_if_needed();
 }
 
 void ContourData::flood_fill(int offset_seed,
@@ -260,6 +281,32 @@ void ContourData::flood_fill(int offset_seed,
     }
 }
 
+void ContourData::eliminate_redundant_points_if_needed()
+{
+    eliminate_redundant_points(l_out_, PhiValue::OutsideRegion);
+    eliminate_redundant_points(l_in_,  PhiValue::InsideRegion);
+}
+
+void ContourData::eliminate_redundant_points(RawContour& boundary,
+                                             PhiValue region_value)
+{
+    for( std::size_t i = 0; i < boundary.size(); )
+    {
+        auto& point = boundary[i];
+
+        if( is_redundant(point) )
+        {
+            phi()[ point.offset() ] = region_value;
+            point = boundary.back();
+            boundary.pop_back();
+        }
+        else
+        {
+            ++i;
+        }
+    }
+}
+
 bool ContourData::is_redundant(const ContourPoint& point) const
 {
     const int offset = point.offset();
@@ -306,14 +353,14 @@ bool ContourData::is_redundant(const ContourPoint& point) const
     if (x > 0 && offset >= w)
     {
         int up_left_offset = offset - w - 1;
-        if ( differentSide( phi_[up_left_offset], phi_center ) )
+        if ( phi_value::differentSide( phi_[up_left_offset], phi_center ) )
             return false;
     }
 
     if (x < w - 1 && offset >= w)
     {
         int up_right_offset = offset - w + 1;
-        if ( differentSide( phi_[up_right_offset], phi_center ) )
+        if ( phi_value::differentSide( phi_[up_right_offset], phi_center ) )
             return false;
     }
 
@@ -321,19 +368,71 @@ bool ContourData::is_redundant(const ContourPoint& point) const
     if (x > 0 && offset < last_row_offset)
     {
         int down_left_offset = offset + w - 1;
-        if ( differentSide( phi_[down_left_offset], phi_center ) )
+        if ( phi_value::differentSide( phi_[down_left_offset], phi_center ) )
             return false;
     }
 
     if (x < w - 1 && offset < last_row_offset)
     {
         int down_right_offset = offset + w + 1;
-        if ( differentSide(phi_[down_right_offset], phi_center) )
+        if ( phi_value::differentSide(phi_[down_right_offset], phi_center) )
             return false;
     }
 #endif
 
     return true;
+}
+
+bool ContourData::is_valid() const
+{
+    if ( empty() )
+        return false;
+
+    for ( const auto& point : l_out_ )
+    {
+        if ( phi_[ point.offset() ] != PhiValue::ExteriorBoundary )
+            return false;
+
+        if ( is_redundant( point ) )
+            return false;
+    }
+
+    for ( const auto& point : l_in_ )
+    {
+        if ( phi_[ point.offset() ] != PhiValue::InteriorBoundary )
+            return false;
+
+        if ( is_redundant( point ) )
+            return false;
+    }
+
+    RawContour result;
+    result.reserve( l_out_.size() + l_in_.size() );
+    result.insert( result.end(), l_out_.begin(), l_out_.end() );
+    result.insert( result.end(), l_in_.begin(), l_in_.end() );
+
+    if ( has_duplicates(result) )
+        return false;
+
+
+    return true;
+}
+
+ExportedContour ContourData::export_contour(const RawContour& raw_boundary) const
+{
+    ExportedContour geometric_boundary;
+    geometric_boundary.reserve( raw_boundary.size() );
+
+    const int width = phi().width();
+
+    for ( const auto& point : raw_boundary )
+    {
+        const int y = point.offset() / width;
+
+        geometric_boundary.emplace_back( point.x(), y );
+    }
+
+    return geometric_boundary;
 }
 
 }

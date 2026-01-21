@@ -30,23 +30,24 @@ set(ip_src
     ${ALGO_DIR}/filters.cpp
     ${ALGO_DIR}/filters.hpp
 
+    ${ALGO_DIR}/filters2.cpp
+    ${ALGO_DIR}/filters2.hpp
+
     ${CORE_DIR}/boundary_builder.cpp
     ${CORE_DIR}/boundary_builder.hpp
 
     ${CORE_DIR}/shape.cpp
     ${CORE_DIR}/shape.hpp
 
-    ${CORE_DIR}/matrix.txx
     ${CORE_DIR}/matrix.hpp
-
     ${CORE_DIR}/image_span.hpp
     ${CORE_DIR}/point.hpp
     ${CORE_DIR}/point_hash.hpp
     ${CORE_DIR}/ofeli_math.hpp
+    ${CORE_DIR}/color.hpp
 )
 
-add_library(${TARGET_NAME} STATIC ${ip_src}
-    core/color.hpp)
+add_library(${TARGET_NAME} STATIC ${ip_src})
 add_library(ofeli::image_processing ALIAS ${TARGET_NAME})
 
 

@@ -39,6 +39,8 @@
 
 #include <cmath>
 #include <cassert>
+#include <unordered_set>
+#include <iostream>
 
 #include "boundary_builder.hpp"
 #include "ofeli_math.hpp"
@@ -47,8 +49,8 @@ namespace ofeli_ip
 {
 
 BoundaryBuilder::BoundaryBuilder(int phi_width, int phi_height,
-                                 ContourList& Lout_init,
-                                 ContourList& Lin_init)
+                                 RawContour& Lout_init,
+                                 RawContour& Lin_init)
     : grid_width_(phi_width), grid_height_(phi_height),
     Lout_init_(Lout_init), Lin_init_(Lin_init)
 {
@@ -56,9 +58,9 @@ BoundaryBuilder::BoundaryBuilder(int phi_width, int phi_height,
     assert( phi_height >= 1 );
 }
 
-void BoundaryBuilder::get_rectangle_points(Point2D_i top_left,
-                                           Point2D_i bottom_right,
-                                           BoundaryOrientation orientation)
+void BoundaryBuilder::generate_rectangle_points(Point2D_i top_left,
+                                                Point2D_i bottom_right,
+                                                BoundaryOrientation orientation)
 {
     auto* list1 = &Lout_init_;
     auto* list2 = &Lin_init_;
@@ -68,14 +70,14 @@ void BoundaryBuilder::get_rectangle_points(Point2D_i top_left,
         std::swap(list1, list2);
     }
 
-    get_rectangle_points( top_left.x, top_left.y,
+    generate_rectangle_points( top_left.x, top_left.y,
                           bottom_right.x, bottom_right.y,
                           *list1, *list2 );
 }
 
-void BoundaryBuilder::get_rectangle_points(Point2D_f top_left,
-                                           Point2D_f bottom_right,
-                                           BoundaryOrientation orientation)
+void BoundaryBuilder::generate_rectangle_points(Point2D_f top_left,
+                                                Point2D_f bottom_right,
+                                                BoundaryOrientation orientation)
 {
     auto* list1 = &Lout_init_;
     auto* list2 = &Lin_init_;
@@ -85,15 +87,15 @@ void BoundaryBuilder::get_rectangle_points(Point2D_f top_left,
         std::swap(list1, list2);
     }
 
-    get_rectangle_points( std::lround(top_left.x*grid_width_), std::lround(top_left.y*grid_height_),
+    generate_rectangle_points( std::lround(top_left.x*grid_width_), std::lround(top_left.y*grid_height_),
                           std::lround(bottom_right.x*grid_width_), std::lround(bottom_right.y*grid_height_),
                           *list1, *list2 );
 }
 
-void BoundaryBuilder::get_rectangle_points(int x1, int y1,
-                                           int x2, int y2,
-                                           ContourList& list_out,
-                                           ContourList& list_in)
+void BoundaryBuilder::generate_rectangle_points(int x1, int y1,
+                                                int x2, int y2,
+                                                RawContour& list_out,
+                                                RawContour& list_in)
 {
     if( x1 > x2 )
     {
@@ -106,12 +108,12 @@ void BoundaryBuilder::get_rectangle_points(int x1, int y1,
 
     if( x1 != x2 && y1 != y2 )
     {
-        get_rectangle_points_for_one_list( list_in,
+        generate_rectangle_points_for_one_list( list_in,
                                           x1, y1,
                                           x2, y2 );
 
 #ifdef ALGO_8_CONNEXITY
-        get_rectangle_points_for_one_list( list_out,
+        generate_rectangle_points_for_one_list( list_out,
                                           x1-1, y1-1,
                                           x2+1, y2+1 );
 #else
@@ -142,9 +144,9 @@ void BoundaryBuilder::get_rectangle_points(int x1, int y1,
     }
 }
 
-void BoundaryBuilder::get_rectangle_points_for_one_list(ContourList& list_init,
-                                                        int x1, int y1,
-                                                        int x2, int y2)
+void BoundaryBuilder::generate_rectangle_points_for_one_list(RawContour& list_init,
+                                                             int x1, int y1,
+                                                             int x2, int y2)
 {
     for( int x = x1; x <= x2; ++x )
     {
@@ -171,9 +173,9 @@ void BoundaryBuilder::get_rectangle_points_for_one_list(ContourList& list_init,
     }
 }
 
-void BoundaryBuilder::get_ellipse_points(int width, int height,
-                                         Point2D_i center,
-                                         BoundaryOrientation orientation)
+void BoundaryBuilder::generate_ellipse_points(int width, int height,
+                                              Point2D_i center,
+                                              BoundaryOrientation orientation)
 {
     auto* list1 = &Lout_init_;
     auto* list2 = &Lin_init_;
@@ -186,14 +188,14 @@ void BoundaryBuilder::get_ellipse_points(int width, int height,
     const int a = width  / 2;
     const int b = height / 2;
 
-    get_ellipse_points( center.x, center.y,
-                        a, b,
-                        *list1, *list2 );
+    generate_ellipse_points( center.x, center.y,
+                             a, b,
+                             *list1, *list2 );
 }
 
-void BoundaryBuilder::get_ellipse_points(float width_ratio, float height_ratio,
-                                         Point2D_f center,
-                                         BoundaryOrientation orientation)
+void BoundaryBuilder::generate_ellipse_points(float width_ratio, float height_ratio,
+                                              Point2D_f center,
+                                              BoundaryOrientation orientation)
 {
     auto* list1 = &Lout_init_;
     auto* list2 = &Lin_init_;
@@ -212,15 +214,15 @@ void BoundaryBuilder::get_ellipse_points(float width_ratio, float height_ratio,
     const int a = std::lround( (width_ratio  / 2.f) * grid_width_  );
     const int b = std::lround( (height_ratio / 2.f) * grid_height_ );
 
-    get_ellipse_points( x0, y0,
-                        a, b,
-                        *list1, *list2 );
+    generate_ellipse_points( x0, y0,
+                             a, b,
+                             *list1, *list2 );
 }
 
-void BoundaryBuilder::get_ellipse_points(int x0, int y0,
-                                         int a,  int b,
-                                         ContourList& list_out,
-                                         ContourList& list_in)
+void BoundaryBuilder::generate_ellipse_points(int x0, int y0,
+                                              int a,  int b,
+                                              RawContour& list_out,
+                                              RawContour& list_in)
 {
 
     build_ellipse_midpoint_connected(x0, y0, a, b, list_out);
@@ -229,7 +231,7 @@ void BoundaryBuilder::get_ellipse_points(int x0, int y0,
 
 void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0,
                                                        int a, int b,
-                                                       ContourList& list_out)
+                                                       RawContour& list_out)
 {
     int x = 0;
     int y = b;
@@ -326,23 +328,49 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0,
 }
 
 void BoundaryBuilder::build_inner_contiguous(int x0, int y0,
-                                             const ContourList& l_out,
-                                             ContourList& l_in)
+                                             const RawContour& l_out,
+                                             RawContour& l_in)
 {
-    for( const auto& point : l_out )
+    std::unordered_set<int> seen;
+    seen.reserve(l_out.size());
+
+    for (const auto& point : l_out)
     {
-        const auto p = get_position( point.offset() );
+        const auto p = get_position(point.offset());
 
-        const int dx = x0 - p.x;
-        const int dy = y0 - p.y;
-
-        const int sx = math::sign( dx );
-        const int sy = math::sign( dy );
+        const int sx = math::sign(x0 - p.x);
+        const int sy = math::sign(y0 - p.y);
 
         const Point2D_i pi { p.x + sx, p.y + sy };
 
-        if ( pi != p && inside_grid( pi ) )
-            l_in.emplace_back( get_offset(pi), pi.x );
+        if (!inside_grid(pi))
+            continue;
+
+        const int off = get_offset(pi);
+
+        if (seen.insert(off).second)
+            l_in.emplace_back(off, pi.x);
+    }
+}
+
+void BoundaryBuilder::check_duplicates(const RawContour& contour)
+{
+    std::unordered_set<int> seen;
+    seen.reserve(contour.size());
+
+    for (size_t i = 0; i < contour.size(); ++i)
+    {
+        int off = contour[i].offset();
+
+        if (!seen.insert(off).second)
+        {
+            auto p = get_position(off);
+            std::cerr << "[DUPLICATE] index=" << i
+                      << " offset=" << off
+                      << " pos=(" << p.x << "," << p.y << ")\n";
+
+            std::cerr.flush();
+        }
     }
 }
 
