@@ -1051,8 +1051,6 @@ void SettingsWindow::accept()
         config.speed = SpeedModel::EDGE_BASED;
     }
 
-    //config.connectivity
-
     config.algo_config.is_cycle2 = internalspeed_groupbox->isChecked();
     config.algo_config.disk_radius = disk_radius_spin->value();
     config.algo_config.Na = Na_spin->value();
