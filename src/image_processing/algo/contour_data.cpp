@@ -46,8 +46,10 @@
 namespace ofeli_ip
 {
 
-ContourData::ContourData(int phi_width, int phi_height)
-    : phi_(phi_width, phi_height)
+ContourData::ContourData(int phi_width, int phi_height,
+                         Connectivity connectivity)
+    : phi_(phi_width, phi_height),
+    connectivity_(connectivity)
 {
     assert( phi_width  >= 1 );
     assert( phi_height >= 1 );
@@ -61,8 +63,10 @@ ContourData::ContourData(int phi_width, int phi_height)
 }
 
 ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
-                         int phi_width, int phi_height)
-    : phi_(phi_width, phi_height)
+                         int phi_width, int phi_height,
+                         Connectivity connectivity)
+    : phi_(phi_width, phi_height),
+    connectivity_(connectivity)
 {
     assert( phi_grayscale_img_data != nullptr );
     assert( phi_width  >= 1 );
@@ -95,8 +99,10 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
 
 ContourData::ContourData(const RawContour& l_out,
                          const RawContour& l_in,
-                         int phi_width, int phi_height)
-    : phi_(phi_width, phi_height), l_out_(l_out), l_in_(l_in)
+                         int phi_width, int phi_height,
+                         Connectivity connectivity)
+    : phi_(phi_width, phi_height), l_out_(l_out), l_in_(l_in),
+    connectivity_(connectivity)
 {
     assert( !l_out.empty() );
     assert( !l_in.empty() );
@@ -118,7 +124,8 @@ ContourData::ContourData(const RawContour& l_out,
 ContourData::ContourData(const ContourData& contour)
     : phi_( contour.phi_ ),
     l_out_( contour.l_out_ ),
-    l_in_( contour.l_in_ )
+    l_in_( contour.l_in_ ),
+    connectivity_( contour.connectivity_ )
 {
     allocate_lists();
 }
@@ -126,7 +133,8 @@ ContourData::ContourData(const ContourData& contour)
 ContourData::ContourData(ContourData&& contour) noexcept
     : phi_( std::move(contour.phi_) ),
     l_out_( std::move(contour.l_out_) ),
-    l_in_( std::move(contour.l_in_) )
+    l_in_( std::move(contour.l_in_) ),
+    connectivity_( contour.connectivity_ )
 {
     allocate_lists();
 }
@@ -348,37 +356,40 @@ bool ContourData::is_redundant(const ContourPoint& point) const
             return false;
     }
 
-#ifdef ALGO_8_CONNEXITY
-    // Diagonaux supérieurs
-    if (x > 0 && offset >= w)
-    {
-        int up_left_offset = offset - w - 1;
-        if ( phi_value::differentSide( phi_[up_left_offset], phi_center ) )
-            return false;
-    }
+    const auto connected = connectivity_;
 
-    if (x < w - 1 && offset >= w)
+    if ( connected == Connectivity::Eight )
     {
-        int up_right_offset = offset - w + 1;
-        if ( phi_value::differentSide( phi_[up_right_offset], phi_center ) )
-            return false;
-    }
+        // Diagonaux supérieurs
+        if (x > 0 && offset >= w)
+        {
+            int up_left_offset = offset - w - 1;
+            if ( phi_value::differentSide( phi_[up_left_offset], phi_center ) )
+                return false;
+        }
 
-    // Diagonaux inférieurs
-    if (x > 0 && offset < last_row_offset)
-    {
-        int down_left_offset = offset + w - 1;
-        if ( phi_value::differentSide( phi_[down_left_offset], phi_center ) )
-            return false;
-    }
+        if (x < w - 1 && offset >= w)
+        {
+            int up_right_offset = offset - w + 1;
+            if ( phi_value::differentSide( phi_[up_right_offset], phi_center ) )
+                return false;
+        }
 
-    if (x < w - 1 && offset < last_row_offset)
-    {
-        int down_right_offset = offset + w + 1;
-        if ( phi_value::differentSide(phi_[down_right_offset], phi_center) )
-            return false;
+        // Diagonaux inférieurs
+        if (x > 0 && offset < last_row_offset)
+        {
+            int down_left_offset = offset + w - 1;
+            if ( phi_value::differentSide( phi_[down_left_offset], phi_center ) )
+                return false;
+        }
+
+        if (x < w - 1 && offset < last_row_offset)
+        {
+            int down_right_offset = offset + w + 1;
+            if ( phi_value::differentSide(phi_[down_right_offset], phi_center) )
+                return false;
+        }
     }
-#endif
 
     return true;
 }

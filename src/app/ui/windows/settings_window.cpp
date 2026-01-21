@@ -125,6 +125,14 @@ void SettingsWindow::setupUiAlgoTab()
     /// Algorithm tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+    connectivity_cb = new QComboBox;
+    connectivity_cb->addItem("4-connected (Von Neumann)");
+    connectivity_cb->addItem("8-connected (Moore)");
+
+    QFormLayout* connect_layout = new QFormLayout;
+    connect_layout->addRow("Connectivity :", connectivity_cb);
+
     QGroupBox* externalspeed_groupbox = new QGroupBox(tr("Cycle 1 – Data-driven evolution"));
 
     Na_spin = new QSpinBox;
@@ -285,8 +293,12 @@ void SettingsWindow::setupUiAlgoTab()
 
 
     QVBoxLayout* algorithm_layout = new QVBoxLayout;
+    algorithm_layout->addLayout(connect_layout);
+    algorithm_layout->addSpacing(8);
     algorithm_layout->addWidget(externalspeed_groupbox);
+    algorithm_layout->addSpacing(8);
     algorithm_layout->addWidget(internalspeed_groupbox);
+    algorithm_layout->addSpacing(8);
     algorithm_layout->addWidget(tracking_groupbox);
     algorithm_layout->addStretch(1);
 
@@ -1024,11 +1036,11 @@ void SettingsWindow::accept()
 {
     auto& config = AppSettings::instance();
 
-    bool is_ac_config_changed = false;
-
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
+
+    config.connectivity = ofeli_ip::Connectivity( connectivity_cb->currentIndex() );
 
     if( chanvese_radio->isChecked() )
     {
@@ -1039,14 +1051,12 @@ void SettingsWindow::accept()
         config.speed = SpeedModel::EDGE_BASED;
     }
 
-    ofeli_ip::AcConfig previous_algo_config = config.algo_config;
+    //config.connectivity
 
     config.algo_config.is_cycle2 = internalspeed_groupbox->isChecked();
     config.algo_config.disk_radius = disk_radius_spin->value();
     config.algo_config.Na = Na_spin->value();
     config.algo_config.Ns = Ns_spin->value();
-
-    ofeli_ip::RegionColorConfig previous_region_config = config.region_ac_config;
 
     config.region_ac_config.lambda_in = lambda_in_spin->value();
     config.region_ac_config.lambda_out = lambda_out_spin->value();
@@ -1056,12 +1066,6 @@ void SettingsWindow::accept()
     config.region_ac_config.weights.c1 = alpha_spin->value();
     config.region_ac_config.weights.c2 = beta_spin->value();
     config.region_ac_config.weights.c3 = gamma_spin->value();
-
-    if(    previous_algo_config != config.algo_config
-        || previous_region_config != config.region_ac_config )
-    {
-        is_ac_config_changed = true;
-    }
 
     config.kernel_gradient_length = klength_gradient_spin->value();
 
@@ -1184,6 +1188,15 @@ void SettingsWindow::reject()
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
+
+    if ( config.connectivity == ofeli_ip::Connectivity::Four )
+    {
+        connectivity_cb->setCurrentIndex( 0 );
+    }
+    else if ( config.connectivity == ofeli_ip::Connectivity::Eight )
+    {
+        connectivity_cb->setCurrentIndex( 1 );
+    }
 
     Na_spin->setValue(config.algo_config.Na);
 
@@ -1363,6 +1376,8 @@ void SettingsWindow::default_settings()
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
+
+    connectivity_cb->setCurrentIndex( int(ofeli_ip::Connectivity::Four) );
 
     Na_spin->setValue( 30 );
     // region based model by default

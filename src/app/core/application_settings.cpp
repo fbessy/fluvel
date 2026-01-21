@@ -61,6 +61,9 @@ ApplicationSettings::ApplicationSettings()
     //////////////////////////////////////////////////
     // Algorithm
 
+    connectivity = static_cast<ofeli_ip::Connectivity>(settings.value("Settings/Algorithm/connectivity",
+                                                       int(ofeli_ip::Connectivity::Four)).toInt());
+
     algo_config.is_cycle2 = settings.value("Settings/Algorithm/has_smoothing_cycle", true).toBool();
     algo_config.disk_radius = settings.value("Settings/Algorithm/disk_radius", 2).toInt();
     algo_config.Na = settings.value("Settings/Algorithm/Na", 30).toInt();
@@ -180,6 +183,8 @@ void ApplicationSettings::save()
 
     settings.setValue("Language/current_index", app_language);
 
+    settings.setValue("Settings/Algorithm/connectivity", int(connectivity));
+
     settings.setValue("Settings/Algorithm/Na", algo_config.Na);
     settings.setValue("Settings/Algorithm/Ns", algo_config.Ns);
     settings.setValue("Settings/Algorithm/speed", speed);
@@ -256,6 +261,8 @@ RuntimeSettings ApplicationSettings::snapshot() const
     RuntimeSettings rs;
 
     rs.app_language = app_language;
+
+    rs.connectivity = connectivity;
 
     rs.algo_config = algo_config;
     rs.region_ac_config = region_ac_config;

@@ -97,7 +97,9 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
             conf.failure_mode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
 
             region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
-                                                                  ofeli_ip::ContourData(img_algo.width(), img_algo.height()),
+                                                                  ofeli_ip::ContourData(img_algo.width(),
+                                                                                        img_algo.height(),
+                                                                                        config.connectivity),
                                                                   conf,
                                                                   config.region_ac_config);
 

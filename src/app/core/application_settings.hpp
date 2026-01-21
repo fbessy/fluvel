@@ -74,6 +74,8 @@ public:
 
     Language app_language;
 
+    ofeli_ip::Connectivity connectivity;
+
     ofeli_ip::AcConfig algo_config;
     ofeli_ip::RegionColorConfig region_ac_config;
 

@@ -114,6 +114,8 @@ private :
 
     QWidget* page1;
 
+    QComboBox* connectivity_cb;
+
     QSpinBox* Na_spin;
     QSpinBox* Ns_spin;
     QRadioButton* chanvese_radio;

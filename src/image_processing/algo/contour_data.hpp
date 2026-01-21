@@ -49,6 +49,12 @@
 namespace ofeli_ip
 {
 
+//! Pixel connectivity of the neighborhood used by the algorithm (4- or 8-connected).
+enum class Connectivity {
+    Four,
+    Eight
+};
+
 enum class PhiValue : int8_t
 {
     InsideRegion      = -3,
@@ -104,16 +110,19 @@ class ContourData
 public :
 
     //! Constructor to initialize the contour with one ellipse.
-    ContourData(int phi_width, int phi_height);
+    ContourData(int phi_width, int phi_height,
+                Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour from a grayscale image data buffer of the levet-set function #phi.
     ContourData(const unsigned char* phi_grayscale_img_data,
-                int phi_width, int phi_height);
+                int phi_width, int phi_height,
+                Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of #l_out and #l_in.
     ContourData(const RawContour& l_out,
                 const RawContour& l_in,
-                int phi_width, int phi_height);
+                int phi_width, int phi_height,
+                Connectivity connectivity = Connectivity::Four);
 
     //! Copy constructor.
     ContourData(const ContourData& contour);
@@ -157,6 +166,8 @@ public :
 
     bool is_valid() const;
 
+    Connectivity connectivity() const { return connectivity_; }
+
 private :
 
     //! Allocate lists.
@@ -189,6 +200,9 @@ private :
     RawContour l_out_;
     //! List of points representing the interior boundary (called Lin in the reference paper).
     RawContour l_in_;
+
+    //! Pixel connectivity of the neighborhood to define ContourData (4- or 8-connected).
+    const Connectivity connectivity_;
 };
 
 

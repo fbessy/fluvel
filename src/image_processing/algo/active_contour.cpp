@@ -330,33 +330,36 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
         add_region_neighbor(down_offset, x);
     }
 
-#ifdef ALGO_8_CONNEXITY
-    // Diagonaux supérieurs
-    if (x > 0 && offset >= w)
-    {
-        const int up_left_offset = offset - w - 1;
-        add_region_neighbor(up_left_offset, x-1);
-    }
+    const auto connected = cd_.connectivity();
 
-    if (x < w - 1 && offset >= w)
+    if ( connected == Connectivity::Eight )
     {
-        const int up_right_offset = offset - w + 1;
-        add_region_neighbor(up_right_offset, x+1);
-    }
+        // Diagonaux supérieurs
+        if (x > 0 && offset >= w)
+        {
+            const int up_left_offset = offset - w - 1;
+            add_region_neighbor(up_left_offset, x-1);
+        }
 
-    // Diagonaux inférieurs
-    if (x > 0 && offset < last_row_offset)
-    {
-        const int down_left_offset = offset + w - 1;
-        add_region_neighbor(down_left_offset, x-1);
-    }
+        if (x < w - 1 && offset >= w)
+        {
+            const int up_right_offset = offset - w + 1;
+            add_region_neighbor(up_right_offset, x+1);
+        }
 
-    if (x < w - 1 && offset < last_row_offset)
-    {
-        const int down_right_offset = offset + w + 1;
-        add_region_neighbor(down_right_offset, x+1);
+        // Diagonaux inférieurs
+        if (x > 0 && offset < last_row_offset)
+        {
+            const int down_left_offset = offset + w - 1;
+            add_region_neighbor(down_left_offset, x-1);
+        }
+
+        if (x < w - 1 && offset < last_row_offset)
+        {
+            const int down_right_offset = offset + w + 1;
+            add_region_neighbor(down_right_offset, x+1);
+        }
     }
-#endif
 
     const auto& ctx = context();
 

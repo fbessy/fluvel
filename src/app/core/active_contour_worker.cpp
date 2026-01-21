@@ -164,12 +164,14 @@ void ActiveContourWorker::initializeActiveContour()
         workAlgo = m_workImage;
         initialPhi = config.initialPhi.copy();
 
+#ifdef OFELI_DEBUG
         int bpp = m_workImage.depth() / 8;  // ou 4 pour ARGB32
         int expected = m_workImage.width() * bpp;
 
         qDebug() << "bytesPerLine =" << m_workImage.bytesPerLine()
                  << "expected =" << expected
                  << "padding =" << m_workImage.bytesPerLine() - expected;
+#endif
 
         //downscale_fctr = 1;
         if ( downscale_fctr >= 2 )
@@ -185,16 +187,19 @@ void ActiveContourWorker::initializeActiveContour()
                                            Qt::FastTransformation);
         }
 
+#ifdef OFELI_DEBUG
         int bpp2 = workAlgo.depth() / 8;  // ou 4 pour ARGB32
         int expected2 = workAlgo.width() * bpp2;
 
         qDebug() << "bytesPerLine =" << workAlgo.bytesPerLine()
                  << "expected =" << expected2
                  << "padding =" << workAlgo.bytesPerLine() - expected2;
+#endif
 
         ofeli_ip::ContourData initialCD(initialPhi.constBits(),
                                         initialPhi.width(),
-                                        initialPhi.height());
+                                        initialPhi.height(),
+                                        config.connectivity);
 
         bool is_rgb = ( workAlgo.format() != QImage::Format_Grayscale8 );
 
