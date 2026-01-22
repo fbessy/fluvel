@@ -69,7 +69,7 @@ private :
     int get_global_speed_sign() const;
 
     //! Otsu's method to calculate an optimal global threshold.
-    static unsigned char do_otsu_method(const ImageSpan& image);
+    static unsigned char do_otsu_method(ImageSpan image);
 
     //! Image wrapper.
     ImageSpan gradient_image_;

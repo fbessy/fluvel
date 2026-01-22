@@ -89,17 +89,21 @@ int EdgeAc::get_global_speed_sign() const
     unsigned int sum_in = 0;
     unsigned int sum_out = 0;
 
-    const int img_size = gradient_image_.size();
+    const int w = gradient_image_.width();
+    const int h = gradient_image_.height();
 
-    for( int offset = 0; offset < img_size; offset++ )
+    for (int y = 0; y < h; ++y)
     {
-        if( phi_value::isInside( cd_.phi()[offset] ) )
+        for (int x = 0; x < w; ++x)
         {
-            //sum_in += (unsigned int)(gradient_image_.at(offset));
-        }
-        else
-        {
-            //sum_out += (unsigned int)(gradient_image_.at(offset));
+            if( phi_value::isInside( cd_.phi().at(x,y) ) )
+            {
+                sum_in += (unsigned int)(gradient_image_.at(x,y));
+            }
+            else
+            {
+                sum_out += (unsigned int)(gradient_image_.at(x,y));
+            }
         }
     }
 
@@ -115,7 +119,7 @@ int EdgeAc::get_global_speed_sign() const
     return sign;
 }
 
-unsigned char EdgeAc::do_otsu_method(const ImageSpan& image)
+unsigned char EdgeAc::do_otsu_method(ImageSpan image)
 {
     unsigned char threshold = 0;
 
@@ -123,11 +127,12 @@ unsigned char EdgeAc::do_otsu_method(const ImageSpan& image)
 
     std::memset( (void*)histogram, 0, GRAYSCALE_DEPTH * sizeof( unsigned int ) );
 
-    for( int offset = 0;
-         offset < image.size();
-         offset++ )
+    for (int y = 0; y < image.height(); ++y)
     {
-        //histogram[ image.at(offset) ]++;
+        for (int x = 0; x < image.width(); ++x)
+        {
+            histogram[ image.gray(x,y) ]++;
+        }
     }
 
     unsigned int sum = 0;
