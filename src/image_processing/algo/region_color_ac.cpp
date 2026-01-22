@@ -52,16 +52,19 @@ void RegionColorAc::initialize_sums()
     sum_out_     = { 0, 0, 0 };
     pxl_nbr_out_ = 0;
 
-    for( int offset = 0; offset < pxl_nbr_total_; ++offset )
+    for (int y = 0; y < cd_.phi().height(); ++y)
     {
-        const Rgb_64i rgb = static_cast<Rgb_64i>( image_.pixel_rgb_at(offset) );
-
-        sum_total_ += rgb;
-
-        if( phi_value::isOutside( cd_.phi()[offset] ) )
+        for (int x = 0; x < cd_.phi().width(); ++x)
         {
-            sum_out_ += rgb;
-            ++pxl_nbr_out_;
+            const Rgb_64i rgb = static_cast<Rgb_64i>( image_.atPixelRgb( x, y ) );
+
+            sum_total_ += rgb;
+
+            if( phi_value::isOutside( cd_.phi().at( x, y ) ) )
+            {
+                sum_out_ += rgb;
+                ++pxl_nbr_out_;
+            }
         }
     }
 }
@@ -120,7 +123,8 @@ Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
 
 void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    const Rgb_uc rgb = image_.pixel_rgb_at( point.offset() );
+    const auto p = cd_.phi().coord( point.offset() );
+    const Rgb_uc rgb = image_.atPixelRgb( p.x, p.y );
 
     const auto col = rgb_to_color(rgb);
 
@@ -143,7 +147,8 @@ void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
 void RegionColorAc::do_specific_when_switch(int offset,
                                             BoundarySwitch ctx_choice)
 {
-    const Rgb_64i rgb = static_cast<Rgb_64i>( image_.pixel_rgb_at(offset) );
+    const auto p = cd_.phi().coord( offset );
+    const Rgb_64i rgb = static_cast<Rgb_64i>( image_.atPixelRgb( p.x, p.y ) );
 
     if ( ctx_choice == BoundarySwitch::In )
     {
@@ -157,7 +162,7 @@ void RegionColorAc::do_specific_when_switch(int offset,
     }
 }
 
-void RegionColorAc::resetExecutionState(ImageSpan32 image)
+void RegionColorAc::resetExecutionState(ImageSpan image)
 {
     restart();
 

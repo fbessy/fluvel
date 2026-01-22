@@ -3,168 +3,146 @@
 
 #include <cassert>
 #include <bit>
+#include <utility>
 
 #include "color.hpp"
 
 namespace ofeli_ip
 {
-/*
+
+enum class ImageFormat
+{
+    Gray8,
+    Rgb24,
+    Bgr24,
+    Bgr32,
+    Rgba32
+};
+
 class ImageSpan final
 {
+public:
+
+    ImageSpan() = default;
+
     ImageSpan(const unsigned char* data,
-              int width, int height,
-              int channels = 1,
-              int stride = 0)
+              int widthPixels, int heightPixels,
+              ImageFormat format = ImageFormat::Gray8,
+              int strideBytes = 0)
         : data_(data),
-        width_(width), height_(height), channels_(channels)
+        widthPixels_(widthPixels), heightPixels_(heightPixels),
+        format_(format),
+        channelsPerPixel_(channels_from_format(format)),
+        strideBytes_(compute_stride(widthPixels_,
+                                    channelsPerPixel_,
+                                    strideBytes))
     {
         assert( data != nullptr );
-        assert( width  > 0 );
-        assert( height > 0 );
-        assert( channels > 0 );
-        assert( stride >= 0 );
+        assert( widthPixels  > 0 );
+        assert( heightPixels > 0 );
+        assert( strideBytes >= 0 );
 
-        if ( stride == 0 )
-            stride_ = width_;
-        else
-            stride_ = stride;
-
-
-        assert( stride_ > 0 );
+        assert(strideBytes_ >= widthPixels_ * channelsPerPixel_);
     }
 
-    // to do ??
-    unsigned char pixel_at(int offset) const noexcept
+    const unsigned char* data()   const noexcept { return data_; }
+    int width()                   const noexcept { return widthPixels_; }
+    int height()                  const noexcept { return heightPixels_; }
+    int size()                  const noexcept   { return widthPixels_*heightPixels_; }
+    ImageFormat format() const noexcept { return format_; }
+    int channels()                const noexcept { return channelsPerPixel_; }
+    int strideBytes()             const noexcept { return strideBytes_; }
+
+    const unsigned char* row(int y) const noexcept
     {
-        assert( offset >= 0 && offset < size() );
-
-        return data_[offset];
+        assert(y >= 0 && y < heightPixels_);
+        return data_ + y * strideBytes_;
     }
 
-    // to do ??
-    unsigned char pixel_at(int x, int y) const noexcept
+    unsigned char at(int x, int y, int c = 0) const noexcept
     {
-        assert( x >= 0 && x < width_ );
-        assert( y >= 0 && y < height_ );
+        assert(x >= 0 && x < widthPixels_);
+        assert(y >= 0 && y < heightPixels_);
+        assert(c >= 0 && c < channelsPerPixel_);
 
-        return data_[ x+y*width_ ];
+        return row(y)[x * channelsPerPixel_ + c];
     }
 
-    int width()  const { return width_; }
-    int height() const { return height_; }
-    int size()   const { return width_ * height_; }
+    inline Rgb_uc atPixelRgb(int x, int y) const noexcept
+    {
+        const unsigned char* p = row( y );
+
+        switch (format_)
+        {
+        case ImageFormat::Gray8:
+        {
+            const unsigned char v = p[x];
+            return { v, v, v };
+        }
+        case ImageFormat::Rgb24:
+        {
+            p +=  x * 3;
+            return { p[0], p[1], p[2] };
+        }
+        case ImageFormat::Bgr24:
+        {
+            p += x * 3;
+            return { p[2], p[1], p[0] };
+        }
+        case ImageFormat::Bgr32:
+        {
+            p += x * 4;
+            return { p[2], p[1], p[0] };
+        }
+        case ImageFormat::Rgba32:
+        {
+            p += x * 4;
+            return { p[0], p[1], p[2] }; // ignore alpha
+        }
+        }
+
+        // Violation de contrat : format_ invalide
+        std::unreachable();
+    }
+
+    unsigned char gray(int x, int y) const noexcept
+    {
+        assert(format_ == ImageFormat::Gray8);
+        assert(channelsPerPixel_ == 1);
+
+        return at(x, y, 0);
+    }
 
 private:
     const unsigned char* data_;
-    int widthPixels;
-    int heightPixels;
-    int channelsPerPixel_;  // 1 = gray, 3 = RGB, 4 = RGBA
+    int widthPixels_;
+    int heightPixels_;
+    ImageFormat format_;
+    int channelsPerPixel_;
     int strideBytes_;       // bytes per row
-};
-*/
-class ImageSpan8 final
-{
 
-public:
-
-    ImageSpan8(const unsigned char* img_data,
-               int img_width,
-               int img_height):
-        data_(img_data),
-        width_(img_width),
-        height_(img_height)
+    static int compute_stride(int width,
+                              int channels,
+                              int strideBytes)
     {
-        assert( data_ != nullptr );
-        assert( width_  > 0 );
-        assert( height_ > 0 );
+        return (strideBytes == 0)
+        ? width * channels
+        : strideBytes;
     }
 
-    unsigned char pixel_at(int offset) const noexcept
+    static constexpr int channels_from_format(ImageFormat fmt) noexcept
     {
-        assert( offset >= 0 && offset < size() );
+        switch (fmt)
+        {
+        case ImageFormat::Gray8:  return 1;
+        case ImageFormat::Rgb24:  return 3;
+        case ImageFormat::Bgr24:  return 3;
+        case ImageFormat::Bgr32:  return 4;
+        case ImageFormat::Rgba32: return 4;
+        }
 
-        return data_[offset];
+        std::unreachable();
     }
-
-    unsigned char pixel_at(int x, int y) const noexcept
-    {
-        assert( x >= 0 && x < width_ );
-        assert( y >= 0 && y < height_ );
-
-        return data_[ x+y*width_ ];
-    }
-
-    int width()  const { return width_; }
-    int height() const { return height_; }
-    int size()   const { return width_ * height_; }
-
-private:
-
-    const unsigned char* data_;
-    int width_;
-    int height_;
-};
-
-class ImageSpan32 final
-{
-public:
-    ImageSpan32(const unsigned char* data,
-                int width,
-                int height):
-        data_(data),
-        width_(width),
-        height_(height)
-    {
-        assert(data_ != nullptr);
-        assert(width_  > 0);
-        assert(height_ > 0);
-    }
-
-    // --- Accès par offset
-    Bgra32 pixel_bgra_at(int offset) const noexcept
-    {
-        assert( offset >= 0 && offset < size() );
-
-        const unsigned char* p = data_ + offset * 4;
-        return { p[0], p[1], p[2], p[3] };
-    }
-
-    // --- Accès par coordonnées
-    Bgra32 pixel_bgra_at(int x, int y) const noexcept
-    {
-        assert( x >= 0 && x < width_ );
-        assert( y >= 0 && y < height_ );
-
-        const unsigned char* p = data_ + (x + y * width_) * 4;
-        return { p[0], p[1], p[2], p[3] };
-    }
-
-    // --- Accès logique RGB (indépendant endianness)
-    Rgb_uc pixel_rgb_at(int offset) const noexcept
-    {
-        assert( offset >= 0 && offset < size() );
-
-        const auto px = pixel_bgra_at(offset);
-        return Rgb_uc{ px.red, px.green, px.blue };
-    }
-
-    Rgb_uc pixel_rgb_at(int x, int y) const noexcept
-    {
-        assert( x >= 0 && x < width_ );
-        assert( y >= 0 && y < height_ );
-
-        const auto px = pixel_bgra_at(x, y);
-        return Rgb_uc{ px.red, px.green, px.blue };
-    }
-
-    int width()  const { return width_; }
-    int height() const { return height_; }
-    int size()   const { return width_ * height_; }
-
-private:
-    const unsigned char* data_;
-    int width_;
-    int height_;
 };
 
 }

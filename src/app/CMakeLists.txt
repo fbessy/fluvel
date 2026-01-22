@@ -206,11 +206,11 @@ target_include_directories(${target_name} PRIVATE
 )
 
 if(OpenCV_FOUND)
-    target_compile_definitions(${target_name} PRIVATE OFELI_HAS_OPEN_CV)
+    target_compile_definitions(${target_name} PRIVATE OFELI_USE_OPENCV)
 endif()
 
 if(Qt6_FOUND)
-    target_compile_definitions(${target_name} PRIVATE OFELI_HAS_QT)
+    target_compile_definitions(${target_name} PRIVATE OFELI_USE_QT)
 endif()
 
 

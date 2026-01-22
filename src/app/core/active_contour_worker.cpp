@@ -203,34 +203,24 @@ void ActiveContourWorker::initializeActiveContour()
 
         bool is_rgb = ( workAlgo.format() != QImage::Format_Grayscale8 );
 
+        const auto img = image_span_from_qimage( workAlgo );
+
         if( config.speed == SpeedModel::REGION_BASED )
         {
             if( is_rgb )
             {
-                ofeli_ip::ImageSpan32 image_rgb(image_span_32_from_qimage(workAlgo));
-
-                ac = std::make_unique<ofeli_ip::RegionColorAc>(image_rgb,
+                ac = std::make_unique<ofeli_ip::RegionColorAc>(img,
                                                                std::move(initialCD),
                                                                config.algo_config,
                                                                config.region_ac_config);
             }
             else
             {
-                ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(workAlgo));
-
-                ac = std::make_unique<ofeli_ip::RegionAc>(image_grayscale,
+                ac = std::make_unique<ofeli_ip::RegionAc>(img,
                                                           std::move(initialCD),
                                                           config.algo_config,
                                                           config.region_ac_config);
             }
-        }
-        else if( config.speed == SpeedModel::EDGE_BASED )
-        {
-            ofeli_ip::ImageSpan8  image_grayscale(image_span_8_from_qimage(workAlgo));
-
-            ac = std::make_unique<ofeli_ip::EdgeAc>(image_grayscale,
-                                                    std::move(initialCD),
-                                                    config.algo_config);
         }
     }
 }

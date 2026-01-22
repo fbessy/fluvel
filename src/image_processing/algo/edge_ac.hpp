@@ -53,7 +53,7 @@ public :
 
     //! Constructor to initialize with an initial contour.
     template<typename T>
-    EdgeAc(ImageSpan8 gradient_image,
+    EdgeAc(ImageSpan gradient_image,
            T&& initial_contour,
            const AcConfig& config = AcConfig()); /* optional parameter */
 
@@ -69,10 +69,10 @@ private :
     int get_global_speed_sign() const;
 
     //! Otsu's method to calculate an optimal global threshold.
-    static unsigned char do_otsu_method(const ImageSpan8& image);
+    static unsigned char do_otsu_method(const ImageSpan& image);
 
     //! Image wrapper.
-    ImageSpan8 gradient_image_;
+    ImageSpan gradient_image_;
 
     //! Global speed sign (1 or -1).
     const int global_speed_sign_;
@@ -83,7 +83,7 @@ private :
 
 
 template<typename T>
-EdgeAc::EdgeAc(ImageSpan8 gradient_image,
+EdgeAc::EdgeAc(ImageSpan gradient_image,
                T&& initial_contour,
                const AcConfig& config) /* optional parameter with AcConfig() */
     : ActiveContour(std::forward<T>(initial_contour), config),

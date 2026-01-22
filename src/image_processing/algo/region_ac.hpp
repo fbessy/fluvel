@@ -127,7 +127,7 @@ public :
 
     //! Constructor to initialize with an initial contour.
     template<typename T>
-    RegionAc(ImageSpan8 image,
+    RegionAc(ImageSpan image,
              T&& initial_contour,
              const AcConfig& general_config = AcConfig(),              /* optional parameter */
              const RegionConfig& region_config = RegionConfig());  /* optional parameter */
@@ -153,7 +153,7 @@ private :
                                  BoundarySwitch ctx_choice) override;
 
     //! Image wrapper.
-    ImageSpan8 image_;
+    ImageSpan image_;
 
     //! Specific configuration for region based active contour.
     const RegionConfig region_config_;
@@ -176,7 +176,7 @@ private :
 };
 
 template<typename T>
-RegionAc::RegionAc(ImageSpan8 image,
+RegionAc::RegionAc(ImageSpan image,
                    T&& initial_contour,
                    const AcConfig& general_config,      /* optional parameter with AcConfig() */
                    const RegionConfig& region_config) /* optional parameter with RegionConfig() */

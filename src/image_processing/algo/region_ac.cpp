@@ -50,16 +50,19 @@ void RegionAc::initialize_sums()
     sum_out_ = 0;
     pxl_nbr_out_ = 0;
 
-    for( int offset = 0; offset < pxl_nbr_total_; ++offset )
+    for (int y = 0; y < cd_.phi().height(); ++y)
     {
-        const int64_t intensity = static_cast<int64_t>( image_.pixel_at(offset) );
-
-        sum_total_ += intensity;
-
-        if( phi_value::isOutside( cd_.phi()[offset] ) )
+        for (int x = 0; x < cd_.phi().width(); ++x)
         {
-            sum_out_ += intensity;
-            ++pxl_nbr_out_;
+            const int64_t intensity = static_cast<int64_t>( image_.at(x,y) );
+
+            sum_total_ += intensity;
+
+            if( phi_value::isOutside( cd_.phi().at(x,y) ) )
+            {
+                sum_out_ += intensity;
+                ++pxl_nbr_out_;
+            }
         }
     }
 }
@@ -79,7 +82,9 @@ void RegionAc::do_specific_cycle1()
 
 void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    const int pxl = static_cast<int>( image_.pixel_at( point.offset() ) );
+    const auto p = cd_.phi().coord( point.offset() );
+
+    const int pxl = static_cast<int>( image_.at( p.x,p.y ) );
 
     const int diff_out = pxl - average_out_;
     const int diff_in  = pxl - average_in_;
@@ -93,7 +98,8 @@ void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 void RegionAc::do_specific_when_switch(int offset,
                                        BoundarySwitch ctx_choice)
 {
-    const int64_t intensity = static_cast<int64_t>( image_.pixel_at(offset) );
+    const auto p = cd_.phi().coord( offset );
+    const int64_t intensity = static_cast<int64_t>( image_.at(p.x, p.y) );
 
     if ( ctx_choice == BoundarySwitch::In )
     {

@@ -129,13 +129,13 @@ public :
 
     ///! Constructor to initialize with an initial contour.
     template<typename T>
-    RegionColorAc(ImageSpan32 image,
+    RegionColorAc(ImageSpan image,
                   T&& initial_contour,
                   const AcConfig& general_config = AcConfig(),                       /* optional parameter */
                   const RegionColorConfig& region_config = RegionColorConfig());     /* optional parameter */
 
     //! Reset the execution state with a new image buffer. Used for video tracking.
-    void resetExecutionState(ImageSpan32 image);
+    void resetExecutionState(ImageSpan image);
 
     //! Getter function for #average_rgb_out
     const Rgb_uc& get_Cout() const { return average_out_; }
@@ -162,7 +162,7 @@ private :
     inline Color_3i rgb_to_color(const Rgb_uc& rgb) const;
 
     //! Image wrapper.
-    ImageSpan32 image_;
+    ImageSpan image_;
 
     //! Specific configuration for YUV region based active contour.
     const RegionColorConfig region_config_;
@@ -197,7 +197,7 @@ private :
 // Definitions
 
 template<typename T>
-RegionColorAc::RegionColorAc(ImageSpan32 image,
+RegionColorAc::RegionColorAc(ImageSpan image,
                              T&& initial_contour,
                              const AcConfig& general_config,            /* optional parameter with AcConfig() */
                              const RegionColorConfig& region_config)    /* optional parameter with RegionColorConfig() */
