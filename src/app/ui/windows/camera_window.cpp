@@ -82,6 +82,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     blackLabel->setPixmap(QPixmap::fromImage(blackImage));
 
     videoView = new ImageView(this);
+    videoView->setMaxDisplayFps(60.0);
 
     cameraOverlay = new CameraOverlayWidget(this);
 
