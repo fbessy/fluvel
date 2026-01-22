@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "phi_editor.hpp"   // pour PhiEditor
-#include "matrix.hpp"       // ofeli_ip::Matrix
+#include "grid2d.hpp"       // ofeli_ip::Grid2D
 #include "point.hpp"
 
 namespace ofeli_app {

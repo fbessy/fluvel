@@ -46,7 +46,7 @@
 #include "pixmap_widget.hpp"
 #include "scroll_area_widget.hpp"
 #include "kernel_size_spinbox.hpp"
-#include "matrix.hpp"
+#include "grid2d.hpp"
 #include "contour_rendering.hpp"
 #include "contour_data.hpp"
 #include "phi_editor.hpp"

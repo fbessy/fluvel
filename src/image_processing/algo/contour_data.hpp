@@ -44,7 +44,7 @@
 
 #include <vector>
 
-#include "matrix.hpp"
+#include "grid2d.hpp"
 
 namespace ofeli_ip
 {
@@ -59,11 +59,11 @@ enum class PhiValue : int8_t
 {
     InsideRegion      = -3,
     InteriorBoundary  = -1,
-    ExteriorBoundary  = 1,
-    OutsideRegion     = 3
+    ExteriorBoundary  =  1,
+    OutsideRegion     =  3
 };
 
-using DiscreteLevelSet = Matrix2D<PhiValue>;
+using DiscreteLevelSet = Grid2D<PhiValue>;
 
 enum class SpeedValue : int8_t
 {

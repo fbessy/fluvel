@@ -39,7 +39,7 @@ set(ip_src
     ${CORE_DIR}/shape.cpp
     ${CORE_DIR}/shape.hpp
 
-    ${CORE_DIR}/matrix.hpp
+    ${CORE_DIR}/grid2d.hpp
     ${CORE_DIR}/image_span.hpp
     ${CORE_DIR}/point.hpp
     ${CORE_DIR}/point_hash.hpp

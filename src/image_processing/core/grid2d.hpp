@@ -37,8 +37,8 @@
 **
 ****************************************************************************/
 
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef GRID_HPP
+#define GRID_HPP
 
 #include <vector>
 #include <cassert>
@@ -49,19 +49,19 @@ namespace ofeli_ip
 {
 
 template<typename T>
-class Matrix2D
+class Grid2D
 {
 public:
-    Matrix2D() = default;
+    Grid2D() = default;
 
-    Matrix2D(int width, int height)
+    Grid2D(int width, int height)
         : width_(width)
         , height_(height)
         , data_(static_cast<size_t>(width * height))
     {
     }
 
-    //! Matrix2D methods
+    //! Grid2D methods
 
     int width()  const noexcept { return width_;  }
     int height() const noexcept { return height_; }
@@ -133,4 +133,4 @@ private:
 
 }
 
-#endif // MATRIX_HPP
+#endif // GRID_HPP

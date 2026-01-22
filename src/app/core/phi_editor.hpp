@@ -6,7 +6,7 @@
 #include <QRect>
 #include <QImage>
 
-#include "matrix.hpp"
+#include "grid2d.hpp"
 #include "active_contour.hpp"
 #include "shape_type.hpp"
 
