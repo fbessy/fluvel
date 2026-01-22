@@ -4,8 +4,9 @@ set(IP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(TARGET_NAME ofeli_image_processing)
 
-set(ALGO_DIR ${IP_DIR}/algo)
-set(CORE_DIR ${IP_DIR}/core)
+set(ALGO_DIR     ${IP_DIR}/algo)
+set(CORE_DIR     ${IP_DIR}/core)
+set(ADAPTERS_DIR ${IP_DIR}/adapters)
 
 
 set(ip_src
@@ -33,11 +34,11 @@ set(ip_src
     ${ALGO_DIR}/filters2.cpp
     ${ALGO_DIR}/filters2.hpp
 
-    ${CORE_DIR}/boundary_builder.cpp
-    ${CORE_DIR}/boundary_builder.hpp
+    ${ALGO_DIR}/boundary_builder.cpp
+    ${ALGO_DIR}/boundary_builder.hpp
 
-    ${CORE_DIR}/shape.cpp
-    ${CORE_DIR}/shape.hpp
+    ${ALGO_DIR}/shape.cpp
+    ${ALGO_DIR}/shape.hpp
 
     ${CORE_DIR}/grid2d.hpp
     ${CORE_DIR}/image_span.hpp
@@ -45,6 +46,8 @@ set(ip_src
     ${CORE_DIR}/point_hash.hpp
     ${CORE_DIR}/ofeli_math.hpp
     ${CORE_DIR}/color.hpp
+
+    ${ADAPTERS_DIR}/image_adapters.hpp
 )
 
 add_library(${TARGET_NAME} STATIC ${ip_src})
@@ -52,6 +55,7 @@ add_library(ofeli::image_processing ALIAS ${TARGET_NAME})
 
 
 target_include_directories(${TARGET_NAME} PUBLIC
+    ${ADAPTERS_DIR}
     ${CORE_DIR}
     ${ALGO_DIR}
 )
