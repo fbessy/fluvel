@@ -113,7 +113,7 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
 {
     Point2D_f relative_p1, relative_p2;
 
-    float euclidean_dist, min_dist, sq;
+    float dist, min_dist;
 
     // initialization with a minimum value in order to maximize
     // the directed or relative hausdorff distance
@@ -143,27 +143,12 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
                 relative_p2.x = float(p2.x) - shape_2.get_centroid().x;
                 relative_p2.y = float(p2.y) - shape_2.get_centroid().y;
 
-                // computes the square and the euclidean distance
-                sq = ( math::square(relative_p2.x-relative_p1.x) +
-                       math::square(relative_p2.y-relative_p1.y)   );
-
-                if( sq > 0.f )
-                {
-                    euclidean_dist = std::sqrt( sq );
-                }
-                else if ( sq == 0.f )
-                {
-                    euclidean_dist = 0.f;
-                }
-                else
-                {
-                    euclidean_dist = std::numeric_limits<float>::max();
-                }
+                dist = math::euclidean_distance( relative_p1, relative_p2 );
 
                 // it minimizes min_dist
-                if( euclidean_dist < min_dist )
+                if( dist < min_dist )
                 {
-                    min_dist = euclidean_dist;
+                    min_dist = dist;
                 }
 
 #if defined(EARLY_BREAKING) && !defined(NAIVE_ALGO)
@@ -283,19 +268,8 @@ float HausdorffDistance::get_centroids_distance() const
     if( shape_a.is_valid() &&
         shape_b.is_valid() )
     {
-        Point2D_f gap( shape_b.get_centroid().x - shape_a.get_centroid().x,
-                     shape_b.get_centroid().y - shape_a.get_centroid().y );
-
-        float sq_val = math::square( gap.x ) + math::square( gap.y );
-
-        if( sq_val > 0.f )
-        {
-            gap_dist = std::sqrt( sq_val );
-        }
-        else if( sq_val == 0.f )
-        {
-            gap_dist = 0.f;
-        }
+        gap_dist = math::euclidean_distance( shape_a.get_centroid(),
+                                             shape_b.get_centroid() );
     }
 
     return gap_dist;

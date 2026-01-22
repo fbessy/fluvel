@@ -38,10 +38,12 @@
 ****************************************************************************/
 
 #include "shape.hpp"
+#include "ofeli_math.hpp"
 
 #include <random>
 #include <algorithm>
 #include <limits>
+#include <cassert>
 
 namespace ofeli_ip
 {
@@ -118,16 +120,13 @@ bool Shape::is_valid() const
 
 float Shape::get_grid_diagonal(int grid_width, int grid_height)
 {
-    float square_sum = float( grid_width*grid_width + grid_height*grid_height );
+    assert( grid_width >= 0 );
+    assert( grid_height >= 0 );
 
-    float result = std::numeric_limits<float>::max();
+    Point2D_i top_left { 0, 0 };
+    Point2D_i bottom_right { grid_width-1, grid_height-1 };
 
-    if ( square_sum > 0.f )
-    {
-        result = std::sqrt( square_sum );
-    }
-
-    return result;
+    return math::euclidean_distance( top_left, bottom_right );
 }
 
 }
