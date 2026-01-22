@@ -176,6 +176,31 @@ struct AcConfig
     }
 };
 
+//! Kernel support to know the geometry limit of the internal kernel.
+struct KernelSupport
+{
+    int min_dx = 0;
+    int max_dx = 0;
+    int min_dy = 0;
+    int max_dy = 0;
+};
+
+//! Precomputed disk-shaped kernel offsets for internal smoothing (Fint).
+struct InternalKernel
+{
+    std::vector<int> offsets;
+    KernelSupport support;
+
+    bool fully_inside(int x, int y,
+                      int width, int height) const
+    {
+        return    x + support.min_dx >= 0
+               && x + support.max_dx < width
+               && y + support.min_dy >= 0
+               && y + support.max_dy < height;
+    }
+};
+
 //! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
 struct BoundarySwitchContext
 {
@@ -431,8 +456,8 @@ private :
     void calculate_shapes_intersection();
 
     //! Build kernel offsets.
-    static std::vector<int> make_internal_kernel_offsets(int disk_radius,
-                                                         int grid_width);
+    static InternalKernel make_internal_kernel_offsets(int disk_radius,
+                                                       int grid_width);
 
     //! To transformate active contour data point to the points for the Hausdorff distance.
     static Point2D_i from_ContourPoint(const ContourPoint& point,
@@ -442,7 +467,7 @@ private :
     const AcConfig config_;
 
     //! Precomputed disk-shaped kernel offsets for internal smoothing (Fint).
-    const std::vector<int> internal_kernel_offsets_;
+    const InternalKernel internal_kernel_;
 
     //! BoundarySwitchContext for the procedure switch_in.
     const BoundarySwitchContext ctx_in_;
@@ -467,6 +492,12 @@ private :
     //! #update_state_cycle2() to calculate #state.
     EvolutionData ed_;
 };
+
+inline Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point,
+                                                  int grid_width)
+{
+    return { point.x(), point.offset() / grid_width };
+}
 
 namespace speed_value
 {

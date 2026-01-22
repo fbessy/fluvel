@@ -52,7 +52,7 @@ ActiveContour::ActiveContour(const ContourData& initial_state,
                              const AcConfig& config)
     : cd_(initial_state),
     config_(config),
-    internal_kernel_offsets_(make_internal_kernel_offsets(config.disk_radius,
+    internal_kernel_(make_internal_kernel_offsets(config.disk_radius,
                                                           initial_state.phi().width())),
     ctx_in_(BoundarySwitchContext::make_switch_in(cd_)),
     ctx_out_(BoundarySwitchContext::make_switch_out(cd_)),
@@ -76,7 +76,7 @@ ActiveContour::ActiveContour(ContourData&& initial_state,
                              const AcConfig& config)
     : cd_( std::move(initial_state) ),
     config_(config),
-    internal_kernel_offsets_(make_internal_kernel_offsets(config.disk_radius,
+    internal_kernel_(make_internal_kernel_offsets(config.disk_radius,
                                                           cd_.phi().width())),
     ctx_in_(BoundarySwitchContext::make_switch_in(cd_)),
     ctx_out_(BoundarySwitchContext::make_switch_out(cd_)),
@@ -437,25 +437,37 @@ void ActiveContour::compute_internal_speed_Fint(RawContour& boundary)
     }
 }
 
-std::vector<int> ActiveContour::make_internal_kernel_offsets(int disk_radius,
+InternalKernel ActiveContour::make_internal_kernel_offsets(int disk_radius,
                                                              int grid_width)
 {
     const int r = disk_radius;
     const int w = grid_width;
 
-    std::vector<int> offsets;
-    offsets.reserve( (2 * r + 1) * (2 * r + 1) );
+    InternalKernel kernel;
+    kernel.offsets.reserve( (2 * r + 1) * (2 * r + 1) );
+
+    kernel.support.min_dx =  r;
+    kernel.support.max_dx = -r;
+    kernel.support.min_dy =  r;
+    kernel.support.max_dy = -r;
 
     for ( int dy = -r; dy <= r; ++dy )
     {
         for ( int dx = -r; dx <= r; ++dx )
         {
             if ( dx*dx + dy*dy <= r*r )
-                offsets.push_back( dy * w + dx );
+            {
+                kernel.offsets.push_back( dy * w + dx );
+
+                kernel.support.min_dx = std::min(kernel.support.min_dx, dx);
+                kernel.support.max_dx = std::max(kernel.support.max_dx, dx);
+                kernel.support.min_dy = std::min(kernel.support.min_dy, dy);
+                kernel.support.max_dy = std::max(kernel.support.max_dy, dy);
+            }
         }
     }
 
-    return offsets;
+    return kernel;
 }
 
 void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
@@ -473,24 +485,45 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
     // protrudes outward and must be pushed outward to smooth curvature.
 
     const int base = point.offset();
+    const int y = base / cd_.phi().width();
 
     int neighbor_offset;
 
     int inside = 0;
     int outside = 0;
 
-    for (int delta : internal_kernel_offsets_)
+    if ( internal_kernel_.fully_inside( point.x(), y,
+                                        cd_.phi().width(), cd_.phi().height() ) )
     {
-        neighbor_offset = base + delta;
+        // fast path without all neighbors existence checks
 
-        if ( cd_.phi().valid( neighbor_offset ) )
+        for (int delta : internal_kernel_.offsets)
         {
+            neighbor_offset = base + delta;
+
             PhiValue v = cd_.phi()[ neighbor_offset ];
 
             if ( phi_value::isInside(v) )
                 ++inside;
             else
                 ++outside;
+        }
+    }
+    else
+    {
+        for (int delta : internal_kernel_.offsets)
+        {
+            neighbor_offset = base + delta;
+
+            if ( cd_.phi().valid( neighbor_offset ) /* all checks */ )
+            {
+                PhiValue v = cd_.phi()[ neighbor_offset ];
+
+                if ( phi_value::isInside(v) )
+                    ++inside;
+                else
+                    ++outside;
+            }
         }
     }
 
@@ -609,18 +642,12 @@ void ActiveContour::check_hausdorff_stopping_condition()
             stop();
         }
 
-        // swap the shapes in constant time, in complexity O(1)
-        // to prepare data for the next cycle 2 stopping condition iteration.
+        // swap the shapes in constant time O(1)
+        // to prepare data for the next periodic check of the hausdorff condition
         ed_.l_out_shape.swap(ed_.previous_shape);
         ed_.previous_step_count = ed_.step_count;
         ed_.previous_quantile = ed_.hausdorff_quantile;
     }
-}
-
-Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point,
-                                           int grid_width)
-{
-    return { point.x(), point.offset() / grid_width };
 }
 
 void ActiveContour::calculate_shapes_intersection()
