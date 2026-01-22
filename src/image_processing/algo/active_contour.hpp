@@ -436,7 +436,7 @@ private :
 
     //! To transformate active contour data point to the points for the Hausdorff distance.
     static Point2D_i from_ContourPoint(const ContourPoint& point,
-                                     int grid_width);
+                                       int grid_width);
 
     //! Generic configuration of the active contour.
     const AcConfig config_;
