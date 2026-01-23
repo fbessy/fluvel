@@ -135,16 +135,6 @@ public :
     //! Move constructor.
     ContourData(ContourData&& contour) noexcept;
 
-    //! Initializes the contour *this with one ellipse. It is performed when the simplest constructor is called or when one or both boundary lists is/are empty.
-    void define_from_ellipse();
-
-    //! Eliminates redundant points to maintain a contiguous boundary.
-    void eliminate_redundant_points(Contour& boundary,
-                                    PhiValue region_value);
-
-    //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
-    bool is_redundant(const ContourPoint& point) const;
-
     //! Wrapper to use directly with offset lists without the need to get the variable #phi.
     Point2D_i coord(int offet) const
     {
@@ -174,6 +164,23 @@ public :
     Connectivity connectivity() const { return connectivity_; }
 
 private :
+
+    //! Initializes the contour *this with one ellipse. It is performed when the simplest constructor is called or when one or both boundary lists is/are empty.
+    void define_from_ellipse();
+
+    //! Eliminates redundant points to maintain a contiguous boundary.
+    void eliminate_redundant_points(Contour& boundary,
+                                    PhiValue region_value);
+
+    //! To use define_from_ellipse and eliminate_redundant_points
+    //! in ActiveContour.
+    friend class ActiveContour;
+
+    //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
+    bool is_redundant(const ContourPoint& point) const;
+
+
+
 
     //! Allocate lists.
     void allocate_lists();
