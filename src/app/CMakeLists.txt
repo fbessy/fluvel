@@ -58,6 +58,9 @@ set(app_src
     ${UI_COMP_DIR}/algo_info_overlay.cpp
     ${UI_COMP_DIR}/algo_info_overlay.hpp
 
+    ${UI_COMP_DIR}/contour_rendering_qimage.cpp
+    ${UI_COMP_DIR}/contour_rendering_qimage.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 
@@ -69,9 +72,6 @@ set(app_src
 
     ${CORE_DIR}/frame_clock.cpp
     ${CORE_DIR}/frame_clock.hpp
-
-    ${CORE_DIR}/contour_rendering.cpp
-    ${CORE_DIR}/contour_rendering.hpp
 
     ${CORE_DIR}/application_settings.cpp
     ${CORE_DIR}/application_settings.hpp

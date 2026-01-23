@@ -47,7 +47,7 @@
 #include "scroll_area_widget.hpp"
 #include "kernel_size_spinbox.hpp"
 #include "grid2d.hpp"
-#include "contour_rendering.hpp"
+#include "contour_rendering_qimage.hpp"
 #include "contour_data.hpp"
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"

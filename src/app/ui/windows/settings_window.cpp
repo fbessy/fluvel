@@ -38,7 +38,7 @@
 ****************************************************************************/
 
 #include "settings_window.hpp"
-#include "contour_rendering.hpp"
+#include "contour_rendering_qimage.hpp"
 #include "application_settings.hpp"
 
 #include "image_window.hpp"

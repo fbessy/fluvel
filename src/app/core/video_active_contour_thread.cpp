@@ -2,7 +2,7 @@
 #include "image_adapters.hpp"
 #include "frame_clock.hpp"
 #include "application_settings.hpp"
-#include "contour_rendering.hpp"
+#include "contour_rendering_qimage.hpp"
 #include "active_contour.hpp"
 
 namespace ofeli_app {

@@ -42,7 +42,7 @@
 
 #include <QWidget>
 #include "shape.hpp"
-#include "contour_rendering.hpp"
+#include "contour_rendering_qimage.hpp"
 
 QT_BEGIN_NAMESPACE
 class QSpinBox;

@@ -5,7 +5,7 @@
 #include "edge_ac.hpp"
 
 #include "application_settings.hpp"
-#include "contour_rendering.hpp"
+#include "contour_rendering_qimage.hpp"
 #include "image_span.hpp"
 #include "image_adapters.hpp"
 #include "algo_stats.hpp"

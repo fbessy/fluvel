@@ -39,7 +39,7 @@
 
 #include "application_settings.hpp"
 #include "boundary_builder.hpp"
-#include "contour_rendering.hpp"
+#include "contour_rendering_qimage.hpp"
 
 #include <QSettings>
 #include <QPainter>
