@@ -53,7 +53,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
     scale_spin(nullptr),
     img_width(0), img_height(0)
 {
-    count_this++; // static variable to count the instances
+    ++count_this; // static variable to count the instances
     id_this = count_this; // in order to know if *this is the first or the second widget of evaluation_window
 
     QSettings settings;
@@ -275,9 +275,9 @@ void AnalysisWidget::create_list()
 
     QRgb pix;
 
-    for( int y = 0; y < img_height; y++ )
+    for( int y = 0; y < img_height; ++y )
     {
-        for( int x = 0; x < img_width; x++ )
+        for( int x = 0; x < img_width; ++x )
         {
             pix = img_noise.pixel(x,y);
 
@@ -338,9 +338,9 @@ void AnalysisWidget::refresh_img_noise(int noise_percent)
 
         QRgb rgb_color = color.rgb();
 
-        for( int y = 0; y < img_height; y++ )
+        for( int y = 0; y < img_height; ++y )
         {
-            for( int x = 0; x < img_width; x++ )
+            for( int x = 0; x < img_width; ++x )
             {
                 if ( proba_distri(gen) )
                 {

@@ -32,21 +32,21 @@ void FrameStatsView::frameReceived(qint64 recvTsNs)
     if (windowStartNs == 0)
         windowStartNs = recvTsNs;
 
-    inputFrames++;
+    ++inputFrames;
     updateWindowLocked(recvTsNs);
 }
 
 void FrameStatsView::frameProcessed()
 {
     QMutexLocker lock(&mutex);
-    processedFrames++;
+    ++processedFrames;
 }
 
 void FrameStatsView::frameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
 {
     QMutexLocker lock(&mutex);
 
-    displayedFrames++;
+    ++displayedFrames;
 
     // latence affichage - réception
     double latencyMs =

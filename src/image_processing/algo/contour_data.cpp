@@ -284,7 +284,7 @@ void ContourData::flood_fill(const Point2D_i& seed,
                     span_down = false;
                 }
 
-                x++;
+                ++x;
             }
         }
     }

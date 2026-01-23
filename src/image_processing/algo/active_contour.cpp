@@ -159,7 +159,7 @@ void ActiveContour::run_steps(int n_steps)
         n_steps = 1;
     }
 
-    for( int i = 0; i < n_steps; i++ )
+    for( int i = 0; i < n_steps; ++i )
     {
         if( is_stopped() )
             return;
@@ -211,8 +211,8 @@ void ActiveContour::step_cycle1()
     bool is_outward_moving = directional_substep( BoundarySwitch::In );
     bool is_inward_moving  = directional_substep( BoundarySwitch::Out );
 
-    ed_.step_count++;
-    ed_.phase_step_count++;
+    ++ed_.step_count;
+    ++ed_.phase_step_count;
 
     ed_.is_moving = is_outward_moving || is_inward_moving;
 
@@ -231,8 +231,8 @@ void ActiveContour::step_cycle2()
     directional_substep( BoundarySwitch::In );
     directional_substep( BoundarySwitch::Out );
 
-    ed_.step_count++;
-    ed_.phase_step_count++;
+    ++ed_.step_count;
+    ++ed_.phase_step_count;
 
     update_state_cycle2();
 }
