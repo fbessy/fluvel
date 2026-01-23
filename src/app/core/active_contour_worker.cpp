@@ -241,9 +241,10 @@ void ActiveContourWorker::drawAndEmitResult()
     const auto& l_in  = ac->l_in_raw();
 
     draw_list_to_img(l_out, config.color_out, config.outside_combo,
-                     result.bits(), result.width(), result.height());
+                     result);
+
     draw_list_to_img(l_in, config.color_in, config.inside_combo,
-                     result.bits(), result.width(), result.height());
+                     result);
 
     emit resultReady(result);
 }

@@ -54,9 +54,7 @@ void get_color(int index,
 void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
                       const RgbColor& color,
                       int combobox_index,
-                      unsigned char* img_rgb32_data,
-                      int img_rgb32_width,
-                      int img_rgb32_height);
+                      QImage& img);
 
 void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                        const RgbColor& color,

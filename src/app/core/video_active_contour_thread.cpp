@@ -117,9 +117,10 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
             if (downscale_fctr == 1)
             {
                 draw_list_to_img(region_ac->l_out_raw(), config.color_out, config.outside_combo,
-                                 result.bits(), result.width(), result.height());
+                                 result);
+
                 draw_list_to_img(region_ac->l_in_raw(), config.color_in, config.inside_combo,
-                                 result.bits(), result.width(), result.height());
+                                 result);
             }
             else
             {

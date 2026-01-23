@@ -40,6 +40,7 @@
 #include "contour_rendering.hpp"
 #include "contour_data.hpp"
 #include "common_settings.hpp"
+#include <QImage>
 
 namespace ofeli_app
 {
@@ -104,30 +105,29 @@ void get_color(int index,
 void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
                       const RgbColor& color,
                       int combobox_index,
-                      unsigned char* img_rgb32_data,
-                      int img_rgb32_width,
-                      int img_rgb32_height)
+                      QImage& img)
 {
-    assert(img_rgb32_data != nullptr
-           && img_rgb32_width > 0
-           && img_rgb32_height >0 );
+    assert(!img.isNull());
+    assert(img.format() == QImage::Format_RGB32);
 
-    if( combobox_index != ComboBoxColorIndex::NO )
+    if (combobox_index == ComboBoxColorIndex::NO)
+        return;
+
+    uchar* data = img.bits();
+    const int stride = img.bytesPerLine();
+
+    for (const auto& point : list)
     {
-        int offset;
+        assert(point.x >= 0 && point.x < img.width());
+        assert(point.y >= 0 && point.y < img.height());
 
-        for( const auto& point : list )
-        {
-            offset = point.y * img_rgb32_width + point.x;
+        uchar* px = data + point.y * stride + 4 * point.x;
 
-            assert(offset >= 0 && offset < img_rgb32_width*img_rgb32_height );
-
-            offset *= 4;
-
-            img_rgb32_data[ offset+2 ] = color.red;
-            img_rgb32_data[ offset+1 ] = color.green;
-            img_rgb32_data[ offset   ] = color.blue;
-        }
+        // QImage::Format_RGB32: memory layout is B,G,R,0xFF
+        px[0] = color.blue;
+        px[1] = color.green;
+        px[2] = color.red;
+        px[3] = 255;
     }
 }
 
@@ -135,66 +135,74 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                        const RgbColor& color,
                        int combobox_index,
                        unsigned int upscale_factor,
-                       QImage& img_rgb32)
+                       QImage& img)
 {
-    if (    upscale_factor == 2
-         || upscale_factor == 4 )
+    if (combobox_index == ComboBoxColorIndex::NO)
+        return;
+
+    if (upscale_factor != 2 && upscale_factor != 4)
+        return;
+
+    assert(!img.isNull());
+    assert(img.format() == QImage::Format_RGB32);
+
+    const int w = img.width();
+    const int h = img.height();
+
+    uchar* data = img.bits();
+    const int stride = img.bytesPerLine();
+
+    const int kernel_radius = upscale_factor / 2;
+
+    for (const auto& point : list)
     {
-        if ( combobox_index != ComboBoxColorIndex::NO )
+        const int base_x = static_cast<int>(upscale_factor) * point.x;
+        const int base_y = static_cast<int>(upscale_factor) * point.y;
+
+        // fast path: whole kernel inside image
+        if (   base_x + kernel_radius < w
+            && base_y + kernel_radius < h
+            && base_x - kernel_radius + 1 >= 0
+            && base_y - kernel_radius + 1 >= 0 )
         {
-            int offset;
-            int x, y;
-            unsigned int small_img_width = img_rgb32.width() / upscale_factor;
-
-            const int kernel_radius = upscale_factor / 2;
-
-            unsigned char* img_rgb32_data = img_rgb32.bits();
-
-            for( const auto& point : list )
+            for (int dy = -kernel_radius + 1; dy <= kernel_radius; ++dy)
             {
-                x = point.x;
-                y = point.y;
+                uchar* line = data + (base_y + dy) * stride;
 
-                if (    (int)upscale_factor*x+kernel_radius < img_rgb32.width()
-                     && (int)upscale_factor*y+kernel_radius < img_rgb32.height()
-                     && (int)upscale_factor*x-kernel_radius+1 >= 0
-                     && (int)upscale_factor*y-kernel_radius+1 >= 0 )
+                for (int dx = -kernel_radius + 1; dx <= kernel_radius; ++dx)
                 {
-                    for( int dx = -kernel_radius+1; dx <= kernel_radius; dx++ )
-                    {
-                        for( int dy = -kernel_radius+1; dy <= kernel_radius; dy++ )
-                        {
-                            offset = (upscale_factor*x+dx)+(upscale_factor*y+dy)*img_rgb32.width();
+                    uchar* px = line + 4 * (base_x + dx);
 
-                            assert(offset >= 0 && offset < img_rgb32.width()*img_rgb32.height() );
-
-                            img_rgb32_data[ 4*offset+2 ] = color.red;
-                            img_rgb32_data[ 4*offset+1 ] = color.green;
-                            img_rgb32_data[ 4*offset   ] = color.blue;
-                        }
-                    }
+                    px[0] = color.blue;
+                    px[1] = color.green;
+                    px[2] = color.red;
+                    px[3] = 255;
                 }
-                else
+            }
+        }
+        else
+        {
+            // slow path with per-pixel bounds check
+            for (int dy = -kernel_radius + 1; dy <= kernel_radius; ++dy)
+            {
+                const int y = base_y + dy;
+                if (y < 0 || y >= h)
+                    continue;
+
+                uchar* line = data + y * stride;
+
+                for (int dx = -kernel_radius + 1; dx <= kernel_radius; ++dx)
                 {
-                    for( int dx = -kernel_radius+1; dx <= kernel_radius; dx++ )
-                    {
-                        for( int dy = -kernel_radius+1; dy <= kernel_radius; dy++ )
-                        {
-                            if (    (int)upscale_factor*x+dx < img_rgb32.width()
-                                 && (int)upscale_factor*y+dy < img_rgb32.height()
-                                 && (int)upscale_factor*x+dx >= 0
-                                 && (int)upscale_factor*y+dy >= 0 )
-                            {
-                                offset = (upscale_factor*x+dx)+(upscale_factor*y+dy)*img_rgb32.width();
+                    const int x = base_x + dx;
+                    if (x < 0 || x >= w)
+                        continue;
 
-                                assert(offset >= 0 && offset < img_rgb32.width()*img_rgb32.height() );
+                    uchar* px = line + 4 * x;
 
-                                img_rgb32_data[ 4*offset+2 ] = color.red;
-                                img_rgb32_data[ 4*offset+1 ] = color.green;
-                                img_rgb32_data[ 4*offset   ] = color.blue;
-                            }
-                        }
-                    }
+                    px[0] = color.blue;
+                    px[1] = color.green;
+                    px[2] = color.red;
+                    px[3] = 255;
                 }
             }
         }
