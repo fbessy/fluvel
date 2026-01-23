@@ -42,6 +42,7 @@
 
 #include "contour_data.hpp"
 #include "boundary_builder.hpp"
+#include "neighborhood.hpp"
 
 namespace ofeli_ip
 {
@@ -187,7 +188,7 @@ void ContourData::define_lists_and_phi_from_binary_phi()
         if ( is_boundary )
         {
             const Point2D_i current_point = phi_.coord(offset);
-            const ContourPoint point{ int(offset), current_point.x };
+            const ContourPoint point{ current_point.x, current_point.y };
 
             if ( is_redundant( point ) )
                 current_phi = region_val;
@@ -203,41 +204,41 @@ void ContourData::define_phi_from_lists()
 
     for( const auto& p : l_out_ )
     {
-        phi_[ p.offset() ] = PhiValue::ExteriorBoundary;
+        phi_.at( p.x, p.y ) = PhiValue::ExteriorBoundary;
     }
 
     for( const auto& p : l_in_ )
     {
-        flood_fill( p.offset(),
+        flood_fill( { p.x, p.y },
                     PhiValue::OutsideRegion,
                     PhiValue::InsideRegion );
 
-        phi_[ p.offset() ] = PhiValue::InteriorBoundary;
+        phi_.at( p.x, p.y ) = PhiValue::InteriorBoundary;
     }
 
     eliminate_redundant_points_if_needed();
 }
 
-void ContourData::flood_fill(int offset_seed,
-                                PhiValue target_value,
-                                PhiValue replacement_value)
+void ContourData::flood_fill(const Point2D_i& seed,
+                             PhiValue target_value,
+                             PhiValue replacement_value)
 {
     if( target_value != replacement_value &&
-        offset_seed < phi_.width()*phi_.height()-1 )
+        phi_.valid(seed) )
     {
-        std::stack<size_t> offset_seeds;
+        std::stack<Point2D_i> seeds_stack;
         // top seed coordinates (x_ts,y_ts) and x for scan the row
         int x;
         bool span_up, span_down;
 
-        offset_seeds.push(offset_seed);
+        seeds_stack.push(seed);
 
-        while( !offset_seeds.empty() )
+        while( !seeds_stack.empty() )
         {
             // unstack the top seed
-            const auto [x_ts, y_ts] = phi_.coord( offset_seeds.top() );
+            const auto [x_ts, y_ts] = seeds_stack.top();
 
-            offset_seeds.pop();
+            seeds_stack.pop();
 
             // x initialization at the left-most point of the seed
             x = x_ts;
@@ -259,7 +260,7 @@ void ContourData::flood_fill(int offset_seed,
                     y_ts > 0
                     && phi_.at(x,y_ts-1) == target_value )
                 {
-                    offset_seeds.push( phi_.offset(x,y_ts-1) );
+                    seeds_stack.emplace( x, y_ts-1 );
                     span_up = true;
                 }
                 else if( span_up &&
@@ -273,7 +274,7 @@ void ContourData::flood_fill(int offset_seed,
                     y_ts < phi_.height()-1 &&
                     phi_.at(x,y_ts+1) == target_value )
                 {
-                    offset_seeds.push( phi_.offset(x,y_ts+1) );
+                    seeds_stack.emplace( x, y_ts+1 );
                     span_down = true;
                 }
                 else if( span_down &&
@@ -304,7 +305,7 @@ void ContourData::eliminate_redundant_points(RawContour& boundary,
 
         if( is_redundant(point) )
         {
-            phi()[ point.offset() ] = region_value;
+            phi_.at( point.x, point.y) = region_value;
             point = boundary.back();
             boundary.pop_back();
         }
@@ -315,83 +316,75 @@ void ContourData::eliminate_redundant_points(RawContour& boundary,
     }
 }
 
-bool ContourData::is_redundant(const ContourPoint& point) const
+bool ContourData::is_redundant(const ContourPoint& p) const
 {
-    const int offset = point.offset();
-    const int x = point.x();
+    const int x = p.x;
+    const int y = p.y;
+
     const int w = phi_.width();
     const int h = phi_.height();
-    const int last_row_offset = w * (h - 1);
 
-    const auto phi_center = phi_[offset];
+    const auto phi_center = phi_.at(x, y);
+    const auto connectivity = connectivity_;
 
-    // Voisins horizontaux
-    if (x > 0)
+    if ( fully_inside_8(x, y, w, h) )
     {
-        int left_offset = offset - 1;
+        // FAST PATH: aucun valid(), aucune branche parasite
 
-        if ( phi_value::differentSide(phi_[left_offset], phi_center) )
-            return false;
-    }
-
-    if (x < w - 1)
-    {
-        int right_offset = offset + 1;
-        if ( phi_value::differentSide(phi_[right_offset], phi_center) )
-            return false;
-    }
-
-    // Voisins verticaux
-    if (offset >= w) // Pas dans la première ligne
-    {
-        int up_offset = offset - w;
-        if ( phi_value::differentSide( phi_[up_offset], phi_center ) )
-            return false;
-    }
-
-    if (offset < last_row_offset) // Pas dans la dernière ligne
-    {
-        int down_offset = offset + w;
-        if ( phi_value::differentSide( phi_[down_offset], phi_center ) )
-            return false;
-    }
-
-    const auto connected = connectivity_;
-
-    if ( connected == Connectivity::Eight )
-    {
-        // Diagonaux supérieurs
-        if (x > 0 && offset >= w)
+        for ( const auto& d : neighbors4 )
         {
-            int up_left_offset = offset - w - 1;
-            if ( phi_value::differentSide( phi_[up_left_offset], phi_center ) )
+            if ( phi_value::differentSide(phi_.at(x + d.dx, y + d.dy),
+                                          phi_center) )
                 return false;
         }
 
-        if (x < w - 1 && offset >= w)
+        if ( connectivity == Connectivity::Eight )
         {
-            int up_right_offset = offset - w + 1;
-            if ( phi_value::differentSide( phi_[up_right_offset], phi_center ) )
-                return false;
+            for ( const auto& d : neighbors4_diag )
+            {
+                if ( phi_value::differentSide(phi_.at(x + d.dx, y + d.dy),
+                                              phi_center) )
+                    return false;
+            }
         }
 
-        // Diagonaux inférieurs
-        if (x > 0 && offset < last_row_offset)
-        {
-            int down_left_offset = offset + w - 1;
-            if ( phi_value::differentSide( phi_[down_left_offset], phi_center ) )
-                return false;
-        }
-
-        if (x < w - 1 && offset < last_row_offset)
-        {
-            int down_right_offset = offset + w + 1;
-            if ( phi_value::differentSide(phi_[down_right_offset], phi_center) )
-                return false;
-        }
+        return true;
     }
+    else
+    {
+        // SLOW PATH: bords
 
-    return true;
+        for ( const auto& d : neighbors4 )
+        {
+            const int nx = x + d.dx;
+            const int ny = y + d.dy;
+
+            if ( !phi_.valid(nx, ny) )
+                continue;
+
+            if ( phi_value::differentSide(phi_.at(nx, ny),
+                                          phi_center) )
+                return false;
+        }
+
+        if ( connectivity == Connectivity::Eight )
+        {
+            for ( const auto& d : neighbors4_diag )
+            {
+                const int nx = x + d.dx;
+                const int ny = y + d.dy;
+
+                if ( !phi_.valid(nx, ny) )
+                    continue;
+
+                if ( phi_value::differentSide(phi_.at(nx, ny),
+                                              phi_center) )
+                    return false;
+            }
+        }
+
+        return true;
+    }
 }
 
 bool ContourData::is_valid() const
@@ -399,21 +392,21 @@ bool ContourData::is_valid() const
     if ( empty() )
         return false;
 
-    for ( const auto& point : l_out_ )
+    for ( const auto& p : l_out_ )
     {
-        if ( phi_[ point.offset() ] != PhiValue::ExteriorBoundary )
+        if ( phi_.at( p.x, p.y ) != PhiValue::ExteriorBoundary )
             return false;
 
-        if ( is_redundant( point ) )
+        if ( is_redundant( p ) )
             return false;
     }
 
-    for ( const auto& point : l_in_ )
+    for ( const auto& p : l_in_ )
     {
-        if ( phi_[ point.offset() ] != PhiValue::InteriorBoundary )
+        if ( phi_.at( p.x, p.y ) != PhiValue::InteriorBoundary )
             return false;
 
-        if ( is_redundant( point ) )
+        if ( is_redundant( p ) )
             return false;
     }
 
@@ -434,13 +427,9 @@ ExportedContour ContourData::export_contour(const RawContour& raw_boundary) cons
     ExportedContour geometric_boundary;
     geometric_boundary.reserve( raw_boundary.size() );
 
-    const int width = phi().width();
-
     for ( const auto& point : raw_boundary )
     {
-        const int y = point.offset() / width;
-
-        geometric_boundary.emplace_back( point.x(), y );
+        geometric_boundary.emplace_back( point.x, point.y );
     }
 
     return geometric_boundary;

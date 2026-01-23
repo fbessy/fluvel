@@ -50,7 +50,8 @@ set(ip_src
     ${ADAPTERS_DIR}/image_adapters.hpp
 )
 
-add_library(${TARGET_NAME} STATIC ${ip_src})
+add_library(${TARGET_NAME} STATIC ${ip_src}
+    core/neighborhood.hpp)
 add_library(ofeli::image_processing ALIAS ${TARGET_NAME})
 
 

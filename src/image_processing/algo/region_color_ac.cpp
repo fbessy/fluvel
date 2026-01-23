@@ -123,8 +123,7 @@ Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
 
 void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    const auto p = cd_.phi().coord( point.offset() );
-    const Rgb_uc rgb = image_.atPixelRgb( p.x, p.y );
+    const Rgb_uc rgb = image_.atPixelRgb( point.x, point.y );
 
     const auto col = rgb_to_color(rgb);
 
@@ -141,14 +140,13 @@ void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
     const int speed_out = veloc_out.c1 + veloc_out.c2 + veloc_out.c3;
     const int speed_in  = veloc_in.c1  + veloc_in.c2  + veloc_in.c3;
 
-    point.set_speed( speed_value::get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in) );
+    point.speed = speed_value::get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in);
 }
 
-void RegionColorAc::do_specific_when_switch(int offset,
+void RegionColorAc::do_specific_when_switch(const ContourPoint& point,
                                             BoundarySwitch ctx_choice)
 {
-    const auto p = cd_.phi().coord( offset );
-    const Rgb_64i rgb = static_cast<Rgb_64i>( image_.atPixelRgb( p.x, p.y ) );
+    const Rgb_64i rgb = static_cast<Rgb_64i>( image_.atPixelRgb( point.x, point.y ) );
 
     if ( ctx_choice == BoundarySwitch::In )
     {

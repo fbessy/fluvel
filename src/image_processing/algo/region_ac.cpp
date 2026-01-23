@@ -82,9 +82,7 @@ void RegionAc::do_specific_cycle1()
 
 void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    const auto p = cd_.phi().coord( point.offset() );
-
-    const int pxl = static_cast<int>( image_.at( p.x,p.y ) );
+    const int pxl = static_cast<int>( image_.at( point.x, point.y ) );
 
     const int diff_out = pxl - average_out_;
     const int diff_in  = pxl - average_in_;
@@ -92,14 +90,13 @@ void RegionAc::compute_external_speed_Fd(ContourPoint& point)
     const int speed =   region_config_.lambda_out * ( math::square(diff_out) )
                       - region_config_.lambda_in  * ( math::square(diff_in) );
 
-    point.set_speed( speed_value::get_discrete_speed( speed ) );
+    point.speed = speed_value::get_discrete_speed( speed );
 }
 
-void RegionAc::do_specific_when_switch(int offset,
+void RegionAc::do_specific_when_switch(const ContourPoint& point,
                                        BoundarySwitch ctx_choice)
 {
-    const auto p = cd_.phi().coord( offset );
-    const int64_t intensity = static_cast<int64_t>( image_.at(p.x, p.y) );
+    const int64_t intensity = static_cast<int64_t>( image_.at(point.x, point.y) );
 
     if ( ctx_choice == BoundarySwitch::In )
     {

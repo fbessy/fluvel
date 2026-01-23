@@ -204,13 +204,13 @@ struct InternalKernel
 //! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
 struct BoundarySwitchContext
 {
-    RawContour& scanned_boundary;
+    RawContour& active_boundary;
     RawContour& adjacent_boundary;
-    SpeedValue target_direction;
-    PhiValue adjacent_phi_val;
-    PhiValue neighbor_region_phi_val;
-    PhiValue neighbor_boundary_phi_val;
-    PhiValue region_redundant_phi_val;
+    SpeedValue required_speed_sign;
+    PhiValue current_to_adjacent_val;
+    PhiValue neighbor_from_region_val;
+    PhiValue neighbor_to_boundary_val;
+    PhiValue redundant_to_region_val;
 
     static BoundarySwitchContext make_switch_in(ContourData& cd)
     {
@@ -423,15 +423,14 @@ private :
     //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one boundary list to the other.
     void switch_boundary_point(ContourPoint& point);
 
-    //! Second procedure for generic method switch_boundary_point.
-    void add_region_neighbor(int neighbor_offset,
-                             int neighbor_x);
+    //! Promote a neighboring region point to boundary.
+    void promote_region_to_boundary(int nx, int ny);
 
     //! Specific step for each iteration in cycle 1.
     virtual void do_specific_cycle1() { }
 
     //! Specific step when switch in or a switch out procedure is performed.
-    virtual void do_specific_when_switch(int,
+    virtual void do_specific_when_switch(const ContourPoint& point,
                                          BoundarySwitch) { }
 
     //! Stops the active contour and puts it in a terminal state.
@@ -460,8 +459,7 @@ private :
                                                        int grid_width);
 
     //! To transformate active contour data point to the points for the Hausdorff distance.
-    static Point2D_i from_ContourPoint(const ContourPoint& point,
-                                       int grid_width);
+    static Point2D_i from_ContourPoint(const ContourPoint& point);
 
     //! Generic configuration of the active contour.
     const AcConfig config_;
@@ -479,7 +477,7 @@ private :
     const BoundarySwitchContext* ctx_;
 
     //! Temporary points to add after each scan of the list #l_in or #l_out.
-    RawContour points_to_append_;
+    RawContour active_boundary_staging_;
 
     //! Number of iterations in one cycle1-cycle2.
     int steps_per_cycle_;
@@ -493,10 +491,9 @@ private :
     EvolutionData ed_;
 };
 
-inline Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point,
-                                                  int grid_width)
+inline Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point)
 {
-    return { point.x(), point.offset() / grid_width };
+    return { point.x, point.y };
 }
 
 namespace speed_value

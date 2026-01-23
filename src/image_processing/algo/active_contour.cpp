@@ -42,6 +42,7 @@
 
 #include "active_contour.hpp"
 #include "hausdorff_distance.hpp"
+#include "neighborhood.hpp"
 
 
 namespace ofeli_ip
@@ -60,7 +61,7 @@ ActiveContour::ActiveContour(const ContourData& initial_state,
     state_( PhaseState::Cycle1 ),
     ed_( cd_ )
 {
-    points_to_append_.reserve( cd_.l_out_raw().capacity() );
+    active_boundary_staging_.reserve( cd_.l_out_raw().capacity() );
 
     if ( config_.is_cycle2 )
     {
@@ -84,7 +85,7 @@ ActiveContour::ActiveContour(ContourData&& initial_state,
     state_( PhaseState::Cycle1 ),
     ed_( cd_ )
 {
-    points_to_append_.reserve( cd_.l_out_raw().capacity() );
+    active_boundary_staging_.reserve( cd_.l_out_raw().capacity() );
 
     if ( config_.is_cycle2 )
     {
@@ -255,22 +256,22 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
     select_context( ctx_choice );
     const auto& ctx = context();
 
-    auto& scanned  = ctx.scanned_boundary;
+    auto& active   = ctx.active_boundary;
     auto& adjacent = ctx.adjacent_boundary;
 
-    points_to_append_.clear();
+    active_boundary_staging_.clear();
 
-    compute_speed( scanned );
+    compute_speed( active );
 
-    for( std::size_t i = 0; i < scanned.size(); )
+    for( std::size_t i = 0; i < active.size(); )
     {
-        auto& point = scanned[i];
+        auto& point = active[i];
 
-        if( point.speed() == ctx.target_direction )
+        if( point.speed == ctx.required_speed_sign )
         {
             is_moving = true;
 
-            do_specific_when_switch( point.offset(),
+            do_specific_when_switch( point,
                                      ctx_choice );
 
             switch_boundary_point( point );
@@ -281,14 +282,14 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
         }
     }
 
-    scanned.insert( scanned.end(),
-                    points_to_append_.begin(),
-                    points_to_append_.end() );
+    active.insert( active.end(),
+                   active_boundary_staging_.begin(),
+                   active_boundary_staging_.end() );
 
     if( is_moving )
     {
         cd_.eliminate_redundant_points( adjacent,
-                                        ctx.region_redundant_phi_val );
+                                        ctx.redundant_to_region_val );
     }
 
     return is_moving;
@@ -296,98 +297,90 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
 
 void ActiveContour::switch_boundary_point(ContourPoint& point)
 {
-    assert( !is_stopped() );
+    assert(!is_stopped());
 
-    const int offset = point.offset();
-    const int x = point.x();
+    const int x = point.x;
+    const int y = point.y;
+
     const int w = cd_.phi().width();
     const int h = cd_.phi().height();
-    const int last_row_offset = w * (h - 1);
-
-    // Voisins horizontaux
-    if (x > 0)
-    {
-        const int left_offset = offset - 1;
-        add_region_neighbor(left_offset, x-1);
-    }
-
-    if (x < w - 1)
-    {
-        const int right_offset = offset + 1;
-        add_region_neighbor(right_offset, x+1);
-    }
-
-    // Voisins verticaux
-    if (offset >= w) // Pas dans la première ligne
-    {
-        const int up_offset = offset - w;
-        add_region_neighbor(up_offset, x);
-    }
-
-    if (offset < last_row_offset) // Pas dans la dernière ligne
-    {
-        const int down_offset = offset + w;
-        add_region_neighbor(down_offset, x);
-    }
 
     const auto connected = cd_.connectivity();
 
-    if ( connected == Connectivity::Eight )
+    // ---------- FAST PATH ----------
+    if ( x > 0 && x + 1 < w && y > 0 && y + 1 < h )
     {
-        // Diagonaux supérieurs
-        if (x > 0 && offset >= w)
+        // voisins 4-connectés
+        for (const auto& d : neighbors4)
         {
-            const int up_left_offset = offset - w - 1;
-            add_region_neighbor(up_left_offset, x-1);
+            promote_region_to_boundary( x + d.dx, y + d.dy );
         }
 
-        if (x < w - 1 && offset >= w)
+        // extension diagonale
+        if ( connected == Connectivity::Eight )
         {
-            const int up_right_offset = offset - w + 1;
-            add_region_neighbor(up_right_offset, x+1);
+            for ( const auto& d : neighbors4_diag )
+            {
+                promote_region_to_boundary( x + d.dx, y + d.dy );
+            }
+        }
+    }
+    else
+    {
+        // ---------- SLOW PATH (bords) ----------
+        for ( const auto& d : neighbors4 )
+        {
+            const int nx = x + d.dx;
+            const int ny = y + d.dy;
+
+            if (nx < 0 || nx >= w || ny < 0 || ny >= h)
+                continue;
+
+            promote_region_to_boundary( nx, ny );
         }
 
-        // Diagonaux inférieurs
-        if (x > 0 && offset < last_row_offset)
+        if ( connected == Connectivity::Eight )
         {
-            const int down_left_offset = offset + w - 1;
-            add_region_neighbor(down_left_offset, x-1);
-        }
+            for ( const auto& d : neighbors4_diag )
+            {
+                const int nx = x + d.dx;
+                const int ny = y + d.dy;
 
-        if (x < w - 1 && offset < last_row_offset)
-        {
-            const int down_right_offset = offset + w + 1;
-            add_region_neighbor(down_right_offset, x+1);
+                if ( nx < 0 || nx >= w || ny < 0 || ny >= h )
+                    continue;
+
+                promote_region_to_boundary( nx, ny );
+            }
         }
     }
 
     const auto& ctx = context();
 
-    // change the phi value of the current point
-    // according to the phi value of the adjacent list
-    cd_.phi()[ offset ] = ctx.adjacent_phi_val;
+    // bascule du point courant
+    cd_.phi().at(x, y) = ctx.current_to_adjacent_val;
 
-    // switch the current point to the adjacent boundary list
-    ctx.adjacent_boundary.emplace_back( offset, x );
+    // passage dans la boundary adjacente
+    ctx.adjacent_boundary.emplace_back(x, y);
 
-    point = ctx.scanned_boundary.back();
-    ctx.scanned_boundary.pop_back();
+    point = ctx.active_boundary.back();
+    ctx.active_boundary.pop_back();
 }
 
-void ActiveContour::add_region_neighbor(int neighbor_offset,
-                                        int neighbor_x)
+void ActiveContour::promote_region_to_boundary(int nx, int ny)
 {
-    assert( !is_stopped() );
+    assert(!is_stopped());
 
     const auto& ctx = context();
 
-    // if a neighbor ∈ one region
-    if( cd_.phi()[ neighbor_offset ] == ctx.neighbor_region_phi_val )
-    {
-        cd_.phi()[ neighbor_offset ] = ctx.neighbor_boundary_phi_val;
+    auto& phi_neighbor = cd_.phi().at(nx, ny);
 
-        // neighbor ∈ region ==> ∈ neighbor list
-        points_to_append_.emplace_back( neighbor_offset, neighbor_x );
+    // neighbor ∈ region ?
+    if (phi_neighbor == ctx.neighbor_from_region_val)
+    {
+        phi_neighbor = ctx.neighbor_to_boundary_val;
+
+        // neighbor pending to boundary active
+        active_boundary_staging_.emplace_back(nx, ny);
     }
 }
 
@@ -423,7 +416,7 @@ void ActiveContour::compute_external_speed_Fd(ContourPoint& point)
 
     // this class should never be instantiated
     // reimplement a better and data-dependent speed function in a child class
-    point.set_speed( SpeedValue::GoInward );
+    point.speed = SpeedValue::GoInward;
 }
 
 void ActiveContour::compute_internal_speed_Fint(RawContour& boundary)
@@ -438,7 +431,7 @@ void ActiveContour::compute_internal_speed_Fint(RawContour& boundary)
 }
 
 InternalKernel ActiveContour::make_internal_kernel_offsets(int disk_radius,
-                                                             int grid_width)
+                                                           int grid_width)
 {
     const int r = disk_radius;
     const int w = grid_width;
@@ -484,15 +477,14 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
     // If the neighborhood is mostly inside, the boundary locally
     // protrudes outward and must be pushed outward to smooth curvature.
 
-    const int base = point.offset();
-    const int y = base / cd_.phi().width();
+    const int base = cd_.phi().offset( point.x, point.y );
 
     int neighbor_offset;
 
     int inside = 0;
     int outside = 0;
 
-    if ( internal_kernel_.fully_inside( point.x(), y,
+    if ( internal_kernel_.fully_inside( point.x, point.y,
                                         cd_.phi().width(), cd_.phi().height() ) )
     {
         // fast path without all neighbors existence checks
@@ -529,11 +521,11 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 
     // intentionally inverted, here.
     if (inside > outside)
-        point.set_speed(SpeedValue::GoOutward);
+        point.speed = SpeedValue::GoOutward;
     else if (outside > inside)
-        point.set_speed(SpeedValue::GoInward);
+        point.speed = SpeedValue::GoInward;
     else
-        point.set_speed(SpeedValue::NoMove);
+        point.speed = SpeedValue::NoMove;
 }
 
 void ActiveContour::stop()
@@ -614,8 +606,7 @@ void ActiveContour::check_hausdorff_stopping_condition()
 
         for( const auto& point : cd_.l_out_raw() )
         {
-            ed_.l_out_shape.push_back( from_ContourPoint( point,
-                                                          cd_.phi().width() ) );
+            ed_.l_out_shape.push_back( from_ContourPoint( point ) );
         }
 
         ed_.l_out_shape.calculate_centroid();

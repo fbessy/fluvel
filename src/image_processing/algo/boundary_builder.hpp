@@ -115,11 +115,6 @@ private :
     void add_point_unique(RawContour& out,
                           int x, int y);
 
-    int get_offset(int x, int y) const;
-    int get_offset(const Point2D_i& p) const;
-
-    Point2D_i get_position(int offset) const;
-
     bool inside_grid(int x, int y) const;
     inline bool inside_grid(const Point2D_i& p) const;
 
@@ -129,22 +124,6 @@ private :
     RawContour& Lout_init_;
     RawContour& Lin_init_;
 };
-
-inline int BoundaryBuilder::get_offset(int x, int y) const
-{
-    return x+y*grid_width_;
-}
-
-inline int BoundaryBuilder::get_offset(const Point2D_i& p) const
-{
-    return get_offset(p.x, p.y);
-}
-
-inline Point2D_i BoundaryBuilder::get_position(int offset) const
-{
-    int y = offset / grid_width_;
-    return { offset - y*grid_width_, y };
-}
 
 inline bool BoundaryBuilder::inside_grid(int x, int y) const
 {
@@ -177,18 +156,18 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(RawContour& list,
 inline void BoundaryBuilder::add_point_unique(RawContour& out,
                                               int x, int y)
 {
-    int current_offset = get_offset(x, y);
+    const ContourPoint p{ x, y };
 
-    constexpr int WINDOW = 4; // ou 6 si correcteurs multiples
+    constexpr int WINDOW = 4;
+    const int n = static_cast<int>( out.size() );
 
-    const int n = static_cast<int>(out.size());
     for (int i = std::max(0, n - WINDOW); i < n; ++i)
     {
-        if (out[i].offset() == current_offset)
+        if ( out[i] == p )
             return;
     }
 
-    out.emplace_back(current_offset, x);
+    out.push_back( p );
 }
 
 }

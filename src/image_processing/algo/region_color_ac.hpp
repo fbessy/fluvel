@@ -155,7 +155,7 @@ private :
     void compute_external_speed_Fd(ContourPoint& point) override;
 
     //! Updates the six sums, #n_in and #n_out, before each #switch_in, in the cycle 1, in order to calculate means #CoutYUV and #CinYUV.
-    void do_specific_when_switch(int offset,
+    void do_specific_when_switch(const ContourPoint& point,
                                  BoundarySwitch ctx_choice) override;
 
     //! Calculates components \a of a color space (in function of the color space option) with a rgb value.

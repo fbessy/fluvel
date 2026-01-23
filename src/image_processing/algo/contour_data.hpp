@@ -75,30 +75,27 @@ enum class SpeedValue : int8_t
 class ContourPoint
 {
 public:
-    ContourPoint(int offset1, int x1): offset_(offset1), x_(x1)
+
+    int x;
+    int y;
+
+    //! Internal speed Fint or external speed Fd to evolve the active contour in one direction locally.
+    SpeedValue speed;
+
+    ContourPoint(int x1, int y1): x(x1), y(y1)
     {}
 
-    int offset() const { return offset_; }
-    int x() const { return x_; }
-    SpeedValue speed() const { return speed_; }
-    void set_speed(SpeedValue speed) { speed_ = speed; }
+    ContourPoint(const Point2D_i& p) : x(p.x), y(p.y) {}
 
     bool operator==(const ContourPoint& other) const noexcept
     {
-        return offset_ == other.offset_;
+        return x == other.x && y == other.y;
     }
 
     bool operator!=(const ContourPoint& other) const noexcept
     {
         return !(*this == other);
     }
-
-private:
-    int offset_;
-    int x_; // in order to check fastly neighborhood existence (border cases to handle)
-
-    //! Internal speed Fint or external speed Fd to evolve the active contour in one direction locally.
-    SpeedValue speed_;
 };
 
 using RawContour      = std::vector<ContourPoint>;
@@ -180,9 +177,9 @@ private :
     void define_phi_from_lists();
 
     //! Performs a flood fill algorithm for the method #define_phi_from_lists().
-    void flood_fill(int offset_seed,
-                       PhiValue target_value,
-                       PhiValue replacement_value);
+    void flood_fill(const Point2D_i& seed,
+                    PhiValue target_value,
+                    PhiValue replacement_value);
 
     //! Eliminates redundant points for the both lists to maintain a contiguous boundary.
     void eliminate_redundant_points_if_needed();

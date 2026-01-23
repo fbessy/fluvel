@@ -110,7 +110,7 @@ public:
         return static_cast<size_t>(y * width_ + x);
     }
 
-    size_t offset(Point2D<int> p) const noexcept
+    size_t offset(const Point2D<int>& p) const noexcept
     {
         return static_cast<size_t>(p.y * width_ + p.x);
     }
@@ -118,6 +118,11 @@ public:
     bool valid(int x, int y) const noexcept
     {
         return x >= 0 && y >= 0 && x < width_ && y < height_;
+    }
+
+    bool valid(const Point2D<int>& p) const noexcept
+    {
+        return valid( p.x, p.y );
     }
 
     bool valid(int offset) const noexcept

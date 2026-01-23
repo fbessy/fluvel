@@ -44,6 +44,7 @@
 
 #include "boundary_builder.hpp"
 #include "ofeli_math.hpp"
+#include "point_hash.hpp"
 
 namespace ofeli_ip
 {
@@ -122,10 +123,10 @@ void BoundaryBuilder::generate_rectangle_points(int x1, int y1,
             if( x >= 0 && x < grid_width_ )
             {
                 if( y1-1 >= 0 && y1-1 < grid_height_ )
-                    list_out.emplace_back( get_offset(x,y1-1), x );
+                    list_out.emplace_back( x, y1-1 );
 
                 if( y2+1 >= 0 && y2+1 < grid_height_ )
-                    list_out.emplace_back( get_offset(x,y2+1), x );
+                    list_out.emplace_back( x, y2+1 );
             }
         }
 
@@ -134,10 +135,10 @@ void BoundaryBuilder::generate_rectangle_points(int x1, int y1,
             if( y >= 0 && y < grid_height_ )
             {
                 if( x1-1 >= 0 && x1-1 < grid_width_ )
-                    list_out.emplace_back( get_offset(x1-1,y), x1-1 );
+                    list_out.emplace_back( x1-1, y );
 
                 if( x2+1 >= 0 && x2+1 < grid_width_ )
-                    list_out.emplace_back( get_offset(x2+1,y), x2+1 );
+                    list_out.emplace_back( x2+1, y );
             }
         }
 #endif
@@ -153,10 +154,10 @@ void BoundaryBuilder::generate_rectangle_points_for_one_list(RawContour& list_in
         if( x >= 0 && x < grid_width_ )
         {
             if( y1 >= 0 && y1 < grid_height_ )
-                list_init.emplace_back( get_offset(x,y1), x );
+                list_init.emplace_back( x, y1 );
 
             if( y2 >= 0 && y2 < grid_height_ )
-                list_init.emplace_back( get_offset(x,y2), x );
+                list_init.emplace_back( x, y2 );
         }
     }
 
@@ -165,10 +166,10 @@ void BoundaryBuilder::generate_rectangle_points_for_one_list(RawContour& list_in
         if( y >= 0 && y < grid_height_ )
         {
             if( x1 >= 0 && x1 < grid_width_ )
-                list_init.emplace_back( get_offset(x1,y), x1 );
+                list_init.emplace_back( x1, y );
 
             if( x2 >= 0 && x2 < grid_width_ )
-                list_init.emplace_back( get_offset(x2,y), x2 );
+                list_init.emplace_back( x2, y );
         }
     }
 }
@@ -331,13 +332,11 @@ void BoundaryBuilder::build_inner_contiguous(int x0, int y0,
                                              const RawContour& l_out,
                                              RawContour& l_in)
 {
-    std::unordered_set<int> seen;
+    std::unordered_set<Point2D_i> seen;
     seen.reserve(l_out.size());
 
-    for (const auto& point : l_out)
+    for (const auto& p : l_out)
     {
-        const auto p = get_position(point.offset());
-
         const int sx = math::sign(x0 - p.x);
         const int sy = math::sign(y0 - p.y);
 
@@ -346,29 +345,23 @@ void BoundaryBuilder::build_inner_contiguous(int x0, int y0,
         if (!inside_grid(pi))
             continue;
 
-        const int off = get_offset(pi);
-
-        if (seen.insert(off).second)
-            l_in.emplace_back(off, pi.x);
+        if (seen.insert(pi).second)
+            l_in.emplace_back(pi);
     }
 }
 
 void BoundaryBuilder::check_duplicates(const RawContour& contour)
 {
-    std::unordered_set<int> seen;
+    std::unordered_set<Point2D_i> seen;
     seen.reserve(contour.size());
 
-    for (size_t i = 0; i < contour.size(); ++i)
+    for (const auto& p : contour)
     {
-        int off = contour[i].offset();
+        const Point2D_i point { p.x, p.y };
 
-        if (!seen.insert(off).second)
+        if (!seen.insert(point).second)
         {
-            auto p = get_position(off);
-            std::cerr << "[DUPLICATE] index=" << i
-                      << " offset=" << off
-                      << " pos=(" << p.x << "," << p.y << ")\n";
-
+            std::cerr << " pos=(" << point.x << "," << point.y << ")\n";
             std::cerr.flush();
         }
     }

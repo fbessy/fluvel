@@ -64,25 +64,6 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                        unsigned int upscale_factor,
                        QImage& img_rgb32);
 
-void draw_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
-                            const RgbColor& color1,
-                            const RgbColor& color2,
-                            unsigned char* img1_rgb_data,
-                            unsigned char* img2_rgb_data);
-
-void erase_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const unsigned char* img_to_copy,
-                       unsigned char* img_rgb_data);
-
-void erase_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
-                             const unsigned char* img_to_copy,
-                             unsigned char* img1_rgb_data,
-                             unsigned char* img2_rgb_data);
-
-void erase_list_to_img_grayscale(const std::vector<ofeli_ip::ContourPoint>& list,
-                                 const unsigned char* img_grayscale_to_copy,
-                                 unsigned char* img_rgb_data);
-
 QRgb get_QRgb(RgbColor col);
 
 }

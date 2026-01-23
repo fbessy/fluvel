@@ -257,8 +257,6 @@ void ActiveContourWorker::emitContourOnly()
     if (!ac)
         return;
 
-    int y;
-
     const auto& l_out = ac->l_out_raw();
     const auto& l_in  = ac->l_in_raw();
 
@@ -268,20 +266,12 @@ void ActiveContourWorker::emitContourOnly()
     outPts.reserve(l_out.size());
     inPts.reserve(l_in.size());
 
-    const int width = ac->phi().width();
-
     for (const auto& p : l_out)
-    {
-        y =  p.offset() / width;
-        outPts.emplace_back( p.x(), y );
-    }
-
+        outPts.emplace_back( p.x, p.y );
 
     for (const auto& p : l_in)
-    {
-        y =  p.offset() / width;
-        inPts.emplace_back( p.x(), y );
-    }
+        inPts.emplace_back( p.x, p.y );
+
 
     emit contourUpdated(outPts, inPts);
 }

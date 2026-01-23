@@ -149,7 +149,7 @@ private :
     void compute_external_speed_Fd(ContourPoint& point) override;
 
     //! Updates variables #sum_in, #sum_out and #pxl_nbr_out in order to calculate the means #average_out and #average_in in constant time ( complexity 0(1) ).
-    void do_specific_when_switch(int offset,
+    void do_specific_when_switch(const ContourPoint& point,
                                  BoundarySwitch ctx_choice) override;
 
     //! Image wrapper.

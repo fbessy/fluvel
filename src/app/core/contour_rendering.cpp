@@ -118,7 +118,7 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
 
         for( const auto& point : list )
         {
-            offset = point.offset();
+            offset = point.y * img_rgb32_width + point.x;
 
             assert(offset >= 0 && offset < img_rgb32_width*img_rgb32_height );
 
@@ -152,10 +152,8 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
 
             for( const auto& point : list )
             {
-                offset = point.offset();
-
-                y = offset/small_img_width;
-                x = offset-y*small_img_width;
+                x = point.x;
+                y = point.y;
 
                 if (    (int)upscale_factor*x+kernel_radius < img_rgb32.width()
                      && (int)upscale_factor*y+kernel_radius < img_rgb32.height()
@@ -200,83 +198,6 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                 }
             }
         }
-    }
-}
-
-void draw_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
-                            const RgbColor& color1,
-                            const RgbColor& color2,
-                            unsigned char* img1_rgb_data,
-                            unsigned char* img2_rgb_data)
-{
-    int offset;
-
-    for( const auto& point : list )
-    {
-        offset = point.offset() * 4;
-
-        img1_rgb_data[ offset+2 ] = color1.red;
-        img1_rgb_data[ offset+1 ] = color1.green;
-        img1_rgb_data[ offset   ] = color1.blue;
-
-        img2_rgb_data[ offset+2 ] = color2.red;
-        img2_rgb_data[ offset+1 ] = color2.green;
-        img2_rgb_data[ offset   ] = color2.blue;
-    }
-}
-
-void erase_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const unsigned char* img_to_copy,
-                       unsigned char* img_rgb_data)
-{
-    int offset;
-
-    for( const auto& point : list )
-    {
-        offset = point.offset() * 4;
-
-        img_rgb_data[ offset+2 ] = img_to_copy[ offset+2 ];
-        img_rgb_data[ offset+1 ] = img_to_copy[ offset+1 ];
-        img_rgb_data[ offset   ] = img_to_copy[ offset   ];
-    }
-}
-
-void erase_list_to_img1_img2(const std::vector<ofeli_ip::ContourPoint>& list,
-                             const unsigned char* img_to_copy,
-                             unsigned char* img1_rgb_data,
-                             unsigned char* img2_rgb_data)
-{
-    int offset;
-
-    for( const auto& point : list )
-    {
-        offset = point.offset() * 4;
-
-        img1_rgb_data[ offset+2 ] = img_to_copy[ offset+2 ];
-        img1_rgb_data[ offset+1 ] = img_to_copy[ offset+1 ];
-        img1_rgb_data[ offset   ] = img_to_copy[ offset   ];
-
-        img2_rgb_data[ offset+2 ] = img_to_copy[ offset+2 ];
-        img2_rgb_data[ offset+1 ] = img_to_copy[ offset+1 ];
-        img2_rgb_data[ offset   ] = img_to_copy[ offset   ];
-    }
-}
-
-void erase_list_to_img_grayscale(const std::vector<ofeli_ip::ContourPoint>& list,
-                                 const unsigned char* img_grayscale_to_copy,
-                                 unsigned char* img_rgb_data)
-{
-    int offset;
-    unsigned char intensity;
-
-    for( const auto& point : list )
-    {
-        offset = point.offset();
-        intensity = img_grayscale_to_copy[ offset ];
-
-        img_rgb_data[ 4*offset+2 ] = intensity;
-        img_rgb_data[ 4*offset+1 ] = intensity;
-        img_rgb_data[ 4*offset   ] = intensity;
     }
 }
 
