@@ -76,29 +76,37 @@ class ContourPoint
 {
 public:
 
-    int x;
-    int y;
+    ContourPoint(int x, int y): x_(x), y_(y) {}
+    ContourPoint(const Point2D_i& p): x_(p.x), y_(p.y) {}
 
-    //! Internal speed Fint or external speed Fd to evolve the active contour in one direction locally.
-    SpeedValue speed;
-
-    ContourPoint(int x1, int y1): x(x1), y(y1)
-    {}
-
-    ContourPoint(const Point2D_i& p) : x(p.x), y(p.y) {}
+    Point2D_i pos() const noexcept { return {x_, y_}; }
+    int x() const noexcept { return x_; }
+    int y() const noexcept { return y_; }
 
     bool operator==(const ContourPoint& other) const noexcept
     {
-        return x == other.x && y == other.y;
+        return x_ == other.x_ && y_ == other.y_;
     }
 
     bool operator!=(const ContourPoint& other) const noexcept
     {
         return !(*this == other);
     }
+
+private:
+    int x_;
+    int y_;
+
+    //! Pending sign speed of the algorithm to drive the contour
+    SpeedValue speed_;
+
+    friend class ActiveContour;
+    friend class RegionAc;
+    friend class RegionColorAc;
+    friend class EdgeAc;
 };
 
-using RawContour      = std::vector<ContourPoint>;
+using Contour         = std::vector<ContourPoint>;
 using ExportedContour = std::vector<Point2D_i>;
 
 class ContourData
@@ -116,8 +124,8 @@ public :
                 Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of #l_out and #l_in.
-    ContourData(const RawContour& l_out,
-                const RawContour& l_in,
+    ContourData(const Contour& l_out,
+                const Contour& l_in,
                 int phi_width, int phi_height,
                 Connectivity connectivity = Connectivity::Four);
 
@@ -131,7 +139,7 @@ public :
     void define_from_ellipse();
 
     //! Eliminates redundant points to maintain a contiguous boundary.
-    void eliminate_redundant_points(RawContour& boundary,
+    void eliminate_redundant_points(Contour& boundary,
                                     PhiValue region_value);
 
     //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
@@ -153,11 +161,11 @@ public :
     DiscreteLevelSet& phi() { return phi_; }
     const DiscreteLevelSet& phi() const { return phi_; }
     //! Getter function for the exterior boundary #l_out.
-    RawContour& l_out_raw() { return l_out_; }
-    const RawContour& l_out_raw() const { return l_out_; }
+    Contour& l_out() { return l_out_; }
+    const Contour& l_out() const { return l_out_; }
     //! Getter function for the interior boundary #l_in.
-    RawContour& l_in_raw() { return l_in_; }
-    const RawContour& l_in_raw() const { return l_in_; }
+    Contour& l_in() { return l_in_; }
+    const Contour& l_in() const { return l_in_; }
 
     bool empty() const { return l_out_.empty() || l_in_.empty(); }
 
@@ -185,7 +193,7 @@ private :
     void eliminate_redundant_points_if_needed();
 
     //! Export a boundary list as a copied geometric representation.
-    std::vector<Point2D_i> export_contour(const RawContour& boundary) const;
+    std::vector<Point2D_i> export_contour(const Contour& boundary) const;
 
     template<typename T>
     static bool has_duplicates(const std::vector<T>& v);
@@ -194,9 +202,9 @@ private :
     DiscreteLevelSet phi_;
 
     //! List of points representing the exterior boundary (called Lout in the reference paper).
-    RawContour l_out_;
+    Contour l_out_;
     //! List of points representing the interior boundary (called Lin in the reference paper).
-    RawContour l_in_;
+    Contour l_in_;
 
     //! Pixel connectivity of the neighborhood to define ContourData (4- or 8-connected).
     const Connectivity connectivity_;

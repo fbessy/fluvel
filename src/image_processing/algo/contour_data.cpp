@@ -98,8 +98,8 @@ ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
     assert( is_valid() );
 }
 
-ContourData::ContourData(const RawContour& l_out,
-                         const RawContour& l_in,
+ContourData::ContourData(const Contour& l_out,
+                         const Contour& l_in,
                          int phi_width, int phi_height,
                          Connectivity connectivity)
     : phi_(phi_width, phi_height), l_out_(l_out), l_in_(l_in),
@@ -168,7 +168,7 @@ void ContourData::define_lists_and_phi_from_binary_phi()
     {
         PhiValue& current_phi = phi_[offset];
         PhiValue region_val;
-        RawContour* boundary = nullptr;
+        Contour* boundary = nullptr;
         bool is_boundary = false;
 
         // get the generic context to eliminate redundant points
@@ -203,17 +203,16 @@ void ContourData::define_phi_from_lists()
     phi_.fill(PhiValue::OutsideRegion);
 
     for( const auto& p : l_out_ )
-    {
-        phi_.at( p.x, p.y ) = PhiValue::ExteriorBoundary;
-    }
+        phi_.at( p.x(), p.y() ) = PhiValue::ExteriorBoundary;
+
 
     for( const auto& p : l_in_ )
     {
-        flood_fill( { p.x, p.y },
+        flood_fill( { p.x(), p.y() },
                     PhiValue::OutsideRegion,
                     PhiValue::InsideRegion );
 
-        phi_.at( p.x, p.y ) = PhiValue::InteriorBoundary;
+        phi_.at( p.x(), p.y() ) = PhiValue::InteriorBoundary;
     }
 
     eliminate_redundant_points_if_needed();
@@ -296,17 +295,17 @@ void ContourData::eliminate_redundant_points_if_needed()
     eliminate_redundant_points(l_in_,  PhiValue::InsideRegion);
 }
 
-void ContourData::eliminate_redundant_points(RawContour& boundary,
+void ContourData::eliminate_redundant_points(Contour& boundary,
                                              PhiValue region_value)
 {
     for( std::size_t i = 0; i < boundary.size(); )
     {
-        auto& point = boundary[i];
+        auto& p = boundary[i];
 
-        if( is_redundant(point) )
+        if( is_redundant( p ) )
         {
-            phi_.at( point.x, point.y) = region_value;
-            point = boundary.back();
+            phi_.at( p.x(), p.y() ) = region_value;
+            p = boundary.back();
             boundary.pop_back();
         }
         else
@@ -318,8 +317,8 @@ void ContourData::eliminate_redundant_points(RawContour& boundary,
 
 bool ContourData::is_redundant(const ContourPoint& p) const
 {
-    const int x = p.x;
-    const int y = p.y;
+    const int x = p.x();
+    const int y = p.y();
 
     const int w = phi_.width();
     const int h = phi_.height();
@@ -394,7 +393,7 @@ bool ContourData::is_valid() const
 
     for ( const auto& p : l_out_ )
     {
-        if ( phi_.at( p.x, p.y ) != PhiValue::ExteriorBoundary )
+        if ( phi_.at( p.x(), p.y() ) != PhiValue::ExteriorBoundary )
             return false;
 
         if ( is_redundant( p ) )
@@ -403,14 +402,14 @@ bool ContourData::is_valid() const
 
     for ( const auto& p : l_in_ )
     {
-        if ( phi_.at( p.x, p.y ) != PhiValue::InteriorBoundary )
+        if ( phi_.at( p.x(), p.y() ) != PhiValue::InteriorBoundary )
             return false;
 
         if ( is_redundant( p ) )
             return false;
     }
 
-    RawContour result;
+    Contour result;
     result.reserve( l_out_.size() + l_in_.size() );
     result.insert( result.end(), l_out_.begin(), l_out_.end() );
     result.insert( result.end(), l_in_.begin(), l_in_.end() );
@@ -422,14 +421,14 @@ bool ContourData::is_valid() const
     return true;
 }
 
-ExportedContour ContourData::export_contour(const RawContour& raw_boundary) const
+ExportedContour ContourData::export_contour(const Contour& boundary) const
 {
     ExportedContour geometric_boundary;
-    geometric_boundary.reserve( raw_boundary.size() );
+    geometric_boundary.reserve( boundary.size() );
 
-    for ( const auto& point : raw_boundary )
+    for ( const auto& point : boundary )
     {
-        geometric_boundary.emplace_back( point.x, point.y );
+        geometric_boundary.emplace_back( point.x(), point.y() );
     }
 
     return geometric_boundary;

@@ -204,8 +204,8 @@ struct InternalKernel
 //! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
 struct BoundarySwitchContext
 {
-    RawContour& active_boundary;
-    RawContour& adjacent_boundary;
+    Contour& active_boundary;
+    Contour& adjacent_boundary;
     SpeedValue required_speed_sign;
     PhiValue current_to_adjacent_val;
     PhiValue neighbor_from_region_val;
@@ -215,8 +215,8 @@ struct BoundarySwitchContext
     static BoundarySwitchContext make_switch_in(ContourData& cd)
     {
         return {
-            cd.l_out_raw(),
-            cd.l_in_raw(),
+            cd.l_out(),
+            cd.l_in(),
             SpeedValue::GoOutward,
             PhiValue::InteriorBoundary,
             PhiValue::OutsideRegion,
@@ -228,8 +228,8 @@ struct BoundarySwitchContext
     static BoundarySwitchContext make_switch_out(ContourData& cd)
     {
         return {
-            cd.l_in_raw(),
-            cd.l_out_raw(),
+            cd.l_in(),
+            cd.l_out(),
             SpeedValue::GoInward,
             PhiValue::ExteriorBoundary,
             PhiValue::InsideRegion,
@@ -295,9 +295,9 @@ struct EvolutionData
           centroids_distance(std::numeric_limits<float>().max()),
           stopping_status( StoppingStatus::None )
     {
-        l_out_shape.reserve( cd.l_out_raw().capacity() );
-        previous_shape.reserve( cd.l_out_raw().capacity() );
-        intersection.reserve( cd.l_out_raw().capacity() );
+        l_out_shape.reserve( cd.l_out().capacity() );
+        previous_shape.reserve( cd.l_out().capacity() );
+        intersection.reserve( cd.l_out().capacity() );
     }
 
     //! Reset execution state of evolution data. Used for video tracking.
@@ -351,9 +351,9 @@ public :
     const DiscreteLevelSet& phi() const { return cd_.phi(); }
 
     //! Getter for the list of offset points representing the exterior boundary.
-    const RawContour& l_out_raw() const { return cd_.l_out_raw(); }
+    const Contour& l_out() const { return cd_.l_out(); }
     //! Getter for the list of offset points representing the interior boundary.
-    const RawContour& l_in_raw() const { return cd_.l_in_raw(); }
+    const Contour& l_in() const { return cd_.l_in(); }
 
     //! Getter method for #state.
     PhaseState state() const { return state_; }
@@ -406,16 +406,16 @@ private :
     bool directional_substep(BoundarySwitch ctx_choice);
 
     //! Computes the speed for all points of a boundary list #l_out or #l_in.
-    void compute_speed(RawContour& boundary);
+    void compute_speed(Contour& boundary);
 
     //! Computes the external speed Fd for all points of a boundary list #l_out or #l_in.
-    void compute_external_speed_Fd(RawContour& boundary);
+    void compute_external_speed_Fd(Contour& boundary);
 
     //! Computes the external speed \a Fd for a current point (\a x,\a y) of #l_out or #l_in.
     virtual void compute_external_speed_Fd(ContourPoint& point);
 
     //! Computes the internal speed  Fint for all points of a boundary list #l_out or #l_in.
-    void compute_internal_speed_Fint(RawContour& boundary);
+    void compute_internal_speed_Fint(Contour& boundary);
 
     //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
     void compute_internal_speed_Fint(ContourPoint& point);
@@ -477,7 +477,7 @@ private :
     const BoundarySwitchContext* ctx_;
 
     //! Temporary points to add after each scan of the list #l_in or #l_out.
-    RawContour active_boundary_staging_;
+    Contour active_boundary_staging_;
 
     //! Number of iterations in one cycle1-cycle2.
     int steps_per_cycle_;
@@ -493,7 +493,7 @@ private :
 
 inline Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point)
 {
-    return { point.x, point.y };
+    return { point.x(), point.y() };
 }
 
 namespace speed_value
@@ -628,8 +628,8 @@ constexpr SpeedValue get_discrete_speed(int speed)
  *
  * -----------------------------   Display the initial active contour   -----------------------------
  *
- * const ofeli::list<int>* Lout = &ac.l_out_raw();
- * const ofeli::list<int>* Lin = &ac.l_in_raw();
+ * const ofeli::list<int>* Lout = &ac.l_out();
+ * const ofeli::list<int>* Lin = &ac.l_in();
  *
  * // put the color of lists into the displayed buffer
  * for( auto it = Lout->get_begin(); it != Lout->get_end(); ++it )
@@ -689,8 +689,8 @@ constexpr SpeedValue get_discrete_speed(int speed)
  *     ++ac;
  *
  *     // to get the temporary result
- *     Lout = &ac.l_out_raw();
- *     Lin = &ac.l_in_raw();
+ *     Lout = &ac.l_out();
+ *     Lin = &ac.l_in();
  *
  *     // put the color of lists into the displayed buffer
  *     for( auto it = Lout->get_begin(); it != Lout->get_end(); ++it )

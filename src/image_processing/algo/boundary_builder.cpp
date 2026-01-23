@@ -50,8 +50,8 @@ namespace ofeli_ip
 {
 
 BoundaryBuilder::BoundaryBuilder(int phi_width, int phi_height,
-                                 RawContour& Lout_init,
-                                 RawContour& Lin_init)
+                                 Contour& Lout_init,
+                                 Contour& Lin_init)
     : grid_width_(phi_width), grid_height_(phi_height),
     Lout_init_(Lout_init), Lin_init_(Lin_init)
 {
@@ -95,8 +95,8 @@ void BoundaryBuilder::generate_rectangle_points(Point2D_f top_left,
 
 void BoundaryBuilder::generate_rectangle_points(int x1, int y1,
                                                 int x2, int y2,
-                                                RawContour& list_out,
-                                                RawContour& list_in)
+                                                Contour& list_out,
+                                                Contour& list_in)
 {
     if( x1 > x2 )
     {
@@ -145,7 +145,7 @@ void BoundaryBuilder::generate_rectangle_points(int x1, int y1,
     }
 }
 
-void BoundaryBuilder::generate_rectangle_points_for_one_list(RawContour& list_init,
+void BoundaryBuilder::generate_rectangle_points_for_one_list(Contour& list_init,
                                                              int x1, int y1,
                                                              int x2, int y2)
 {
@@ -222,8 +222,8 @@ void BoundaryBuilder::generate_ellipse_points(float width_ratio, float height_ra
 
 void BoundaryBuilder::generate_ellipse_points(int x0, int y0,
                                               int a,  int b,
-                                              RawContour& list_out,
-                                              RawContour& list_in)
+                                              Contour& list_out,
+                                              Contour& list_in)
 {
 
     build_ellipse_midpoint_connected(x0, y0, a, b, list_out);
@@ -232,7 +232,7 @@ void BoundaryBuilder::generate_ellipse_points(int x0, int y0,
 
 void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0,
                                                        int a, int b,
-                                                       RawContour& list_out)
+                                                       Contour& list_out)
 {
     int x = 0;
     int y = b;
@@ -329,18 +329,18 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0,
 }
 
 void BoundaryBuilder::build_inner_contiguous(int x0, int y0,
-                                             const RawContour& l_out,
-                                             RawContour& l_in)
+                                             const Contour& l_out,
+                                             Contour& l_in)
 {
     std::unordered_set<Point2D_i> seen;
     seen.reserve(l_out.size());
 
     for (const auto& p : l_out)
     {
-        const int sx = math::sign(x0 - p.x);
-        const int sy = math::sign(y0 - p.y);
+        const int sx = math::sign(x0 - p.x());
+        const int sy = math::sign(y0 - p.y());
 
-        const Point2D_i pi { p.x + sx, p.y + sy };
+        const Point2D_i pi { p.x() + sx, p.y() + sy };
 
         if (!inside_grid(pi))
             continue;
@@ -350,14 +350,14 @@ void BoundaryBuilder::build_inner_contiguous(int x0, int y0,
     }
 }
 
-void BoundaryBuilder::check_duplicates(const RawContour& contour)
+void BoundaryBuilder::check_duplicates(const Contour& contour)
 {
     std::unordered_set<Point2D_i> seen;
     seen.reserve(contour.size());
 
     for (const auto& p : contour)
     {
-        const Point2D_i point { p.x, p.y };
+        const Point2D_i point { p.x(), p.y() };
 
         if (!seen.insert(point).second)
         {

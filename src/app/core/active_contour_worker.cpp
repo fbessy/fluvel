@@ -237,8 +237,8 @@ void ActiveContourWorker::drawAndEmitResult()
     if ( ac == nullptr )
         return;
 
-    const auto& l_out = ac->l_out_raw();
-    const auto& l_in  = ac->l_in_raw();
+    const auto& l_out = ac->l_out();
+    const auto& l_in  = ac->l_in();
 
     draw_list_to_img(l_out, config.color_out, config.outside_combo,
                      result);
@@ -258,8 +258,8 @@ void ActiveContourWorker::emitContourOnly()
     if (!ac)
         return;
 
-    const auto& l_out = ac->l_out_raw();
-    const auto& l_in  = ac->l_in_raw();
+    const auto& l_out = ac->l_out();
+    const auto& l_in  = ac->l_in();
 
     QVector<QPoint> outPts;
     QVector<QPoint> inPts;
@@ -268,11 +268,10 @@ void ActiveContourWorker::emitContourOnly()
     inPts.reserve(l_in.size());
 
     for (const auto& p : l_out)
-        outPts.emplace_back( p.x, p.y );
+        outPts.emplace_back( p.x(), p.y() );
 
     for (const auto& p : l_in)
-        inPts.emplace_back( p.x, p.y );
-
+        inPts.emplace_back( p.x(), p.y() );
 
     emit contourUpdated(outPts, inPts);
 }

@@ -61,7 +61,7 @@ ActiveContour::ActiveContour(const ContourData& initial_state,
     state_( PhaseState::Cycle1 ),
     ed_( cd_ )
 {
-    active_boundary_staging_.reserve( cd_.l_out_raw().capacity() );
+    active_boundary_staging_.reserve( cd_.l_out().capacity() );
 
     if ( config_.is_cycle2 )
     {
@@ -85,7 +85,7 @@ ActiveContour::ActiveContour(ContourData&& initial_state,
     state_( PhaseState::Cycle1 ),
     ed_( cd_ )
 {
-    active_boundary_staging_.reserve( cd_.l_out_raw().capacity() );
+    active_boundary_staging_.reserve( cd_.l_out().capacity() );
 
     if ( config_.is_cycle2 )
     {
@@ -267,7 +267,7 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
     {
         auto& point = active[i];
 
-        if( point.speed == ctx.required_speed_sign )
+        if( point.speed_ == ctx.required_speed_sign )
         {
             is_moving = true;
 
@@ -299,8 +299,8 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
 {
     assert(!is_stopped());
 
-    const int x = point.x;
-    const int y = point.y;
+    const int x = point.x();
+    const int y = point.y();
 
     const int w = cd_.phi().width();
     const int h = cd_.phi().height();
@@ -384,7 +384,7 @@ void ActiveContour::promote_region_to_boundary(int nx, int ny)
     }
 }
 
-void ActiveContour::compute_speed(RawContour& boundary)
+void ActiveContour::compute_speed(Contour& boundary)
 {
     assert( !is_stopped() );
 
@@ -399,7 +399,7 @@ void ActiveContour::compute_speed(RawContour& boundary)
     }
 }
 
-void ActiveContour::compute_external_speed_Fd(RawContour& boundary)
+void ActiveContour::compute_external_speed_Fd(Contour& boundary)
 {
     assert( state_ == PhaseState::Cycle1 );
 
@@ -416,10 +416,10 @@ void ActiveContour::compute_external_speed_Fd(ContourPoint& point)
 
     // this class should never be instantiated
     // reimplement a better and data-dependent speed function in a child class
-    point.speed = SpeedValue::GoInward;
+    point.speed_ = SpeedValue::GoInward;
 }
 
-void ActiveContour::compute_internal_speed_Fint(RawContour& boundary)
+void ActiveContour::compute_internal_speed_Fint(Contour& boundary)
 {
     assert(    state_ == PhaseState::Cycle2
             || state_ == PhaseState::FinalCycle2 );
@@ -477,14 +477,14 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
     // If the neighborhood is mostly inside, the boundary locally
     // protrudes outward and must be pushed outward to smooth curvature.
 
-    const int base = cd_.phi().offset( point.x, point.y );
+    const int base = cd_.phi().offset( point.x(), point.y() );
 
     int neighbor_offset;
 
     int inside = 0;
     int outside = 0;
 
-    if ( internal_kernel_.fully_inside( point.x, point.y,
+    if ( internal_kernel_.fully_inside( point.x(), point.y(),
                                         cd_.phi().width(), cd_.phi().height() ) )
     {
         // fast path without all neighbors existence checks
@@ -521,11 +521,11 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 
     // intentionally inverted, here.
     if (inside > outside)
-        point.speed = SpeedValue::GoOutward;
+        point.speed_ = SpeedValue::GoOutward;
     else if (outside > inside)
-        point.speed = SpeedValue::GoInward;
+        point.speed_ = SpeedValue::GoInward;
     else
-        point.speed = SpeedValue::NoMove;
+        point.speed_ = SpeedValue::NoMove;
 }
 
 void ActiveContour::stop()
@@ -604,7 +604,7 @@ void ActiveContour::check_hausdorff_stopping_condition()
     {
         ed_.l_out_shape.clear();
 
-        for( const auto& point : cd_.l_out_raw() )
+        for( const auto& point : cd_.l_out() )
         {
             ed_.l_out_shape.push_back( from_ContourPoint( point ) );
         }

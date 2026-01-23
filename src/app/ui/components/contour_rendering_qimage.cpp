@@ -116,12 +116,12 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
     uchar* data = img.bits();
     const int stride = img.bytesPerLine();
 
-    for (const auto& point : list)
+    for (const auto& p : list)
     {
-        assert(point.x >= 0 && point.x < img.width());
-        assert(point.y >= 0 && point.y < img.height());
+        assert(p.x() >= 0 && p.x() < img.width());
+        assert(p.y() >= 0 && p.y() < img.height());
 
-        uchar* px = data + point.y * stride + 4 * point.x;
+        uchar* px = data + p.y() * stride + 4 * p.x();
 
         // QImage::Format_RGB32: memory layout is B,G,R,0xFF
         px[0] = color.blue;
@@ -156,8 +156,8 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
 
     for (const auto& point : list)
     {
-        const int base_x = static_cast<int>(upscale_factor) * point.x;
-        const int base_y = static_cast<int>(upscale_factor) * point.y;
+        const int base_x = static_cast<int>(upscale_factor) * point.x();
+        const int base_y = static_cast<int>(upscale_factor) * point.y();
 
         // fast path: whole kernel inside image
         if (   base_x + kernel_radius < w
