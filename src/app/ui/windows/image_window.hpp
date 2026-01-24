@@ -70,9 +70,27 @@ public:
 
 public slots:
     void refreshAlgoOverlay();
+    void onImageReady(const QImage& image);
+    void onFileSelected(const QString& path);
+
+protected:
+    virtual void closeEvent(QCloseEvent* event) override;
 
 private:
-    virtual void closeEvent(QCloseEvent* event) override;
+
+    // --- Setup ---
+    void setupUi();
+    void setupActions();
+    void setupConnections();
+
+    void updateWindowTitle();
+
+    void setCurrentFile(const QString &fileName1);
+    void updateRecentFileActions();
+    QString strippedName(const QString &fullFileName);
+
+    void updateCameraAction();
+    void onStartCameraActionTriggered();
 
     // --- UI ---
     CameraWindow* camera_window = nullptr;
@@ -87,7 +105,6 @@ private:
 
     ImageView* imageView = nullptr;
     AlgoInfoOverlay* imageOverlay = nullptr;
-
 
 
 
@@ -113,14 +130,6 @@ private:
 
     QStringList nameFilters;
     QString last_directory_used;
-    void setCurrentFile(const QString &fileName1);
-    void updateRecentFileActions();
-    QString strippedName(const QString &fullFileName);
-
-    void updateCameraAction();
-    void onStartCameraActionTriggered();
-
-
 
     // --- Controllers / Workers ---
     ImageController* imageController = nullptr;
@@ -129,10 +138,10 @@ private:
     std::unique_ptr<PhiEditor> phiEditor;
     std::unique_ptr<PhiViewModel> phiViewModel;
 
-    // --- Setup ---
-    void setupUi();
-    void setupActions();
-    void setupConnections();
+    QString m_fileName;
+    QString m_fullPath;
+    QSize   m_imageSize;
+    int     m_channels = 0;
 
 signals:
 

@@ -38,7 +38,7 @@ ImageWindow::~ImageWindow()
 
 void ImageWindow::setupUi()
 {
-    setWindowTitle( tr("Ofeli") );
+    updateWindowTitle();
     setWindowIcon( QIcon(":/icons/app/Ofeli.svg") );
 
     QSettings settings;
@@ -222,6 +222,13 @@ void ImageWindow::setupActions()
 
 void ImageWindow::setupConnections()
 {
+    connect(this, &ImageWindow::fileSelected,
+            this, &ImageWindow::onFileSelected);
+
+    connect(imageController, &ImageController::imageReady,
+            this,            &ImageWindow::onImageReady);
+
+
     nameFilters << "*.bmp"
                 << "*.gif"
                 << "*.jpg" << "*.jpeg" << "*.mng"
@@ -402,6 +409,44 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     config.save();
 
     QMainWindow::closeEvent(event);
+}
+
+void ImageWindow::onImageReady(const QImage& image)
+{
+    m_imageSize = image.size();
+    m_channels  = image.depth() / 8;
+
+    if ( m_channels > 3 )
+        m_channels = 3; // because this application processes only 3 channels
+                        // even there are 4 channels, for example.
+
+    updateWindowTitle();
+}
+
+void ImageWindow::onFileSelected(const QString& path)
+{
+    m_fileName = QFileInfo(path).fileName();
+    m_fullPath = path;
+
+    updateWindowTitle();
+
+    statusBar()->showMessage(path);
+}
+
+void ImageWindow::updateWindowTitle()
+{
+    QString title = "Ofeli";
+
+    if (!m_fileName.isEmpty() && m_imageSize.isValid() && m_channels > 0)
+    {
+        title += QString(" - %1 - %2×%3×%4")
+                     .arg(m_fileName)
+                     .arg(m_imageSize.width())
+                     .arg(m_imageSize.height())
+                     .arg(m_channels);
+    }
+
+    setWindowTitle(title);
 }
 
 }
