@@ -123,6 +123,8 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
+        ui/components/image_view_interaction.hpp
+        ui/components/pan_zoom_interaction.hpp ui/components/pan_zoom_interaction.cpp
     )
 endif()
 

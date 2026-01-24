@@ -1,4 +1,5 @@
 #include "image_view.hpp"
+#include "image_view_interaction.hpp"
 #include "application_settings.hpp"
 
 #include <QPainter>
@@ -6,7 +7,8 @@
 #include <QMouseEvent>
 #include <QThread>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 ImageView::ImageView(QWidget* parent)
     : QGraphicsView(parent),
@@ -208,6 +210,56 @@ void ImageView::updateDragMode()
     }
 }
 
+double ImageView::currentZoom() const
+{
+    return getCurrentZoom();
+}
+
+void ImageView::scaleView(double sx, double sy)
+{
+    scale(sx, sy);
+}
+
+void ImageView::translateView(double dx, double dy)
+{
+    translate(dx, dy);
+}
+
+void ImageView::enableAutoView(bool enable)
+{
+    autoViewEnabled = enable;
+}
+
+double ImageView::getCurrentZoom() const
+{
+    return transform().m11(); // scale X
+}
+
+void ImageView::toggleFullScreen()
+{
+    if (!isFullScreenMode)
+    {
+        normalGeometry    = geometry();
+        normalWindowFlags = windowFlags();
+
+        setWindowFlags(Qt::Window);
+        showFullScreen();
+        isFullScreenMode = true;
+    }
+    else
+    {
+        setWindowFlags(normalWindowFlags);
+        showNormal();
+
+        QTimer::singleShot(0, this, [this]() {
+            setGeometry(normalGeometry);
+        });
+
+        isFullScreenMode = false;
+    }
+}
+
+#if 0
 // ------------------------------------------------------------
 // Interaction
 // ------------------------------------------------------------
@@ -291,6 +343,7 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 
     updateDragMode();
 }
+#endif
 
 void ImageView::resizeEvent(QResizeEvent* event)
 {
@@ -303,14 +356,50 @@ void ImageView::resizeEvent(QResizeEvent* event)
     updateDragMode();
 }
 
-double ImageView::getCurrentZoom() const
-{
-    return transform().m11(); // scale X
-}
-
 QImage ImageView::currentImage() const
 {
     return lastDisplayedImage;
+}
+
+void ImageView::setInteraction(ImageViewInteraction* interaction)
+{
+    m_interaction = interaction;
+}
+
+void ImageView::wheelEvent(::QWheelEvent* event)
+{
+    if (m_interaction)
+    {
+        m_interaction->wheel(*this, event);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::wheelEvent(event);
+}
+
+void ImageView::mousePressEvent(::QMouseEvent* event)
+{
+    if (m_interaction)
+    {
+        m_interaction->mousePress(*this, event);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::mousePressEvent(event);
+}
+
+void ImageView::mouseDoubleClickEvent(::QMouseEvent* event)
+{
+    if (m_interaction)
+    {
+        m_interaction->mouseDoubleClick(*this, event);
+        event->accept();
+        return;
+    }
+
+    QGraphicsView::mouseDoubleClickEvent(event);
 }
 
 } // namespace ofeli_app

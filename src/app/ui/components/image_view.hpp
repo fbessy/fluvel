@@ -10,7 +10,16 @@
 
 #include "contour_point_item.hpp"
 
-namespace ofeli_app {
+
+class QWheelEvent;
+class QMouseEvent;
+class QResizeEvent;
+
+
+namespace ofeli_app
+{
+
+class ImageViewInteraction;
 
 class ImageView : public QGraphicsView
 {
@@ -29,15 +38,25 @@ public:
     void setMaxDisplayFps(double fps);
 
     QImage currentImage() const;
+    void setInteraction(ImageViewInteraction* interaction);
+
+    void applyAutoView();
+    void updateDragMode();
+    double currentZoom() const;
+    void scaleView(double sx, double sy);
+    void translateView(double dx, double dy);
+    void enableAutoView(bool enable);
+    void toggleFullScreen();
 
 public slots:
     void displayContour(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
 
 protected:
-    void wheelEvent(QWheelEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseDoubleClickEvent(QMouseEvent* event) override;
+    void wheelEvent(::QWheelEvent* event) override;
+    void mousePressEvent(::QMouseEvent* event) override;
+    void mouseDoubleClickEvent(::QMouseEvent* event) override;
+
     void resizeEvent(QResizeEvent* event) override;
 
 private slots:
@@ -45,19 +64,12 @@ private slots:
 
 private:
     void updatePixmap(const QImage& img);
-
-    void applyAutoView();
-    void updateDragMode();
     double getCurrentZoom() const;
 
     QGraphicsScene*        scene = nullptr;
     QGraphicsPixmapItem*  pixmapItem = nullptr;
 
     bool autoViewEnabled = true;
-
-    // --- Zoom / Pan ---
-    const double minZoom = 0.1;
-    const double maxZoom = 20.0;
 
     // --- Fullscreen ---
     bool isFullScreenMode = false;
@@ -81,6 +93,7 @@ private:
     ContourPointsItem* contourOutItem = nullptr;
     ContourPointsItem* contourInItem  = nullptr;
 
+    ImageViewInteraction* m_interaction = nullptr;
 };
 
 } // namespace ofeli_app

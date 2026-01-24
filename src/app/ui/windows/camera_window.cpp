@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include "camera_window.hpp"
+#include "pan_zoom_interaction.hpp"
 #include "frame_clock.hpp"
 
 #include <QSettings>
@@ -83,6 +84,9 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     videoView = new ImageView(this);
     videoView->setMaxDisplayFps(60.0);
+
+    auto panZoom = new PanZoomInteraction;
+    videoView->setInteraction(panZoom);
 
     cameraOverlay = new CameraOverlayWidget(this);
 

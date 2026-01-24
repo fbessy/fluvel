@@ -5,6 +5,7 @@
 #include "active_contour_worker.hpp"
 #include "preview_pipeline.hpp"
 #include "algo_info_overlay.hpp"
+#include "pan_zoom_interaction.hpp"
 
 #include <QMenuBar>
 #include <QToolBar>
@@ -73,6 +74,9 @@ void ImageWindow::setupUi()
 
     imageView = new ImageView(central);
     imageView->setMaxDisplayFps(60.0);
+
+    auto panZoom = new PanZoomInteraction;
+    imageView->setInteraction(panZoom);
 
     imageOverlay = new AlgoInfoOverlay(this);
     imageOverlay->raise();
