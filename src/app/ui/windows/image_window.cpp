@@ -265,7 +265,7 @@ void ImageWindow::setupConnections()
     }
     connect(this, &ImageWindow::fileSelected, imageController, &ImageController::loadImage);
 
-    //connect(deleteAct, &QAction::triggered, this, &ImageWindow::deleteList);
+    connect(deleteAct, &QAction::triggered, this, &ImageWindow::deleteList);
     //connect(saveAct, &QAction::triggered, this, &ImageWindow::saveImage);
     connect(exitAct, &QAction::triggered, this, &ImageWindow::close);
 
@@ -326,9 +326,24 @@ void ImageWindow::setupConnections()
             });
 }
 
-QString ImageWindow::strippedName(const QString &fullFileName)
+QString ImageWindow::strippedName(const QString &fullFilename)
 {
-    return QFileInfo(fullFileName).fileName();
+    return QFileInfo(fullFilename).fileName();
+}
+
+void ImageWindow::setCurrentFile(const QString &fileName)
+{
+    QSettings settings;
+    QStringList files = settings.value("Main/Name/recentFileList").toStringList();
+    files.removeAll(fileName);
+    files.prepend(fileName);
+    while( files.size() > MaxRecentFiles )
+    {
+        files.removeLast();
+    }
+
+    settings.setValue("Main/Name/recentFileList", files);
+    updateRecentFileActions();
 }
 
 void ImageWindow::updateRecentFileActions()
@@ -364,18 +379,25 @@ void ImageWindow::updateRecentFileActions()
     }
 }
 
+void ImageWindow::deleteList()
+{
+    QStringList files;
+    files.clear();
+
+    QSettings settings;
+    settings.setValue("Main/Name/recentFileList", files);
+
+    updateRecentFileActions();
+}
+
 void ImageWindow::updateCameraAction()
 {
     auto cameras = QMediaDevices::videoInputs();
 
-    if (cameras.isEmpty())
-    {
+    if ( cameras.isEmpty() )
         cameraAct->setEnabled(false);
-    }
     else
-    {
         cameraAct->setEnabled(true);
-    }
 }
 
 void ImageWindow::onStartCameraActionTriggered()
@@ -383,13 +405,9 @@ void ImageWindow::onStartCameraActionTriggered()
     auto cameras = QMediaDevices::videoInputs();
 
     if( cameras.isEmpty() )
-    {
         QMessageBox::information(this, tr("Information"), tr("No camera available."));
-    }
     else
-    {
         camera_window->show();
-    }
 }
 
 void ImageWindow::refreshAlgoOverlay()
@@ -425,7 +443,9 @@ void ImageWindow::onImageReady(const QImage& image)
 
 void ImageWindow::onFileSelected(const QString& path)
 {
-    m_fileName = QFileInfo(path).fileName();
+    setCurrentFile(path); // for recent file
+
+    m_fileName = strippedName(path);
     m_fullPath = path;
 
     updateWindowTitle();
@@ -437,13 +457,17 @@ void ImageWindow::updateWindowTitle()
 {
     QString title = "Ofeli";
 
-    if (!m_fileName.isEmpty() && m_imageSize.isValid() && m_channels > 0)
+    if (    !m_fileName.isEmpty()
+         && m_imageSize.isValid()
+         && m_channels > 0 )
     {
-        title += QString(" - %1 - %2×%3×%4")
+        const QString colorText = (m_channels == 1) ? "Gray" : "RGB";
+
+        title += QString(" - %1 - %2×%3 - %4")
                      .arg(m_fileName)
                      .arg(m_imageSize.width())
                      .arg(m_imageSize.height())
-                     .arg(m_channels);
+                     .arg(colorText);
     }
 
     setWindowTitle(title);

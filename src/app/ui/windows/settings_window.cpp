@@ -110,7 +110,8 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     settings_grid->setColumnStretch(1,1);
     setLayout(settings_grid);
 
-    last_directory_used = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
+    last_directory_used = settings.value("Main/Name/last_directory_used",
+                                         QDir().homePath()).toString();
 
     has_contours_hidden = true;
 

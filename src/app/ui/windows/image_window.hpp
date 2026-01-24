@@ -85,9 +85,10 @@ private:
 
     void updateWindowTitle();
 
-    void setCurrentFile(const QString &fileName1);
+    void setCurrentFile(const QString &fileName);
     void updateRecentFileActions();
-    QString strippedName(const QString &fullFileName);
+    void deleteList();
+    static QString strippedName(const QString &fullFileName);
 
     void updateCameraAction();
     void onStartCameraActionTriggered();
