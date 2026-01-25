@@ -5,7 +5,10 @@
 #include "active_contour_worker.hpp"
 #include "preview_pipeline.hpp"
 #include "algo_info_overlay.hpp"
-#include "pan_zoom_interaction.hpp"
+#include "interaction_set.hpp"
+#include "pan_behavior.hpp"
+#include "fullscreen_behavior.hpp"
+#include "autofit_behavior.hpp"
 
 #include <QMenuBar>
 #include <QToolBar>
@@ -75,11 +78,14 @@ void ImageWindow::setupUi()
     imageView = new ImageView(central);
     imageView->setMaxDisplayFps(60.0);
 
-    auto panZoom = new PanZoomInteraction;
-    imageView->setInteraction(panZoom);
+    auto interaction = std::make_unique<InteractionSet>();
+    interaction->addBehavior(std::make_unique<AutoFitBehavior>());
+    interaction->addBehavior(std::make_unique<FullscreenBehavior>());
+    interaction->addBehavior(std::make_unique<PanBehavior>());
+    imageView->setInteraction(interaction.release());
 
-    imageOverlay = new AlgoInfoOverlay(this);
-    imageOverlay->raise();
+    //imageOverlay = new AlgoInfoOverlay(imageView->viewport());
+    //imageOverlay->raise();
 
     // Assemblage
     mainLayout->addWidget(controlBar);

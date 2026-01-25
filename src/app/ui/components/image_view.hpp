@@ -46,16 +46,20 @@ public:
     void scaleView(double sx, double sy);
     void translateView(double dx, double dy);
     void enableAutoView(bool enable);
-    void toggleFullScreen();
+    void toggleFullscreen();
+    void applyAutoFit();
+    void userInteracted();
 
 public slots:
     void displayContour(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
 
 protected:
-    void wheelEvent(::QWheelEvent* event) override;
-    void mousePressEvent(::QMouseEvent* event) override;
-    void mouseDoubleClickEvent(::QMouseEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
 
     void resizeEvent(QResizeEvent* event) override;
 
@@ -70,6 +74,11 @@ private:
     QGraphicsPixmapItem*  pixmapItem = nullptr;
 
     bool autoViewEnabled = true;
+    bool autoFitEnabled = true;
+
+    // --- Zoom / Pan ---
+    const double minZoom = 0.1;
+    const double maxZoom = 20.0;
 
     // --- Fullscreen ---
     bool isFullScreenMode = false;

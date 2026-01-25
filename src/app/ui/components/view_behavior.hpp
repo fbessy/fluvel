@@ -1,5 +1,5 @@
-#ifndef IMAGE_VIEW_INTERACTION_HPP
-#define IMAGE_VIEW_INTERACTION_HPP
+// view_behavior.hpp
+#pragma once
 
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -9,10 +9,10 @@ namespace ofeli_app
 
 class ImageView;
 
-class ImageViewInteraction
+class ViewBehavior
 {
 public:
-    virtual ~ImageViewInteraction() = default;
+    virtual ~ViewBehavior() = default;
 
     virtual void wheel(ImageView&, QWheelEvent*) {}
     virtual void mousePress(ImageView&, QMouseEvent*) {}
@@ -22,5 +22,3 @@ public:
 };
 
 } // namespace ofeli_app
-
-#endif // IMAGE_VIEW_INTERACTION_HPP

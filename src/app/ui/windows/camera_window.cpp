@@ -38,8 +38,11 @@
 ****************************************************************************/
 
 #include "camera_window.hpp"
-#include "pan_zoom_interaction.hpp"
 #include "frame_clock.hpp"
+#include "interaction_set.hpp"
+#include "pan_behavior.hpp"
+#include "fullscreen_behavior.hpp"
+#include "autofit_behavior.hpp"
 
 #include <QSettings>
 #include <QMediaDevices>
@@ -85,8 +88,11 @@ CameraWindow::CameraWindow(QWidget* parent)
     videoView = new ImageView(this);
     videoView->setMaxDisplayFps(60.0);
 
-    auto panZoom = new PanZoomInteraction;
-    videoView->setInteraction(panZoom);
+    auto interaction = std::make_unique<InteractionSet>();
+    interaction->addBehavior(std::make_unique<AutoFitBehavior>());
+    interaction->addBehavior(std::make_unique<FullscreenBehavior>());
+    interaction->addBehavior(std::make_unique<PanBehavior>());
+    videoView->setInteraction(interaction.release());
 
     cameraOverlay = new CameraOverlayWidget(this);
 

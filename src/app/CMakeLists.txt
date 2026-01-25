@@ -61,6 +61,24 @@ set(app_src
     ${UI_COMP_DIR}/contour_rendering_qimage.cpp
     ${UI_COMP_DIR}/contour_rendering_qimage.hpp
 
+    ${UI_COMP_DIR}/image_view_interaction.hpp
+    ${UI_COMP_DIR}/interaction_set.cpp
+    ${UI_COMP_DIR}/interaction_set.hpp
+
+    ${UI_COMP_DIR}/view_behavior.hpp
+
+    ${UI_COMP_DIR}/fullscreen_behavior.cpp
+    ${UI_COMP_DIR}/fullscreen_behavior.hpp
+
+    ${UI_COMP_DIR}/autofit_behavior.cpp
+    ${UI_COMP_DIR}/autofit_behavior.hpp
+
+    ${UI_COMP_DIR}/pan_behavior.cpp
+    ${UI_COMP_DIR}/pan_behavior.hpp
+
+    ${UI_COMP_DIR}/zoom_behavior.cpp
+    ${UI_COMP_DIR}/zoom_behavior.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 
@@ -123,8 +141,6 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
-        ui/components/image_view_interaction.hpp
-        ui/components/pan_zoom_interaction.hpp ui/components/pan_zoom_interaction.cpp
     )
 endif()
 

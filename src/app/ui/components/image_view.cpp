@@ -23,6 +23,9 @@ ImageView::ImageView(QWidget* parent)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
 
+    //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     //AppSettings.instance().color_in
 
     contourOutItem = new ContourPointsItem;
@@ -173,7 +176,7 @@ void ImageView::updatePixmap(const QImage& img)
 
     if( needUpdateDragMode )
     {
-        updateDragMode();
+        //updateDragMode();
     }
 }
 
@@ -182,8 +185,8 @@ void ImageView::applyAutoView()
     if (!pixmapItem)
         return;
 
-    resetTransform();
-    fitInView(pixmapItem, Qt::KeepAspectRatio);
+    //resetTransform();
+    //fitInView(pixmapItem, Qt::KeepAspectRatio);
 }
 
 void ImageView::updateDragMode()
@@ -235,31 +238,41 @@ double ImageView::getCurrentZoom() const
     return transform().m11(); // scale X
 }
 
-void ImageView::toggleFullScreen()
+void ImageView::toggleFullscreen()
 {
     if (!isFullScreenMode)
     {
-        normalGeometry    = geometry();
-        normalWindowFlags = windowFlags();
+        normalGeometry = window()->geometry();
+        normalWindowFlags = window()->windowFlags();
+        window()->setWindowFlags(Qt::Window);
+        window()->showFullScreen();
 
-        setWindowFlags(Qt::Window);
-        showFullScreen();
         isFullScreenMode = true;
     }
     else
     {
-        setWindowFlags(normalWindowFlags);
-        showNormal();
-
-        QTimer::singleShot(0, this, [this]() {
-            setGeometry(normalGeometry);
-        });
-
+        window()->setWindowFlags(normalWindowFlags);
+        window()->showNormal();
+        window()->setGeometry(normalGeometry);
         isFullScreenMode = false;
     }
 }
 
-#if 0
+void ImageView::applyAutoFit()
+{
+    if (!pixmapItem)
+        return;
+
+    autoFitEnabled = true;
+    resetTransform();
+    fitInView(pixmapItem, Qt::KeepAspectRatio);
+}
+
+void ImageView::userInteracted()
+{
+    autoFitEnabled = false;
+}
+
 // ------------------------------------------------------------
 // Interaction
 // ------------------------------------------------------------
@@ -285,9 +298,9 @@ void ImageView::wheelEvent(QWheelEvent* event)
     QPointF delta = scenePosAfter - scenePosBefore;
     translate(delta.x(), delta.y());
 
-    autoViewEnabled = false;
+    autoFitEnabled = false;
 
-    updateDragMode();
+    //updateDragMode();
 
 #ifdef OFELI_DEBUG
     qDebug()
@@ -298,7 +311,7 @@ void ImageView::wheelEvent(QWheelEvent* event)
 #endif
 }
 
-void ImageView::mousePressEvent(QMouseEvent* event)
+/*void ImageView::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::MiddleButton) {
         autoViewEnabled = true;
@@ -311,9 +324,9 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     }
 
     QGraphicsView::mousePressEvent(event);
-}
+}*/
 
-void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
+/*void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 {
     Q_UNUSED(event);
 
@@ -342,18 +355,17 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
     }
 
     updateDragMode();
-}
-#endif
+}*/
 
 void ImageView::resizeEvent(QResizeEvent* event)
 {
     QGraphicsView::resizeEvent(event);
 
-    if ( autoViewEnabled ) {
-        applyAutoView();
+    if ( autoFitEnabled ) {
+        applyAutoFit();
     }
 
-    updateDragMode();
+    //updateDragMode();
 }
 
 QImage ImageView::currentImage() const
@@ -366,7 +378,7 @@ void ImageView::setInteraction(ImageViewInteraction* interaction)
     m_interaction = interaction;
 }
 
-void ImageView::wheelEvent(::QWheelEvent* event)
+/*void ImageView::wheelEvent(QWheelEvent* event)
 {
     if (m_interaction)
     {
@@ -376,30 +388,42 @@ void ImageView::wheelEvent(::QWheelEvent* event)
     }
 
     QGraphicsView::wheelEvent(event);
-}
+}*/
 
-void ImageView::mousePressEvent(::QMouseEvent* event)
+void ImageView::mousePressEvent(QMouseEvent* event)
 {
-    if (m_interaction)
-    {
+    if ( m_interaction )
         m_interaction->mousePress(*this, event);
-        event->accept();
-        return;
-    }
 
-    QGraphicsView::mousePressEvent(event);
+    if ( !event->isAccepted() )
+        QGraphicsView::mousePressEvent(event);
 }
 
-void ImageView::mouseDoubleClickEvent(::QMouseEvent* event)
+void ImageView::mouseMoveEvent(QMouseEvent* event)
+{
+    if ( m_interaction )
+        m_interaction->mouseMove(*this, event);
+
+    if ( !event->isAccepted() )
+        QGraphicsView::mouseMoveEvent(event);
+}
+
+void ImageView::mouseReleaseEvent(QMouseEvent* event)
+{
+    if ( m_interaction )
+        m_interaction->mouseRelease(*this, event);
+
+    if ( !event->isAccepted() )
+        QGraphicsView::mouseReleaseEvent(event);
+}
+
+void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 {
     if (m_interaction)
-    {
         m_interaction->mouseDoubleClick(*this, event);
-        event->accept();
-        return;
-    }
 
-    QGraphicsView::mouseDoubleClickEvent(event);
+    if ( !event->isAccepted() )
+        QGraphicsView::mouseDoubleClickEvent(event);
 }
 
 } // namespace ofeli_app

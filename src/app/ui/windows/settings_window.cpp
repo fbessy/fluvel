@@ -52,6 +52,9 @@
 #include "phi_view_model.hpp"
 #include "shape_type.hpp"
 
+#include "interaction_set.hpp"
+#include "zoom_behavior.hpp"
+
 #include <QtWidgets>
 
 #include <stack>
@@ -100,6 +103,11 @@ SettingsWindow::SettingsWindow(QWidget* parent,
 
 
     settingsView = new ImageView(this);
+
+    //auto interaction = std::make_unique<InteractionSet>();
+    //interaction->addBehavior(std::make_unique<ZoomBehavior>());
+
+    //settingsView->setInteraction(interaction.release());
 
     QGridLayout *settings_grid = new QGridLayout;
     settings_grid->addWidget(tabs,0,0);

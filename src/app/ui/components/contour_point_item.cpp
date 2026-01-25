@@ -9,6 +9,11 @@ namespace ofeli_app
 ContourPointsItem::ContourPointsItem()
 {
     setTransformOriginPoint(0, 0);
+
+    setAcceptedMouseButtons(Qt::NoButton);
+    setAcceptHoverEvents(false);
+    setFlag(QGraphicsItem::ItemIsSelectable, false);
+    setFlag(QGraphicsItem::ItemIsFocusable, false);
 }
 
 void ContourPointsItem::setPoints(const QVector<QPoint>& pts)
