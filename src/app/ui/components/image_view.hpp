@@ -40,12 +40,10 @@ public:
     QImage currentImage() const;
     void setInteraction(ImageViewInteraction* interaction);
 
-    void applyAutoView();
-    void updateDragMode();
     double currentZoom() const;
     void scaleView(double sx, double sy);
     void translateView(double dx, double dy);
-    void enableAutoView(bool enable);
+
     void toggleFullscreen();
     void applyAutoFit();
     void userInteracted();
@@ -73,7 +71,6 @@ private:
     QGraphicsScene*        scene = nullptr;
     QGraphicsPixmapItem*  pixmapItem = nullptr;
 
-    bool autoViewEnabled = true;
     bool autoFitEnabled = true;
 
     // --- Zoom / Pan ---

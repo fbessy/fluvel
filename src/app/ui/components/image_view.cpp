@@ -23,9 +23,6 @@ ImageView::ImageView(QWidget* parent)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
 
-    //setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
     //AppSettings.instance().color_in
 
     contourOutItem = new ContourPointsItem;
@@ -141,17 +138,10 @@ void ImageView::flushPendingFrame()
 
 void ImageView::updatePixmap(const QImage& img)
 {
-    bool needUpdateDragMode = false;
-
-    if( lastDisplayedImage.width()  != img.width() ||
-        lastDisplayedImage.height() != img.height()   )
-    {
-        needUpdateDragMode = true;
-    }
+    const bool newImage = !pixmapItem ||
+                          pixmapItem->pixmap().size() != img.size();
 
     lastDisplayedImage = img;
-
-    const bool firstFrame = (pixmapItem == nullptr);
 
     if (!pixmapItem)
     {
@@ -163,53 +153,11 @@ void ImageView::updatePixmap(const QImage& img)
         pixmapItem->setZValue(0);
         pixmapItem->setPixmap(QPixmap::fromImage(img));
     }
-
-
-
     scene->setSceneRect(pixmapItem->boundingRect());
 
-    if (firstFrame || autoViewEnabled)
+    if (newImage)
     {
-        applyAutoView();
-        needUpdateDragMode = true;
-    }
-
-    if( needUpdateDragMode )
-    {
-        //updateDragMode();
-    }
-}
-
-void ImageView::applyAutoView()
-{
-    if (!pixmapItem)
-        return;
-
-    //resetTransform();
-    //fitInView(pixmapItem, Qt::KeepAspectRatio);
-}
-
-void ImageView::updateDragMode()
-{
-    if ( !scene )
-        return;
-
-    if ( autoViewEnabled )
-    {
-        setDragMode(QGraphicsView::NoDrag);
-    }
-    else
-    {
-        QRectF sceneRect = scene->sceneRect();
-        QRectF viewRect  = mapToScene(viewport()->rect()).boundingRect();
-
-        bool canPan =
-            sceneRect.width()  > viewRect.width() ||
-            sceneRect.height() > viewRect.height();
-
-        setDragMode(canPan
-                        ? QGraphicsView::ScrollHandDrag
-                        : QGraphicsView::NoDrag);
+        applyAutoFit();
     }
 }
 
@@ -226,11 +174,6 @@ void ImageView::scaleView(double sx, double sy)
 void ImageView::translateView(double dx, double dy)
 {
     translate(dx, dy);
-}
-
-void ImageView::enableAutoView(bool enable)
-{
-    autoViewEnabled = enable;
 }
 
 double ImageView::getCurrentZoom() const
@@ -300,8 +243,6 @@ void ImageView::wheelEvent(QWheelEvent* event)
 
     autoFitEnabled = false;
 
-    //updateDragMode();
-
 #ifdef OFELI_DEBUG
     qDebug()
         << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
@@ -311,61 +252,12 @@ void ImageView::wheelEvent(QWheelEvent* event)
 #endif
 }
 
-/*void ImageView::mousePressEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::MiddleButton) {
-        autoViewEnabled = true;
-
-        applyAutoView();
-        updateDragMode();
-
-        event->accept();
-        return;
-    }
-
-    QGraphicsView::mousePressEvent(event);
-}*/
-
-/*void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
-{
-    Q_UNUSED(event);
-
-    if (!isFullScreenMode)
-    {
-        normalGeometry = geometry();
-        normalWindowFlags = windowFlags();
-
-        setWindowFlags(Qt::Window);
-        showFullScreen();
-        isFullScreenMode = true;
-
-        autoViewEnabled = true;
-        applyAutoView();
-    }
-    else
-    {
-        setWindowFlags(normalWindowFlags);
-        showNormal();
-
-        QTimer::singleShot(0, this, [this]() {
-            setGeometry(normalGeometry);
-        });
-
-        isFullScreenMode = false;
-    }
-
-    updateDragMode();
-}*/
-
 void ImageView::resizeEvent(QResizeEvent* event)
 {
     QGraphicsView::resizeEvent(event);
 
-    if ( autoFitEnabled ) {
+    if (autoFitEnabled)
         applyAutoFit();
-    }
-
-    //updateDragMode();
 }
 
 QImage ImageView::currentImage() const
