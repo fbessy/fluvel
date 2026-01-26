@@ -260,11 +260,6 @@ void ImageView::resizeEvent(QResizeEvent* event)
         applyAutoFit();
 }
 
-QImage ImageView::currentImage() const
-{
-    return lastDisplayedImage;
-}
-
 void ImageView::setInteraction(ImageViewInteraction* interaction)
 {
     m_interaction = interaction;
@@ -316,6 +311,58 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 
     if ( !event->isAccepted() )
         QGraphicsView::mouseDoubleClickEvent(event);
+}
+
+QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
+{
+    if (!pixmapItem)
+        return QPoint(-1, -1);
+
+    QPointF scenePos = mapToScene(viewPos);
+    QPointF itemPos  = pixmapItem->mapFromScene(scenePos);
+
+    QPoint p = itemPos.toPoint();
+
+    if (!pixmapItem->boundingRect().contains(p))
+        return QPoint(-1, -1);
+
+    return p;
+}
+
+QColor ImageView::pixelColorAt(const QPoint& imagePos) const
+{
+    if (!lastDisplayedImage.valid(imagePos))
+        return QColor();
+
+    return QColor::fromRgb(lastDisplayedImage.pixel(imagePos));
+}
+
+QImage ImageView::currentImage() const
+{
+    return lastDisplayedImage;
+}
+
+QImage ImageView::renderToImage() const
+{
+    if (!scene || scene->sceneRect().isEmpty())
+        return QImage();
+
+    QRectF rect = scene->sceneRect();
+
+    QImage img(rect.size().toSize(),
+               QImage::Format_ARGB32_Premultiplied);
+    img.fill(Qt::transparent);
+
+    QPainter painter(&img);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
+    scene->render(&painter,
+                  QRectF(img.rect()),
+                  rect,
+                  Qt::IgnoreAspectRatio);
+
+    return img;
 }
 
 } // namespace ofeli_app

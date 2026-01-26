@@ -38,6 +38,8 @@ public:
     void setMaxDisplayFps(double fps);
 
     QImage currentImage() const;
+    QImage renderToImage() const;
+
     void setInteraction(ImageViewInteraction* interaction);
 
     double currentZoom() const;
@@ -47,6 +49,9 @@ public:
     void toggleFullscreen();
     void applyAutoFit();
     void userInteracted();
+
+    QPoint imageCoordinatesFromView(const QPoint& viewPos) const;
+    QColor pixelColorAt(const QPoint& imagePos) const;
 
 public slots:
     void displayContour(const QVector<QPoint>& out,

@@ -93,6 +93,9 @@ private:
     void updateCameraAction();
     void onStartCameraActionTriggered();
 
+    void saveDisplayed();
+    static QString makeUniqueFileName(const QString& filePath);
+
     // --- UI ---
     CameraWindow* camera_window = nullptr;
     AnalysisWindow* evaluation_window = nullptr;

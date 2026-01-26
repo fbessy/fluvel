@@ -119,7 +119,7 @@ void ImageWindow::setupActions()
 
     saveAct = new QAction(tr("S&ave..."), this);
     saveAct->setShortcut(tr("Ctrl+A"));
-    saveAct->setEnabled(false);
+    saveAct->setEnabled(true);
     saveAct->setStatusTip(tr("Save the displayed and preprocessed images."));
 
     saveAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentSaveAs,
@@ -276,7 +276,7 @@ void ImageWindow::setupConnections()
     connect(this, &ImageWindow::fileSelected, imageController, &ImageController::loadImage);
 
     connect(deleteAct, &QAction::triggered, this, &ImageWindow::deleteList);
-    //connect(saveAct, &QAction::triggered, this, &ImageWindow::saveImage);
+    connect(saveAct, &QAction::triggered, this, &ImageWindow::saveDisplayed);
     connect(exitAct, &QAction::triggered, this, &ImageWindow::close);
 
     connect(cameraAct, &QAction::triggered, this, &ImageWindow::onStartCameraActionTriggered);
@@ -481,6 +481,68 @@ void ImageWindow::updateWindowTitle()
     }
 
     setWindowTitle(title);
+}
+
+void ImageWindow::saveDisplayed()
+{
+    QImage displayed = imageView->renderToImage();
+    if (displayed.isNull())
+        return;
+
+    QString baseName = m_fileName.isEmpty()
+                           ? "displayed"
+                           : QFileInfo(m_fileName).baseName();
+
+    QString selectedFilter;
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Save displayed image"),
+        last_directory_used + "/" + baseName,
+        tr("PNG (*.png);;JPG (*.jpg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm)"),
+        &selectedFilter
+        );
+
+    if (fileName.isEmpty())
+        return; // Cancel
+
+    // 🔑 déduire l’extension à partir du filtre
+    QString extension;
+    if      (selectedFilter.contains("*.png")) extension = "png";
+    else if (selectedFilter.contains("*.jpg")) extension = "jpg";
+    else if (selectedFilter.contains("*.bmp")) extension = "bmp";
+    else if (selectedFilter.contains("*.ppm")) extension = "ppm";
+    else if (selectedFilter.contains("*.xbm")) extension = "xbm";
+    else if (selectedFilter.contains("*.xpm")) extension = "xpm";
+
+    QFileInfo fi(fileName);
+    if (fi.suffix().isEmpty())
+        fileName += "." + extension;
+
+    fileName = makeUniqueFileName( fileName );
+    displayed.save(fileName);
+}
+
+QString ImageWindow::makeUniqueFileName(const QString& filePath)
+{
+    QFileInfo fi(filePath);
+    QString base = fi.completeBaseName();
+    QString ext  = fi.suffix();
+    QDir dir = fi.dir();
+
+    QString candidate = filePath;
+    int index = 1;
+
+    while (QFile::exists(candidate))
+    {
+        candidate = dir.filePath(
+            QString("%1 (%2).%3")
+                .arg(base)
+                .arg(index++)
+                .arg(ext)
+            );
+    }
+
+    return candidate;
 }
 
 }
