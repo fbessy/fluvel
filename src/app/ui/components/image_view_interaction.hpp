@@ -4,6 +4,8 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 
+#include <QtCore/Qt>
+
 namespace ofeli_app
 {
 
@@ -19,6 +21,12 @@ public:
     virtual void mouseMove(ImageView&, QMouseEvent*) {}
     virtual void mouseRelease(ImageView&, QMouseEvent*) {}
     virtual void mouseDoubleClick(ImageView&, QMouseEvent*) {}
+
+    virtual Qt::CursorShape cursorForEvent(
+        const ImageView& view,
+        bool hasImage,
+        bool isPanRelevant,
+        const QMouseEvent* event) const {}
 };
 
 } // namespace ofeli_app

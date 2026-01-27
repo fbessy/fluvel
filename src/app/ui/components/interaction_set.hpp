@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include <QtCore/Qt>
+
 #include "image_view_interaction.hpp"
 #include "view_behavior.hpp"
 
@@ -31,12 +33,25 @@ public:
 
     void addBehavior(std::unique_ptr<ViewBehavior> behavior);
 
+    const ViewBehavior* capturingBehavior() const;
+
+    Qt::CursorShape cursor(const ImageView& view,
+                           bool hasImage,
+                           bool isPanRelevant,
+                           const QMouseEvent* e) const;
+
 protected:
     void wheel(ImageView& view, QWheelEvent* event) override;
     void mousePress(ImageView& view, QMouseEvent* event) override;
     void mouseMove(ImageView& view, QMouseEvent* event) override;
     void mouseRelease(ImageView& view, QMouseEvent* event) override;
     void mouseDoubleClick(ImageView& view, QMouseEvent* event) override;
+
+    Qt::CursorShape cursorForEvent(
+        const ImageView& view,
+        bool hasImage,
+        bool isPanRelevant,
+        const QMouseEvent* event) const override;
 
 private:
     std::vector<std::unique_ptr<ViewBehavior>> behaviors_;

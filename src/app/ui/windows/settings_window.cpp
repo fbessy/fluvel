@@ -972,7 +972,7 @@ void SettingsWindow::setupConnections()
     connect(phiViewModel_,
             &PhiViewModel::viewChanged,
             settingsView,
-            &ImageView::displayImage);
+            &ImageView::setImage);
 
     phiViewModel_->onConnectivityChanged( connectivity_cb->currentIndex() );
 

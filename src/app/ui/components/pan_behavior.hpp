@@ -16,9 +16,33 @@ public:
     void mouseMove(ImageView& view, QMouseEvent* event) override;
     void mouseRelease(ImageView& view, QMouseEvent* event) override;
 
+    bool isCapturing() const override
+    {
+        return capturing_;
+    }
+
+    Qt::CursorShape activeCursor() const override
+    {
+        return Qt::ClosedHandCursor;
+    }
+
+    Qt::CursorShape availableCursor(
+        bool hasImage,
+        bool isPanRelevant,
+        const ImageView&,
+        const QMouseEvent*) const override
+    {
+        if (hasImage && isPanRelevant)
+            return Qt::OpenHandCursor;
+
+        return Qt::ArrowCursor;
+    }
+
+    int priority() const override { return 10; }
+
 private:
     Qt::MouseButton button_;
-    bool dragging_ = false;
+    bool capturing_ = false;
     QPoint lastPos_;
 };
 

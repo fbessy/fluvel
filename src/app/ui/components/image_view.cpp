@@ -57,7 +57,7 @@ void ImageView::setMaxDisplayFps(double fps)
     minDisplayIntervalMs = static_cast<int>(1000.0 / fps);
 }
 
-void ImageView::displayImage(const QImage& img)
+void ImageView::setImage(const QImage& img)
 {
     // Toujours garder la dernière image
     pendingFrame = img;
@@ -243,6 +243,12 @@ void ImageView::wheelEvent(QWheelEvent* event)
 
     autoFitEnabled = false;
 
+    if (m_interaction)
+        setCursor(m_interaction->cursorForEvent(*this,
+                                                hasImage(),
+                                                isPanRelevant(),
+                                                nullptr));
+
 #ifdef OFELI_DEBUG
     qDebug()
         << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
@@ -280,7 +286,13 @@ void ImageView::setInteraction(ImageViewInteraction* interaction)
 void ImageView::mousePressEvent(QMouseEvent* event)
 {
     if ( m_interaction )
+    {
         m_interaction->mousePress(*this, event);
+        setCursor(m_interaction->cursorForEvent(*this,
+                                                hasImage(),
+                                                isPanRelevant(),
+                                                event));
+    }
 
     if ( !event->isAccepted() )
         QGraphicsView::mousePressEvent(event);
@@ -289,7 +301,13 @@ void ImageView::mousePressEvent(QMouseEvent* event)
 void ImageView::mouseMoveEvent(QMouseEvent* event)
 {
     if ( m_interaction )
+    {
         m_interaction->mouseMove(*this, event);
+        setCursor(m_interaction->cursorForEvent(*this,
+                                                hasImage(),
+                                                isPanRelevant(),
+                                                event));
+    }
 
     if ( !event->isAccepted() )
         QGraphicsView::mouseMoveEvent(event);
@@ -298,7 +316,13 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
 void ImageView::mouseReleaseEvent(QMouseEvent* event)
 {
     if ( m_interaction )
+    {
         m_interaction->mouseRelease(*this, event);
+        setCursor(m_interaction->cursorForEvent(*this,
+                                                hasImage(),
+                                                isPanRelevant(),
+                                                event));
+    }
 
     if ( !event->isAccepted() )
         QGraphicsView::mouseReleaseEvent(event);
@@ -318,15 +342,27 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
     if (!pixmapItem)
         return QPoint(-1, -1);
 
-    QPointF scenePos = mapToScene(viewPos);
-    QPointF itemPos  = pixmapItem->mapFromScene(scenePos);
+    const QPointF scenePos = mapToScene(viewPos);
 
-    QPoint p = itemPos.toPoint();
+    QPointF itemPos = pixmapItem->mapFromScene(scenePos);
 
-    if (!pixmapItem->boundingRect().contains(p))
+    const int x = static_cast<int>(std::floor(itemPos.x()));
+    const int y = static_cast<int>(std::floor(itemPos.y()));
+    const QPoint p(x, y);
+
+    if (!pixmapItem->boundingRect().contains(QPointF(p)))
         return QPoint(-1, -1);
 
     return p;
+}
+
+void ImageView::enterEvent(QEnterEvent*)
+{
+    if (m_interaction)
+        setCursor(m_interaction->cursorForEvent(*this,
+                                                hasImage(),
+                                                isPanRelevant(),
+                                                nullptr));
 }
 
 QColor ImageView::pixelColorAt(const QPoint& imagePos) const
@@ -337,14 +373,26 @@ QColor ImageView::pixelColorAt(const QPoint& imagePos) const
     return QColor::fromRgb(lastDisplayedImage.pixel(imagePos));
 }
 
-QImage ImageView::currentImage() const
+void ImageView::setListener(ImageViewListener* listener)
+{
+    listener_ = listener;
+}
+
+void ImageView::onColorPicked(const QColor& color,
+                              const QPoint& imagePos)
+{
+    if (listener_)
+        listener_->onColorPicked(color, imagePos);
+}
+
+const QImage& ImageView::image() const
 {
     return lastDisplayedImage;
 }
 
 QImage ImageView::renderToImage() const
 {
-    if (!scene || scene->sceneRect().isEmpty())
+    if ( !scene || scene->sceneRect().isEmpty() )
         return QImage();
 
     QRectF rect = scene->sceneRect();
@@ -363,6 +411,23 @@ QImage ImageView::renderToImage() const
                   Qt::IgnoreAspectRatio);
 
     return img;
+}
+
+bool ImageView::hasImage() const
+{
+    return pixmapItem != nullptr;
+}
+
+bool ImageView::isPanRelevant() const
+{
+    if (!hasImage())
+        return false;
+
+    const QRectF sceneRect = scene->sceneRect();
+    const QRectF viewRect  = mapToScene(viewport()->rect()).boundingRect();
+
+    return sceneRect.width()  > viewRect.width()
+           || sceneRect.height() > viewRect.height();
 }
 
 } // namespace ofeli_app

@@ -43,6 +43,7 @@
 #include <QWidget>
 #include "shape.hpp"
 #include "contour_rendering_qimage.hpp"
+#include "image_view_listener.hpp"
 
 QT_BEGIN_NAMESPACE
 class QSpinBox;
@@ -55,10 +56,10 @@ QT_END_NAMESPACE
 namespace ofeli_app
 {
 
-class PixmapWidget;
-class ScrollAreaWidget;
+class ImageView;
 
-class AnalysisWidget : public QWidget
+class AnalysisWidget : public QWidget,
+                       public ImageViewListener
 {
     Q_OBJECT
 
@@ -79,22 +80,10 @@ private :
 
     void create_list();
 
-    virtual bool eventFilter(QObject* object, QEvent* event) override;
-
-    virtual void dragEnterEvent(QDragEnterEvent* event) override;
-    virtual void dragMoveEvent(QDragMoveEvent* event) override;
-    virtual void dropEvent(QDropEvent* event) override;
-    virtual void dragLeaveEvent(QDragLeaveEvent* event) override;
-
-    virtual void mouseMoveEvent(QMouseEvent* event) override;
-    virtual void mousePressEvent(QMouseEvent* event) override;
-
     QLabel* text_list_length;
     QString absolute_name;
     QLabel* name_label;
-    PixmapWidget* img_disp;
-    ScrollAreaWidget* area;
-    QSpinBox* scale_spin;
+    ImageView* imageView;
     QPushButton* open_button;
 
     QComboBox* color_list;
@@ -105,8 +94,6 @@ private :
     QImage img_noise;
     int img_width;
     int img_height;
-    int X_position;
-    int Y_position;
 
     ofeli_ip::Shape shape;
     RgbColor rgb;
@@ -122,20 +109,13 @@ private slots :
     void open_filename();
     void open_img();
     void get_list_color();
-
-    void scale_img_disp(int value);
-
-    void adjust_vertical_scroll(int min, int max);
-    void adjust_horizontal_scroll(int min, int max);
-
-    void wheel_zoom(int val, ScrollAreaWidget* obj);
-
     void refresh_rgb(int);
     void refresh_img_noise(int noise_percent);
+    void onColorPicked(const QColor& color,
+                       const QPoint& imagePos) override;
 
 signals :
 
-    void changed(const QMimeData* mimeData = nullptr);
     void change_list();
 
 };

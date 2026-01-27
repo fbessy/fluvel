@@ -142,6 +142,7 @@ else()
     qt_add_executable(${target_name}
         ${app_src}
         ui/components/color_picker_behavior.hpp ui/components/color_picker_behavior.cpp
+        ui/components/image_view_listener.hpp
     )
 endif()
 

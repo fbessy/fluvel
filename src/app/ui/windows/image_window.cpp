@@ -290,7 +290,7 @@ void ImageWindow::setupConnections()
     connect(imageController, &ImageController::imageReady, this,
             [this](const QImage& img) {
                 imageView->clearOverlays();
-                imageView->displayImage(img);
+                imageView->setImage(img);
                 imageView->updateSceneRectForImage();
             });
 
@@ -300,7 +300,7 @@ void ImageWindow::setupConnections()
 
     // former display with a qimage with the contour
     connect(acWorker.get(),  &ActiveContourWorker::resultReady,
-            imageView, &ImageView::displayImage);
+            imageView, &ImageView::setImage);
 
     connect(acWorker.get(),
             &ActiveContourWorker::contourUpdated,

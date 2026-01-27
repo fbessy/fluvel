@@ -9,6 +9,7 @@
 #include <QImage>
 
 #include "contour_point_item.hpp"
+#include "image_view_listener.hpp"
 
 
 class QWheelEvent;
@@ -29,7 +30,7 @@ public:
     explicit ImageView(QWidget* parent = nullptr);
 
     // Affichage image (thread-safe via event loop)
-    void displayImage(const QImage& img);
+    void setImage(const QImage& img);
 
     void clearOverlays();
     void updateSceneRectForImage();
@@ -37,7 +38,7 @@ public:
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);
 
-    QImage currentImage() const;
+    const QImage& image() const;
     QImage renderToImage() const;
 
     void setInteraction(ImageViewInteraction* interaction);
@@ -53,6 +54,13 @@ public:
     QPoint imageCoordinatesFromView(const QPoint& viewPos) const;
     QColor pixelColorAt(const QPoint& imagePos) const;
 
+    void setListener(ImageViewListener* listener);
+    void onColorPicked(const QColor& color,
+                       const QPoint& imagePos);
+
+    bool hasImage() const;
+    bool isPanRelevant() const;
+
 public slots:
     void displayContour(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
@@ -63,6 +71,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseDoubleClickEvent(QMouseEvent* event) override;
+    void enterEvent(QEnterEvent*) override;
 
     void resizeEvent(QResizeEvent* event) override;
 
@@ -105,6 +114,10 @@ private:
     ContourPointsItem* contourInItem  = nullptr;
 
     ImageViewInteraction* m_interaction = nullptr;
+    ImageViewListener*        listener_ = nullptr;
+
+signals:
+    void imageClicked(int x, int y);
 };
 
 } // namespace ofeli_app

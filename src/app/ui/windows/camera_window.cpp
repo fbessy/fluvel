@@ -178,7 +178,7 @@ void CameraWindow::startCamera(const QCameraDevice& device)
         connect(ac_thread, &VideoActiveContourThread::frameResultReady,
                 this, [this](const QImage& img, qint64 recvTs)
                 {
-                    videoView->displayImage(img);
+                    videoView->setImage(img);
 
                     const qint64 displayTs = FrameClock::nowNs();
                     frameStats.frameDisplayed(recvTs, displayTs); // ✅ display + latence

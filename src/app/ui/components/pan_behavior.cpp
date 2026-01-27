@@ -14,9 +14,9 @@ PanBehavior::PanBehavior(Qt::MouseButton button)
 void PanBehavior::mousePress(ImageView&,
                              QMouseEvent* e)
 {
-    if (e->button() == Qt::LeftButton)
+    if (e->button() == button_)
     {
-        dragging_ = true;
+        capturing_ = true;
         lastPos_ = e->pos();
         // ❌ pas de accept ici
     }
@@ -25,7 +25,7 @@ void PanBehavior::mousePress(ImageView&,
 void PanBehavior::mouseMove(ImageView& view,
                             QMouseEvent* e)
 {
-    if (!dragging_)
+    if (!capturing_)
         return;
 
     QPoint delta = e->pos() - lastPos_;
@@ -42,9 +42,9 @@ void PanBehavior::mouseMove(ImageView& view,
 void PanBehavior::mouseRelease(ImageView&,
                                QMouseEvent* e)
 {
-    if (e->button() == Qt::LeftButton)
+    if (e->button() == button_)
     {
-        dragging_ = false;
+        capturing_ = false;
         e->accept();
     }
 }

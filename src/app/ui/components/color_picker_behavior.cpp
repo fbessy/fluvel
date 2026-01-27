@@ -1,16 +1,17 @@
 #include "color_picker_behavior.hpp"
+#include "image_view.hpp"
 
 namespace ofeli_app
 {
 
-ColorPickerBehavior::ColorPickerBehavior(bool singleShot)
-    : singleShot_(singleShot)
+ColorPickerBehavior::ColorPickerBehavior(Qt::MouseButton button)
+    : button_(button)
 {
 }
 
 void ColorPickerBehavior::mousePress(ImageView& view, QMouseEvent* e)
 {
-    if (e->button() != Qt::LeftButton)
+    if (e->button() != button_)
         return;
 
     QPoint imgPos = view.imageCoordinatesFromView(e->pos());
@@ -21,13 +22,9 @@ void ColorPickerBehavior::mousePress(ImageView& view, QMouseEvent* e)
     if (!color.isValid())
         return;
 
-    if (onColorPicked)
-        onColorPicked(color, imgPos);
+    view.onColorPicked(color, imgPos);
 
     e->accept();
-
-    //if (singleShot_)
-        //view.removeBehavior(this); // ou désactivation externe
 }
 
 }

@@ -20,14 +20,27 @@ class ImageView;
 class ColorPickerBehavior : public ViewBehavior
 {
 public:
-    explicit ColorPickerBehavior(bool singleShot = false);
+    explicit ColorPickerBehavior(Qt::MouseButton button = Qt::RightButton);
 
-    void mousePress(ImageView&, QMouseEvent*) override;
+    Qt::CursorShape availableCursor(
+        bool hasImage,
+        bool /*isZoomed*/,
+        const ImageView&,
+        const QMouseEvent*) const override
+    {
+        return hasImage ? Qt::CrossCursor : Qt::ArrowCursor;
+    }
 
-    std::function<void(const QColor&, const QPoint&)> onColorPicked;
+    int priority() const override { return 30; }
+
+protected:
+    void mousePress(ImageView& view, QMouseEvent* e) override;
 
 private:
-    bool singleShot_;
+    Qt::MouseButton button_;
+
+signals:
+    void colorPicked(const QColor& color, const QPoint& imgPos);
 };
 
 }
