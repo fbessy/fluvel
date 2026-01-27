@@ -37,14 +37,8 @@ set(app_src
     ${UI_COMP_DIR}/analysis_widget.cpp
     ${UI_COMP_DIR}/analysis_widget.hpp
 
-    ${UI_COMP_DIR}/pixmap_widget.cpp
-    ${UI_COMP_DIR}/pixmap_widget.hpp
-
     ${UI_COMP_DIR}/kernel_size_spinbox.cpp
     ${UI_COMP_DIR}/kernel_size_spinbox.hpp
-
-    ${UI_COMP_DIR}/scroll_area_widget.cpp
-    ${UI_COMP_DIR}/scroll_area_widget.hpp
 
     ${UI_COMP_DIR}/frame_stats_view.cpp
     ${UI_COMP_DIR}/frame_stats_view.hpp
@@ -78,6 +72,11 @@ set(app_src
 
     ${UI_COMP_DIR}/zoom_behavior.cpp
     ${UI_COMP_DIR}/zoom_behavior.hpp
+
+    ${UI_COMP_DIR}/color_picker_behavior.cpp
+    ${UI_COMP_DIR}/color_picker_behavior.hpp
+
+    ${UI_COMP_DIR}/image_view_listener.hpp
 
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
@@ -141,8 +140,6 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
-        ui/components/color_picker_behavior.hpp ui/components/color_picker_behavior.cpp
-        ui/components/image_view_listener.hpp
     )
 endif()
 

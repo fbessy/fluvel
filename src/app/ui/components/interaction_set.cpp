@@ -53,8 +53,6 @@ const ViewBehavior* InteractionSet::capturingBehavior() const
 {
     for (const auto& b : behaviors_)
     {
-
-        qDebug() << "capturing ?" << b.get() << b->isCapturing();
         if (b->isCapturing())
             return b.get();
 

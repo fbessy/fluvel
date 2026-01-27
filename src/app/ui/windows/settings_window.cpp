@@ -43,8 +43,6 @@
 
 #include "image_window.hpp"
 #include "filters.hpp"
-#include "pixmap_widget.hpp"
-#include "scroll_area_widget.hpp"
 #include "kernel_size_spinbox.hpp"
 #include "boundary_builder.hpp"
 #include "active_contour.hpp"

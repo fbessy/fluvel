@@ -41,10 +41,7 @@
 #define SETTINGS_WINDOW_HPP
 
 #include "application_settings.hpp"
-
 #include "filters.hpp"
-#include "pixmap_widget.hpp"
-#include "scroll_area_widget.hpp"
 #include "kernel_size_spinbox.hpp"
 #include "grid2d.hpp"
 #include "contour_rendering_qimage.hpp"
