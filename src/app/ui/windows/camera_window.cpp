@@ -43,6 +43,7 @@
 #include "pan_behavior.hpp"
 #include "fullscreen_behavior.hpp"
 #include "autofit_behavior.hpp"
+#include "pixel_info_behavior.hpp"
 
 #include <QSettings>
 #include <QMediaDevices>
@@ -92,6 +93,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
+    interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
     videoView->setInteraction(interaction.release());
 
     cameraOverlay = new CameraOverlayWidget(this);

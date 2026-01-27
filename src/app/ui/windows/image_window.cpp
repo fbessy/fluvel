@@ -9,6 +9,7 @@
 #include "pan_behavior.hpp"
 #include "fullscreen_behavior.hpp"
 #include "autofit_behavior.hpp"
+#include "pixel_info_behavior.hpp"
 
 #include <QMenuBar>
 #include <QToolBar>
@@ -82,10 +83,12 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
+    interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
+
     imageView->setInteraction(interaction.release());
 
-    //imageOverlay = new AlgoInfoOverlay(imageView->viewport());
-    //imageOverlay->raise();
+    imageOverlay = new AlgoInfoOverlay(imageView->viewport());
+    imageOverlay->raise();
 
     // Assemblage
     mainLayout->addWidget(controlBar);

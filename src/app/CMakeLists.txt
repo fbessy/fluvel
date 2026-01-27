@@ -76,6 +76,12 @@ set(app_src
     ${UI_COMP_DIR}/color_picker_behavior.cpp
     ${UI_COMP_DIR}/color_picker_behavior.hpp
 
+    ${UI_COMP_DIR}/pixel_info_behavior.cpp
+    ${UI_COMP_DIR}/pixel_info_behavior.hpp
+
+    ${UI_COMP_DIR}/pixel_info_overlay.cpp
+    ${UI_COMP_DIR}/pixel_info_overlay.hpp
+
     ${UI_COMP_DIR}/image_view_listener.hpp
 
     ${CORE_DIR}/image_controller.cpp

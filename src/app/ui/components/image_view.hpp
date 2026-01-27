@@ -52,7 +52,7 @@ public:
     void userInteracted();
 
     QPoint imageCoordinatesFromView(const QPoint& viewPos) const;
-    QColor pixelColorAt(const QPoint& imagePos) const;
+    QRgb pixelColorAt(const QPoint& imagePos) const;
 
     void setListener(ImageViewListener* listener);
     void onColorPicked(const QColor& color,
@@ -60,6 +60,9 @@ public:
 
     bool hasImage() const;
     bool isPanRelevant() const;
+    QGraphicsScene* graphicsScene() const;
+
+    bool isGrayscale() const;
 
 public slots:
     void displayContour(const QVector<QPoint>& out,

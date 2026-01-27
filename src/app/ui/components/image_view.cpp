@@ -365,12 +365,12 @@ void ImageView::enterEvent(QEnterEvent*)
                                                 nullptr));
 }
 
-QColor ImageView::pixelColorAt(const QPoint& imagePos) const
+QRgb ImageView::pixelColorAt(const QPoint& imagePos) const
 {
     if (!lastDisplayedImage.valid(imagePos))
-        return QColor();
+        return QRgb();
 
-    return QColor::fromRgb(lastDisplayedImage.pixel(imagePos));
+    return lastDisplayedImage.pixel(imagePos);
 }
 
 void ImageView::setListener(ImageViewListener* listener)
@@ -428,6 +428,17 @@ bool ImageView::isPanRelevant() const
 
     return sceneRect.width()  > viewRect.width()
            || sceneRect.height() > viewRect.height();
+}
+
+QGraphicsScene* ImageView::graphicsScene() const
+{
+    return scene;
+}
+
+bool ImageView::isGrayscale() const
+{
+    return lastDisplayedImage.format() == QImage::Format_Grayscale8 ||
+           lastDisplayedImage.format() == QImage::Format_Grayscale16;
 }
 
 } // namespace ofeli_app
