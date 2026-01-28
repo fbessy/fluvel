@@ -13,6 +13,8 @@
 #include <QTimer>
 #include <QElapsedTimer>
 
+#include <cassert>
+
 namespace ofeli_app
 {
 
@@ -26,39 +28,75 @@ ActiveContourWorker::ActiveContourWorker()
 
 void ActiveContourWorker::restart()
 {
-    if (m_state == WorkerState::Restarting)
+    if ( !ac )
+        return;
+
+    if ( m_state == WorkerState::Restarting )
         return;
 
     setState( WorkerState::Restarting );
 
     m_timer->stop();
-    ac.reset();
-    initializeActiveContour();
 
+    if ( !ac->is_initial() )
+    {
+        initializeActiveContour();
+    }
+
+    updateStats();
+    emitContourOnly();
+
+    start();
+}
+
+void ActiveContourWorker::start()
+{
     setState( WorkerState::Running );
     m_timer->start();
 }
 
 void ActiveContourWorker::togglePause()
 {
+    if ( !ac )
+        return;
+
     if (m_state == WorkerState::Running)
+    {
         suspend();
+    }
     else if (m_state == WorkerState::Idle)
+    {
         resume();
+    }
+    else if (m_state == WorkerState::Stopped)
+    {
+        restart();
+    }
 }
 
 void ActiveContourWorker::step()
 {
-    if ( m_state == WorkerState::Running )
-        suspend();
+    if ( !ac )
+        return;
 
-    if ( m_state == WorkerState::Idle )
+    if ( m_state == WorkerState::Running )
+    {
+        suspend();
+    }
+    else if ( m_state == WorkerState::Idle )
     {
         if ( stepOnce() )
         {
-            setState( WorkerState::Stopped );
-            emit finished();
+            stop();
         }
+
+        updateStats();
+        emitContourOnly();
+    }
+    else if ( m_state == WorkerState::Stopped )
+    {
+        setState( WorkerState::Idle );
+        initializeActiveContour();
 
         updateStats();
         emitContourOnly();
@@ -67,36 +105,44 @@ void ActiveContourWorker::step()
 
 bool ActiveContourWorker::stepOnce()
 {
-    if ( !ac || ac->is_stopped() )
-        return true;
+    assert( ac );
 
-    ac->step();
+    if ( ac->is_stopped() )
+    {
+        initializeActiveContour();
+    }
+    else
+    {
+        ac->step();
+    }
 
     return ac->is_stopped();
 }
 
 void ActiveContourWorker::setImage(const QImage& img)
 {
-    m_workImage = img.copy();
+    m_timer->stop();
+
+    m_workImage = img;
+
     setState( WorkerState::Idle );
-}
+    initializeActiveContour();
 
-void ActiveContourWorker::start()
-{
-    if (m_state != WorkerState::Idle &&
-        m_state != WorkerState::Stopped)
-        return;
-
-    restart();
+    updateStats();
+    emitContourOnly();
 }
 
 void ActiveContourWorker::stop()
 {
-    if (m_state != WorkerState::Running)
-        return;
-
     m_timer->stop();
     setState( WorkerState::Stopped );
+
+    updateStats();
+    emitContourOnly();
+
+    emit finished();
+
+    initializeActiveContour();
 }
 
 void ActiveContourWorker::suspend()
@@ -105,6 +151,9 @@ void ActiveContourWorker::suspend()
     {
         m_timer->stop();
         setState( WorkerState::Idle );
+
+        updateStats();
+        emitContourOnly();
     }
 }
 
@@ -112,15 +161,15 @@ void ActiveContourWorker::resume()
 {
     if (m_state == WorkerState::Idle)
     {
-        m_timer->start();
         setState( WorkerState::Running );
+        m_timer->start();
     }
 }
 
 void ActiveContourWorker::onTimeout()
 {
-    if (m_state != WorkerState::Running || !ac)
-        return;
+    assert( ac );
+    assert( m_state == WorkerState::Running );
 
     constexpr qint64 budgetMs = 10;
     QElapsedTimer timer;
@@ -130,13 +179,7 @@ void ActiveContourWorker::onTimeout()
     {
         if ( stepOnce() )
         {
-            m_timer->stop();
-            m_state = WorkerState::Stopped;
-            emit finished();
-
-            updateStats();
-            emitContourOnly();
-
+            stop();
             return;
         }
     }
@@ -156,71 +199,74 @@ void ActiveContourWorker::updateStats()
 
 void ActiveContourWorker::initializeActiveContour()
 {
-    if( !m_workImage.isNull() )
-    {
-        const auto& config = AppSettings::instance();
-        unsigned int downscale_fctr = config.downscale_factor;
+    if( m_workImage.isNull() )
+        return;
 
-        workAlgo = m_workImage;
-        initialPhi = config.initialPhi.copy();
+
+    ac.reset();
+
+    const auto& config = AppSettings::instance();
+    unsigned int downscale_fctr = config.downscale_factor;
+
+    workAlgo = m_workImage;
+    initialPhi = config.initialPhi.copy();
 
 #ifdef OFELI_DEBUG
-        int bpp = m_workImage.depth() / 8;  // ou 4 pour ARGB32
-        int expected = m_workImage.width() * bpp;
+    int bpp = m_workImage.depth() / 8;  // ou 4 pour ARGB32
+    int expected = m_workImage.width() * bpp;
 
-        qDebug() << "bytesPerLine =" << m_workImage.bytesPerLine()
-                 << "expected =" << expected
-                 << "padding =" << m_workImage.bytesPerLine() - expected;
+    qDebug() << "bytesPerLine =" << m_workImage.bytesPerLine()
+             << "expected =" << expected
+             << "padding =" << m_workImage.bytesPerLine() - expected;
 #endif
 
-        //downscale_fctr = 1;
-        if ( downscale_fctr >= 2 )
-        {
-            workAlgo = workAlgo.scaled(workAlgo.width()/downscale_fctr,
-                                       workAlgo.height()/downscale_fctr,
+    //downscale_fctr = 1;
+    if ( downscale_fctr >= 2 )
+    {
+        workAlgo = workAlgo.scaled(workAlgo.width()/downscale_fctr,
+                                   workAlgo.height()/downscale_fctr,
+                                   Qt::IgnoreAspectRatio,
+                                   Qt::FastTransformation);
+
+        initialPhi = initialPhi.scaled(workAlgo.width(),
+                                       workAlgo.height(),
                                        Qt::IgnoreAspectRatio,
                                        Qt::FastTransformation);
-
-            initialPhi = initialPhi.scaled(workAlgo.width(),
-                                           workAlgo.height(),
-                                           Qt::IgnoreAspectRatio,
-                                           Qt::FastTransformation);
-        }
+    }
 
 #ifdef OFELI_DEBUG
-        int bpp2 = workAlgo.depth() / 8;  // ou 4 pour ARGB32
-        int expected2 = workAlgo.width() * bpp2;
+    int bpp2 = workAlgo.depth() / 8;  // ou 4 pour ARGB32
+    int expected2 = workAlgo.width() * bpp2;
 
-        qDebug() << "bytesPerLine =" << workAlgo.bytesPerLine()
-                 << "expected =" << expected2
-                 << "padding =" << workAlgo.bytesPerLine() - expected2;
+    qDebug() << "bytesPerLine =" << workAlgo.bytesPerLine()
+             << "expected =" << expected2
+             << "padding =" << workAlgo.bytesPerLine() - expected2;
 #endif
 
-        ofeli_ip::ContourData initialCD(initialPhi.constBits(),
-                                        initialPhi.width(),
-                                        initialPhi.height(),
-                                        config.connectivity);
+    ofeli_ip::ContourData initialCD(initialPhi.constBits(),
+                                    initialPhi.width(),
+                                    initialPhi.height(),
+                                    config.connectivity);
 
-        bool is_rgb = ( workAlgo.format() != QImage::Format_Grayscale8 );
+    bool is_rgb = ( workAlgo.format() != QImage::Format_Grayscale8 );
 
-        const auto img = image_span_from_qimage( workAlgo );
+    const auto img = image_span_from_qimage( workAlgo );
 
-        if( config.speed == SpeedModel::REGION_BASED )
+    if( config.speed == SpeedModel::REGION_BASED )
+    {
+        if( is_rgb )
         {
-            if( is_rgb )
-            {
-                ac = std::make_unique<ofeli_ip::RegionColorAc>(img,
-                                                               std::move(initialCD),
-                                                               config.algo_config,
-                                                               config.region_ac_config);
-            }
-            else
-            {
-                ac = std::make_unique<ofeli_ip::RegionAc>(img,
-                                                          std::move(initialCD),
-                                                          config.algo_config,
-                                                          config.region_ac_config);
-            }
+            ac = std::make_unique<ofeli_ip::RegionColorAc>(img,
+                                                           std::move(initialCD),
+                                                           config.algo_config,
+                                                           config.region_ac_config);
+        }
+        else
+        {
+            ac = std::make_unique<ofeli_ip::RegionAc>(img,
+                                                      std::move(initialCD),
+                                                      config.algo_config,
+                                                      config.region_ac_config);
         }
     }
 }

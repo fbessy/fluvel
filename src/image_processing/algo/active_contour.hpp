@@ -105,6 +105,9 @@ public :
     //! Getter method for #state.
     PhaseState state() const { return state_; }
 
+    //! Gets if the active contour is with the initial state.
+    bool is_initial() const { return step_count() == 0; }
+
     //! Gets if the active contour reaches the final state.
     bool is_stopped() const { return state_ == PhaseState::Stopped; }
 
