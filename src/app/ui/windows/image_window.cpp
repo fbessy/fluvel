@@ -57,6 +57,10 @@ void ImageWindow::setupUi()
     stepButton = new QPushButton( tr("Step") );
     convergeButton = new QPushButton( tr("Converge") );
 
+    stepButton->setAutoRepeat(true);
+    stepButton->setAutoRepeatDelay(300);
+    stepButton->setAutoRepeatInterval(100);
+
     // Widget central
     QWidget* central = new QWidget(this);
 
