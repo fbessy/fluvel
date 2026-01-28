@@ -79,11 +79,15 @@ void ActiveContourWorker::togglePause()
     }
     else if (m_state == WorkerState::Idle)
     {
+        if ( ac->is_initial() && !initialShown )
+        {
+            updateStats();
+            emitContourOnly();
+
+            initialShown = true;
+        }
+
         resume();
-    }
-    else if (m_state == WorkerState::Stopped)
-    {
-        restart();
     }
 }
 
