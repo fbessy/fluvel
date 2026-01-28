@@ -18,10 +18,17 @@
 namespace ofeli_app
 {
 
+constexpr int    workerPeriod_ms            = 16;
+constexpr qint64 timeSliceInteractive_ms    = 10;
+constexpr qint64 timeSliceConverge_ms       = 15;
+
 ActiveContourWorker::ActiveContourWorker()
-    : QObject(nullptr), m_timer(new QTimer(this))
+    : QObject(nullptr),
+    m_timer(new QTimer(this)),
+    m_mode(RunMode::Interactive),
+    timeSlice_ms(timeSliceInteractive_ms)
 {
-    m_timer->setInterval(16);
+    m_timer->setInterval(workerPeriod_ms);
     connect(m_timer, &QTimer::timeout,
             this, &ActiveContourWorker::onTimeout);
 }
@@ -36,7 +43,7 @@ void ActiveContourWorker::restart()
 
     setState( WorkerState::Restarting );
 
-    m_timer->stop();
+    setMode( RunMode::Interactive );
 
     if ( !ac->is_initial() )
     {
@@ -60,6 +67,12 @@ void ActiveContourWorker::togglePause()
     if ( !ac )
         return;
 
+    if ( m_state == WorkerState::Restarting )
+        return;
+
+
+    setMode( RunMode::Interactive );
+
     if (m_state == WorkerState::Running)
     {
         suspend();
@@ -79,28 +92,56 @@ void ActiveContourWorker::step()
     if ( !ac )
         return;
 
+    if ( m_state == WorkerState::Restarting )
+        return;
+
+
+    setMode( RunMode::Interactive );
+
     if ( m_state == WorkerState::Running )
     {
         suspend();
     }
     else if ( m_state == WorkerState::Idle )
     {
-        if ( stepOnce() )
+        if ( ac->is_initial() && !initialShown )
+        {
+            updateStats();
+            emitContourOnly();
+
+            initialShown = true;
+        }
+        else if ( stepOnce() )
         {
             stop();
         }
-
-        updateStats();
-        emitContourOnly();
+        else
+        {
+            updateStats();
+            emitContourOnly();
+        }
     }
-    else if ( m_state == WorkerState::Stopped )
+}
+
+void ActiveContourWorker::converge()
+{
+    if ( !ac )
+        return;
+
+    if ( m_state == WorkerState::Restarting )
+        return;
+
+
+    if ( ac->is_initial() )
     {
-        setState( WorkerState::Idle );
-        initializeActiveContour();
-
         updateStats();
         emitContourOnly();
     }
+
+    setMode( RunMode::Converge );
+
+    if ( m_state != WorkerState::Running )
+        start();
 }
 
 bool ActiveContourWorker::stepOnce()
@@ -122,14 +163,16 @@ bool ActiveContourWorker::stepOnce()
 void ActiveContourWorker::setImage(const QImage& img)
 {
     m_timer->stop();
+    setState( WorkerState::Restarting );
 
     m_workImage = img;
 
-    setState( WorkerState::Idle );
     initializeActiveContour();
 
     updateStats();
     emitContourOnly();
+
+    initialShown = true;
 }
 
 void ActiveContourWorker::stop()
@@ -143,6 +186,8 @@ void ActiveContourWorker::stop()
     emit finished();
 
     initializeActiveContour();
+
+    initialShown = false;
 }
 
 void ActiveContourWorker::suspend()
@@ -160,10 +205,7 @@ void ActiveContourWorker::suspend()
 void ActiveContourWorker::resume()
 {
     if (m_state == WorkerState::Idle)
-    {
-        setState( WorkerState::Running );
-        m_timer->start();
-    }
+        start();
 }
 
 void ActiveContourWorker::onTimeout()
@@ -171,11 +213,10 @@ void ActiveContourWorker::onTimeout()
     assert( ac );
     assert( m_state == WorkerState::Running );
 
-    constexpr qint64 budgetMs = 10;
     QElapsedTimer timer;
     timer.start();
 
-    while (timer.elapsed() < budgetMs)
+    while ( timer.elapsed() < timeSlice_ms )
     {
         if ( stepOnce() )
         {
@@ -184,8 +225,11 @@ void ActiveContourWorker::onTimeout()
         }
     }
 
-    updateStats();
-    emitContourOnly();
+    if ( m_mode == RunMode::Interactive )
+    {
+        updateStats();
+        emitContourOnly();
+    }
 }
 
 void ActiveContourWorker::updateStats()
@@ -202,6 +246,8 @@ void ActiveContourWorker::initializeActiveContour()
     if( m_workImage.isNull() )
         return;
 
+    m_timer->stop();
+    setState( WorkerState::Restarting );
 
     ac.reset();
 
@@ -269,6 +315,8 @@ void ActiveContourWorker::initializeActiveContour()
                                                       config.region_ac_config);
         }
     }
+
+    setState( WorkerState::Idle );
 }
 
 void ActiveContourWorker::drawAndEmitResult()
@@ -326,6 +374,16 @@ AlgoStats ActiveContourWorker::currentStats() const
 {
     QMutexLocker lock(&m_statsMutex);
     return m_currentStats;
+}
+
+void ActiveContourWorker::setMode(RunMode mode)
+{
+    m_mode = mode;
+
+    if ( m_mode == RunMode::Interactive )
+        timeSlice_ms = timeSliceInteractive_ms;
+    else if ( m_mode == RunMode::Converge )
+        timeSlice_ms = timeSliceConverge_ms;
 }
 
 }

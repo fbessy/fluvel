@@ -55,6 +55,7 @@ void ImageWindow::setupUi()
     restartButton = new QPushButton( tr("Start / Restart") );
     pauseButton = new QPushButton( tr("Pause / Resume") );
     stepButton = new QPushButton( tr("Step") );
+    convergeButton = new QPushButton( tr("Converge") );
 
     // Widget central
     QWidget* central = new QWidget(this);
@@ -73,6 +74,7 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(restartButton);
     controlLayout->addWidget(pauseButton);
     controlLayout->addWidget(stepButton);
+    controlLayout->addWidget(convergeButton);
     controlLayout->addStretch();
     // --- Image view ---
 
@@ -325,6 +327,9 @@ void ImageWindow::setupConnections()
 
     connect(stepButton,     &QPushButton::clicked,
             acWorker.get(), &ActiveContourWorker::step);
+
+    connect(convergeButton,     &QPushButton::clicked,
+            acWorker.get(), &ActiveContourWorker::converge);
 
     connect(imageController,    &ImageController::imageReadyWithoutResize,
             phiViewModel.get(), &PhiViewModel::setBackgroundWithUpdate);

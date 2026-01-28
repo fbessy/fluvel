@@ -106,6 +106,7 @@ private:
     QPushButton* restartButton = nullptr;
     QPushButton* pauseButton = nullptr;
     QPushButton* stepButton = nullptr;
+    QPushButton* convergeButton = nullptr;
 
     ImageView* imageView = nullptr;
     AlgoInfoOverlay* imageOverlay = nullptr;

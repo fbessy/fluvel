@@ -11,6 +11,12 @@
 namespace ofeli_app
 {
 
+enum class RunMode
+{
+    Interactive,  // UI updates
+    Converge      // full speed without freeze, no UI updates
+};
+
 enum class WorkerState
 {
     Idle,        // image chargée, pas d'exécution
@@ -32,6 +38,8 @@ public:
     void restart();        // reset + start
     void togglePause();    // suspend / resume
     void step();           // one iteration
+    void converge();       // converge to the final state and
+                           // display only the final result
 
     void stop();
 
@@ -62,7 +70,10 @@ private:
 
     void setState(WorkerState state) { m_state = state; }
 
+    void setMode(RunMode mode);
+
     WorkerState m_state;
+    RunMode m_mode;
     QTimer* m_timer;
     QImage m_workImage;
     std::unique_ptr<ofeli_ip::ActiveContour> ac;
@@ -72,6 +83,9 @@ private:
 
     QImage workAlgo;
     QImage initialPhi;
+
+    qint64 timeSlice_ms;
+    bool initialShown;
 };
 
 }
