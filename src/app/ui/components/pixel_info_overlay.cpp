@@ -51,14 +51,15 @@ void PixelInfoOverlay::calc_bounding(const QString& maxStr)
 void PixelInfoOverlay::updateInfo(const QPoint& pixel,
                                   const QRgb& color,
                                   bool isGrayImg,
-                                  const QPointF& displayScenePos)
+                                  const QPointF& anchorScenePos,
+                                  ImageView& view)
 {
     if ( isGrayImg )
     {
         calc_bounding( kMaxGrayText );
 
         text_ = QString("(%1, %2)\n Gray:%3")
-        .arg(pixel.x())
+            .arg(pixel.x())
             .arg(pixel.y())
             .arg(qRed(color));
     }
@@ -74,8 +75,32 @@ void PixelInfoOverlay::updateInfo(const QPoint& pixel,
             .arg(qBlue(color));
     }
 
-    // Décalage pour ne pas masquer le pixel
-    setPos( displayScenePos );
+    updatePlacement(anchorScenePos, view);
+}
+
+void PixelInfoOverlay::updatePlacement(const QPointF& anchorScenePos,
+                                       ImageView& view)
+{
+    constexpr int margin = 8;
+
+    const QSizeF overlaySize = boundingRect().size();
+    const QRect viewRect = view.viewport()->rect();
+
+    QPoint anchorViewPos = view.mapFromScene(anchorScenePos);
+
+    QPoint pos = anchorViewPos + QPoint(margin, margin);
+    QRectF rect(pos, overlaySize);
+
+    if (rect.right() > viewRect.right())
+        pos.setX(anchorViewPos.x() - overlaySize.width() - margin);
+
+    if (rect.bottom() > viewRect.bottom())
+        pos.setY(anchorViewPos.y() - overlaySize.height() - margin);
+
+    pos.setX(std::max(pos.x(), viewRect.left()));
+    pos.setY(std::max(pos.y(), viewRect.top()));
+
+    setPos(view.mapToScene(pos));
 }
 
 void PixelInfoOverlay::showOverlay()

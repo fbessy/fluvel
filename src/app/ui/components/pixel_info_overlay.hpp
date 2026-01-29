@@ -7,6 +7,8 @@
 #include <QPoint>
 #include <QFont>
 
+#include "image_view.hpp"
+
 namespace ofeli_app {
 
 class PixelInfoOverlay final : public QGraphicsItem
@@ -19,7 +21,11 @@ public:
     void updateInfo(const QPoint& pixel,
                     const QRgb& color,
                     bool isGrayImg,
-                    const QPointF& displayScenePos);
+                    const QPointF& anchorScenePos,
+                    ImageView& view);
+
+    void updatePlacement(const QPointF& anchorScenePos,
+                         ImageView& view);
 
     void showOverlay();
     void hideOverlay();

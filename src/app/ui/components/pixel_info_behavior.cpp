@@ -72,16 +72,14 @@ void PixelInfoBehavior::updateOverlay(ImageView& view,
 
     const QRgb color = view.pixelColorAt(pixel);
 
-    constexpr int dx = 12;
-    constexpr int dy = 12;
-
-    const QPoint overlayViewPos = viewPos + QPoint(dx, dy);
-    const QPointF overlayScenePos = view.mapToScene(overlayViewPos);
+    // position ancre : exactement sous le curseur
+    const QPointF anchorScenePos = view.mapToScene(viewPos);
 
     overlay_->updateInfo(pixel,
                          color,
                          view.isGrayscale(),
-                         overlayScenePos);
+                         anchorScenePos,
+                         view);
 }
 
 } // namespace ofeli_app
