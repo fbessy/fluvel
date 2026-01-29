@@ -339,7 +339,7 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 
 QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 {
-    if (!pixmapItem)
+    if (!pixmapItem || lastDisplayedImage.isNull())
         return QPoint(-1, -1);
 
     const QPointF scenePos = mapToScene(viewPos);
@@ -350,7 +350,7 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
     const int y = static_cast<int>(std::floor(itemPos.y()));
     const QPoint p(x, y);
 
-    if (!pixmapItem->boundingRect().contains(QPointF(p)))
+    if ( !lastDisplayedImage.valid(p) )
         return QPoint(-1, -1);
 
     return p;
