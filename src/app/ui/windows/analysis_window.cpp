@@ -56,9 +56,9 @@ AnalysisWindow::AnalysisWindow(QWidget* parent) :
 
     QSettings settings;
 
-    setWindowTitle(tr("Evaluation : input"));
+    setWindowTitle(tr("Analysis : input"));
 
-    const auto geo = settings.value("Evaluation/Window/geometry").toByteArray();
+    const auto geo = settings.value("Analysis/Window/geometry").toByteArray();
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
@@ -167,7 +167,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent) :
     setLayout(input_layout);
 
     result_popup = new QDialog(this);
-    result_popup->setWindowTitle(tr("Evaluation : result"));
+    result_popup->setWindowTitle(tr("Analysis : result"));
     result_popup->setLayout(result_layout);
 }
 
@@ -292,7 +292,7 @@ void AnalysisWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue( "Evaluation/Window/geometry", saveGeometry() );
+    settings.setValue( "Analysis/Window/geometry", saveGeometry() );
 
     widget1->save_settings();
     widget2->save_settings();

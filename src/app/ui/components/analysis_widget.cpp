@@ -124,11 +124,11 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
     pm.fill(Qt::white);
     color_list->addItem( pm, tr("White") );
 
-    selected.red = (unsigned char)( settings.value("Evaluation/R"
+    selected.red = (unsigned char)( settings.value("Analysis/R"
                                                    +QString::number(id_this), 128).toInt() );
-    selected.green = (unsigned char)( settings.value("Evaluation/G"
+    selected.green = (unsigned char)( settings.value("Analysis/G"
                                                      +QString::number(id_this), 0).toInt() );
-    selected.blue = (unsigned char)( settings.value("Evaluation/B"
+    selected.blue = (unsigned char)( settings.value("Analysis/B"
                                                     +QString::number(id_this), 255).toInt() );
 
     pm.fill( QColor(selected.red,
@@ -136,7 +136,7 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
                     selected.blue) );
     color_list->addItem( pm, tr("Selected") );
 
-    color_list->setCurrentIndex( settings.value("Evaluation/combo"
+    color_list->setCurrentIndex( settings.value("Analysis/combo"
                                                 +QString::number(id_this), 0).toInt() );
 
     ///////////////////////////////////////
@@ -389,14 +389,14 @@ void AnalysisWidget::save_settings() const
 
     settings.setValue("Main/Name/last_directory_used", last_directory_used);
 
-    settings.setValue( "Evaluation/combo"+QString::number(id_this),
+    settings.setValue( "Analysis/combo"+QString::number(id_this),
                        color_list->currentIndex() );
 
-    settings.setValue( "Evaluation/R"+QString::number(id_this),
+    settings.setValue( "Analysis/R"+QString::number(id_this),
                        int(selected.red) );
-    settings.setValue( "Evaluation/G"+QString::number(id_this),
+    settings.setValue( "Analysis/G"+QString::number(id_this),
                        int(selected.green) );
-    settings.setValue( "Evaluation/B"+ QString::number(id_this),
+    settings.setValue( "Analysis/B"+ QString::number(id_this),
                        int(selected.blue) );
 }
 
