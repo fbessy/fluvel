@@ -24,7 +24,7 @@ enum class WorkerState
     Ready,
     Suspended,
     Running,         // timer is active
-    Stopped,         // atomic state because the active contour is reset
+    Finished,        // atomic state because the active contour is reset
                      // to prepare the next run
 };
 
@@ -44,7 +44,7 @@ public:
     void converge();       // converge to the final state and
                            // display only the final result
 
-    void stop();
+    void finish();
 
     AlgoStats currentStats() const;
 
@@ -52,7 +52,6 @@ signals:
     void resultReady(const QImage& img);
     void contourUpdated(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
-    void finished();
     void stateChanged(WorkerState state);
 
 private slots:

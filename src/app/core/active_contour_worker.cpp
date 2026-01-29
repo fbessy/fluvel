@@ -195,20 +195,18 @@ void ActiveContourWorker::initializeFromImage(const QImage& img)
     initialShown = true;
 }
 
-void ActiveContourWorker::stop()
+void ActiveContourWorker::finish()
 {
     m_timer->stop();
-    setState( WorkerState::Stopped );
+    setState( WorkerState::Finished );
 }
 
 void ActiveContourWorker::finalizeAndPrepareNextRun()
 {
-    stop();
+    finish();
 
     updateStats();
     emitContourOnly();
-
-    emit finished();
 
     initializeActiveContour();
 }

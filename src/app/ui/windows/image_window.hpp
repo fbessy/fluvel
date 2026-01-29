@@ -106,7 +106,7 @@ private:
     LanguageWindow* language_window = nullptr;
 
     QPushButton* restartButton = nullptr;
-    QPushButton* pauseButton = nullptr;
+    QPushButton* togglePauseButton = nullptr;
     QPushButton* stepButton = nullptr;
     QPushButton* convergeButton = nullptr;
 

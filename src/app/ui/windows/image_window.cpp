@@ -36,7 +36,7 @@ ImageWindow::~ImageWindow()
 {
     if ( acWorker )
     {
-        acWorker->stop();
+        acWorker->finish();
         acWorker.reset();
     }
 }
@@ -54,14 +54,15 @@ void ImageWindow::setupUi()
 
     restartButton = new QPushButton( tr("Start") );
     restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-    restartButton->setToolTip(tr("Start or restart the active contour."));
+    restartButton->setToolTip(tr("Run the active contour."));
 
-    pauseButton = new QPushButton( tr("Resume") );
-    pauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    togglePauseButton = new QPushButton( tr("Resume") );
+    togglePauseButton->setToolTip(tr("Resume the active contour execution."));
+    togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
     stepButton = new QPushButton( tr("Step") );
     stepButton->setIcon(style()->standardIcon(QStyle::SP_ArrowRight));
-    stepButton->setToolTip(tr("Display the nex iteration of the active contour."));
+    stepButton->setToolTip(tr("Advance the active contour by one iteration."));
 
     stepButton->setAutoRepeat(true);
     stepButton->setAutoRepeatDelay(300);
@@ -69,9 +70,10 @@ void ImageWindow::setupUi()
 
     convergeButton = new QPushButton( tr("Converge") );
     convergeButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekForward));
+    convergeButton->setToolTip(tr("Run until completion without displaying intermediate steps."));
 
     restartButton->setEnabled(false);
-    pauseButton->setEnabled(false);
+    togglePauseButton->setEnabled(false);
     stepButton->setEnabled(false);
     convergeButton->setEnabled(false);
 
@@ -90,7 +92,7 @@ void ImageWindow::setupUi()
     controlLayout->setSpacing(6);
 
     controlLayout->addWidget(restartButton);
-    controlLayout->addWidget(pauseButton);
+    controlLayout->addWidget(togglePauseButton);
     controlLayout->addWidget(stepButton);
     controlLayout->addWidget(convergeButton);
     controlLayout->addStretch();
@@ -141,7 +143,7 @@ void ImageWindow::setupActions()
 
     saveAct = new QAction(tr("&Save..."), this);
     saveAct->setShortcut(QKeySequence::Save);
-    saveAct->setStatusTip(tr("Save the displayed and preprocessed images."));
+    saveAct->setStatusTip(tr("Save the displayed image."));
 
     saveAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentSaveAs,
                                       style->standardIcon(QStyle::SP_DialogSaveButton)) );
@@ -170,7 +172,7 @@ void ImageWindow::setupActions()
     }
 
     analysisAct = new QAction(tr("&Analysis"), this);
-    analysisAct->setStatusTip(tr("Compute the modified Hausdorff distance."));
+    analysisAct->setStatusTip(tr("Compute the Hausdorff distance."));
     analysisAct->setShortcut(tr("Ctrl+A"));
 
     analysisAct->setIcon( QIcon::fromTheme("accessories-calculator",
@@ -336,20 +338,20 @@ void ImageWindow::setupConnections()
             this, &ImageWindow::refreshAlgoOverlay);
     m_statsTimer->start();
 
-    connect(restartButton,   &QPushButton::clicked,
-            acWorker.get(),  &ActiveContourWorker::restart);
+    connect(restartButton,      &QPushButton::clicked,
+            acWorker.get(),     &ActiveContourWorker::restart);
 
-    connect(pauseButton,     &QPushButton::clicked,
-            acWorker.get(),  &ActiveContourWorker::togglePause);
+    connect(togglePauseButton,  &QPushButton::clicked,
+            acWorker.get(),     &ActiveContourWorker::togglePause);
 
-    connect(stepButton,      &QPushButton::clicked,
-            acWorker.get(),  &ActiveContourWorker::step);
+    connect(stepButton,         &QPushButton::clicked,
+            acWorker.get(),     &ActiveContourWorker::step);
 
-    connect(convergeButton,  &QPushButton::clicked,
-            acWorker.get(),  &ActiveContourWorker::converge);
+    connect(convergeButton,     &QPushButton::clicked,
+            acWorker.get(),     &ActiveContourWorker::converge);
 
-    connect(acWorker.get(),  &ActiveContourWorker::stateChanged,
-            this,            &ImageWindow::onStateChanged);
+    connect(acWorker.get(),     &ActiveContourWorker::stateChanged,
+            this,               &ImageWindow::onStateChanged);
 
     connect(imageController,    &ImageController::imageReadyWithoutResize,
             phiViewModel.get(), &PhiViewModel::setBackgroundWithUpdate);
@@ -533,7 +535,7 @@ void ImageWindow::saveDisplayed()
     if (fileName.isEmpty())
         return; // Cancel
 
-    // 🔑 déduire l’extension à partir du filtre
+    // déduire l’extension à partir du filtre
     QString extension;
     if      (selectedFilter.contains("*.png")) extension = "png";
     else if (selectedFilter.contains("*.jpg")) extension = "jpg";
@@ -579,7 +581,7 @@ void ImageWindow::onStateChanged(WorkerState state)
                       state != WorkerState::Initializing );
 
     restartButton->setEnabled( isEnable );
-    pauseButton->setEnabled( isEnable );
+    togglePauseButton->setEnabled( isEnable );
     stepButton->setEnabled( isEnable );
     convergeButton->setEnabled( isEnable );
 
@@ -589,23 +591,26 @@ void ImageWindow::onStateChanged(WorkerState state)
     {
         restartButton->setText( tr("Restart") );
         restartButton->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
+        restartButton->setToolTip(tr("Restart the active contour from its initial state."));
     }
     else if ( state == WorkerState::Ready )
     {
         restartButton->setText( tr("Start") );
         restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        restartButton->setToolTip(tr("Run the active contour."));
     }
 
     if ( state == WorkerState::Running )
     {
-        pauseButton->setText( tr("Pause") );
-        pauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+        togglePauseButton->setText( tr("Pause") );
+        togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+        togglePauseButton->setToolTip(tr("Suspend execution and display the current state."));
     }
     else if ( state == WorkerState::Suspended ||
               state == WorkerState::Ready )
     {
-        pauseButton->setText( tr("Resume") );
-        pauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        togglePauseButton->setToolTip(tr("Resume the active contour execution."));
+        togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     }
 }
 
