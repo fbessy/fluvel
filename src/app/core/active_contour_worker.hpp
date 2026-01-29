@@ -19,12 +19,13 @@ enum class RunMode
 
 enum class WorkerState
 {
-    Uninitialized,   // rien de prêt
-    Initializing,    // préparation en cours (CA, buffers, etc.)
-    Ready,           // initialisé, prêt
-    Suspended,       // pause or mode step
-    Running,         // timer actif, algo en cours
-    Stopped,         // algo convergé
+    Uninitialized,
+    Initializing,    // prepare active contour
+    Ready,
+    Suspended,
+    Running,         // timer is active
+    Stopped,         // atomic state because the active contour is reset
+                     // to prepare the next run
 };
 
 class ActiveContourWorker : public QObject

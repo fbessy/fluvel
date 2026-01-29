@@ -60,7 +60,7 @@ void ImageWindow::setupUi()
     pauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 
     stepButton = new QPushButton( tr("Step") );
-    stepButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
+    stepButton->setIcon(style()->standardIcon(QStyle::SP_ArrowRight));
     stepButton->setToolTip(tr("Display the nex iteration of the active contour."));
 
     stepButton->setAutoRepeat(true);
@@ -68,8 +68,12 @@ void ImageWindow::setupUi()
     stepButton->setAutoRepeatInterval(100);
 
     convergeButton = new QPushButton( tr("Converge") );
-    //convergeButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
     convergeButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekForward));
+
+    restartButton->setEnabled(false);
+    pauseButton->setEnabled(false);
+    stepButton->setEnabled(false);
+    convergeButton->setEnabled(false);
 
     // Widget central
     QWidget* central = new QWidget(this);
@@ -571,14 +575,25 @@ QString ImageWindow::makeUniqueFileName(const QString& filePath)
 
 void ImageWindow::onStateChanged(WorkerState state)
 {
+    bool isEnable = ( state != WorkerState::Uninitialized &&
+                      state != WorkerState::Initializing );
+
+    restartButton->setEnabled( isEnable );
+    pauseButton->setEnabled( isEnable );
+    stepButton->setEnabled( isEnable );
+    convergeButton->setEnabled( isEnable );
+
+
     if ( state == WorkerState::Running ||
          state == WorkerState::Suspended )
     {
         restartButton->setText( tr("Restart") );
+        restartButton->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
     }
-    else
+    else if ( state == WorkerState::Ready )
     {
         restartButton->setText( tr("Start") );
+        restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     }
 
     if ( state == WorkerState::Running )

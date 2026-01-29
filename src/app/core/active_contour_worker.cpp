@@ -43,12 +43,12 @@ void ActiveContourWorker::restart()
 
     initializeActiveContour();
 
-    if ( m_state == WorkerState::Uninitialized ||
-         m_state == WorkerState::Initializing )
+    if ( m_state != WorkerState::Ready )
         return;
 
     updateStats();
     emitContourOnly();
+
     initialShown = true;
 
     start();
@@ -211,7 +211,6 @@ void ActiveContourWorker::finalizeAndPrepareNextRun()
     emit finished();
 
     initializeActiveContour();
-    initialShown = false;
 }
 
 void ActiveContourWorker::suspend()
@@ -342,6 +341,7 @@ void ActiveContourWorker::initializeActiveContour()
     }
 
     setState( WorkerState::Ready );
+    initialShown = false;
 }
 
 void ActiveContourWorker::drawAndEmitResult()
