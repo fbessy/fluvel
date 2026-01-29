@@ -50,6 +50,7 @@
 
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"
+#include "active_contour_worker.hpp"
 
 namespace ofeli_app {
 
@@ -72,6 +73,7 @@ public slots:
     void refreshAlgoOverlay();
     void onImageReady(const QImage& image);
     void onFileSelected(const QString& path);
+    void onStateChanged(WorkerState state);
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;

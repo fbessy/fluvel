@@ -19,10 +19,12 @@ enum class RunMode
 
 enum class WorkerState
 {
-    Idle,        // image chargée, pas d'exécution
-    Running,     // timer actif, algo en cours
-    Stopped,     // algo convergé
-    Restarting   // transition atomique
+    Uninitialized,   // rien de prêt
+    Initializing,    // préparation en cours (CA, buffers, etc.)
+    Ready,           // initialisé, prêt
+    Suspended,       // pause or mode step
+    Running,         // timer actif, algo en cours
+    Stopped,         // algo convergé
 };
 
 class ActiveContourWorker : public QObject
@@ -33,7 +35,7 @@ public:
 
     ActiveContourWorker();
 
-    void setImage(const QImage& img);
+    void initializeFromImage(const QImage& img);
 
     void restart();        // reset + start
     void togglePause();    // suspend / resume
@@ -50,6 +52,7 @@ signals:
     void contourUpdated(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
     void finished();
+    void stateChanged(WorkerState state);
 
 private slots:
     void onTimeout();
@@ -58,19 +61,19 @@ private:
 
     void drawAndEmitResult();
     void emitContourOnly();
+    void updateStats();
 
     void suspend();
     void resume();
     void start();
-    bool stepOnce();
-
-    void updateStats();
+    void performStep();
+    bool stepOnceAlgo();
 
     void initializeActiveContour();
-
-    void setState(WorkerState state) { m_state = state; }
+    void finalizeAndPrepareNextRun();
 
     void setMode(RunMode mode);
+    void setState(WorkerState state);
 
     WorkerState m_state;
     RunMode m_mode;

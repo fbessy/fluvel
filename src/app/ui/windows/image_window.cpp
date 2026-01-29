@@ -52,14 +52,24 @@ void ImageWindow::setupUi()
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
-    restartButton = new QPushButton( tr("Start / Restart") );
-    pauseButton = new QPushButton( tr("Pause / Resume") );
+    restartButton = new QPushButton( tr("Start") );
+    restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    restartButton->setToolTip(tr("Start or restart the active contour."));
+
+    pauseButton = new QPushButton( tr("Resume") );
+    pauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
     stepButton = new QPushButton( tr("Step") );
-    convergeButton = new QPushButton( tr("Converge") );
+    stepButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
+    stepButton->setToolTip(tr("Display the nex iteration of the active contour."));
 
     stepButton->setAutoRepeat(true);
     stepButton->setAutoRepeatDelay(300);
     stepButton->setAutoRepeatInterval(100);
+
+    convergeButton = new QPushButton( tr("Converge") );
+    //convergeButton->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
+    convergeButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekForward));
 
     // Widget central
     QWidget* central = new QWidget(this);
@@ -304,7 +314,7 @@ void ImageWindow::setupConnections()
 
     // new display with contour item in the image view
     connect(imageController, &ImageController::contourReady,
-            acWorker.get(),  &ActiveContourWorker::setImage);
+            acWorker.get(),  &ActiveContourWorker::initializeFromImage);
 
     // former display with a qimage with the contour
     connect(acWorker.get(),  &ActiveContourWorker::resultReady,
@@ -322,17 +332,20 @@ void ImageWindow::setupConnections()
             this, &ImageWindow::refreshAlgoOverlay);
     m_statsTimer->start();
 
-    connect(restartButton,       &QPushButton::clicked,
+    connect(restartButton,   &QPushButton::clicked,
             acWorker.get(),  &ActiveContourWorker::restart);
 
-    connect(pauseButton,    &QPushButton::clicked,
-            acWorker.get(), &ActiveContourWorker::togglePause);
+    connect(pauseButton,     &QPushButton::clicked,
+            acWorker.get(),  &ActiveContourWorker::togglePause);
 
-    connect(stepButton,     &QPushButton::clicked,
-            acWorker.get(), &ActiveContourWorker::step);
+    connect(stepButton,      &QPushButton::clicked,
+            acWorker.get(),  &ActiveContourWorker::step);
 
-    connect(convergeButton,     &QPushButton::clicked,
-            acWorker.get(), &ActiveContourWorker::converge);
+    connect(convergeButton,  &QPushButton::clicked,
+            acWorker.get(),  &ActiveContourWorker::converge);
+
+    connect(acWorker.get(),  &ActiveContourWorker::stateChanged,
+            this,            &ImageWindow::onStateChanged);
 
     connect(imageController,    &ImageController::imageReadyWithoutResize,
             phiViewModel.get(), &PhiViewModel::setBackgroundWithUpdate);
@@ -554,6 +567,31 @@ QString ImageWindow::makeUniqueFileName(const QString& filePath)
     }
 
     return candidate;
+}
+
+void ImageWindow::onStateChanged(WorkerState state)
+{
+    if ( state == WorkerState::Running ||
+         state == WorkerState::Suspended )
+    {
+        restartButton->setText( tr("Restart") );
+    }
+    else
+    {
+        restartButton->setText( tr("Start") );
+    }
+
+    if ( state == WorkerState::Running )
+    {
+        pauseButton->setText( tr("Pause") );
+        pauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+    }
+    else if ( state == WorkerState::Suspended ||
+              state == WorkerState::Ready )
+    {
+        pauseButton->setText( tr("Resume") );
+        pauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    }
 }
 
 }

@@ -25,6 +25,7 @@ constexpr qint64 timeSliceConverge_ms       = 15;
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr),
     m_timer(new QTimer(this)),
+    m_state(WorkerState::Uninitialized),
     m_mode(RunMode::Interactive),
     timeSlice_ms(timeSliceInteractive_ms)
 {
@@ -35,39 +36,38 @@ ActiveContourWorker::ActiveContourWorker()
 
 void ActiveContourWorker::restart()
 {
-    if ( !ac )
+    if ( m_state == WorkerState::Initializing )
         return;
-
-    if ( m_state == WorkerState::Restarting )
-        return;
-
-    setState( WorkerState::Restarting );
 
     setMode( RunMode::Interactive );
 
-    if ( !ac->is_initial() )
-    {
-        initializeActiveContour();
-    }
+    initializeActiveContour();
+
+    if ( m_state == WorkerState::Uninitialized ||
+         m_state == WorkerState::Initializing )
+        return;
 
     updateStats();
     emitContourOnly();
+    initialShown = true;
 
     start();
 }
 
 void ActiveContourWorker::start()
 {
+    if ( m_state == WorkerState::Uninitialized ||
+         m_state == WorkerState::Initializing )
+        return;
+
     setState( WorkerState::Running );
     m_timer->start();
 }
 
 void ActiveContourWorker::togglePause()
 {
-    if ( !ac )
-        return;
-
-    if ( m_state == WorkerState::Restarting )
+    if ( m_state == WorkerState::Uninitialized ||
+         m_state == WorkerState::Initializing )
         return;
 
 
@@ -77,26 +77,30 @@ void ActiveContourWorker::togglePause()
     {
         suspend();
     }
-    else if (m_state == WorkerState::Idle)
+    else if (m_state == WorkerState::Suspended)
     {
-        if ( ac->is_initial() && !initialShown )
+        resume();
+    }
+    else if (m_state == WorkerState::Ready)
+    {
+        if ( !initialShown )
         {
             updateStats();
             emitContourOnly();
 
             initialShown = true;
         }
-
-        resume();
+        else
+        {
+            resume();
+        }
     }
 }
 
 void ActiveContourWorker::step()
 {
-    if ( !ac )
-        return;
-
-    if ( m_state == WorkerState::Restarting )
+    if ( m_state == WorkerState::Uninitialized ||
+         m_state == WorkerState::Initializing )
         return;
 
 
@@ -106,40 +110,52 @@ void ActiveContourWorker::step()
     {
         suspend();
     }
-    else if ( m_state == WorkerState::Idle )
+    else if ( m_state == WorkerState::Suspended )
     {
-        if ( ac->is_initial() && !initialShown )
+        performStep();
+    }
+    else if ( m_state == WorkerState::Ready )
+    {
+        if ( !initialShown )
         {
             updateStats();
             emitContourOnly();
 
             initialShown = true;
         }
-        else if ( stepOnce() )
-        {
-            stop();
-        }
         else
         {
-            updateStats();
-            emitContourOnly();
+            performStep();
         }
+    }
+}
+
+void ActiveContourWorker::performStep()
+{
+    if ( stepOnceAlgo() )
+    {
+        finalizeAndPrepareNextRun();
+    }
+    else
+    {
+        updateStats();
+        emitContourOnly();
     }
 }
 
 void ActiveContourWorker::converge()
 {
-    if ( !ac )
+    if ( m_state == WorkerState::Uninitialized ||
+         m_state == WorkerState::Initializing )
         return;
 
-    if ( m_state == WorkerState::Restarting )
-        return;
 
-
-    if ( ac->is_initial() )
+    if ( m_state == WorkerState::Ready )
     {
         updateStats();
         emitContourOnly();
+
+        initialShown = true;
     }
 
     setMode( RunMode::Converge );
@@ -148,9 +164,9 @@ void ActiveContourWorker::converge()
         start();
 }
 
-bool ActiveContourWorker::stepOnce()
+bool ActiveContourWorker::stepOnceAlgo()
 {
-    assert( ac );
+    assert( ac != nullptr );
 
     if ( ac->is_stopped() )
     {
@@ -164,10 +180,10 @@ bool ActiveContourWorker::stepOnce()
     return ac->is_stopped();
 }
 
-void ActiveContourWorker::setImage(const QImage& img)
+void ActiveContourWorker::initializeFromImage(const QImage& img)
 {
     m_timer->stop();
-    setState( WorkerState::Restarting );
+    setState( WorkerState::Initializing );
 
     m_workImage = img;
 
@@ -183,6 +199,11 @@ void ActiveContourWorker::stop()
 {
     m_timer->stop();
     setState( WorkerState::Stopped );
+}
+
+void ActiveContourWorker::finalizeAndPrepareNextRun()
+{
+    stop();
 
     updateStats();
     emitContourOnly();
@@ -190,16 +211,15 @@ void ActiveContourWorker::stop()
     emit finished();
 
     initializeActiveContour();
-
     initialShown = false;
 }
 
 void ActiveContourWorker::suspend()
 {
-    if (m_state == WorkerState::Running)
+    if ( m_state == WorkerState::Running )
     {
         m_timer->stop();
-        setState( WorkerState::Idle );
+        setState( WorkerState::Suspended );
 
         updateStats();
         emitContourOnly();
@@ -208,13 +228,14 @@ void ActiveContourWorker::suspend()
 
 void ActiveContourWorker::resume()
 {
-    if (m_state == WorkerState::Idle)
+    if ( m_state == WorkerState::Suspended ||
+         m_state == WorkerState::Ready )
         start();
 }
 
 void ActiveContourWorker::onTimeout()
 {
-    assert( ac );
+    assert( ac != nullptr );
     assert( m_state == WorkerState::Running );
 
     QElapsedTimer timer;
@@ -222,9 +243,9 @@ void ActiveContourWorker::onTimeout()
 
     while ( timer.elapsed() < timeSlice_ms )
     {
-        if ( stepOnce() )
+        if ( stepOnceAlgo() )
         {
-            stop();
+            finalizeAndPrepareNextRun();
             return;
         }
     }
@@ -251,7 +272,7 @@ void ActiveContourWorker::initializeActiveContour()
         return;
 
     m_timer->stop();
-    setState( WorkerState::Restarting );
+    setState( WorkerState::Initializing );
 
     ac.reset();
 
@@ -320,7 +341,7 @@ void ActiveContourWorker::initializeActiveContour()
         }
     }
 
-    setState( WorkerState::Idle );
+    setState( WorkerState::Ready );
 }
 
 void ActiveContourWorker::drawAndEmitResult()
@@ -353,7 +374,7 @@ void ActiveContourWorker::emitContourOnly()
     //drawAndEmitResult();
         //return;
 
-    if (!ac)
+    if ( ac == nullptr )
         return;
 
     const auto& l_out = ac->l_out();
@@ -388,6 +409,12 @@ void ActiveContourWorker::setMode(RunMode mode)
         timeSlice_ms = timeSliceInteractive_ms;
     else if ( m_mode == RunMode::Converge )
         timeSlice_ms = timeSliceConverge_ms;
+}
+
+void ActiveContourWorker::setState(WorkerState state)
+{
+    m_state = state;
+    emit stateChanged(state);
 }
 
 }
