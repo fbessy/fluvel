@@ -52,7 +52,7 @@
    segmentation algorithm of Y. Shi and W. C. Karl <b>[1],</b> using a
    discrete approach for the approximation of level-set-based
    curve evolution (implicit active contours).</p>
-   <p>This is a novel (2005) and fast algorithm without the need
+   <p>This is a fast algorithm without the need
    of solving partial differential equations (PDE) while preserving the
    advantages of level set methods, such as the automatic handling of
    topological changes. Considerable speedups (×100) have been
