@@ -7,6 +7,7 @@
 #include <QVideoFrame>
 #include "frame_stats_view.hpp"
 #include "runtime_settings.hpp"
+#include "temporal_smoother.hpp"
 
 namespace ofeli_app {
 
@@ -45,6 +46,8 @@ private:
     bool configChanged;
 
     std::unique_ptr<ofeli_ip::RegionColorAc> region_ac;
+
+    ofeli_ip::TemporalSmoother smoother;
 
 private slots:
     void reloadSettings();

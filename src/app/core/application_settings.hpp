@@ -125,6 +125,8 @@ public:
 
     bool has_O1_morpho;
 
+    bool has_temporal_smoothing;
+
     /////////////////////////////////////////
 
     bool has_histo_normaliz;

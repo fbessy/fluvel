@@ -92,9 +92,22 @@ public:
     auto begin() const noexcept { return data_.begin(); }
     auto end()   const noexcept { return data_.end(); }
 
-    void fill(const T& value)
+    void fill(const T& value = T{})
     {
         std::fill(data_.begin(), data_.end(), value);
+    }
+
+    void clear()
+    {
+        data_.clear();
+    }
+
+    void resize(int width, int height)
+    {
+        width_ = width;
+        height_ = height;
+
+        data_.resize( width_ * height_ );
     }
 
     Point2D_i coord(size_t offset) const noexcept

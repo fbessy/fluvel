@@ -133,6 +133,8 @@ ApplicationSettings::ApplicationSettings()
 
     has_O1_morpho = settings.value("Settings/Preprocessing/has_O1_morpho", true).toBool();
 
+    has_temporal_smoothing = settings.value("Settings/Preprocessing/has_temporal_smoothing", true).toBool();
+
     ////////////////////////////////////////////
     // Display
 
@@ -237,6 +239,9 @@ void ApplicationSettings::save()
     settings.setValue("Settings/Preprocessing/kernel_tophat_length", kernel_tophat_length);
 
     settings.setValue("Settings/Preprocessing/has_O1_morpho", has_O1_morpho);
+
+    settings.setValue("Settings/Preprocessing/has_temporal_smoothing", has_temporal_smoothing);
+
     settings.setValue("Settings/Display/has_histo_normaliz", has_histo_normaliz);
     settings.setValue("Settings/Display/has_display_each", has_display_each);
 
@@ -312,6 +317,8 @@ RuntimeSettings ApplicationSettings::snapshot() const
     rs.kernel_tophat_length = kernel_tophat_length;
 
     rs.has_O1_morpho = has_O1_morpho;
+
+    rs.has_temporal_smoothing = has_temporal_smoothing;
 
     /////////////////////////////////////////
 

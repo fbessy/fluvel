@@ -41,7 +41,8 @@ set(ip_src
     ${ALGO_DIR}/shape.cpp
     ${ALGO_DIR}/shape.hpp
 
-
+    ${ALGO_DIR}/temporal_smoother.cpp
+    ${ALGO_DIR}/temporal_smoother.hpp
 
     ${CORE_DIR}/grid2d.hpp
     ${CORE_DIR}/image_span.hpp

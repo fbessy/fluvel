@@ -87,10 +87,13 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
                                        Qt::IgnoreAspectRatio,
                                        Qt::FastTransformation);
 
-        const auto img_algo = image_span_from_qimage( q_img_algo );
+        auto img_algo = image_span_from_qimage( q_img_algo );
 
         if ( !region_ac || configChanged )
         {
+            if ( config.has_temporal_smoothing )
+                smoother.reset( img_algo );
+
             ofeli_ip::AcConfig conf = config.algo_config;
 
             // a specific configuration for video tracking
@@ -107,7 +110,13 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         }
         else
         {
-            region_ac->resetExecutionState(img_algo);
+            if ( config.has_temporal_smoothing )
+            {
+                smoother.update( img_algo );
+                img_algo = smoother.outputSpan();
+            }
+
+            region_ac->resetExecutionState( img_algo );
         }
 
         region_ac->run_cycles(config.cycles_nbr);

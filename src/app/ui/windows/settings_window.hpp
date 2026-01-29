@@ -135,6 +135,7 @@ private :
     QSpinBox* disk_radius_spin;
 
     QComboBox* downscale_factor_cb;
+    QCheckBox* has_temporal_smoothing_cb;
     QSpinBox* cycles_nbr_sb;
 
 

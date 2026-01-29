@@ -287,12 +287,14 @@ void SettingsWindow::setupUiAlgoTab()
     downscale_factor_cb->addItem("2");
     downscale_factor_cb->addItem("4");
 
+    has_temporal_smoothing_cb = new QCheckBox;
 
     cycles_nbr_sb = new QSpinBox;
     cycles_nbr_sb->setMinimum(1);
 
     QFormLayout* cycles_nbr_layout = new QFormLayout;
     cycles_nbr_layout->addRow("downscale factor = ", downscale_factor_cb);
+    cycles_nbr_layout->addRow("Temporal adaptative smoothing :", has_temporal_smoothing_cb);
     cycles_nbr_layout->addRow("cycles per frame = ", cycles_nbr_sb);
 
     tracking_groupbox->setLayout(cycles_nbr_layout);
@@ -1094,9 +1096,10 @@ void SettingsWindow::accept()
     {
         config.downscale_factor = 4;
     }
+
+    config.has_temporal_smoothing = has_temporal_smoothing_cb->isChecked();
+
     config.cycles_nbr = cycles_nbr_sb->value();
-
-
 
     ///////////////////////////////////
     //       Initialization          //
@@ -1244,6 +1247,8 @@ void SettingsWindow::reject()
     {
         downscale_factor_cb->setCurrentIndex(2);
     }
+
+    has_temporal_smoothing_cb->setChecked( config.has_temporal_smoothing );
 
     cycles_nbr_sb->setValue(config.cycles_nbr);
 
@@ -1407,6 +1412,7 @@ void SettingsWindow::default_settings()
 
     // /4
     downscale_factor_cb->setCurrentIndex( 2 );
+    has_temporal_smoothing_cb->setChecked( true );
     cycles_nbr_sb->setValue( 3 );
 
     internalspeed_groupbox->setChecked( true );
