@@ -112,9 +112,8 @@ void ImageWindow::setupActions()
     QStyle* style =  QApplication::style();
 
     openAct = new QAction(tr("&Open..."), this);
-    openAct->setShortcut(tr("Ctrl+O"));
+    openAct->setShortcut(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an image file (*.png, *.bmp, *.jpg, *.jpeg, *.tiff, *.tif, *.gif, *.pbm, *.pgm, *.ppm, *.svg, *.svgz, *.mng, *.xbm, *.xpm)."));
-    openAct->setEnabled(true);
 
     openAct->setIcon( QIcon::fromTheme( QIcon::ThemeIcon::DocumentOpen,
                                       style->standardIcon(QStyle::SP_DirOpenIcon)) );
@@ -126,21 +125,22 @@ void ImageWindow::setupActions()
     deleteAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::EditClear,
                                         QIcon(":/icons/toolbar/edit-clear-list.svg")) );
 
-    saveAct = new QAction(tr("S&ave..."), this);
-    saveAct->setShortcut(tr("Ctrl+A"));
-    saveAct->setEnabled(true);
+    saveAct = new QAction(tr("&Save..."), this);
+    saveAct->setShortcut(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the displayed and preprocessed images."));
 
     saveAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentSaveAs,
                                       style->standardIcon(QStyle::SP_DialogSaveButton)) );
 
-    exitAct = new QAction(tr("E&xit"), this);
-    exitAct->setShortcut(tr("Ctrl+X"));
+    quitAct = new QAction(tr("&Quit"), this);
+    quitAct->setShortcut(QKeySequence::Quit);
 
-    exitAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::ApplicationExit,
+
+    quitAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::ApplicationExit,
                                       style->standardIcon(QStyle::SP_TitleBarCloseButton)) );
 
-    cameraAct = new QAction(tr("Camera"), this);
+    cameraAct = new QAction(tr("Came&ra"), this);
+    cameraAct->setShortcut(tr("Ctrl+R"));
     cameraAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraWeb) );
     cameraAct->setEnabled(false);
 
@@ -155,17 +155,16 @@ void ImageWindow::setupActions()
                                                     QIcon(":/icons/toolbar/document-open-recent.svg")) );
     }
 
-    evaluateAct = new QAction(tr("E&valuate"), this);
-    evaluateAct->setStatusTip(tr("Compute the modified Hausdorff distance."));
-    evaluateAct->setShortcut(tr("Ctrl+V"));
-    evaluateAct->setEnabled(true);
+    analysisAct = new QAction(tr("&Analysis"), this);
+    analysisAct->setStatusTip(tr("Compute the modified Hausdorff distance."));
+    analysisAct->setShortcut(tr("Ctrl+A"));
 
-    evaluateAct->setIcon( QIcon::fromTheme("accessories-calculator",
+    analysisAct->setIcon( QIcon::fromTheme("accessories-calculator",
                                           QIcon(":/icons/toolbar/insert-horizontal-rule.svg")) );
 
-    settingsAct = new QAction(tr("S&ettings"), this);
+    settingsAct = new QAction(tr("&Settings"), this);
+    settingsAct->setShortcut(QKeySequence::Preferences);
     settingsAct->setStatusTip(tr("Image preprocessing and active contour initialization."));
-    settingsAct->setShortcut(tr("Ctrl+E"));
     settingsAct->setEnabled(true);
 
     settingsAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentProperties,
@@ -207,11 +206,11 @@ void ImageWindow::setupActions()
 
     fileMenu->addAction(saveAct);
     fileMenu->addSeparator();
-    fileMenu->addAction(exitAct);
+    fileMenu->addAction(quitAct);
 
     windowMenu = new QMenu(tr("&Window"), this);
     windowMenu->addAction(cameraAct);
-    windowMenu->addAction(evaluateAct);
+    windowMenu->addAction(analysisAct);
     windowMenu->addAction(settingsAct);
 
     helpMenu = new QMenu(tr("&Help"), this);
@@ -286,11 +285,11 @@ void ImageWindow::setupConnections()
 
     connect(deleteAct, &QAction::triggered, this, &ImageWindow::deleteList);
     connect(saveAct, &QAction::triggered, this, &ImageWindow::saveDisplayed);
-    connect(exitAct, &QAction::triggered, this, &ImageWindow::close);
+    connect(quitAct, &QAction::triggered, this, &ImageWindow::close);
 
     connect(cameraAct, &QAction::triggered, this, &ImageWindow::onStartCameraActionTriggered);
     connect(mediaDevices, &QMediaDevices::videoInputsChanged, this, &ImageWindow::updateCameraAction);
-    connect(evaluateAct, &QAction::triggered, evaluation_window, &AnalysisWindow::show);
+    connect(analysisAct, &QAction::triggered, evaluation_window, &AnalysisWindow::show);
     connect(settingsAct, &QAction::triggered, settings_window, &SettingsWindow::show);
 
     connect(aboutAct, &QAction::triggered, about_window, &AboutWindow::show);

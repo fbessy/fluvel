@@ -119,11 +119,11 @@ private:
     QAction* recentFileActs[MaxRecentFiles];
     QAction* deleteAct = nullptr;
     QAction* saveAct = nullptr;
-    QAction* exitAct = nullptr;
+    QAction* quitAct = nullptr;
 
     QAction* cameraAct = nullptr;
     QMediaDevices* mediaDevices = nullptr;
-    QAction* evaluateAct = nullptr;
+    QAction* analysisAct = nullptr;
     QAction* settingsAct = nullptr;
 
     QAction* aboutAct = nullptr;
