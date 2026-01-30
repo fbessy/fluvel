@@ -248,7 +248,7 @@ void ImageWindow::setupActions()
     settings_window = new SettingsWindow(this, phiEditor.get(),
                                                phiViewModel.get());
 
-    camera_window = new CameraWindow(this);
+    camera_window = new CameraWindow;
     evaluation_window = new AnalysisWindow(this);
     about_window = new AboutWindow(this);
     language_window = new LanguageWindow(this);
@@ -503,11 +503,21 @@ void ImageWindow::updateWindowTitle()
     {
         const QString colorText = (m_channels == 1) ? "Gray" : "RGB";
 
-        title += QString(" - %1 - %2×%3 - %4")
-                     .arg(m_fileName)
-                     .arg(m_imageSize.width())
-                     .arg(m_imageSize.height())
-                     .arg(colorText);
+        QString downscaleStr;
+        downscaleStr.clear();
+
+        QString sizeStr = QString("%1×%2")
+                              .arg(m_imageSize.width())
+                              .arg(m_imageSize.height());
+
+        const auto& df = AppSettings::instance().downscale_factor;
+
+        if ( df >= 2 )
+            sizeStr += QString(" /%1").arg(df);
+
+
+        title += QString(" - %1 - %2 - %3")
+                     .arg(m_fileName, sizeStr, colorText);
     }
 
     setWindowTitle(title);

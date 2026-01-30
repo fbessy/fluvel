@@ -28,6 +28,7 @@ public:
 signals:
     void frameProcessed(qint64 receiveTs, qint64 processTs);
     void frameResultReady(const QImage& img, qint64 receiveTs);
+    void frameSizeStr(QString str);
 
 protected:
     void run() override;

@@ -59,9 +59,10 @@ namespace ofeli_app
 {
 
 CameraWindow::CameraWindow(QWidget* parent)
-    : QDialog(parent),
+    : QMainWindow(parent),
     cameraSelector(nullptr),
-    labels(nullptr),
+    toggleStreamingButton(nullptr),
+    stacked(nullptr),
     blackLabel(nullptr),
     videoView(nullptr),
     mediaDevices(nullptr),
@@ -73,7 +74,8 @@ CameraWindow::CameraWindow(QWidget* parent)
     statsTimer(nullptr),
     lastFrameReceiveTs(0)
 {
-    setWindowTitle( tr("Camera") );
+    setWindowIcon( QIcon(":/icons/app/Ofeli.svg") );
+    setWindowTitle( tr("Ofeli - Camera") );
 
     QSettings settings;
     const auto geo = settings.value("Camera/Window/geometry").toByteArray();
@@ -110,31 +112,46 @@ CameraWindow::CameraWindow(QWidget* parent)
     overlayStack->addWidget(cameraOverlay);
     cameraOverlay->raise();
 
-    labels = new QStackedWidget(this);
-    labels->addWidget(blackLabel);
-    labels->addWidget(viewContainer);
-
-
-    // État initial
-    labels->setCurrentIndex(0);
+    stacked = new QStackedWidget(this);
+    stacked->addWidget(blackLabel);
+    stacked->addWidget(viewContainer);
 
     cameraSelector = new QComboBox(this);
+    cameraSelector->setEnabled(false);
+
+    toggleStreamingButton = new QPushButton( tr("Start") );
+    toggleStreamingButton->setEnabled(false);
+    toggleStreamingButton->setToolTip(tr("Start camera streaming."));
+    toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
+    QWidget* central = new QWidget(this);
+
+    QWidget* controlBar = new QWidget(central);
+    QHBoxLayout* controlLayout = new QHBoxLayout(controlBar);
+    controlLayout->setContentsMargins(8, 4, 8, 4);
+    controlLayout->setSpacing(6);
+    controlLayout->addWidget(cameraSelector);
+    controlLayout->addWidget(toggleStreamingButton);
+    controlLayout->addStretch();
+
     mediaDevices = new QMediaDevices(this);
 
-    connect(cameraSelector, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &CameraWindow::onCameraSelected);
+    updateCameraList();
+
+    connect(toggleStreamingButton,  &QPushButton::clicked,
+            this,                   &CameraWindow::onToggleStreaming);
 
     connect(mediaDevices,
             &QMediaDevices::videoInputsChanged,
             this,
             &CameraWindow::updateCameraList);
 
-    updateCameraList();
-
-    QVBoxLayout* layout = new QVBoxLayout;
-    layout->addWidget(cameraSelector);
-    layout->addWidget(labels);
+    QVBoxLayout* layout = new QVBoxLayout(central);
+    layout->addWidget(controlBar);
+    layout->addWidget(stacked);
     setLayout(layout);
+
+    setCentralWidget(central);
 
     statsTimer = new QTimer(this);
     statsTimer->setInterval(500);
@@ -147,94 +164,113 @@ CameraWindow::~CameraWindow()
 
 void CameraWindow::startCamera(const QCameraDevice& device)
 {
-    if ( !device.isNull() )
-    {
-        stopCamera();
+    if ( device.isNull() )
+        return;
 
-        camera = new QCamera(device, this);
-        videoSink = new QVideoSink(this);
-        captureSession = new QMediaCaptureSession(this);
 
-        captureSession->setCamera(camera);
-        captureSession->setVideoSink(videoSink);
-        camera->start();
+    stopCamera();
 
-        ac_thread = new VideoActiveContourThread(this);
+    camera = new QCamera(device, this);
+    videoSink = new QVideoSink(this);
+    captureSession = new QMediaCaptureSession(this);
 
-        connect(videoSink, &QVideoSink::videoFrameChanged,
-                this, [this](const QVideoFrame& frame)
-                {
-                    const qint64 recvTs = FrameClock::nowNs();
+    captureSession->setCamera(camera);
+    captureSession->setVideoSink(videoSink);
+    camera->start();
 
-                    frameStats.frameReceived(recvTs);   // ✅ input
-                    ac_thread->submitFrame(frame);      // envoi thread
-                });
+    ac_thread = new VideoActiveContourThread(this);
 
-        connect(ac_thread, &VideoActiveContourThread::frameProcessed,
-                this, [this]()
-                {
-                    frameStats.frameProcessed();        // ✅ processing
-                },
-                Qt::QueuedConnection);
+    connect(videoSink, &QVideoSink::videoFrameChanged,
+            this, [this](const QVideoFrame& frame)
+            {
+                const qint64 recvTs = FrameClock::nowNs();
 
-        connect(ac_thread, &VideoActiveContourThread::frameResultReady,
-                this, [this](const QImage& img, qint64 recvTs)
-                {
-                    videoView->setImage(img);
+                frameStats.frameReceived(recvTs);   // ✅ input
+                ac_thread->submitFrame(frame);      // envoi thread
+            });
 
-                    const qint64 displayTs = FrameClock::nowNs();
-                    frameStats.frameDisplayed(recvTs, displayTs); // ✅ display + latence
-                },
-                Qt::QueuedConnection);
+    connect(ac_thread, &VideoActiveContourThread::frameProcessed,
+            this, [this]()
+            {
+                frameStats.frameProcessed();        // ✅ processing
+            },
+            Qt::QueuedConnection);
 
-        ac_thread->start();
+    connect(ac_thread, &VideoActiveContourThread::frameResultReady,
+            this, [this](const QImage& img, qint64 recvTs)
+            {
+                videoView->setImage(img);
 
-        statsTimer->start();
+                const qint64 displayTs = FrameClock::nowNs();
+                frameStats.frameDisplayed(recvTs, displayTs); // ✅ display + latence
+            },
+            Qt::QueuedConnection);
 
-        connect(statsTimer, &QTimer::timeout,
-                this, &CameraWindow::updateStatsUi);
+    ac_thread->start();
 
-        connect(this,
-                &CameraWindow::cameraStatsUpdated,
-                cameraOverlay,
-                &CameraOverlayWidget::setStats);
+    statsTimer->start();
 
-        frameStats.reset();
+    connect(statsTimer, &QTimer::timeout,
+            this, &CameraWindow::updateStatsUi);
 
-        labels->setCurrentIndex(1);
-    }
+    connect(this,
+            &CameraWindow::cameraStatsUpdated,
+            cameraOverlay,
+            &CameraOverlayWidget::setStats);
+
+    deviceWindowTitle = "Ofeli - " + device.description() + " - ";
+    connect(ac_thread, &VideoActiveContourThread::frameSizeStr,
+            this, &CameraWindow::onFrameSizeStr);
+
+    frameStats.reset();
+}
+
+void CameraWindow::onFrameSizeStr(QString str)
+{
+    setWindowTitle( deviceWindowTitle + str );
 }
 
 void CameraWindow::updateCameraList()
 {
-    cameraSelector->blockSignals(true);
     cameraSelector->clear();
-
-    cameraSelector->addItem(tr("Éteint"));
 
     const auto cameras = QMediaDevices::videoInputs();
     for (const auto &cam : cameras) {
         cameraSelector->addItem(cam.description());
     }
 
-    cameraSelector->setCurrentIndex(0);
-    cameraSelector->setEnabled(!cameras.isEmpty());
+    cameraSelector->setEnabled( !cameras.isEmpty() );
+    toggleStreamingButton->setEnabled( !cameras.isEmpty() );
 
-    cameraSelector->blockSignals(false);
+    cameraSelector->setCurrentIndex(0);
 }
 
-void CameraWindow::onCameraSelected(int index)
+void CameraWindow::onToggleStreaming()
 {
-    if (index == 0) {
+    if ( camera != nullptr && camera->isActive() )
+    {
+        stacked->setCurrentIndex(0);
         stopCamera();
+
+        toggleStreamingButton->setText( tr("Start") );
+        toggleStreamingButton->setToolTip(tr("Start camera streaming."));
+        toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
+        setWindowTitle( tr("Ofeli - Camera") );
         return;
     }
 
+    const int camIndex = cameraSelector->currentIndex();
     const auto cameras = QMediaDevices::videoInputs();
-    const int camIndex = index - 1;
 
-    if (camIndex >= 0 && camIndex < cameras.size()) {
-        startCamera(cameras[camIndex]);
+    if ( camIndex >= 0 && camIndex < cameras.size() )
+    {
+        stacked->setCurrentIndex(1);
+        startCamera( cameras[camIndex] );
+
+        toggleStreamingButton->setText( tr("Stop") );
+        toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
+        toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     }
 }
 
@@ -274,8 +310,6 @@ void CameraWindow::stopCamera()
         camera->deleteLater();
         camera = nullptr;
     }
-
-    labels->setCurrentIndex(0);
 }
 
 void CameraWindow::updateStatsUi()
@@ -302,7 +336,7 @@ void CameraWindow::closeEvent(QCloseEvent* event)
 
     settings.setValue( "Camera/Window/geometry", saveGeometry() );
 
-    QDialog::closeEvent(event);
+    QMainWindow::closeEvent(event);
 }
 
 }

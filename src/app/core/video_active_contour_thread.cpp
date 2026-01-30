@@ -69,23 +69,24 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 {
     qint64 startTs = FrameClock::nowNs();
 
-    QImage result = frame.toImage().convertToFormat(QImage::Format_RGB32);
+    QImage input = frame.toImage().convertToFormat(QImage::Format_RGB32);
+    QImage result;
 
-    if ( !result.isNull() )
+    if ( !input.isNull() )
     {
         const auto& config = runtime_settings;
 
         if (config.is_show_mirrored)
-            result = result.flipped(Qt::Horizontal);
+            input = input.flipped(Qt::Horizontal);
 
         // downscale
-        QImage q_img_algo = result;
+        QImage q_img_algo = input;
         unsigned int downscale_fctr = config.downscale_factor;
         if (downscale_fctr >= 2)
-            q_img_algo = result.scaled(result.width()/downscale_fctr,
-                                       result.height()/downscale_fctr,
-                                       Qt::IgnoreAspectRatio,
-                                       Qt::FastTransformation);
+            q_img_algo = input.scaled(input.width()/downscale_fctr,
+                                      input.height()/downscale_fctr,
+                                      Qt::IgnoreAspectRatio,
+                                      Qt::FastTransformation);
 
         auto img_algo = image_span_from_qimage( q_img_algo );
 
@@ -107,6 +108,17 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
                                                                   config.region_ac_config);
 
             configChanged = false;
+
+            QString size_str = QString("%1×%2")
+                                   .arg(QString::number(input.width()),
+                                        QString::number(input.height()));
+
+            if ( downscale_fctr >= 2 )
+            {
+                size_str += QString(" /%1").arg(downscale_fctr);
+            }
+
+            emit frameSizeStr(size_str);
         }
         else
         {
@@ -123,6 +135,8 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         if (region_ac)
         {
+            result = input;
+
             if (downscale_fctr == 1)
             {
                 draw_list_to_img(region_ac->l_out(), config.color_out, config.outside_combo,

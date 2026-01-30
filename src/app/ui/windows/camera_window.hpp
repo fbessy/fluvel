@@ -40,7 +40,7 @@
 #ifndef CAMERA_WINDOW_HPP
 #define CAMERA_WINDOW_HPP
 
-#include <QDialog>
+#include <QMainWindow>
 #include <QStackedWidget>
 #include <QLabel>
 #include <QCamera>
@@ -49,6 +49,7 @@
 #include <QVideoSink>
 #include <QThread>
 #include <QComboBox>
+#include <QPushButton>
 
 #include "video_active_contour_thread.hpp"
 #include "application_settings.hpp"
@@ -59,17 +60,18 @@
 namespace ofeli_app
 {
 
-class CameraWindow : public QDialog
+class CameraWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit CameraWindow(QWidget* parent);
+    explicit CameraWindow(QWidget* parent = nullptr);
     ~CameraWindow();
 
 private slots:
     void updateCameraList();
-    void onCameraSelected(int index);
+    void onToggleStreaming();
     void updateStatsUi();
+    void onFrameSizeStr(QString str);
 
 private:
 
@@ -79,7 +81,9 @@ private:
     virtual void closeEvent(QCloseEvent* event) override;
 
     QComboBox* cameraSelector;
-    QStackedWidget* labels;
+    QPushButton* toggleStreamingButton;
+
+    QStackedWidget* stacked;
     QLabel* blackLabel;
     ImageView* videoView;
     CameraOverlayWidget* cameraOverlay;
@@ -96,6 +100,8 @@ private:
     quint64 nextFrameId;  // compteur unique des frames
     QTimer* statsTimer; // timer pour snapshot périodique
     qint64 lastFrameReceiveTs;
+
+    QString deviceWindowTitle;
 
 signals:
     void cameraStatsUpdated(const CameraStatsUi& stats);
