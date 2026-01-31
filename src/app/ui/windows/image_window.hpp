@@ -74,6 +74,8 @@ public slots:
     void onImageReady(const QImage& image);
     void onFileSelected(const QString& path);
     void onStateChanged(WorkerState state);
+    void onCameraWindowShown();
+    void onCameraWindowClosed();
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;
@@ -86,6 +88,9 @@ private:
     void setupConnections();
 
     void updateWindowTitle();
+    QIcon settingsIcon();
+    QIcon loadSymbolic(const QString& name,
+                       const QIcon& fallback);
 
     void setCurrentFile(const QString &fileName);
     void updateRecentFileActions();
@@ -123,7 +128,8 @@ private:
     QAction* saveAct = nullptr;
     QAction* quitAct = nullptr;
 
-    QAction* cameraAct = nullptr;
+    QAction* imageSessionAct = nullptr;
+    QAction* cameraSessionAct = nullptr;
     QMediaDevices* mediaDevices = nullptr;
     QAction* analysisAct = nullptr;
     QAction* settingsAct = nullptr;
@@ -132,7 +138,8 @@ private:
     QAction* languageAct = nullptr;
 
     QMenu* fileMenu = nullptr;
-    QMenu* windowMenu = nullptr;
+    QMenu* segmentationMenu = nullptr;
+    QMenu* sessionMenu = nullptr;
     QMenu* helpMenu = nullptr;
 
     QStringList nameFilters;
@@ -153,15 +160,6 @@ private:
 signals:
 
     void fileSelected(QString fileName);
-
-    /*
-    // Actions UI (fines, lisibles)
-    void openImage();
-    void saveImage();
-
-    void startContour(); // start or restart contour
-    void suspendResumeContour();
-    void suspendToNextIteration();*/
 };
 
 }

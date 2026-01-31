@@ -249,14 +249,7 @@ void CameraWindow::onToggleStreaming()
 {
     if ( camera != nullptr && camera->isActive() )
     {
-        stacked->setCurrentIndex(0);
-        stopCamera();
-
-        toggleStreamingButton->setText( tr("Start") );
-        toggleStreamingButton->setToolTip(tr("Start camera streaming."));
-        toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-
-        setWindowTitle( tr("Ofeli - Camera") );
+        stopCameraAndUi();
         return;
     }
 
@@ -312,6 +305,21 @@ void CameraWindow::stopCamera()
     }
 }
 
+void CameraWindow::stopCameraAndUi()
+{
+    if ( camera != nullptr && camera->isActive() )
+    {
+        stacked->setCurrentIndex(0);
+        stopCamera();
+
+        toggleStreamingButton->setText( tr("Start") );
+        toggleStreamingButton->setToolTip(tr("Start camera streaming."));
+        toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+
+        setWindowTitle( tr("Ofeli - Camera") );
+    }
+}
+
 void CameraWindow::updateStatsUi()
 {
     auto snap = frameStats.snapshot();
@@ -328,14 +336,21 @@ void CameraWindow::updateStatsUi()
     emit cameraStatsUpdated(stats);
 }
 
+void CameraWindow::showEvent(QShowEvent* event)
+{
+    emit cameraWindowShown();
+    QMainWindow::showEvent(event);
+}
+
 void CameraWindow::closeEvent(QCloseEvent* event)
 {
-    stopCamera();
+    stopCameraAndUi();
 
     QSettings settings;
 
     settings.setValue( "Camera/Window/geometry", saveGeometry() );
 
+    emit cameraWindowClosed();
     QMainWindow::closeEvent(event);
 }
 

@@ -77,8 +77,10 @@ private:
 
     void startCamera(const QCameraDevice& device);
     void stopCamera();
+    void stopCameraAndUi();
 
-    virtual void closeEvent(QCloseEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
 
     QComboBox* cameraSelector;
     QPushButton* toggleStreamingButton;
@@ -105,6 +107,8 @@ private:
 
 signals:
     void cameraStatsUpdated(const CameraStatsUi& stats);
+    void cameraWindowShown();
+    void cameraWindowClosed();
 };
 
 }

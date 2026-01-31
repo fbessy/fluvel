@@ -123,6 +123,7 @@
 int main( int argc, char* argv[] )
 {
     QApplication app(argc, argv);
+    QApplication::setQuitOnLastWindowClosed(false);
 
     QCoreApplication::setOrganizationName("ofeli");
     QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/fastlevelset/");

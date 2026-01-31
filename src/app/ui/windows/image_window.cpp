@@ -77,6 +77,14 @@ void ImageWindow::setupUi()
     stepButton->setEnabled(false);
     convergeButton->setEnabled(false);
 
+
+
+    QPushButton* settingsButton = new QPushButton;
+    settingsButton->setIcon( settingsIcon() );
+    settingsButton->setToolTip(tr("Segmentation settings"));
+    settingsButton->setFlat(true); // optionnel mais souvent plus élégant
+    settingsButton->setFocusPolicy(Qt::NoFocus);
+
     // Widget central
     QWidget* central = new QWidget(this);
 
@@ -96,6 +104,14 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(stepButton);
     controlLayout->addWidget(convergeButton);
     controlLayout->addStretch();
+
+    controlLayout->addSpacerItem(
+        new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
+        );
+
+    controlLayout->addWidget(settingsButton);
+
+
     // --- Image view ---
 
     imageView = new ImageView(central);
@@ -127,6 +143,25 @@ void ImageWindow::setupActions()
 
     QStyle* style =  QApplication::style();
 
+    imageSessionAct = new QAction(tr("&Image"), this);
+    imageSessionAct->setShortcut(tr("Ctrl+I"));
+    imageSessionAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraWeb) );
+    imageSessionAct->setCheckable(true);
+    imageSessionAct->setChecked(true);
+    imageSessionAct->setEnabled(true);
+
+    cameraSessionAct = new QAction(tr("Came&ra"), this);
+    cameraSessionAct->setShortcut(tr("Ctrl+R"));
+    cameraSessionAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraVideo) );
+    cameraSessionAct->setCheckable(true);
+    cameraSessionAct->setChecked(false);
+    cameraSessionAct->setEnabled(false);
+
+    quitAct = new QAction(tr("&Quit"), this);
+    quitAct->setShortcut(QKeySequence::Quit);
+    quitAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::ApplicationExit,
+                                      style->standardIcon(QStyle::SP_TitleBarCloseButton)) );
+
     openAct = new QAction(tr("&Open..."), this);
     openAct->setShortcut(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an image file (*.png, *.bmp, *.jpg, *.jpeg, *.tiff, *.tif, *.gif, *.pbm, *.pgm, *.ppm, *.svg, *.svgz, *.mng, *.xbm, *.xpm)."));
@@ -139,7 +174,7 @@ void ImageWindow::setupActions()
     deleteAct->setStatusTip(tr("Clean the recent files list."));
 
     deleteAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::EditClear,
-                                        QIcon(":/icons/toolbar/edit-clear-list.svg")) );
+                                        style->standardIcon(QStyle::SP_LineEditClearButton)));
 
     saveAct = new QAction(tr("&Save..."), this);
     saveAct->setShortcut(QKeySequence::Save);
@@ -148,17 +183,6 @@ void ImageWindow::setupActions()
     saveAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentSaveAs,
                                       style->standardIcon(QStyle::SP_DialogSaveButton)) );
 
-    quitAct = new QAction(tr("&Quit"), this);
-    quitAct->setShortcut(QKeySequence::Quit);
-
-
-    quitAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::ApplicationExit,
-                                      style->standardIcon(QStyle::SP_TitleBarCloseButton)) );
-
-    cameraAct = new QAction(tr("Came&ra"), this);
-    cameraAct->setShortcut(tr("Ctrl+R"));
-    cameraAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraWeb) );
-    cameraAct->setEnabled(false);
 
     mediaDevices = new QMediaDevices(this);
 
@@ -168,7 +192,7 @@ void ImageWindow::setupActions()
         recentFileActs[i]->setVisible(false);
 
         recentFileActs[i]->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpenRecent,
-                                                    QIcon(":/icons/toolbar/document-open-recent.svg")) );
+                                                    style->standardIcon(QStyle::SP_DirOpenIcon)) );
     }
 
     analysisAct = new QAction(tr("&Analysis"), this);
@@ -183,9 +207,7 @@ void ImageWindow::setupActions()
     settingsAct->setStatusTip(tr("Image preprocessing and active contour initialization."));
     settingsAct->setEnabled(true);
 
-    settingsAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentProperties,
-                                          QIcon(":/icons/toolbar/configure.svg")) );
-
+    settingsAct->setIcon( settingsIcon() );
 
     menuBar()->addSeparator();
 
@@ -193,19 +215,27 @@ void ImageWindow::setupActions()
     aboutAct->setStatusTip(tr("Information, license and home page."));
 
     aboutAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::HelpAbout,
-                                       style->standardIcon(QStyle::QStyle::SP_MessageBoxInformation)) );
+                                       style->standardIcon(QStyle::SP_MessageBoxInformation)) );
 
 
     languageAct = new QAction(tr("&Language"), this);
     languageAct->setStatusTip(tr("Choose the application language."));
 
-    languageAct->setIcon( QIcon::fromTheme("preferences-desktop-locale",
-                                          QIcon(":/icons/toolbar/preferences-desktop-locale.svg")) );
+    QIcon languageIcon = loadSymbolic("preferences-desktop-locale",
+                                      QIcon(":/icons/toolbar/preferences-desktop-locale.svg"));
+
+    languageAct->setIcon( languageIcon );
 
 
     ////////////////////////////////////////////////////////////////////////////////////////
     /////////////                          Create Menus                /////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
+
+    sessionMenu = new QMenu(tr("&Session"), this);
+    sessionMenu->addAction(imageSessionAct);
+    sessionMenu->addAction(cameraSessionAct);
+    sessionMenu->addSeparator();
+    sessionMenu->addAction(quitAct);
 
     fileMenu = new QMenu(tr("&File"), this);
     fileMenu->addAction(openAct);
@@ -221,20 +251,18 @@ void ImageWindow::setupActions()
     fileMenu->addSeparator();
 
     fileMenu->addAction(saveAct);
-    fileMenu->addSeparator();
-    fileMenu->addAction(quitAct);
 
-    windowMenu = new QMenu(tr("&Window"), this);
-    windowMenu->addAction(cameraAct);
-    windowMenu->addAction(analysisAct);
-    windowMenu->addAction(settingsAct);
+    segmentationMenu = new QMenu(tr("&Segmentation"), this);
+    segmentationMenu->addAction(analysisAct);
+    segmentationMenu->addAction(settingsAct);
 
     helpMenu = new QMenu(tr("&Help"), this);
     helpMenu->addAction(aboutAct);
     helpMenu->addAction(languageAct);
 
+    menuBar()->addMenu(sessionMenu);
     menuBar()->addMenu(fileMenu);
-    menuBar()->addMenu(windowMenu);
+    menuBar()->addMenu(segmentationMenu);
     menuBar()->addMenu(helpMenu);
 
     imageController = new ImageController(this);
@@ -303,7 +331,18 @@ void ImageWindow::setupConnections()
     connect(saveAct, &QAction::triggered, this, &ImageWindow::saveDisplayed);
     connect(quitAct, &QAction::triggered, this, &ImageWindow::close);
 
-    connect(cameraAct, &QAction::triggered, this, &ImageWindow::onStartCameraActionTriggered);
+    connect(imageSessionAct, &QAction::triggered, this, [this]() {
+        imageSessionAct->setChecked(true);
+    });
+
+    connect(cameraSessionAct, &QAction::triggered, this, &ImageWindow::onStartCameraActionTriggered);
+
+    connect(camera_window, &CameraWindow::cameraWindowClosed,
+            this, &ImageWindow::onCameraWindowClosed);
+    connect(camera_window, &CameraWindow::cameraWindowShown,
+            this, &ImageWindow::onCameraWindowShown);
+
+
     connect(mediaDevices, &QMediaDevices::videoInputsChanged, this, &ImageWindow::updateCameraAction);
     connect(analysisAct, &QAction::triggered, evaluation_window, &AnalysisWindow::show);
     connect(settingsAct, &QAction::triggered, settings_window, &SettingsWindow::show);
@@ -435,19 +474,31 @@ void ImageWindow::updateCameraAction()
     auto cameras = QMediaDevices::videoInputs();
 
     if ( cameras.isEmpty() )
-        cameraAct->setEnabled(false);
+        cameraSessionAct->setEnabled(false);
     else
-        cameraAct->setEnabled(true);
+        cameraSessionAct->setEnabled(true);
 }
 
 void ImageWindow::onStartCameraActionTriggered()
 {
+    cameraSessionAct->setChecked(camera_window && camera_window->isVisible());
+
     auto cameras = QMediaDevices::videoInputs();
 
     if( cameras.isEmpty() )
+    {
         QMessageBox::information(this, tr("Information"), tr("No camera available."));
+    }
     else
+    {
+        camera_window->setWindowState(
+            camera_window->windowState() & ~Qt::WindowMinimized
+            );
+
         camera_window->show();
+        camera_window->raise();
+        camera_window->activateWindow();
+    }
 }
 
 void ImageWindow::refreshAlgoOverlay()
@@ -467,6 +518,8 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     config.save();
 
     QMainWindow::closeEvent(event);
+
+    QApplication::quit();
 }
 
 void ImageWindow::onImageReady(const QImage& image)
@@ -622,6 +675,36 @@ void ImageWindow::onStateChanged(WorkerState state)
         togglePauseButton->setToolTip(tr("Resume the active contour execution."));
         togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     }
+}
+
+QIcon ImageWindow::settingsIcon()
+{
+    return loadSymbolic("preferences-system",
+                        QIcon(":/icons/toolbar/configure.svg"));
+}
+
+QIcon ImageWindow::loadSymbolic(const QString& name,
+                                const QIcon& fallback)
+{
+    QIcon icon = QIcon::fromTheme(name + "-symbolic");
+    if (!icon.isNull())
+        return icon;
+
+    icon = QIcon::fromTheme(name);
+    if (!icon.isNull())
+        return icon;
+
+    return fallback;
+}
+
+void ImageWindow::onCameraWindowShown()
+{
+    cameraSessionAct->setChecked(true);
+}
+
+void ImageWindow::onCameraWindowClosed()
+{
+    cameraSessionAct->setChecked(false);
 }
 
 }
