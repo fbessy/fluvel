@@ -82,6 +82,9 @@ set(app_src
     ${UI_COMP_DIR}/pixel_info_overlay.cpp
     ${UI_COMP_DIR}/pixel_info_overlay.hpp
 
+    ${UI_COMP_DIR}/icon_loader.cpp
+    ${UI_COMP_DIR}/icon_loader.hpp
+
     ${UI_COMP_DIR}/image_view_listener.hpp
 
     ${CORE_DIR}/image_controller.cpp
@@ -180,21 +183,24 @@ set(APP_RESOURCES
     ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_128.png
     ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_256.png
 
-    #${OFELI_RESOURCES_DIR}/icons/toolbar/application-exit.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/configure.svg
-    #${OFELI_RESOURCES_DIR}/icons/toolbar/document-open.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-open-recent.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-print.svg
-    #${OFELI_RESOURCES_DIR}/icons/toolbar/document-save-as.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/edit-clear-list.svg
-    #${OFELI_RESOURCES_DIR}/icons/toolbar/help-about.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/help-contents.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/insert-horizontal-rule.svg
-    #${OFELI_RESOURCES_DIR}/icons/toolbar/media-playback-start.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/preferences-desktop-locale.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/zoom-in.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/zoom-original.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/zoom-out.svg
+
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/application-exit-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/camera-web-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/configure-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-open-recent-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-open-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-save-as-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/edit-clear-history.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/go-next-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/help-about-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/measure-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playback-pause-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playback-start-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playback-stop-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playlist-repeat-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-seek-forward-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/preferences-desktop-locale-symbolic.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/view-preview-symbolic.svg
 
     ${OFELI_RESOURCES_DIR}/docs/application_to_plant_recognition.pdf
 

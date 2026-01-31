@@ -10,6 +10,7 @@
 #include "fullscreen_behavior.hpp"
 #include "autofit_behavior.hpp"
 #include "pixel_info_behavior.hpp"
+#include "icon_loader.hpp"
 
 #include <QMenuBar>
 #include <QToolBar>
@@ -52,38 +53,62 @@ void ImageWindow::setupUi()
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
+    startResumeIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
+                                   QStyle::SP_MediaPlay,
+                                   ":/icons/toolbar/media-playback-start-symbolic.svg");
+
+    restartIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaylistRepeat,
+                               QStyle::SP_BrowserReload,
+                               ":/icons/toolbar/media-playlist-repeat-symbolic.svg");
+
+    pauseIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause,
+                             QStyle::SP_MediaPause,
+                             ":/icons/toolbar/media-playback-pause-symbolic.svg");
+
     restartButton = new QPushButton( tr("Start") );
-    restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     restartButton->setToolTip(tr("Run the active contour."));
+    restartButton->setIcon( startResumeIcon );
 
     togglePauseButton = new QPushButton( tr("Resume") );
     togglePauseButton->setToolTip(tr("Resume the active contour execution."));
-    togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    togglePauseButton->setIcon( startResumeIcon );
 
     stepButton = new QPushButton( tr("Step") );
-    stepButton->setIcon(style()->standardIcon(QStyle::SP_ArrowRight));
     stepButton->setToolTip(tr("Advance the active contour by one iteration."));
+
+    QIcon stepIcon = il::loadIcon(QIcon::ThemeIcon::GoNext,
+                                  QStyle::SP_ArrowRight,
+                                  ":/icons/toolbar/go-next-symbolic.svg");
+
+    stepButton->setIcon( stepIcon );
 
     stepButton->setAutoRepeat(true);
     stepButton->setAutoRepeatDelay(300);
     stepButton->setAutoRepeatInterval(100);
 
     convergeButton = new QPushButton( tr("Converge") );
-    convergeButton->setIcon(style()->standardIcon(QStyle::SP_MediaSeekForward));
     convergeButton->setToolTip(tr("Run until completion without displaying intermediate steps."));
+
+    QIcon convergeIcon = il::loadIcon(QIcon::ThemeIcon::MediaSeekForward,
+                                      QStyle::SP_MediaSeekForward,
+                                      ":/icons/toolbar/media-seek-forward-symbolic.svg");
+
+    convergeButton->setIcon( convergeIcon );
 
     restartButton->setEnabled(false);
     togglePauseButton->setEnabled(false);
     stepButton->setEnabled(false);
     convergeButton->setEnabled(false);
 
-
-
     QPushButton* settingsButton = new QPushButton;
-    settingsButton->setIcon( settingsIcon() );
     settingsButton->setToolTip(tr("Segmentation settings"));
-    settingsButton->setFlat(true); // optionnel mais souvent plus élégant
+    settingsButton->setFlat(true);
     settingsButton->setFocusPolicy(Qt::NoFocus);
+
+    settingsIcon = il::loadIcon("configure",
+                                ":/icons/toolbar/configure-symbolic.svg");
+
+    settingsButton->setIcon( settingsIcon );
 
     // Widget central
     QWidget* central = new QWidget(this);
@@ -141,88 +166,113 @@ void ImageWindow::setupActions()
     /////////////                          Create Actions                /////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    QStyle* style =  QApplication::style();
-
     imageSessionAct = new QAction(tr("&Image"), this);
     imageSessionAct->setShortcut(tr("Ctrl+I"));
-    imageSessionAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraWeb) );
+
+    QIcon imageIcon = il::loadIcon("image-x-generic-symbolic",
+                                   ":/icons/toolbar/view-preview-symbolic.svg");
+
+    imageSessionAct->setIcon( imageIcon );
     imageSessionAct->setCheckable(true);
     imageSessionAct->setChecked(true);
     imageSessionAct->setEnabled(true);
 
     cameraSessionAct = new QAction(tr("Came&ra"), this);
     cameraSessionAct->setShortcut(tr("Ctrl+R"));
-    cameraSessionAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::CameraVideo) );
+
+    QIcon cameraIcon = il::loadIcon(QIcon::ThemeIcon::CameraWeb,
+                                    ":/icons/toolbar/camera-web-symbolic.svg");
+
+    cameraSessionAct->setIcon( cameraIcon );
+
     cameraSessionAct->setCheckable(true);
     cameraSessionAct->setChecked(false);
     cameraSessionAct->setEnabled(false);
 
     quitAct = new QAction(tr("&Quit"), this);
     quitAct->setShortcut(QKeySequence::Quit);
-    quitAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::ApplicationExit,
-                                      style->standardIcon(QStyle::SP_TitleBarCloseButton)) );
+
+    QIcon quitIcon = il::loadIcon(QIcon::ThemeIcon::ApplicationExit,
+                                  QStyle::SP_TitleBarCloseButton,
+                                  ":/icons/toolbar/application-exit-symbolic.svg");
+
+    quitAct->setIcon( quitIcon );
 
     openAct = new QAction(tr("&Open..."), this);
     openAct->setShortcut(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an image file (*.png, *.bmp, *.jpg, *.jpeg, *.tiff, *.tif, *.gif, *.pbm, *.pgm, *.ppm, *.svg, *.svgz, *.mng, *.xbm, *.xpm)."));
 
-    openAct->setIcon( QIcon::fromTheme( QIcon::ThemeIcon::DocumentOpen,
-                                      style->standardIcon(QStyle::SP_DirOpenIcon)) );
+    QIcon openIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpen,
+                                  QStyle::SP_DirOpenIcon,
+                                  ":/icons/toolbar/document-open-symbolic.svg");
+
+    openAct->setIcon( openIcon );
 
 
     deleteAct = new QAction(tr("Clear list"), this);
     deleteAct->setStatusTip(tr("Clean the recent files list."));
 
-    deleteAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::EditClear,
-                                        style->standardIcon(QStyle::SP_LineEditClearButton)));
+    QIcon deleteIcon = il::loadIcon(QIcon::ThemeIcon::EditClear,
+                                    QStyle::SP_LineEditClearButton,
+                                    ":/icons/toolbar/edit-clear-history.svg");
+
+    deleteAct->setIcon( deleteIcon );
 
     saveAct = new QAction(tr("&Save..."), this);
     saveAct->setShortcut(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the displayed image."));
 
-    saveAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentSaveAs,
-                                      style->standardIcon(QStyle::SP_DialogSaveButton)) );
+    QIcon saveIcon = il::loadIcon(QIcon::ThemeIcon::DocumentSaveAs,
+                                  QStyle::SP_DialogSaveButton,
+                                  ":/icons/toolbar/document-save-as-symbolic.svg");
+
+    saveAct->setIcon( saveIcon );
 
 
     mediaDevices = new QMediaDevices(this);
+
+    QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent,
+                                    QStyle::SP_DirOpenIcon,
+                                    ":/icons/toolbar/document-open-recent-symbolic.svg");
 
     for( int i = 0; i < MaxRecentFiles; ++i )
     {
         recentFileActs[i] = new QAction(this);
         recentFileActs[i]->setVisible(false);
 
-        recentFileActs[i]->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::DocumentOpenRecent,
-                                                    style->standardIcon(QStyle::SP_DirOpenIcon)) );
+        recentFileActs[i]->setIcon( recentIcon );
     }
 
     analysisAct = new QAction(tr("&Analysis"), this);
     analysisAct->setStatusTip(tr("Compute the Hausdorff distance."));
     analysisAct->setShortcut(tr("Ctrl+A"));
 
-    analysisAct->setIcon( QIcon::fromTheme("accessories-calculator",
-                                          QIcon(":/icons/toolbar/insert-horizontal-rule.svg")) );
+    analysisAct->setIcon( QIcon(":/icons/toolbar/measure-symbolic.svg") );
 
     settingsAct = new QAction(tr("&Settings"), this);
     settingsAct->setShortcut(QKeySequence::Preferences);
     settingsAct->setStatusTip(tr("Image preprocessing and active contour initialization."));
     settingsAct->setEnabled(true);
 
-    settingsAct->setIcon( settingsIcon() );
+    settingsAct->setIcon( settingsIcon );
 
     menuBar()->addSeparator();
 
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setStatusTip(tr("Information, license and home page."));
 
-    aboutAct->setIcon( QIcon::fromTheme(QIcon::ThemeIcon::HelpAbout,
-                                       style->standardIcon(QStyle::SP_MessageBoxInformation)) );
+    QIcon aboutIcon = il::loadIcon(QIcon::ThemeIcon::HelpAbout,
+                                   QStyle::SP_MessageBoxInformation,
+                                   ":/icons/toolbar/help-about-symbolic.svg");
+
+    aboutAct->setIcon( aboutIcon );
 
 
     languageAct = new QAction(tr("&Language"), this);
     languageAct->setStatusTip(tr("Choose the application language."));
 
-    QIcon languageIcon = loadSymbolic("preferences-desktop-locale",
-                                      QIcon(":/icons/toolbar/preferences-desktop-locale.svg"));
+    QIcon languageIcon = il::loadIcon("preferences-desktop-locale",
+                                      ":/icons/toolbar/preferences-desktop-locale.svg");
 
     languageAct->setIcon( languageIcon );
 
@@ -653,49 +703,29 @@ void ImageWindow::onStateChanged(WorkerState state)
          state == WorkerState::Suspended )
     {
         restartButton->setText( tr("Restart") );
-        restartButton->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
         restartButton->setToolTip(tr("Restart the active contour from its initial state."));
+        restartButton->setIcon( restartIcon );
     }
     else if ( state == WorkerState::Ready )
     {
         restartButton->setText( tr("Start") );
-        restartButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
         restartButton->setToolTip(tr("Run the active contour."));
+        restartButton->setIcon( startResumeIcon );
     }
 
     if ( state == WorkerState::Running )
     {
         togglePauseButton->setText( tr("Pause") );
-        togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
         togglePauseButton->setToolTip(tr("Suspend execution and display the current state."));
+        togglePauseButton->setIcon( pauseIcon );
     }
     else if ( state == WorkerState::Suspended ||
               state == WorkerState::Ready )
     {
         togglePauseButton->setText( tr("Resume") );
         togglePauseButton->setToolTip(tr("Resume the active contour execution."));
-        togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        togglePauseButton->setIcon( startResumeIcon );
     }
-}
-
-QIcon ImageWindow::settingsIcon()
-{
-    return loadSymbolic("preferences-system",
-                        QIcon(":/icons/toolbar/configure.svg"));
-}
-
-QIcon ImageWindow::loadSymbolic(const QString& name,
-                                const QIcon& fallback)
-{
-    QIcon icon = QIcon::fromTheme(name + "-symbolic");
-    if (!icon.isNull())
-        return icon;
-
-    icon = QIcon::fromTheme(name);
-    if (!icon.isNull())
-        return icon;
-
-    return fallback;
 }
 
 void ImageWindow::onCameraWindowShown()

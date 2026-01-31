@@ -88,10 +88,6 @@ private:
     void setupConnections();
 
     void updateWindowTitle();
-    QIcon settingsIcon();
-    QIcon loadSymbolic(const QString& name,
-                       const QIcon& fallback);
-
     void setCurrentFile(const QString &fileName);
     void updateRecentFileActions();
     void deleteList();
@@ -156,6 +152,11 @@ private:
     QString m_fullPath;
     QSize   m_imageSize;
     int     m_channels = 0;
+
+    QIcon startResumeIcon;
+    QIcon restartIcon;
+    QIcon pauseIcon;
+    QIcon settingsIcon;
 
 signals:
 

@@ -105,6 +105,9 @@ private:
 
     QString deviceWindowTitle;
 
+    QIcon startIcon;
+    QIcon stopIcon;
+
 signals:
     void cameraStatsUpdated(const CameraStatsUi& stats);
     void cameraWindowShown();

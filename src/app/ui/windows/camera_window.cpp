@@ -44,6 +44,7 @@
 #include "fullscreen_behavior.hpp"
 #include "autofit_behavior.hpp"
 #include "pixel_info_behavior.hpp"
+#include "icon_loader.hpp"
 
 #include <QSettings>
 #include <QMediaDevices>
@@ -119,10 +120,18 @@ CameraWindow::CameraWindow(QWidget* parent)
     cameraSelector = new QComboBox(this);
     cameraSelector->setEnabled(false);
 
+    startIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
+                             QStyle::SP_MediaPlay,
+                             ":/icons/toolbar/media-playback-start-symbolic.svg");
+
+    stopIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop,
+                            QStyle::SP_MediaStop,
+                            ":/icons/toolbar/media-playback-stop-symbolic.svg");
+
     toggleStreamingButton = new QPushButton( tr("Start") );
     toggleStreamingButton->setEnabled(false);
     toggleStreamingButton->setToolTip(tr("Start camera streaming."));
-    toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+    toggleStreamingButton->setIcon( startIcon );
 
     QWidget* central = new QWidget(this);
 
@@ -263,7 +272,7 @@ void CameraWindow::onToggleStreaming()
 
         toggleStreamingButton->setText( tr("Stop") );
         toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
-        toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
+        toggleStreamingButton->setIcon( stopIcon );
     }
 }
 
@@ -314,7 +323,7 @@ void CameraWindow::stopCameraAndUi()
 
         toggleStreamingButton->setText( tr("Start") );
         toggleStreamingButton->setToolTip(tr("Start camera streaming."));
-        toggleStreamingButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+        toggleStreamingButton->setIcon( startIcon );
 
         setWindowTitle( tr("Ofeli - Camera") );
     }
