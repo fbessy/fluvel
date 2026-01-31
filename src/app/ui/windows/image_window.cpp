@@ -672,6 +672,7 @@ void ImageWindow::onStateChanged(WorkerState state)
     else if ( state == WorkerState::Suspended ||
               state == WorkerState::Ready )
     {
+        togglePauseButton->setText( tr("Resume") );
         togglePauseButton->setToolTip(tr("Resume the active contour execution."));
         togglePauseButton->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
     }
