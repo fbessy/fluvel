@@ -100,7 +100,7 @@ void ImageWindow::setupUi()
     stepButton->setEnabled(false);
     convergeButton->setEnabled(false);
 
-    QPushButton* settingsButton = new QPushButton;
+    settingsButton = new QPushButton;
     settingsButton->setToolTip(tr("Segmentation settings"));
     settingsButton->setFlat(true);
     settingsButton->setFocusPolicy(Qt::NoFocus);
@@ -375,30 +375,45 @@ void ImageWindow::setupConnections()
             }
         });
     }
-    connect(this, &ImageWindow::fileSelected, imageController, &ImageController::loadImage);
+    connect(this,            &ImageWindow::fileSelected,
+            imageController, &ImageController::loadImage);
 
-    connect(deleteAct, &QAction::triggered, this, &ImageWindow::deleteList);
-    connect(saveAct, &QAction::triggered, this, &ImageWindow::saveDisplayed);
-    connect(quitAct, &QAction::triggered, this, &ImageWindow::close);
+    connect(deleteAct, &QAction::triggered,
+            this,      &ImageWindow::deleteList);
+
+    connect(saveAct, &QAction::triggered,
+            this,    &ImageWindow::saveDisplayed);
+
+    connect(quitAct, &QAction::triggered,
+            this,    &ImageWindow::close);
 
     connect(imageSessionAct, &QAction::triggered, this, [this]() {
         imageSessionAct->setChecked(true);
     });
 
-    connect(cameraSessionAct, &QAction::triggered, this, &ImageWindow::onStartCameraActionTriggered);
+    connect(cameraSessionAct, &QAction::triggered,
+            this,             &ImageWindow::onStartCameraActionTriggered);
 
     connect(camera_window, &CameraWindow::cameraWindowClosed,
-            this, &ImageWindow::onCameraWindowClosed);
+            this,          &ImageWindow::onCameraWindowClosed);
     connect(camera_window, &CameraWindow::cameraWindowShown,
-            this, &ImageWindow::onCameraWindowShown);
+            this,          &ImageWindow::onCameraWindowShown);
 
 
-    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this, &ImageWindow::updateCameraAction);
-    connect(analysisAct, &QAction::triggered, evaluation_window, &AnalysisWindow::show);
-    connect(settingsAct, &QAction::triggered, settings_window, &SettingsWindow::show);
+    connect(mediaDevices,      &QMediaDevices::videoInputsChanged,
+            this,              &ImageWindow::updateCameraAction);
 
-    connect(aboutAct, &QAction::triggered, about_window, &AboutWindow::show);
-    connect(languageAct, &QAction::triggered, language_window, &LanguageWindow::show);
+    connect(analysisAct,       &QAction::triggered,
+            evaluation_window, &AnalysisWindow::show);
+
+    connect(settingsAct,     &QAction::triggered,
+            settings_window, &SettingsWindow::show);
+
+    connect(aboutAct,        &QAction::triggered,
+            about_window,    &AboutWindow::show);
+
+    connect(languageAct,     &QAction::triggered,
+            language_window, &LanguageWindow::show);
 
     connect(imageController, &ImageController::imageReady, this,
             [this](const QImage& img) {
@@ -413,7 +428,7 @@ void ImageWindow::setupConnections()
 
     // former display with a qimage with the contour
     connect(acWorker.get(),  &ActiveContourWorker::resultReady,
-            imageView, &ImageView::setImage);
+            imageView,       &ImageView::setImage);
 
     connect(acWorker.get(),
             &ActiveContourWorker::contourUpdated,
@@ -438,6 +453,9 @@ void ImageWindow::setupConnections()
 
     connect(convergeButton,     &QPushButton::clicked,
             acWorker.get(),     &ActiveContourWorker::converge);
+
+    connect(settingsButton,     &QPushButton::clicked,
+            settings_window,    &SettingsWindow::show);
 
     connect(acWorker.get(),     &ActiveContourWorker::stateChanged,
             this,               &ImageWindow::onStateChanged);
