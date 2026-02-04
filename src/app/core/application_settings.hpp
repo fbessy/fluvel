@@ -43,8 +43,8 @@
 #include "active_contour.hpp"
 #include "region_color_ac.hpp"
 #include "filters.hpp"
-#include "runtime_settings.hpp"
 #include "color.hpp"
+#include "common_settings.hpp"
 
 #include <QObject>
 #include <QDir>
@@ -86,8 +86,6 @@ public:
 
     void set_img_display_config(const DisplayConfig& disp_config);
     void set_cam_display_config(const DisplayConfig& disp_config);
-
-    RuntimeSettings snapshot() const;
 
     QDir settingsDirectory();
 

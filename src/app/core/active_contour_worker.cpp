@@ -27,7 +27,8 @@ ActiveContourWorker::ActiveContourWorker()
     m_timer(new QTimer(this)),
     m_state(WorkerState::Uninitialized),
     m_mode(RunMode::Interactive),
-    timeSlice_ms(timeSliceInteractive_ms)
+    timeSlice_ms(timeSliceInteractive_ms),
+    config(AppSettings::instance().imgSessSettings)
 {
     m_timer->setInterval(workerPeriod_ms);
     connect(m_timer, &QTimer::timeout,
@@ -281,11 +282,13 @@ void ActiveContourWorker::initializeActiveContour()
 
     ac.reset();
 
-    const auto& config = AppSettings::instance();
-    unsigned int downscale_fctr = config.downscale_factor;
+    const auto& config = AppSettings::instance().imgSessSettings;
+
+    const bool has_downscale = config.downscale_conf.has_downscale;
+    const int downscale_fctr = config.downscale_conf.downscale_factor;
 
     workAlgo = m_workImage;
-    initialPhi = config.initialPhi.copy();
+    initialPhi = config.initial_phi.copy();
 
 #ifdef OFELI_DEBUG
     int bpp = m_workImage.depth() / 8;  // ou 4 pour ARGB32
@@ -296,9 +299,10 @@ void ActiveContourWorker::initializeActiveContour()
              << "padding =" << m_workImage.bytesPerLine() - expected;
 #endif
 
-    //downscale_fctr = 1;
-    if ( downscale_fctr >= 2 )
+    if ( has_downscale )
     {
+        assert( downscale_fctr == 2 || downscale_fctr == 4 );
+
         workAlgo = workAlgo.scaled(workAlgo.width()/downscale_fctr,
                                    workAlgo.height()/downscale_fctr,
                                    Qt::IgnoreAspectRatio,
@@ -322,28 +326,26 @@ void ActiveContourWorker::initializeActiveContour()
     ofeli_ip::ContourData initialCD(initialPhi.constBits(),
                                     initialPhi.width(),
                                     initialPhi.height(),
-                                    config.connectivity);
+                                    config.img_algo_conf.connectivity);
 
     bool is_rgb = ( workAlgo.format() != QImage::Format_Grayscale8 );
 
     const auto img = image_span_from_qimage( workAlgo );
 
-    if( config.speed == SpeedModel::REGION_BASED )
+
+    if( is_rgb )
     {
-        if( is_rgb )
-        {
-            ac = std::make_unique<ofeli_ip::RegionColorAc>(img,
-                                                           std::move(initialCD),
-                                                           config.algo_config,
-                                                           config.region_ac_config);
-        }
-        else
-        {
-            ac = std::make_unique<ofeli_ip::RegionAc>(img,
-                                                      std::move(initialCD),
-                                                      config.algo_config,
-                                                      config.region_ac_config);
-        }
+        ac = std::make_unique<ofeli_ip::RegionColorAc>(img,
+                                                       std::move(initialCD),
+                                                       config.img_algo_conf.ac_config,
+                                                       config.img_algo_conf.region_ac_config);
+    }
+    else
+    {
+        ac = std::make_unique<ofeli_ip::RegionAc>(img,
+                                                  std::move(initialCD),
+                                                  config.img_algo_conf.ac_config,
+                                                  config.img_algo_conf.region_ac_config);
     }
 
     setState( WorkerState::Ready );
@@ -431,6 +433,7 @@ void ActiveContourWorker::setState(WorkerState state)
 
 void ActiveContourWorker::reloadSettings()
 {
+    config = AppSettings::instance().imgSessSettings;
 }
 
 }

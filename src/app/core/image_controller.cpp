@@ -37,10 +37,10 @@ void ImageController::loadImage(const QString& path)
     {
         bool isResize = false;
 
-        if ( !AppSettings::instance().initialPhi.isNull() )
+        if ( !AppSettings::instance().imgSessSettings.initial_phi.isNull() )
         {
-            if ( AppSettings::instance().initialPhi.width()  != img.width() ||
-                 AppSettings::instance().initialPhi.height() != img.height() )
+            if ( AppSettings::instance().imgSessSettings.initial_phi.width()  != img.width() ||
+                 AppSettings::instance().imgSessSettings.initial_phi.height() != img.height() )
             {
                 AppSettings::instance().resize_initial_phi( img.width(),
                                                             img.height() );

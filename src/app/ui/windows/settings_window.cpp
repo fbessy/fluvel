@@ -91,13 +91,11 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     setupUiAlgoTab();
     setupUiInitTab();
     setupUiPreprocessingTab();
-    setupUiDisplayTab();
 
     tabs = new QTabWidget(this);
     tabs->addTab( page1, tr("Algorithm") );
     tabs->addTab( page2, tr("Initialization") );
     tabs->addTab( page3, tr("Preprocessing") );
-    tabs->addTab( page4, tr("Display") );
 
 
     settingsView = new ImageView(this);
@@ -731,101 +729,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     page3->setLayout(page3_layout);
 }
 
-void SettingsWindow::setupUiDisplayTab()
-{
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Display tab
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    QGroupBox* active_contour_groupbox = new QGroupBox(tr("Active contour"));
-
-    outsidecolor_combobox = new QComboBox;
-    insidecolor_combobox = new QComboBox;
-
-    // QPixmap pm : petite image affichant la couleur devant le nom de la couleur dans le combobox
-    QPixmap pm(12,12);
-    pm.fill(Qt::red);
-    outsidecolor_combobox->addItem (pm, tr("Red"));
-    insidecolor_combobox->addItem (pm, tr("Red"));
-    pm.fill(Qt::green);
-    outsidecolor_combobox->addItem (pm, tr("Green"));
-    insidecolor_combobox->addItem (pm, tr("Green"));
-    pm.fill(Qt::blue);
-    outsidecolor_combobox->addItem (pm, tr("Blue"));
-    insidecolor_combobox->addItem (pm, tr("Blue"));
-    pm.fill(Qt::cyan);
-    outsidecolor_combobox->addItem (pm, tr("Cyan"));
-    insidecolor_combobox->addItem (pm, tr("Cyan"));
-    pm.fill(Qt::magenta);
-    outsidecolor_combobox->addItem (pm, tr("Magenta"));
-    insidecolor_combobox->addItem (pm, tr("Magenta"));
-    pm.fill(Qt::yellow);
-    outsidecolor_combobox->addItem (pm, tr("Yellow"));
-    insidecolor_combobox->addItem (pm, tr("Yellow"));
-    pm.fill(Qt::black);
-    outsidecolor_combobox->addItem (pm, tr("Black"));
-    insidecolor_combobox->addItem (pm, tr("Black"));
-    pm.fill(Qt::white);
-    outsidecolor_combobox->addItem (pm, tr("White"));
-    insidecolor_combobox->addItem (pm, tr("White"));
-    pm.fill(Qt::transparent);
-    outsidecolor_combobox->addItem (pm,tr("Selected"));
-    insidecolor_combobox->addItem (pm,tr("Selected"));
-    outsidecolor_combobox->addItem (pm, tr("No"));
-    insidecolor_combobox->addItem (pm, tr("No"));
-
-    outsidecolor_select = new QPushButton(tr("Select"));
-    insidecolor_select = new QPushButton(tr("Select"));
-
-    QFormLayout* Loutcolor_form = new QFormLayout;
-    Loutcolor_form->addRow(tr("Lout :"), outsidecolor_combobox);
-
-    QFormLayout* Lincolor_form = new QFormLayout;
-    Lincolor_form->addRow(tr("   Lin :"), insidecolor_combobox);
-
-    QHBoxLayout* Loutcolor_hlay = new QHBoxLayout;
-    Loutcolor_hlay->addLayout(Loutcolor_form);
-    Loutcolor_hlay->addWidget(outsidecolor_select);
-
-    QHBoxLayout* Lincolor_hlay = new QHBoxLayout;
-    Lincolor_hlay->addLayout(Lincolor_form);
-    Lincolor_hlay->addWidget(insidecolor_select);
-
-    QVBoxLayout* color_layout = new QVBoxLayout;
-    color_layout->addLayout(Loutcolor_hlay);
-    color_layout->addLayout(Lincolor_hlay);
-
-    QGroupBox* color_groupbox = new QGroupBox(tr("boundaries lists colors"));
-    color_groupbox->setFlat(true);
-    color_groupbox->setLayout(color_layout);
-
-    QVBoxLayout* active_contour_layout = new QVBoxLayout;
-    active_contour_layout->addWidget(color_groupbox);
-
-    active_contour_groupbox->setLayout(active_contour_layout);
-
-    QGroupBox* tracking_display_groupbox = new QGroupBox(tr("Video tracking"));
-
-    fps_checkbox = new QCheckBox(tr("show frames per second (FPS)"));
-    mirrored_checkbox = new QCheckBox(tr("show mirrored (horizontally flipped) frames"));
-
-    QVBoxLayout* tracking_display_layout = new QVBoxLayout;
-    tracking_display_layout->addWidget(fps_checkbox);
-    tracking_display_layout->addWidget(mirrored_checkbox);
-    tracking_display_groupbox->setLayout(tracking_display_layout);
-
-
-    ////////////////////////////////////////////
-
-    QVBoxLayout* display_layout = new QVBoxLayout;
-    display_layout->addWidget(active_contour_groupbox);
-    display_layout->addWidget(tracking_display_groupbox);
-    display_layout->addStretch(1);
-
-    page4 = new QWidget;
-    page4->setLayout( display_layout );
-}
-
 void SettingsWindow::setupConnections()
 {
     //connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
@@ -841,9 +744,6 @@ void SettingsWindow::setupConnections()
     //connect(alpha_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
     //connect(beta_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
     //connect(gamma_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-
-    //connect(chanvese_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(geodesic_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
     connect(width_slider,      &QSlider::valueChanged,
             width_shape_spin,  &QSpinBox::setValue);
@@ -918,9 +818,6 @@ void SettingsWindow::setupConnections()
         //connect(page3,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
         //connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-
-    connect(outsidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_out()));
-    connect(insidecolor_select,SIGNAL(clicked()),this,SLOT(set_color_in()));
 
 
     connect(add_button, &QPushButton::clicked,
@@ -1282,51 +1179,6 @@ void SettingsWindow::reject()
         complex1_morpho_radio->setChecked(true);
     }
 
-    /////////////////////////////
-    //        Display          //
-    /////////////////////////////
-
-    insidecolor_combobox->setCurrentIndex(config.inside_combo);
-    outsidecolor_combobox->setCurrentIndex(config.outside_combo);
-
-    selected_in_disp = config.selected_in;
-    selected_out_disp = config.selected_out;
-
-    RgbColor color;
-
-    if( config.inside_combo == ComboBoxColorIndex::SELECTED )
-    {
-        color = selected_in_disp;
-    }
-    else
-    {
-        //get_color(config.inside_combo,
-                  //color);
-    }
-    QPixmap pm1(12,12);
-    //pm1.fill( QColor( get_QRgb(color) ) );
-    insidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm1);
-
-    if( config.outside_combo == ComboBoxColorIndex::SELECTED )
-    {
-        color = selected_out_disp;
-    }
-    //else
-    //{
-        //get_color(config.outside_combo,
-          //        color);
-    //}
-    //QPixmap pm2(12,12);
-    //pm2.fill( QColor( get_QRgb(color) ) );
-    //outsidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm2);
-
-
-    fps_checkbox->setChecked(config.is_show_fps);
-    mirrored_checkbox->setChecked(config.is_show_mirrored);
-
-    //calculate_filtered_copy_visu_buffers();
-    //tab_visu( tabs->currentIndex() );
-
     phiEditor_->reject();
 
     QDialog::reject();
@@ -1420,60 +1272,6 @@ void SettingsWindow::default_settings()
 
     // config.has_O1_morpho
     complex2_morpho_radio->setChecked( true );
-
-    /////////////////////////////
-    //        Display          //
-    /////////////////////////////
-
-    outsidecolor_combobox->setCurrentIndex( ComboBoxColorIndex::BLUE );
-    insidecolor_combobox->setCurrentIndex( ComboBoxColorIndex::RED );
-
-    fps_checkbox->setChecked( true );
-    mirrored_checkbox->setChecked( true );
-
-    //calculate_filtered_copy_visu_buffers();
-    //tab_visu( tabs->currentIndex() );
-}
-
-
-// Fonction appelée par le boutton selected de boundaries outside
-// sélection et affichage d'une couleur particulière
-void SettingsWindow::set_color_out()
-{
-    // Sélection d'une QColor a partir d'une boite de dialogue couleur
-    QColor color_out = QColorDialog::getColor(Qt::white, this, tr("Select Lout color"));
-    if( color_out.isValid() )
-    {
-        selected_out_disp.red   = (unsigned char)(color_out.red());
-        selected_out_disp.green = (unsigned char)(color_out.green());
-        selected_out_disp.blue  = (unsigned char)(color_out.blue());
-
-        QPixmap pm(12,12);
-        pm.fill(color_out);
-        outsidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
-
-        outsidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
-    }
-}
-
-// Fonction appelée par le boutton selected de boundaries inside
-// sélection et affichage d'une couleure particulière
-void SettingsWindow::set_color_in()
-{
-    // Selection d'une QColor à partir d'une boîte de dialogue couleur
-    QColor color_in = QColorDialog::getColor(Qt::white, this, tr("Select Lin color"));
-    if( color_in.isValid() )
-    {
-        selected_in_disp.red   = (unsigned char)(color_in.red());
-        selected_in_disp.green = (unsigned char)(color_in.green());
-        selected_in_disp.blue  = (unsigned char)(color_in.blue());
-
-        QPixmap pm(12,12);
-        pm.fill(color_in);
-        insidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
-
-        insidecolor_combobox->setCurrentIndex(ComboBoxColorIndex::SELECTED);
-    }
 }
 
 const unsigned char* SettingsWindow::get_filtered_img_data()

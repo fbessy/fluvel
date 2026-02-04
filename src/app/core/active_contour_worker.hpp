@@ -7,6 +7,7 @@
 
 #include "active_contour.hpp"
 #include "algo_stats.hpp"
+#include "application_settings.hpp"
 
 namespace ofeli_app
 {
@@ -90,6 +91,8 @@ private:
 
     qint64 timeSlice_ms;
     bool initialShown;
+
+    ImageSessionSettings config;
 };
 
 }

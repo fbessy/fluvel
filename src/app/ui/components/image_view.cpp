@@ -27,14 +27,26 @@ ImageView::ImageView(QWidget* parent, Session session)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
 
+    QColor col_lout, col_lin;
+
+    if ( display_config_.display_l_out )
+        col_lout = toQColor(display_config_.l_out_color);
+    else
+        col_lout = Qt::transparent;
+
+    if ( display_config_.display_l_in )
+        col_lin = toQColor(display_config_.l_in_color);
+    else
+        col_lin = Qt::transparent;
+
     contourOutItem = new ContourPointsItem;
     contourOutItem->setZValue(100);
-    contourOutItem->setColor( toQColor(display_config_.l_out_color) );
+    contourOutItem->setColor( col_lout );
     scene->addItem(contourOutItem);
 
     contourInItem = new ContourPointsItem;
     contourInItem->setZValue(100);
-    contourInItem->setColor( toQColor(display_config_.l_in_color) );
+    contourInItem->setColor( col_lin );
     scene->addItem(contourInItem);
 
     displayTimer.start();

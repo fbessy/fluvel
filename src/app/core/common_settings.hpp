@@ -205,6 +205,60 @@ inline ofeli_ip::Rgb_uc get_color(int index)
     return color;
 }
 
+inline int get_index(const ofeli_ip::Rgb_uc& color)
+{
+    int index = ComboBoxColorIndex::SELECTED;
+
+
+    if ( color == ofeli_ip::Rgb_uc{255, 0, 0} )
+    {
+        index = ComboBoxColorIndex::RED;
+    }
+
+    else if ( color == ofeli_ip::Rgb_uc{0, 255, 0} )
+    {
+        index = ComboBoxColorIndex::GREEN;
+    }
+
+    else if ( color == ofeli_ip::Rgb_uc{0, 0, 255} )
+    {
+        index = ComboBoxColorIndex::BLUE;
+    }
+
+    else if ( color == ofeli_ip::Rgb_uc{0, 255, 255} )
+    {
+        index = ComboBoxColorIndex::CYAN;
+    }
+
+    else if ( color == ofeli_ip::Rgb_uc{255, 0, 255} )
+    {
+        index = ComboBoxColorIndex::MAGENTA;
+    }
+
+    else if ( color == ofeli_ip::Rgb_uc{255, 255, 0} )
+    {
+        index = ComboBoxColorIndex::YELLOW;
+    }
+
+    else if ( color == ofeli_ip::Rgb_uc{0, 0, 0} )
+    {
+        index = ComboBoxColorIndex::BLACK;
+    }
+    else if ( color == ofeli_ip::Rgb_uc{255, 255, 255} )
+    {
+        index = ComboBoxColorIndex::WHITE;
+    }
+
+    return index;
+}
+
+inline QRgb get_QRgb(ofeli_ip::Rgb_uc col)
+{
+    return qRgb(int(col.red),
+                int(col.green),
+                int(col.blue));
+}
+
 }
 
 #endif // COMMON_SETTINGS_HPP

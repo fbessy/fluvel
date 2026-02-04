@@ -145,11 +145,4 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
     }
 }
 
-QRgb get_QRgb(ofeli_ip::Rgb_uc col)
-{
-    return qRgb(int(col.red),
-                int(col.green),
-                int(col.blue));
-}
-
 }

@@ -255,32 +255,6 @@ private :
     QLabel* time_filt;
 
 
-    /////////////////////////////////////////
-
-    // widgets et variables liés à l'onglet display :
-
-    QWidget* page4;
-    bool has_histo_normaliz2;
-
-    QComboBox* outsidecolor_combobox;
-
-    QPushButton* outsidecolor_select;
-    QPushButton* insidecolor_select;
-
-    // colors to display contour in settings window
-    // as a preview color settings before user acceptance
-    RgbColor color_out_disp;
-    RgbColor selected_out_disp;
-    RgbColor color_in_disp;
-    RgbColor selected_in_disp;
-
-    QComboBox* insidecolor_combobox;
-
-    // for group box tracking
-    QCheckBox* fps_checkbox;
-    QCheckBox* mirrored_checkbox;
-
-
     ofeli_ip::Filters* filters2;
     float calculate_filtered_image();
     void calculate_filtered_copy_visu_buffers();
@@ -340,7 +314,6 @@ private :
     void setupUiAlgoTab();
     void setupUiInitTab();
     void setupUiPreprocessingTab();
-    void setupUiDisplayTab();
     void setupConnections();
 
     ShapeInfo computeShapeInfo();
@@ -358,8 +331,8 @@ private slots :
     //void show_phi_with_filtered_image();
 
     //void change_display_size();
-    void set_color_out();
-    void set_color_in();
+    //void set_color_out();
+    //void set_color_in();
 
 signals :
 

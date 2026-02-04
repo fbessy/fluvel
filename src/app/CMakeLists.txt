@@ -102,7 +102,6 @@ set(app_src
     ${CORE_DIR}/application_settings.cpp
     ${CORE_DIR}/application_settings.hpp
 
-    ${CORE_DIR}/runtime_settings.hpp
     ${CORE_DIR}/common_settings.hpp
 
     ${CORE_DIR}/phi_editor.cpp

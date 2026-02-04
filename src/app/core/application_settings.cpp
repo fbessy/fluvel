@@ -446,85 +446,6 @@ void ApplicationSettings::load_disp(const QString& scope,
     disp_config.display_overlay = settings.value(scope + "/display/display_overlay", true).toBool();
 }
 
-RuntimeSettings ApplicationSettings::snapshot() const
-{
-    RuntimeSettings rs;
-
-    rs.app_language = app_language;
-
-    rs.connectivity = connectivity;
-
-    rs.algo_config = algo_config;
-    rs.region_ac_config = region_ac_config;
-
-    rs.speed = speed;
-    rs.kernel_gradient_length = kernel_gradient_length;
-
-    rs.downscale_factor = downscale_factor;
-    rs.cycles_nbr = cycles_nbr;
-
-    /////////////////////////////////////////
-
-    rs.initialPhi = initialPhi.copy();
-
-    /////////////////////////////////////////
-
-    rs.has_preprocess = has_preprocess;
-
-    rs.has_gaussian_noise = has_gaussian_noise;
-    rs.std_noise = std_noise;
-    rs.has_salt_noise = has_salt_noise;
-    rs.proba_noise = proba_noise;
-    rs.has_speckle_noise = has_speckle_noise;
-    rs.std_speckle_noise = std_speckle_noise;
-
-    rs.has_median_filt = has_median_filt;
-    rs.kernel_median_length = kernel_median_length;
-    rs.has_O1_algo = has_O1_algo;
-    rs.has_mean_filt = has_mean_filt;
-    rs.kernel_mean_length = kernel_mean_length;
-    rs.has_gaussian_filt = has_gaussian_filt;
-    rs.kernel_gaussian_length = kernel_gaussian_length;
-    rs.sigma = sigma;
-
-    rs.has_aniso_diff = has_aniso_diff;
-    rs.aniso_option = aniso_option;
-    rs.max_itera = max_itera;
-    rs.lambda = lambda;
-    rs.kappa = kappa;
-
-    rs.has_open_filt = has_open_filt;
-    rs.kernel_open_length = kernel_open_length;
-    rs.has_close_filt = has_close_filt;
-    rs.kernel_close_length = kernel_close_length;
-    rs.has_top_hat_filt = has_top_hat_filt;
-    rs.is_white_top_hat = is_white_top_hat;
-    rs.kernel_tophat_length = kernel_tophat_length;
-
-    rs.has_O1_morpho = has_O1_morpho;
-
-    rs.has_temporal_smoothing = has_temporal_smoothing;
-
-    /////////////////////////////////////////
-
-    rs.has_histo_normaliz = has_histo_normaliz;
-
-    rs.has_display_each = has_display_each;
-
-    rs.outside_combo = outside_combo;
-    rs.inside_combo = inside_combo;
-
-    rs.color_out = color_out;
-    rs.color_in = color_in;
-    rs.selected_out = selected_out;
-    rs.selected_in = selected_in;
-
-    rs.is_show_fps = is_show_fps;
-    rs.is_show_mirrored = is_show_mirrored;
-
-    return rs;
-}
-
 QDir ApplicationSettings::settingsDirectory()
 {
     QSettings settings;
@@ -539,19 +460,21 @@ bool ApplicationSettings::load_initial_phi()
     QDir dir = settingsDirectory();
     QString phiPath = dir.filePath(kPhiInitFilename);
 
+    QImage& img = imgSessSettings.initial_phi;
+
     if (QFile::exists(phiPath))
     {
-        initialPhi.load(phiPath);
+        img.load(phiPath);
     }
 
-    if ( !initialPhi.isNull() &&
-         initialPhi.format() !=  QImage::Format_Grayscale8 )
+    if ( !img.isNull() &&
+         img.format() !=  QImage::Format_Grayscale8 )
     {
-        initialPhi = initialPhi.convertToFormat(QImage::Format_Grayscale8);
+        img = img.convertToFormat(QImage::Format_Grayscale8);
     }
 
-    if ( !initialPhi.isNull() &&
-         initialPhi.format() == QImage::Format_Grayscale8 )
+    if ( !img.isNull() &&
+         img.format() == QImage::Format_Grayscale8 )
     {
         isOk = true;
     }
@@ -564,10 +487,10 @@ void ApplicationSettings::load_default_initial_phi()
     const int width  = 1280;
     const int height = 720;
 
-    initialPhi = QImage(width, height, QImage::Format_Grayscale8);
-    initialPhi.fill(Qt::black);
+    imgSessSettings.initial_phi = QImage(width, height, QImage::Format_Grayscale8);
+    imgSessSettings.initial_phi.fill(Qt::black);
 
-    QPainter painter(&initialPhi);
+    QPainter painter(&imgSessSettings.initial_phi);
 
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setBrush(Qt::white);
@@ -590,14 +513,16 @@ bool ApplicationSettings::save_initial_phi()
 {
     bool isOk = false;
 
-    if ( !initialPhi.isNull() &&
-         initialPhi.format() == QImage::Format_Grayscale8 )
+    QImage img = imgSessSettings.initial_phi;
+
+    if ( !img.isNull() &&
+         img.format() == QImage::Format_Grayscale8 )
     {
         QDir dir = settingsDirectory();
         QString phiPath = dir.filePath(kPhiInitFilename);
 
 
-        isOk = initialPhi.save(phiPath, "PNG");
+        isOk = img.save(phiPath, "PNG");
     }
 
     return isOk;
@@ -605,12 +530,13 @@ bool ApplicationSettings::save_initial_phi()
 
 void ApplicationSettings::resize_initial_phi(int width, int height)
 {
-    if ( !initialPhi.isNull() )
+    QImage& img = imgSessSettings.initial_phi;
+
+    if ( !img.isNull() )
     {
-        initialPhi = initialPhi.scaled( width,
-                                        height,
-                                        Qt::IgnoreAspectRatio,
-                                        Qt::FastTransformation);
+        img = img.scaled( width, height,
+                          Qt::IgnoreAspectRatio,
+                          Qt::FastTransformation );
     }
 }
 

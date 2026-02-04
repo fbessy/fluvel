@@ -39,6 +39,18 @@ struct Rgb
           blue(static_cast<T>(other.blue))
     {}
 
+    bool operator==(const Rgb& other) const noexcept
+    {
+        return    red   == other.red
+               && green == other.green
+               && blue  == other.blue;
+    }
+
+    bool operator!=(const Rgb& other) const noexcept
+    {
+        return !(*this == other);
+    }
+
     template <Arithmetic U>
     Rgb& operator+=(const Rgb<U>& rhs)
     {

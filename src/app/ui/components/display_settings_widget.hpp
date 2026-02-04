@@ -20,6 +20,10 @@ public:
                           const DisplayConfig& config,
                           Session session);
 
+private slots:
+    void set_color_out();
+    void set_color_in();
+
 private:
 
     void init_combobox_color(QComboBox* color_cb);

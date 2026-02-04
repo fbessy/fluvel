@@ -6,8 +6,8 @@
 #include <QWaitCondition>
 #include <QVideoFrame>
 #include "frame_stats_view.hpp"
-#include "runtime_settings.hpp"
 #include "temporal_smoother.hpp"
+#include "common_settings.hpp"
 
 namespace ofeli_app {
 
