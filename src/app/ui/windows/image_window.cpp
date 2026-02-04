@@ -100,6 +100,16 @@ void ImageWindow::setupUi()
     stepButton->setEnabled(false);
     convergeButton->setEnabled(false);
 
+
+    compactModeButton = new QPushButton;
+    compactModeButton->setCheckable(true);
+    compactModeButton->setFocusPolicy(Qt::NoFocus);
+    compactModeButton->setToolTip(tr("Activate compact mode."));
+
+    compactModeButton->setIcon(
+        QIcon::fromTheme("view-compact")
+        );
+
     settingsButton = new QPushButton;
     settingsButton->setToolTip(tr("Segmentation settings"));
     settingsButton->setFlat(true);
@@ -130,6 +140,8 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(convergeButton);
     controlLayout->addStretch();
 
+    controlLayout->addWidget(compactModeButton);
+
     controlLayout->addSpacerItem(
         new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
         );
@@ -153,9 +165,15 @@ void ImageWindow::setupUi()
     imageOverlay = new AlgoInfoOverlay(imageView->viewport());
     imageOverlay->raise();
 
+    // --- Display bar ---
+    displayBar = new DisplaySettingsWidget(central,
+                                           AppSettings::instance().imgSessSettings.img_disp_conf,
+                                           Session::Image);
+
     // Assemblage
     mainLayout->addWidget(controlBar);
     mainLayout->addWidget(imageView, 1); // stretch = important
+    mainLayout->addWidget(displayBar);
 
     setCentralWidget(central);
 }
@@ -453,6 +471,12 @@ void ImageWindow::setupConnections()
 
     connect(convergeButton,     &QPushButton::clicked,
             acWorker.get(),     &ActiveContourWorker::converge);
+
+    connect(compactModeButton, &QToolButton::toggled,
+            this, [this](bool checked)
+            {
+                displayBar->setVisible(!checked);
+            });
 
     connect(settingsButton,     &QPushButton::clicked,
             settings_window,    &SettingsWindow::show);

@@ -149,6 +149,9 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
+        ui/components/algo_settings_widget.hpp ui/components/algo_settings_widget.cpp
+        ui/components/display_settings_widget.hpp ui/components/display_settings_widget.cpp
+        ui/windows/camera_settings_window.hpp ui/windows/camera_settings_window.cpp
     )
 endif()
 

@@ -10,6 +10,8 @@
 
 #include "contour_point_item.hpp"
 #include "image_view_listener.hpp"
+#include "common_settings.hpp"
+#include "application_settings.hpp"
 
 
 class QWheelEvent;
@@ -27,7 +29,9 @@ class ImageView : public QGraphicsView
     Q_OBJECT
 
 public:
-    explicit ImageView(QWidget* parent = nullptr);
+
+    explicit ImageView(QWidget* parent = nullptr,
+                       Session session = Session::Image);
 
     // Affichage image (thread-safe via event loop)
     void setImage(const QImage& img);
@@ -67,6 +71,8 @@ public:
 public slots:
     void displayContour(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
+    void onConfigChanged();
+    void onDownscaleChanged();
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -119,9 +125,23 @@ private:
     ImageViewInteraction* m_interaction = nullptr;
     ImageViewListener*        listener_ = nullptr;
 
+    DisplayConfig display_config_;
+    DownscaleConfig downscale_config_;
+
+    Session session_;
+
 signals:
     void imageClicked(int x, int y);
 };
+
+inline QColor toQColor(const ofeli_ip::Rgb_uc& c)
+{
+    return QColor(
+        static_cast<int>(c.red),
+        static_cast<int>(c.green),
+        static_cast<int>(c.blue)
+        );
+}
 
 } // namespace ofeli_app
 

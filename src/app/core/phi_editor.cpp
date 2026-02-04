@@ -60,7 +60,7 @@ void PhiEditor::clear()
 
 void PhiEditor::accept()
 {
-    AppSettings::instance().initialPhi = current;
+    AppSettings::instance().imgSessSettings.initial_phi = current;
 }
 
 void PhiEditor::reject()

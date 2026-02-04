@@ -22,7 +22,7 @@ public:
                const QStyleOptionGraphicsItem*,
                QWidget*) override;
 
-    void setColor(QColor color) { color_ = color; }
+    void setColor(QColor color) { color_ = color; update(); }
 
 private:
     QVector<QPoint> points_;

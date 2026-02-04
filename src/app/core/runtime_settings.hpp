@@ -11,6 +11,21 @@
 namespace ofeli_app
 {
 
+struct RuntimeImageSettings
+{
+    ImageSessionSettings runImgSessSettings;
+};
+
+struct RuntimeCameraSettings
+{
+    CameraSessionSettings runCamSessSettings;
+};
+
+struct RuntimeDispSettings
+{
+    DisplayConfig runDispSettings;
+};
+
 struct RuntimeSettings
 {
     Language app_language;

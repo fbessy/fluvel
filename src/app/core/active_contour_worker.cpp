@@ -32,6 +32,14 @@ ActiveContourWorker::ActiveContourWorker()
     m_timer->setInterval(workerPeriod_ms);
     connect(m_timer, &QTimer::timeout,
             this, &ActiveContourWorker::onTimeout);
+
+    QObject::connect(
+        &AppSettings::instance(),
+        &ApplicationSettings::imgSettingsApplied,
+        this,
+        &ActiveContourWorker::reloadSettings,
+        Qt::QueuedConnection
+        );
 }
 
 void ActiveContourWorker::restart()
@@ -349,7 +357,7 @@ void ActiveContourWorker::drawAndEmitResult()
 
     QImage result = m_workImage.convertToFormat(QImage::Format_RGB32);
 
-    const auto& config = AppSettings::instance();
+    const auto& config = AppSettings::instance().imgSessSettings.img_disp_conf;
 
     if ( ac == nullptr )
         return;
@@ -357,11 +365,17 @@ void ActiveContourWorker::drawAndEmitResult()
     const auto& l_out = ac->l_out();
     const auto& l_in  = ac->l_in();
 
-    draw_list_to_img(l_out, config.color_out, config.outside_combo,
-                     result);
+    if ( config.display_l_out )
+    {
+        draw_list_to_img(l_out, config.l_out_color,
+                         result);
+    }
 
-    draw_list_to_img(l_in, config.color_in, config.inside_combo,
-                     result);
+    if ( config.display_l_in )
+    {
+        draw_list_to_img(l_in, config.l_in_color,
+                         result);
+    }
 
     emit resultReady(result);
 }
@@ -413,6 +427,10 @@ void ActiveContourWorker::setState(WorkerState state)
 {
     m_state = state;
     emit stateChanged(state);
+}
+
+void ActiveContourWorker::reloadSettings()
+{
 }
 
 }

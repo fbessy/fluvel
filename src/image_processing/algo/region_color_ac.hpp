@@ -50,12 +50,12 @@
 namespace ofeli_ip
 {
 
-enum ColorSpaceOption : unsigned int
+enum class ColorSpaceOption
 {
-    RGB          = 0,
-    YUV          = 1,
-    Lab          = 2,
-    Luv          = 3
+    RGB,
+    YUV,
+    Lab,
+    Luv
 };
 
 //! \class RegionColorConfig

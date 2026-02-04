@@ -151,14 +151,6 @@ void SettingsWindow::setupUiAlgoTab()
     QFormLayout *Na_layout = new QFormLayout;
     Na_layout->addRow("Na =", Na_spin);
 
-    klength_gradient_spin = new KernelSizeSpinBox;
-    klength_gradient_spin->setSingleStep(2);
-    klength_gradient_spin->setMinimum(3);
-    klength_gradient_spin->setMaximum(499);
-
-    chanvese_radio = new QRadioButton(tr("Chan-Vese model"));
-    chanvese_radio->setToolTip(tr("region-based model for bimodal images"));
-
     lambda_out_spin = new QSpinBox;
     lambda_out_spin->setSingleStep(1);
     lambda_out_spin->setMinimum(1);
@@ -173,36 +165,21 @@ void SettingsWindow::setupUiAlgoTab()
 
     QFormLayout* lambda_layout = new QFormLayout;
 
-    auto& config = AppSettings::instance();
+    auto& config = AppSettings::instance().imgSessSettings.img_disp_conf;
 
-    QColor RGBout_list( get_QRgb(config.color_out) );
-    QColor RGBin_list( get_QRgb(config.color_in) );
+    QColor RGBout_list( get_QRgb(config.l_out_color) );
+    QColor RGBin_list( get_QRgb(config.l_in_color) );
 
     lambda_layout->addRow("<font color="+RGBout_list.name()+">"+"λout"+"<font color=black>"+" =", lambda_out_spin);
     lambda_layout->addRow("<font color="+RGBin_list.name()+">"+"λin"+"<font color=black>"+" =", lambda_in_spin);
 
     QVBoxLayout* chanvese_layout = new QVBoxLayout;
-    chanvese_layout->addWidget(chanvese_radio);
     chanvese_layout->addLayout(lambda_layout);
 
-    geodesic_radio = new QRadioButton(tr("geodesic model"));
-    geodesic_radio->setToolTip(tr("edge-based model for smoothed multimodal images"));
 
-    klength_gradient_spin = new KernelSizeSpinBox;
-    klength_gradient_spin->setSingleStep(2);
-    klength_gradient_spin->setMinimum(3);
-    klength_gradient_spin->setMaximum(499);
-    klength_gradient_spin->setToolTip(tr("morphological gradient structuring element size"));
-    QFormLayout *gradient_layout = new QFormLayout;
-    gradient_layout->addRow(tr("SE size ="), klength_gradient_spin);
-
-    QVBoxLayout* geodesic_layout = new QVBoxLayout;
-    geodesic_layout->addWidget(geodesic_radio);
-    geodesic_layout->addLayout(gradient_layout);
 
     QHBoxLayout* speed_layout = new QHBoxLayout;
     speed_layout->addLayout(chanvese_layout);
-    speed_layout->addLayout(geodesic_layout);
 
     color_weights_groupbox = new QGroupBox(tr("Color space"));
     color_weights_groupbox->setFlat(true);
@@ -502,6 +479,9 @@ void SettingsWindow::setupUiPreprocessingTab()
     /// Preprocessing tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    is_downscale_cb = new QCheckBox("Downscale :");
+    is_downscale_cb->setChecked(false);
+
     gaussian_noise_groupbox = new QGroupBox(tr("Gaussian white noise"));
     gaussian_noise_groupbox->setCheckable(true);
     gaussian_noise_groupbox->setChecked(false);
@@ -757,21 +737,6 @@ void SettingsWindow::setupUiDisplayTab()
     /// Display tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    QGroupBox* size_groupbox = new QGroupBox(tr("Image"));
-
-    histo_checkbox = new QCheckBox(tr("histogram normalization for the gradient"));
-
-
-    QFormLayout* size_layout = new QFormLayout;
-    size_layout->addRow(" ",histo_checkbox);
-
-    size_groupbox->setLayout(size_layout);
-
-    ////////////////////////////////////////////
-
-    step_checkbox = new QCheckBox(tr("display after each iteration"));
-    step_checkbox->setToolTip(tr("It doesn't concern the video tracking part."));
-
     QGroupBox* active_contour_groupbox = new QGroupBox(tr("Active contour"));
 
     outsidecolor_combobox = new QComboBox;
@@ -836,7 +801,6 @@ void SettingsWindow::setupUiDisplayTab()
 
     QVBoxLayout* active_contour_layout = new QVBoxLayout;
     active_contour_layout->addWidget(color_groupbox);
-    active_contour_layout->addWidget(step_checkbox);
 
     active_contour_groupbox->setLayout(active_contour_layout);
 
@@ -854,7 +818,6 @@ void SettingsWindow::setupUiDisplayTab()
     ////////////////////////////////////////////
 
     QVBoxLayout* display_layout = new QVBoxLayout;
-    display_layout->addWidget(size_groupbox);
     display_layout->addWidget(active_contour_groupbox);
     display_layout->addWidget(tracking_display_groupbox);
     display_layout->addStretch(1);
@@ -1050,56 +1013,31 @@ void SettingsWindow::applyCurrentShape(bool add)
 
 void SettingsWindow::accept()
 {
-    auto& config = AppSettings::instance();
+    auto& config_algo = AppSettings::instance().imgSessSettings.img_algo_conf;
 
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
 
-    config.connectivity = ofeli_ip::Connectivity( connectivity_cb->currentIndex() );
+    config_algo.connectivity = ofeli_ip::Connectivity( connectivity_cb->currentIndex() );
 
-    if( chanvese_radio->isChecked() )
-    {
-        config.speed = SpeedModel::REGION_BASED;
-    }
-    if( geodesic_radio->isChecked() )
-    {
-        config.speed = SpeedModel::EDGE_BASED;
-    }
+    config_algo.ac_config.is_cycle2 = internalspeed_groupbox->isChecked();
+    config_algo.ac_config.disk_radius = disk_radius_spin->value();
+    config_algo.ac_config.Na = Na_spin->value();
+    config_algo.ac_config.Ns = Ns_spin->value();
 
-    config.algo_config.is_cycle2 = internalspeed_groupbox->isChecked();
-    config.algo_config.disk_radius = disk_radius_spin->value();
-    config.algo_config.Na = Na_spin->value();
-    config.algo_config.Ns = Ns_spin->value();
+    config_algo.region_ac_config.lambda_in = lambda_in_spin->value();
+    config_algo.region_ac_config.lambda_out = lambda_out_spin->value();
 
-    config.region_ac_config.lambda_in = lambda_in_spin->value();
-    config.region_ac_config.lambda_out = lambda_out_spin->value();
+    config_algo.region_ac_config.color_space = ofeli_ip::ColorSpaceOption( color_space_cb->currentIndex() );
 
-    config.region_ac_config.color_space = ofeli_ip::ColorSpaceOption( color_space_cb->currentIndex() );
+    config_algo.region_ac_config.weights.c1 = alpha_spin->value();
+    config_algo.region_ac_config.weights.c2 = beta_spin->value();
+    config_algo.region_ac_config.weights.c3 = gamma_spin->value();
 
-    config.region_ac_config.weights.c1 = alpha_spin->value();
-    config.region_ac_config.weights.c2 = beta_spin->value();
-    config.region_ac_config.weights.c3 = gamma_spin->value();
+    //config.has_temporal_smoothing = has_temporal_smoothing_cb->isChecked();
 
-    config.kernel_gradient_length = klength_gradient_spin->value();
-
-
-    if ( downscale_factor_cb->currentIndex() == 0 )
-    {
-        config.downscale_factor = 1;
-    }
-    else if ( downscale_factor_cb->currentIndex() == 1 )
-    {
-        config.downscale_factor = 2;
-    }
-    else if ( downscale_factor_cb->currentIndex() == 2 )
-    {
-        config.downscale_factor = 4;
-    }
-
-    config.has_temporal_smoothing = has_temporal_smoothing_cb->isChecked();
-
-    config.cycles_nbr = cycles_nbr_sb->value();
+    //config.cycles_nbr = cycles_nbr_sb->value();
 
     ///////////////////////////////////
     //       Initialization          //
@@ -1111,85 +1049,105 @@ void SettingsWindow::accept()
     //        Preprocessing          //
     ///////////////////////////////////
 
-    config.has_preprocess = page3->isChecked();
-    config.has_gaussian_noise = gaussian_noise_groupbox->isChecked();
-    config.std_noise = float( std_noise_spin->value() );
-    config.has_salt_noise = salt_noise_groupbox->isChecked();
-    config.proba_noise = float( proba_noise_spin->value() ) / 100.f;
-    config.has_speckle_noise = speckle_noise_groupbox->isChecked();
-    config.std_speckle_noise = float( std_speckle_noise_spin->value() );
-    config.has_median_filt = median_groupbox->isChecked();
-    config.kernel_median_length = klength_median_spin->value();
-    config.has_O1_algo = complex_radio2->isChecked();
+    AppSettings::instance().imgSessSettings.has_preprocess = page3->isChecked();
 
-    config.has_mean_filt = mean_groupbox->isChecked();
-    config.kernel_mean_length = klength_mean_spin->value();
+    auto& ds_config = AppSettings::instance().imgSessSettings.downscale_conf;
 
-    config.has_gaussian_filt = gaussian_groupbox->isChecked();
-    config.kernel_gaussian_length = klength_gaussian_spin->value();
-    config.sigma = float( std_filter_spin->value() );
-    config.has_aniso_diff = aniso_groupbox->isChecked();
+    if ( is_downscale_cb->isChecked() )
+    {
+        if ( downscale_factor_cb->currentIndex() == 0 )
+        {
+            ds_config.downscale_factor = 2;
+        }
+        else if ( downscale_factor_cb->currentIndex() == 1 )
+        {
+            ds_config.downscale_factor = 4;
+        }
+    }
+    else
+    {
+        ds_config.downscale_factor = 1;
+    }
 
-    config.max_itera = iteration_filter_spin->value();
-    config.lambda = float( lambda_spin->value() );
-    config.kappa = float( kappa_spin->value() );
+    auto& filt_config = AppSettings::instance().imgSessSettings.filtering_conf;
+
+    filt_config.has_gaussian_noise = gaussian_noise_groupbox->isChecked();
+    filt_config.std_noise = float( std_noise_spin->value() );
+    filt_config.has_salt_noise = salt_noise_groupbox->isChecked();
+    filt_config.proba_noise = float( proba_noise_spin->value() ) / 100.f;
+    filt_config.has_speckle_noise = speckle_noise_groupbox->isChecked();
+    filt_config.std_speckle_noise = float( std_speckle_noise_spin->value() );
+    filt_config.has_median_filt = median_groupbox->isChecked();
+    filt_config.kernel_median_length = klength_median_spin->value();
+    filt_config.has_O1_algo = complex_radio2->isChecked();
+
+    filt_config.has_mean_filt = mean_groupbox->isChecked();
+    filt_config.kernel_mean_length = klength_mean_spin->value();
+
+    filt_config.has_gaussian_filt = gaussian_groupbox->isChecked();
+    filt_config.kernel_gaussian_length = klength_gaussian_spin->value();
+    filt_config.sigma = float( std_filter_spin->value() );
+    filt_config.has_aniso_diff = aniso_groupbox->isChecked();
+
+    filt_config.max_itera = iteration_filter_spin->value();
+    filt_config.lambda = float( lambda_spin->value() );
+    filt_config.kappa = float( kappa_spin->value() );
     if( aniso1_radio->isChecked() )
     {
-        config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION1;
+        filt_config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION1;
     }
     else if( aniso2_radio->isChecked() )
     {
-        config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION2;
+        filt_config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION2;
     }
 
-    config.has_open_filt = open_groupbox->isChecked();
-    config.kernel_open_length = klength_open_spin->value();
-    config.has_close_filt = close_groupbox->isChecked();
-    config.kernel_close_length = klength_close_spin->value();
-    config.has_top_hat_filt = tophat_groupbox->isChecked();
-    config.is_white_top_hat = whitetophat_radio->isChecked();
-    config.kernel_tophat_length = klength_tophat_spin->value();
-    config.has_O1_morpho = complex2_morpho_radio->isChecked();
+    filt_config.has_open_filt = open_groupbox->isChecked();
+    filt_config.kernel_open_length = klength_open_spin->value();
+    filt_config.has_close_filt = close_groupbox->isChecked();
+    filt_config.kernel_close_length = klength_close_spin->value();
+    filt_config.has_top_hat_filt = tophat_groupbox->isChecked();
+    filt_config.is_white_top_hat = whitetophat_radio->isChecked();
+    filt_config.kernel_tophat_length = klength_tophat_spin->value();
+    filt_config.has_O1_morpho = complex2_morpho_radio->isChecked();
 
     /////////////////////////////
     //        Display          //
     /////////////////////////////
 
-    config.has_histo_normaliz = histo_checkbox->isChecked();
-    config.has_display_each = step_checkbox->isChecked();
+    // auto& disp_config = AppSettings::instance().imgSessSettings.img_disp_conf;
 
-    config.inside_combo = insidecolor_combobox->currentIndex();
-    config.outside_combo = outsidecolor_combobox->currentIndex();
+    // filt_config.inside_combo = insidecolor_combobox->currentIndex();
+    // filt_config.outside_combo = outsidecolor_combobox->currentIndex();
 
-    config.selected_in  = selected_in_disp;
-    config.selected_out = selected_out_disp;
+    // filt_config.selected_in  = selected_in_disp;
+    // filt_config.selected_out = selected_out_disp;
 
 
-    if( config.outside_combo == ComboBoxColorIndex::SELECTED )
-    {
-        config.color_out = config.selected_out;
-    }
-    else
-    {
-       get_color(config.outside_combo,
-                 config.color_out);
-    }
+    // if( config.outside_combo == ComboBoxColorIndex::SELECTED )
+    // {
+    //     config.color_out = config.selected_out;
+    // }
+    // else
+    // {
+    //    get_color(config.outside_combo,
+    //              config.color_out);
+    // }
 
-    if( config.inside_combo == ComboBoxColorIndex::SELECTED )
-    {
-        config.color_in = config.selected_in;
-    }
-    else
-    {
-        get_color(config.inside_combo,
-                  config.color_in);
-    }
+    // if( config.inside_combo == ComboBoxColorIndex::SELECTED )
+    // {
+    //     config.color_in = config.selected_in;
+    // }
+    // else
+    // {
+    //     get_color(config.inside_combo,
+    //               config.color_in);
+    // }
 
-    config.is_show_fps = fps_checkbox->isChecked();
-    config.is_show_mirrored = mirrored_checkbox->isChecked();
+    // config.is_show_fps = fps_checkbox->isChecked();
+    // config.is_show_mirrored = mirrored_checkbox->isChecked();
 
     // for data persistence
-    config.save();
+    AppSettings::instance().save();
 
     QDialog::accept();
 }
@@ -1215,15 +1173,6 @@ void SettingsWindow::reject()
 
     Na_spin->setValue(config.algo_config.Na);
 
-    if( config.speed == SpeedModel::REGION_BASED )
-    {
-        chanvese_radio->setChecked(true);
-    }
-    else if( config.speed == SpeedModel::EDGE_BASED )
-    {
-        geodesic_radio->setChecked(true);
-    }
-
     lambda_in_spin->setValue(config.region_ac_config.lambda_in);
     lambda_out_spin->setValue(config.region_ac_config.lambda_out);
 
@@ -1232,8 +1181,6 @@ void SettingsWindow::reject()
     alpha_spin->setValue(config.region_ac_config.weights.c1);
     beta_spin->setValue(config.region_ac_config.weights.c2);
     gamma_spin->setValue(config.region_ac_config.weights.c3);
-
-    klength_gradient_spin->setValue(config.kernel_gradient_length);
 
     if ( config.downscale_factor == 1 )
     {
@@ -1339,9 +1286,6 @@ void SettingsWindow::reject()
     //        Display          //
     /////////////////////////////
 
-    histo_checkbox->setChecked(config.has_histo_normaliz);
-    step_checkbox->setChecked(config.has_display_each);
-
     insidecolor_combobox->setCurrentIndex(config.inside_combo);
     outsidecolor_combobox->setCurrentIndex(config.outside_combo);
 
@@ -1356,25 +1300,25 @@ void SettingsWindow::reject()
     }
     else
     {
-        get_color(config.inside_combo,
-                  color);
+        //get_color(config.inside_combo,
+                  //color);
     }
     QPixmap pm1(12,12);
-    pm1.fill( QColor( get_QRgb(color) ) );
+    //pm1.fill( QColor( get_QRgb(color) ) );
     insidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm1);
 
     if( config.outside_combo == ComboBoxColorIndex::SELECTED )
     {
         color = selected_out_disp;
     }
-    else
-    {
-        get_color(config.outside_combo,
-                  color);
-    }
-    QPixmap pm2(12,12);
-    pm2.fill( QColor( get_QRgb(color) ) );
-    outsidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm2);
+    //else
+    //{
+        //get_color(config.outside_combo,
+          //        color);
+    //}
+    //QPixmap pm2(12,12);
+    //pm2.fill( QColor( get_QRgb(color) ) );
+    //outsidecolor_combobox->setItemIcon(ComboBoxColorIndex::SELECTED,pm2);
 
 
     fps_checkbox->setChecked(config.is_show_fps);
@@ -1397,8 +1341,6 @@ void SettingsWindow::default_settings()
     connectivity_cb->setCurrentIndex( int(ofeli_ip::Connectivity::Four) );
 
     Na_spin->setValue( 30 );
-    // region based model by default
-    chanvese_radio->setChecked( true );
     lambda_in_spin->setValue( 1 );
     lambda_out_spin->setValue( 1 );
 
@@ -1407,8 +1349,6 @@ void SettingsWindow::default_settings()
     alpha_spin->setValue( 1 );
     beta_spin->setValue( 1 );
     gamma_spin->setValue( 1 );
-
-    klength_gradient_spin->setValue( 5 );
 
     // /4
     downscale_factor_cb->setCurrentIndex( 2 );
@@ -1484,9 +1424,6 @@ void SettingsWindow::default_settings()
     /////////////////////////////
     //        Display          //
     /////////////////////////////
-
-    histo_checkbox->setChecked( true );
-    step_checkbox->setChecked( true );
 
     outsidecolor_combobox->setCurrentIndex( ComboBoxColorIndex::BLUE );
     insidecolor_combobox->setCurrentIndex( ComboBoxColorIndex::RED );

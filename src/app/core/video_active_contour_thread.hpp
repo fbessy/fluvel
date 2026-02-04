@@ -35,7 +35,7 @@ protected:
 
 private:
 
-    RuntimeSettings runtime_settings;
+    CameraSessionSettings snapshot_settings;
 
     QImage processFrame(QVideoFrame& frame, qint64& processTs);
 

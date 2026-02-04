@@ -48,6 +48,8 @@
 #include "about_window.hpp"
 #include "language_window.hpp"
 
+#include "display_settings_widget.hpp"
+
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"
 #include "active_contour_worker.hpp"
@@ -110,12 +112,13 @@ private:
     QPushButton* togglePauseButton = nullptr;
     QPushButton* stepButton = nullptr;
     QPushButton* convergeButton = nullptr;
+    QPushButton* compactModeButton = nullptr;
     QPushButton* settingsButton = nullptr;
 
     ImageView* imageView = nullptr;
     AlgoInfoOverlay* imageOverlay = nullptr;
 
-
+    DisplaySettingsWidget* displayBar = nullptr;
 
     QAction* openAct = nullptr;
     QAction* separatorAct = nullptr;

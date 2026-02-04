@@ -44,6 +44,7 @@
 #include "region_color_ac.hpp"
 #include "filters.hpp"
 #include "runtime_settings.hpp"
+#include "color.hpp"
 
 #include <QObject>
 #include <QDir>
@@ -63,6 +64,29 @@ public:
     virtual ~ApplicationSettings();
 
     void save();
+    void save_img_session_config();
+    void save_cam_session_config();
+
+    void save_algo(const QString& scope,
+                   const AlgoConfig& algoConfig);
+    void save_downscale(const QString& scope,
+                        const DownscaleConfig& downscale_config);
+    void save_disp(const QString& scope,
+                   const DisplayConfig& disp_config);
+
+    void load_img_session_config();
+    void load_cam_session_config();
+
+    void load_algo(const QString& scope,
+                   AlgoConfig& algoConfig);
+    void load_downscale(const QString& scope,
+                        DownscaleConfig& downscale_config);
+    void load_disp(const QString& scope,
+                   DisplayConfig& disp_config);
+
+    void set_img_display_config(const DisplayConfig& disp_config);
+    void set_cam_display_config(const DisplayConfig& disp_config);
+
     RuntimeSettings snapshot() const;
 
     QDir settingsDirectory();
@@ -144,8 +168,14 @@ public:
     bool is_show_fps;
     bool is_show_mirrored;
 
+    ImageSessionSettings imgSessSettings;
+    CameraSessionSettings camSessSettings;
+
 signals:
-    void settingsApplied();
+    void imgSettingsApplied();
+    void imgDisplaySettingsChanged();
+    void camSettingsApplied();
+    void camDisplaySettingsChanged();
 };
 
 class AppSettings

@@ -40,78 +40,18 @@
 #include "contour_rendering_qimage.hpp"
 #include "contour_data.hpp"
 #include "common_settings.hpp"
+
 #include <QImage>
 
 namespace ofeli_app
 {
 
-void get_color(int index,
-               RgbColor& color)
-{
-    switch( index )
-    {
-    case ComboBoxColorIndex::RED :
-        color.red   = 255;
-        color.green = 0;
-        color.blue  = 0;
-        break;
-
-    case ComboBoxColorIndex::GREEN :
-        color.red   = 0;
-        color.green = 255;
-        color.blue  = 0;
-        break;
-
-    case ComboBoxColorIndex::BLUE :
-        color.red   = 0;
-        color.green = 0;
-        color.blue  = 255;
-        break;
-
-    case ComboBoxColorIndex::CYAN :
-        color.red   = 0;
-        color.green = 255;
-        color.blue  = 255;
-        break;
-
-    case ComboBoxColorIndex::MAGENTA :
-        color.red   = 255;
-        color.green = 0;
-        color.blue  = 255;
-        break;
-
-    case ComboBoxColorIndex::YELLOW :
-        color.red   = 255;
-        color.green = 255;
-        color.blue  = 0;
-        break;
-
-    case ComboBoxColorIndex::BLACK :
-    case ComboBoxColorIndex::NO :
-    default :
-        color.red   = 0;
-        color.green = 0;
-        color.blue  = 0;
-        break;
-
-    case ComboBoxColorIndex::WHITE :
-        color.red   = 255;
-        color.green = 255;
-        color.blue  = 255;
-        break;
-    }
-}
-
 void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                      const RgbColor& color,
-                      int combobox_index,
+                      const ofeli_ip::Rgb_uc& color,
                       QImage& img)
 {
     assert(!img.isNull());
     assert(img.format() == QImage::Format_RGB32);
-
-    if (combobox_index == ComboBoxColorIndex::NO)
-        return;
 
     uchar* data = img.bits();
     const int stride = img.bytesPerLine();
@@ -132,14 +72,10 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
 }
 
 void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const RgbColor& color,
-                       int combobox_index,
-                       unsigned int upscale_factor,
+                       const ofeli_ip::Rgb_uc& color,
+                       int upscale_factor,
                        QImage& img)
 {
-    if (combobox_index == ComboBoxColorIndex::NO)
-        return;
-
     if (upscale_factor != 2 && upscale_factor != 4)
         return;
 
@@ -156,8 +92,8 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
 
     for (const auto& point : list)
     {
-        const int base_x = static_cast<int>(upscale_factor) * point.x();
-        const int base_y = static_cast<int>(upscale_factor) * point.y();
+        const int base_x = upscale_factor * point.x();
+        const int base_y = upscale_factor * point.y();
 
         // fast path: whole kernel inside image
         if (   base_x + kernel_radius < w
@@ -209,7 +145,7 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
     }
 }
 
-QRgb get_QRgb(RgbColor col)
+QRgb get_QRgb(ofeli_ip::Rgb_uc col)
 {
     return qRgb(int(col.red),
                 int(col.green),

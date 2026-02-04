@@ -115,11 +115,8 @@ private :
 
     QSpinBox* Na_spin;
     QSpinBox* Ns_spin;
-    QRadioButton* chanvese_radio;
     QSpinBox* lambda_out_spin;
     QSpinBox* lambda_in_spin;
-    QRadioButton* geodesic_radio;
-    KernelSizeSpinBox* klength_gradient_spin;
     QGroupBox* color_weights_groupbox;
     QComboBox* color_space_cb;
     QSpinBox* alpha_spin;
@@ -175,6 +172,8 @@ private :
     // widgets et variables liés à l'onglet preprocessing :
 
     QGroupBox* preprocessing();
+
+    QCheckBox* is_downscale_cb;
 
     QVBoxLayout* noise_layout();
 
@@ -261,11 +260,8 @@ private :
     // widgets et variables liés à l'onglet display :
 
     QWidget* page4;
-    QCheckBox* histo_checkbox;
     bool has_histo_normaliz2;
 
-
-    QCheckBox* step_checkbox;
     QComboBox* outsidecolor_combobox;
 
     QPushButton* outsidecolor_select;

@@ -42,6 +42,8 @@
 
 #include "contour_data.hpp"
 #include "common_settings.hpp"
+#include "color.hpp"
+
 #include <QRgb>
 #include <QImage>
 
@@ -49,20 +51,18 @@ namespace ofeli_app
 {
 
 void get_color(int index,
-               RgbColor& color);
+               ofeli_ip::Rgb_uc& color);
 
 void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                      const RgbColor& color,
-                      int combobox_index,
+                      const ofeli_ip::Rgb_uc& color,
                       QImage& img);
 
 void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const RgbColor& color,
-                       int combobox_index,
-                       unsigned int upscale_factor,
+                       const ofeli_ip::Rgb_uc& color,
+                       int upscale_factor,
                        QImage& img_rgb32);
 
-QRgb get_QRgb(RgbColor col);
+QRgb get_QRgb(ofeli_ip::Rgb_uc col);
 
 }
 

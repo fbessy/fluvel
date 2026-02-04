@@ -9,14 +9,14 @@ namespace ofeli_app {
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
     : QThread(parent),
-    runtime_settings(AppSettings::instance().snapshot()),
+    snapshot_settings(AppSettings::instance().camSessSettings),
     frameAvailable(false),
     running(true),
     configChanged(false)
 {
     QObject::connect(
         &AppSettings::instance(),
-        &ApplicationSettings::settingsApplied,
+        &ApplicationSettings::camSettingsApplied,
         this,
         &VideoActiveContourThread::reloadSettings,
         Qt::QueuedConnection
@@ -74,38 +74,43 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
     if ( !input.isNull() )
     {
-        const auto& config = runtime_settings;
+        const auto& config = snapshot_settings;
 
-        if (config.is_show_mirrored)
+        if (config.has_show_mirrored)
             input = input.flipped(Qt::Horizontal);
 
         // downscale
         QImage q_img_algo = input;
-        unsigned int downscale_fctr = config.downscale_factor;
-        if (downscale_fctr >= 2)
-            q_img_algo = input.scaled(input.width()/downscale_fctr,
-                                      input.height()/downscale_fctr,
+        bool has_downscale = config.downscale_conf.has_downscale;
+        int downscale_fctr = config.downscale_conf.downscale_factor;
+
+        has_downscale = false;
+
+        if ( has_downscale )
+        {
+            assert( downscale_fctr == 2 || downscale_fctr == 4 );
+
+            q_img_algo = input.scaled(input.width() / downscale_fctr,
+                                      input.height() / downscale_fctr,
                                       Qt::IgnoreAspectRatio,
                                       Qt::FastTransformation);
+        }
 
         auto img_algo = image_span_from_qimage( q_img_algo );
 
         if ( !region_ac || configChanged )
         {
-            if ( config.has_temporal_smoothing )
+            if ( config.has_temporal_filtering )
                 smoother.reset( img_algo );
 
-            ofeli_ip::AcConfig conf = config.algo_config;
-
-            // a specific configuration for video tracking
-            conf.failure_mode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
+            const auto& conf = config.cam_algo_conf;
 
             region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
                                                                   ofeli_ip::ContourData(img_algo.width(),
                                                                                         img_algo.height(),
-                                                                                        config.connectivity),
-                                                                  conf,
-                                                                  config.region_ac_config);
+                                                                                        conf.connectivity),
+                                                                  conf.ac_config,
+                                                                  conf.region_ac_config);
 
             configChanged = false;
 
@@ -122,7 +127,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         }
         else
         {
-            if ( config.has_temporal_smoothing )
+            if ( config.has_temporal_filtering )
             {
                 smoother.update( img_algo );
                 img_algo = smoother.outputSpan();
@@ -135,20 +140,41 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         if (region_ac)
         {
+            const auto& display_config = config.cam_disp_conf;
+
             result = input;
 
-            if (downscale_fctr == 1)
+            if ( has_downscale )
             {
-                draw_list_to_img(region_ac->l_out(), config.color_out, config.outside_combo,
-                                 result);
+                if ( display_config.display_l_out )
+                {
+                    draw_upscale_list(region_ac->l_out(),
+                                      display_config.l_out_color,
+                                      downscale_fctr, result);
+                }
 
-                draw_list_to_img(region_ac->l_in(), config.color_in, config.inside_combo,
-                                 result);
+                if ( display_config.display_l_in )
+                {
+                    draw_upscale_list(region_ac->l_in(),
+                                      display_config.l_in_color,
+                                      downscale_fctr, result);
+                }
             }
             else
             {
-                draw_upscale_list(region_ac->l_out(), config.color_out, config.outside_combo, downscale_fctr, result);
-                draw_upscale_list(region_ac->l_in(), config.color_in, config.inside_combo, downscale_fctr, result);
+                if ( display_config.display_l_out )
+                {
+                    draw_list_to_img(region_ac->l_out(),
+                                     display_config.l_out_color,
+                                     result);
+                }
+
+                if ( display_config.display_l_in )
+                {
+                    draw_list_to_img(region_ac->l_in(),
+                                     display_config.l_in_color,
+                                     result);
+                }
             }
         }
     }
@@ -166,7 +192,7 @@ void VideoActiveContourThread::stop()
 
 void VideoActiveContourThread::reloadSettings()
 {
-    runtime_settings = AppSettings::instance().snapshot();
+    snapshot_settings = AppSettings::instance().camSessSettings;
     configChanged = true;
 }
 
