@@ -99,7 +99,7 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     tabBar->setElideMode(Qt::ElideNone);
 
     tabs->addTab( downscale_page, tr("Downscale") );
-    tabs->addTab( preprocess_page, tr("Preprocessing") );
+    tabs->addTab( preprocess_page, tr("Processing") );
     tabs->addTab( init_page, tr("Initialization") );
     tabs->addTab( algo_page, tr("Algorithm") );
 
@@ -720,7 +720,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     preprocess_tabs->addTab(page_noise, tr("Noise generators"));
     preprocess_tabs->addTab(filter_tabs, tr("Filters"));
 
-    preprocess_page = new QGroupBox(tr("Preprocessing"));
+    preprocess_page = new QGroupBox(tr("Processing"));
     preprocess_page->setCheckable(true);
     preprocess_page->setChecked(false);
 
