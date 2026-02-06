@@ -101,14 +101,13 @@ void ImageWindow::setupUi()
     convergeButton->setEnabled(false);
 
 
-    compactModeButton = new QPushButton;
-    compactModeButton->setCheckable(true);
-    compactModeButton->setFocusPolicy(Qt::NoFocus);
-    compactModeButton->setToolTip(tr("Activate compact mode."));
+    bottomPanelToggle = new QPushButton;
+    bottomPanelToggle->setCheckable(true);
+    bottomPanelToggle->setChecked(true);
+    bottomPanelToggle->setFocusPolicy(Qt::NoFocus);
+    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
 
-    compactModeButton->setIcon(
-        QIcon::fromTheme("view-compact")
-        );
+    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
 
     settingsButton = new QPushButton;
     settingsButton->setToolTip(tr("Segmentation settings"));
@@ -140,7 +139,7 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(convergeButton);
     controlLayout->addStretch();
 
-    controlLayout->addWidget(compactModeButton);
+    controlLayout->addWidget(bottomPanelToggle);
 
     controlLayout->addSpacerItem(
         new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
@@ -478,10 +477,21 @@ void ImageWindow::setupConnections()
     connect(convergeButton,     &QPushButton::clicked,
             acWorker.get(),     &ActiveContourWorker::converge);
 
-    connect(compactModeButton, &QToolButton::toggled,
+    connect(bottomPanelToggle, &QToolButton::toggled,
             this, [this](bool checked)
             {
-                displayBar->setVisible(!checked);
+                if ( checked )
+                {
+                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
+                    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
+                }
+                else
+                {
+                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_off.svg"));
+                    bottomPanelToggle->setToolTip(tr("Bottom panel is hidden."));
+                }
+
+                displayBar->setVisible(checked);
             });
 
     connect(settingsButton,     &QPushButton::clicked,
