@@ -29,7 +29,7 @@ private:
     void init_combobox_color(QComboBox* color_cb);
     void setConfig();
 
-    QCheckBox* preprocess_cb_;
+    QCheckBox* input_displayed_cb_;
 
     QComboBox* lout_color_cb_;
     QPushButton* lout_select_color_;

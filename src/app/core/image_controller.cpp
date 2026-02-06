@@ -6,29 +6,32 @@ namespace ofeli_app {
 ImageController::ImageController(QObject* parent):
     QObject(parent)
 {
-    connect(this, &ImageController::imageReady,
-            this, &ImageController::applyFilters);
+    connect(&AppSettings::instance(), &ApplicationSettings::imgDisplaySettingsChanged,
+            this, &ImageController::setDisplayedImage);
 }
 
 void ImageController::loadImage(const QString& path)
 {
-    img = QImage(path);
+    inputImage_ = QImage(path);
     bool isOk = false;
 
-    if ( !img.isNull() )
+    if ( !inputImage_.isNull() )
     {
-        if ( img.isGrayscale() && img.format() != QImage::Format_Grayscale8 )
+        if (    inputImage_.isGrayscale()
+             && inputImage_.format() != QImage::Format_Grayscale8 )
         {
-            img = img.convertToFormat( QImage::Format_Grayscale8 );
+            inputImage_ = inputImage_.convertToFormat( QImage::Format_Grayscale8 );
         }
-        else if ( img.format() != QImage::Format_RGB32 )
+        else if ( inputImage_.format() != QImage::Format_RGB32 )
         {
-            img = img.convertToFormat( QImage::Format_RGB32 );
+            inputImage_ = inputImage_.convertToFormat( QImage::Format_RGB32 );
         }
     }
 
-    if ( !img.isNull() &&
-         ( img.format() == QImage::Format_Grayscale8 || img.format() == QImage::Format_RGB32 ) )
+    if (    !inputImage_.isNull()
+         &&
+            (    inputImage_.format() == QImage::Format_Grayscale8
+              || inputImage_.format() == QImage::Format_RGB32 ) )
     {
         isOk = true;
     }
@@ -39,11 +42,11 @@ void ImageController::loadImage(const QString& path)
 
         if ( !AppSettings::instance().imgSessSettings.initial_phi.isNull() )
         {
-            if ( AppSettings::instance().imgSessSettings.initial_phi.width()  != img.width() ||
-                 AppSettings::instance().imgSessSettings.initial_phi.height() != img.height() )
+            if ( AppSettings::instance().imgSessSettings.initial_phi.width()  != inputImage_.width() ||
+                 AppSettings::instance().imgSessSettings.initial_phi.height() != inputImage_.height() )
             {
-                AppSettings::instance().resize_initial_phi( img.width(),
-                                                            img.height() );
+                AppSettings::instance().resize_initial_phi( inputImage_.width(),
+                                                            inputImage_.height() );
 
                 isResize = true;
             }
@@ -51,21 +54,33 @@ void ImageController::loadImage(const QString& path)
 
         if ( isResize )
         {
-            emit imageReadyWithResize(img);
+            emit imageReadyWithResize(inputImage_);
         }
         else
         {
-            emit imageReadyWithoutResize(img);
+            emit imageReadyWithoutResize(inputImage_);
         }
 
-        emit imageReady(img);
+        emit inputImageReady(inputImage_);
     }
 }
 
-void ImageController::applyFilters()
+void ImageController::onProcessedImageReady(const QImage& processed)
 {
-    filtered = img;
-    emit contourReady(filtered);
+    processedImage_ = processed;
+
+    setDisplayedImage();
+}
+
+void ImageController::setDisplayedImage()
+{
+    if ( AppSettings::instance().imgSessSettings.img_disp_conf.input_displayed)
+        displayedImage_ = inputImage_;
+    else
+        displayedImage_ = processedImage_;
+
+
+    emit displayedImageReady(displayedImage_);
 }
 
 }

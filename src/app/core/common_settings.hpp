@@ -76,15 +76,15 @@ struct DownscaleConfig
 
 struct DisplayConfig
 {
-    bool display_preprocess;
+    bool input_displayed;
 
-    bool display_l_out;
+    bool l_out_displayed;
     ofeli_ip::Rgb_uc l_out_color;
 
-    bool display_l_in;
+    bool l_in_displayed;
     ofeli_ip::Rgb_uc l_in_color;
 
-    bool display_overlay;
+    bool algorithm_overlay;
 };
 
 struct FilteringConfig

@@ -29,12 +29,12 @@ ImageView::ImageView(QWidget* parent, Session session)
 
     QColor col_lout, col_lin;
 
-    if ( display_config_.display_l_out )
+    if ( display_config_.l_out_displayed )
         col_lout = toQColor(display_config_.l_out_color);
     else
         col_lout = Qt::transparent;
 
-    if ( display_config_.display_l_in )
+    if ( display_config_.l_in_displayed )
         col_lin = toQColor(display_config_.l_in_color);
     else
         col_lin = Qt::transparent;
@@ -48,6 +48,8 @@ ImageView::ImageView(QWidget* parent, Session session)
     contourInItem->setZValue(100);
     contourInItem->setColor( col_lin );
     scene->addItem(contourInItem);
+
+    applyDownscaleToItems();
 
     displayTimer.start();
 
@@ -128,17 +130,6 @@ void ImageView::displayContour(const QVector<QPoint>& out,
 
     contourOutItem->setPoints(out);
     contourInItem->setPoints(in);
-
-    const bool has_ds = downscale_config_.has_downscale;
-
-    if ( has_ds )
-    {
-        const int df = downscale_config_.downscale_factor;
-        const qreal factor = qreal( df );
-
-        contourOutItem->setScale( factor );
-        contourInItem->setScale( factor );
-    }
 }
 
 void ImageView::clearOverlays()
@@ -486,15 +477,18 @@ void ImageView::onConfigChanged()
 
     QColor col_lout, col_lin;
 
-    if ( display_config_.display_l_out )
+    if ( display_config_.l_out_displayed )
         col_lout = toQColor(display_config_.l_out_color);
     else
         col_lout = Qt::transparent;
 
-    if ( display_config_.display_l_in )
+    if ( display_config_.l_in_displayed )
         col_lin = toQColor(display_config_.l_in_color);
     else
         col_lin = Qt::transparent;
+
+
+    applyDownscaleToItems();
 
     contourOutItem->setColor( col_lout );
     contourInItem->setColor( col_lin );
@@ -506,6 +500,24 @@ void ImageView::onDownscaleChanged()
         downscale_config_ = AppSettings::instance().imgSessSettings.downscale_conf;
     else if ( session_ == Session::Camera )
         downscale_config_ = AppSettings::instance().imgSessSettings.downscale_conf;
+
+
+    clearOverlays();
+    applyDownscaleToItems();
+}
+
+void ImageView::applyDownscaleToItems()
+{
+    const bool has_ds = downscale_config_.has_downscale;
+    const int      df = downscale_config_.downscale_factor;
+
+    qreal factor = static_cast<qreal>(1.0);
+
+    if ( has_ds && display_config_.input_displayed )
+        factor = qreal( df );
+
+    contourOutItem->setScale( factor );
+    contourInItem->setScale( factor );
 }
 
 } // namespace ofeli_app

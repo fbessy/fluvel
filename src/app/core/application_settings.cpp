@@ -268,11 +268,11 @@ void ApplicationSettings::save_disp(const QString& scope,
 {
     QSettings settings;
 
-    settings.setValue(scope + "/display/display_preprocess",
-                      disp_config.display_preprocess);
+    settings.setValue(scope + "/display/input_displayed",
+                      disp_config.input_displayed);
 
-    settings.setValue(scope + "/display/display_l_out",
-                      disp_config.display_l_out);
+    settings.setValue(scope + "/display/l_out_displayed",
+                      disp_config.l_out_displayed);
 
     settings.setValue(scope + "/display/l_out_red",
                       disp_config.l_out_color.red);
@@ -281,8 +281,8 @@ void ApplicationSettings::save_disp(const QString& scope,
     settings.setValue(scope + "/display/l_out_blue",
                       disp_config.l_out_color.blue);
 
-    settings.setValue(scope + "/display/display_l_in",
-                      disp_config.display_l_in);
+    settings.setValue(scope + "/display/l_in_displayed",
+                      disp_config.l_in_displayed);
 
     settings.setValue(scope + "/display/l_in_red",
                       disp_config.l_in_color.red);
@@ -291,8 +291,8 @@ void ApplicationSettings::save_disp(const QString& scope,
     settings.setValue(scope + "/display/l_in_blue",
                       disp_config.l_in_color.blue);
 
-    settings.setValue(scope + "/display/display_overlay",
-                      disp_config.display_overlay);
+    settings.setValue(scope + "/display/algorithm_overlay",
+                      disp_config.algorithm_overlay);
 }
 
 void ApplicationSettings::load_img_session_config()
@@ -322,37 +322,37 @@ void ApplicationSettings::load_img_session_config()
 
     auto& fc = imgSessSettings.filtering_conf;
 
-    fc.has_gaussian_noise = settings.value("Settings/Preprocessing/has_gaussian_noise", false).toBool();
-    fc.std_noise = settings.value("Settings/Preprocessing/std_noise", 20.f).toFloat();
-    fc.has_salt_noise = settings.value("Settings/Preprocessing/has_salt_noise", false).toBool();
-    fc.proba_noise = settings.value("Settings/Preprocessing/proba_noise", 0.05f).toFloat();
-    fc.has_speckle_noise = settings.value("Settings/Preprocessing/has_speckle_noise", false).toBool();
-    fc.std_speckle_noise = settings.value("Settings/Preprocessing/std_speckle_noise", 0.16f).toFloat();
+    fc.has_gaussian_noise = settings.value("img/preprocess/has_gaussian_noise", false).toBool();
+    fc.std_noise = settings.value("img/preprocess/std_noise", 20.f).toFloat();
+    fc.has_salt_noise = settings.value("img/preprocess/has_salt_noise", false).toBool();
+    fc.proba_noise = settings.value("img/preprocess/proba_noise", 0.05f).toFloat();
+    fc.has_speckle_noise = settings.value("img/preprocess/has_speckle_noise", false).toBool();
+    fc.std_speckle_noise = settings.value("img/preprocess/std_speckle_noise", 0.16f).toFloat();
 
-    fc.has_median_filt = settings.value("Settings/Preprocessing/has_median_filt", false).toBool();
-    fc.kernel_median_length = settings.value("Settings/Preprocessing/kernel_median_length", 5).toInt();
-    fc.has_O1_algo = settings.value("Settings/Preprocessing/has_O1_algo", true).toBool();
-    fc.has_mean_filt = settings.value("Settings/Preprocessing/has_mean_filt", false).toBool();
-    fc.kernel_mean_length = settings.value("Settings/Preprocessing/kernel_mean_length", 5).toInt();
-    fc.has_gaussian_filt = settings.value("Settings/Preprocessing/has_gaussian_filt", false).toBool();
-    fc.kernel_gaussian_length = settings.value("Settings/Preprocessing/kernel_gaussian_length", 5).toInt();
-    fc.sigma = settings.value("Settings/Preprocessing/sigma", 2.f).toFloat();
+    fc.has_median_filt = settings.value("img/preprocess/has_median_filt", false).toBool();
+    fc.kernel_median_length = settings.value("img/preprocess/kernel_median_length", 5).toInt();
+    fc.has_O1_algo = settings.value("img/preprocess/has_O1_algo", true).toBool();
+    fc.has_mean_filt = settings.value("img/preprocess/has_mean_filt", false).toBool();
+    fc.kernel_mean_length = settings.value("img/preprocess/kernel_mean_length", 5).toInt();
+    fc.has_gaussian_filt = settings.value("img/preprocess/has_gaussian_filt", false).toBool();
+    fc.kernel_gaussian_length = settings.value("img/preprocess/kernel_gaussian_length", 5).toInt();
+    fc.sigma = settings.value("img/preprocess/sigma", 2.f).toFloat();
 
-    fc.has_aniso_diff = settings.value("Settings/Preprocessing/has_aniso_diff", false).toBool();
-    fc.aniso_option = ofeli_ip::AnisoDiff( settings.value("Settings/Preprocessing/aniso_option", ofeli_ip::AnisoDiff::FUNCTION1).toUInt() );
-    fc.max_itera = settings.value("Settings/Preprocessing/max_itera", 10).toInt();
-    fc.lambda = settings.value("Settings/Preprocessing/lambda", 1.f/7.f).toFloat();
-    fc.kappa = settings.value("Settings/Preprocessing/kappa", 30.f).toFloat();
+    fc.has_aniso_diff = settings.value("img/preprocess/has_aniso_diff", false).toBool();
+    fc.aniso_option = ofeli_ip::AnisoDiff( settings.value("img/preprocess/aniso_option", ofeli_ip::AnisoDiff::FUNCTION1).toUInt() );
+    fc.max_itera = settings.value("img/preprocess/max_itera", 10).toInt();
+    fc.lambda = settings.value("img/preprocess/lambda", 1.f/7.f).toFloat();
+    fc.kappa = settings.value("img/preprocess/kappa", 30.f).toFloat();
 
-    fc.has_open_filt = settings.value("Settings/Preprocessing/has_open_filt", false).toBool();
-    fc.kernel_open_length = settings.value("Settings/Preprocessing/kernel_open_length", 5).toInt();
-    fc.has_close_filt = settings.value("Settings/Preprocessing/has_close_filt", false).toBool();
-    fc.kernel_close_length = settings.value("Settings/Preprocessing/kernel_close_length", 5).toInt();
-    fc.has_top_hat_filt = settings.value("Settings/Preprocessing/has_top_hat_filt", false).toBool();
-    fc.is_white_top_hat = settings.value("Settings/Preprocessing/is_white_top_hat", true).toBool();
-    fc.kernel_tophat_length = settings.value("Settings/Preprocessing/kernel_tophat_length", 5).toInt();
+    fc.has_open_filt = settings.value("img/preprocess/has_open_filt", false).toBool();
+    fc.kernel_open_length = settings.value("img/preprocess/kernel_open_length", 5).toInt();
+    fc.has_close_filt = settings.value("img/preprocess/has_close_filt", false).toBool();
+    fc.kernel_close_length = settings.value("img/preprocess/kernel_close_length", 5).toInt();
+    fc.has_top_hat_filt = settings.value("img/preprocess/has_top_hat_filt", false).toBool();
+    fc.is_white_top_hat = settings.value("img/preprocess/is_white_top_hat", true).toBool();
+    fc.kernel_tophat_length = settings.value("img/preprocess/kernel_tophat_length", 5).toInt();
 
-    fc.has_O1_morpho = settings.value("Settings/Preprocessing/has_O1_morpho", true).toBool();
+    fc.has_O1_morpho = settings.value("img/preprocess/has_O1_morpho", true).toBool();
 
     // display
     load_disp("img",
@@ -431,19 +431,19 @@ void ApplicationSettings::load_disp(const QString& scope,
 {
     QSettings settings;
 
-    disp_config.display_preprocess = settings.value(scope + "/preprocess/has_downscale", true).toBool();
+    disp_config.input_displayed = settings.value(scope + "/display/input_displayed", false).toBool();
 
-    disp_config.display_l_out = settings.value(scope + "/display/display_l_out", true).toBool();
+    disp_config.l_out_displayed = settings.value(scope + "/display/l_out_displayed", true).toBool();
     disp_config.l_out_color.red = settings.value(scope + "/display/l_out_red", 0u).toUInt();
     disp_config.l_out_color.green = settings.value(scope + "/display/l_out_green", 0u).toUInt();
     disp_config.l_out_color.blue = settings.value(scope + "/display/l_out_blue", 255u).toUInt();
 
-    disp_config.display_l_in = settings.value(scope + "/display/display_l_in", true).toBool();
+    disp_config.l_in_displayed = settings.value(scope + "/display/l_in_displayed", true).toBool();
     disp_config.l_in_color.red = settings.value(scope + "/display/l_in_red", 255u).toUInt();
     disp_config.l_in_color.green = settings.value(scope + "/display/l_in_green", 0u).toUInt();
     disp_config.l_in_color.blue = settings.value(scope + "/display/l_in_blue", 0u).toUInt();
 
-    disp_config.display_overlay = settings.value(scope + "/display/display_overlay", true).toBool();
+    disp_config.algorithm_overlay = settings.value(scope + "/display/algorithm_overlay", true).toBool();
 }
 
 QDir ApplicationSettings::settingsDirectory()

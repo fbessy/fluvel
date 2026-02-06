@@ -85,17 +85,23 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     dial_buttons->addButton(QDialogButtonBox::Cancel);
     dial_buttons->addButton(QDialogButtonBox::Reset);
 
-
-
-
-    setupUiAlgoTab();
-    setupUiInitTab();
+    setupUiDownscaleTab();
     setupUiPreprocessingTab();
+    setupUiInitTab();
+    setupUiAlgoTab();
 
     tabs = new QTabWidget(this);
-    tabs->addTab( page1, tr("Algorithm") );
-    tabs->addTab( page2, tr("Initialization") );
-    tabs->addTab( page3, tr("Preprocessing") );
+
+    auto *tabBar = tabs->tabBar();
+
+    tabBar->setExpanding(false);
+    tabBar->setUsesScrollButtons(false);
+    tabBar->setElideMode(Qt::ElideNone);
+
+    tabs->addTab( downscale_page, tr("Downscale") );
+    tabs->addTab( preprocess_page, tr("Preprocessing") );
+    tabs->addTab( init_page, tr("Initialization") );
+    tabs->addTab( algo_page, tr("Algorithm") );
 
 
     settingsView = new ImageView(this);
@@ -255,24 +261,19 @@ void SettingsWindow::setupUiAlgoTab()
 
     ////////////////////////////////////////////
 
-    QGroupBox* tracking_groupbox = new QGroupBox(tr("Video tracking"));
+    //QGroupBox* tracking_groupbox = new QGroupBox(tr("Video tracking"));
 
-    downscale_factor_cb = new QComboBox;
-    downscale_factor_cb->addItem("1");
-    downscale_factor_cb->addItem("2");
-    downscale_factor_cb->addItem("4");
+    //has_temporal_smoothing_cb = new QCheckBox;
 
-    has_temporal_smoothing_cb = new QCheckBox;
+    //cycles_nbr_sb = new QSpinBox;
+    //cycles_nbr_sb->setMinimum(1);
 
-    cycles_nbr_sb = new QSpinBox;
-    cycles_nbr_sb->setMinimum(1);
+    //QFormLayout* cycles_nbr_layout = new QFormLayout;
+    //cycles_nbr_layout->addRow("downscale factor = ", downscale_factor_cb);
+    //cycles_nbr_layout->addRow("Temporal adaptative smoothing :", has_temporal_smoothing_cb);
+    //cycles_nbr_layout->addRow("cycles per frame = ", cycles_nbr_sb);
 
-    QFormLayout* cycles_nbr_layout = new QFormLayout;
-    cycles_nbr_layout->addRow("downscale factor = ", downscale_factor_cb);
-    cycles_nbr_layout->addRow("Temporal adaptative smoothing :", has_temporal_smoothing_cb);
-    cycles_nbr_layout->addRow("cycles per frame = ", cycles_nbr_sb);
-
-    tracking_groupbox->setLayout(cycles_nbr_layout);
+    //tracking_groupbox->setLayout(cycles_nbr_layout);
 
 
 
@@ -282,12 +283,12 @@ void SettingsWindow::setupUiAlgoTab()
     algorithm_layout->addWidget(externalspeed_groupbox);
     algorithm_layout->addSpacing(8);
     algorithm_layout->addWidget(internalspeed_groupbox);
-    algorithm_layout->addSpacing(8);
-    algorithm_layout->addWidget(tracking_groupbox);
+    //algorithm_layout->addSpacing(8);
+    //algorithm_layout->addWidget(tracking_groupbox);
     algorithm_layout->addStretch(1);
 
-    page1 = new QWidget;
-    page1->setLayout(algorithm_layout);
+    algo_page = new QWidget;
+    algo_page->setLayout(algorithm_layout);
 }
 
 void SettingsWindow::setupUiInitTab()
@@ -295,20 +296,6 @@ void SettingsWindow::setupUiInitTab()
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /// Initialization tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    open_phi_button = new QPushButton(tr("Open ϕ(t=0)"));
-    open_phi_button->setToolTip(tr("or drag and drop an image of ϕ(t=0)"));
-    save_phi_button = new QPushButton(tr("Save ϕ(t=0)"));
-
-    open_phi_button->setEnabled(false);
-    save_phi_button->setEnabled(false);
-
-
-    QHBoxLayout* openSavePhi= new QHBoxLayout;
-    openSavePhi->addWidget(open_phi_button);
-    openSavePhi->addWidget(save_phi_button);
-
-    ////////////////////////////////////////////////////
 
     QGroupBox* shape_groupbox = new QGroupBox(tr("Shape"));
     shape_groupbox->setFlat(true);
@@ -460,15 +447,37 @@ void SettingsWindow::setupUiInitTab()
     ////////////////////////////////////////////
 
     QVBoxLayout* initialization_layout = new QVBoxLayout;
-    initialization_layout->addLayout(openSavePhi);
     initialization_layout->addWidget(shape_groupbox);
     initialization_layout->addWidget(shape_size_groupbox);
     initialization_layout->addWidget(position_groupbox);
     initialization_layout->addWidget(modify_groupbox);
     initialization_layout->addStretch(1);
 
-    page2 = new QWidget;
-    page2->setLayout(initialization_layout);
+    init_page = new QWidget;
+    init_page->setLayout(initialization_layout);
+}
+
+void SettingsWindow::setupUiDownscaleTab()
+{
+    downscale_page = new QGroupBox(tr("Downscale"));
+    downscale_page->setCheckable(true);
+
+    downscale_factor_cb = new QComboBox;
+    downscale_factor_cb->addItem("2");
+    downscale_factor_cb->addItem("4");
+
+    auto *label = new QLabel(tr("Factor:"));
+
+    auto *hbox = new QHBoxLayout;
+    hbox->addWidget(label);
+    hbox->addWidget(downscale_factor_cb);
+    hbox->addStretch();
+
+    auto* vbox = new QVBoxLayout;
+    vbox->addLayout(hbox);
+    vbox->addStretch();
+
+    downscale_page->setLayout(vbox);
 }
 
 void SettingsWindow::setupUiPreprocessingTab()
@@ -477,8 +486,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     /// Preprocessing tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    is_downscale_cb = new QCheckBox("Downscale :");
-    is_downscale_cb->setChecked(false);
+    //is_downscale_cb = new QCheckBox("Downscale :");
+    //is_downscale_cb->setChecked(false);
 
     gaussian_noise_groupbox = new QGroupBox(tr("Gaussian white noise"));
     gaussian_noise_groupbox->setCheckable(true);
@@ -711,9 +720,9 @@ void SettingsWindow::setupUiPreprocessingTab()
     preprocess_tabs->addTab(page_noise, tr("Noise generators"));
     preprocess_tabs->addTab(filter_tabs, tr("Filters"));
 
-    page3 = new QGroupBox(tr("Preprocessing"));
-    page3->setCheckable(true);
-    page3->setChecked(false);
+    preprocess_page = new QGroupBox(tr("Preprocessing"));
+    preprocess_page->setCheckable(true);
+    preprocess_page->setChecked(false);
 
 
     time_filt = new QLabel(this);
@@ -723,10 +732,10 @@ void SettingsWindow::setupUiPreprocessingTab()
     elapsed_filt_layout->addWidget(time_filt);
     time_filt_groupbox->setLayout(elapsed_filt_layout);
 
-    QVBoxLayout* page3_layout = new QVBoxLayout;
-    page3_layout->addWidget(preprocess_tabs);
-    page3_layout->addWidget(time_filt_groupbox);
-    page3->setLayout(page3_layout);
+    QVBoxLayout* preprocess_layout = new QVBoxLayout;
+    preprocess_layout->addWidget(preprocess_tabs);
+    preprocess_layout->addWidget(time_filt_groupbox);
+    preprocess_page->setLayout(preprocess_layout);
 }
 
 void SettingsWindow::setupConnections()
@@ -815,7 +824,7 @@ void SettingsWindow::setupConnections()
     //connect(complex1_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
     //connect(complex2_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
-        //connect(page3,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+        //connect(preprocess_page,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
         //connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
@@ -946,24 +955,19 @@ void SettingsWindow::accept()
     //        Preprocessing          //
     ///////////////////////////////////
 
-    AppSettings::instance().imgSessSettings.has_preprocess = page3->isChecked();
+    AppSettings::instance().imgSessSettings.has_preprocess = preprocess_page->isChecked();
 
     auto& ds_config = AppSettings::instance().imgSessSettings.downscale_conf;
 
-    if ( is_downscale_cb->isChecked() )
+    ds_config.has_downscale = downscale_page->isChecked();
+
+    if ( downscale_factor_cb->currentIndex() == 0 )
     {
-        if ( downscale_factor_cb->currentIndex() == 0 )
-        {
-            ds_config.downscale_factor = 2;
-        }
-        else if ( downscale_factor_cb->currentIndex() == 1 )
-        {
-            ds_config.downscale_factor = 4;
-        }
+        ds_config.downscale_factor = 2;
     }
-    else
+    else if ( downscale_factor_cb->currentIndex() == 1 )
     {
-        ds_config.downscale_factor = 1;
+        ds_config.downscale_factor = 4;
     }
 
     auto& filt_config = AppSettings::instance().imgSessSettings.filtering_conf;
@@ -1053,53 +1057,53 @@ void SettingsWindow::accept()
 // les widgets reprennent leur état, correspondant aux valeurs des paramètres
 void SettingsWindow::reject()
 {
-    const auto& config = AppSettings::instance();
+    const auto& config_algo = AppSettings::instance().imgSessSettings.img_algo_conf;
+    const auto& config_downscale = AppSettings::instance().imgSessSettings.downscale_conf;
+    const auto& config_filter = AppSettings::instance().imgSessSettings.filtering_conf;
 
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
 
-    if ( config.connectivity == ofeli_ip::Connectivity::Four )
+    if ( config_algo.connectivity == ofeli_ip::Connectivity::Four )
     {
         connectivity_cb->setCurrentIndex( 0 );
     }
-    else if ( config.connectivity == ofeli_ip::Connectivity::Eight )
+    else if ( config_algo.connectivity == ofeli_ip::Connectivity::Eight )
     {
         connectivity_cb->setCurrentIndex( 1 );
     }
 
-    Na_spin->setValue(config.algo_config.Na);
+    Na_spin->setValue(config_algo.ac_config.Na);
 
-    lambda_in_spin->setValue(config.region_ac_config.lambda_in);
-    lambda_out_spin->setValue(config.region_ac_config.lambda_out);
+    lambda_in_spin->setValue(config_algo.region_ac_config.lambda_in);
+    lambda_out_spin->setValue(config_algo.region_ac_config.lambda_out);
 
-    color_space_cb->setCurrentIndex( int(config.region_ac_config.color_space) );
+    color_space_cb->setCurrentIndex( int(config_algo.region_ac_config.color_space) );
 
-    alpha_spin->setValue(config.region_ac_config.weights.c1);
-    beta_spin->setValue(config.region_ac_config.weights.c2);
-    gamma_spin->setValue(config.region_ac_config.weights.c3);
+    alpha_spin->setValue(config_algo.region_ac_config.weights.c1);
+    beta_spin->setValue(config_algo.region_ac_config.weights.c2);
+    gamma_spin->setValue(config_algo.region_ac_config.weights.c3);
 
-    if ( config.downscale_factor == 1 )
+    Ns_spin->setValue(config_algo.ac_config.Ns);
+    internalspeed_groupbox->setChecked(config_algo.ac_config.is_cycle2);
+    disk_radius_spin->setValue(config_algo.ac_config.disk_radius);
+
+
+    downscale_page->setChecked( config_downscale.has_downscale );
+
+    if ( config_downscale.downscale_factor == 2 )
     {
-        downscale_factor_cb->setCurrentIndex(0);
+        downscale_factor_cb->setCurrentIndex( 0 );
     }
-    else if ( config.downscale_factor == 2 )
+    else if ( config_downscale.downscale_factor == 4 )
     {
-        downscale_factor_cb->setCurrentIndex(1);
-    }
-    else if ( config.downscale_factor == 4 )
-    {
-        downscale_factor_cb->setCurrentIndex(2);
+        downscale_factor_cb->setCurrentIndex( 1 );
     }
 
-    has_temporal_smoothing_cb->setChecked( config.has_temporal_smoothing );
+    //has_temporal_smoothing_cb->setChecked( config.has_temporal_smoothing );
 
-    cycles_nbr_sb->setValue(config.cycles_nbr);
-
-
-    Ns_spin->setValue(config.algo_config.Ns);
-    internalspeed_groupbox->setChecked(config.algo_config.is_cycle2);
-    disk_radius_spin->setValue(config.algo_config.disk_radius);
+    //cycles_nbr_sb->setValue(config.cycles_nbr);
 
     ///////////////////////////////////
     //       Initialization          //
@@ -1111,19 +1115,19 @@ void SettingsWindow::reject()
     //        Preprocessing          //
     ///////////////////////////////////
 
-    page3->setChecked(config.has_preprocess);
+    preprocess_page->setChecked(AppSettings::instance().imgSessSettings.has_preprocess);
 
-    gaussian_noise_groupbox->setChecked(config.has_gaussian_noise);
-    std_noise_spin->setValue( double( config.std_noise ) );
-    salt_noise_groupbox->setChecked(config.has_salt_noise);
-    proba_noise_spin->setValue( double( 100.f*config.proba_noise ) );
-    speckle_noise_groupbox->setChecked(config.has_speckle_noise);
-    std_speckle_noise_spin->setValue( double( config.std_speckle_noise ) );
+    gaussian_noise_groupbox->setChecked(config_filter.has_gaussian_noise);
+    std_noise_spin->setValue( double( config_filter.std_noise ) );
+    salt_noise_groupbox->setChecked(config_filter.has_salt_noise);
+    proba_noise_spin->setValue( double( 100.f*config_filter.proba_noise ) );
+    speckle_noise_groupbox->setChecked(config_filter.has_speckle_noise);
+    std_speckle_noise_spin->setValue( double( config_filter.std_speckle_noise ) );
 
-    median_groupbox->setChecked(config.has_median_filt);
-    klength_median_spin->setValue(config.kernel_median_length);
+    median_groupbox->setChecked(config_filter.has_median_filt);
+    klength_median_spin->setValue(config_filter.kernel_median_length);
 
-    if( config.has_O1_algo )
+    if( config_filter.has_O1_algo )
     {
         complex_radio2->setChecked(true);
     }
@@ -1132,35 +1136,35 @@ void SettingsWindow::reject()
         complex_radio1->setChecked(true);
     }
 
-    mean_groupbox->setChecked(config.has_mean_filt);
-    klength_mean_spin->setValue(config.kernel_mean_length);
+    mean_groupbox->setChecked(config_filter.has_mean_filt);
+    klength_mean_spin->setValue(config_filter.kernel_mean_length);
 
-    gaussian_groupbox->setChecked(config.has_gaussian_filt);
-    klength_gaussian_spin->setValue(config.kernel_gaussian_length);
-    std_filter_spin->setValue( double( config.sigma ) );
+    gaussian_groupbox->setChecked(config_filter.has_gaussian_filt);
+    klength_gaussian_spin->setValue(config_filter.kernel_gaussian_length);
+    std_filter_spin->setValue( double( config_filter.sigma ) );
 
-    aniso_groupbox->setChecked(config.has_aniso_diff);
-    iteration_filter_spin->setValue(config.max_itera);
-    lambda_spin->setValue( double( config.lambda ) );
-    kappa_spin->setValue( double( config.kappa ) );
-    if( config.aniso_option == ofeli_ip::AnisoDiff::FUNCTION1 )
+    aniso_groupbox->setChecked(config_filter.has_aniso_diff);
+    iteration_filter_spin->setValue(config_filter.max_itera);
+    lambda_spin->setValue( double( config_filter.lambda ) );
+    kappa_spin->setValue( double( config_filter.kappa ) );
+    if( config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION1 )
     {
         aniso1_radio->setChecked(true);
     }
-    else if( config.aniso_option == ofeli_ip::AnisoDiff::FUNCTION2 )
+    else if( config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION2 )
     {
         aniso2_radio->setChecked(true);
     }
 
-    open_groupbox->setChecked(config.has_open_filt);
-    klength_open_spin->setValue(config.kernel_open_length);
+    open_groupbox->setChecked(config_filter.has_open_filt);
+    klength_open_spin->setValue(config_filter.kernel_open_length);
 
-    close_groupbox->setChecked(config.has_close_filt);
-    klength_close_spin->setValue(config.kernel_close_length);
+    close_groupbox->setChecked(config_filter.has_close_filt);
+    klength_close_spin->setValue(config_filter.kernel_close_length);
 
-    tophat_groupbox->setChecked(config.has_top_hat_filt);
+    tophat_groupbox->setChecked(config_filter.has_top_hat_filt);
 
-    if( config.is_white_top_hat )
+    if( config_filter.is_white_top_hat )
     {
         whitetophat_radio->setChecked(true);
     }
@@ -1168,9 +1172,9 @@ void SettingsWindow::reject()
     {
         blacktophat_radio->setChecked(true);
     }
-    klength_tophat_spin->setValue(config.kernel_tophat_length);
+    klength_tophat_spin->setValue(config_filter.kernel_tophat_length);
 
-    if( config.has_O1_morpho )
+    if( config_filter.has_O1_morpho )
     {
         complex2_morpho_radio->setChecked(true);
     }
@@ -1202,8 +1206,7 @@ void SettingsWindow::default_settings()
     beta_spin->setValue( 1 );
     gamma_spin->setValue( 1 );
 
-    // /4
-    downscale_factor_cb->setCurrentIndex( 2 );
+    downscale_factor_cb->setCurrentIndex( 1 );
     has_temporal_smoothing_cb->setChecked( true );
     cycles_nbr_sb->setValue( 3 );
 
@@ -1229,7 +1232,7 @@ void SettingsWindow::default_settings()
     //        Preprocessing          //
     ///////////////////////////////////
 
-    page3->setChecked( false );
+    preprocess_page->setChecked( false );
 
     gaussian_noise_groupbox->setChecked( false );
     std_noise_spin->setValue( 20.0 );

@@ -89,6 +89,7 @@ private slots:
 
 private:
     void updatePixmap(const QImage& img);
+    void applyDownscaleToItems();
     double getCurrentZoom() const;
 
     QGraphicsScene*        scene = nullptr;

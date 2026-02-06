@@ -355,8 +355,8 @@ void ImageWindow::setupConnections()
     connect(this, &ImageWindow::fileSelected,
             this, &ImageWindow::onFileSelected);
 
-    connect(imageController, &ImageController::imageReady,
-            this,            &ImageWindow::onImageReady);
+    connect(imageController, &ImageController::displayedImageReady,
+            this,            &ImageWindow::onDisplayedImageReady);
 
 
     nameFilters << "*.bmp"
@@ -433,7 +433,7 @@ void ImageWindow::setupConnections()
     connect(languageAct,     &QAction::triggered,
             language_window, &LanguageWindow::show);
 
-    connect(imageController, &ImageController::imageReady, this,
+    connect(imageController, &ImageController::inputImageReady, this,
             [this](const QImage& img) {
                 imageView->clearOverlays();
                 imageView->setImage(img);
@@ -441,8 +441,14 @@ void ImageWindow::setupConnections()
             });
 
     // new display with contour item in the image view
-    connect(imageController, &ImageController::contourReady,
-            acWorker.get(),  &ActiveContourWorker::initializeFromImage);
+    connect(imageController, &ImageController::inputImageReady,
+            acWorker.get(),  &ActiveContourWorker::initializeFromInput);
+
+    connect(acWorker.get(),  &ActiveContourWorker::processedImageReady,
+            imageController, &ImageController::onProcessedImageReady);
+
+    connect(imageController,  &ImageController::displayedImageReady,
+            imageView,        &ImageView::setImage);
 
     // former display with a qimage with the contour
     connect(acWorker.get(),  &ActiveContourWorker::resultReady,
@@ -614,10 +620,10 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     QApplication::quit();
 }
 
-void ImageWindow::onImageReady(const QImage& image)
+void ImageWindow::onDisplayedImageReady(const QImage& displayed)
 {
-    m_imageSize = image.size();
-    m_channels  = image.depth() / 8;
+    m_imageSize = displayed.size();
+    m_channels  = displayed.depth() / 8;
 
     if ( m_channels > 3 )
         m_channels = 3; // because this application processes only 3 channels
@@ -648,18 +654,9 @@ void ImageWindow::updateWindowTitle()
     {
         const QString colorText = (m_channels == 1) ? "Gray" : "RGB";
 
-        QString downscaleStr;
-        downscaleStr.clear();
-
-        QString sizeStr = QString("%1×%2")
-                              .arg(m_imageSize.width())
-                              .arg(m_imageSize.height());
-
-        const auto& df = AppSettings::instance().downscale_factor;
-
-        if ( df >= 2 )
-            sizeStr += QString(" /%1").arg(df);
-
+        const QString sizeStr = QString("%1×%2")
+                                    .arg(m_imageSize.width())
+                                    .arg(m_imageSize.height());
 
         title += QString(" - %1 - %2 - %3")
                      .arg(m_fileName, sizeStr, colorText);

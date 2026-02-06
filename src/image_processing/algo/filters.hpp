@@ -55,7 +55,8 @@ class Filters
 public :
 
     //! Constructor with an input pointer on a row-wise image data buffer and the dimensions of the image.
-    Filters(const unsigned char* img_data1, int img_width1, int img_height1, int byte_per_pixel1);
+    Filters(const unsigned char* img_data1,
+            int img_width1, int img_height1, int byte_per_pixel1);
 
     //! Desctructor.
     ~Filters();

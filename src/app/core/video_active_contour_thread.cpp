@@ -146,14 +146,14 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
             if ( has_downscale )
             {
-                if ( display_config.display_l_out )
+                if ( display_config.l_out_displayed )
                 {
                     draw_upscale_list(region_ac->l_out(),
                                       display_config.l_out_color,
                                       downscale_fctr, result);
                 }
 
-                if ( display_config.display_l_in )
+                if ( display_config.l_in_displayed )
                 {
                     draw_upscale_list(region_ac->l_in(),
                                       display_config.l_in_color,
@@ -162,14 +162,14 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
             }
             else
             {
-                if ( display_config.display_l_out )
+                if ( display_config.l_out_displayed )
                 {
                     draw_list_to_img(region_ac->l_out(),
                                      display_config.l_out_color,
                                      result);
                 }
 
-                if ( display_config.display_l_in )
+                if ( display_config.l_in_displayed )
                 {
                     draw_list_to_img(region_ac->l_in(),
                                      display_config.l_in_color,

@@ -12,20 +12,23 @@ Q_OBJECT
 
 public:
     ImageController(QObject* parent);
-    void applyFilters();
 
 public slots:
     void loadImage(const QString& path);
+    void onProcessedImageReady(const QImage& processed);
 
 signals:
-    void imageReady(const QImage& image);
+    void inputImageReady(const QImage& image);
     void imageReadyWithResize(const QImage& image);
     void imageReadyWithoutResize(const QImage& image);
-    void contourReady(const QImage& image);
+    void displayedImageReady(const QImage& image);
 
 private:
-    QImage img;
-    QImage filtered;
+    void setDisplayedImage();
+
+    QImage inputImage_;
+    QImage processedImage_;
+    QImage displayedImage_;
 };
 
 }

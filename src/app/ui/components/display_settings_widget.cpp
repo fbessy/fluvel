@@ -40,7 +40,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lout_gb->setLayout(lout_layout);
     lout_gb->setCheckable(true);
     lout_gb->setFlat(true);
-    lout_gb->setChecked( config.display_l_out );
+    lout_gb->setChecked( config.l_out_displayed );
 
 
     lin_color_cb_ = new QComboBox;
@@ -67,16 +67,16 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lin_gb->setLayout(lin_layout);
     lin_gb->setCheckable(true);
     lin_gb->setFlat(true);
-    lin_gb->setChecked( config.display_l_in );
+    lin_gb->setChecked( config.l_in_displayed );
 
-    preprocess_cb_ = new QCheckBox(tr("preprocess"));
-    preprocess_cb_->setChecked( config.display_preprocess );
+    input_displayed_cb_ = new QCheckBox(tr("Input image"));
+    input_displayed_cb_->setChecked( config.input_displayed );
 
-    display_overlay_cb_ = new QCheckBox(tr("overlay"));
-    display_overlay_cb_->setChecked( config.display_overlay );
+    display_overlay_cb_ = new QCheckBox(tr("Algorithm overlay"));
+    display_overlay_cb_->setChecked( config.algorithm_overlay );
 
     QVBoxLayout* right_layout = new QVBoxLayout;
-    right_layout->addWidget(preprocess_cb_);
+    right_layout->addWidget(input_displayed_cb_);
     right_layout->addWidget(display_overlay_cb_);
 
 
@@ -96,28 +96,28 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     connect(lout_gb, &QGroupBox::toggled,
             this, [this](bool checked)
             {
-                config_.display_l_out = checked;
+                config_.l_out_displayed = checked;
                 setConfig();
             });
 
     connect(lin_gb, &QGroupBox::toggled,
             this, [this](bool checked)
             {
-                config_.display_l_in = checked;
+                config_.l_in_displayed = checked;
                 setConfig();
             });
 
-    connect(preprocess_cb_, &QCheckBox::toggled,
+    connect(input_displayed_cb_, &QCheckBox::toggled,
             this, [this](bool checked)
             {
-                config_.display_preprocess = checked;
+                config_.input_displayed = checked;
                 setConfig();
             });
 
     connect(display_overlay_cb_, &QCheckBox::toggled,
             this, [this](bool checked)
             {
-                config_.display_overlay = checked;
+                config_.algorithm_overlay = checked;
                 setConfig();
             });
 

@@ -55,12 +55,12 @@
 namespace ofeli_app
 {
 
-enum TabIndex : int
+enum class TabIndex
 {
-    ALGORITHM = 0,
-    INITIALIZATION,
-    PREPROCESSING,
-    DISPLAY
+    Downscale,
+    Preprocessing,
+    Initialization,
+    Algorithm
 };
 
 class SettingsWindow : public QDialog
@@ -107,73 +107,17 @@ private :
     //             onglets                 //
     /////////////////////////////////////////
 
-    // widgets et variables liés à l'onglet algorithm :
+    /////////////////////////////////////////
 
-    QWidget* page1;
-
-    QComboBox* connectivity_cb;
-
-    QSpinBox* Na_spin;
-    QSpinBox* Ns_spin;
-    QSpinBox* lambda_out_spin;
-    QSpinBox* lambda_in_spin;
-    QGroupBox* color_weights_groupbox;
-    QComboBox* color_space_cb;
-    QSpinBox* alpha_spin;
-    QSpinBox* beta_spin;
-    QSpinBox* gamma_spin;
-    SpeedModel speed;
-    int kernel_gradient_length2;
-    unsigned int alpha2;
-    unsigned int beta2;
-    unsigned int gamma2;
-
-    QGroupBox* internalspeed_groupbox;
-    QSpinBox* disk_radius_spin;
-
+    QGroupBox* downscale_page;
     QComboBox* downscale_factor_cb;
-    QCheckBox* has_temporal_smoothing_cb;
-    QSpinBox* cycles_nbr_sb;
-
-
-    /////////////////////////////////////////
-
-    // widgets et variables liés à l'onglet initialization :
-
-    QWidget* page2;
-
-    QPushButton* open_phi_button;
-    QPushButton* save_phi_button;
-
-    //QImage img_phi;
-    void open_phi();
-    void phiInit2imgPhi();
-    void imgPhi2phiInit();
-
-    QRadioButton* rectangle_radio;
-    QRadioButton* ellipse_radio;
-    QSpinBox* width_shape_spin;
-    QSlider* width_slider;
-    QSpinBox* height_shape_spin;
-    QSlider* height_slider;
-    QSpinBox* abscissa_spin;
-    QSlider* abscissa_slider;
-    QSpinBox* ordinate_spin;
-    QSlider* ordinate_slider;
-
-    QPushButton* add_button;
-    QPushButton* subtract_button;
-    QPushButton* clear_button;
-
-    static unsigned char otsu_method(const int histogram[], unsigned int img_size);
-
-    /////////////////////////////////////////
 
     // widgets et variables liés à l'onglet preprocessing :
 
-    QGroupBox* preprocessing();
+    QTabWidget* preprocess_tabs;
+    QGroupBox* preprocess_page;
 
-    QCheckBox* is_downscale_cb;
+    //QCheckBox* is_downscale_cb;
 
     QVBoxLayout* noise_layout();
 
@@ -249,8 +193,6 @@ private :
     QRadioButton* complex2_morpho_radio;
     bool has_O1_morpho2;
 
-    QTabWidget* preprocess_tabs;
-    QGroupBox* page3;
     bool has_preprocess2;
     QLabel* time_filt;
 
@@ -259,6 +201,63 @@ private :
     float calculate_filtered_image();
     void calculate_filtered_copy_visu_buffers();
     const unsigned char* img2_filtered;
+
+    /////////////////////////////////////////
+
+    // widgets et variables liés à l'onglet initialization :
+
+    QWidget* init_page;
+
+    void open_phi();
+    void phiInit2imgPhi();
+    void imgPhi2phiInit();
+
+    QRadioButton* rectangle_radio;
+    QRadioButton* ellipse_radio;
+    QSpinBox* width_shape_spin;
+    QSlider* width_slider;
+    QSpinBox* height_shape_spin;
+    QSlider* height_slider;
+    QSpinBox* abscissa_spin;
+    QSlider* abscissa_slider;
+    QSpinBox* ordinate_spin;
+    QSlider* ordinate_slider;
+
+    QPushButton* add_button;
+    QPushButton* subtract_button;
+    QPushButton* clear_button;
+
+    static unsigned char otsu_method(const int histogram[], unsigned int img_size);
+
+    // widgets et variables liés à l'onglet algorithm :
+
+    QWidget* algo_page;
+
+    QComboBox* connectivity_cb;
+
+    QSpinBox* Na_spin;
+    QSpinBox* Ns_spin;
+    QSpinBox* lambda_out_spin;
+    QSpinBox* lambda_in_spin;
+    QGroupBox* color_weights_groupbox;
+    QComboBox* color_space_cb;
+    QSpinBox* alpha_spin;
+    QSpinBox* beta_spin;
+    QSpinBox* gamma_spin;
+    SpeedModel speed;
+    int kernel_gradient_length2;
+    unsigned int alpha2;
+    unsigned int beta2;
+    unsigned int gamma2;
+
+    QGroupBox* internalspeed_groupbox;
+    QSpinBox* disk_radius_spin;
+
+    QCheckBox* has_temporal_smoothing_cb;
+    QSpinBox* cycles_nbr_sb;
+
+
+
 
     QImage img;
 
@@ -311,9 +310,11 @@ private :
     PhiViewModel* phiViewModel_;
 
     // --- Setup ---
-    void setupUiAlgoTab();
-    void setupUiInitTab();
+    void setupUiDownscaleTab();
     void setupUiPreprocessingTab();
+    void setupUiInitTab();
+    void setupUiAlgoTab();
+
     void setupConnections();
 
     ShapeInfo computeShapeInfo();

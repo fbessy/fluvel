@@ -37,7 +37,7 @@ public:
 
     ActiveContourWorker();
 
-    void initializeFromImage(const QImage& img);
+    void initializeFromInput(const QImage& input);
 
     void restart();        // reset + start
     void togglePause();    // suspend / resume
@@ -50,6 +50,7 @@ public:
     AlgoStats currentStats() const;
 
 signals:
+    void processedImageReady(const QImage& img);
     void resultReady(const QImage& img);
     void contourUpdated(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
@@ -71,28 +72,32 @@ private:
     void performStep();
     bool stepOnceAlgo();
 
+    void processImage();
+    void downscaleInputImage();
+    void applyPreprocessing();
     void initializeActiveContour();
     void finalizeAndPrepareNextRun();
 
     void setMode(RunMode mode);
     void setState(WorkerState state);
 
-    WorkerState m_state;
-    RunMode m_mode;
-    QTimer* m_timer;
-    QImage m_workImage;
-    std::unique_ptr<ofeli_ip::ActiveContour> ac;
+    WorkerState state_;
+    RunMode mode_;
+    QTimer* timer_;
+    std::unique_ptr<ofeli_ip::ActiveContour> ac_;
 
-    mutable QMutex m_statsMutex;
-    AlgoStats m_currentStats;
+    mutable QMutex statsMutex_;
+    AlgoStats currentStats_;
 
-    QImage workAlgo;
-    QImage initialPhi;
+    QImage inputImage_;
+    QImage downscaledImage_;
+    QImage processedImage_;
+    QImage initialPhi_;
 
-    qint64 timeSlice_ms;
-    bool initialShown;
+    qint64 timeSlice_ms_;
+    bool initialShown_;
 
-    ImageSessionSettings config;
+    ImageSessionSettings config_;
 };
 
 }

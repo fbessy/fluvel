@@ -73,7 +73,7 @@ public:
 
 public slots:
     void refreshAlgoOverlay();
-    void onImageReady(const QImage& image);
+    void onDisplayedImageReady(const QImage& input);
     void onFileSelected(const QString& path);
     void onStateChanged(WorkerState state);
     void onCameraWindowShown();
