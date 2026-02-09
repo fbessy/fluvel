@@ -9,7 +9,8 @@ namespace ofeli_app {
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
     : QThread(parent),
-    snapshot_settings(AppSettings::instance().camSessSettings),
+    config_(AppSettings::instance().camSessSettings),
+    displayConfig_(AppSettings::instance().camSessSettings.cam_disp_conf),
     frameAvailable(false),
     running(true),
     configChanged(false)
@@ -19,6 +20,14 @@ VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
         &ApplicationSettings::camSettingsApplied,
         this,
         &VideoActiveContourThread::reloadSettings,
+        Qt::QueuedConnection
+        );
+
+    QObject::connect(
+        &AppSettings::instance(),
+        &ApplicationSettings::camDisplaySettingsChanged,
+        this,
+        &VideoActiveContourThread::reloadDisplaySettings,
         Qt::QueuedConnection
         );
 }
@@ -74,7 +83,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
     if ( !input.isNull() )
     {
-        const auto& config = snapshot_settings;
+        const auto& config = config_;
 
         if (config.has_show_mirrored)
             input = input.flipped(Qt::Horizontal);
@@ -140,39 +149,39 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         if (region_ac)
         {
-            const auto& display_config = config.cam_disp_conf;
+            const auto& dc = displayConfig_;
 
             result = input;
 
             if ( has_downscale )
             {
-                if ( display_config.l_out_displayed )
+                if ( dc.l_out_displayed )
                 {
                     draw_upscale_list(region_ac->l_out(),
-                                      display_config.l_out_color,
+                                      dc.l_out_color,
                                       downscale_fctr, result);
                 }
 
-                if ( display_config.l_in_displayed )
+                if ( dc.l_in_displayed )
                 {
                     draw_upscale_list(region_ac->l_in(),
-                                      display_config.l_in_color,
+                                      dc.l_in_color,
                                       downscale_fctr, result);
                 }
             }
             else
             {
-                if ( display_config.l_out_displayed )
+                if ( dc.l_out_displayed )
                 {
                     draw_list_to_img(region_ac->l_out(),
-                                     display_config.l_out_color,
+                                     dc.l_out_color,
                                      result);
                 }
 
-                if ( display_config.l_in_displayed )
+                if ( dc.l_in_displayed )
                 {
                     draw_list_to_img(region_ac->l_in(),
-                                     display_config.l_in_color,
+                                     dc.l_in_color,
                                      result);
                 }
             }
@@ -192,8 +201,13 @@ void VideoActiveContourThread::stop()
 
 void VideoActiveContourThread::reloadSettings()
 {
-    snapshot_settings = AppSettings::instance().camSessSettings;
+    config_ = AppSettings::instance().camSessSettings;
     configChanged = true;
+}
+
+void VideoActiveContourThread::reloadDisplaySettings()
+{
+    displayConfig_ = AppSettings::instance().camSessSettings.cam_disp_conf;
 }
 
 } // namespace ofeli_app

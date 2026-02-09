@@ -35,7 +35,8 @@ protected:
 
 private:
 
-    CameraSessionSettings snapshot_settings;
+    CameraSessionSettings config_;
+    DisplayConfig displayConfig_;
 
     QImage processFrame(QVideoFrame& frame, qint64& processTs);
 
@@ -52,6 +53,7 @@ private:
 
 private slots:
     void reloadSettings();
+    void reloadDisplaySettings();
 };
 
 } // namespace ofeli_app

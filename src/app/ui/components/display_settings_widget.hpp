@@ -17,7 +17,6 @@ class DisplaySettingsWidget : public QWidget
 
 public:
     DisplaySettingsWidget(QWidget* parent,
-                          const DisplayConfig& config,
                           Session session);
 
 private slots:

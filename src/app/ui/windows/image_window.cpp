@@ -166,7 +166,6 @@ void ImageWindow::setupUi()
 
     // --- Display bar ---
     displayBar = new DisplaySettingsWidget(central,
-                                           AppSettings::instance().imgSessSettings.img_disp_conf,
                                            Session::Image);
 
     // Assemblage

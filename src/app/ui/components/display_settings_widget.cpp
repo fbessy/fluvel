@@ -12,19 +12,24 @@ namespace ofeli_app
 {
 
 DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
-                                             const DisplayConfig& config,
                                              Session session)
-    : QWidget(parent), config_(config), session_(session)
+    : QWidget(parent), session_(session)
 {
+    if ( session_ == Session::Image )
+        config_ = AppSettings::instance().imgSessSettings.img_disp_conf;
+    else if ( session_ == Session::Camera )
+        config_ = AppSettings::instance().camSessSettings.cam_disp_conf;;
+
+
     lout_color_cb_ = new QComboBox;
     init_combobox_color( lout_color_cb_ );
 
-    int lout_index = get_index( config.l_out_color );
+    int lout_index = get_index( config_.l_out_color );
 
     if ( lout_index == ComboBoxColorIndex::SELECTED )
     {
         QPixmap pm(12,12);
-        pm.fill( get_QRgb(config.l_out_color) );
+        pm.fill( get_QRgb(config_.l_out_color) );
         lout_color_cb_->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
     }
 
@@ -40,18 +45,18 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lout_gb->setLayout(lout_layout);
     lout_gb->setCheckable(true);
     lout_gb->setFlat(true);
-    lout_gb->setChecked( config.l_out_displayed );
+    lout_gb->setChecked( config_.l_out_displayed );
 
 
     lin_color_cb_ = new QComboBox;
     init_combobox_color( lin_color_cb_ );
 
-    int lin_index = get_index( config.l_in_color );
+    int lin_index = get_index( config_.l_in_color );
 
     if ( lin_index == ComboBoxColorIndex::SELECTED )
     {
         QPixmap pm(12,12);
-        pm.fill( get_QRgb(config.l_in_color) );
+        pm.fill( get_QRgb(config_.l_in_color) );
         lin_color_cb_->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
     }
 
@@ -67,13 +72,13 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lin_gb->setLayout(lin_layout);
     lin_gb->setCheckable(true);
     lin_gb->setFlat(true);
-    lin_gb->setChecked( config.l_in_displayed );
+    lin_gb->setChecked( config_.l_in_displayed );
 
     input_displayed_cb_ = new QCheckBox(tr("Input image"));
-    input_displayed_cb_->setChecked( config.input_displayed );
+    input_displayed_cb_->setChecked( config_.input_displayed );
 
     display_overlay_cb_ = new QCheckBox(tr("Algorithm overlay"));
-    display_overlay_cb_->setChecked( config.algorithm_overlay );
+    display_overlay_cb_->setChecked( config_.algorithm_overlay );
 
     QVBoxLayout* right_layout = new QVBoxLayout;
     right_layout->addWidget(input_displayed_cb_);

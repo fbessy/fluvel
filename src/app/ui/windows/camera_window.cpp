@@ -173,7 +173,6 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     // --- Display bar ---
     displayBar = new DisplaySettingsWidget(central,
-                                           AppSettings::instance().imgSessSettings.img_disp_conf,
                                            Session::Camera);
 
     QVBoxLayout* layout = new QVBoxLayout(central);
