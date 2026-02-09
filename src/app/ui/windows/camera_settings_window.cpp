@@ -3,6 +3,8 @@
 namespace ofeli_app
 {
 
-CameraSettingsWindow::CameraSettingsWindow() {}
+CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
+    QDialog(parent)
+{}
 
 }

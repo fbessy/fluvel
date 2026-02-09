@@ -140,6 +140,14 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
 
     connect(lin_select_color_,  &QPushButton::clicked,
             this,               &DisplaySettingsWidget::set_color_in);
+
+    refresh_input_displayed_cb_availability();
+
+    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsApplied,
+            this,                     &DisplaySettingsWidget::onImgSettingsApplied);
+
+    connect(&AppSettings::instance(), &ApplicationSettings::camSettingsApplied,
+            this,                     &DisplaySettingsWidget::onCamSettingsApplied);
 }
 
 void DisplaySettingsWidget::init_combobox_color(QComboBox* color_cb)
@@ -230,6 +238,56 @@ void DisplaySettingsWidget::setConfig()
         AppSettings::instance().set_img_display_config(config_);
     else if ( session_ == Session::Camera )
         AppSettings::instance().set_cam_display_config(config_);
+}
+
+void DisplaySettingsWidget::refresh_input_displayed_cb_availability()
+{
+    bool isEnabled = false;
+
+    if ( session_ == Session::Image )
+    {
+        const bool has_downscale = AppSettings::instance().imgSessSettings.downscale_conf.has_downscale;
+        const bool has_preprocess = AppSettings::instance().imgSessSettings.has_preprocess;
+        const auto& fc = AppSettings::instance().imgSessSettings.filtering_conf;
+
+        if (      has_downscale
+            || ( has_preprocess && (    fc.has_gaussian_noise
+                                   || fc.has_salt_noise
+                                   || fc.has_speckle_noise
+                                   || fc.has_mean_filt
+                                   || fc.has_gaussian_filt
+                                   || fc.has_median_filt
+                                   || fc.has_aniso_diff
+                                   || fc.has_open_filt
+                                   || fc.has_close_filt
+                                   || fc.has_top_hat_filt ) ) )
+        {
+            isEnabled = true;
+        }
+    }
+    else if ( session_ == Session::Camera )
+    {
+        const bool has_downscale = AppSettings::instance().camSessSettings.downscale_conf.has_downscale;
+        const bool has_filter = AppSettings::instance().camSessSettings.has_temporal_filtering;
+
+        isEnabled = ( has_downscale || has_filter );
+    }
+
+    if ( !isEnabled )
+        input_displayed_cb_->setChecked(false);
+
+
+    input_displayed_cb_->setEnabled( isEnabled );
+}
+
+void DisplaySettingsWidget::onImgSettingsApplied()
+{
+    refresh_input_displayed_cb_availability();
+}
+
+void DisplaySettingsWidget::onCamSettingsApplied()
+{
+    refresh_input_displayed_cb_availability();
 }
 
 }

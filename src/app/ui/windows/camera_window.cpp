@@ -133,6 +133,26 @@ CameraWindow::CameraWindow(QWidget* parent)
     toggleStreamingButton->setToolTip(tr("Start camera streaming."));
     toggleStreamingButton->setIcon( startIcon );
 
+    bottomPanelToggle = new QPushButton;
+    bottomPanelToggle->setCheckable(true);
+    bottomPanelToggle->setChecked(true);
+    bottomPanelToggle->setFocusPolicy(Qt::NoFocus);
+    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
+
+    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
+
+    settingsButton = new QPushButton;
+    settingsButton->setToolTip(tr("Segmentation settings"));
+    settingsButton->setFlat(true);
+    settingsButton->setFocusPolicy(Qt::NoFocus);
+
+    settingsIcon = il::loadIcon("configure",
+                                ":/icons/toolbar/configure-symbolic.svg");
+
+    settingsButton->setIcon( settingsIcon );
+
+    settings_window = new CameraSettingsWindow(this);
+
     QWidget* central = new QWidget(this);
 
     QWidget* controlBar = new QWidget(central);
@@ -143,24 +163,60 @@ CameraWindow::CameraWindow(QWidget* parent)
     controlLayout->addWidget(toggleStreamingButton);
     controlLayout->addStretch();
 
-    mediaDevices = new QMediaDevices(this);
+    controlLayout->addWidget(bottomPanelToggle);
 
-    updateCameraList();
+    controlLayout->addSpacerItem(
+        new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
+        );
+
+    controlLayout->addWidget(settingsButton);
+
+    // --- Display bar ---
+    displayBar = new DisplaySettingsWidget(central,
+                                           AppSettings::instance().imgSessSettings.img_disp_conf,
+                                           Session::Camera);
+
+    QVBoxLayout* layout = new QVBoxLayout(central);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(controlBar);
+    layout->addWidget(stacked);
+    layout->addWidget(displayBar);
+    setLayout(layout);
+
+    setCentralWidget(central);
+
+    connect(bottomPanelToggle, &QPushButton::toggled,
+            this, [this](bool checked)
+            {
+                if ( checked )
+                {
+                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
+                    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
+                }
+                else
+                {
+                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_off.svg"));
+                    bottomPanelToggle->setToolTip(tr("Bottom panel is hidden."));
+                }
+
+                displayBar->setVisible(checked);
+            });
+
+    connect(settingsButton,     &QPushButton::clicked,
+            settings_window,    &CameraSettingsWindow::show);
 
     connect(toggleStreamingButton,  &QPushButton::clicked,
             this,                   &CameraWindow::onToggleStreaming);
+
+    mediaDevices = new QMediaDevices(this);
+
+    updateCameraList();
 
     connect(mediaDevices,
             &QMediaDevices::videoInputsChanged,
             this,
             &CameraWindow::updateCameraList);
-
-    QVBoxLayout* layout = new QVBoxLayout(central);
-    layout->addWidget(controlBar);
-    layout->addWidget(stacked);
-    setLayout(layout);
-
-    setCentralWidget(central);
 
     statsTimer = new QTimer(this);
     statsTimer->setInterval(500);

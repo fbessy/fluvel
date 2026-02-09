@@ -324,7 +324,6 @@ void AnalysisWidget::refresh_img_noise(int noise_percent)
         }
 
         imageView->setImage(img_noise);
-        QApplication::processEvents();
 
         create_list();
     }

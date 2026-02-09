@@ -56,6 +56,8 @@
 #include "image_view.hpp"
 #include "frame_stats_view.hpp"
 #include "camera_overlay_widget.hpp"
+#include "display_settings_widget.hpp"
+#include "camera_settings_window.hpp"
 
 namespace ofeli_app
 {
@@ -107,6 +109,14 @@ private:
 
     QIcon startIcon;
     QIcon stopIcon;
+    QIcon settingsIcon;
+
+    QPushButton* bottomPanelToggle;
+    QPushButton* settingsButton;
+
+    DisplaySettingsWidget* displayBar;
+
+    CameraSettingsWindow* settings_window;
 
 signals:
     void cameraStatsUpdated(const CameraStatsUi& stats);

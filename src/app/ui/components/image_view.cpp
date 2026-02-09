@@ -180,6 +180,7 @@ void ImageView::updatePixmap(const QImage& img)
         pixmapItem->setZValue(0);
         pixmapItem->setPixmap(QPixmap::fromImage(img));
     }
+
     scene->setSceneRect(pixmapItem->boundingRect());
 
     if (newImage)

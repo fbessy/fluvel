@@ -11,7 +11,7 @@ class CameraSettingsWindow : public QDialog
     Q_OBJECT
 
 public:
-    CameraSettingsWindow();
+    CameraSettingsWindow(QWidget* parent);
 };
 
 }

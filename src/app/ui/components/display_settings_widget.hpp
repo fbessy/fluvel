@@ -24,10 +24,14 @@ private slots:
     void set_color_out();
     void set_color_in();
 
+    void onImgSettingsApplied();
+    void onCamSettingsApplied();
+
 private:
 
     void init_combobox_color(QComboBox* color_cb);
     void setConfig();
+    void refresh_input_displayed_cb_availability();
 
     QCheckBox* input_displayed_cb_;
 

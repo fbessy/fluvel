@@ -110,7 +110,7 @@ void ImageWindow::setupUi()
     bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
 
     settingsButton = new QPushButton;
-    settingsButton->setToolTip(tr("Segmentation settings"));
+    settingsButton->setToolTip(tr("Camera session settings"));
     settingsButton->setFlat(true);
     settingsButton->setFocusPolicy(Qt::NoFocus);
 
@@ -477,7 +477,7 @@ void ImageWindow::setupConnections()
     connect(convergeButton,     &QPushButton::clicked,
             acWorker.get(),     &ActiveContourWorker::converge);
 
-    connect(bottomPanelToggle, &QToolButton::toggled,
+    connect(bottomPanelToggle, &QPushButton::toggled,
             this, [this](bool checked)
             {
                 if ( checked )
