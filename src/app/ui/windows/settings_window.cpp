@@ -1284,6 +1284,7 @@ void SettingsWindow::default_settings()
     complex2_morpho_radio->setChecked( true );
 }
 
+/*
 const unsigned char* SettingsWindow::get_filtered_img_data()
 {
     const auto& config = AppSettings::instance();
@@ -1420,7 +1421,7 @@ float SettingsWindow::calculate_filtered_image()
     elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
 
     return elapsed_time;
-}
+}*/
 
 void SettingsWindow::showEvent(QShowEvent* event)
 {

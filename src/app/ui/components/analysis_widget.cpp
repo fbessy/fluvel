@@ -249,7 +249,7 @@ void AnalysisWidget::refresh_rgb(int color_list_index)
     }
     else
     {
-        //get_color(color_list_index, rgb);
+        rgb = get_color(color_list_index);
     }
 
     refresh_img_noise( noise_sp->value() );

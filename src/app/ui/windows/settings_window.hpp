@@ -74,7 +74,7 @@ public :
                    PhiEditor* phiEditor,
                    PhiViewModel* phiViewModel);
 
-    const unsigned char* get_filtered_img_data();
+    //const unsigned char* get_filtered_img_data();
 
 protected:
 
@@ -198,8 +198,7 @@ private :
 
 
     ofeli_ip::Filters* filters2;
-    float calculate_filtered_image();
-    void calculate_filtered_copy_visu_buffers();
+    //float calculate_filtered_image();
     const unsigned char* img2_filtered;
 
     /////////////////////////////////////////

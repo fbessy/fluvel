@@ -37,13 +37,14 @@
 **
 ****************************************************************************/
 
-#ifndef ANALYSIS_WIDGET_H
-#define ANALYSIS_WIDGET_H
+#ifndef ANALYSIS_WIDGET_HPP
+#define ANALYSIS_WIDGET_HPP
 
 #include <QWidget>
 #include "shape.hpp"
 #include "contour_rendering_qimage.hpp"
 #include "image_view_listener.hpp"
+#include "color.hpp"
 
 QT_BEGIN_NAMESPACE
 class QSpinBox;
@@ -72,7 +73,7 @@ public :
 
     ofeli_ip::Shape& get_shape() { return shape; }
     const QImage get_image() const { return img; }
-    const RgbColor& get_rgb() const { return rgb; }
+    const ofeli_ip::Rgb_uc& get_rgb() const { return rgb; }
 
     void save_settings() const;
     
@@ -87,7 +88,7 @@ private :
     QPushButton* open_button;
 
     QComboBox* color_list;
-    RgbColor selected;
+    ofeli_ip::Rgb_uc selected;
     QSpinBox* noise_sp;
 
     QImage img;
@@ -96,7 +97,7 @@ private :
     int img_height;
 
     ofeli_ip::Shape shape;
-    RgbColor rgb;
+    ofeli_ip::Rgb_uc rgb;
 
     QString last_directory_used;
     QStringList name_filters;

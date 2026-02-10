@@ -24,24 +24,6 @@ enum Language : int
     FRENCH
 };
 
-struct RgbColor
-{
-    unsigned char red;
-    unsigned char green;
-    unsigned char blue;
-
-    RgbColor divide(unsigned char n)
-    {
-        RgbColor tmp;
-
-        tmp.red = red / n;
-        tmp.green = green / n;
-        tmp.blue = blue / n;
-
-        return tmp;
-    }
-};
-
 enum ComboBoxColorIndex : int
 {
     RED = 0,

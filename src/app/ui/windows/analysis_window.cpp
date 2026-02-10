@@ -264,8 +264,8 @@ void AnalysisWindow::calculate_shapes_intersection()
     const QImage& larger_shape_img = ( size1 < size2 ) ?
                                      widget2->get_image() : widget1->get_image();
 
-    const RgbColor& chosen_rgb = ( size1 < size2 ) ?
-                                 widget2->get_rgb() : widget1->get_rgb();
+    const ofeli_ip::Rgb_uc& chosen_rgb = ( size1 < size2 ) ?
+                                         widget2->get_rgb() : widget1->get_rgb();
 
     QRgb rgb_pix;
 
