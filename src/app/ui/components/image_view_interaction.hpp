@@ -26,7 +26,10 @@ public:
         const ImageView& view,
         bool hasImage,
         bool isPanRelevant,
-        const QMouseEvent* event) const {}
+        const QMouseEvent* event) const
+    {
+        return Qt::ArrowCursor;
+    }
 };
 
 } // namespace ofeli_app

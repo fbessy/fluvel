@@ -736,7 +736,7 @@ QString ImageWindow::makeUniqueFileName(const QString& filePath)
     return candidate;
 }
 
-void ImageWindow::onStateChanged(WorkerState state)
+void ImageWindow::onStateChanged(ofeli_app::WorkerState state)
 {
     bool isEnable = ( state != WorkerState::Uninitialized &&
                       state != WorkerState::Initializing );

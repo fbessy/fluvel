@@ -54,7 +54,7 @@ signals:
     void resultReady(const QImage& img);
     void contourUpdated(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
-    void stateChanged(WorkerState state);
+    void stateChanged(ofeli_app::WorkerState state);
 
 private slots:
     void onTimeout();

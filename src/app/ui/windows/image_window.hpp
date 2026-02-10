@@ -75,7 +75,7 @@ public slots:
     void refreshAlgoOverlay();
     void onDisplayedImageReady(const QImage& input);
     void onFileSelected(const QString& path);
-    void onStateChanged(WorkerState state);
+    void onStateChanged(ofeli_app::WorkerState state);
     void onCameraWindowShown();
     void onCameraWindowClosed();
 
