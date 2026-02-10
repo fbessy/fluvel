@@ -401,6 +401,7 @@ void ActiveContourWorker::initializeFromInput(const QImage& input)
     timer_->stop();
     setState( WorkerState::Initializing );
 
+    config_ = AppSettings::instance().imgSessSettings;
     inputImage_ = input;
 
     processImage();

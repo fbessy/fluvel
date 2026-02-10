@@ -61,7 +61,11 @@ void ImageController::loadImage(const QString& path)
             emit imageReadyWithoutResize(inputImage_);
         }
 
-        emit inputImageReady(inputImage_);
+        if ( AppSettings::instance().imgSessSettings.initial_phi.width()  == inputImage_.width() &&
+             AppSettings::instance().imgSessSettings.initial_phi.height() == inputImage_.height() )
+        {
+            emit inputImageReady(inputImage_);
+        }
     }
 }
 

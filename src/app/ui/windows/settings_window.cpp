@@ -72,7 +72,7 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     img2_filtered(nullptr),
     img1(nullptr)
 {
-    setWindowTitle(tr("Settings"));
+    setWindowTitle(tr("Image session settings"));
 
     QSettings settings;
 
@@ -83,7 +83,7 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     dial_buttons = new QDialogButtonBox(this);
     dial_buttons->addButton(QDialogButtonBox::Ok);
     dial_buttons->addButton(QDialogButtonBox::Cancel);
-    dial_buttons->addButton(QDialogButtonBox::Reset);
+    dial_buttons->addButton(QDialogButtonBox::RestoreDefaults);
 
     setupUiDownscaleTab();
     setupUiPreprocessingTab();
@@ -744,8 +744,12 @@ void SettingsWindow::setupConnections()
 
     connect( dial_buttons, SIGNAL(accepted()), this, SLOT(accept()) );
     connect( dial_buttons, SIGNAL(rejected()), this, SLOT(reject()) );
-    connect( dial_buttons->button(QDialogButtonBox::Reset),
-            SIGNAL(clicked()), this, SLOT(default_settings()) );
+
+    auto* restoreBtn =
+        dial_buttons->button(QDialogButtonBox::RestoreDefaults);
+
+    connect(restoreBtn, &QPushButton::clicked,
+            this, &SettingsWindow::default_settings);
 
     //connect(klength_gradient_spin,SIGNAL(valueChanged(int)),this,
     //SLOT(show_phi_with_filtered_image()));
@@ -1207,8 +1211,8 @@ void SettingsWindow::default_settings()
     gamma_spin->setValue( 1 );
 
     downscale_factor_cb->setCurrentIndex( 1 );
-    has_temporal_smoothing_cb->setChecked( true );
-    cycles_nbr_sb->setValue( 3 );
+    //has_temporal_smoothing_cb->setChecked( true );
+    //cycles_nbr_sb->setValue( 3 );
 
     internalspeed_groupbox->setChecked( true );
     Ns_spin->setValue( 3 );
