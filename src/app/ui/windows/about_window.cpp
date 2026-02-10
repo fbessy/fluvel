@@ -99,7 +99,9 @@ AboutWindow::AboutWindow(QWidget* parent) :
 
     QPushButton* webpage = new QPushButton( tr("Web page") );
     webpage->setAutoDefault(false);
-    connect( webpage, SIGNAL(clicked()), this, SLOT(open_webpage()) );
+
+    connect( webpage, &QPushButton::clicked,
+             this,    &AboutWindow::open_webpage );
 
     QPushButton* license = new QPushButton( tr("License") );
     license->setAutoDefault(false);
@@ -148,7 +150,9 @@ AboutWindow::AboutWindow(QWidget* parent) :
         license_window->restoreGeometry(geo_license);
 
     license_window->setLayout(layout_license);
-    connect( license, SIGNAL(clicked()), license_window, SLOT(show()) );
+
+    connect( license,        &QPushButton::clicked,
+             license_window, &QDialog::show );
 
     QVBoxLayout* left_layout = new QVBoxLayout;
     left_layout->addWidget(icon_label);

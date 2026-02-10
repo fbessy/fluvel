@@ -68,8 +68,12 @@ LanguageWindow::LanguageWindow(QWidget* parent) :
     buttons->addButton(QDialogButtonBox::Ok);
     buttons->addButton(QDialogButtonBox::Cancel);
     buttons->setCenterButtons(true);
-    connect( buttons, SIGNAL(accepted()), this, SLOT(accept()) );
-    connect( buttons, SIGNAL(rejected()), this, SLOT(reject()) );
+
+    connect(buttons, &QDialogButtonBox::accepted,
+            this,    &LanguageWindow::accept);
+
+    connect(buttons, &QDialogButtonBox::rejected,
+            this,    &LanguageWindow::reject);
 
     QLabel* restart_label = new QLabel(this);
     restart_label->setAlignment(Qt::AlignJustify);

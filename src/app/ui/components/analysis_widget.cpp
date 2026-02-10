@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #include "analysis_widget.hpp"
+#include "analysis_window.hpp"
 #include "interaction_set.hpp"
 #include "color_picker_behavior.hpp"
 #include "pan_behavior.hpp"
@@ -183,14 +184,25 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
 
     imageView->setListener(this);
 
-    connect( open_button, SIGNAL(clicked()), this, SLOT(open_filename()) );
+    connect(open_button, &QPushButton::clicked,
+            this, &AnalysisWidget::open_filename);
 
-    connect( color_list, SIGNAL(currentIndexChanged(int)), this,
-            SLOT(refresh_rgb(int)) );
-    connect( color_select, SIGNAL(clicked()), this, SLOT(get_list_color()) );
+    connect(color_list,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &AnalysisWidget::refresh_rgb);
 
-    connect( this, SIGNAL(change_list()), parent, SLOT(check_lists()) );
-    connect( noise_sp, SIGNAL(valueChanged(int)), this, SLOT(refresh_img_noise(int)) );
+    connect(color_select, &QPushButton::clicked,
+            this, &AnalysisWidget::get_list_color);
+
+    auto *analysisWindow = qobject_cast<AnalysisWindow*>(parentWidget());
+    Q_ASSERT(analysisWindow);
+
+    connect(this,   &AnalysisWidget::change_list,
+            analysisWindow, &AnalysisWindow::check_lists);
+
+    connect(noise_sp,
+            QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &AnalysisWidget::refresh_img_noise);
 }
 
 void AnalysisWidget::open_filename()

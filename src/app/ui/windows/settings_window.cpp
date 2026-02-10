@@ -742,8 +742,11 @@ void SettingsWindow::setupConnections()
 {
     //connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
 
-    connect( dial_buttons, SIGNAL(accepted()), this, SLOT(accept()) );
-    connect( dial_buttons, SIGNAL(rejected()), this, SLOT(reject()) );
+    connect(dial_buttons, &QDialogButtonBox::accepted,
+            this, &SettingsWindow::accept);
+
+    connect(dial_buttons, &QDialogButtonBox::rejected,
+            this, &SettingsWindow::reject);
 
     auto* restoreBtn =
         dial_buttons->button(QDialogButtonBox::RestoreDefaults);

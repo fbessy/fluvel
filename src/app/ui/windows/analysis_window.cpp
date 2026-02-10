@@ -82,7 +82,8 @@ AnalysisWindow::AnalysisWindow(QWidget* parent) :
     input_layout->addLayout(lists_select_layout);
     input_layout->addWidget(compute_button);
 
-    connect( compute_button, SIGNAL(clicked()), this, SLOT(compute_hd()) );
+    connect(compute_button, &QPushButton::clicked,
+            this,           &AnalysisWindow::compute_hd);
 
 
     ///////////////////////////////////////
@@ -115,7 +116,8 @@ AnalysisWindow::AnalysisWindow(QWidget* parent) :
     QFormLayout* hundredth_layout = new QFormLayout;
     hundredth_layout->addRow("hundredth =", hundredth_sp);
 
-    connect( hundredth_sp, SIGNAL(valueChanged(int)), this, SLOT(refresh_quantile(int)) );
+    connect( hundredth_sp, QOverload<int>::of(&QSpinBox::valueChanged ),
+             this,         &AnalysisWindow::refresh_quantile );
 
     quantile_label = new QLabel(this);
     quantile_label->setText( tr("Hausdorff ratio = ") );

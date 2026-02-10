@@ -46,7 +46,12 @@ KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent) :
     QSpinBox(parent), previous_result(QValidator::Acceptable)
 {
     setSuffix(" × ");
-    connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(set_suffix(const QString&)), Qt::UniqueConnection );
+
+    connect(this,
+            QOverload<const QString &>::of(&QSpinBox::textChanged),
+            this,
+            &KernelSizeSpinBox::set_suffix,
+            Qt::UniqueConnection);
 }
 
 QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
