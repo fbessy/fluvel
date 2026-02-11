@@ -74,15 +74,21 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lin_gb->setFlat(true);
     lin_gb->setChecked( config_.l_in_displayed );
 
-    input_displayed_cb_ = new QCheckBox(tr("Input image"));
-    input_displayed_cb_->setChecked( config_.input_displayed );
-
     display_overlay_cb_ = new QCheckBox(tr("Algorithm overlay"));
     display_overlay_cb_->setChecked( config_.algorithm_overlay );
 
+    input_displayed_cb_ = new QCheckBox(tr("Input image"));
+    input_displayed_cb_->setChecked( config_.input_displayed );
+
+    flip_cb_ = new QCheckBox(tr("Flip horizontally"));
+    flip_cb_->setChecked( config_.flip_horizontal );
+
     QVBoxLayout* right_layout = new QVBoxLayout;
-    right_layout->addWidget(input_displayed_cb_);
     right_layout->addWidget(display_overlay_cb_);
+    right_layout->addWidget(input_displayed_cb_);
+
+    if ( session_ == Session::Camera )
+        right_layout->addWidget(flip_cb_);
 
 
     QHBoxLayout* widget_layout = new QHBoxLayout;
@@ -112,6 +118,13 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
+    connect(display_overlay_cb_, &QCheckBox::toggled,
+            this, [this](bool checked)
+            {
+                config_.algorithm_overlay = checked;
+                setConfig();
+            });
+
     connect(input_displayed_cb_, &QCheckBox::toggled,
             this, [this](bool checked)
             {
@@ -119,10 +132,10 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
-    connect(display_overlay_cb_, &QCheckBox::toggled,
+    connect(flip_cb_, &QCheckBox::toggled,
             this, [this](bool checked)
             {
-                config_.algorithm_overlay = checked;
+                config_.flip_horizontal = checked;
                 setConfig();
             });
 

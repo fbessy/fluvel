@@ -32,8 +32,6 @@ private:
     void setConfig();
     void refresh_input_displayed_cb_availability();
 
-    QCheckBox* input_displayed_cb_;
-
     QComboBox* lout_color_cb_;
     QPushButton* lout_select_color_;
 
@@ -41,6 +39,8 @@ private:
     QPushButton* lin_select_color_;
 
     QCheckBox* display_overlay_cb_;
+    QCheckBox* input_displayed_cb_;
+    QCheckBox* flip_cb_;
 
     DisplayConfig config_;
     Session session_;

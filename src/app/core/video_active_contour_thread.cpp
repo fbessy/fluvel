@@ -201,7 +201,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
                 }
             }
 
-            if ( config.has_show_mirrored && !dc.input_displayed )
+            if ( dc.flip_horizontal )
                 result = result.flipped(Qt::Horizontal);
         }
     }

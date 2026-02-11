@@ -194,9 +194,6 @@ void ApplicationSettings::save_cam_session_config()
     save_disp("cam",
               camSessSettings.cam_disp_conf);
 
-    settings.setValue("cam/display/has_show_mirrored",
-                      camSessSettings.has_show_mirrored);
-
     emit camSettingsApplied();
 }
 
@@ -268,8 +265,6 @@ void ApplicationSettings::save_disp(const QString& scope,
 {
     QSettings settings;
 
-    settings.setValue(scope + "/display/input_displayed",
-                      disp_config.input_displayed);
 
     settings.setValue(scope + "/display/l_out_displayed",
                       disp_config.l_out_displayed);
@@ -293,6 +288,12 @@ void ApplicationSettings::save_disp(const QString& scope,
 
     settings.setValue(scope + "/display/algorithm_overlay",
                       disp_config.algorithm_overlay);
+
+    settings.setValue(scope + "/display/input_displayed",
+                      disp_config.input_displayed);
+
+    settings.setValue(scope + "/display/flip_horizontal",
+                      disp_config.flip_horizontal);
 }
 
 void ApplicationSettings::load_img_session_config()
@@ -382,9 +383,6 @@ void ApplicationSettings::load_cam_session_config()
     // display
     load_disp("cam",
               camSessSettings.cam_disp_conf);
-
-    camSessSettings.has_show_mirrored = settings.value("cam/display/has_show_mirrored",
-                                                       true).toBool();
 }
 
 void ApplicationSettings::load_algo(const QString& scope,
@@ -431,8 +429,6 @@ void ApplicationSettings::load_disp(const QString& scope,
 {
     QSettings settings;
 
-    disp_config.input_displayed = settings.value(scope + "/display/input_displayed", false).toBool();
-
     disp_config.l_out_displayed = settings.value(scope + "/display/l_out_displayed", true).toBool();
     disp_config.l_out_color.red = settings.value(scope + "/display/l_out_red", 0u).toUInt();
     disp_config.l_out_color.green = settings.value(scope + "/display/l_out_green", 0u).toUInt();
@@ -444,6 +440,8 @@ void ApplicationSettings::load_disp(const QString& scope,
     disp_config.l_in_color.blue = settings.value(scope + "/display/l_in_blue", 0u).toUInt();
 
     disp_config.algorithm_overlay = settings.value(scope + "/display/algorithm_overlay", true).toBool();
+    disp_config.input_displayed   = settings.value(scope + "/display/input_displayed", false).toBool();
+    disp_config.flip_horizontal   = settings.value(scope + "/display/flip_horizontal", false).toBool();
 }
 
 QDir ApplicationSettings::settingsDirectory()

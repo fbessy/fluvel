@@ -58,8 +58,6 @@ struct DownscaleConfig
 
 struct DisplayConfig
 {
-    bool input_displayed;
-
     bool l_out_displayed;
     ofeli_ip::Rgb_uc l_out_color;
 
@@ -67,6 +65,8 @@ struct DisplayConfig
     ofeli_ip::Rgb_uc l_in_color;
 
     bool algorithm_overlay;
+    bool input_displayed;
+    bool flip_horizontal;
 };
 
 struct FilteringConfig
@@ -126,7 +126,6 @@ struct CameraSessionSettings
     bool has_temporal_filtering;
 
     DisplayConfig cam_disp_conf;
-    bool has_show_mirrored;
 };
 
 inline ofeli_ip::Rgb_uc get_color(int index)
