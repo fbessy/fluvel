@@ -32,6 +32,8 @@ private:
     float noise_estimate_;
     bool noise_initialized_ = false;
 
+    bool high_motion_ = false;
+
     Grid2D<Rgb_uc> output_;
 };
 

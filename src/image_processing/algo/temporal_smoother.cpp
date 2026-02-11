@@ -69,14 +69,32 @@ void TemporalSmoother::update(ImageSpan src)
     motion_eff = std::max(0.f, motion_eff);
     const float motion_nl = motion_eff * motion_eff;
 
-    const float threshold = 11.f;
+    const float threshold_low  = 2.25f;
+    const float threshold_high = 25.f;
+
+    if ( high_motion_ )
+    {
+        if ( motion_nl < threshold_low )
+            high_motion_ = false;
+    }
+    else
+    {
+        if ( motion_nl > threshold_high )
+            high_motion_ = true;
+    }
+
+    const float effective_threshold = high_motion_ ? threshold_high
+                                                   : threshold_low;
+
     const float alpha_min = 0.05f;
     const float alpha_max = 0.75f;
 
-    float t = std::clamp(motion_nl / threshold, 0.f, 1.f);
+    float t = std::clamp(motion_nl / effective_threshold, 0.f, 1.f);
     t = std::sqrt(t);
 
-    alpha_ = alpha_min + t * (alpha_max - alpha_min);
+    const float alpha_new = alpha_min + t * (alpha_max - alpha_min);
+
+    alpha_ = 0.9f * alpha_ + 0.1f * alpha_new;
 }
 
 // called once per frame
