@@ -144,39 +144,56 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         }
 
         region_ac->run_cycles(config.cycles_nbr);
+        processTs = FrameClock::nowNs() - startTs;
 
         if (region_ac)
         {
             const auto& dc = displayConfig_;
 
-            result = input;
-
-            if ( has_downscale )
+            if ( dc.input_displayed )
             {
-                if ( dc.l_out_displayed )
+                result = input;
+            }
+            else if ( config.has_temporal_filtering )
+            {
+                QImage img(img_algo.data(),
+                           img_algo.width(),
+                           img_algo.height(),
+                           3 * img_algo.width(),
+                           QImage::Format_RGB888);
+
+                result = img.convertToFormat(QImage::Format_RGB32);
+            }
+            else
+            {
+                result = q_img_algo;
+            }
+
+            if ( dc.l_out_displayed )
+            {
+                if ( has_downscale && dc.input_displayed )
                 {
                     draw_upscale_list(region_ac->l_out(),
                                       dc.l_out_color,
                                       downscale_fctr, result);
                 }
-
-                if ( dc.l_in_displayed )
-                {
-                    draw_upscale_list(region_ac->l_in(),
-                                      dc.l_in_color,
-                                      downscale_fctr, result);
-                }
-            }
-            else
-            {
-                if ( dc.l_out_displayed )
+                else
                 {
                     draw_list_to_img(region_ac->l_out(),
                                      dc.l_out_color,
                                      result);
                 }
+            }
 
-                if ( dc.l_in_displayed )
+            if ( dc.l_in_displayed )
+            {
+                if ( has_downscale && dc.input_displayed )
+                {
+                    draw_upscale_list(region_ac->l_in(),
+                                      dc.l_in_color,
+                                      downscale_fctr, result);
+                }
+                else
                 {
                     draw_list_to_img(region_ac->l_in(),
                                      dc.l_in_color,
@@ -186,7 +203,6 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         }
     }
 
-    processTs = FrameClock::nowNs() - startTs;
     return result;
 }
 
