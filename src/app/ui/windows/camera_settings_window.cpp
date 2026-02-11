@@ -16,7 +16,7 @@ namespace ofeli_app
 {
 
 CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
-    QDialog(parent)
+    QDialog(parent), config_(AppSettings::instance().camSessSettings)
 {
     setWindowTitle(tr("Camera session settings"));
 
@@ -72,6 +72,15 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
     layout->addWidget(dial_buttons);
 
     setLayout(layout);
+
+    // to initialize ui state in function of the configuration
+    reject();
+
+    connect(dial_buttons, &QDialogButtonBox::accepted,
+            this,         &CameraSettingsWindow::accept);
+
+    connect(dial_buttons, &QDialogButtonBox::rejected,
+            this,         &CameraSettingsWindow::reject);
 }
 
 void CameraSettingsWindow::setupUiDownscaleGb()
@@ -80,14 +89,46 @@ void CameraSettingsWindow::setupUiDownscaleGb()
     downscale_gb->setCheckable(true);
 
     downscale_factor_cb = new QComboBox;
-    downscale_factor_cb->addItem("2");
-    downscale_factor_cb->addItem("4");
+    downscale_factor_cb->addItem("2", 2);
+    downscale_factor_cb->addItem("4", 4);
 
     auto* fl = new QFormLayout;
     fl->addRow(tr("Factor:"),
                downscale_factor_cb);
 
     downscale_gb->setLayout(fl);
+}
+
+void CameraSettingsWindow::accept()
+{
+    config_.downscale_conf.has_downscale = downscale_gb->isChecked();
+    config_.downscale_conf.downscale_factor = downscale_factor_cb->currentData().toInt();
+    config_.has_temporal_filtering = filter_cb->isChecked();
+
+    algoWidget->accept();
+    config_.cycles_nbr = phases_sb->value();
+
+    // for data persistence
+    AppSettings::instance().save_cam_session_config();
+
+    QDialog::accept();
+}
+
+void CameraSettingsWindow::reject()
+{
+    downscale_gb->setChecked( config_.downscale_conf.has_downscale );
+
+    int index = downscale_factor_cb->findData( config_.downscale_conf.downscale_factor );
+    if ( index >= 0 )
+        downscale_factor_cb->setCurrentIndex( index );
+
+    filter_cb->setChecked( config_.has_temporal_filtering );
+
+
+    algoWidget->reject();
+    phases_sb->setValue( config_.cycles_nbr );
+
+    QDialog::reject();
 }
 
 }

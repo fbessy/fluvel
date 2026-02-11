@@ -1,6 +1,9 @@
 #include "algo_settings_widget.hpp"
 #include "application_settings.hpp"
 
+#include <cassert>
+#include <utility>
+
 #include <QComboBox>
 #include <QSpinBox>
 #include <QGroupBox>
@@ -11,37 +14,41 @@ namespace ofeli_app
 
 AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
                                        Session session)
-    : QWidget(parent)
+    : QWidget(parent), session_(session), config_(config(session))
 {
-    connectivity_cb = new QComboBox;
-    connectivity_cb->addItem("4-connected (Von Neumann)");
-    connectivity_cb->addItem("8-connected (Moore)");
+    connectivity_cb_ = new QComboBox;
+
+    connectivity_cb_->addItem("4-connected (Von Neumann)",
+                              QVariant::fromValue(ofeli_ip::Connectivity::Four));
+
+    connectivity_cb_->addItem("8-connected (Moore)",
+                              QVariant::fromValue(ofeli_ip::Connectivity::Eight));
 
     QFormLayout* connect_layout = new QFormLayout;
-    connect_layout->addRow("Connectivity :", connectivity_cb);
+    connect_layout->addRow("Connectivity :", connectivity_cb_);
 
     QGroupBox* externalspeed_groupbox = new QGroupBox(tr("Cycle 1 – Data-driven evolution"));
 
-    Na_spin = new QSpinBox;
-    Na_spin->setSingleStep(1);
-    Na_spin->setMinimum(1);
-    Na_spin->setMaximum(999);
-    Na_spin->setSuffix(tr(" iterations"));
-    Na_spin->setToolTip(tr("Number of iterations of the data-driven evolution (Cycle 1)."));
+    Na_spin_ = new QSpinBox;
+    Na_spin_->setSingleStep(1);
+    Na_spin_->setMinimum(1);
+    Na_spin_->setMaximum(999);
+    Na_spin_->setSuffix(tr(" iterations"));
+    Na_spin_->setToolTip(tr("Number of iterations of the data-driven evolution (Cycle 1)."));
     QFormLayout *Na_layout = new QFormLayout;
-    Na_layout->addRow("Na =", Na_spin);
+    Na_layout->addRow("Na =", Na_spin_);
 
-    lambda_out_spin = new QSpinBox;
-    lambda_out_spin->setSingleStep(1);
-    lambda_out_spin->setMinimum(1);
-    lambda_out_spin->setMaximum(100000);
-    lambda_out_spin->setToolTip(tr("weight of the outside homogeneity criterion"));
+    lambda_out_spin_ = new QSpinBox;
+    lambda_out_spin_->setSingleStep(1);
+    lambda_out_spin_->setMinimum(1);
+    lambda_out_spin_->setMaximum(100000);
+    lambda_out_spin_->setToolTip(tr("weight of the outside homogeneity criterion"));
 
-    lambda_in_spin = new QSpinBox;
-    lambda_in_spin->setSingleStep(1);
-    lambda_in_spin->setMinimum(1);
-    lambda_in_spin->setMaximum(100000);
-    lambda_in_spin->setToolTip(tr("weight of the inside homogeneity criterion"));
+    lambda_in_spin_ = new QSpinBox;
+    lambda_in_spin_->setSingleStep(1);
+    lambda_in_spin_->setMinimum(1);
+    lambda_in_spin_->setMaximum(100000);
+    lambda_in_spin_->setToolTip(tr("weight of the inside homogeneity criterion"));
 
     QFormLayout* lambda_layout = new QFormLayout;
 
@@ -50,8 +57,8 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     QColor RGBout_list( get_QRgb(config.l_out_color) );
     QColor RGBin_list( get_QRgb(config.l_in_color) );
 
-    lambda_layout->addRow("<font color="+RGBout_list.name()+">"+"λout"+"<font color=black>"+" =", lambda_out_spin);
-    lambda_layout->addRow("<font color="+RGBin_list.name()+">"+"λin"+"<font color=black>"+" =", lambda_in_spin);
+    lambda_layout->addRow("<font color="+RGBout_list.name()+">"+"λout"+"<font color=black>"+" =", lambda_out_spin_);
+    lambda_layout->addRow("<font color="+RGBin_list.name()+">"+"λin"+"<font color=black>"+" =", lambda_in_spin_);
 
     QVBoxLayout* chanvese_layout = new QVBoxLayout;
     chanvese_layout->addLayout(lambda_layout);
@@ -61,42 +68,49 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     QHBoxLayout* speed_layout = new QHBoxLayout;
     speed_layout->addLayout(chanvese_layout);
 
-    color_weights_groupbox = new QGroupBox(tr("Color space"));
-    color_weights_groupbox->setFlat(true);
+    color_weights_groupbox_ = new QGroupBox(tr("Color space"));
+    color_weights_groupbox_->setFlat(true);
 
-    color_space_cb = new QComboBox;
-    color_space_cb->addItem("RGB");
-    color_space_cb->addItem("YUV");
-    color_space_cb->addItem("L*a*b* (CIELAB)");
-    color_space_cb->addItem("L*u*v* (CIELUV)");
+    color_space_cb_ = new QComboBox;
+    color_space_cb_->addItem("RGB",
+                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::RGB));
 
-    alpha_spin = new QSpinBox;
-    alpha_spin->setSingleStep(1);
-    alpha_spin->setMinimum(1);
-    alpha_spin->setMaximum(100000);
+    color_space_cb_->addItem("YUV",
+                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::YUV));
 
-    beta_spin = new QSpinBox;
-    beta_spin->setSingleStep(1);
-    beta_spin->setMinimum(1);
-    beta_spin->setMaximum(100000);
+    color_space_cb_->addItem("L*a*b* (CIELAB)",
+                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::Lab));
 
-    gamma_spin = new QSpinBox;
-    gamma_spin->setSingleStep(1);
-    gamma_spin->setMinimum(1);
-    gamma_spin->setMaximum(100000);
+    color_space_cb_->addItem("L*u*v* (CIELUV)",
+                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::Luv));
+
+    alpha_spin_ = new QSpinBox;
+    alpha_spin_->setSingleStep(1);
+    alpha_spin_->setMinimum(1);
+    alpha_spin_->setMaximum(100000);
+
+    beta_spin_ = new QSpinBox;
+    beta_spin_->setSingleStep(1);
+    beta_spin_->setMinimum(1);
+    beta_spin_->setMaximum(100000);
+
+    gamma_spin_ = new QSpinBox;
+    gamma_spin_->setSingleStep(1);
+    gamma_spin_->setMinimum(1);
+    gamma_spin_->setMaximum(100000);
 
 
 
     QFormLayout* color_weights_layout = new QFormLayout;
-    color_weights_layout->addRow(tr("1st component weight ="), alpha_spin);
-    color_weights_layout->addRow(tr("2nd component weight ="), beta_spin);
-    color_weights_layout->addRow(tr("3rd component weight ="), gamma_spin);
+    color_weights_layout->addRow(tr("1st component weight ="), alpha_spin_);
+    color_weights_layout->addRow(tr("2nd component weight ="), beta_spin_);
+    color_weights_layout->addRow(tr("3rd component weight ="), gamma_spin_);
 
     QVBoxLayout* vcolor_layout = new QVBoxLayout;
-    vcolor_layout->addWidget(color_space_cb);
+    vcolor_layout->addWidget(color_space_cb_);
     vcolor_layout->addLayout(color_weights_layout);
 
-    color_weights_groupbox->setLayout(vcolor_layout);
+    color_weights_groupbox_->setLayout(vcolor_layout);
 
 
 
@@ -104,33 +118,33 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
 
     externalspeed_layout->addLayout(Na_layout);
     externalspeed_layout->addLayout(speed_layout);
-    externalspeed_layout->addWidget(color_weights_groupbox);
+    externalspeed_layout->addWidget(color_weights_groupbox_);
     externalspeed_groupbox->setLayout(externalspeed_layout);
 
     ////////////////////////////////////////////
 
-    internalspeed_groupbox = new QGroupBox(tr("Cycle 2 - Internal smoothing"));
-    internalspeed_groupbox->setCheckable(true);
-    internalspeed_groupbox->setChecked(true);
+    internalspeed_groupbox_ = new QGroupBox(tr("Cycle 2 - Internal smoothing"));
+    internalspeed_groupbox_->setCheckable(true);
+    internalspeed_groupbox_->setChecked(true);
 
-    Ns_spin = new QSpinBox;
-    Ns_spin->setSingleStep(1);
-    Ns_spin->setMinimum(1);
-    Ns_spin->setMaximum(999);
-    Ns_spin->setSuffix(tr(" iterations"));
-    Ns_spin->setToolTip(tr("Number of internal smoothing iterations (Cycle 2)."));
+    Ns_spin_ = new QSpinBox;
+    Ns_spin_->setSingleStep(1);
+    Ns_spin_->setMinimum(1);
+    Ns_spin_->setMaximum(999);
+    Ns_spin_->setSuffix(tr(" iterations"));
+    Ns_spin_->setToolTip(tr("Number of internal smoothing iterations (Cycle 2)."));
 
-    disk_radius_spin = new QSpinBox;
-    disk_radius_spin->setSingleStep(1);
-    disk_radius_spin->setMinimum(1);
-    disk_radius_spin->setMaximum(999);
-    disk_radius_spin->setToolTip(tr("Radius of the disk-shaped neighborhood used for the majority vote during internal smoothing."));
+    disk_radius_spin_ = new QSpinBox;
+    disk_radius_spin_->setSingleStep(1);
+    disk_radius_spin_->setMinimum(1);
+    disk_radius_spin_->setMaximum(999);
+    disk_radius_spin_->setToolTip(tr("Radius of the disk-shaped neighborhood used for the majority vote during internal smoothing."));
 
     QFormLayout* internalspeed_layout = new QFormLayout;
-    internalspeed_layout->addRow("Ns =", Ns_spin);
-    internalspeed_layout->addRow("R =", disk_radius_spin);
+    internalspeed_layout->addRow("Ns =", Ns_spin_);
+    internalspeed_layout->addRow("R =", disk_radius_spin_);
 
-    internalspeed_groupbox->setLayout(internalspeed_layout);
+    internalspeed_groupbox_->setLayout(internalspeed_layout);
 
     ////////////////////////////////////////////
 
@@ -140,10 +154,69 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     algorithm_layout->addSpacing(8);
     algorithm_layout->addWidget(externalspeed_groupbox);
     algorithm_layout->addSpacing(8);
-    algorithm_layout->addWidget(internalspeed_groupbox);
+    algorithm_layout->addWidget(internalspeed_groupbox_);
     algorithm_layout->addStretch(1);
 
     setLayout(algorithm_layout);
+
+    // to initialize ui state in function of the configuration
+    reject();
+}
+
+void AlgoSettingsWidget::accept()
+{
+    config_.connectivity = connectivity_cb_->currentData().value<ofeli_ip::Connectivity>();
+
+    config_.ac_config.Na = Na_spin_->value();
+    config_.ac_config.Ns = Ns_spin_->value();
+    config_.ac_config.is_cycle2 = internalspeed_groupbox_->isChecked();
+    config_.ac_config.disk_radius = disk_radius_spin_->value();
+
+    config_.region_ac_config.lambda_out = lambda_out_spin_->value();
+    config_.region_ac_config.lambda_in  = lambda_in_spin_->value();
+
+    config_.region_ac_config.color_space = color_space_cb_->currentData().value<ofeli_ip::ColorSpaceOption>();
+
+    config_.region_ac_config.weights.c1 = alpha_spin_->value();
+    config_.region_ac_config.weights.c2 = beta_spin_->value();
+    config_.region_ac_config.weights.c3 = gamma_spin_->value();
+}
+
+void AlgoSettingsWidget::reject()
+{
+    int index = connectivity_cb_->findData(QVariant::fromValue(config_.connectivity));
+    if ( index >= 0 )
+        connectivity_cb_->setCurrentIndex( index );
+
+    Na_spin_->setValue( config_.ac_config.Na );
+    Ns_spin_->setValue( config_.ac_config.Ns );
+    internalspeed_groupbox_->setChecked( config_.ac_config.is_cycle2 );
+    disk_radius_spin_->setValue( config_.ac_config.disk_radius );
+
+    lambda_out_spin_->setValue( config_.region_ac_config.lambda_out );
+    lambda_in_spin_->setValue( config_.region_ac_config.lambda_in );
+
+    index = color_space_cb_->findData(QVariant::fromValue(config_.region_ac_config.color_space));
+    if ( index >= 0 )
+        color_space_cb_->setCurrentIndex( index );
+
+    alpha_spin_->setValue( config_.region_ac_config.weights.c1 );
+    beta_spin_->setValue(  config_.region_ac_config.weights.c2 );
+    gamma_spin_->setValue( config_.region_ac_config.weights.c3 );
+}
+
+AlgoConfig& AlgoSettingsWidget::config(Session session)
+{
+    switch (session)
+    {
+    case Session::Image:
+        return AppSettings::instance().imgSessSettings.img_algo_conf;
+
+    case Session::Camera:
+        return AppSettings::instance().camSessSettings.cam_algo_conf;
+    }
+
+    std::unreachable();
 }
 
 }

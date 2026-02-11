@@ -1055,7 +1055,7 @@ void SettingsWindow::accept()
     // config.is_show_mirrored = mirrored_checkbox->isChecked();
 
     // for data persistence
-    AppSettings::instance().save();
+    AppSettings::instance().save_img_session_config();
 
     QDialog::accept();
 }

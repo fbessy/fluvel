@@ -93,8 +93,6 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         bool has_downscale = config.downscale_conf.has_downscale;
         int downscale_fctr = config.downscale_conf.downscale_factor;
 
-        has_downscale = false;
-
         if ( has_downscale )
         {
             assert( downscale_fctr == 2 || downscale_fctr == 4 );
