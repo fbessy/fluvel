@@ -69,8 +69,7 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     phiEditor_(phiEditor),
     phiViewModel_(phiViewModel),
     filters2(nullptr),
-    img2_filtered(nullptr),
-    img1(nullptr)
+    img2_filtered(nullptr)
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -120,11 +119,6 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     settings_grid->setColumnStretch(1,1);
     setLayout(settings_grid);
 
-    last_directory_used = settings.value("Main/Name/last_directory_used",
-                                         QDir().homePath()).toString();
-
-    has_contours_hidden = true;
-
     reject();
 
     setupConnections();
@@ -132,163 +126,14 @@ SettingsWindow::SettingsWindow(QWidget* parent,
 
 void SettingsWindow::setupUiAlgoTab()
 {
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    /// Algorithm tab
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    algo_widget = new AlgoSettingsWidget(this,
+                                         Session::Image);
 
-
-    connectivity_cb = new QComboBox;
-    connectivity_cb->addItem("4-connected (Von Neumann)");
-    connectivity_cb->addItem("8-connected (Moore)");
-
-    QFormLayout* connect_layout = new QFormLayout;
-    connect_layout->addRow("Connectivity :", connectivity_cb);
-
-    QGroupBox* externalspeed_groupbox = new QGroupBox(tr("Cycle 1 – Data-driven evolution"));
-
-    Na_spin = new QSpinBox;
-    Na_spin->setSingleStep(1);
-    Na_spin->setMinimum(1);
-    Na_spin->setMaximum(999);
-    Na_spin->setSuffix(tr(" iterations"));
-    Na_spin->setToolTip(tr("Number of iterations of the data-driven evolution (Cycle 1)."));
-    QFormLayout *Na_layout = new QFormLayout;
-    Na_layout->addRow("Na =", Na_spin);
-
-    lambda_out_spin = new QSpinBox;
-    lambda_out_spin->setSingleStep(1);
-    lambda_out_spin->setMinimum(1);
-    lambda_out_spin->setMaximum(100000);
-    lambda_out_spin->setToolTip(tr("weight of the outside homogeneity criterion"));
-
-    lambda_in_spin = new QSpinBox;
-    lambda_in_spin->setSingleStep(1);
-    lambda_in_spin->setMinimum(1);
-    lambda_in_spin->setMaximum(100000);
-    lambda_in_spin->setToolTip(tr("weight of the inside homogeneity criterion"));
-
-    QFormLayout* lambda_layout = new QFormLayout;
-
-    auto& config = AppSettings::instance().imgSessSettings.img_disp_conf;
-
-    QColor RGBout_list( get_QRgb(config.l_out_color) );
-    QColor RGBin_list( get_QRgb(config.l_in_color) );
-
-    lambda_layout->addRow("<font color="+RGBout_list.name()+">"+"λout"+"<font color=black>"+" =", lambda_out_spin);
-    lambda_layout->addRow("<font color="+RGBin_list.name()+">"+"λin"+"<font color=black>"+" =", lambda_in_spin);
-
-    QVBoxLayout* chanvese_layout = new QVBoxLayout;
-    chanvese_layout->addLayout(lambda_layout);
-
-
-
-    QHBoxLayout* speed_layout = new QHBoxLayout;
-    speed_layout->addLayout(chanvese_layout);
-
-    color_weights_groupbox = new QGroupBox(tr("Color space"));
-    color_weights_groupbox->setFlat(true);
-
-    color_space_cb = new QComboBox;
-    color_space_cb->addItem("RGB");
-    color_space_cb->addItem("YUV");
-    color_space_cb->addItem("L*a*b* (CIELAB)");
-    color_space_cb->addItem("L*u*v* (CIELUV)");
-
-    alpha_spin = new QSpinBox;
-    alpha_spin->setSingleStep(1);
-    alpha_spin->setMinimum(1);
-    alpha_spin->setMaximum(100000);
-    alpha_spin->setToolTip(tr("perceptual lightness weight"));
-
-    beta_spin = new QSpinBox;
-    beta_spin->setSingleStep(1);
-    beta_spin->setMinimum(1);
-    beta_spin->setMaximum(100000);
-    beta_spin->setToolTip(tr("green-red chrominance weight"));
-
-    gamma_spin = new QSpinBox;
-    gamma_spin->setSingleStep(1);
-    gamma_spin->setMinimum(1);
-    gamma_spin->setMaximum(100000);
-    gamma_spin->setToolTip(tr("blue–yellow chrominance weight"));
-
-
-
-    QFormLayout* color_weights_layout = new QFormLayout;
-    color_weights_layout->addRow(tr("1st component weight ="), alpha_spin);
-    color_weights_layout->addRow(tr("2nd component weight ="), beta_spin);
-    color_weights_layout->addRow(tr("3rd component weight ="), gamma_spin);
-
-    QVBoxLayout* vcolor_layout = new QVBoxLayout;
-    vcolor_layout->addWidget(color_space_cb);
-    vcolor_layout->addLayout(color_weights_layout);
-
-    color_weights_groupbox->setLayout(vcolor_layout);
-
-
-
-    QVBoxLayout* externalspeed_layout = new QVBoxLayout;
-
-    externalspeed_layout->addLayout(Na_layout);
-    externalspeed_layout->addLayout(speed_layout);
-    externalspeed_layout->addWidget(color_weights_groupbox);
-    externalspeed_groupbox->setLayout(externalspeed_layout);
-
-    ////////////////////////////////////////////
-
-    internalspeed_groupbox = new QGroupBox(tr("Cycle 2 - Internal smoothing"));
-    internalspeed_groupbox->setCheckable(true);
-    internalspeed_groupbox->setChecked(true);
-
-    Ns_spin = new QSpinBox;
-    Ns_spin->setSingleStep(1);
-    Ns_spin->setMinimum(1);
-    Ns_spin->setMaximum(999);
-    Ns_spin->setSuffix(tr(" iterations"));
-    Ns_spin->setToolTip(tr("Number of internal smoothing iterations (Cycle 2)."));
-
-    disk_radius_spin = new QSpinBox;
-    disk_radius_spin->setSingleStep(1);
-    disk_radius_spin->setMinimum(1);
-    disk_radius_spin->setMaximum(999);
-    disk_radius_spin->setToolTip(tr("Radius of the disk-shaped neighborhood used for the majority vote during internal smoothing."));
-
-    QFormLayout* internalspeed_layout = new QFormLayout;
-    internalspeed_layout->addRow("Ns =", Ns_spin);
-    internalspeed_layout->addRow("R =", disk_radius_spin);
-
-    internalspeed_groupbox->setLayout(internalspeed_layout);
-
-    ////////////////////////////////////////////
-
-    //QGroupBox* tracking_groupbox = new QGroupBox(tr("Video tracking"));
-
-    //has_temporal_smoothing_cb = new QCheckBox;
-
-    //cycles_nbr_sb = new QSpinBox;
-    //cycles_nbr_sb->setMinimum(1);
-
-    //QFormLayout* cycles_nbr_layout = new QFormLayout;
-    //cycles_nbr_layout->addRow("downscale factor = ", downscale_factor_cb);
-    //cycles_nbr_layout->addRow("Temporal adaptative smoothing :", has_temporal_smoothing_cb);
-    //cycles_nbr_layout->addRow("cycles per frame = ", cycles_nbr_sb);
-
-    //tracking_groupbox->setLayout(cycles_nbr_layout);
-
-
-
-    QVBoxLayout* algorithm_layout = new QVBoxLayout;
-    algorithm_layout->addLayout(connect_layout);
-    algorithm_layout->addSpacing(8);
-    algorithm_layout->addWidget(externalspeed_groupbox);
-    algorithm_layout->addSpacing(8);
-    algorithm_layout->addWidget(internalspeed_groupbox);
-    //algorithm_layout->addSpacing(8);
-    //algorithm_layout->addWidget(tracking_groupbox);
-    algorithm_layout->addStretch(1);
+    QVBoxLayout* algo_layout = new QVBoxLayout;
+    algo_layout->addWidget(algo_widget);
 
     algo_page = new QWidget;
-    algo_page->setLayout(algorithm_layout);
+    algo_page->setLayout(algo_layout);
 }
 
 void SettingsWindow::setupUiInitTab()
@@ -850,12 +695,12 @@ void SettingsWindow::setupConnections()
             settingsView,
             &ImageView::setImage);
 
-    phiViewModel_->onConnectivityChanged( connectivity_cb->currentIndex() );
+    //phiViewModel_->onConnectivityChanged( connectivity_cb->currentIndex() );
 
-    connect(connectivity_cb,
+    /*connect(connectivity_cb,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             phiViewModel_,
-            &PhiViewModel::onConnectivityChanged);
+            &PhiViewModel::onConnectivityChanged);*/
 
     auto updateOverlay = [this]()
     {
@@ -926,42 +771,6 @@ void SettingsWindow::applyCurrentShape(bool add)
 
 void SettingsWindow::accept()
 {
-    auto& config_algo = AppSettings::instance().imgSessSettings.img_algo_conf;
-
-    ///////////////////////////////////
-    //          Algorithm            //
-    ///////////////////////////////////
-
-    config_algo.connectivity = ofeli_ip::Connectivity( connectivity_cb->currentIndex() );
-
-    config_algo.ac_config.is_cycle2 = internalspeed_groupbox->isChecked();
-    config_algo.ac_config.disk_radius = disk_radius_spin->value();
-    config_algo.ac_config.Na = Na_spin->value();
-    config_algo.ac_config.Ns = Ns_spin->value();
-
-    config_algo.region_ac_config.lambda_in = lambda_in_spin->value();
-    config_algo.region_ac_config.lambda_out = lambda_out_spin->value();
-
-    config_algo.region_ac_config.color_space = ofeli_ip::ColorSpaceOption( color_space_cb->currentIndex() );
-
-    config_algo.region_ac_config.weights.c1 = alpha_spin->value();
-    config_algo.region_ac_config.weights.c2 = beta_spin->value();
-    config_algo.region_ac_config.weights.c3 = gamma_spin->value();
-
-    //config.has_temporal_smoothing = has_temporal_smoothing_cb->isChecked();
-
-    //config.cycles_nbr = cycles_nbr_sb->value();
-
-    ///////////////////////////////////
-    //       Initialization          //
-    ///////////////////////////////////
-
-    phiEditor_->accept();
-
-    ///////////////////////////////////
-    //        Preprocessing          //
-    ///////////////////////////////////
-
     AppSettings::instance().imgSessSettings.has_preprocess = preprocess_page->isChecked();
 
     auto& ds_config = AppSettings::instance().imgSessSettings.downscale_conf;
@@ -1018,41 +827,9 @@ void SettingsWindow::accept()
     filt_config.kernel_tophat_length = klength_tophat_spin->value();
     filt_config.has_O1_morpho = complex2_morpho_radio->isChecked();
 
-    /////////////////////////////
-    //        Display          //
-    /////////////////////////////
+    phiEditor_->accept();
 
-    // auto& disp_config = AppSettings::instance().imgSessSettings.img_disp_conf;
-
-    // filt_config.inside_combo = insidecolor_combobox->currentIndex();
-    // filt_config.outside_combo = outsidecolor_combobox->currentIndex();
-
-    // filt_config.selected_in  = selected_in_disp;
-    // filt_config.selected_out = selected_out_disp;
-
-
-    // if( config.outside_combo == ComboBoxColorIndex::SELECTED )
-    // {
-    //     config.color_out = config.selected_out;
-    // }
-    // else
-    // {
-    //    get_color(config.outside_combo,
-    //              config.color_out);
-    // }
-
-    // if( config.inside_combo == ComboBoxColorIndex::SELECTED )
-    // {
-    //     config.color_in = config.selected_in;
-    // }
-    // else
-    // {
-    //     get_color(config.inside_combo,
-    //               config.color_in);
-    // }
-
-    // config.is_show_fps = fps_checkbox->isChecked();
-    // config.is_show_mirrored = mirrored_checkbox->isChecked();
+    algo_widget->accept();
 
     // for data persistence
     AppSettings::instance().save_img_session_config();
@@ -1060,67 +837,9 @@ void SettingsWindow::accept()
     QDialog::accept();
 }
 
-// si on clique sur le boutton Cancel de settings_window
-// les widgets reprennent leur état, correspondant aux valeurs des paramètres
 void SettingsWindow::reject()
 {
-    const auto& config_algo = AppSettings::instance().imgSessSettings.img_algo_conf;
-    const auto& config_downscale = AppSettings::instance().imgSessSettings.downscale_conf;
     const auto& config_filter = AppSettings::instance().imgSessSettings.filtering_conf;
-
-    ///////////////////////////////////
-    //          Algorithm            //
-    ///////////////////////////////////
-
-    if ( config_algo.connectivity == ofeli_ip::Connectivity::Four )
-    {
-        connectivity_cb->setCurrentIndex( 0 );
-    }
-    else if ( config_algo.connectivity == ofeli_ip::Connectivity::Eight )
-    {
-        connectivity_cb->setCurrentIndex( 1 );
-    }
-
-    Na_spin->setValue(config_algo.ac_config.Na);
-
-    lambda_in_spin->setValue(config_algo.region_ac_config.lambda_in);
-    lambda_out_spin->setValue(config_algo.region_ac_config.lambda_out);
-
-    color_space_cb->setCurrentIndex( int(config_algo.region_ac_config.color_space) );
-
-    alpha_spin->setValue(config_algo.region_ac_config.weights.c1);
-    beta_spin->setValue(config_algo.region_ac_config.weights.c2);
-    gamma_spin->setValue(config_algo.region_ac_config.weights.c3);
-
-    Ns_spin->setValue(config_algo.ac_config.Ns);
-    internalspeed_groupbox->setChecked(config_algo.ac_config.is_cycle2);
-    disk_radius_spin->setValue(config_algo.ac_config.disk_radius);
-
-
-    downscale_page->setChecked( config_downscale.has_downscale );
-
-    if ( config_downscale.downscale_factor == 2 )
-    {
-        downscale_factor_cb->setCurrentIndex( 0 );
-    }
-    else if ( config_downscale.downscale_factor == 4 )
-    {
-        downscale_factor_cb->setCurrentIndex( 1 );
-    }
-
-    //has_temporal_smoothing_cb->setChecked( config.has_temporal_smoothing );
-
-    //cycles_nbr_sb->setValue(config.cycles_nbr);
-
-    ///////////////////////////////////
-    //       Initialization          //
-    ///////////////////////////////////
-
-    phiEditor_->reject();
-
-    ///////////////////////////////////
-    //        Preprocessing          //
-    ///////////////////////////////////
 
     preprocess_page->setChecked(AppSettings::instance().imgSessSettings.has_preprocess);
 
@@ -1192,6 +911,8 @@ void SettingsWindow::reject()
 
     phiEditor_->reject();
 
+    algo_widget->reject();
+
     QDialog::reject();
 }
 
@@ -1200,7 +921,7 @@ void SettingsWindow::default_settings()
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
-
+/*
     connectivity_cb->setCurrentIndex( int(ofeli_ip::Connectivity::Four) );
 
     Na_spin->setValue( 30 );
@@ -1219,21 +940,7 @@ void SettingsWindow::default_settings()
 
     internalspeed_groupbox->setChecked( true );
     Ns_spin->setValue( 3 );
-    disk_radius_spin->setValue( 2 );
-
-    ///////////////////////////////////
-    //       Initialization          //
-    ///////////////////////////////////
-
-    ellipse_radio->setChecked( true );
-
-    // 65% width and 65% height by default
-    width_shape_spin->setValue(65);
-    height_shape_spin->setValue(65);
-
-    // centered by default
-    abscissa_spin->setValue(0);
-    ordinate_spin->setValue(0);
+    disk_radius_spin->setValue( 2 );*/
 
     ///////////////////////////////////
     //        Preprocessing          //
@@ -1282,6 +989,20 @@ void SettingsWindow::default_settings()
 
     // config.has_O1_morpho
     complex2_morpho_radio->setChecked( true );
+
+    ///////////////////////////////////
+    //       Initialization          //
+    ///////////////////////////////////
+
+    ellipse_radio->setChecked( true );
+
+    // 65% width and 65% height by default
+    width_shape_spin->setValue(65);
+    height_shape_spin->setValue(65);
+
+    // centered by default
+    abscissa_spin->setValue(0);
+    ordinate_spin->setValue(0);
 }
 
 /*

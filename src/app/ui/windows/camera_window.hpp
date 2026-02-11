@@ -69,6 +69,10 @@ public:
     explicit CameraWindow(QWidget* parent = nullptr);
     ~CameraWindow();
 
+protected:
+    void showEvent(QShowEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
+
 private slots:
     void updateCameraList();
     void onToggleStreaming();
@@ -80,9 +84,6 @@ private:
     void startCamera(const QCameraDevice& device);
     void stopCamera();
     void stopCameraAndUi();
-
-    void showEvent(QShowEvent* event) override;
-    void closeEvent(QCloseEvent* event) override;
 
     QComboBox* cameraSelector;
     QPushButton* toggleStreamingButton;

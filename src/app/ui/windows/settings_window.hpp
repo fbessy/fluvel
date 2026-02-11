@@ -49,6 +49,7 @@
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"
 #include "image_view.hpp"
+#include "algo_settings_widget.hpp"
 
 #include <QtWidgets>
 
@@ -84,11 +85,11 @@ protected:
     //! Restore the ui states in function of the ApplicationSettings.
     void reject() override;
 
+    void showEvent(QShowEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
+
 private :
 
-
-    virtual void showEvent(QShowEvent* event) override;
-    virtual void closeEvent(QCloseEvent* event) override;
     void applyCurrentShape(bool add);
 
     //////////////////////////////////////////
@@ -230,80 +231,8 @@ private :
 
     // widgets et variables liés à l'onglet algorithm :
 
+    AlgoSettingsWidget* algo_widget;
     QWidget* algo_page;
-
-    QComboBox* connectivity_cb;
-
-    QSpinBox* Na_spin;
-    QSpinBox* Ns_spin;
-    QSpinBox* lambda_out_spin;
-    QSpinBox* lambda_in_spin;
-    QGroupBox* color_weights_groupbox;
-    QComboBox* color_space_cb;
-    QSpinBox* alpha_spin;
-    QSpinBox* beta_spin;
-    QSpinBox* gamma_spin;
-    SpeedModel speed;
-    int kernel_gradient_length2;
-    unsigned int alpha2;
-    unsigned int beta2;
-    unsigned int gamma2;
-
-    QGroupBox* internalspeed_groupbox;
-    QSpinBox* disk_radius_spin;
-
-    QCheckBox* has_temporal_smoothing_cb;
-    QSpinBox* cycles_nbr_sb;
-
-
-
-
-    QImage img;
-
-    QString last_directory_used;
-
-    QPixmap pixmap_settings;
-
-    /////////////////////////////////////////////////
-    //        variables liés au slot open()        //
-    /////////////////////////////////////////////////
-
-    // chaîne de caractère du chemin+nom de l'image obtenu a partir d'une boite de dialogue ouverture de Qt
-    QString fileName_phi;
-    // buffer et informations des images
-    // buffer 8 bits
-    const unsigned char* img1;
-    bool is_rgb1;
-    // ligne
-    int img_width;
-    // colonne
-    int img_height;
-
-    // taille de l'image
-    int img_size;
-    int find_offset(int x, int y) const;
-
-    // position du curseur souris
-    int positionX;
-    int positionY;
-    void show_phi_list_value();
-
-    // pour la fenêtre de configuration des parametres
-    void mouse_move_event_settings(QMouseEvent* event);
-    void mouse_press_event_settings(QMouseEvent* event);
-
-    bool has_contours_hidden;
-    void img1_visu();
-    bool has_show_img1;
-    void update_visu();
-
-    void save_phi_without_given_extension(const QString& img_str,
-                                          const QString& selected_filter,
-                                          const QString& fileName_save,
-                                          const QImage& img_phi_save);
-
-    QStringList nameFilters;
-
 
     PhiEditor* phiEditor_;
     PhiViewModel* phiViewModel_;
@@ -342,11 +271,6 @@ public slots:
     void onAddShape();
     void onSubtractShape();
 };
-
-inline int SettingsWindow::find_offset(int x, int y) const
-{
-    return x+y*img_width;
-}
 
 }
 
