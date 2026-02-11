@@ -15,12 +15,12 @@ void TemporalSmoother::reset(ImageSpan first_src)
     {
         for (int x = 0; x < accum_.width(); ++x)
         {
-            const Rgb_uc s = first_src.atPixelRgb(x, y);
+            const Rgb_uc color = first_src.atPixelRgb(x, y);
 
             accum_.at(x, y) = Rgb_f {
-                static_cast<float>(s.red),
-                static_cast<float>(s.green),
-                static_cast<float>(s.blue)
+                static_cast<float>(color.red),
+                static_cast<float>(color.green),
+                static_cast<float>(color.blue)
             };
         }
     }

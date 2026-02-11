@@ -85,9 +85,6 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
     {
         const auto& config = config_;
 
-        if (config.has_show_mirrored)
-            input = input.flipped(Qt::Horizontal);
-
         // downscale
         QImage q_img_algo = input;
         bool has_downscale = config.downscale_conf.has_downscale;
@@ -108,16 +105,19 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         if ( !region_ac || configChanged )
         {
             if ( config.has_temporal_filtering )
+            {
                 smoother.reset( img_algo );
+                img_algo = smoother.outputSpan();
+            }
 
-            const auto& conf = config.cam_algo_conf;
+            const auto& algo_conf = config.cam_algo_conf;
 
             region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
                                                                   ofeli_ip::ContourData(img_algo.width(),
                                                                                         img_algo.height(),
-                                                                                        conf.connectivity),
-                                                                  conf.ac_config,
-                                                                  conf.region_ac_config);
+                                                                                        algo_conf.connectivity),
+                                                                  algo_conf.ac_config,
+                                                                  algo_conf.region_ac_config);
 
             configChanged = false;
 
@@ -200,6 +200,9 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
                                      result);
                 }
             }
+
+            if ( config.has_show_mirrored && !dc.input_displayed )
+                result = result.flipped(Qt::Horizontal);
         }
     }
 
