@@ -199,8 +199,8 @@ set(APP_RESOURCES
 
 
     ${OFELI_RESOURCES_DIR}/icons/toolbar/application-exit-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/bottom_panel_off.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/bottom_panel_on.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/right_panel_off.svg
+    ${OFELI_RESOURCES_DIR}/icons/toolbar/right_panel_on.svg
     ${OFELI_RESOURCES_DIR}/icons/toolbar/camera-web-symbolic.svg
     ${OFELI_RESOURCES_DIR}/icons/toolbar/configure-symbolic.svg
     ${OFELI_RESOURCES_DIR}/icons/toolbar/document-open-recent-symbolic.svg

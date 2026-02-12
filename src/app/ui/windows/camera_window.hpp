@@ -112,7 +112,7 @@ private:
     QIcon stopIcon;
     QIcon settingsIcon;
 
-    QPushButton* bottomPanelToggle;
+    QPushButton* rightPanelToggle;
     QPushButton* settingsButton;
 
     DisplaySettingsWidget* displayBar;

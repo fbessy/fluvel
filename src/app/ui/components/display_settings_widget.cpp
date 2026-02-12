@@ -29,23 +29,31 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lin_selector_ = new ColorSelectorWidget(this,
                                             toQColor(config_.l_in_color) );
 
-    QHBoxLayout* lout_layout = new QHBoxLayout;
+    QVBoxLayout* lout_layout = new QVBoxLayout;
     lout_layout->addWidget(lout_selector_);
+    lout_layout->setContentsMargins(0, 0, 0, 0);
+    lout_layout->setContentsMargins(0,0,0,0);
 
     QGroupBox* lout_gb = new QGroupBox(tr("Lout"));
     lout_gb->setLayout(lout_layout);
     lout_gb->setCheckable(true);
-    lout_gb->setFlat(true);
     lout_gb->setChecked( config_.l_out_displayed );
 
-    QHBoxLayout* lin_layout = new QHBoxLayout;
+    lout_gb->setFlat(true);
+    lout_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+
+    QVBoxLayout* lin_layout = new QVBoxLayout;
     lin_layout->addWidget(lin_selector_);
+    lin_layout->setContentsMargins(0, 0, 0, 0);
+    lin_layout->setContentsMargins(0,0,0,0);
 
     QGroupBox* lin_gb = new QGroupBox(tr("Lin"));
     lin_gb->setLayout(lin_layout);
     lin_gb->setCheckable(true);
-    lin_gb->setFlat(true);
     lin_gb->setChecked( config_.l_in_displayed );
+
+    lin_gb->setFlat(true);
+    lin_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     display_overlay_cb_ = new QCheckBox(tr("Algorithm overlay"));
     display_overlay_cb_->setChecked( config_.algorithm_overlay );
@@ -56,21 +64,15 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     flip_cb_ = new QCheckBox(tr("Flip horizontally"));
     flip_cb_->setChecked( config_.flip_horizontal );
 
-    QVBoxLayout* right_layout = new QVBoxLayout;
-    right_layout->addWidget(display_overlay_cb_);
-    right_layout->addWidget(input_displayed_cb_);
-
-    if ( session_ == Session::Camera )
-        right_layout->addWidget(flip_cb_);
-
-
-    QHBoxLayout* widget_layout = new QHBoxLayout;
+    QVBoxLayout* widget_layout = new QVBoxLayout;
     widget_layout->addWidget(lout_gb);
     widget_layout->addWidget(lin_gb);
-    widget_layout->addLayout(right_layout);
+    widget_layout->addWidget(display_overlay_cb_);
+    widget_layout->addWidget(input_displayed_cb_);
 
-    widget_layout->setContentsMargins(8, 4, 8, 4);
-    widget_layout->setSpacing(6);
+    if ( session_ == Session::Camera )
+        widget_layout->addWidget(flip_cb_);
+
     widget_layout->addStretch();
 
     setLayout( widget_layout );

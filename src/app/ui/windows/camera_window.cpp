@@ -133,13 +133,13 @@ CameraWindow::CameraWindow(QWidget* parent)
     toggleStreamingButton->setToolTip(tr("Start camera streaming."));
     toggleStreamingButton->setIcon( startIcon );
 
-    bottomPanelToggle = new QPushButton;
-    bottomPanelToggle->setCheckable(true);
-    bottomPanelToggle->setChecked(true);
-    bottomPanelToggle->setFocusPolicy(Qt::NoFocus);
-    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
+    rightPanelToggle = new QPushButton;
+    rightPanelToggle->setCheckable(true);
+    rightPanelToggle->setChecked(true);
+    rightPanelToggle->setFocusPolicy(Qt::NoFocus);
+    rightPanelToggle->setToolTip(tr("Right panel is visible."));
 
-    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
+    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
 
     settingsButton = new QPushButton;
     settingsButton->setToolTip(tr("Segmentation settings"));
@@ -163,7 +163,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     controlLayout->addWidget(toggleStreamingButton);
     controlLayout->addStretch();
 
-    controlLayout->addWidget(bottomPanelToggle);
+    controlLayout->addWidget(rightPanelToggle);
 
     controlLayout->addSpacerItem(
         new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
@@ -175,28 +175,36 @@ CameraWindow::CameraWindow(QWidget* parent)
     displayBar = new DisplaySettingsWidget(central,
                                            Session::Camera);
 
-    QVBoxLayout* layout = new QVBoxLayout(central);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(controlBar);
-    layout->addWidget(stacked);
-    layout->addWidget(displayBar);
-    setLayout(layout);
+    // --- Layout horizontal contenu principal ---
+    QHBoxLayout* contentLayout = new QHBoxLayout;
+    contentLayout->setContentsMargins(0, 0, 0, 0);
+    contentLayout->setSpacing(0);
+
+    contentLayout->addWidget(stacked, 1);   // zone principale extensible
+    contentLayout->addWidget(displayBar);   // panneau droit
+
+    // --- Layout vertical global ---
+    QVBoxLayout* mainLayout = new QVBoxLayout(central);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+
+    mainLayout->addWidget(controlBar);
+    mainLayout->addLayout(contentLayout);
 
     setCentralWidget(central);
 
-    connect(bottomPanelToggle, &QPushButton::toggled,
+    connect(rightPanelToggle, &QPushButton::toggled,
             this, [this](bool checked)
             {
                 if ( checked )
                 {
-                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
-                    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
+                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
+                    rightPanelToggle->setToolTip(tr("Right panel is visible."));
                 }
                 else
                 {
-                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_off.svg"));
-                    bottomPanelToggle->setToolTip(tr("Bottom panel is hidden."));
+                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_off.svg"));
+                    rightPanelToggle->setToolTip(tr("Right panel is hidden."));
                 }
 
                 displayBar->setVisible(checked);

@@ -100,13 +100,13 @@ void ImageWindow::setupUi()
     convergeButton->setEnabled(false);
 
 
-    bottomPanelToggle = new QPushButton;
-    bottomPanelToggle->setCheckable(true);
-    bottomPanelToggle->setChecked(true);
-    bottomPanelToggle->setFocusPolicy(Qt::NoFocus);
-    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
+    rightPanelToggle = new QPushButton;
+    rightPanelToggle->setCheckable(true);
+    rightPanelToggle->setChecked(true);
+    rightPanelToggle->setFocusPolicy(Qt::NoFocus);
+    rightPanelToggle->setToolTip(tr("Right panel is visible."));
 
-    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
+    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
 
     settingsButton = new QPushButton;
     settingsButton->setToolTip(tr("Camera session settings"));
@@ -121,10 +121,10 @@ void ImageWindow::setupUi()
     // Widget central
     QWidget* central = new QWidget(this);
 
-    // Layout principal
-    QVBoxLayout* mainLayout = new QVBoxLayout(central);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setSpacing(0);
+    // Layout principal vertical
+    QVBoxLayout* vLayout = new QVBoxLayout(central);
+    vLayout->setContentsMargins(0, 0, 0, 0);
+    vLayout->setSpacing(0);
 
     // --- Control bar ---
     QWidget* controlBar = new QWidget(central);
@@ -137,18 +137,13 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(stepButton);
     controlLayout->addWidget(convergeButton);
     controlLayout->addStretch();
-
-    controlLayout->addWidget(bottomPanelToggle);
-
+    controlLayout->addWidget(rightPanelToggle);
     controlLayout->addSpacerItem(
         new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
         );
-
     controlLayout->addWidget(settingsButton);
 
-
     // --- Image view ---
-
     imageView = new ImageView(central);
     imageView->setMaxDisplayFps(60.0);
 
@@ -157,20 +152,25 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
-
     imageView->setInteraction(interaction.release());
 
     imageOverlay = new AlgoInfoOverlay(imageView->viewport());
     imageOverlay->raise();
 
-    // --- Display bar ---
-    displayBar = new DisplaySettingsWidget(central,
-                                           Session::Image);
+    // --- Display bar (à droite) ---
+    displayBar = new DisplaySettingsWidget(central, Session::Image);
 
-    // Assemblage
-    mainLayout->addWidget(controlBar);
-    mainLayout->addWidget(imageView, 1); // stretch = important
-    mainLayout->addWidget(displayBar);
+    // --- Layout horizontal contenu principal ---
+    QHBoxLayout* contentLayout = new QHBoxLayout();
+    contentLayout->setContentsMargins(0, 0, 0, 0);
+    contentLayout->setSpacing(0);
+
+    contentLayout->addWidget(imageView, 1);  // prend tout l'espace
+    contentLayout->addWidget(displayBar, 0); // largeur naturelle
+
+    // Assemblage global
+    vLayout->addWidget(controlBar);
+    vLayout->addLayout(contentLayout);
 
     setCentralWidget(central);
 }
@@ -473,18 +473,18 @@ void ImageWindow::setupConnections()
     connect(convergeButton,     &QPushButton::clicked,
             acWorker.get(),     &ActiveContourWorker::converge);
 
-    connect(bottomPanelToggle, &QPushButton::toggled,
+    connect(rightPanelToggle, &QPushButton::toggled,
             this, [this](bool checked)
             {
                 if ( checked )
                 {
-                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_on.svg"));
-                    bottomPanelToggle->setToolTip(tr("Bottom panel is visible."));
+                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
+                    rightPanelToggle->setToolTip(tr("Right panel is visible."));
                 }
                 else
                 {
-                    bottomPanelToggle->setIcon(QIcon(":/icons/toolbar/bottom_panel_off.svg"));
-                    bottomPanelToggle->setToolTip(tr("Bottom panel is hidden."));
+                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_off.svg"));
+                    rightPanelToggle->setToolTip(tr("Right panel is hidden."));
                 }
 
                 displayBar->setVisible(checked);
