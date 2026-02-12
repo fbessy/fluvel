@@ -3,16 +3,11 @@
 
 namespace ofeli_app {
 
-ZoomBehavior::ZoomBehavior(double minZoom,
-                           double maxZoom,
-                           double zoomFactor)
-    : minZoom_(minZoom)
-    , maxZoom_(maxZoom)
-    , zoomFactor_(zoomFactor)
+ZoomBehavior::ZoomBehavior(double /*zoomFactor*/)
 {
 }
 
-void ZoomBehavior::wheel(ImageView& view,
+void ZoomBehavior::wheel(ImageView& /*view*/,
                          QWheelEvent* event)
 {
     /*

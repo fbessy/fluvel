@@ -177,7 +177,7 @@ private :
     virtual void do_specific_cycle1() { }
 
     //! Specific step when switch in or a switch out procedure is performed.
-    virtual void do_specific_when_switch(const ContourPoint& point,
+    virtual void do_specific_when_switch(const ContourPoint& /*point*/,
                                          BoundarySwitch) { }
 
     //! Stops the active contour and puts it in a terminal state.

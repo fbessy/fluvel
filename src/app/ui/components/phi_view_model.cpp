@@ -181,9 +181,10 @@ void PhiViewModel::updateListsFloodFill()
     QImage visited(w, h, QImage::Format_Grayscale8);
     visited.fill(0);
 
+    /*
     auto inside = [&](int x, int y) {
         return x >= 0 && x < w && y >= 0 && y < h;
-    };
+    };*/
 
     auto pixel = [&](int x, int y) -> uchar {
         return phi.constScanLine(y)[x];

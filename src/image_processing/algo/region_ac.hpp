@@ -183,7 +183,6 @@ RegionAc::RegionAc(ImageSpan image,
     : ActiveContour(std::forward<T>(initial_contour), general_config),
     image_(image),
     region_config_(region_config),
-    average_in_(255), average_out_(0),
     sum_total_(0), pxl_nbr_total_(image.size()),
     sum_out_(0), pxl_nbr_out_(0)
 {

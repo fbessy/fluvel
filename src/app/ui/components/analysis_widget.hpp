@@ -113,7 +113,7 @@ private slots :
     void refresh_rgb(int);
     void refresh_img_noise(int noise_percent);
     void onColorPicked(const QColor& color,
-                       const QPoint& imagePos) override;
+                       const QPoint& /*imagePos*/) override;
 
 signals :
 

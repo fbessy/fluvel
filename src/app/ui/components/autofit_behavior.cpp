@@ -14,7 +14,7 @@ AutoFitBehavior::AutoFitBehavior(Qt::MouseButton button)
 void AutoFitBehavior::mouseRelease(ImageView& view,
                                    QMouseEvent* event)
 {
-    if (event->button() == Qt::MiddleButton)
+    if (event->button() == button_)
     {
         view.applyAutoFit();
         event->accept();

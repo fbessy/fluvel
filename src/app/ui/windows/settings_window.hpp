@@ -85,7 +85,7 @@ protected:
     //! Restore the ui states in function of the ApplicationSettings.
     void reject() override;
 
-    void showEvent(QShowEvent* event) override;
+    void showEvent(QShowEvent* /*event*/) override;
     void closeEvent(QCloseEvent* event) override;
 
 private :

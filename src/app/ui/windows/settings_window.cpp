@@ -66,10 +66,10 @@ SettingsWindow::SettingsWindow(QWidget* parent,
                                PhiEditor* phiEditor,
                                PhiViewModel* phiViewModel) :
     QDialog(parent),
-    phiEditor_(phiEditor),
-    phiViewModel_(phiViewModel),
     filters2(nullptr),
-    img2_filtered(nullptr)
+    img2_filtered(nullptr),
+    phiEditor_(phiEditor),
+    phiViewModel_(phiViewModel)
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -1144,7 +1144,7 @@ float SettingsWindow::calculate_filtered_image()
     return elapsed_time;
 }*/
 
-void SettingsWindow::showEvent(QShowEvent* event)
+void SettingsWindow::showEvent(QShowEvent* /*event*/)
 {
     if ( phiViewModel_ != nullptr )
     {

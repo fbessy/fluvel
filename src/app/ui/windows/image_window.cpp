@@ -585,13 +585,21 @@ void ImageWindow::updateCameraAction()
 
 void ImageWindow::onStartCameraActionTriggered()
 {
+    if ( !cameraSessionAct )
+        return;
+
+    if ( !camera_window )
+        return;
+
     cameraSessionAct->setChecked(camera_window && camera_window->isVisible());
 
     auto cameras = QMediaDevices::videoInputs();
 
     if( cameras.isEmpty() )
     {
-        QMessageBox::information(this, tr("Information"), tr("No camera available."));
+        QMessageBox::information(this,
+                                 tr("Information"),
+                                 tr("No camera available."));
     }
     else
     {

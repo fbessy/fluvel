@@ -60,7 +60,7 @@ class ImageView;
 class AlgoInfoOverlay;
 class ImageController;
 class ActiveContourWorker;
-class AlgoStats;
+struct AlgoStats;
 
 class ImageWindow : public QMainWindow
 {

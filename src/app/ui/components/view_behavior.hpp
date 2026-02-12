@@ -30,8 +30,8 @@ public:
     }
 
     virtual Qt::CursorShape availableCursor(
-        bool hasImage,
-        bool isPanRelevant,
+        bool /*hasImage*/,
+        bool /*isPanRelevant*/,
         const ImageView&,
         const QMouseEvent*) const
     {

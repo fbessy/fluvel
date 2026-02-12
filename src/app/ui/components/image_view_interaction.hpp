@@ -23,10 +23,10 @@ public:
     virtual void mouseDoubleClick(ImageView&, QMouseEvent*) {}
 
     virtual Qt::CursorShape cursorForEvent(
-        const ImageView& view,
-        bool hasImage,
-        bool isPanRelevant,
-        const QMouseEvent* event) const
+        const ImageView& /*view*/,
+        bool /*hasImage*/,
+        bool /*isPanRelevant*/,
+        const QMouseEvent* /*event*/) const
     {
         return Qt::ArrowCursor;
     }

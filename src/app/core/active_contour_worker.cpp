@@ -24,9 +24,9 @@ constexpr qint64 timeSliceConverge_ms       = 15;
 
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr),
-    timer_(new QTimer(this)),
     state_(WorkerState::Uninitialized),
     mode_(RunMode::Interactive),
+    timer_(new QTimer(this)),
     timeSlice_ms_(timeSliceInteractive_ms),
     config_(AppSettings::instance().imgSessSettings)
 {

@@ -342,7 +342,7 @@ void AnalysisWidget::refresh_img_noise(int noise_percent)
 }
 
 void AnalysisWidget::onColorPicked(const QColor& color,
-                                   const QPoint& imagePos)
+                                   const QPoint& /*imagePos*/)
 {
     if ( img.isNull() )
         return;
