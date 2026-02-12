@@ -55,6 +55,7 @@
 #include <QImage>
 #include <QCloseEvent>
 #include <QTimer>
+#include <QSettings>
 
 namespace ofeli_app
 {
@@ -82,6 +83,8 @@ CameraWindow::CameraWindow(QWidget* parent)
     const auto geo = settings.value("Camera/Window/geometry").toByteArray();
     if (!geo.isEmpty())
         restoreGeometry(geo);
+
+    currentCameraId = settings.value("Camera/last_id").toByteArray();
 
     blackLabel = new QLabel(this);
     blackLabel->setAlignment(Qt::AlignCenter);
@@ -304,15 +307,15 @@ void CameraWindow::onFrameSizeStr(QString str)
 
 void CameraWindow::updateCameraList()
 {
-    cameraSelector->clear();
-
     const auto cameras = QMediaDevices::videoInputs();
+
+    cameraSelector->clear();
 
     for (const auto& cam : cameras)
     {
         cameraSelector->addItem(
-            cam.description(),   // affichage
-            cam.id()             // donnée stable (QByteArray)
+            cam.description(),
+            cam.id()
             );
     }
 
@@ -320,38 +323,84 @@ void CameraWindow::updateCameraList()
     cameraSelector->setEnabled(hasCamera);
     toggleStreamingButton->setEnabled(hasCamera);
 
-    if (hasCamera)
+    if (!hasCamera)
+    {
+        // plus aucune caméra disponible
+        stopCameraAndUi();
+        currentCameraId.clear();
+        return;
+    }
+
+    // 🔎 Vérifier si la caméra active existe encore
+    if (!currentCameraId.isEmpty())
+    {
+        int index = cameraSelector->findData(currentCameraId);
+
+        if (index >= 0)
+        {
+            // caméra toujours présente → restaurer sélection
+            cameraSelector->setCurrentIndex(index);
+        }
+        else
+        {
+            // caméra débranchée à chaud
+            stopCameraAndUi();
+            currentCameraId.clear();
+
+            // fallback propre : sélectionner la première dispo
+            cameraSelector->setCurrentIndex(0);
+        }
+    }
+    else
+    {
+        // aucun historique → sélectionner première caméra
         cameraSelector->setCurrentIndex(0);
+    }
 }
 
 void CameraWindow::onToggleStreaming()
 {
+    // --- Si déjà actif → stop ---
     if (camera != nullptr && camera->isActive())
     {
         stopCameraAndUi();
         return;
     }
 
+    // --- Récupérer l'ID sélectionné ---
     const QByteArray selectedId =
         cameraSelector->currentData().toByteArray();
 
+    if (selectedId.isEmpty())
+        return;
+
+    // --- Sauvegarde persistante ---
+    currentCameraId = selectedId;
+
+    QSettings settings;
+    settings.setValue("Camera/last_id", currentCameraId);
+
+    // --- Chercher le device correspondant ---
     const auto cameras = QMediaDevices::videoInputs();
 
-    auto it = std::find_if(cameras.begin(), cameras.end(),
-                           [&](const QCameraDevice& c)
-                           {
-                               return c.id() == selectedId;
-                           });
-
-    if (it != cameras.end())
+    for (const auto& cam : cameras)
     {
-        stacked->setCurrentIndex(1);
-        startCamera(*it);
+        if (cam.id() == selectedId)
+        {
+            stacked->setCurrentIndex(1);
+            startCamera(cam);
 
-        toggleStreamingButton->setText(tr("Stop"));
-        toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
-        toggleStreamingButton->setIcon(stopIcon);
+            toggleStreamingButton->setText(tr("Stop"));
+            toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
+            toggleStreamingButton->setIcon(stopIcon);
+            return;
+        }
     }
+
+    // --- Sécurité : si ID non trouvé ---
+    // (ex: changement ultra-rapide device)
+    stopCameraAndUi();
+    currentCameraId.clear();
 }
 
 void CameraWindow::stopCamera()

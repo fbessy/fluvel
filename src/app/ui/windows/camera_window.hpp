@@ -85,6 +85,8 @@ private:
     void stopCamera();
     void stopCameraAndUi();
 
+    QByteArray currentCameraId;
+
     QComboBox* cameraSelector;
     QPushButton* toggleStreamingButton;
 
