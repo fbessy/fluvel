@@ -113,8 +113,8 @@ AboutWindow::AboutWindow(QWidget* parent) :
     const auto language = config.app_language;
 
     QString txt_file;
-    if( language == Language::FRENCH ||
-        ( language == Language::SYSTEM &&
+    if( language == Language::French ||
+        ( language == Language::System &&
           locale == "fr" ) )
     {
         txt_file = QString(":/licenses/license_fr.txt");

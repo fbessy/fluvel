@@ -40,30 +40,47 @@
 #include "language_window.hpp"
 #include "application_settings.hpp"
 
-#include <QtWidgets>
+#include <QComboBox>
+#include <QSettings>
+#include <QDialogButtonBox>
+#include <QLabel>
+#include <QVBoxLayout>
 
 namespace ofeli_app
 {
 
-LanguageWindow::LanguageWindow(QWidget* parent) :
-    QDialog(parent)
+LanguageWindow::LanguageWindow(QWidget* parent)
+    : QDialog(parent)
 {
-    setWindowTitle( tr("Language") );
+    setWindowTitle(tr("Language"));
 
     QSettings settings;
     const auto geo = settings.value("Language/Window/geometry").toByteArray();
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
-    list_widget = new QListWidget(this);
+    // --- Combo box ---
+    combo = new QComboBox(this);
 
     QString locale = QLocale::system().name().section('_', 0, 0);
 
-    list_widget->addItem( tr("System (")+locale+")" );
-    list_widget->addItem( tr("English") );
-    list_widget->addItem( tr("French") );
-    list_widget->setCurrentRow( int(AppSettings::instance().app_language) );
+    combo->addItem(tr("System (%1)").arg(locale),
+                   QVariant::fromValue(int(Language::System)));
 
+    combo->addItem(tr("English"),
+                   QVariant::fromValue(int(Language::English)));
+
+    combo->addItem(tr("French"),
+                   QVariant::fromValue(int(Language::French)));
+
+    // sélectionner la langue actuelle indépendamment de l’index
+    auto currentLanguage = AppSettings::instance().app_language;
+
+    int index = combo->findData(QVariant::fromValue(int(currentLanguage)));
+    if (index >= 0)
+        combo->setCurrentIndex(index);
+
+    // --- Buttons ---
     QDialogButtonBox* buttons = new QDialogButtonBox(this);
     buttons->addButton(QDialogButtonBox::Ok);
     buttons->addButton(QDialogButtonBox::Cancel);
@@ -75,13 +92,15 @@ LanguageWindow::LanguageWindow(QWidget* parent) :
     connect(buttons, &QDialogButtonBox::rejected,
             this,    &LanguageWindow::reject);
 
+    // --- Restart label ---
     QLabel* restart_label = new QLabel(this);
     restart_label->setAlignment(Qt::AlignJustify);
     restart_label->setWordWrap(true);
     restart_label->setText(tr("The change will take effect after restarting the application."));
 
+    // --- Layout ---
     QVBoxLayout* layout_this = new QVBoxLayout;
-    layout_this->addWidget(list_widget);
+    layout_this->addWidget(combo);
     layout_this->addWidget(restart_label);
     layout_this->addWidget(buttons);
     layout_this->setSizeConstraint(QLayout::SetMinimumSize);
@@ -91,19 +110,27 @@ LanguageWindow::LanguageWindow(QWidget* parent) :
 
 void LanguageWindow::accept()
 {
-    auto language = Language( list_widget->currentRow() );
+    // récupérer la valeur logique (pas l’index)
+    Language language = Language(
+        combo->currentData().toInt()
+    );
+
     AppSettings::instance().app_language = language;
 
     QSettings settings;
-    settings.setValue("Language/current_index", language);
+    settings.setValue("Language/current", int(language));
 
     QDialog::accept();
 }
 
 void LanguageWindow::reject()
 {
+    // restaurer la langue active
     auto language = AppSettings::instance().app_language;
-    list_widget->setCurrentRow( int(language) );
+
+    int index = combo->findData(QVariant::fromValue(int(language)));
+    if (index >= 0)
+        combo->setCurrentIndex(index);
 
     QDialog::reject();
 }
@@ -115,6 +142,5 @@ void LanguageWindow::closeEvent(QCloseEvent* event)
 
     QDialog::closeEvent(event);
 }
-
 
 }

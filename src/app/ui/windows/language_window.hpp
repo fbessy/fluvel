@@ -3,9 +3,7 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
-class QListWidget;
-QT_END_NAMESPACE
+class QComboBox;
 
 namespace ofeli_app
 {
@@ -33,8 +31,7 @@ protected:
 
 private :
 
-    //! This widget is the part of the window that displays the list of languages.
-    QListWidget* list_widget;
+    QComboBox* combo;
 };
 
 }

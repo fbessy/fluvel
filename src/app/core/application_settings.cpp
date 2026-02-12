@@ -55,8 +55,10 @@ ApplicationSettings::ApplicationSettings()
 {
     QSettings settings;
 
-    app_language = Language( settings.value("Language/current_index",
-                                             Language::SYSTEM).toInt() );
+    app_language = Language(
+        settings.value("Language/current",
+                       int(Language::System)).toInt()
+        );
 
     load_img_session_config();
     load_cam_session_config();
@@ -71,8 +73,7 @@ void ApplicationSettings::save()
 {
     QSettings settings;
 
-    settings.setValue("Language/current_index",
-                      app_language);
+    settings.setValue("Language/current", int(app_language));
 
     save_img_session_config();
     save_cam_session_config();

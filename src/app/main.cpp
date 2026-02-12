@@ -140,13 +140,13 @@ int main( int argc, char* argv[] )
     QString locale;
     switch(language)
     {
-    case ofeli_app::Language::SYSTEM:
+    case ofeli_app::Language::System:
         locale = QLocale::system().name().section('_', 0, 0);
         break;
-    case ofeli_app::Language::FRENCH:
+    case ofeli_app::Language::French:
         locale = "fr";
         break;
-    case ofeli_app::Language::ENGLISH:
+    case ofeli_app::Language::English:
     default:
         locale = "en";
         break;

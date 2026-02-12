@@ -17,11 +17,11 @@ enum SpeedModel : int
     EDGE_BASED         // Geodesic model
 };
 
-enum Language : int
+enum class Language
 {
-    SYSTEM = 0,
-    ENGLISH,
-    FRENCH
+    System = 0,
+    English,
+    French
 };
 
 enum ComboBoxColorIndex : int
