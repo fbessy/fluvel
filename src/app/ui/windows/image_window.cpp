@@ -3,7 +3,6 @@
 #include "image_view.hpp"
 #include "image_controller.hpp"
 #include "active_contour_worker.hpp"
-#include "preview_pipeline.hpp"
 #include "algo_info_overlay.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
@@ -333,8 +332,6 @@ void ImageWindow::setupActions()
 
     imageController = new ImageController(this);
     acWorker = std::make_unique<ActiveContourWorker>();
-
-    previewPipeline = new PreviewPipeline(this);
 
     phiEditor = std::make_unique<PhiEditor>();
     phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());

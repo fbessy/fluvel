@@ -22,14 +22,20 @@ set(app_src
     ${UI_WIN_DIR}/settings_window.cpp
     ${UI_WIN_DIR}/settings_window.hpp
 
+    ${UI_WIN_DIR}/camera_settings_window.cpp
+    ${UI_WIN_DIR}/camera_settings_window.hpp
+
     ${UI_WIN_DIR}/language_window.cpp
     ${UI_WIN_DIR}/language_window.hpp
 
     ${UI_WIN_DIR}/about_window.cpp
     ${UI_WIN_DIR}/about_window.hpp
 
-    ${UI_COMP_DIR}/image_view.cpp
-    ${UI_COMP_DIR}/image_view.hpp
+    ${UI_COMP_DIR}/algo_settings_widget.cpp
+    ${UI_COMP_DIR}/algo_settings_widget.hpp
+
+    ${UI_COMP_DIR}/display_settings_widget.cpp
+    ${UI_COMP_DIR}/display_settings_widget.hpp
 
     ${UI_COMP_DIR}/camera_overlay_widget.cpp
     ${UI_COMP_DIR}/camera_overlay_widget.hpp
@@ -40,20 +46,11 @@ set(app_src
     ${UI_COMP_DIR}/kernel_size_spinbox.cpp
     ${UI_COMP_DIR}/kernel_size_spinbox.hpp
 
-    ${UI_COMP_DIR}/frame_stats_view.cpp
-    ${UI_COMP_DIR}/frame_stats_view.hpp
+    ${UI_COMP_DIR}/icon_loader.cpp
+    ${UI_COMP_DIR}/icon_loader.hpp
 
-    ${UI_COMP_DIR}/phi_view_model.cpp
-    ${UI_COMP_DIR}/phi_view_model.hpp
-
-    ${UI_COMP_DIR}/contour_point_item.cpp
-    ${UI_COMP_DIR}/contour_point_item.hpp
-
-    ${UI_COMP_DIR}/algo_info_overlay.cpp
-    ${UI_COMP_DIR}/algo_info_overlay.hpp
-
-    ${UI_COMP_DIR}/contour_rendering_qimage.cpp
-    ${UI_COMP_DIR}/contour_rendering_qimage.hpp
+    ${UI_COMP_DIR}/image_view.cpp
+    ${UI_COMP_DIR}/image_view.hpp
 
     ${UI_COMP_DIR}/image_view_interaction.hpp
     ${UI_COMP_DIR}/interaction_set.cpp
@@ -82,8 +79,20 @@ set(app_src
     ${UI_COMP_DIR}/pixel_info_overlay.cpp
     ${UI_COMP_DIR}/pixel_info_overlay.hpp
 
-    ${UI_COMP_DIR}/icon_loader.cpp
-    ${UI_COMP_DIR}/icon_loader.hpp
+    ${UI_COMP_DIR}/contour_point_item.cpp
+    ${UI_COMP_DIR}/contour_point_item.hpp
+
+    ${UI_COMP_DIR}/frame_stats_view.cpp
+    ${UI_COMP_DIR}/frame_stats_view.hpp
+
+    ${UI_COMP_DIR}/phi_view_model.cpp
+    ${UI_COMP_DIR}/phi_view_model.hpp
+
+    ${UI_COMP_DIR}/algo_info_overlay.cpp
+    ${UI_COMP_DIR}/algo_info_overlay.hpp
+
+    ${UI_COMP_DIR}/contour_rendering_qimage.cpp
+    ${UI_COMP_DIR}/contour_rendering_qimage.hpp
 
     ${UI_COMP_DIR}/image_view_listener.hpp
 
@@ -106,9 +115,6 @@ set(app_src
 
     ${CORE_DIR}/phi_editor.cpp
     ${CORE_DIR}/phi_editor.hpp
-
-    ${CORE_DIR}/preview_pipeline.cpp
-    ${CORE_DIR}/preview_pipeline.hpp
 
     ${CORE_DIR}/shape_overlay_renderer.cpp
     ${CORE_DIR}/shape_overlay_renderer.hpp
@@ -148,9 +154,6 @@ elseif(WIN32)
 else()
     qt_add_executable(${target_name}
         ${app_src}
-        ui/components/algo_settings_widget.hpp ui/components/algo_settings_widget.cpp
-        ui/components/display_settings_widget.hpp ui/components/display_settings_widget.cpp
-        ui/windows/camera_settings_window.hpp ui/windows/camera_settings_window.cpp
     )
 endif()
 

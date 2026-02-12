@@ -32,9 +32,6 @@ set(ip_src
     ${ALGO_DIR}/filters.cpp
     ${ALGO_DIR}/filters.hpp
 
-    ${ALGO_DIR}/filters2.cpp
-    ${ALGO_DIR}/filters2.hpp
-
     ${ALGO_DIR}/boundary_builder.cpp
     ${ALGO_DIR}/boundary_builder.hpp
 

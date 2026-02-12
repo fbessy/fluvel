@@ -60,7 +60,6 @@ class ImageView;
 class AlgoInfoOverlay;
 class ImageController;
 class ActiveContourWorker;
-class PreviewPipeline;
 class AlgoStats;
 
 class ImageWindow : public QMainWindow
@@ -148,7 +147,6 @@ private:
     // --- Controllers / Workers ---
     ImageController* imageController = nullptr;
     std::unique_ptr<ActiveContourWorker> acWorker;
-    PreviewPipeline* previewPipeline = nullptr;
     std::unique_ptr<PhiEditor> phiEditor;
     std::unique_ptr<PhiViewModel> phiViewModel;
 
