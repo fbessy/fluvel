@@ -6,8 +6,6 @@ set(TARGET_NAME ofeli_image_processing)
 
 set(ALGO_DIR     ${IP_DIR}/algo)
 set(CORE_DIR     ${IP_DIR}/core)
-set(ADAPTERS_DIR ${IP_DIR}/adapters)
-
 
 set(ip_src
     ${ALGO_DIR}/contour_data.cpp
@@ -48,8 +46,6 @@ set(ip_src
     ${CORE_DIR}/ofeli_math.hpp
     ${CORE_DIR}/color.hpp
     ${CORE_DIR}/neighborhood.hpp
-
-    ${ADAPTERS_DIR}/image_adapters.hpp
 )
 
 add_library(${TARGET_NAME} STATIC ${ip_src})
@@ -57,7 +53,6 @@ add_library(ofeli::image_processing ALIAS ${TARGET_NAME})
 
 
 target_include_directories(${TARGET_NAME} PUBLIC
-    ${ADAPTERS_DIR}
     ${CORE_DIR}
     ${ALGO_DIR}
 )

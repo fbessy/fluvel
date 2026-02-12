@@ -135,15 +135,6 @@ signals:
     void imageClicked(int x, int y);
 };
 
-inline QColor toQColor(const ofeli_ip::Rgb_uc& c)
-{
-    return QColor(
-        static_cast<int>(c.red),
-        static_cast<int>(c.green),
-        static_cast<int>(c.blue)
-        );
-}
-
 } // namespace ofeli_app
 
-#endif // IMAGE_VIEW_BASE_H
+#endif // IMAGE_VIEW_BASE_HPP

@@ -2,6 +2,7 @@
 #include "image_view_interaction.hpp"
 #include "application_settings.hpp"
 #include "common_settings.hpp"
+#include "color_adapters.hpp"
 
 #include <QPainter>
 #include <QWheelEvent>

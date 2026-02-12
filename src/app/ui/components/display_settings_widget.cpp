@@ -1,5 +1,7 @@
 #include "display_settings_widget.hpp"
 #include "application_settings.hpp"
+#include "color_selector_widget.hpp"
+#include "color_adapters.hpp"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -21,25 +23,14 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
         config_ = AppSettings::instance().camSessSettings.cam_disp_conf;;
 
 
-    lout_color_cb_ = new QComboBox;
-    init_combobox_color( lout_color_cb_ );
+    lout_selector_ = new ColorSelectorWidget(this,
+                                             toQColor(config_.l_out_color) );
 
-    int lout_index = get_index( config_.l_out_color );
-
-    if ( lout_index == ComboBoxColorIndex::SELECTED )
-    {
-        QPixmap pm(12,12);
-        pm.fill( get_QRgb(config_.l_out_color) );
-        lout_color_cb_->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
-    }
-
-    lout_color_cb_->setCurrentIndex( lout_index );
-
-    lout_select_color_ = new QPushButton(tr("select"));
+    lin_selector_ = new ColorSelectorWidget(this,
+                                            toQColor(config_.l_in_color) );
 
     QHBoxLayout* lout_layout = new QHBoxLayout;
-    lout_layout->addWidget(lout_color_cb_);
-    lout_layout->addWidget(lout_select_color_);
+    lout_layout->addWidget(lout_selector_);
 
     QGroupBox* lout_gb = new QGroupBox(tr("Lout"));
     lout_gb->setLayout(lout_layout);
@@ -47,26 +38,8 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lout_gb->setFlat(true);
     lout_gb->setChecked( config_.l_out_displayed );
 
-
-    lin_color_cb_ = new QComboBox;
-    init_combobox_color( lin_color_cb_ );
-
-    int lin_index = get_index( config_.l_in_color );
-
-    if ( lin_index == ComboBoxColorIndex::SELECTED )
-    {
-        QPixmap pm(12,12);
-        pm.fill( get_QRgb(config_.l_in_color) );
-        lin_color_cb_->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
-    }
-
-    lin_color_cb_->setCurrentIndex( lin_index );
-
-    lin_select_color_ = new QPushButton(tr("select"));
-
     QHBoxLayout* lin_layout = new QHBoxLayout;
-    lin_layout->addWidget(lin_color_cb_);
-    lin_layout->addWidget(lin_select_color_);
+    lin_layout->addWidget(lin_selector_);
 
     QGroupBox* lin_gb = new QGroupBox(tr("Lin"));
     lin_gb->setLayout(lin_layout);
@@ -102,8 +75,6 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
 
     setLayout( widget_layout );
 
-
-
     connect(lout_gb, &QGroupBox::toggled,
             this, [this](bool checked)
             {
@@ -111,10 +82,24 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
+    connect(lout_selector_, &ColorSelectorWidget::colorSelected,
+            this, [this](const QColor& color)
+            {
+                config_.l_out_color = toRgb_uc(color);
+                setConfig();
+            });
+
     connect(lin_gb, &QGroupBox::toggled,
             this, [this](bool checked)
             {
                 config_.l_in_displayed = checked;
+                setConfig();
+            });
+
+    connect(lin_selector_, &ColorSelectorWidget::colorSelected,
+            this, [this](const QColor& color)
+            {
+                config_.l_in_color = toRgb_uc(color);
                 setConfig();
             });
 
@@ -139,25 +124,6 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
-    connect(lout_color_cb_, &QComboBox::currentIndexChanged,
-            this, [this](int index)
-            {
-                config_.l_out_color = get_color(index);
-                setConfig();
-            });
-
-    connect(lin_color_cb_, &QComboBox::currentIndexChanged,
-            this, [this](int index)
-            {
-                config_.l_in_color = get_color(index);
-                setConfig();
-            });
-
-    connect(lout_select_color_,  &QPushButton::clicked,
-            this,                &DisplaySettingsWidget::set_color_out);
-
-    connect(lin_select_color_,  &QPushButton::clicked,
-            this,               &DisplaySettingsWidget::set_color_in);
 
     refresh_input_displayed_cb_availability();
 
@@ -166,88 +132,6 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
 
     connect(&AppSettings::instance(), &ApplicationSettings::camSettingsApplied,
             this,                     &DisplaySettingsWidget::onCamSettingsApplied);
-}
-
-void DisplaySettingsWidget::init_combobox_color(QComboBox* color_cb)
-{
-    assert( color_cb != nullptr );
-
-    // QPixmap pm : petite image affichant la couleur devant le nom de la couleur dans le combobox
-    QPixmap pm(12,12);
-
-    pm.fill(Qt::red);
-    color_cb->addItem (pm, tr("Red"));
-
-    pm.fill(Qt::green);
-    color_cb->addItem (pm, tr("Green"));
-
-    pm.fill(Qt::blue);
-    color_cb->addItem (pm, tr("Blue"));
-
-    pm.fill(Qt::cyan);
-    color_cb->addItem (pm, tr("Cyan"));
-
-    pm.fill(Qt::magenta);
-    color_cb->addItem (pm, tr("Magenta"));
-
-    pm.fill(Qt::yellow);
-    color_cb->addItem (pm, tr("Yellow"));
-
-    pm.fill(Qt::black);
-    color_cb->addItem (pm, tr("Black"));
-
-    pm.fill(Qt::white);
-    color_cb->addItem (pm, tr("White"));
-
-    pm.fill(Qt::transparent);
-    color_cb->addItem (pm,tr("Selected"));
-}
-
-void DisplaySettingsWidget::set_color_out()
-{
-    // Sélection d'une QColor a partir d'une boite de dialogue couleur
-    QColor color_out = QColorDialog::getColor(Qt::white, this, tr("Select Lout color"));
-    if( color_out.isValid() )
-    {
-        QPixmap pm(12,12);
-        pm.fill(color_out);
-
-        lout_color_cb_->blockSignals(true);
-
-        lout_color_cb_->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
-        lout_color_cb_->setCurrentIndex(ComboBoxColorIndex::SELECTED);
-
-        lout_color_cb_->blockSignals(false);
-
-        config_.l_out_color.red   = (unsigned char)(color_out.red());
-        config_.l_out_color.green = (unsigned char)(color_out.green());
-        config_.l_out_color.blue  = (unsigned char)(color_out.blue());
-        setConfig();
-    }
-}
-
-void DisplaySettingsWidget::set_color_in()
-{
-    // Selection d'une QColor à partir d'une boîte de dialogue couleur
-    QColor color_in = QColorDialog::getColor(Qt::white, this, tr("Select Lin color"));
-    if( color_in.isValid() )
-    {
-        QPixmap pm(12,12);
-        pm.fill(color_in);
-
-        lin_color_cb_->blockSignals(true);
-
-        lin_color_cb_->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
-        lin_color_cb_->setCurrentIndex(ComboBoxColorIndex::SELECTED);
-
-        lin_color_cb_->blockSignals(false);
-
-
-        config_.l_in_color.red   = (unsigned char)(color_in.red());
-        config_.l_in_color.green = (unsigned char)(color_in.green());
-        config_.l_in_color.blue  = (unsigned char)(color_in.blue());
-        setConfig();
-    }
 }
 
 void DisplaySettingsWidget::setConfig()

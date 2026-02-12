@@ -11,6 +11,8 @@
 namespace ofeli_app
 {
 
+class ColorSelectorWidget;
+
 class DisplaySettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -20,23 +22,16 @@ public:
                           Session session);
 
 private slots:
-    void set_color_out();
-    void set_color_in();
-
     void onImgSettingsApplied();
     void onCamSettingsApplied();
 
 private:
 
-    void init_combobox_color(QComboBox* color_cb);
     void setConfig();
     void refresh_input_displayed_cb_availability();
 
-    QComboBox* lout_color_cb_;
-    QPushButton* lout_select_color_;
-
-    QComboBox* lin_color_cb_;
-    QPushButton* lin_select_color_;
+    ColorSelectorWidget* lout_selector_;
+    ColorSelectorWidget* lin_selector_;
 
     QCheckBox* display_overlay_cb_;
     QCheckBox* input_displayed_cb_;
