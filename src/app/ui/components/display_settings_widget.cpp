@@ -117,13 +117,15 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
-    connect(flip_cb_, &QCheckBox::toggled,
-            this, [this](bool checked)
-            {
-                config_.flip_horizontal = checked;
-                setConfig();
-            });
-
+    if ( session_ == Session::Camera )
+    {
+        connect(flip_cb_, &QCheckBox::toggled,
+                this, [this](bool checked)
+                {
+                    config_.flip_horizontal = checked;
+                    setConfig();
+                });
+    }
 
     refresh_input_displayed_cb_availability();
 
