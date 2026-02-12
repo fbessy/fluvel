@@ -307,35 +307,50 @@ void CameraWindow::updateCameraList()
     cameraSelector->clear();
 
     const auto cameras = QMediaDevices::videoInputs();
-    for (const auto &cam : cameras) {
-        cameraSelector->addItem(cam.description());
+
+    for (const auto& cam : cameras)
+    {
+        cameraSelector->addItem(
+            cam.description(),   // affichage
+            cam.id()             // donnée stable (QByteArray)
+            );
     }
 
-    cameraSelector->setEnabled( !cameras.isEmpty() );
-    toggleStreamingButton->setEnabled( !cameras.isEmpty() );
+    const bool hasCamera = !cameras.isEmpty();
+    cameraSelector->setEnabled(hasCamera);
+    toggleStreamingButton->setEnabled(hasCamera);
 
-    cameraSelector->setCurrentIndex(0);
+    if (hasCamera)
+        cameraSelector->setCurrentIndex(0);
 }
 
 void CameraWindow::onToggleStreaming()
 {
-    if ( camera != nullptr && camera->isActive() )
+    if (camera != nullptr && camera->isActive())
     {
         stopCameraAndUi();
         return;
     }
 
-    const int camIndex = cameraSelector->currentIndex();
+    const QByteArray selectedId =
+        cameraSelector->currentData().toByteArray();
+
     const auto cameras = QMediaDevices::videoInputs();
 
-    if ( camIndex >= 0 && camIndex < cameras.size() )
+    auto it = std::find_if(cameras.begin(), cameras.end(),
+                           [&](const QCameraDevice& c)
+                           {
+                               return c.id() == selectedId;
+                           });
+
+    if (it != cameras.end())
     {
         stacked->setCurrentIndex(1);
-        startCamera( cameras[camIndex] );
+        startCamera(*it);
 
-        toggleStreamingButton->setText( tr("Stop") );
+        toggleStreamingButton->setText(tr("Stop"));
         toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
-        toggleStreamingButton->setIcon( stopIcon );
+        toggleStreamingButton->setIcon(stopIcon);
     }
 }
 
