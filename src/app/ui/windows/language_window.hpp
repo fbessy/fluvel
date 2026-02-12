@@ -29,9 +29,9 @@ protected:
     //! Restore the language combobox state in function of the ApplicationSettings language.
     void reject() override;
 
-private :
+    void closeEvent(QCloseEvent* event) override;
 
-    virtual void closeEvent(QCloseEvent* event) override;
+private :
 
     //! This widget is the part of the window that displays the list of languages.
     QListWidget* list_widget;

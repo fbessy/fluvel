@@ -51,15 +51,15 @@ class KernelSizeSpinBox : public QSpinBox
 public:
     explicit KernelSizeSpinBox(QWidget* parent = nullptr);
 
-signals:
-
 private slots:
     void set_suffix(const QString& text);
 
+protected:
+    QValidator::State validate(QString& text, int& pos) const override;
+    void focusInEvent(QFocusEvent* event) override;
+
 private:
 
-    virtual QValidator::State validate(QString& text, int& pos) const override;
-    virtual void focusInEvent(QFocusEvent* event) override;
     QValidator::State previous_result;
 
 };

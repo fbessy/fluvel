@@ -55,9 +55,10 @@ public :
     //! A parametric constructor with a pointer on the QWidget parent.
     AboutWindow(QWidget* parent);
 
-private :
+protected:
+    void closeEvent(QCloseEvent* event) override;
 
-    virtual void closeEvent(QCloseEvent* event) override;
+private :
 
     //! A subwindow with the license application, displayed when the user clicks on the license button.
     QDialog* license_window;

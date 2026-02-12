@@ -64,9 +64,11 @@ public slots :
 
     void check_lists();
 
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 private :
 
-    virtual void closeEvent(QCloseEvent* event) override;
     void calculate_shapes_intersection();
 
     AnalysisWidget* widget1;
