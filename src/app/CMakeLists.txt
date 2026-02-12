@@ -5,6 +5,7 @@ set(APP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(UI_WIN_DIR ${APP_DIR}/ui/windows)
 set(UI_COMP_DIR ${APP_DIR}/ui/components)
 set(CORE_DIR ${APP_DIR}/core)
+set(INTEROP_DIR ${APP_DIR}/interop)
 
 set(app_src
 
@@ -42,6 +43,9 @@ set(app_src
 
     ${UI_COMP_DIR}/analysis_widget.cpp
     ${UI_COMP_DIR}/analysis_widget.hpp
+
+    ${UI_COMP_DIR}/color_selector_widget.cpp
+    ${UI_COMP_DIR}/color_selector_widget.hpp
 
     ${UI_COMP_DIR}/kernel_size_spinbox.cpp
     ${UI_COMP_DIR}/kernel_size_spinbox.hpp
@@ -121,6 +125,11 @@ set(app_src
 
     ${CORE_DIR}/shape_type.hpp
     ${CORE_DIR}/algo_stats.hpp
+
+    ${CORE_DIR}/algo_stats.hpp
+
+    ${INTEROP_DIR}/image_adapters.hpp
+    ${INTEROP_DIR}/color_adapters.hpp
 )
 
 if(APPLE)
@@ -238,6 +247,7 @@ target_include_directories(${target_name} PRIVATE
     ${CORE_DIR}
     ${UI_COMP_DIR}
     ${UI_WIN_DIR}
+    ${INTEROP_DIR}
 )
 
 if(OpenCV_FOUND)
