@@ -175,8 +175,14 @@ int main( int argc, char* argv[] )
     QApplication::setWindowIcon(appIcon);
     qputenv("QT_QPA_PLATFORMTHEME", "kde");
 
-    ofeli_app::ImageWindow mainWindow;
-    mainWindow.show();
+    std::unique_ptr<QWidget> root;
 
+#ifdef Q_OS_ANDROID
+    root = std::make_unique<ofeli_app::CameraWindow>();
+#else
+    root = std::make_unique<ofeli_app::ImageWindow>();
+#endif
+
+    root->show();
     return app.exec();
 }

@@ -85,6 +85,10 @@ private:
     void stopCamera();
     void stopCameraAndUi();
 
+#ifdef Q_OS_ANDROID
+    void ensureCameraPermission();
+#endif
+
     QByteArray currentCameraId;
 
     QComboBox* cameraSelector;

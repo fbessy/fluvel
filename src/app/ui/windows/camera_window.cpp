@@ -57,6 +57,12 @@
 #include <QTimer>
 #include <QSettings>
 
+#ifdef Q_OS_ANDROID
+    #include <QCoreApplication>
+    #include <QPermission>
+    #include <QtCore/qpermissions.h>
+#endif
+
 namespace ofeli_app
 {
 
@@ -387,6 +393,10 @@ void CameraWindow::onToggleStreaming()
     {
         if (cam.id() == selectedId)
         {
+#ifdef Q_OS_ANDROID
+            ensureCameraPermission();
+#endif
+
             stacked->setCurrentIndex(1);
             startCamera(cam);
 
@@ -489,5 +499,30 @@ void CameraWindow::closeEvent(QCloseEvent* event)
     emit cameraWindowClosed();
     QMainWindow::closeEvent(event);
 }
+
+#ifdef Q_OS_ANDROID
+void CameraWindow::ensureCameraPermission()
+{
+    QCameraPermission permission;
+
+    switch (qApp->checkPermission(permission)) {
+
+    case Qt::PermissionStatus::Undetermined:
+        qApp->requestPermission(permission, this,
+                                [](const QPermission &p) {
+                                    if (p.status() != Qt::PermissionStatus::Granted)
+                                        qWarning() << "Camera permission denied";
+                                });
+        break;
+
+    case Qt::PermissionStatus::Denied:
+        qWarning() << "Camera permission denied";
+        break;
+
+    case Qt::PermissionStatus::Granted:
+        break;
+    }
+}
+#endif
 
 }
