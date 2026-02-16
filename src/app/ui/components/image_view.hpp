@@ -37,7 +37,6 @@ public:
     void setImage(const QImage& img);
 
     void clearOverlays();
-    void updateSceneRectForImage();
 
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);
@@ -69,10 +68,10 @@ public:
     bool isGrayscale() const;
 
 public slots:
+    void setDisplayConfig(const DisplayConfig& displayConfig);
+    void setDownscaleConfig(const DownscaleConfig& downscaleConfig);
     void displayContour(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
-    void onConfigChanged();
-    void onDownscaleChanged();
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -126,8 +125,8 @@ private:
     ImageViewInteraction* m_interaction = nullptr;
     ImageViewListener*        listener_ = nullptr;
 
-    DisplayConfig display_config_;
-    DownscaleConfig downscale_config_;
+    DisplayConfig displayConfig_;
+    DownscaleConfig downscaleConfig_;
 
     Session session_;
 

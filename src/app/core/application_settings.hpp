@@ -99,10 +99,11 @@ public:
     CameraSessionSettings camSessSettings;
 
 signals:
-    void imgSettingsApplied();
-    void imgDisplaySettingsChanged();
-    void camSettingsApplied();
-    void camDisplaySettingsChanged();
+    void imgSettingsChanged(const ImageSessionSettings& conf);
+    void imgDisplaySettingsChanged(const DisplayConfig& conf);
+    void camSettingsChanged(const CameraSessionSettings& conf);
+    void camDisplaySettingsChanged(const DisplayConfig& conf);
+    void resizedPhi(const QImage& phi);
 };
 
 class AppSettings

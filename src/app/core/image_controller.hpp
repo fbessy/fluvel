@@ -1,6 +1,8 @@
 #ifndef IMAGE_CONTROLLER_HPP
 #define IMAGE_CONTROLLER_HPP
 
+#include "active_contour_worker.hpp"
+
 #include <QImage>
 #include <QObject>
 
@@ -16,6 +18,14 @@ public:
 public slots:
     void loadImage(const QString& path);
     void onProcessedImageReady(const QImage& processed);
+    void onContourUpdated(const QVector<QPoint>& l_out,
+                          const QVector<QPoint>& l_in);
+    void onStateChanged(ofeli_app::WorkerState state);
+
+    void restart();
+    void togglePause();
+    void step();
+    void converge();
 
 signals:
     void inputImageReady(const QImage& image);
@@ -23,12 +33,24 @@ signals:
     void imageReadyWithoutResize(const QImage& image);
     void displayedImageReady(const QImage& image);
 
+    void contourUpdated(const QVector<QPoint>& l_out,
+                        const QVector<QPoint>& l_in);
+    void stateChanged(ofeli_app::WorkerState state);
+
+    void clearOverlaysRequested();
+
 private:
-    void setDisplayedImage();
+
+    void onImgSettingsChanged(const ImageSessionSettings& conf);
+    void onImgDisplaySettingsChanged(const DisplayConfig& displayConfig);
+    void refreshView();
 
     QImage inputImage_;
     QImage processedImage_;
-    QImage displayedImage_;
+    DisplayConfig displayConfig_;
+
+    ActiveContourWorker acWorker;
+    ImageSessionSettings config_;
 };
 
 }

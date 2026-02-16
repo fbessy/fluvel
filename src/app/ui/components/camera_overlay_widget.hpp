@@ -5,17 +5,10 @@
 #include <QWidget>
 #include <QLabel>
 
-namespace ofeli_app {
+#include "camera_stats.hpp"
 
-struct CameraStatsUi
+namespace ofeli_app
 {
-    float inputFps = 0.f;
-    float processingFps = 0.f;
-    float displayFps = 0.f;
-    float dropRate = 0.f;
-    float avgLatencyMs = 0.f;
-    float maxLatencyMs = 0.f;
-};
 
 class CameraOverlayWidget : public QWidget
 {
@@ -25,7 +18,7 @@ public:
     explicit CameraOverlayWidget(QWidget* parent = nullptr);
 
 public slots:
-    void setStats(const CameraStatsUi& stats);
+    void setStats(const CameraStats& stats);
 
 protected:
     void resizeEvent(QResizeEvent* event) override;

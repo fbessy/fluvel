@@ -4,7 +4,6 @@
 #include "region_color_ac.hpp"
 #include "edge_ac.hpp"
 
-#include "application_settings.hpp"
 #include "contour_rendering_qimage.hpp"
 #include "image_span.hpp"
 #include "image_adapters.hpp"
@@ -12,6 +11,7 @@
 
 #include <QTimer>
 #include <QElapsedTimer>
+#include <QDebug>
 
 #include <cassert>
 
@@ -27,20 +27,11 @@ ActiveContourWorker::ActiveContourWorker()
     state_(WorkerState::Uninitialized),
     mode_(RunMode::Interactive),
     timer_(new QTimer(this)),
-    timeSlice_ms_(timeSliceInteractive_ms),
-    config_(AppSettings::instance().imgSessSettings)
+    timeSlice_ms_(timeSliceInteractive_ms)
 {
     timer_->setInterval(workerPeriod_ms);
     connect(timer_, &QTimer::timeout,
             this, &ActiveContourWorker::onTimeout);
-
-    QObject::connect(
-        &AppSettings::instance(),
-        &ApplicationSettings::imgSettingsApplied,
-        this,
-        &ActiveContourWorker::reloadSettings,
-        Qt::QueuedConnection
-        );
 }
 
 void ActiveContourWorker::restart()
@@ -69,7 +60,7 @@ void ActiveContourWorker::restart()
         return;
 
     updateStats();
-    emitContourOnly();
+    emitContour();
 
     initialShown_ = true;
 
@@ -108,7 +99,7 @@ void ActiveContourWorker::togglePause()
         if ( !initialShown_ )
         {
             updateStats();
-            emitContourOnly();
+            emitContour();
 
             initialShown_ = true;
         }
@@ -141,7 +132,7 @@ void ActiveContourWorker::step()
         if ( !initialShown_ )
         {
             updateStats();
-            emitContourOnly();
+            emitContour();
 
             initialShown_ = true;
         }
@@ -161,7 +152,7 @@ void ActiveContourWorker::performStep()
     else
     {
         updateStats();
-        emitContourOnly();
+        emitContour();
     }
 }
 
@@ -175,7 +166,7 @@ void ActiveContourWorker::converge()
     if ( state_ == WorkerState::Ready )
     {
         updateStats();
-        emitContourOnly();
+        emitContour();
 
         initialShown_ = true;
     }
@@ -213,10 +204,16 @@ void ActiveContourWorker::processImage()
 
 void ActiveContourWorker::downscaleInputImage()
 {
+    if ( inputImage_.isNull() )
+        return;
+
+    if ( config_.initial_phi.isNull() )
+        return;
+
     const bool has_downscale = config_.downscale_conf.has_downscale;
     const int downscale_fctr = config_.downscale_conf.downscale_factor;
 
-    initialPhi_ = config_.initial_phi.copy();
+    scaledPhi_ = config_.initial_phi;
 
 #ifdef OFELI_DEBUG
     int bpp = inputImage_.depth() / 8;  // ou 4 pour ARGB32
@@ -236,10 +233,10 @@ void ActiveContourWorker::downscaleInputImage()
                                               Qt::IgnoreAspectRatio,
                                               Qt::FastTransformation);
 
-        initialPhi_ = initialPhi_.scaled(downscaledImage_.width(),
-                                         downscaledImage_.height(),
-                                         Qt::IgnoreAspectRatio,
-                                         Qt::FastTransformation);
+        scaledPhi_ = scaledPhi_.scaled(downscaledImage_.width(),
+                                       downscaledImage_.height(),
+                                       Qt::IgnoreAspectRatio,
+                                       Qt::FastTransformation);
     }
     else
     {
@@ -258,6 +255,9 @@ void ActiveContourWorker::downscaleInputImage()
 
 void ActiveContourWorker::applyPreprocessing()
 {
+    if ( downscaledImage_.isNull() )
+        return;
+
     //float elapsed_time;
     //std::clock_t start_time, stop_time;
 
@@ -396,13 +396,14 @@ void ActiveContourWorker::applyPreprocessing()
     //return elapsed_time;
 }
 
-void ActiveContourWorker::initializeFromInput(const QImage& input)
+void ActiveContourWorker::initializeFromInput(const QImage& input,
+                                              const ImageSessionSettings& config)
 {
     timer_->stop();
     setState( WorkerState::Initializing );
 
-    config_ = AppSettings::instance().imgSessSettings;
     inputImage_ = input;
+    config_ = config;
 
     processImage();
 
@@ -412,7 +413,7 @@ void ActiveContourWorker::initializeFromInput(const QImage& input)
         return;
 
     updateStats();
-    emitContourOnly();
+    emitContour();
 
     initialShown_ = true;
 }
@@ -427,9 +428,9 @@ void ActiveContourWorker::initializeActiveContour()
 
     ac_.reset();
 
-    ofeli_ip::ContourData initialCD(initialPhi_.constBits(),
-                                    initialPhi_.width(),
-                                    initialPhi_.height(),
+    ofeli_ip::ContourData initialCD(scaledPhi_.constBits(),
+                                    scaledPhi_.width(),
+                                    scaledPhi_.height(),
                                     config_.img_algo_conf.connectivity);
 
     bool is_rgb = ( processedImage_.format() != QImage::Format_Grayscale8 );
@@ -467,7 +468,7 @@ void ActiveContourWorker::finalizeAndPrepareNextRun()
     finish();
 
     updateStats();
-    emitContourOnly();
+    emitContour();
 
     initializeActiveContour();
 }
@@ -480,7 +481,7 @@ void ActiveContourWorker::suspend()
         setState( WorkerState::Suspended );
 
         updateStats();
-        emitContourOnly();
+        emitContour();
     }
 }
 
@@ -511,7 +512,7 @@ void ActiveContourWorker::onTimeout()
     if ( mode_ == RunMode::Interactive )
     {
         updateStats();
-        emitContourOnly();
+        emitContour();
     }
 }
 
@@ -524,61 +525,27 @@ void ActiveContourWorker::updateStats()
     currentStats_ = stats;
 }
 
-void ActiveContourWorker::drawAndEmitResult()
+void ActiveContourWorker::emitContour()
 {
-    if( processedImage_.isNull() )
-        return;
-
-    QImage result = processedImage_.convertToFormat(QImage::Format_RGB32);
-
-    const auto& display_config = config_.img_disp_conf;
-
     if ( ac_ == nullptr )
         return;
 
     const auto& l_out = ac_->l_out();
     const auto& l_in  = ac_->l_in();
 
-    if ( display_config.l_out_displayed )
-    {
-        draw_list_to_img(l_out, display_config.l_out_color,
-                         result);
-    }
+    QVector<QPoint> l_out_pts;
+    QVector<QPoint> l_in_pts;
 
-    if ( display_config.l_in_displayed )
-    {
-        draw_list_to_img(l_in, display_config.l_in_color,
-                         result);
-    }
-
-    emit resultReady(result);
-}
-
-void ActiveContourWorker::emitContourOnly()
-{
-    // to test the former display
-    //drawAndEmitResult();
-        //return;
-
-    if ( ac_ == nullptr )
-        return;
-
-    const auto& l_out = ac_->l_out();
-    const auto& l_in  = ac_->l_in();
-
-    QVector<QPoint> outPts;
-    QVector<QPoint> inPts;
-
-    outPts.reserve(l_out.size());
-    inPts.reserve(l_in.size());
+    l_out_pts.reserve(l_out.size());
+    l_in_pts.reserve(l_in.size());
 
     for (const auto& p : l_out)
-        outPts.emplace_back( p.x(), p.y() );
+        l_out_pts.emplace_back( p.x(), p.y() );
 
     for (const auto& p : l_in)
-        inPts.emplace_back( p.x(), p.y() );
+        l_in_pts.emplace_back( p.x(), p.y() );
 
-    emit contourUpdated(outPts, inPts);
+    emit contourUpdated(l_out_pts, l_in_pts);
 }
 
 AlgoStats ActiveContourWorker::currentStats() const
@@ -603,9 +570,9 @@ void ActiveContourWorker::setState(WorkerState state)
     emit stateChanged(state);
 }
 
-void ActiveContourWorker::reloadSettings()
+void ActiveContourWorker::setAlgoConfig(const ImageSessionSettings& config)
 {
-    config_ = AppSettings::instance().imgSessSettings;
+    config_ = config;
 
     processImage();
     initializeActiveContour();
@@ -614,7 +581,7 @@ void ActiveContourWorker::reloadSettings()
         return;
 
     updateStats();
-    emitContourOnly();
+    emitContour();
 
     initialShown_ = true;
 }

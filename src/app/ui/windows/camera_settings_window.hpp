@@ -46,7 +46,6 @@ private:
     QCheckBox* filter_cb;
 
     CameraSessionSettings& config_;
-
 };
 
 }

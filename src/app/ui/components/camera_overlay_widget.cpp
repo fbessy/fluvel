@@ -37,7 +37,7 @@ void CameraOverlayWidget::resizeEvent(QResizeEvent*)
     label_->move(10, 10);
 }
 
-void CameraOverlayWidget::setStats(const CameraStatsUi& s)
+void CameraOverlayWidget::setStats(const CameraStats& s)
 {
     label_->setText(QString(
                         "In: %1 fps | Proc: %2 fps | Disp: %3 fps\n"

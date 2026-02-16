@@ -15,8 +15,6 @@ namespace ofeli_app
 ImageView::ImageView(QWidget* parent, Session session)
     : QGraphicsView(parent),
     scene(new QGraphicsScene(this)),
-    display_config_(AppSettings::instance().imgSessSettings.img_disp_conf),
-    downscale_config_(AppSettings::instance().imgSessSettings.downscale_conf),
     session_(session)
 {
     setScene(scene);
@@ -28,29 +26,13 @@ ImageView::ImageView(QWidget* parent, Session session)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
 
-    QColor col_lout, col_lin;
-
-    if ( display_config_.l_out_displayed )
-        col_lout = toQColor(display_config_.l_out_color);
-    else
-        col_lout = Qt::transparent;
-
-    if ( display_config_.l_in_displayed )
-        col_lin = toQColor(display_config_.l_in_color);
-    else
-        col_lin = Qt::transparent;
-
     contourOutItem = new ContourPointsItem;
     contourOutItem->setZValue(100);
-    contourOutItem->setColor( col_lout );
     scene->addItem(contourOutItem);
 
     contourInItem = new ContourPointsItem;
     contourInItem->setZValue(100);
-    contourInItem->setColor( col_lin );
     scene->addItem(contourInItem);
-
-    applyDownscaleToItems();
 
     displayTimer.start();
 
@@ -59,23 +41,6 @@ ImageView::ImageView(QWidget* parent, Session session)
 
     connect(throttleTimer, &QTimer::timeout,
             this, &ImageView::flushPendingFrame);
-
-    if ( session_ == Session::Image )
-    {
-        connect(&AppSettings::instance(), &ApplicationSettings::imgDisplaySettingsChanged,
-                this, &ImageView::onConfigChanged);
-
-        connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsApplied,
-                this, &ImageView::onDownscaleChanged);
-    }
-    else if ( session_ == Session::Camera )
-    {
-        connect(&AppSettings::instance(), &ApplicationSettings::camDisplaySettingsChanged,
-                this, &ImageView::onConfigChanged);
-
-        connect(&AppSettings::instance(), &ApplicationSettings::camSettingsApplied,
-                this, &ImageView::onDownscaleChanged);
-    }
 }
 
 // ------------------------------------------------------------
@@ -144,11 +109,6 @@ void ImageView::clearOverlays()
     {
         contourInItem->clearPoints();
     }
-}
-
-void ImageView::updateSceneRectForImage()
-{
-    //viewport()->repaint();
 }
 
 // ------------------------------------------------------------
@@ -470,22 +430,33 @@ bool ImageView::isGrayscale() const
            lastDisplayedImage.format() == QImage::Format_Grayscale16;
 }
 
-void ImageView::onConfigChanged()
+void ImageView::applyDownscaleToItems()
 {
-    if ( session_ == Session::Image )
-        display_config_ = AppSettings::instance().imgSessSettings.img_disp_conf;
-    else if ( session_ == Session::Camera )
-        display_config_ = AppSettings::instance().camSessSettings.cam_disp_conf;
+    const bool has_ds = downscaleConfig_.has_downscale;
+    const int      df = downscaleConfig_.downscale_factor;
+
+    qreal factor = static_cast<qreal>(1.0);
+
+    if ( has_ds && displayConfig_.input_displayed )
+        factor = qreal( df );
+
+    contourOutItem->setScale( factor );
+    contourInItem->setScale( factor );
+}
+
+void ImageView::setDisplayConfig(const DisplayConfig& displayConfig)
+{
+    displayConfig_ = displayConfig;
 
     QColor col_lout, col_lin;
 
-    if ( display_config_.l_out_displayed )
-        col_lout = toQColor(display_config_.l_out_color);
+    if ( displayConfig_.l_out_displayed )
+        col_lout = toQColor(displayConfig_.l_out_color);
     else
         col_lout = Qt::transparent;
 
-    if ( display_config_.l_in_displayed )
-        col_lin = toQColor(display_config_.l_in_color);
+    if ( displayConfig_.l_in_displayed )
+        col_lin = toQColor(displayConfig_.l_in_color);
     else
         col_lin = Qt::transparent;
 
@@ -496,30 +467,12 @@ void ImageView::onConfigChanged()
     contourInItem->setColor( col_lin );
 }
 
-void ImageView::onDownscaleChanged()
+void ImageView::setDownscaleConfig(const DownscaleConfig& downscaleConfig)
 {
-    if ( session_ == Session::Image )
-        downscale_config_ = AppSettings::instance().imgSessSettings.downscale_conf;
-    else if ( session_ == Session::Camera )
-        downscale_config_ = AppSettings::instance().imgSessSettings.downscale_conf;
-
+    downscaleConfig_ = downscaleConfig;
 
     clearOverlays();
     applyDownscaleToItems();
-}
-
-void ImageView::applyDownscaleToItems()
-{
-    const bool has_ds = downscale_config_.has_downscale;
-    const int      df = downscale_config_.downscale_factor;
-
-    qreal factor = static_cast<qreal>(1.0);
-
-    if ( has_ds && display_config_.input_displayed )
-        factor = qreal( df );
-
-    contourOutItem->setScale( factor );
-    contourInItem->setScale( factor );
 }
 
 } // namespace ofeli_app

@@ -9,27 +9,10 @@ namespace ofeli_app {
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
     : QThread(parent),
-    config_(AppSettings::instance().camSessSettings),
-    displayConfig_(AppSettings::instance().camSessSettings.cam_disp_conf),
     frameAvailable(false),
     running(true),
     configChanged(false)
 {
-    QObject::connect(
-        &AppSettings::instance(),
-        &ApplicationSettings::camSettingsApplied,
-        this,
-        &VideoActiveContourThread::reloadSettings,
-        Qt::QueuedConnection
-        );
-
-    QObject::connect(
-        &AppSettings::instance(),
-        &ApplicationSettings::camDisplaySettingsChanged,
-        this,
-        &VideoActiveContourThread::reloadDisplaySettings,
-        Qt::QueuedConnection
-        );
 }
 
 void VideoActiveContourThread::submitFrame(const QVideoFrame& frame)
@@ -102,7 +85,14 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         auto img_algo = image_span_from_qimage( q_img_algo );
 
-        if ( !region_ac || configChanged )
+        const int newW = img_algo.width();
+        const int newH = img_algo.height();
+
+        const bool sizeChanged =
+            (newW != currentWidth_) ||
+            (newH != currentHeight_);
+
+        if ( !region_ac || configChanged || sizeChanged )
         {
             if ( config.has_temporal_filtering )
             {
@@ -119,6 +109,8 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
                                                                   algo_conf.ac_config,
                                                                   algo_conf.region_ac_config);
 
+            currentWidth_  = newW;
+            currentHeight_ = newH;
             configChanged = false;
 
             QString size_str = QString("%1×%2")
@@ -216,15 +208,17 @@ void VideoActiveContourThread::stop()
     condition.wakeAll();
 }
 
-void VideoActiveContourThread::reloadSettings()
+void VideoActiveContourThread::setAlgoConfig(const CameraSessionSettings& config)
 {
-    config_ = AppSettings::instance().camSessSettings;
+    QMutexLocker locker(&frameMutex);
+    config_ = config;
     configChanged = true;
 }
 
-void VideoActiveContourThread::reloadDisplaySettings()
+void VideoActiveContourThread::setDisplayConfig(const DisplayConfig& dc)
 {
-    displayConfig_ = AppSettings::instance().camSessSettings.cam_disp_conf;
+    QMutexLocker locker(&frameMutex);
+    displayConfig_ = dc;
 }
 
 } // namespace ofeli_app

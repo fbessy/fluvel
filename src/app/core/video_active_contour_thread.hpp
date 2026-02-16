@@ -1,5 +1,5 @@
-#ifndef VIDEO_ACTIVE_CONTOUR_THREAD_H
-#define VIDEO_ACTIVE_CONTOUR_THREAD_H
+#ifndef VIDEO_ACTIVE_CONTOUR_THREAD_HPP
+#define VIDEO_ACTIVE_CONTOUR_THREAD_HPP
 
 #include <QThread>
 #include <QMutex>
@@ -25,6 +25,9 @@ public:
     void submitFrame(const QVideoFrame& frame);
     void stop();
 
+    void setAlgoConfig(const CameraSessionSettings& config);
+    void setDisplayConfig(const DisplayConfig& dc);
+
 signals:
     void frameProcessed(qint64 receiveTs, qint64 processTs);
     void frameResultReady(const QImage& img, qint64 receiveTs);
@@ -48,12 +51,10 @@ private:
     bool configChanged;
 
     std::unique_ptr<ofeli_ip::RegionColorAc> region_ac;
+    int currentWidth_  = 0;
+    int currentHeight_ = 0;
 
     ofeli_ip::TemporalSmoother smoother;
-
-private slots:
-    void reloadSettings();
-    void reloadDisplaySettings();
 };
 
 } // namespace ofeli_app

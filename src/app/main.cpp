@@ -120,10 +120,19 @@
 #include <QApplication>
 #include <QCoreApplication>
 
+#ifdef Q_OS_ANDROID
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#endif
+
 int main( int argc, char* argv[] )
 {
+#ifdef Q_OS_ANDROID
+    QGuiApplication app(argc, argv);
+#else
     QApplication app(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
+#endif
 
     QCoreApplication::setOrganizationName("ofeli");
     QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/fastlevelset/");
@@ -175,14 +184,37 @@ int main( int argc, char* argv[] )
     QApplication::setWindowIcon(appIcon);
     qputenv("QT_QPA_PLATFORMTHEME", "kde");
 
-    std::unique_ptr<QWidget> root;
+    std::unique_ptr<QMainWindow> root;
 
 #ifdef Q_OS_ANDROID
-    root = std::make_unique<ofeli_app::CameraWindow>();
+    //root = std::make_unique<ofeli_app::CameraWindow>();
+    //root->show();
+    QQmlApplicationEngine engine;
+    //engine.loadFromModule("ofeli", "Main");
+
+//#include <QDir>
+//#include <QDebug>
+
+    //qDebug() << "Resources root:" << QDir(":/").entryList(QDir::Files | QDir::Dirs);
+    //qDebug() << "Resources qml:" << QDir(":/qml").entryList(QDir::Files | QDir::Dirs);
+
+    engine.load(QUrl("qrc:/qml/Main.qml"));
+
+    QObject::connect(
+        &engine,
+        &QQmlApplicationEngine::objectCreationFailed,
+        &app,
+        []() { qDebug() << "QML CREATION FAILED"; QCoreApplication::exit(-1); },
+        Qt::QueuedConnection);
+
+    if (engine.rootObjects().isEmpty()) {
+        return -1;
+    }
 #else
     root = std::make_unique<ofeli_app::ImageWindow>();
+    root->show();
 #endif
 
-    root->show();
+
     return app.exec();
 }

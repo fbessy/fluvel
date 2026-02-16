@@ -43,21 +43,16 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QLabel>
-#include <QCamera>
-#include <QMediaDevices>
-#include <QMediaCaptureSession>
-#include <QVideoSink>
-#include <QThread>
 #include <QComboBox>
 #include <QPushButton>
 
+#include "camera_controller.hpp"
 #include "video_active_contour_thread.hpp"
 #include "application_settings.hpp"
 #include "image_view.hpp"
-#include "frame_stats_view.hpp"
-#include "camera_overlay_widget.hpp"
 #include "display_settings_widget.hpp"
 #include "camera_settings_window.hpp"
+#include "camera_overlay_widget.hpp"
 
 namespace ofeli_app
 {
@@ -67,7 +62,6 @@ class CameraWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit CameraWindow(QWidget* parent = nullptr);
-    ~CameraWindow();
 
 protected:
     void showEvent(QShowEvent* event) override;
@@ -76,18 +70,17 @@ protected:
 private slots:
     void updateCameraList();
     void onToggleStreaming();
-    void updateStatsUi();
     void onFrameSizeStr(QString str);
 
 private:
 
-    void startCamera(const QCameraDevice& device);
-    void stopCamera();
     void stopCameraAndUi();
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
 #endif
+
+    CameraController* controller;
 
     QByteArray currentCameraId;
 
@@ -100,17 +93,6 @@ private:
     CameraOverlayWidget* cameraOverlay;
 
     QMediaDevices*         mediaDevices;
-    QList<QCameraDevice>  cameras;
-    QCamera* camera;
-    QMediaCaptureSession* captureSession;
-    QVideoSink* videoSink;
-
-    VideoActiveContourThread* ac_thread;
-
-    FrameStatsView frameStats;
-    quint64 nextFrameId;  // compteur unique des frames
-    QTimer* statsTimer; // timer pour snapshot périodique
-    qint64 lastFrameReceiveTs;
 
     QString deviceWindowTitle;
 
@@ -126,7 +108,6 @@ private:
     CameraSettingsWindow* settings_window;
 
 signals:
-    void cameraStatsUpdated(const CameraStatsUi& stats);
     void cameraWindowShown();
     void cameraWindowClosed();
 };

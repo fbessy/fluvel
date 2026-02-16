@@ -103,6 +103,9 @@ set(app_src
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 
+    ${CORE_DIR}/camera_controller.cpp
+    ${CORE_DIR}/camera_controller.hpp
+
     ${CORE_DIR}/active_contour_worker.cpp
     ${CORE_DIR}/active_contour_worker.hpp
 
@@ -127,10 +130,31 @@ set(app_src
     ${CORE_DIR}/algo_stats.hpp
 
     ${CORE_DIR}/algo_stats.hpp
+    ${CORE_DIR}/camera_stats.hpp
 
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
 )
+
+qt_add_executable(${target_name}
+    ${app_src}
+    resources.qrc
+)
+
+if(ANDROID)
+    # qt_add_qml_module(${target_name}
+    #     URI ofeli
+    #     VERSION 1.0
+    #     QML_FILES
+    #         qml/Main.qml
+    # )
+    qt_add_resources(${target_name} "qml"
+        PREFIX "/"
+        FILES
+            qml/Main.qml
+            qml/lenna.bmp
+    )
+endif()
 
 if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE Ofeli.icns)
@@ -143,10 +167,10 @@ if(APPLE)
         MACOSX_PACKAGE_LOCATION "Resources"
     )
 
-    qt_add_executable(${target_name}
-        MACOSX_BUNDLE
-        ${app_src}
-        ${app_icon_macos}
+    target_sources(${target_name} PRIVATE ${app_icon_macos})
+
+    set_target_properties(${target_name} PROPERTIES
+        MACOSX_BUNDLE TRUE
     )
 
 elseif(WIN32)
@@ -154,15 +178,12 @@ elseif(WIN32)
         ${OFELI_RESOURCES_DIR}/icons/app/Ofeli.rc
     )
 
-    qt_add_executable(${target_name}
-        WIN32
-        ${app_src}
+    target_sources(${target_name} PRIVATE
         ${app_icon_resource_windows}
     )
 
-else()
-    qt_add_executable(${target_name}
-        ${app_src}
+    set_target_properties(${target_name} PROPERTIES
+        WIN32_EXECUTABLE TRUE
     )
 endif()
 
@@ -299,12 +320,23 @@ elseif (MSVC)
     )
 endif()
 
+set(APP_QT_LIBS
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Multimedia
+    Qt6::MultimediaWidgets
+    Qt6::Widgets
+)
+
+if(ANDROID)
+    list(APPEND APP_QT_LIBS
+        Qt6::Qml
+        Qt6::Quick
+    )
+endif()
+
 target_link_libraries(${target_name} PRIVATE
-    Qt::Core
-    Qt::Gui
-    Qt::Multimedia
-    Qt::MultimediaWidgets
-    Qt::Widgets
+    ${APP_QT_LIBS}
     ofeli::image_processing
 )
 

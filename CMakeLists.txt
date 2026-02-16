@@ -37,9 +37,15 @@ set(OFELI_TRANSLATIONS_DIR
     ${OFELI_ROOT_DIR}/translations
 )
 
-find_package(Qt6 REQUIRED COMPONENTS
+set(QT_COMPONENTS
     Core Gui Multimedia MultimediaWidgets Widgets LinguistTools
 )
+
+if(ANDROID OR IOS)
+    list(APPEND QT_COMPONENTS Qml Quick)
+endif()
+
+find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 add_subdirectory(src/image_processing)
 add_subdirectory(src/app)

@@ -308,8 +308,8 @@ void SettingsWindow::setupUiDownscaleTab()
     downscale_page->setCheckable(true);
 
     downscale_factor_cb = new QComboBox;
-    downscale_factor_cb->addItem("2");
-    downscale_factor_cb->addItem("4");
+    downscale_factor_cb->addItem("2", 2);
+    downscale_factor_cb->addItem("4", 4);
 
     auto *label = new QLabel(tr("Factor:"));
 
@@ -771,20 +771,12 @@ void SettingsWindow::applyCurrentShape(bool add)
 
 void SettingsWindow::accept()
 {
-    AppSettings::instance().imgSessSettings.has_preprocess = preprocess_page->isChecked();
-
     auto& ds_config = AppSettings::instance().imgSessSettings.downscale_conf;
 
     ds_config.has_downscale = downscale_page->isChecked();
+    ds_config.downscale_factor = downscale_factor_cb->currentData().toInt();
 
-    if ( downscale_factor_cb->currentIndex() == 0 )
-    {
-        ds_config.downscale_factor = 2;
-    }
-    else if ( downscale_factor_cb->currentIndex() == 1 )
-    {
-        ds_config.downscale_factor = 4;
-    }
+    AppSettings::instance().imgSessSettings.has_preprocess = preprocess_page->isChecked();
 
     auto& filt_config = AppSettings::instance().imgSessSettings.filtering_conf;
 
@@ -839,6 +831,14 @@ void SettingsWindow::accept()
 
 void SettingsWindow::reject()
 {
+    const auto& ds_config = AppSettings::instance().imgSessSettings.downscale_conf;
+
+    downscale_page->setChecked( ds_config.has_downscale );
+
+    int index = downscale_factor_cb->findData( ds_config.downscale_factor );
+    if ( index >= 0 )
+        downscale_factor_cb->setCurrentIndex( index );
+
     const auto& config_filter = AppSettings::instance().imgSessSettings.filtering_conf;
 
     preprocess_page->setChecked(AppSettings::instance().imgSessSettings.has_preprocess);

@@ -167,7 +167,7 @@ void ApplicationSettings::save_img_session_config()
     save_disp("img",
               imgSessSettings.img_disp_conf);
 
-    emit imgSettingsApplied();
+    emit imgSettingsChanged(imgSessSettings);
 }
 
 void ApplicationSettings::save_cam_session_config()
@@ -195,7 +195,7 @@ void ApplicationSettings::save_cam_session_config()
     save_disp("cam",
               camSessSettings.cam_disp_conf);
 
-    emit camSettingsApplied();
+    emit camSettingsChanged(camSessSettings);
 }
 
 void ApplicationSettings::save_algo(const QString& scope,
@@ -252,13 +252,13 @@ void ApplicationSettings::save_downscale(const QString& scope,
 void ApplicationSettings::set_img_display_config(const DisplayConfig& disp_config)
 {
     imgSessSettings.img_disp_conf = disp_config;
-    emit imgDisplaySettingsChanged();
+    emit imgDisplaySettingsChanged(imgSessSettings.img_disp_conf);
 }
 
 void ApplicationSettings::set_cam_display_config(const DisplayConfig& disp_config)
 {
     camSessSettings.cam_disp_conf = disp_config;
-    emit camDisplaySettingsChanged();
+    emit camDisplaySettingsChanged(camSessSettings.cam_disp_conf);
 }
 
 void ApplicationSettings::save_disp(const QString& scope,
@@ -533,9 +533,14 @@ void ApplicationSettings::resize_initial_phi(int width, int height)
 
     if ( !img.isNull() )
     {
-        img = img.scaled( width, height,
-                          Qt::IgnoreAspectRatio,
-                          Qt::FastTransformation );
+        if ( width != img.width() || height != img.height() )
+        {
+            img = img.scaled( width, height,
+                              Qt::IgnoreAspectRatio,
+                              Qt::FastTransformation );
+
+            emit resizedPhi( img );
+        }
     }
 }
 

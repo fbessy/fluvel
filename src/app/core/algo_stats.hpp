@@ -4,7 +4,8 @@
 #include <QColor>
 #include <vector>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 struct AlgoMetric
 {

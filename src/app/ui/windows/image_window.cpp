@@ -32,15 +32,6 @@ ImageWindow::ImageWindow(QWidget* parent)
     last_directory_used = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
 }
 
-ImageWindow::~ImageWindow()
-{
-    if ( acWorker )
-    {
-        acWorker->finish();
-        acWorker.reset();
-    }
-}
-
 void ImageWindow::setupUi()
 {
     updateWindowTitle();
@@ -145,7 +136,6 @@ void ImageWindow::setupUi()
 
     // --- Image view ---
     imageView = new ImageView(central);
-    imageView->setMaxDisplayFps(60.0);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
@@ -331,7 +321,6 @@ void ImageWindow::setupActions()
     menuBar()->addMenu(helpMenu);
 
     imageController = new ImageController(this);
-    acWorker = std::make_unique<ActiveContourWorker>();
 
     phiEditor = std::make_unique<PhiEditor>();
     phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());
@@ -428,29 +417,31 @@ void ImageWindow::setupConnections()
     connect(languageAct,     &QAction::triggered,
             language_window, &LanguageWindow::show);
 
-    connect(imageController, &ImageController::inputImageReady, this,
-            [this](const QImage& img) {
-                imageView->clearOverlays();
-                imageView->setImage(img);
-                imageView->updateSceneRectForImage();
+    imageView->setDownscaleConfig( AppSettings::instance().imgSessSettings.downscale_conf );
+    imageView->setDisplayConfig( AppSettings::instance().imgSessSettings.img_disp_conf );
+
+    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged,
+            this, [this](const ImageSessionSettings& conf) {
+                imageView->setDownscaleConfig( conf.downscale_conf );
             });
 
-    // new display with contour item in the image view
-    connect(imageController, &ImageController::inputImageReady,
-            acWorker.get(),  &ActiveContourWorker::initializeFromInput);
+    connect(&AppSettings::instance(),
+            &ApplicationSettings::imgDisplaySettingsChanged,
+            imageView,
+            &ImageView::setDisplayConfig);
 
-    connect(acWorker.get(),  &ActiveContourWorker::processedImageReady,
-            imageController, &ImageController::onProcessedImageReady);
+    connect(imageController,
+            &ImageController::clearOverlaysRequested,
+            imageView,
+            &ImageView::clearOverlays);
 
-    connect(imageController,  &ImageController::displayedImageReady,
-            imageView,        &ImageView::setImage);
+    connect(imageController,
+            &ImageController::displayedImageReady,
+            imageView,
+            &ImageView::setImage);
 
-    // former display with a qimage with the contour
-    connect(acWorker.get(),  &ActiveContourWorker::resultReady,
-            imageView,       &ImageView::setImage);
-
-    connect(acWorker.get(),
-            &ActiveContourWorker::contourUpdated,
+    connect(imageController,
+            &ImageController::contourUpdated,
             imageView,
             &ImageView::displayContour,
             Qt::QueuedConnection);
@@ -462,16 +453,16 @@ void ImageWindow::setupConnections()
     m_statsTimer->start();
 
     connect(restartButton,      &QPushButton::clicked,
-            acWorker.get(),     &ActiveContourWorker::restart);
+            imageController,    &ImageController::restart);
 
     connect(togglePauseButton,  &QPushButton::clicked,
-            acWorker.get(),     &ActiveContourWorker::togglePause);
+            imageController,    &ImageController::togglePause);
 
     connect(stepButton,         &QPushButton::clicked,
-            acWorker.get(),     &ActiveContourWorker::step);
+            imageController,    &ImageController::step);
 
     connect(convergeButton,     &QPushButton::clicked,
-            acWorker.get(),     &ActiveContourWorker::converge);
+            imageController,    &ImageController::converge);
 
     connect(rightPanelToggle, &QPushButton::toggled,
             this, [this](bool checked)
@@ -493,7 +484,7 @@ void ImageWindow::setupConnections()
     connect(settingsButton,     &QPushButton::clicked,
             settings_window,    &SettingsWindow::show);
 
-    connect(acWorker.get(),     &ActiveContourWorker::stateChanged,
+    connect(imageController,    &ImageController::stateChanged,
             this,               &ImageWindow::onStateChanged);
 
     connect(imageController,    &ImageController::imageReadyWithoutResize,
@@ -615,8 +606,8 @@ void ImageWindow::onStartCameraActionTriggered()
 
 void ImageWindow::refreshAlgoOverlay()
 {
-    if (imageOverlay)
-        imageOverlay->setStats(acWorker->currentStats());
+    //if (imageOverlay)
+        //imageOverlay->setStats(acWorker->currentStats());
 }
 
 void ImageWindow::closeEvent(QCloseEvent* event)

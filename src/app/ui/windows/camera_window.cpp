@@ -54,7 +54,6 @@
 #include <QVideoFrame>
 #include <QImage>
 #include <QCloseEvent>
-#include <QTimer>
 #include <QSettings>
 
 #ifdef Q_OS_ANDROID
@@ -73,14 +72,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     stacked(nullptr),
     blackLabel(nullptr),
     videoView(nullptr),
-    mediaDevices(nullptr),
-    camera(nullptr),
-    captureSession(nullptr),
-    videoSink(nullptr),
-    ac_thread(nullptr),
-    nextFrameId(0),
-    statsTimer(nullptr),
-    lastFrameReceiveTs(0)
+    mediaDevices(nullptr)
 {
     setWindowIcon( QIcon(":/icons/app/Ofeli.svg") );
     setWindowTitle( tr("Ofeli - Camera") );
@@ -234,76 +226,25 @@ CameraWindow::CameraWindow(QWidget* parent)
             this,
             &CameraWindow::updateCameraList);
 
-    statsTimer = new QTimer(this);
-    statsTimer->setInterval(500);
-}
+    controller = new CameraController(this);
 
-CameraWindow::~CameraWindow()
-{
-    stopCamera();
-}
+    connect(controller,
+            &CameraController::frameSizeStr,
+            this,
+            &CameraWindow::onFrameSizeStr);
 
-void CameraWindow::startCamera(const QCameraDevice& device)
-{
-    if ( device.isNull() )
-        return;
-
-
-    stopCamera();
-
-    camera = new QCamera(device, this);
-    videoSink = new QVideoSink(this);
-    captureSession = new QMediaCaptureSession(this);
-
-    captureSession->setCamera(camera);
-    captureSession->setVideoSink(videoSink);
-    camera->start();
-
-    ac_thread = new VideoActiveContourThread(this);
-
-    connect(videoSink, &QVideoSink::videoFrameChanged,
-            this, [this](const QVideoFrame& frame)
-            {
-                const qint64 recvTs = FrameClock::nowNs();
-
-                frameStats.frameReceived(recvTs);   // ✅ input
-                ac_thread->submitFrame(frame);      // envoi thread
-            });
-
-    connect(ac_thread, &VideoActiveContourThread::frameProcessed,
-            this, [this]()
-            {
-                frameStats.frameProcessed();        // ✅ processing
-            },
-            Qt::QueuedConnection);
-
-    connect(ac_thread, &VideoActiveContourThread::frameResultReady,
-            this, [this](const QImage& img, qint64 recvTs)
-            {
-                videoView->setImage(img);
-
-                const qint64 displayTs = FrameClock::nowNs();
-                frameStats.frameDisplayed(recvTs, displayTs); // ✅ display + latence
-            },
-            Qt::QueuedConnection);
-
-    ac_thread->start();
-
-    statsTimer->start();
-
-    connect(statsTimer, &QTimer::timeout,
-            this, &CameraWindow::updateStatsUi);
-
-    connect(this,
-            &CameraWindow::cameraStatsUpdated,
+    connect(controller,
+            &CameraController::statsUpdated,
             cameraOverlay,
             &CameraOverlayWidget::setStats);
 
-    deviceWindowTitle = "Ofeli - " + device.description() + " - ";
-    connect(ac_thread, &VideoActiveContourThread::frameSizeStr,
-            this, &CameraWindow::onFrameSizeStr);
-
-    frameStats.reset();
+    connect(controller,
+            &CameraController::imageReady,
+            this,
+            [this](const QImage& img)
+            {
+                videoView->setImage(img);
+            });
 }
 
 void CameraWindow::onFrameSizeStr(QString str)
@@ -329,7 +270,7 @@ void CameraWindow::updateCameraList()
     cameraSelector->setEnabled(hasCamera);
     toggleStreamingButton->setEnabled(hasCamera);
 
-    if (!hasCamera)
+    if ( !hasCamera )
     {
         // plus aucune caméra disponible
         stopCameraAndUi();
@@ -366,97 +307,41 @@ void CameraWindow::updateCameraList()
 
 void CameraWindow::onToggleStreaming()
 {
-    // --- Si déjà actif → stop ---
-    if (camera != nullptr && camera->isActive())
+    if ( !controller )
+        return;
+
+    if ( controller->isActive() )
     {
         stopCameraAndUi();
-        return;
     }
-
-    // --- Récupérer l'ID sélectionné ---
-    const QByteArray selectedId =
-        cameraSelector->currentData().toByteArray();
-
-    if (selectedId.isEmpty())
-        return;
-
-    // --- Sauvegarde persistante ---
-    currentCameraId = selectedId;
-
-    QSettings settings;
-    settings.setValue("Camera/last_id", currentCameraId);
-
-    // --- Chercher le device correspondant ---
-    const auto cameras = QMediaDevices::videoInputs();
-
-    for (const auto& cam : cameras)
+    else
     {
-        if (cam.id() == selectedId)
-        {
-#ifdef Q_OS_ANDROID
-            ensureCameraPermission();
-#endif
+        const QByteArray selectedId =
+            cameraSelector->currentData().toByteArray();
 
-            stacked->setCurrentIndex(1);
-            startCamera(cam);
-
-            toggleStreamingButton->setText(tr("Stop"));
-            toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
-            toggleStreamingButton->setIcon(stopIcon);
+        if (selectedId.isEmpty())
             return;
-        }
-    }
 
-    // --- Sécurité : si ID non trouvé ---
-    // (ex: changement ultra-rapide device)
-    stopCameraAndUi();
-    currentCameraId.clear();
-}
+        currentCameraId = selectedId;
 
-void CameraWindow::stopCamera()
-{
-    if ( statsTimer != nullptr ) {
-        statsTimer->stop();
-    }
+        QSettings settings;
+        settings.setValue("Camera/last_id", currentCameraId);
 
-    if( ac_thread != nullptr )
-    {
-        ac_thread->disconnect(this);
+        stacked->setCurrentIndex(1);
+        controller->start(selectedId);
 
-        ac_thread->stop();
-        ac_thread->wait();
-
-        ac_thread->deleteLater();
-        ac_thread = nullptr;
-    }
-
-    if( captureSession != nullptr ) {
-        captureSession->deleteLater();
-        captureSession = nullptr;
-    }
-
-    if ( videoSink != nullptr )
-    {
-        videoSink->disconnect(this);
-
-        videoSink->deleteLater();
-        videoSink = nullptr;
-    }
-
-    if ( camera != nullptr )
-    {
-        camera->stop();
-        camera->deleteLater();
-        camera = nullptr;
+        toggleStreamingButton->setText(tr("Stop"));
+        toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
+        toggleStreamingButton->setIcon(stopIcon);
     }
 }
 
 void CameraWindow::stopCameraAndUi()
 {
-    if ( camera != nullptr && camera->isActive() )
+    if ( controller && controller->isActive() )
     {
         stacked->setCurrentIndex(0);
-        stopCamera();
+        controller->stop();
 
         toggleStreamingButton->setText( tr("Start") );
         toggleStreamingButton->setToolTip(tr("Start camera streaming."));
@@ -464,22 +349,6 @@ void CameraWindow::stopCameraAndUi()
 
         setWindowTitle( tr("Ofeli - Camera") );
     }
-}
-
-void CameraWindow::updateStatsUi()
-{
-    auto snap = frameStats.snapshot();
-
-    CameraStatsUi stats {
-        snap.inputFps,
-        snap.processingFps,
-        snap.displayFps,
-        snap.dropRate,
-        snap.avgLatencyMs,
-        snap.maxLatencyMs
-    };
-
-    emit cameraStatsUpdated(stats);
 }
 
 void CameraWindow::showEvent(QShowEvent* event)

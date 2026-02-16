@@ -7,7 +7,7 @@
 
 #include "active_contour.hpp"
 #include "algo_stats.hpp"
-#include "application_settings.hpp"
+#include "common_settings.hpp"
 
 namespace ofeli_app
 {
@@ -37,7 +37,8 @@ public:
 
     ActiveContourWorker();
 
-    void initializeFromInput(const QImage& input);
+    void initializeFromInput(const QImage& input,
+                             const ImageSessionSettings& config);
 
     void restart();        // reset + start
     void togglePause();    // suspend / resume
@@ -49,21 +50,20 @@ public:
 
     AlgoStats currentStats() const;
 
+    void setAlgoConfig(const ImageSessionSettings& config);
+
 signals:
     void processedImageReady(const QImage& img);
-    void resultReady(const QImage& img);
-    void contourUpdated(const QVector<QPoint>& out,
-                        const QVector<QPoint>& in);
+    void contourUpdated(const QVector<QPoint>& l_out,
+                        const QVector<QPoint>& l_in);
     void stateChanged(ofeli_app::WorkerState state);
 
 private slots:
     void onTimeout();
-    void reloadSettings();
 
 private:
 
-    void drawAndEmitResult();
-    void emitContourOnly();
+    void emitContour();
     void updateStats();
 
     void suspend();
@@ -92,7 +92,7 @@ private:
     QImage inputImage_;
     QImage downscaledImage_;
     QImage processedImage_;
-    QImage initialPhi_;
+    QImage scaledPhi_;
 
     qint64 timeSlice_ms_;
     bool initialShown_;

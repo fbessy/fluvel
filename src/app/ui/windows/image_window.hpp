@@ -68,7 +68,6 @@ class ImageWindow : public QMainWindow
 
 public:
     explicit ImageWindow(QWidget* parent = nullptr);
-    ~ImageWindow() override;
 
 public slots:
     void refreshAlgoOverlay();
@@ -146,7 +145,6 @@ private:
 
     // --- Controllers / Workers ---
     ImageController* imageController = nullptr;
-    std::unique_ptr<ActiveContourWorker> acWorker;
     std::unique_ptr<PhiEditor> phiEditor;
     std::unique_ptr<PhiViewModel> phiViewModel;
 

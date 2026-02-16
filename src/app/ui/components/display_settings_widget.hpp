@@ -22,8 +22,8 @@ public:
                           Session session);
 
 private slots:
-    void onImgSettingsApplied();
-    void onCamSettingsApplied();
+    void onImgSettingsChanged();
+    void onCamSettingsChanged();
 
 private:
 
