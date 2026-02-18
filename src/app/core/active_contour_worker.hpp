@@ -72,9 +72,9 @@ private:
     void performStep();
     bool stepOnceAlgo();
 
-    void processImage();
-    void downscaleInputImage();
-    void applyPreprocessing();
+    void applyPreprocess();
+    void applyDownscale();
+    void applyProcessing();
     void initializeActiveContour();
     void finalizeAndPrepareNextRun();
 

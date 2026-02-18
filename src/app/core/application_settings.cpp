@@ -86,88 +86,83 @@ void ApplicationSettings::save_img_session_config()
     // algo
 
     save_algo("img",
-              imgSessSettings.img_algo_conf);
+              imgConfig.compute.algo);
 
     // phi init used only for image session
     save_initial_phi();
 
-    // preprocess
-
-    settings.setValue("img/preprocess/has_preprocess",
-                      imgSessSettings.has_preprocess);
-
     save_downscale("img",
-                   imgSessSettings.downscale_conf);
+                   imgConfig.compute.downscale);
 
     settings.setValue("img/preprocess/has_gaussian_noise",
-                      imgSessSettings.filtering_conf.has_gaussian_noise);
+                      imgConfig.compute.processing.has_gaussian_noise);
     settings.setValue("img/preprocess/std_noise",
-                      imgSessSettings.filtering_conf.std_noise);
+                      imgConfig.compute.processing.std_noise);
     settings.setValue("img/preprocess/has_salt_noise",
-                      imgSessSettings.filtering_conf.has_salt_noise);
+                      imgConfig.compute.processing.has_salt_noise);
     settings.setValue("img/preprocess/proba_noise",
-                      imgSessSettings.filtering_conf.proba_noise);
+                      imgConfig.compute.processing.proba_noise);
     settings.setValue("img/preprocess/has_speckle_noise",
-                      imgSessSettings.filtering_conf.has_speckle_noise);
+                      imgConfig.compute.processing.has_speckle_noise);
     settings.setValue("img/preprocess/std_speckle_noise",
-                      imgSessSettings.filtering_conf.std_speckle_noise);
+                      imgConfig.compute.processing.std_speckle_noise);
 
     settings.setValue("img/preprocess/has_median_filt",
-                      imgSessSettings.filtering_conf.has_median_filt);
+                      imgConfig.compute.processing.has_median_filt);
     settings.setValue("img/preprocess/kernel_median_length",
-                      imgSessSettings.filtering_conf.kernel_median_length);
+                      imgConfig.compute.processing.kernel_median_length);
 
     settings.setValue("img/preprocess/has_O1_algo",
-                      imgSessSettings.filtering_conf.has_O1_algo);
+                      imgConfig.compute.processing.has_O1_algo);
     settings.setValue("img/preprocess/has_mean_filt",
-                      imgSessSettings.filtering_conf.has_mean_filt);
+                      imgConfig.compute.processing.has_mean_filt);
     settings.setValue("img/preprocess/kernel_mean_length",
-                      imgSessSettings.filtering_conf.kernel_mean_length);
+                      imgConfig.compute.processing.kernel_mean_length);
     settings.setValue("img/preprocess/has_gaussian_filt",
-                      imgSessSettings.filtering_conf.has_gaussian_filt);
+                      imgConfig.compute.processing.has_gaussian_filt);
     settings.setValue("img/preprocess/kernel_gaussian_length",
-                      imgSessSettings.filtering_conf.kernel_gaussian_length);
+                      imgConfig.compute.processing.kernel_gaussian_length);
     settings.setValue("img/preprocess/sigma",
-                      imgSessSettings.filtering_conf.sigma);
+                      imgConfig.compute.processing.sigma);
 
     settings.setValue("img/preprocess/has_aniso_diff",
-                      imgSessSettings.filtering_conf.has_aniso_diff);
+                      imgConfig.compute.processing.has_aniso_diff);
     settings.setValue("img/preprocess/aniso_option",
-                      imgSessSettings.filtering_conf.aniso_option);
+                      imgConfig.compute.processing.aniso_option);
     settings.setValue("img/preprocess/max_itera",
-                      imgSessSettings.filtering_conf.max_itera);
+                      imgConfig.compute.processing.max_itera);
     settings.setValue("img/Preprocessing/lambda",
-                      imgSessSettings.filtering_conf.lambda);
+                      imgConfig.compute.processing.lambda);
     settings.setValue("img/Preprocessing/kappa",
-                      imgSessSettings.filtering_conf.kappa);
+                      imgConfig.compute.processing.kappa);
 
     settings.setValue("img/preprocess/has_open_filt",
-                      imgSessSettings.filtering_conf.has_open_filt);
+                      imgConfig.compute.processing.has_open_filt);
     settings.setValue("img/preprocess/kernel_open_length",
-                      imgSessSettings.filtering_conf.kernel_open_length);
+                      imgConfig.compute.processing.kernel_open_length);
 
     settings.setValue("img/preprocess/has_close_filt",
-                      imgSessSettings.filtering_conf.has_close_filt);
+                      imgConfig.compute.processing.has_close_filt);
     settings.setValue("img/preprocess/kernel_close_length",
-                      imgSessSettings.filtering_conf.kernel_close_length);
+                      imgConfig.compute.processing.kernel_close_length);
 
     settings.setValue("img/preprocess/has_top_hat_filt",
-                      imgSessSettings.filtering_conf.has_top_hat_filt);
+                      imgConfig.compute.processing.has_top_hat_filt);
     settings.setValue("img/preprocess/is_white_top_hat",
-                      imgSessSettings.filtering_conf.is_white_top_hat);
+                      imgConfig.compute.processing.is_white_top_hat);
     settings.setValue("img/preprocess/kernel_tophat_length",
-                      imgSessSettings.filtering_conf.kernel_tophat_length);
+                      imgConfig.compute.processing.kernel_tophat_length);
 
     settings.setValue("img/preprocess/has_O1_morpho",
-                      imgSessSettings.filtering_conf.has_O1_morpho);
+                      imgConfig.compute.processing.has_O1_morpho);
 
 
     // display
 
     save_disp("img",
-              imgSessSettings.img_disp_conf);
+              imgConfig.display);
 
-    emit imgSettingsChanged(imgSessSettings);
+    emit imgSettingsChanged(imgConfig);
 }
 
 void ApplicationSettings::save_cam_session_config()
@@ -177,25 +172,25 @@ void ApplicationSettings::save_cam_session_config()
     // algo
 
     save_algo("cam",
-              camSessSettings.cam_algo_conf);
+              camConfig.compute.algo);
 
-    settings.setValue("cam/algo/cycles_nbr",
-                      camSessSettings.cycles_nbr);
+    settings.setValue("cam/algo/cyclesNbr",
+                      camConfig.compute.cyclesNbr);
 
     // preprocess
 
     save_downscale("cam",
-                   camSessSettings.downscale_conf);
+                   camConfig.compute.downscale);
 
-    settings.setValue("cam/preprocess/has_temporal_filtering",
-                      camSessSettings.has_temporal_filtering);
+    settings.setValue("cam/preprocess/hasTemporalFiltering",
+                      camConfig.compute.hasTemporalFiltering);
 
     // display
 
     save_disp("cam",
-              camSessSettings.cam_disp_conf);
+              camConfig.display);
 
-    emit camSettingsChanged(camSessSettings);
+    emit camSettingsChanged(camConfig);
 }
 
 void ApplicationSettings::save_algo(const QString& scope,
@@ -207,34 +202,34 @@ void ApplicationSettings::save_algo(const QString& scope,
                       int(algo_config.connectivity));
 
     settings.setValue(scope + "/algo/Na",
-                      algo_config.ac_config.Na);
+                      algo_config.acConfig.Na);
 
     settings.setValue(scope + "/algo/has_smoothing_cycle",
-                      algo_config.ac_config.is_cycle2);
+                      algo_config.acConfig.is_cycle2);
 
     settings.setValue(scope + "/algo/Ns",
-                      algo_config.ac_config.Ns);
+                      algo_config.acConfig.Ns);
 
     settings.setValue(scope + "/algo/disk_radius",
-                      algo_config.ac_config.disk_radius);
+                      algo_config.acConfig.disk_radius);
 
     settings.setValue(scope + "/algo/lambda_out",
-                      algo_config.region_ac_config.lambda_out);
+                      algo_config.regionAcConfig.lambda_out);
 
     settings.setValue(scope + "/algo/lambda_in",
-                      algo_config.region_ac_config.lambda_in);
+                      algo_config.regionAcConfig.lambda_in);
 
     settings.setValue(scope + "/algo/color_space",
-                      int(algo_config.region_ac_config.color_space));
+                      int(algo_config.regionAcConfig.color_space));
 
     settings.setValue(scope + "/algo/alpha",
-                      algo_config.region_ac_config.weights.c1);
+                      algo_config.regionAcConfig.weights.c1);
 
     settings.setValue(scope + "/algo/beta",
-                      algo_config.region_ac_config.weights.c2);
+                      algo_config.regionAcConfig.weights.c2);
 
     settings.setValue(scope + "/algo/gamma",
-                      algo_config.region_ac_config.weights.c3);
+                      algo_config.regionAcConfig.weights.c3);
 }
 
 void ApplicationSettings::save_downscale(const QString& scope,
@@ -242,23 +237,23 @@ void ApplicationSettings::save_downscale(const QString& scope,
 {
     QSettings settings;
 
-    settings.setValue(scope + "/preprocess/has_downscale",
-                      downscale_config.has_downscale);
+    settings.setValue(scope + "/preprocess/hasDownscale",
+                      downscale_config.hasDownscale);
 
-    settings.setValue(scope + "/preprocess/downscale_factor",
-                      downscale_config.downscale_factor);
+    settings.setValue(scope + "/preprocess/downscaleFactor",
+                      downscale_config.downscaleFactor);
 }
 
 void ApplicationSettings::set_img_display_config(const DisplayConfig& disp_config)
 {
-    imgSessSettings.img_disp_conf = disp_config;
-    emit imgDisplaySettingsChanged(imgSessSettings.img_disp_conf);
+    imgConfig.display = disp_config;
+    emit imgDisplaySettingsChanged(imgConfig.display);
 }
 
 void ApplicationSettings::set_cam_display_config(const DisplayConfig& disp_config)
 {
-    camSessSettings.cam_disp_conf = disp_config;
-    emit camDisplaySettingsChanged(camSessSettings.cam_disp_conf);
+    camConfig.display = disp_config;
+    emit camDisplaySettingsChanged(camConfig.display);
 }
 
 void ApplicationSettings::save_disp(const QString& scope,
@@ -302,11 +297,11 @@ void ApplicationSettings::load_img_session_config()
     QSettings settings;
 
     load_algo("img",
-              imgSessSettings.img_algo_conf);
+              imgConfig.compute.algo);
 
     // force StopOnFailure for image session,
     // this parameter is not persistant
-    imgSessSettings.img_algo_conf.ac_config.failure_mode = ofeli_ip::FailureHandlingMode::StopOnFailure;
+    imgConfig.compute.algo.acConfig.failure_mode = ofeli_ip::FailureHandlingMode::StopOnFailure;
 
     bool isOk = load_initial_phi();
 
@@ -315,14 +310,11 @@ void ApplicationSettings::load_img_session_config()
         load_default_initial_phi();
     }
 
-    imgSessSettings.has_preprocess = settings.value("img/preprocess/has_preprocess",
-                                                    false).toBool();
-
     // preprocess
     load_downscale("img",
-                   imgSessSettings.downscale_conf);
+                   imgConfig.compute.downscale);
 
-    auto& fc = imgSessSettings.filtering_conf;
+    auto& fc = imgConfig.compute.processing;
 
     fc.has_gaussian_noise = settings.value("img/preprocess/has_gaussian_noise", false).toBool();
     fc.std_noise = settings.value("img/preprocess/std_noise", 20.f).toFloat();
@@ -358,7 +350,7 @@ void ApplicationSettings::load_img_session_config()
 
     // display
     load_disp("img",
-              imgSessSettings.img_disp_conf);
+              imgConfig.display);
 }
 
 void ApplicationSettings::load_cam_session_config()
@@ -366,24 +358,24 @@ void ApplicationSettings::load_cam_session_config()
     QSettings settings;
 
     load_algo("cam",
-              camSessSettings.cam_algo_conf);
+              camConfig.compute.algo);
 
     // force RecoverOnFailure for camera session
     // this parameter is not persistant
-    camSessSettings.cam_algo_conf.ac_config.failure_mode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
+    camConfig.compute.algo.acConfig.failure_mode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
 
-    camSessSettings.cycles_nbr = settings.value("cam/algo/cycles_nbr", 3).toInt();
+    camConfig.compute.cyclesNbr = settings.value("cam/algo/cyclesNbr", 3).toInt();
 
     // preprocess
     load_downscale("cam",
-                   camSessSettings.downscale_conf);
+                   camConfig.compute.downscale);
 
-    camSessSettings.has_temporal_filtering = settings.value("cam/preprocess/has_temporal_filtering",
+    camConfig.compute.hasTemporalFiltering = settings.value("cam/preprocess/hasTemporalFiltering",
                                                             true).toBool();
 
     // display
     load_disp("cam",
-              camSessSettings.cam_disp_conf);
+              camConfig.display);
 }
 
 void ApplicationSettings::load_algo(const QString& scope,
@@ -393,21 +385,21 @@ void ApplicationSettings::load_algo(const QString& scope,
 
     algo_config.connectivity = static_cast<ofeli_ip::Connectivity>(settings.value(scope + "/algo/connectivity",
                                                                       int(ofeli_ip::Connectivity::Four)).toInt());
-    algo_config.ac_config.Na = settings.value(scope + "/algo/Na", 30).toInt();
-    algo_config.ac_config.is_cycle2 = settings.value(scope + "/algo/has_smoothing_cycle", true).toBool();
-    algo_config.ac_config.Ns = settings.value(scope + "/algo/Ns", 3).toInt();
-    algo_config.ac_config.disk_radius = settings.value(scope + "/algo/disk_radius", 2).toInt();
+    algo_config.acConfig.Na = settings.value(scope + "/algo/Na", 30).toInt();
+    algo_config.acConfig.is_cycle2 = settings.value(scope + "/algo/has_smoothing_cycle", true).toBool();
+    algo_config.acConfig.Ns = settings.value(scope + "/algo/Ns", 3).toInt();
+    algo_config.acConfig.disk_radius = settings.value(scope + "/algo/disk_radius", 2).toInt();
 
 
-    algo_config.region_ac_config.lambda_out = settings.value(scope + "/algo/lambda_out", 1).toInt();
-    algo_config.region_ac_config.lambda_in = settings.value(scope + "/algo/lambda_in", 1).toInt();
+    algo_config.regionAcConfig.lambda_out = settings.value(scope + "/algo/lambda_out", 1).toInt();
+    algo_config.regionAcConfig.lambda_in = settings.value(scope + "/algo/lambda_in", 1).toInt();
 
-    algo_config.region_ac_config.color_space = ofeli_ip::ColorSpaceOption(settings.value(
+    algo_config.regionAcConfig.color_space = ofeli_ip::ColorSpaceOption(settings.value(
                 scope + "/algo/color_space", int(ofeli_ip::ColorSpaceOption::RGB)).toInt());
 
-    algo_config.region_ac_config.weights.c1 = settings.value(scope + "/algo/alpha", 1).toInt();
-    algo_config.region_ac_config.weights.c2 = settings.value(scope + "/algo/beta",  1).toInt();
-    algo_config.region_ac_config.weights.c3 = settings.value(scope + "/algo/gamma", 1).toInt();
+    algo_config.regionAcConfig.weights.c1 = settings.value(scope + "/algo/alpha", 1).toInt();
+    algo_config.regionAcConfig.weights.c2 = settings.value(scope + "/algo/beta",  1).toInt();
+    algo_config.regionAcConfig.weights.c3 = settings.value(scope + "/algo/gamma", 1).toInt();
 }
 
 void ApplicationSettings::load_downscale(const QString& scope,
@@ -422,8 +414,8 @@ void ApplicationSettings::load_downscale(const QString& scope,
         default_is_downscale = true;
     }
 
-    downscale_config.has_downscale = settings.value(scope + "/preprocess/has_downscale", default_is_downscale).toBool();
-    downscale_config.downscale_factor = settings.value(scope + "/preprocess/downscale_factor", 2).toInt();
+    downscale_config.hasDownscale = settings.value(scope + "/preprocess/hasDownscale", default_is_downscale).toBool();
+    downscale_config.downscaleFactor = settings.value(scope + "/preprocess/downscaleFactor", 2).toInt();
 }
 void ApplicationSettings::load_disp(const QString& scope,
                                     DisplayConfig& disp_config)
@@ -459,7 +451,7 @@ bool ApplicationSettings::load_initial_phi()
     QDir dir = settingsDirectory();
     QString phiPath = dir.filePath(kPhiInitFilename);
 
-    QImage& img = imgSessSettings.initial_phi;
+    QImage& img = imgConfig.compute.initialPhi;
 
     if (QFile::exists(phiPath))
     {
@@ -486,10 +478,10 @@ void ApplicationSettings::load_default_initial_phi()
     const int width  = 1280;
     const int height = 720;
 
-    imgSessSettings.initial_phi = QImage(width, height, QImage::Format_Grayscale8);
-    imgSessSettings.initial_phi.fill(Qt::black);
+    imgConfig.compute.initialPhi = QImage(width, height, QImage::Format_Grayscale8);
+    imgConfig.compute.initialPhi.fill(Qt::black);
 
-    QPainter painter(&imgSessSettings.initial_phi);
+    QPainter painter(&imgConfig.compute.initialPhi);
 
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setBrush(Qt::white);
@@ -512,7 +504,7 @@ bool ApplicationSettings::save_initial_phi()
 {
     bool isOk = false;
 
-    QImage img = imgSessSettings.initial_phi;
+    QImage img = imgConfig.compute.initialPhi;
 
     if ( !img.isNull() &&
          img.format() == QImage::Format_Grayscale8 )
@@ -529,7 +521,7 @@ bool ApplicationSettings::save_initial_phi()
 
 void ApplicationSettings::resize_initial_phi(int width, int height)
 {
-    QImage& img = imgSessSettings.initial_phi;
+    QImage& img = imgConfig.compute.initialPhi;
 
     if ( !img.isNull() )
     {

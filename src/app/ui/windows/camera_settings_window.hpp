@@ -45,7 +45,7 @@ private:
     QComboBox* downscale_factor_cb;
     QCheckBox* filter_cb;
 
-    CameraSessionSettings& config_;
+    VideoSessionSettings& config_;
 };
 
 }

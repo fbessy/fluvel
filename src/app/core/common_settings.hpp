@@ -46,14 +46,14 @@ enum class Session
 struct AlgoConfig
 {
     ofeli_ip::Connectivity connectivity;
-    ofeli_ip::AcConfig ac_config;
-    ofeli_ip::RegionColorConfig region_ac_config;
+    ofeli_ip::AcConfig acConfig;
+    ofeli_ip::RegionColorConfig regionAcConfig;
 };
 
 struct DownscaleConfig
 {
-    bool has_downscale;
-    int downscale_factor;
+    bool hasDownscale;
+    int downscaleFactor;
 };
 
 struct DisplayConfig
@@ -69,20 +69,24 @@ struct DisplayConfig
     bool flip_horizontal;
 };
 
-struct FilteringConfig
+struct ProcessingConfig
 {
     bool has_gaussian_noise;
     float std_noise;
+
     bool has_salt_noise;
     float proba_noise;
+
     bool has_speckle_noise;
     float std_speckle_noise;
 
     bool has_median_filt;
     int kernel_median_length;
     bool has_O1_algo;
+
     bool has_mean_filt;
     int kernel_mean_length;
+
     bool has_gaussian_filt;
     int kernel_gaussian_length;
     float sigma;
@@ -95,37 +99,60 @@ struct FilteringConfig
 
     bool has_open_filt;
     int kernel_open_length;
+
     bool has_close_filt;
     int kernel_close_length;
+
     bool has_top_hat_filt;
     bool is_white_top_hat;
     int kernel_tophat_length;
 
     bool has_O1_morpho;
+
+    bool hasProcessing() const
+    {
+        return has_gaussian_noise ||
+               has_salt_noise ||
+               has_speckle_noise ||
+               has_median_filt ||
+               has_mean_filt ||
+               has_gaussian_filt ||
+               has_aniso_diff ||
+               has_open_filt ||
+               has_close_filt ||
+               has_top_hat_filt;
+    }
+};
+
+struct ImageComputeConfig
+{
+    AlgoConfig algo;
+
+    QImage initialPhi;
+
+    DownscaleConfig downscale;
+    ProcessingConfig processing;
 };
 
 struct ImageSessionSettings
 {
-    AlgoConfig img_algo_conf;
-
-    QImage initial_phi;
-
-    bool has_preprocess;
-    DownscaleConfig downscale_conf;
-    FilteringConfig filtering_conf;
-
-    DisplayConfig img_disp_conf;
+    ImageComputeConfig compute;
+    DisplayConfig display;
 };
 
-struct CameraSessionSettings
+struct VideoComputeConfig
 {
-    AlgoConfig cam_algo_conf;
-    int cycles_nbr;
+    AlgoConfig algo;
+    int cyclesNbr;
 
-    DownscaleConfig downscale_conf;
-    bool has_temporal_filtering;
+    DownscaleConfig downscale;
+    bool hasTemporalFiltering;
+};
 
-    DisplayConfig cam_disp_conf;
+struct VideoSessionSettings
+{
+    VideoComputeConfig compute;
+    DisplayConfig display;
 };
 
 inline ofeli_ip::Rgb_uc get_color(int index)

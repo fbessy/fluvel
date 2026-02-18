@@ -27,8 +27,8 @@ CameraController::CameraController(QObject* parent)
             this,
             &CameraController::frameSizeStr);
 
-    onCamSettingsChanged( AppSettings::instance().camSessSettings );
-    onCamDisplaySettingsChanged( AppSettings::instance().camSessSettings.cam_disp_conf );
+    onCamSettingsChanged( AppSettings::instance().camConfig );
+    onCamDisplaySettingsChanged( AppSettings::instance().camConfig.display );
 
     connect(&AppSettings::instance(),
             &ApplicationSettings::camSettingsChanged,
@@ -156,14 +156,14 @@ void CameraController::updateStats()
     emit statsUpdated(stats);
 }
 
-void CameraController::onCamSettingsChanged(const CameraSessionSettings& conf)
+void CameraController::onCamSettingsChanged(const VideoSessionSettings& conf)
 {
     ac_thread_.setAlgoConfig( conf );
 }
 
 void CameraController::onCamDisplaySettingsChanged(const DisplayConfig& disp_config)
 {
-    ac_thread_.setDisplayConfig( disp_config );
+    ac_thread_.applyDisplayConfig( disp_config );
 }
 
 } // namespace

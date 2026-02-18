@@ -8,7 +8,7 @@ namespace ofeli_app
 
 PhiEditor::PhiEditor()
 {
-    current = AppSettings::instance().imgSessSettings.initial_phi;
+    current = AppSettings::instance().imgConfig.compute.initialPhi;
 }
 
 void PhiEditor::onImageSizeReady(int width, int height)
@@ -60,14 +60,14 @@ void PhiEditor::clear()
 
 void PhiEditor::accept()
 {
-    AppSettings::instance().imgSessSettings.initial_phi = current;
+    AppSettings::instance().imgConfig.compute.initialPhi = current;
 }
 
 void PhiEditor::reject()
 {
-    if ( current != AppSettings::instance().imgSessSettings.initial_phi )
+    if ( current != AppSettings::instance().imgConfig.compute.initialPhi )
     {
-        current = AppSettings::instance().imgSessSettings.initial_phi;
+        current = AppSettings::instance().imgConfig.compute.initialPhi;
         emit phiChanged();
     }
 }

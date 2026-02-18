@@ -52,7 +52,7 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
 
     QFormLayout* lambda_layout = new QFormLayout;
 
-    auto& config = AppSettings::instance().imgSessSettings.img_disp_conf;
+    auto& config = AppSettings::instance().imgConfig.display;
 
     QColor RGBout_list( get_QRgb(config.l_out_color) );
     QColor RGBin_list( get_QRgb(config.l_in_color) );
@@ -167,19 +167,19 @@ void AlgoSettingsWidget::accept()
 {
     config_.connectivity = connectivity_cb_->currentData().value<ofeli_ip::Connectivity>();
 
-    config_.ac_config.Na = Na_spin_->value();
-    config_.ac_config.Ns = Ns_spin_->value();
-    config_.ac_config.is_cycle2 = internalspeed_groupbox_->isChecked();
-    config_.ac_config.disk_radius = disk_radius_spin_->value();
+    config_.acConfig.Na = Na_spin_->value();
+    config_.acConfig.Ns = Ns_spin_->value();
+    config_.acConfig.is_cycle2 = internalspeed_groupbox_->isChecked();
+    config_.acConfig.disk_radius = disk_radius_spin_->value();
 
-    config_.region_ac_config.lambda_out = lambda_out_spin_->value();
-    config_.region_ac_config.lambda_in  = lambda_in_spin_->value();
+    config_.regionAcConfig.lambda_out = lambda_out_spin_->value();
+    config_.regionAcConfig.lambda_in  = lambda_in_spin_->value();
 
-    config_.region_ac_config.color_space = color_space_cb_->currentData().value<ofeli_ip::ColorSpaceOption>();
+    config_.regionAcConfig.color_space = color_space_cb_->currentData().value<ofeli_ip::ColorSpaceOption>();
 
-    config_.region_ac_config.weights.c1 = alpha_spin_->value();
-    config_.region_ac_config.weights.c2 = beta_spin_->value();
-    config_.region_ac_config.weights.c3 = gamma_spin_->value();
+    config_.regionAcConfig.weights.c1 = alpha_spin_->value();
+    config_.regionAcConfig.weights.c2 = beta_spin_->value();
+    config_.regionAcConfig.weights.c3 = gamma_spin_->value();
 }
 
 void AlgoSettingsWidget::reject()
@@ -188,21 +188,21 @@ void AlgoSettingsWidget::reject()
     if ( index >= 0 )
         connectivity_cb_->setCurrentIndex( index );
 
-    Na_spin_->setValue( config_.ac_config.Na );
-    Ns_spin_->setValue( config_.ac_config.Ns );
-    internalspeed_groupbox_->setChecked( config_.ac_config.is_cycle2 );
-    disk_radius_spin_->setValue( config_.ac_config.disk_radius );
+    Na_spin_->setValue( config_.acConfig.Na );
+    Ns_spin_->setValue( config_.acConfig.Ns );
+    internalspeed_groupbox_->setChecked( config_.acConfig.is_cycle2 );
+    disk_radius_spin_->setValue( config_.acConfig.disk_radius );
 
-    lambda_out_spin_->setValue( config_.region_ac_config.lambda_out );
-    lambda_in_spin_->setValue( config_.region_ac_config.lambda_in );
+    lambda_out_spin_->setValue( config_.regionAcConfig.lambda_out );
+    lambda_in_spin_->setValue( config_.regionAcConfig.lambda_in );
 
-    index = color_space_cb_->findData(QVariant::fromValue(config_.region_ac_config.color_space));
+    index = color_space_cb_->findData(QVariant::fromValue(config_.regionAcConfig.color_space));
     if ( index >= 0 )
         color_space_cb_->setCurrentIndex( index );
 
-    alpha_spin_->setValue( config_.region_ac_config.weights.c1 );
-    beta_spin_->setValue(  config_.region_ac_config.weights.c2 );
-    gamma_spin_->setValue( config_.region_ac_config.weights.c3 );
+    alpha_spin_->setValue( config_.regionAcConfig.weights.c1 );
+    beta_spin_->setValue(  config_.regionAcConfig.weights.c2 );
+    gamma_spin_->setValue( config_.regionAcConfig.weights.c3 );
 }
 
 AlgoConfig& AlgoSettingsWidget::config(Session session)
@@ -210,10 +210,10 @@ AlgoConfig& AlgoSettingsWidget::config(Session session)
     switch (session)
     {
     case Session::Image:
-        return AppSettings::instance().imgSessSettings.img_algo_conf;
+        return AppSettings::instance().imgConfig.compute.algo;
 
     case Session::Camera:
-        return AppSettings::instance().camSessSettings.cam_algo_conf;
+        return AppSettings::instance().camConfig.compute.algo;
     }
 
     std::unreachable();

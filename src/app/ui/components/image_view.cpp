@@ -432,8 +432,8 @@ bool ImageView::isGrayscale() const
 
 void ImageView::applyDownscaleToItems()
 {
-    const bool has_ds = downscaleConfig_.has_downscale;
-    const int      df = downscaleConfig_.downscale_factor;
+    const bool has_ds = downscaleConfig_.hasDownscale;
+    const int      df = downscaleConfig_.downscaleFactor;
 
     qreal factor = static_cast<qreal>(1.0);
 
@@ -444,9 +444,9 @@ void ImageView::applyDownscaleToItems()
     contourInItem->setScale( factor );
 }
 
-void ImageView::setDisplayConfig(const DisplayConfig& displayConfig)
+void ImageView::applyDisplayConfig(const DisplayConfig& display)
 {
-    displayConfig_ = displayConfig;
+    displayConfig_ = display;
 
     QColor col_lout, col_lin;
 
@@ -467,9 +467,9 @@ void ImageView::setDisplayConfig(const DisplayConfig& displayConfig)
     contourInItem->setColor( col_lin );
 }
 
-void ImageView::setDownscaleConfig(const DownscaleConfig& downscaleConfig)
+void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
 {
-    downscaleConfig_ = downscaleConfig;
+    downscaleConfig_ = downscale;
 
     clearOverlays();
     applyDownscaleToItems();

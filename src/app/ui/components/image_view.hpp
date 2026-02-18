@@ -68,8 +68,8 @@ public:
     bool isGrayscale() const;
 
 public slots:
-    void setDisplayConfig(const DisplayConfig& displayConfig);
-    void setDownscaleConfig(const DownscaleConfig& downscaleConfig);
+    void applyDisplayConfig(const DisplayConfig& display);
+    void applyDownscaleConfig(const DownscaleConfig& downscale);
     void displayContour(const QVector<QPoint>& out,
                         const QVector<QPoint>& in);
 

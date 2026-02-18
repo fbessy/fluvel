@@ -25,8 +25,8 @@ public:
     void submitFrame(const QVideoFrame& frame);
     void stop();
 
-    void setAlgoConfig(const CameraSessionSettings& config);
-    void setDisplayConfig(const DisplayConfig& dc);
+    void setAlgoConfig(const VideoSessionSettings& config);
+    void applyDisplayConfig(const DisplayConfig& dc);
 
 signals:
     void frameProcessed(qint64 receiveTs, qint64 processTs);
@@ -38,7 +38,7 @@ protected:
 
 private:
 
-    CameraSessionSettings config_;
+    VideoSessionSettings config_;
     DisplayConfig displayConfig_;
 
     QImage processFrame(QVideoFrame& frame, qint64& processTs);

@@ -68,7 +68,7 @@ public:
     void save_cam_session_config();
 
     void save_algo(const QString& scope,
-                   const AlgoConfig& algoConfig);
+                   const AlgoConfig& algo);
     void save_downscale(const QString& scope,
                         const DownscaleConfig& downscale_config);
     void save_disp(const QString& scope,
@@ -78,7 +78,7 @@ public:
     void load_cam_session_config();
 
     void load_algo(const QString& scope,
-                   AlgoConfig& algoConfig);
+                   AlgoConfig& algo);
     void load_downscale(const QString& scope,
                         DownscaleConfig& downscale_config);
     void load_disp(const QString& scope,
@@ -95,13 +95,13 @@ public:
     void resize_initial_phi(int width, int height);
 
     Language app_language;
-    ImageSessionSettings imgSessSettings;
-    CameraSessionSettings camSessSettings;
+    ImageSessionSettings imgConfig;
+    VideoSessionSettings camConfig;
 
 signals:
     void imgSettingsChanged(const ImageSessionSettings& conf);
     void imgDisplaySettingsChanged(const DisplayConfig& conf);
-    void camSettingsChanged(const CameraSessionSettings& conf);
+    void camSettingsChanged(const VideoSessionSettings& conf);
     void camDisplaySettingsChanged(const DisplayConfig& conf);
     void resizedPhi(const QImage& phi);
 };

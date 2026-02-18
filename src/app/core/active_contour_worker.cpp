@@ -41,17 +41,16 @@ void ActiveContourWorker::restart()
 
     setMode( RunMode::Interactive );
 
-    const bool has_preprocess = config_.has_preprocess;
-    const auto& fc = config_.filtering_conf;
+    const auto& fc = config_.compute.processing;
 
     // if there is at least one random operation,
     // preprocessing is done at each restart
-    if(   has_preprocess &&
+    if(   fc.hasProcessing() &&
         (    fc.has_gaussian_noise
           || fc.has_salt_noise
           || fc.has_speckle_noise ) )
     {
-        applyPreprocessing();
+        applyProcessing();
     }
 
     initializeActiveContour();
@@ -193,27 +192,27 @@ bool ActiveContourWorker::stepOnceAlgo()
     return ac_->is_stopped();
 }
 
-void ActiveContourWorker::processImage()
+void ActiveContourWorker::applyPreprocess()
 {
     timer_->stop();
     setState( WorkerState::Initializing );
 
-    downscaleInputImage();
-    applyPreprocessing();
+    applyDownscale();
+    applyProcessing();
 }
 
-void ActiveContourWorker::downscaleInputImage()
+void ActiveContourWorker::applyDownscale()
 {
     if ( inputImage_.isNull() )
         return;
 
-    if ( config_.initial_phi.isNull() )
+    if ( config_.compute.initialPhi.isNull() )
         return;
 
-    const bool has_downscale = config_.downscale_conf.has_downscale;
-    const int downscale_fctr = config_.downscale_conf.downscale_factor;
+    const bool hasDownscale = config_.compute.downscale.hasDownscale;
+    const int downscale_fctr = config_.compute.downscale.downscaleFactor;
 
-    scaledPhi_ = config_.initial_phi;
+    scaledPhi_ = config_.compute.initialPhi;
 
 #ifdef OFELI_DEBUG
     int bpp = inputImage_.depth() / 8;  // ou 4 pour ARGB32
@@ -224,7 +223,7 @@ void ActiveContourWorker::downscaleInputImage()
              << "padding =" << inputImage_.bytesPerLine() - expected;
 #endif
 
-    if ( has_downscale )
+    if ( hasDownscale )
     {
         assert( downscale_fctr == 2 || downscale_fctr == 4 );
 
@@ -253,7 +252,7 @@ void ActiveContourWorker::downscaleInputImage()
 #endif
 }
 
-void ActiveContourWorker::applyPreprocessing()
+void ActiveContourWorker::applyProcessing()
 {
     if ( downscaledImage_.isNull() )
         return;
@@ -277,10 +276,9 @@ void ActiveContourWorker::applyPreprocessing()
 
     //start_time = std::clock();
 
-    const bool has_preprocess = config_.has_preprocess;
-    const auto& fc = config_.filtering_conf;
+    const auto& fc = config_.compute.processing;
 
-    if( has_preprocess )
+    if( fc.hasProcessing() )
     {
         if( fc.has_gaussian_noise )
         {
@@ -405,7 +403,7 @@ void ActiveContourWorker::initializeFromInput(const QImage& input,
     inputImage_ = input;
     config_ = config;
 
-    processImage();
+    applyPreprocess();
 
     initializeActiveContour();
 
@@ -431,7 +429,7 @@ void ActiveContourWorker::initializeActiveContour()
     ofeli_ip::ContourData initialCD(scaledPhi_.constBits(),
                                     scaledPhi_.width(),
                                     scaledPhi_.height(),
-                                    config_.img_algo_conf.connectivity);
+                                    config_.compute.algo.connectivity);
 
     bool is_rgb = ( processedImage_.format() != QImage::Format_Grayscale8 );
 
@@ -442,15 +440,15 @@ void ActiveContourWorker::initializeActiveContour()
     {
         ac_ = std::make_unique<ofeli_ip::RegionColorAc>(processedImg,
                                                         std::move(initialCD),
-                                                        config_.img_algo_conf.ac_config,
-                                                        config_.img_algo_conf.region_ac_config);
+                                                        config_.compute.algo.acConfig,
+                                                        config_.compute.algo.regionAcConfig);
     }
     else
     {
         ac_ = std::make_unique<ofeli_ip::RegionAc>(processedImg,
                                                    std::move(initialCD),
-                                                   config_.img_algo_conf.ac_config,
-                                                   config_.img_algo_conf.region_ac_config);
+                                                   config_.compute.algo.acConfig,
+                                                   config_.compute.algo.regionAcConfig);
     }
 
     setState( WorkerState::Ready );
@@ -574,7 +572,7 @@ void ActiveContourWorker::setAlgoConfig(const ImageSessionSettings& config)
 {
     config_ = config;
 
-    processImage();
+    applyPreprocess();
     initializeActiveContour();
 
     if ( state_ != WorkerState::Ready )

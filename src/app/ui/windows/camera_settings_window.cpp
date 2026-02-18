@@ -16,7 +16,7 @@ namespace ofeli_app
 {
 
 CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
-    QDialog(parent), config_(AppSettings::instance().camSessSettings)
+    QDialog(parent), config_(AppSettings::instance().camConfig)
 {
     setWindowTitle(tr("Camera session settings"));
 
@@ -101,12 +101,12 @@ void CameraSettingsWindow::setupUiDownscaleGb()
 
 void CameraSettingsWindow::accept()
 {
-    config_.downscale_conf.has_downscale = downscale_gb->isChecked();
-    config_.downscale_conf.downscale_factor = downscale_factor_cb->currentData().toInt();
-    config_.has_temporal_filtering = filter_cb->isChecked();
+    config_.compute.downscale.hasDownscale = downscale_gb->isChecked();
+    config_.compute.downscale.downscaleFactor = downscale_factor_cb->currentData().toInt();
+    config_.compute.hasTemporalFiltering = filter_cb->isChecked();
 
     algoWidget->accept();
-    config_.cycles_nbr = phases_sb->value();
+    config_.compute.cyclesNbr = phases_sb->value();
 
     // for data persistence
     AppSettings::instance().save_cam_session_config();
@@ -116,17 +116,17 @@ void CameraSettingsWindow::accept()
 
 void CameraSettingsWindow::reject()
 {
-    downscale_gb->setChecked( config_.downscale_conf.has_downscale );
+    downscale_gb->setChecked( config_.compute.downscale.hasDownscale );
 
-    int index = downscale_factor_cb->findData( config_.downscale_conf.downscale_factor );
+    int index = downscale_factor_cb->findData( config_.compute.downscale.downscaleFactor );
     if ( index >= 0 )
         downscale_factor_cb->setCurrentIndex( index );
 
-    filter_cb->setChecked( config_.has_temporal_filtering );
+    filter_cb->setChecked( config_.compute.hasTemporalFiltering );
 
 
     algoWidget->reject();
-    phases_sb->setValue( config_.cycles_nbr );
+    phases_sb->setValue( config_.compute.cyclesNbr );
 
     QDialog::reject();
 }

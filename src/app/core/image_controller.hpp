@@ -42,7 +42,7 @@ signals:
 private:
 
     void onImgSettingsChanged(const ImageSessionSettings& conf);
-    void onImgDisplaySettingsChanged(const DisplayConfig& displayConfig);
+    void onImgDisplaySettingsChanged(const DisplayConfig& display);
     void refreshView();
 
     QImage inputImage_;

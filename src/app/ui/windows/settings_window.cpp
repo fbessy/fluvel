@@ -771,14 +771,12 @@ void SettingsWindow::applyCurrentShape(bool add)
 
 void SettingsWindow::accept()
 {
-    auto& ds_config = AppSettings::instance().imgSessSettings.downscale_conf;
+    auto& ds_config = AppSettings::instance().imgConfig.compute.downscale;
 
-    ds_config.has_downscale = downscale_page->isChecked();
-    ds_config.downscale_factor = downscale_factor_cb->currentData().toInt();
+    ds_config.hasDownscale = downscale_page->isChecked();
+    ds_config.downscaleFactor = downscale_factor_cb->currentData().toInt();
 
-    AppSettings::instance().imgSessSettings.has_preprocess = preprocess_page->isChecked();
-
-    auto& filt_config = AppSettings::instance().imgSessSettings.filtering_conf;
+    auto& filt_config = AppSettings::instance().imgConfig.compute.processing;
 
     filt_config.has_gaussian_noise = gaussian_noise_groupbox->isChecked();
     filt_config.std_noise = float( std_noise_spin->value() );
@@ -831,17 +829,15 @@ void SettingsWindow::accept()
 
 void SettingsWindow::reject()
 {
-    const auto& ds_config = AppSettings::instance().imgSessSettings.downscale_conf;
+    const auto& ds_config = AppSettings::instance().imgConfig.compute.downscale;
 
-    downscale_page->setChecked( ds_config.has_downscale );
+    downscale_page->setChecked( ds_config.hasDownscale );
 
-    int index = downscale_factor_cb->findData( ds_config.downscale_factor );
+    int index = downscale_factor_cb->findData( ds_config.downscaleFactor );
     if ( index >= 0 )
         downscale_factor_cb->setCurrentIndex( index );
 
-    const auto& config_filter = AppSettings::instance().imgSessSettings.filtering_conf;
-
-    preprocess_page->setChecked(AppSettings::instance().imgSessSettings.has_preprocess);
+    const auto& config_filter = AppSettings::instance().imgConfig.compute.processing;
 
     gaussian_noise_groupbox->setChecked(config_filter.has_gaussian_noise);
     std_noise_spin->setValue( double( config_filter.std_noise ) );

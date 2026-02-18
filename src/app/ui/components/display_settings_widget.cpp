@@ -18,9 +18,9 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     : QWidget(parent), session_(session)
 {
     if ( session_ == Session::Image )
-        config_ = AppSettings::instance().imgSessSettings.img_disp_conf;
+        config_ = AppSettings::instance().imgConfig.display;
     else if ( session_ == Session::Camera )
-        config_ = AppSettings::instance().camSessSettings.cam_disp_conf;;
+        config_ = AppSettings::instance().camConfig.display;;
 
 
     lout_selector_ = new ColorSelectorWidget(this,
@@ -152,31 +152,20 @@ void DisplaySettingsWidget::refresh_input_displayed_cb_availability()
 
     if ( session_ == Session::Image )
     {
-        const bool has_downscale = AppSettings::instance().imgSessSettings.downscale_conf.has_downscale;
-        const bool has_preprocess = AppSettings::instance().imgSessSettings.has_preprocess;
-        const auto& fc = AppSettings::instance().imgSessSettings.filtering_conf;
+        const bool hasDownscale = AppSettings::instance().imgConfig.compute.downscale.hasDownscale;
+        const auto& fc = AppSettings::instance().imgConfig.compute.processing;
 
-        if (      has_downscale
-            || ( has_preprocess && (    fc.has_gaussian_noise
-                                   || fc.has_salt_noise
-                                   || fc.has_speckle_noise
-                                   || fc.has_mean_filt
-                                   || fc.has_gaussian_filt
-                                   || fc.has_median_filt
-                                   || fc.has_aniso_diff
-                                   || fc.has_open_filt
-                                   || fc.has_close_filt
-                                   || fc.has_top_hat_filt ) ) )
+        if ( hasDownscale || fc.hasProcessing() )
         {
             isEnabled = true;
         }
     }
     else if ( session_ == Session::Camera )
     {
-        const bool has_downscale = AppSettings::instance().camSessSettings.downscale_conf.has_downscale;
-        const bool has_filter = AppSettings::instance().camSessSettings.has_temporal_filtering;
+        const bool hasDownscale = AppSettings::instance().camConfig.compute.downscale.hasDownscale;
+        const bool has_filter = AppSettings::instance().camConfig.compute.hasTemporalFiltering;
 
-        isEnabled = ( has_downscale || has_filter );
+        isEnabled = ( hasDownscale || has_filter );
     }
 
     if ( !isEnabled )

@@ -7,8 +7,8 @@ namespace ofeli_app
 ImageController::ImageController(QObject* parent):
     QObject(parent)
 {
-    onImgSettingsChanged( AppSettings::instance().imgSessSettings );
-    onImgDisplaySettingsChanged( AppSettings::instance().imgSessSettings.img_disp_conf );
+    onImgSettingsChanged( AppSettings::instance().imgConfig );
+    onImgDisplaySettingsChanged( AppSettings::instance().imgConfig.display );
 
     connect(&AppSettings::instance(),
             &ApplicationSettings::imgSettingsChanged,
@@ -61,10 +61,10 @@ void ImageController::loadImage(const QString& path)
     {
         bool isResize = false;
 
-        if ( !AppSettings::instance().imgSessSettings.initial_phi.isNull() )
+        if ( !AppSettings::instance().imgConfig.compute.initialPhi.isNull() )
         {
-            if ( AppSettings::instance().imgSessSettings.initial_phi.width()  != inputImage_.width() ||
-                 AppSettings::instance().imgSessSettings.initial_phi.height() != inputImage_.height() )
+            if ( AppSettings::instance().imgConfig.compute.initialPhi.width()  != inputImage_.width() ||
+                 AppSettings::instance().imgConfig.compute.initialPhi.height() != inputImage_.height() )
             {
                 AppSettings::instance().resize_initial_phi( inputImage_.width(),
                                                             inputImage_.height() );
@@ -82,13 +82,13 @@ void ImageController::loadImage(const QString& path)
             emit imageReadyWithoutResize(inputImage_);
         }
 
-        if ( AppSettings::instance().imgSessSettings.initial_phi.width()  == inputImage_.width() &&
-             AppSettings::instance().imgSessSettings.initial_phi.height() == inputImage_.height() )
+        if ( AppSettings::instance().imgConfig.compute.initialPhi.width()  == inputImage_.width() &&
+             AppSettings::instance().imgConfig.compute.initialPhi.height() == inputImage_.height() )
         {
             emit clearOverlaysRequested();
 
             acWorker.initializeFromInput(inputImage_,
-                                         AppSettings::instance().imgSessSettings);
+                                         AppSettings::instance().imgConfig);
         }
     }
 }
@@ -107,11 +107,11 @@ void ImageController::onImgSettingsChanged(const ImageSessionSettings& config)
     acWorker.setAlgoConfig( config_ );
 }
 
-void ImageController::onImgDisplaySettingsChanged(const DisplayConfig& displayConfig)
+void ImageController::onImgDisplaySettingsChanged(const DisplayConfig& display)
 {
-    bool needs_refresh = ( displayConfig_.input_displayed != displayConfig.input_displayed );
+    bool needs_refresh = ( displayConfig_.input_displayed != display.input_displayed );
 
-    displayConfig_ = displayConfig;
+    displayConfig_ = display;
 
     if ( needs_refresh )
         refreshView();

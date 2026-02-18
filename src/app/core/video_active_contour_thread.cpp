@@ -70,10 +70,10 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         // downscale
         QImage q_img_algo = input;
-        bool has_downscale = config.downscale_conf.has_downscale;
-        int downscale_fctr = config.downscale_conf.downscale_factor;
+        bool hasDownscale = config.compute.downscale.hasDownscale;
+        int downscale_fctr = config.compute.downscale.downscaleFactor;
 
-        if ( has_downscale )
+        if ( hasDownscale )
         {
             assert( downscale_fctr == 2 || downscale_fctr == 4 );
 
@@ -94,20 +94,20 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
         if ( !region_ac || configChanged || sizeChanged )
         {
-            if ( config.has_temporal_filtering )
+            if ( config.compute.hasTemporalFiltering )
             {
                 smoother.reset( img_algo );
                 img_algo = smoother.outputSpan();
             }
 
-            const auto& algo_conf = config.cam_algo_conf;
+            const auto& algo_conf = config.compute.algo;
 
             region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
                                                                   ofeli_ip::ContourData(img_algo.width(),
                                                                                         img_algo.height(),
                                                                                         algo_conf.connectivity),
-                                                                  algo_conf.ac_config,
-                                                                  algo_conf.region_ac_config);
+                                                                  algo_conf.acConfig,
+                                                                  algo_conf.regionAcConfig);
 
             currentWidth_  = newW;
             currentHeight_ = newH;
@@ -126,7 +126,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
         }
         else
         {
-            if ( config.has_temporal_filtering )
+            if ( config.compute.hasTemporalFiltering )
             {
                 smoother.update( img_algo );
                 img_algo = smoother.outputSpan();
@@ -135,7 +135,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
             region_ac->resetExecutionState( img_algo );
         }
 
-        region_ac->run_cycles(config.cycles_nbr);
+        region_ac->run_cycles(config.compute.cyclesNbr);
         processTs = FrameClock::nowNs() - startTs;
 
         if (region_ac)
@@ -146,7 +146,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
             {
                 result = input;
             }
-            else if ( config.has_temporal_filtering )
+            else if ( config.compute.hasTemporalFiltering )
             {
                 QImage img(img_algo.data(),
                            img_algo.width(),
@@ -163,7 +163,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
             if ( dc.l_out_displayed )
             {
-                if ( has_downscale && dc.input_displayed )
+                if ( hasDownscale && dc.input_displayed )
                 {
                     draw_upscale_list(region_ac->l_out(),
                                       dc.l_out_color,
@@ -179,7 +179,7 @@ QImage VideoActiveContourThread::processFrame(QVideoFrame& frame, qint64& proces
 
             if ( dc.l_in_displayed )
             {
-                if ( has_downscale && dc.input_displayed )
+                if ( hasDownscale && dc.input_displayed )
                 {
                     draw_upscale_list(region_ac->l_in(),
                                       dc.l_in_color,
@@ -208,14 +208,14 @@ void VideoActiveContourThread::stop()
     condition.wakeAll();
 }
 
-void VideoActiveContourThread::setAlgoConfig(const CameraSessionSettings& config)
+void VideoActiveContourThread::setAlgoConfig(const VideoSessionSettings& config)
 {
     QMutexLocker locker(&frameMutex);
     config_ = config;
     configChanged = true;
 }
 
-void VideoActiveContourThread::setDisplayConfig(const DisplayConfig& dc)
+void VideoActiveContourThread::applyDisplayConfig(const DisplayConfig& dc)
 {
     QMutexLocker locker(&frameMutex);
     displayConfig_ = dc;

@@ -38,7 +38,7 @@ private slots:
 
 private:
 
-    void onCamSettingsChanged(const CameraSessionSettings& conf);
+    void onCamSettingsChanged(const VideoSessionSettings& conf);
     void onCamDisplaySettingsChanged(const DisplayConfig& disp_config);
 
     QCamera* camera_ = nullptr;

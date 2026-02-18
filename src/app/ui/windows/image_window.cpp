@@ -417,18 +417,18 @@ void ImageWindow::setupConnections()
     connect(languageAct,     &QAction::triggered,
             language_window, &LanguageWindow::show);
 
-    imageView->setDownscaleConfig( AppSettings::instance().imgSessSettings.downscale_conf );
-    imageView->setDisplayConfig( AppSettings::instance().imgSessSettings.img_disp_conf );
+    imageView->applyDownscaleConfig( AppSettings::instance().imgConfig.compute.downscale );
+    imageView->applyDisplayConfig( AppSettings::instance().imgConfig.display );
 
     connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged,
             this, [this](const ImageSessionSettings& conf) {
-                imageView->setDownscaleConfig( conf.downscale_conf );
+                imageView->applyDownscaleConfig( conf.compute.downscale );
             });
 
     connect(&AppSettings::instance(),
             &ApplicationSettings::imgDisplaySettingsChanged,
             imageView,
-            &ImageView::setDisplayConfig);
+            &ImageView::applyDisplayConfig);
 
     connect(imageController,
             &ImageController::clearOverlaysRequested,
