@@ -32,6 +32,7 @@ private:
     Grid2D<Rgb_f> accum_;
     bool initialized_ = false;
 
+    int sampling_step_ = 1;
     float alpha_ = 0.1f;
 
     float noise_estimate_;

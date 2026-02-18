@@ -36,6 +36,12 @@ void TemporalSmoother::reset(ImageSpan first_src)
     }
 
     initialized_ = true;
+
+    const int total_pixels = accum_.width() * accum_.height();
+    constexpr int target_samples = 200000;
+
+    sampling_step_ = std::max(1,
+                              int(std::sqrt(float(total_pixels) / target_samples)));
 }
 
 // ------------------------------------------------------------
@@ -72,11 +78,10 @@ void TemporalSmoother::update(ImageSpan src)
     // --------------------------------------------------------
     float motion = 0.f;
     int count = 0;
-    constexpr int step = 2;
 
-    for (int y = 0; y < accum_.height(); y += step)
+    for (int y = 0; y < accum_.height(); y += sampling_step_)
     {
-        for (int x = 0; x < accum_.width(); x += step)
+        for (int x = 0; x < accum_.width(); x += sampling_step_)
         {
             const Rgb_uc  s = src.atPixelRgb(x, y);
             const Rgb_f&  a = accum_.at(x, y);
