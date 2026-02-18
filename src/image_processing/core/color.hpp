@@ -122,15 +122,37 @@ struct Rgb
     Rgb<I> rounded() const
     {
         return {
-            static_cast<I>(std::llround(red)),
-            static_cast<I>(std::llround(green)),
-            static_cast<I>(std::llround(blue))
+            static_cast<I>(std::lround(red)),
+            static_cast<I>(std::lround(green)),
+            static_cast<I>(std::lround(blue))
         };
     }
 
-    T scalar() const
+    auto scalar() const
     {
-        return red+green+blue;
+        using R = std::conditional_t<std::integral<T>, int, T>;
+        return static_cast<R>(red)
+               + static_cast<R>(green)
+               + static_cast<R>(blue);
+    }
+
+    template <Arithmetic U>
+    Rgb operator*(U scalar) const
+    {
+        return {
+            static_cast<T>(red   * scalar),
+            static_cast<T>(green * scalar),
+            static_cast<T>(blue  * scalar)
+        };
+    }
+
+    template <Arithmetic U>
+    Rgb& operator*=(U scalar)
+    {
+        red   = static_cast<T>(red   * scalar);
+        green = static_cast<T>(green * scalar);
+        blue  = static_cast<T>(blue  * scalar);
+        return *this;
     }
 };
 
@@ -223,6 +245,17 @@ struct Components_3i
 
 using Color_3i = Components_3i;
 
+inline Color_3i scale_and_round(float c1, float c2, float c3)
+{
+    constexpr float scale = 255.f;
+
+    return {
+        static_cast<int>(std::lround(scale * c1)),
+        static_cast<int>(std::lround(scale * c2)),
+        static_cast<int>(std::lround(scale * c3))
+    };
+}
+
 namespace color
 {
 
@@ -244,23 +277,27 @@ constexpr float INV_GAMMA_CORRECTION(float val)
 }
 
 /** @brief XYZ color of the D65 white point */
-constexpr auto WHITE_POINT_X = 0.950456f;
-constexpr auto WHITE_POINT_Y = 1.f;
-constexpr auto WHITE_POINT_Z = 1.088754f;
+constexpr float WHITE_POINT_X = 0.950456f;
+constexpr float WHITE_POINT_Y = 1.f;
+constexpr float WHITE_POINT_Z = 1.088754f;
 
 /** @brief *u*v color of the D65 white point */
-constexpr auto WHITE_POINT_DENOM = WHITE_POINT_X + 15.f*WHITE_POINT_Y + 3.f*WHITE_POINT_Z;
-constexpr auto WHITE_POINT_U     = 4.f*WHITE_POINT_X / WHITE_POINT_DENOM;
-constexpr auto WHITE_POINT_V     = 9.f*WHITE_POINT_Y / WHITE_POINT_DENOM;
+constexpr float WHITE_POINT_DENOM = WHITE_POINT_X + 15.f*WHITE_POINT_Y + 3.f*WHITE_POINT_Z;
+constexpr float WHITE_POINT_U     = 4.f*WHITE_POINT_X / WHITE_POINT_DENOM;
+constexpr float WHITE_POINT_V     = 9.f*WHITE_POINT_Y / WHITE_POINT_DENOM;
+
+constexpr float LAB_EPSILON = 216.f / 24389.f;
+constexpr float LAB_KAPPA   = 841.f / 108.f;
+constexpr float LAB_DELTA   = 4.f / 29.f;
 
 /**
  * @brief CIE L*a*b* f function (used to convert XYZ to L*a*b*)
  * http://en.wikipedia.org/wiki/Lab_color_space
  */
-constexpr float LAB_FUNC(float val)
+inline float LAB_FUNC(float val)
 {
-    return val >= float(8.85645167903563082e-3) ?
-               std::cbrtf(val) : (841.f/108.f)*(val) + (4.f/29.f);
+    return val >= LAB_EPSILON ?
+               std::cbrtf(val) : LAB_KAPPA*(val) + LAB_DELTA;
 }
 
 inline Xyz_f rgb_to_xyz(const Rgb_uc& rgb)

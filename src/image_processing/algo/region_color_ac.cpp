@@ -91,34 +91,30 @@ void RegionColorAc::do_specific_cycle1()
 
 Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
 {
-    const auto cs = region_config_.color_space;
-
-    if( cs == ColorSpaceOption::YUV )
+    switch (region_config_.color_space)
     {
+    case ColorSpaceOption::YUV:
         return color::rgb_to_yuv(rgb);
-    }
-    else if ( cs == ColorSpaceOption::Lab )
+
+    case ColorSpaceOption::Lab:
     {
         const auto col = color::rgb_to_Lab(rgb);
-
-        return { static_cast<int>(255.f * col.L),
-                 static_cast<int>(255.f * col.a),
-                 static_cast<int>(255.f * col.b) };
+        return scale_and_round(col.L, col.a, col.b);
     }
-    else if ( cs == ColorSpaceOption::Luv )
+
+    case ColorSpaceOption::Luv:
     {
         const auto col = color::rgb_to_Luv(rgb);
+        return scale_and_round(col.L, col.u, col.v);
+    }
 
-        return { static_cast<int>(255.f * col.L),
-                 static_cast<int>(255.f * col.u),
-                 static_cast<int>(255.f * col.v) };
+    case ColorSpaceOption::RGB:
+        return { static_cast<int>(rgb.red),
+                 static_cast<int>(rgb.green),
+                 static_cast<int>(rgb.blue)   };
     }
-    else
-    {
-        return { static_cast<int>( rgb.red ),
-                 static_cast<int>( rgb.green ),
-                 static_cast<int>( rgb.blue ) };
-    }
+
+    std::unreachable();
 }
 
 void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
@@ -138,8 +134,8 @@ void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
     const Color_3i veloc_out = weights * math::square( col - avg_out );
     const Color_3i veloc_in  = weights * math::square( col - avg_in );
 
-    const int speed_out = veloc_out.c1 + veloc_out.c2 + veloc_out.c3;
-    const int speed_in  = veloc_in.c1  + veloc_in.c2  + veloc_in.c3;
+    const int speed_out = veloc_out.scalar();
+    const int speed_in  = veloc_in.scalar();
 
     point.speed_ = speed_value::get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in);
 }
