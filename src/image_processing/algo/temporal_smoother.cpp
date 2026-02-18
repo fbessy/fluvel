@@ -1,15 +1,25 @@
 #include "temporal_smoother.hpp"
+
 #include <algorithm>
-#include <iostream>
+#include <cmath>
+#include <chrono>
+
 namespace ofeli_ip
 {
 
+using clock_type = std::chrono::steady_clock;
+
+// ------------------------------------------------------------
+// RESET
+// ------------------------------------------------------------
 void TemporalSmoother::reset(ImageSpan first_src)
 {
     initialized_ = false;
+    noise_initialized_ = false;
+    time_initialized_ = false;
 
     accum_.resize(first_src.width(),
-                  first_src.height() );
+                  first_src.height());
 
     for (int y = 0; y < accum_.height(); ++y)
     {
@@ -26,18 +36,41 @@ void TemporalSmoother::reset(ImageSpan first_src)
     }
 
     initialized_ = true;
-    noise_initialized_ = false;
 }
 
-
+// ------------------------------------------------------------
+// UPDATE
+// ------------------------------------------------------------
 void TemporalSmoother::update(ImageSpan src)
 {
-    if ( !initialized_ )
+    if (!initialized_)
         return;
 
-    float motion = 0.f;
+    // --------------------------------------------------------
+    // 1) Compute dt (FPS independent)
+    // --------------------------------------------------------
+    float dt_seconds = 0.033f;
 
-    const float beta = 1.f - alpha_;
+    const auto now = clock_type::now();
+
+    if (!time_initialized_)
+    {
+        last_time_ = now;
+        time_initialized_ = true;
+    }
+    else
+    {
+        std::chrono::duration<float> dt = now - last_time_;
+        dt_seconds = dt.count();
+        last_time_ = now;
+    }
+
+    dt_seconds = std::clamp(dt_seconds, 0.001f, 0.5f);
+
+    // --------------------------------------------------------
+    // 2) Compute motion (mean absolute difference)
+    // --------------------------------------------------------
+    float motion = 0.f;
 
     for (int y = 0; y < accum_.height(); ++y)
     {
@@ -46,77 +79,93 @@ void TemporalSmoother::update(ImageSpan src)
             const Rgb_uc  s = src.atPixelRgb(x, y);
             const Rgb_f&  a = accum_.at(x, y);
 
-            Rgb_f out;
-            out.red   = alpha_ * static_cast<float>(s.red)   + beta * a.red;
-            out.green = alpha_ * static_cast<float>(s.green) + beta * a.green;
-            out.blue  = alpha_ * static_cast<float>(s.blue)  + beta * a.blue;
-
-            accum_.at(x, y) = out;
-
-            motion +=   std::abs( static_cast<float>(s.red)   - a.red )
-                      + std::abs( static_cast<float>(s.green) - a.green )
-                      + std::abs( static_cast<float>(s.blue)  - a.blue );
+            motion += std::abs(float(s.red)   - a.red)
+                      + std::abs(float(s.green) - a.green)
+                      + std::abs(float(s.blue)  - a.blue);
         }
     }
 
-    motion /= ( 3.f * accum_.size() );
+    motion /= (3.f * accum_.size());
 
-    // adaptative smoothing
-    // update alpha_ in function of the motion and noise
+    // --------------------------------------------------------
+    // 3) Noise estimation (time-based)
+    // --------------------------------------------------------
+    updateNoiseEstimate(motion, dt_seconds);
 
-    updateNoiseEstimate( motion );
-    float motion_eff = motion - noise_estimate_;
-    motion_eff = std::max(0.f, motion_eff);
-    const float motion_nl = motion_eff * motion_eff;
+    // --------------------------------------------------------
+    // 4) Motion normalized by noise
+    // --------------------------------------------------------
+    constexpr float epsilon = 1e-6f;
 
-    const float threshold_low  = 2.25f;
-    const float threshold_high = 25.f;
+    float motion_ratio = motion / (noise_estimate_ + epsilon);
 
-    if ( high_motion_ )
+    // ratio <= 1 → noise only
+    float ratio_eff = std::max(0.f, motion_ratio - 1.f);
+
+    // --------------------------------------------------------
+    // 5) Linear mapping to tau
+    // --------------------------------------------------------
+    const float tau_min = 0.1f;  // very reactive
+    const float tau_max = 1.0f;  // stable
+
+    const float ratio_threshold = 1.4f;
+    // try between 1.4 and 1.8 for tuning
+
+    float t = std::clamp(ratio_eff / ratio_threshold,
+                         0.f, 1.f);
+
+    float tau = tau_max - t * (tau_max - tau_min);
+
+    // --------------------------------------------------------
+    // 6) Convert tau -> alpha (continuous-time correct)
+    // --------------------------------------------------------
+    float alpha = 1.f - std::exp(-dt_seconds / tau);
+
+    // --------------------------------------------------------
+    // 7) Apply smoothing
+    // --------------------------------------------------------
+    for (int y = 0; y < accum_.height(); ++y)
     {
-        if ( motion_nl < threshold_low )
-            high_motion_ = false;
+        for (int x = 0; x < accum_.width(); ++x)
+        {
+            const Rgb_uc s = src.atPixelRgb(x, y);
+            Rgb_f& a = accum_.at(x, y);
+
+            a.red   += alpha * (float(s.red)   - a.red);
+            a.green += alpha * (float(s.green) - a.green);
+            a.blue  += alpha * (float(s.blue)  - a.blue);
+        }
     }
-    else
-    {
-        if ( motion_nl > threshold_high )
-            high_motion_ = true;
-    }
-
-    const float effective_threshold = high_motion_ ? threshold_high
-                                                   : threshold_low;
-
-    const float alpha_min = 0.05f;
-    const float alpha_max = 0.75f;
-
-    float t = std::clamp(motion_nl / effective_threshold, 0.f, 1.f);
-    t = std::sqrt(t);
-
-    const float alpha_new = alpha_min + t * (alpha_max - alpha_min);
-
-    alpha_ = 0.9f * alpha_ + 0.1f * alpha_new;
 }
 
-// called once per frame
-void TemporalSmoother::updateNoiseEstimate(float motion)
+// ------------------------------------------------------------
+// Noise estimation (FPS independent)
+// ------------------------------------------------------------
+void TemporalSmoother::updateNoiseEstimate(float motion,
+                                           float dt_seconds)
 {
-    constexpr float noise_alpha = 0.02f;
+    const float tau_noise = 3.0f; // converge in ~3 seconds
 
-    if ( !noise_initialized_ )
+    float alpha_noise = 1.f - std::exp(-dt_seconds / tau_noise);
+
+    if (!noise_initialized_)
     {
         noise_estimate_ = motion;
         noise_initialized_ = true;
         return;
     }
 
-    if ( motion < noise_estimate_ )
+    // Only track low-motion regions as noise
+    if (motion < noise_estimate_)
     {
-        noise_estimate_ =
-            (1.f - noise_alpha) * noise_estimate_
-            + noise_alpha         * motion;
+        noise_estimate_ +=
+            alpha_noise * (motion - noise_estimate_);
     }
 }
 
+// ------------------------------------------------------------
+// OUTPUT
+// ------------------------------------------------------------
 void TemporalSmoother::updateOutput()
 {
     output_.resize(accum_.width(), accum_.height());
@@ -128,9 +177,9 @@ void TemporalSmoother::updateOutput()
             const Rgb_f& a = accum_.at(x, y);
 
             output_.at(x, y) = Rgb_uc {
-                static_cast<unsigned char>( a.red   + 0.5f ),
-                static_cast<unsigned char>( a.green + 0.5f ),
-                static_cast<unsigned char>( a.blue  + 0.5f )
+                static_cast<unsigned char>(a.red   + 0.5f),
+                static_cast<unsigned char>(a.green + 0.5f),
+                static_cast<unsigned char>(a.blue  + 0.5f)
             };
         }
     }
@@ -140,14 +189,16 @@ ImageSpan TemporalSmoother::outputSpan()
 {
     updateOutput();
 
-    static_assert(sizeof(Rgb_uc)  == 3,  "Rgb_uc must be exactly 3 bytes");
-    static_assert(alignof(Rgb_uc) == 1,  "Rgb_uc must be byte-aligned");
+    static_assert(sizeof(Rgb_uc)  == 3);
+    static_assert(alignof(Rgb_uc) == 1);
     static_assert(std::is_standard_layout_v<Rgb_uc>);
 
-    return { reinterpret_cast<const unsigned char*>(output_.data()),
-             output_.width(),
-             output_.height(),
-             ImageFormat::Rgb24 };
+    return {
+        reinterpret_cast<const unsigned char*>(output_.data()),
+        output_.width(),
+        output_.height(),
+        ImageFormat::Rgb24
+    };
 }
 
-}
+} // namespace ofeli_ip

@@ -5,6 +5,10 @@
 #include "grid2d.hpp"
 #include "color.hpp"
 
+#include <chrono>
+
+using clock_type = std::chrono::steady_clock;
+
 namespace ofeli_ip
 {
 
@@ -21,7 +25,8 @@ public:
 
 private:
 
-    void updateNoiseEstimate(float motion);
+    void updateNoiseEstimate(float motion,
+                             float dt_seconds);
     void updateOutput();
 
     Grid2D<Rgb_f> accum_;
@@ -31,6 +36,8 @@ private:
 
     float noise_estimate_;
     bool noise_initialized_ = false;
+    bool time_initialized_ = false;
+    clock_type::time_point last_time_;
 
     bool high_motion_ = false;
 
