@@ -35,7 +35,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
 
     setupUiDownscaleGb();
 
-    filter_cb = new QCheckBox(tr("Temporal filtering"));
+    filter_cb = new QCheckBox(tr("Motion-Adaptive Smoothing"));
 
     auto *preprocess_layout = new QVBoxLayout(this);
     preprocess_layout->addWidget(downscale_gb);

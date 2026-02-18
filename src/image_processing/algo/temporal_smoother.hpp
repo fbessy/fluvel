@@ -38,10 +38,13 @@ private:
     bool noise_initialized_ = false;
     bool time_initialized_ = false;
     clock_type::time_point last_time_;
+    float time_since_init_;
 
     bool high_motion_ = false;
 
     Grid2D<Rgb_uc> output_;
+
+    float motion_ratio_filtered_ = 1.f;
 };
 
 }
