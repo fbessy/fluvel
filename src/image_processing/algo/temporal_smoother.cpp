@@ -144,7 +144,7 @@ void TemporalSmoother::update(ImageSpan src)
 void TemporalSmoother::updateNoiseEstimate(float motion,
                                            float dt_seconds)
 {
-    const float tau_noise = 3.0f; // converge in ~3 seconds
+    const float tau_noise = 1.0f; // converge in ~3 seconds at 95%
 
     float alpha_noise = 1.f - std::exp(-dt_seconds / tau_noise);
 
