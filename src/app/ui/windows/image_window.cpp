@@ -443,7 +443,7 @@ void ImageWindow::setupConnections()
     connect(imageController,
             &ImageController::contourUpdated,
             imageView,
-            &ImageView::displayContour,
+            &ImageView::setContour,
             Qt::QueuedConnection);
 
     QTimer* m_statsTimer = new QTimer(this);

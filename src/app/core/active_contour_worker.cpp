@@ -528,22 +528,8 @@ void ActiveContourWorker::emitContour()
     if ( ac_ == nullptr )
         return;
 
-    const auto& l_out = ac_->l_out();
-    const auto& l_in  = ac_->l_in();
-
-    QVector<QPoint> l_out_pts;
-    QVector<QPoint> l_in_pts;
-
-    l_out_pts.reserve(l_out.size());
-    l_in_pts.reserve(l_in.size());
-
-    for (const auto& p : l_out)
-        l_out_pts.emplace_back( p.x(), p.y() );
-
-    for (const auto& p : l_in)
-        l_in_pts.emplace_back( p.x(), p.y() );
-
-    emit contourUpdated(l_out_pts, l_in_pts);
+    emit contourUpdated(ac_->export_l_out(),
+                        ac_->export_l_in());
 }
 
 AlgoStats ActiveContourWorker::currentStats() const

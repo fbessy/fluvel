@@ -54,8 +54,8 @@ public:
 
 signals:
     void processedImageReady(const QImage& img);
-    void contourUpdated(const QVector<QPoint>& l_out,
-                        const QVector<QPoint>& l_in);
+    void contourUpdated(const ofeli_ip::ExportedContour& l_out,
+                        const ofeli_ip::ExportedContour& l_in);
     void stateChanged(ofeli_app::WorkerState state);
 
 private slots:

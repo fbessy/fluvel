@@ -33,11 +33,6 @@ public:
     explicit ImageView(QWidget* parent = nullptr,
                        Session session = Session::Image);
 
-    // Affichage image (thread-safe via event loop)
-    void setImage(const QImage& img);
-
-    void clearOverlays();
-
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);
 
@@ -68,10 +63,18 @@ public:
     bool isGrayscale() const;
 
 public slots:
+    void setImage(const QImage& img);
+
+    void setContour(const QVector<QPoint>& l_out,
+                    const QVector<QPoint>& l_in);
+
+    void setImageAndContour(const QImage& image,
+                            const QVector<QPoint>& l_out,
+                            const QVector<QPoint>& l_in);
+
     void applyDisplayConfig(const DisplayConfig& display);
     void applyDownscaleConfig(const DownscaleConfig& downscale);
-    void displayContour(const QVector<QPoint>& out,
-                        const QVector<QPoint>& in);
+    void clearOverlays();
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -119,8 +122,8 @@ private:
     QVector<QPoint> contourOut_;
     QVector<QPoint> contourIn_;
 
-    ContourPointsItem* contourOutItem = nullptr;
-    ContourPointsItem* contourInItem  = nullptr;
+    ContourPointsItem* l_out_ = nullptr;
+    ContourPointsItem* l_in_  = nullptr;
 
     ImageViewInteraction* m_interaction = nullptr;
     ImageViewListener*        listener_ = nullptr;

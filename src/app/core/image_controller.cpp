@@ -133,6 +133,24 @@ void ImageController::refreshView()
     emit displayedImageReady( img );
 }
 
+void ImageController::onContourUpdated(const ofeli_ip::ExportedContour& l_out,
+                                       const ofeli_ip::ExportedContour& l_in)
+{
+    QVector<QPoint> q_l_out;
+    QVector<QPoint> q_l_in;
+
+    q_l_out.reserve(l_out.size());
+    q_l_in.reserve(l_in.size());
+
+    for (const auto& p : l_out)
+        q_l_out.emplace_back( p.x, p.y );
+
+    for (const auto& p : l_in)
+        q_l_in.emplace_back( p.x, p.y );
+
+    emit contourUpdated(q_l_out, q_l_in);
+}
+
 void ImageController::restart()
 {
     acWorker.restart();
@@ -151,12 +169,6 @@ void ImageController::step()
 void ImageController::converge()
 {
     acWorker.converge();
-}
-
-void ImageController::onContourUpdated(const QVector<QPoint>& l_out,
-                                       const QVector<QPoint>& l_in)
-{
-    emit contourUpdated(l_out, l_in);
 }
 
 void ImageController::onStateChanged(ofeli_app::WorkerState state)

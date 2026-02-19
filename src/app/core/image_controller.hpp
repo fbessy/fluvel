@@ -18,8 +18,8 @@ public:
 public slots:
     void loadImage(const QString& path);
     void onProcessedImageReady(const QImage& processed);
-    void onContourUpdated(const QVector<QPoint>& l_out,
-                          const QVector<QPoint>& l_in);
+    void onContourUpdated(const ofeli_ip::ExportedContour& l_out,
+                          const ofeli_ip::ExportedContour& l_in);
     void onStateChanged(ofeli_app::WorkerState state);
 
     void restart();

@@ -26,13 +26,13 @@ ImageView::ImageView(QWidget* parent, Session session)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
 
-    contourOutItem = new ContourPointsItem;
-    contourOutItem->setZValue(100);
-    scene->addItem(contourOutItem);
+    l_out_ = new ContourPointsItem;
+    l_out_->setZValue(100);
+    scene->addItem(l_out_);
 
-    contourInItem = new ContourPointsItem;
-    contourInItem->setZValue(100);
-    scene->addItem(contourInItem);
+    l_in_ = new ContourPointsItem;
+    l_in_->setZValue(100);
+    scene->addItem(l_in_);
 
     displayTimer.start();
 
@@ -82,33 +82,35 @@ void ImageView::setImage(const QImage& img)
     else
     {
         if (!throttleTimer->isActive())
-        {
             throttleTimer->start(minDisplayIntervalMs - elapsed);
-        }
     }
 }
 
-void ImageView::displayContour(const QVector<QPoint>& out,
-                               const QVector<QPoint>& in)
+void ImageView::setContour(const QVector<QPoint>& l_out,
+                           const QVector<QPoint>& l_in)
 {
-    if (!contourOutItem || !contourInItem)
+    if ( !l_out_ || !l_in_ )
         return;
 
-    contourOutItem->setPoints(out);
-    contourInItem->setPoints(in);
+    l_out_->setPoints(l_out);
+    l_in_->setPoints(l_in);
+}
+
+void ImageView::setImageAndContour(const QImage& image,
+                                   const QVector<QPoint>& l_out,
+                                   const QVector<QPoint>& l_in)
+{
+    setImage(image);
+    setContour(l_out, l_in);
 }
 
 void ImageView::clearOverlays()
 {
-    if ( contourOutItem )
-    {
-        contourOutItem->clearPoints();
-    }
+    if ( l_out_ )
+        l_out_->clearPoints();
 
-    if ( contourInItem )
-    {
-        contourInItem->clearPoints();
-    }
+    if ( l_in_ )
+        l_in_->clearPoints();
 }
 
 // ------------------------------------------------------------
@@ -145,9 +147,7 @@ void ImageView::updatePixmap(const QImage& img)
     scene->setSceneRect(pixmapItem->boundingRect());
 
     if (newImage)
-    {
         applyAutoFit();
-    }
 }
 
 double ImageView::currentZoom() const
@@ -440,8 +440,8 @@ void ImageView::applyDownscaleToItems()
     if ( has_ds && displayConfig_.input_displayed )
         factor = qreal( df );
 
-    contourOutItem->setScale( factor );
-    contourInItem->setScale( factor );
+    l_out_->setScale( factor );
+    l_in_->setScale( factor );
 }
 
 void ImageView::applyDisplayConfig(const DisplayConfig& display)
@@ -463,8 +463,8 @@ void ImageView::applyDisplayConfig(const DisplayConfig& display)
 
     applyDownscaleToItems();
 
-    contourOutItem->setColor( col_lout );
-    contourInItem->setColor( col_lin );
+    l_out_->setColor( col_lout );
+    l_in_->setColor( col_lin );
 }
 
 void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
