@@ -101,8 +101,8 @@ public:
 signals:
     void imgSettingsChanged(const ImageSessionSettings& conf);
     void imgDisplaySettingsChanged(const DisplayConfig& conf);
-    void camSettingsChanged(const VideoSessionSettings& conf);
-    void camDisplaySettingsChanged(const DisplayConfig& conf);
+    void videoSettingsChanged(const VideoSessionSettings& conf);
+    void videoDisplaySettingsChanged(const DisplayConfig& conf);
     void resizedPhi(const QImage& phi);
 };
 

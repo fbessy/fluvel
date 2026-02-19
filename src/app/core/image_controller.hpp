@@ -50,7 +50,6 @@ private:
     DisplayConfig displayConfig_;
 
     ActiveContourWorker acWorker;
-    ImageSessionSettings config_;
 };
 
 }

@@ -10,12 +10,12 @@ class FrameStatsView
 {
 public:
     struct Snapshot {
-        float inputFps = 0.f;
-        float processingFps = 0.f;
-        float displayFps = 0.f;
-        float dropRate = 0.f;
-        float avgLatencyMs = 0.f;
-        float maxLatencyMs = 0.f;
+        double inputFps      = 0.0;
+        double processingFps = 0.0;
+        double displayFps    = 0.0;
+        double dropRate      = 0.0;
+        double avgLatencyMs  = 0.0;
+        double maxLatencyMs  = 0.0;
     };
 
     FrameStatsView();
@@ -23,7 +23,8 @@ public:
     // événements
     void frameReceived(qint64 recvTsNs);
     void frameProcessed();
-    void frameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
+    void frameDisplayed(qint64 recvTsNs,
+                        qint64 displayTsNs);
 
     // lecture stable (fenêtre ~1s)
     Snapshot snapshot();

@@ -1,6 +1,7 @@
 #include "frame_stats_view.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 static constexpr qint64 WINDOW_NS = 1'000'000'000LL; // 1 seconde
 
@@ -42,15 +43,15 @@ void FrameStatsView::frameProcessed()
     ++processedFrames;
 }
 
-void FrameStatsView::frameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
+void FrameStatsView::frameDisplayed(qint64 recvTsNs,
+                                    qint64 displayTsNs)
 {
     QMutexLocker lock(&mutex);
 
     ++displayedFrames;
 
     // latence affichage - réception
-    double latencyMs =
-        double(displayTsNs - recvTsNs) * 1e-6;
+    double latencyMs = double(displayTsNs - recvTsNs) * 1e-6;
 
     latencySumMs += latencyMs;
     latencyMaxMs = std::max(latencyMaxMs, latencyMs);
@@ -74,9 +75,9 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
 
     Snapshot snap;
 
-    snap.inputFps      = inputFrames / seconds;
-    snap.processingFps = processedFrames / seconds;
-    snap.displayFps    = displayedFrames / seconds;
+    snap.inputFps      = double(inputFrames)     / seconds;
+    snap.processingFps = double(processedFrames) / seconds;
+    snap.displayFps    = double(displayedFrames) / seconds;
 
     droppedFrames =
         (inputFrames > displayedFrames)
@@ -90,7 +91,7 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
 
     snap.avgLatencyMs =
         displayedFrames > 0
-            ? latencySumMs / displayedFrames
+        ? latencySumMs / double(displayedFrames)
             : 0.0;
 
     snap.maxLatencyMs = latencyMaxMs;

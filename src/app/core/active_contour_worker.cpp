@@ -41,7 +41,7 @@ void ActiveContourWorker::restart()
 
     setMode( RunMode::Interactive );
 
-    const auto& fc = config_.compute.processing;
+    const auto& fc = config_.processing;
 
     // if there is at least one random operation,
     // preprocessing is done at each restart
@@ -206,13 +206,13 @@ void ActiveContourWorker::applyDownscale()
     if ( inputImage_.isNull() )
         return;
 
-    if ( config_.compute.initialPhi.isNull() )
+    if ( config_.initialPhi.isNull() )
         return;
 
-    const bool hasDownscale = config_.compute.downscale.hasDownscale;
-    const int downscale_fctr = config_.compute.downscale.downscaleFactor;
+    const bool hasDownscale = config_.downscale.hasDownscale;
+    const int downscale_fctr = config_.downscale.downscaleFactor;
 
-    scaledPhi_ = config_.compute.initialPhi;
+    scaledPhi_ = config_.initialPhi;
 
 #ifdef OFELI_DEBUG
     int bpp = inputImage_.depth() / 8;  // ou 4 pour ARGB32
@@ -276,7 +276,7 @@ void ActiveContourWorker::applyProcessing()
 
     //start_time = std::clock();
 
-    const auto& fc = config_.compute.processing;
+    const auto& fc = config_.processing;
 
     if( fc.hasProcessing() )
     {
@@ -395,7 +395,7 @@ void ActiveContourWorker::applyProcessing()
 }
 
 void ActiveContourWorker::initializeFromInput(const QImage& input,
-                                              const ImageSessionSettings& config)
+                                              const ImageComputeConfig& config)
 {
     timer_->stop();
     setState( WorkerState::Initializing );
@@ -429,7 +429,7 @@ void ActiveContourWorker::initializeActiveContour()
     ofeli_ip::ContourData initialCD(scaledPhi_.constBits(),
                                     scaledPhi_.width(),
                                     scaledPhi_.height(),
-                                    config_.compute.algo.connectivity);
+                                    config_.algo.connectivity);
 
     bool is_rgb = ( processedImage_.format() != QImage::Format_Grayscale8 );
 
@@ -440,15 +440,15 @@ void ActiveContourWorker::initializeActiveContour()
     {
         ac_ = std::make_unique<ofeli_ip::RegionColorAc>(processedImg,
                                                         std::move(initialCD),
-                                                        config_.compute.algo.acConfig,
-                                                        config_.compute.algo.regionAcConfig);
+                                                        config_.algo.acConfig,
+                                                        config_.algo.regionAcConfig);
     }
     else
     {
         ac_ = std::make_unique<ofeli_ip::RegionAc>(processedImg,
                                                    std::move(initialCD),
-                                                   config_.compute.algo.acConfig,
-                                                   config_.compute.algo.regionAcConfig);
+                                                   config_.algo.acConfig,
+                                                   config_.algo.regionAcConfig);
     }
 
     setState( WorkerState::Ready );
@@ -554,7 +554,7 @@ void ActiveContourWorker::setState(WorkerState state)
     emit stateChanged(state);
 }
 
-void ActiveContourWorker::setAlgoConfig(const ImageSessionSettings& config)
+void ActiveContourWorker::setAlgoConfig(const ImageComputeConfig& config)
 {
     config_ = config;
 

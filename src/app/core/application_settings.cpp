@@ -190,7 +190,7 @@ void ApplicationSettings::save_cam_session_config()
     save_disp("cam",
               camConfig.display);
 
-    emit camSettingsChanged(camConfig);
+    emit videoSettingsChanged(camConfig);
 }
 
 void ApplicationSettings::save_algo(const QString& scope,
@@ -253,7 +253,7 @@ void ApplicationSettings::set_img_display_config(const DisplayConfig& disp_confi
 void ApplicationSettings::set_cam_display_config(const DisplayConfig& disp_config)
 {
     camConfig.display = disp_config;
-    emit camDisplaySettingsChanged(camConfig.display);
+    emit videoDisplaySettingsChanged(camConfig.display);
 }
 
 void ApplicationSettings::save_disp(const QString& scope,

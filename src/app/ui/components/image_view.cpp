@@ -3,6 +3,7 @@
 #include "application_settings.hpp"
 #include "common_settings.hpp"
 #include "color_adapters.hpp"
+#include "frame_clock.hpp"
 
 #include <QPainter>
 #include <QWheelEvent>
@@ -13,12 +14,8 @@ namespace ofeli_app
 {
 
 ImageView::ImageView(QWidget* parent, Session session)
-    : QGraphicsView(parent),
-    scene(new QGraphicsScene(this)),
-    session_(session)
+    : QGraphicsView(parent)
 {
-    setScene(scene);
-
     setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
 
@@ -26,13 +23,21 @@ ImageView::ImageView(QWidget* parent, Session session)
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
 
-    l_out_ = new ContourPointsItem;
-    l_out_->setZValue(100);
-    scene->addItem(l_out_);
+    scene = new QGraphicsScene(this);
+    setScene(scene);
 
-    l_in_ = new ContourPointsItem;
+    contentRoot_ = new QGraphicsItemGroup;
+    scene->addItem(contentRoot_);
+
+    pixmapItem = new QGraphicsPixmapItem(contentRoot_);
+    pixmapItem->setZValue(0);
+    pixmapItem->setTransformationMode(Qt::FastTransformation);
+
+    l_out_ = new ContourPointsItem(contentRoot_);
+    l_out_->setZValue(100);
+
+    l_in_ = new ContourPointsItem(contentRoot_);
     l_in_->setZValue(100);
-    scene->addItem(l_in_);
 
     displayTimer.start();
 
@@ -68,6 +73,12 @@ void ImageView::setImage(const QImage& img)
         updatePixmap(pendingFrame);
         hasPendingFrame = false;
         displayTimer.restart();
+
+        qint64 displayTs = FrameClock::nowNs();
+
+        emit frameDisplayed(lastReceiveTs_,
+                            displayTs);
+
         return;
     }
 
@@ -78,6 +89,11 @@ void ImageView::setImage(const QImage& img)
         updatePixmap(pendingFrame);
         hasPendingFrame = false;
         displayTimer.restart();
+
+        qint64 displayTs = FrameClock::nowNs();
+
+        emit frameDisplayed(lastReceiveTs_,
+                            displayTs);
     }
     else
     {
@@ -98,10 +114,15 @@ void ImageView::setContour(const QVector<QPoint>& l_out,
 
 void ImageView::setImageAndContour(const QImage& image,
                                    const QVector<QPoint>& l_out,
-                                   const QVector<QPoint>& l_in)
+                                   const QVector<QPoint>& l_in,
+                                   qint64 receiveTs)
 {
     setImage(image);
     setContour(l_out, l_in);
+
+    lastReceiveTs_ = receiveTs;
+
+    update();
 }
 
 void ImageView::clearOverlays()
@@ -124,30 +145,32 @@ void ImageView::flushPendingFrame()
     updatePixmap(pendingFrame);
     hasPendingFrame = false;
     displayTimer.restart();
+
+    qint64 displayTs = FrameClock::nowNs();
+
+    emit frameDisplayed(lastReceiveTs_,
+                        displayTs);
 }
 
 void ImageView::updatePixmap(const QImage& img)
 {
-    const bool newImage = !pixmapItem ||
-                          pixmapItem->pixmap().size() != img.size();
+    if ( img.isNull() || !pixmapItem )
+        return;
 
+    bool sizeChanged =
+        ( lastDisplayedImage.size() != img.size() );
+
+
+    pixmapItem->setPixmap(QPixmap::fromImage(img));
     lastDisplayedImage = img;
 
-    if (!pixmapItem)
-    {
-        pixmapItem = scene->addPixmap(QPixmap::fromImage(img));
-    }
-    else
-    {
-        pixmapItem->setTransformationMode(Qt::FastTransformation);
-        pixmapItem->setZValue(0);
-        pixmapItem->setPixmap(QPixmap::fromImage(img));
-    }
+    scene->setSceneRect(0, 0, img.width(), img.height());
 
-    scene->setSceneRect(pixmapItem->boundingRect());
-
-    if (newImage)
+    if (sizeChanged)
+    {
+        updateDisplayWithConfig();
         applyAutoFit();
+    }
 }
 
 double ImageView::currentZoom() const
@@ -404,7 +427,7 @@ QImage ImageView::renderToImage() const
 
 bool ImageView::hasImage() const
 {
-    return pixmapItem != nullptr;
+    return pixmapItem != nullptr && !lastDisplayedImage.isNull();
 }
 
 bool ImageView::isPanRelevant() const
@@ -430,7 +453,7 @@ bool ImageView::isGrayscale() const
            lastDisplayedImage.format() == QImage::Format_Grayscale16;
 }
 
-void ImageView::applyDownscaleToItems()
+void ImageView::upscaleItems()
 {
     const bool has_ds = downscaleConfig_.hasDownscale;
     const int      df = downscaleConfig_.downscaleFactor;
@@ -448,6 +471,11 @@ void ImageView::applyDisplayConfig(const DisplayConfig& display)
 {
     displayConfig_ = display;
 
+    updateDisplayWithConfig();
+}
+
+void ImageView::updateDisplayWithConfig()
+{
     QColor col_lout, col_lin;
 
     if ( displayConfig_.l_out_displayed )
@@ -460,11 +488,34 @@ void ImageView::applyDisplayConfig(const DisplayConfig& display)
     else
         col_lin = Qt::transparent;
 
-
-    applyDownscaleToItems();
+    upscaleItems();
 
     l_out_->setColor( col_lout );
     l_in_->setColor( col_lin );
+
+    updateFlip();
+}
+
+void ImageView::updateFlip()
+{
+    if (!pixmapItem)
+        return;
+
+    contentRoot_->setTransformOriginPoint(0, 0);
+
+    if (displayConfig_.flip_horizontal)
+    {
+        QTransform t;
+        t.scale(-1, 1);
+        contentRoot_->setTransform(t);
+
+        contentRoot_->setPos(pixmapItem->pixmap().width(), 0);
+    }
+    else
+    {
+        contentRoot_->setTransform(QTransform());
+        contentRoot_->setPos(0, 0);
+    }
 }
 
 void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
@@ -472,7 +523,7 @@ void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
     downscaleConfig_ = downscale;
 
     clearOverlays();
-    applyDownscaleToItems();
+    upscaleItems();
 }
 
 } // namespace ofeli_app

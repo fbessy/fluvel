@@ -38,7 +38,7 @@ public:
     ActiveContourWorker();
 
     void initializeFromInput(const QImage& input,
-                             const ImageSessionSettings& config);
+                             const ImageComputeConfig& config);
 
     void restart();        // reset + start
     void togglePause();    // suspend / resume
@@ -50,7 +50,7 @@ public:
 
     AlgoStats currentStats() const;
 
-    void setAlgoConfig(const ImageSessionSettings& config);
+    void setAlgoConfig(const ImageComputeConfig& config);
 
 signals:
     void processedImageReady(const QImage& img);
@@ -97,7 +97,7 @@ private:
     qint64 timeSlice_ms_;
     bool initialShown_;
 
-    ImageSessionSettings config_;
+    ImageComputeConfig config_;
 };
 
 }

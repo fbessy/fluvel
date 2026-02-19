@@ -10,7 +10,7 @@ namespace ofeli_app {
 class ContourPointsItem : public QGraphicsItem
 {
 public:
-    ContourPointsItem();
+    explicit ContourPointsItem(QGraphicsItem* parent = nullptr);
 
     void setPoints(const QVector<QPoint>& pts);
     void clearPoints();

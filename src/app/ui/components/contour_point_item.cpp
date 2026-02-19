@@ -6,7 +6,8 @@
 namespace ofeli_app
 {
 
-ContourPointsItem::ContourPointsItem()
+ContourPointsItem::ContourPointsItem(QGraphicsItem* parent)
+    :  QGraphicsItem(parent)
 {
     setTransformOriginPoint(0, 0);
 

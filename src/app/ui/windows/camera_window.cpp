@@ -238,13 +238,26 @@ CameraWindow::CameraWindow(QWidget* parent)
             cameraOverlay,
             &CameraOverlayWidget::setStats);
 
-    connect(controller,
-            &CameraController::imageReady,
-            this,
-            [this](const QImage& img)
-            {
-                videoView->setImage(img);
+    videoView->applyDownscaleConfig( AppSettings::instance().camConfig.compute.downscale );
+    videoView->applyDisplayConfig( AppSettings::instance().camConfig.display );
+
+    connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged,
+            this, [this](const VideoSessionSettings& conf) {
+                videoView->applyDownscaleConfig( conf.compute.downscale );
             });
+
+    connect(&AppSettings::instance(),
+            &ApplicationSettings::videoDisplaySettingsChanged,
+            videoView,
+            &ImageView::applyDisplayConfig);
+
+    connect(controller,
+            &CameraController::imageAndContourUpdated,
+            videoView,
+            &ImageView::setImageAndContour);
+
+    connect(videoView,  &ImageView::frameDisplayed,
+            controller, &CameraController::onFrameDisplayed);
 }
 
 void CameraWindow::onFrameSizeStr(QString str)

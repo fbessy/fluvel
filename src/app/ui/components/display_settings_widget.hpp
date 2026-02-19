@@ -23,7 +23,7 @@ public:
 
 private slots:
     void onImgSettingsChanged();
-    void onCamSettingsChanged();
+    void onVideoSettingsChanged();
 
 private:
 

@@ -9,7 +9,18 @@
 #include "temporal_smoother.hpp"
 #include "common_settings.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
+
+struct FrameResult
+{
+    QImage input;
+    QImage preprocessed;
+    ofeli_ip::ExportedContour l_out;
+    ofeli_ip::ExportedContour l_in;
+    qint64 receiveTs;
+    qint64 processTs;
+};
 
 struct FrameData {
     QVideoFrame frame;
@@ -25,12 +36,14 @@ public:
     void submitFrame(const QVideoFrame& frame);
     void stop();
 
-    void setAlgoConfig(const VideoSessionSettings& config);
-    void applyDisplayConfig(const DisplayConfig& dc);
+    void setAlgoConfig(const VideoComputeConfig& config);
 
 signals:
-    void frameProcessed(qint64 receiveTs, qint64 processTs);
-    void frameResultReady(const QImage& img, qint64 receiveTs);
+    void frameProcessed(qint64 receiveTs,
+                        qint64 processTs);
+
+    void frameResultReady(FrameResult result);
+
     void frameSizeStr(QString str);
 
 protected:
@@ -38,10 +51,9 @@ protected:
 
 private:
 
-    VideoSessionSettings config_;
-    DisplayConfig displayConfig_;
+    VideoComputeConfig config_;
 
-    QImage processFrame(QVideoFrame& frame, qint64& processTs);
+    FrameResult processFrame(QVideoFrame& frame);
 
     QMutex frameMutex;
     QWaitCondition condition;

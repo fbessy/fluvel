@@ -9,12 +9,18 @@ CameraController::CameraController(QObject* parent)
     : QObject(parent),
       ac_thread_(this)
 {
-    // Thread → controller
-    connect(&ac_thread_,
-            &VideoActiveContourThread::frameProcessed,
+    onVideoSettingsChanged( AppSettings::instance().camConfig );
+    onVideoDisplaySettingsChanged( AppSettings::instance().camConfig.display );
+
+    connect(&AppSettings::instance(),
+            &ApplicationSettings::videoSettingsChanged,
             this,
-            &CameraController::onFrameProcessed,
-            Qt::QueuedConnection);
+            &CameraController::onVideoSettingsChanged);
+
+    connect(&AppSettings::instance(),
+            &ApplicationSettings::videoDisplaySettingsChanged,
+            this,
+            &CameraController::onVideoDisplaySettingsChanged);
 
     connect(&ac_thread_,
             &VideoActiveContourThread::frameResultReady,
@@ -27,18 +33,7 @@ CameraController::CameraController(QObject* parent)
             this,
             &CameraController::frameSizeStr);
 
-    onCamSettingsChanged( AppSettings::instance().camConfig );
-    onCamDisplaySettingsChanged( AppSettings::instance().camConfig.display );
 
-    connect(&AppSettings::instance(),
-            &ApplicationSettings::camSettingsChanged,
-            this,
-            &CameraController::onCamSettingsChanged);
-
-    connect(&AppSettings::instance(),
-            &ApplicationSettings::camDisplaySettingsChanged,
-            this,
-            &CameraController::onCamDisplaySettingsChanged);
 
     ac_thread_.start();
 
@@ -50,6 +45,12 @@ CameraController::CameraController(QObject* parent)
             &QTimer::timeout,
             this,
             &CameraController::updateStats);
+
+    // Thread → controller
+    connect(&ac_thread_,
+            &VideoActiveContourThread::frameProcessed,
+            this,
+            &CameraController::onFrameProcessed);
 }
 
 CameraController::~CameraController()
@@ -131,13 +132,39 @@ void CameraController::onFrameProcessed()
     frameStats_.frameProcessed();
 }
 
-void CameraController::onFrameResultReady(const QImage& img,
-                                          qint64 recvTs)
+void CameraController::onFrameDisplayed(qint64 recvTsNs,
+                                        qint64 displayTsNs)
 {
-    emit imageReady(img);
+    frameStats_.frameDisplayed(recvTsNs, displayTsNs);
+}
 
-    const qint64 displayTs = FrameClock::nowNs();
-    frameStats_.frameDisplayed(recvTs, displayTs);
+void CameraController::onFrameResultReady(FrameResult result)
+{
+    QVector<QPoint> q_l_out;
+    QVector<QPoint> q_l_in;
+
+    q_l_out.reserve(result.l_out.size());
+    q_l_in.reserve(result.l_in.size());
+
+    for (const auto& p : result.l_out)
+        q_l_out.emplace_back( p.x, p.y );
+
+    for (const auto& p : result.l_in)
+        q_l_in.emplace_back( p.x, p.y );
+
+
+    QImage img;
+
+    if ( displayConfig_.input_displayed )
+        img = result.input;
+    else
+        img = result.preprocessed;
+
+    if ( !img.isNull() )
+        emit imageAndContourUpdated( img,
+                                     q_l_out,
+                                     q_l_in,
+                                     result.receiveTs );
 }
 
 void CameraController::updateStats()
@@ -156,14 +183,14 @@ void CameraController::updateStats()
     emit statsUpdated(stats);
 }
 
-void CameraController::onCamSettingsChanged(const VideoSessionSettings& conf)
+void CameraController::onVideoSettingsChanged(const VideoSessionSettings& conf)
 {
-    ac_thread_.setAlgoConfig( conf );
+    ac_thread_.setAlgoConfig( conf.compute );
 }
 
-void CameraController::onCamDisplaySettingsChanged(const DisplayConfig& disp_config)
+void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& displayConfig)
 {
-    ac_thread_.applyDisplayConfig( disp_config );
+    displayConfig_ = displayConfig;
 }
 
 } // namespace

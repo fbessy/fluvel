@@ -88,7 +88,7 @@ void ImageController::loadImage(const QString& path)
             emit clearOverlaysRequested();
 
             acWorker.initializeFromInput(inputImage_,
-                                         AppSettings::instance().imgConfig);
+                                         AppSettings::instance().imgConfig.compute);
         }
     }
 }
@@ -102,9 +102,7 @@ void ImageController::onProcessedImageReady(const QImage& processed)
 
 void ImageController::onImgSettingsChanged(const ImageSessionSettings& config)
 {
-    config_ = config;
-
-    acWorker.setAlgoConfig( config_ );
+    acWorker.setAlgoConfig( config.compute );
 }
 
 void ImageController::onImgDisplaySettingsChanged(const DisplayConfig& display)

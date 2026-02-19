@@ -70,10 +70,12 @@ public slots:
 
     void setImageAndContour(const QImage& image,
                             const QVector<QPoint>& l_out,
-                            const QVector<QPoint>& l_in);
+                            const QVector<QPoint>& l_in,
+                            qint64 receiveTs);
 
     void applyDisplayConfig(const DisplayConfig& display);
     void applyDownscaleConfig(const DownscaleConfig& downscale);
+    void updateFlip();
     void clearOverlays();
 
 protected:
@@ -91,8 +93,9 @@ private slots:
 
 private:
     void updatePixmap(const QImage& img);
-    void applyDownscaleToItems();
+    void upscaleItems();
     double getCurrentZoom() const;
+    void updateDisplayWithConfig();
 
     QGraphicsScene*        scene = nullptr;
     QGraphicsPixmapItem*  pixmapItem = nullptr;
@@ -131,10 +134,14 @@ private:
     DisplayConfig displayConfig_;
     DownscaleConfig downscaleConfig_;
 
-    Session session_;
+    qint64 lastReceiveTs_;
+
+    QGraphicsItemGroup* contentRoot_;
 
 signals:
     void imageClicked(int x, int y);
+    void frameDisplayed(qint64 receiveTs,
+                        qint64 displayTs);
 };
 
 } // namespace ofeli_app

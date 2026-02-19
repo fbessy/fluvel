@@ -134,8 +134,8 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged,
             this,                     &DisplaySettingsWidget::onImgSettingsChanged);
 
-    connect(&AppSettings::instance(), &ApplicationSettings::camSettingsChanged,
-            this,                     &DisplaySettingsWidget::onCamSettingsChanged);
+    connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged,
+            this,                     &DisplaySettingsWidget::onVideoSettingsChanged);
 }
 
 void DisplaySettingsWidget::setConfig()
@@ -180,7 +180,7 @@ void DisplaySettingsWidget::onImgSettingsChanged()
     refresh_input_displayed_cb_availability();
 }
 
-void DisplaySettingsWidget::onCamSettingsChanged()
+void DisplaySettingsWidget::onVideoSettingsChanged()
 {
     refresh_input_displayed_cb_availability();
 }
