@@ -1,6 +1,7 @@
 #include "camera_controller.hpp"
 #include "frame_clock.hpp"
 #include "application_settings.hpp"
+#include "contour_adapters.hpp"
 
 namespace ofeli_app
 {
@@ -140,18 +141,8 @@ void CameraController::onFrameDisplayed(qint64 recvTsNs,
 
 void CameraController::onFrameResultReady(FrameResult result)
 {
-    QVector<QPoint> q_l_out;
-    QVector<QPoint> q_l_in;
-
-    q_l_out.reserve(result.l_out.size());
-    q_l_in.reserve(result.l_in.size());
-
-    for (const auto& p : result.l_out)
-        q_l_out.emplace_back( p.x, p.y );
-
-    for (const auto& p : result.l_in)
-        q_l_in.emplace_back( p.x, p.y );
-
+    QVector<QPoint> q_l_out = convertToQVector( result.l_out );
+    QVector<QPoint> q_l_in  = convertToQVector( result.l_in );
 
     QImage img;
 

@@ -134,6 +134,7 @@ set(app_src
 
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
+    ${INTEROP_DIR}/contour_adapters.hpp
 )
 
 qt_add_executable(${target_name}
