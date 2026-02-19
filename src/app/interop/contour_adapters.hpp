@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QPoint>
 
+[[nodiscard]]
 inline QVector<QPoint> convertToQVector(const ofeli_ip::ExportedContour& contour)
 {
     QVector<QPoint> q_contour;
