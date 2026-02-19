@@ -297,6 +297,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
             -Wall
             -Wextra
             -Wpedantic
+            -Wconversion
+            -Wsign-conversion
+            -Wshadow
+            -Wold-style-cast
+            -Wfloat-equal
+            -Wnull-dereference
         >
         $<$<CONFIG:Release>:
             -O3

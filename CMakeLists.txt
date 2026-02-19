@@ -2,19 +2,20 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Ofeli VERSION 2.0.0 LANGUAGES CXX)
 
-option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+option(ENABLE_ASAN "Enable Sanitizers" OFF)
 
 if(ENABLE_ASAN)
-    message(STATUS "AddressSanitizer ENABLED")
+    message(STATUS "Sanitizers ENABLED")
 
     add_compile_options(
-        -fsanitize=address
+        -fsanitize=address,undefined
         -fno-omit-frame-pointer
+        -fno-sanitize-recover=undefined
         -g
     )
 
     add_link_options(
-        -fsanitize=address
+        -fsanitize=address,undefined
     )
 endif()
 
