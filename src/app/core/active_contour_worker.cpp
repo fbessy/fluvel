@@ -270,9 +270,19 @@ void ActiveContourWorker::applyProcessing()
     if ( img.isNull() )
         return;
 
+    const qsizetype stride = img.bytesPerLine();
+    const int width = img.width();
+
+    const int bytesPerPixel =
+        static_cast<int>(stride / width);
+
+    if (img.bytesPerLine() != img.width() * 3)
+        return;
+
     ofeli_ip::Filters filters(img.constBits(),
-                              img.width(), img.height(),
-                              img.bytesPerLine()/img.width());
+                              width,
+                              img.height(),
+                              bytesPerPixel);
 
     //start_time = std::clock();
 

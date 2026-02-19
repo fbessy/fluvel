@@ -525,9 +525,10 @@ void ImageWindow::updateRecentFileActions()
     QSettings settings;
     QStringList files = settings.value("Main/Name/recentFileList").toStringList();
 
-    int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
+    qsizetype numRecentFiles = qMin(files.size(),
+                                    MaxRecentFiles);
 
-    for( int i = 0; i < numRecentFiles; ++i )
+    for( qsizetype i = 0; i < numRecentFiles; ++i )
     {
         QString text = tr("&%1").arg( strippedName(files[i]) );
         recentFileActs[i]->setText(text);
@@ -536,7 +537,7 @@ void ImageWindow::updateRecentFileActions()
         recentFileActs[i]->setStatusTip(files[i]);
     }
 
-    for( int j = numRecentFiles; j < MaxRecentFiles; ++j )
+    for( qsizetype j = numRecentFiles; j < MaxRecentFiles; ++j )
     {
         recentFileActs[j]->setVisible(false);
     }

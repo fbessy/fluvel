@@ -158,16 +158,18 @@ inline void BoundaryBuilder::add_point_unique(Contour& out,
 {
     const ContourPoint p{ x, y };
 
-    constexpr int WINDOW = 4;
-    const int n = static_cast<int>( out.size() );
+    constexpr size_t WINDOW = 4;
+    const size_t n = out.size();
 
-    for (int i = std::max(0, n - WINDOW); i < n; ++i)
+    const size_t begin = (n > WINDOW) ? (n - WINDOW) : 0;
+
+    for (size_t i = begin; i < n; ++i)
     {
-        if ( out[i] == p )
+        if (out[i] == p)
             return;
     }
 
-    out.push_back( p );
+    out.push_back(p);
 }
 
 }

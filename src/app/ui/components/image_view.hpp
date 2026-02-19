@@ -30,8 +30,7 @@ class ImageView : public QGraphicsView
 
 public:
 
-    explicit ImageView(QWidget* parent = nullptr,
-                       Session session = Session::Image);
+    explicit ImageView(QWidget* parent = nullptr);
 
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);

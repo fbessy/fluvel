@@ -61,7 +61,11 @@ void ContourPointsItem::paint(QPainter* painter,
 
     painter->setPen(color_);
     painter->setBrush(Qt::NoBrush);
-    painter->drawPoints(points_.data(), points_.size());
+
+    painter->drawPoints(
+        points_.data(),
+        static_cast<int>(points_.size())
+        );
 }
 
 }

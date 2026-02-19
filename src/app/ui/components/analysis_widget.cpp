@@ -42,6 +42,7 @@
 #include "interaction_set.hpp"
 #include "color_picker_behavior.hpp"
 #include "pan_behavior.hpp"
+#include "color_adapters.hpp"
 
 #include "image_view.hpp"
 #include <QtWidgets>
@@ -91,8 +92,8 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
 
     ///////////////////////////////////////
 
-    QPushButton* open_button = new QPushButton( tr("Open image") + " " +
-                                                QString::number(id_this) );
+    open_button = new QPushButton( tr("Open image") + " " +
+                                   QString::number(id_this) );
 
     QVBoxLayout* img_layout = new QVBoxLayout;
     img_layout->addWidget(name_label);
@@ -125,16 +126,14 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
     pm.fill(Qt::white);
     color_list->addItem( pm, tr("White") );
 
-    selected.red = (unsigned char)( settings.value("Analysis/R"
-                                                   +QString::number(id_this), 128).toInt() );
-    selected.green = (unsigned char)( settings.value("Analysis/G"
-                                                     +QString::number(id_this), 0).toInt() );
-    selected.blue = (unsigned char)( settings.value("Analysis/B"
-                                                    +QString::number(id_this), 255).toInt() );
+    selected.red = static_cast<unsigned char>( settings.value("Analysis/R"
+                                               + QString::number(id_this), 128).toInt() );
+    selected.green = static_cast<unsigned char>( settings.value("Analysis/G"
+                                                 + QString::number(id_this), 0).toInt() );
+    selected.blue = static_cast<unsigned char>( settings.value("Analysis/B"
+                                                + QString::number(id_this), 255).toInt() );
 
-    pm.fill( QColor(selected.red,
-                    selected.green,
-                    selected.blue) );
+    pm.fill( toQColor(selected) );
     color_list->addItem( pm, tr("Selected") );
 
     color_list->setCurrentIndex( settings.value("Analysis/combo"
@@ -267,9 +266,7 @@ void AnalysisWidget::create_list()
         {
             pix = img_noise.pixel(x,y);
 
-            if(    (unsigned char)(qRed(pix))   == rgb.red
-                && (unsigned char)(qGreen(pix)) == rgb.green
-                && (unsigned char)(qBlue(pix)   == rgb.blue) )
+            if( toRgb_uc(pix) == rgb )
             {
                 shape.push_back( x, y );
             }
@@ -347,14 +344,10 @@ void AnalysisWidget::onColorPicked(const QColor& color,
     if ( img.isNull() )
         return;
 
-    const QRgb pix = color.rgb();
-
-    selected.red   = qRed(pix);
-    selected.green = qGreen(pix);
-    selected.blue  = qBlue(pix);
+    selected = toRgb_uc( color );
 
     QPixmap pm(12,12);
-    pm.fill(QColor(selected.red, selected.green, selected.blue));
+    pm.fill( toQColor(selected) );
     color_list->setItemIcon(ComboBoxColorIndex::SELECTED, pm);
     color_list->setCurrentIndex(ComboBoxColorIndex::SELECTED);
 
@@ -380,9 +373,7 @@ void AnalysisWidget::get_list_color()
 
     if( color.isValid() )
     {
-        selected.red   = (unsigned char)(color.red());
-        selected.green = (unsigned char)(color.green());
-        selected.blue  = (unsigned char)(color.blue());
+        selected = toRgb_uc( color );
 
         QPixmap pm(12,12);
         pm.fill(color);

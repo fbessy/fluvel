@@ -728,22 +728,28 @@ ShapeInfo SettingsWindow::computeShapeInfo()
     const int canvasHeight = phiEditor_->phi().height();
 
     // Récupération des valeurs des sliders (en pourcentage)
-    float centerXPercent = abscissa_spin->value() / 100.0f; // De -500 à +500, donc normalisé autour de 0
-    float centerYPercent = ordinate_spin->value() / 100.0f;
+    float centerXPercent = static_cast<float>(abscissa_spin->value()) / 100.0f; // De -500 à +500, donc normalisé autour de 0
+    float centerYPercent = static_cast<float>(ordinate_spin->value()) / 100.0f;
 
     // Calcul de la position du centre en pixels
     float centerX = (centerXPercent + 0.5f) * static_cast<float>(canvasWidth);
     float centerY = (centerYPercent + 0.5f) * static_cast<float>(canvasHeight);
 
     // Récupération des dimensions de la shape en pixels
-    float width = width_shape_spin->value() / 100.0f * static_cast<float>(canvasWidth);
-    float height = height_shape_spin->value() / 100.0f * static_cast<float>(canvasHeight);
+    float width  = static_cast<float>(width_shape_spin->value())
+                  / 100.0f * static_cast<float>(canvasWidth);
+
+    float height = static_cast<float>(height_shape_spin->value())
+                   / 100.0f * static_cast<float>(canvasHeight);
 
     // Calcul de la bounding box à partir du centre et des dimensions
-    float topLeftX = centerX - width / 2.0f;
-    float topLeftY = centerY - height / 2.0f;
+    float topLeftX = centerX - ( width / 2.f );
+    float topLeftY = centerY - ( height / 2.f );
 
-    info.boundingBox = QRect(topLeftX, topLeftY, width, height);
+    info.boundingBox = QRect(static_cast<int>(topLeftX),
+                             static_cast<int>(topLeftY),
+                             static_cast<int>(width),
+                             static_cast<int>(height));
 
     return info;
 }

@@ -420,21 +420,29 @@ void ApplicationSettings::load_downscale(const QString& scope,
 void ApplicationSettings::load_disp(const QString& scope,
                                     DisplayConfig& disp_config)
 {
+    auto clampToByte = [](int v) -> uint8_t
+    {
+        if (v < 0) return 0;
+        if (v > 255) return 255;
+        return static_cast<uint8_t>(v);
+    };
+
+
     QSettings settings;
 
-    disp_config.l_out_displayed = settings.value(scope + "/display/l_out_displayed", true).toBool();
-    disp_config.l_out_color.red = settings.value(scope + "/display/l_out_red", 0u).toUInt();
-    disp_config.l_out_color.green = settings.value(scope + "/display/l_out_green", 0u).toUInt();
-    disp_config.l_out_color.blue = settings.value(scope + "/display/l_out_blue", 255u).toUInt();
+    disp_config.l_out_displayed   = settings.value(scope + "/display/l_out_displayed", true).toBool();
+    disp_config.l_out_color.red   = clampToByte( settings.value(scope + "/display/l_out_red", 0).toInt() );
+    disp_config.l_out_color.green = clampToByte( settings.value(scope + "/display/l_out_green", 0).toInt() );
+    disp_config.l_out_color.blue  = clampToByte( settings.value(scope + "/display/l_out_blue", 255).toInt() );
 
-    disp_config.l_in_displayed = settings.value(scope + "/display/l_in_displayed", true).toBool();
-    disp_config.l_in_color.red = settings.value(scope + "/display/l_in_red", 255u).toUInt();
-    disp_config.l_in_color.green = settings.value(scope + "/display/l_in_green", 0u).toUInt();
-    disp_config.l_in_color.blue = settings.value(scope + "/display/l_in_blue", 0u).toUInt();
+    disp_config.l_in_displayed    = settings.value(scope + "/display/l_in_displayed", true).toBool();
+    disp_config.l_in_color.red    = clampToByte( settings.value(scope + "/display/l_in_red", 255).toInt() );
+    disp_config.l_in_color.green  = clampToByte( settings.value(scope + "/display/l_in_green", 0).toInt() );
+    disp_config.l_in_color.blue   = clampToByte( settings.value(scope + "/display/l_in_blue", 0).toInt() );
 
     disp_config.algorithm_overlay = settings.value(scope + "/display/algorithm_overlay", true).toBool();
     disp_config.input_displayed   = settings.value(scope + "/display/input_displayed", false).toBool();
-    disp_config.mirrorMode   = settings.value(scope + "/display/mirrorMode", false).toBool();
+    disp_config.mirrorMode        = settings.value(scope + "/display/mirrorMode", false).toBool();
 }
 
 QDir ApplicationSettings::settingsDirectory()

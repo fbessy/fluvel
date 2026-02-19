@@ -36,7 +36,7 @@ inline ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img)
 
     const int w = img.width();
     const int h = img.height();
-    const int stride = img.bytesPerLine();
+    const int stride = static_cast<int>(img.bytesPerLine());
     const auto* data =
         reinterpret_cast<const unsigned char*>(img.constBits());
 

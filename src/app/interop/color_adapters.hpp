@@ -21,4 +21,13 @@ inline ofeli_ip::Rgb_uc toRgb_uc(const QColor& c)
     };
 }
 
+inline ofeli_ip::Rgb_uc toRgb_uc(QRgb pixel)
+{
+    return {
+        static_cast<unsigned char>(qRed(pixel)),
+        static_cast<unsigned char>(qGreen(pixel)),
+        static_cast<unsigned char>(qBlue(pixel))
+    };
+}
+
 #endif // COLOR_ADAPTERS_HPP

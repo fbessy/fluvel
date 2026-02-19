@@ -40,6 +40,7 @@
 #include "analysis_window.hpp"
 #include "analysis_widget.hpp"
 #include "hausdorff_distance.hpp"
+#include "color_adapters.hpp"
 
 #include <QtWidgets>
 #include <ctime>       // for std::clock_t, std::clock() and CLOCKS_PER_SEC
@@ -280,11 +281,9 @@ void AnalysisWindow::calculate_shapes_intersection()
         {
             rgb_pix = larger_shape_img.pixel(p.x, p.y);
 
-            if( (unsigned char)(qRed(rgb_pix))   == chosen_rgb.red   &&
-                (unsigned char)(qGreen(rgb_pix)) == chosen_rgb.green &&
-                (unsigned char)(qBlue(rgb_pix)   == chosen_rgb.blue)    )
+            if ( toRgb_uc(rgb_pix) == chosen_rgb )
             {
-                intersection.insert( p );
+                intersection.insert(p);
             }
         }
     }

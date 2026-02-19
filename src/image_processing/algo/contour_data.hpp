@@ -136,7 +136,7 @@ public :
     ContourData(ContourData&& contour) noexcept;
 
     //! Wrapper to use directly with offset lists without the need to get the variable #phi.
-    Point2D_i coord(int offet) const
+    Point2D_i coord(size_t offet) const
     {
         return phi_.coord( offet );
     }

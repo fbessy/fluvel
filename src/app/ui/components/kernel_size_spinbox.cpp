@@ -59,7 +59,7 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
     QString text_without_suffix(text);
     text_without_suffix.chop( suffix().size() );
 
-    int size = text_without_suffix.size();
+    qsizetype size = text_without_suffix.size();
     bool is_successed;
     int value = text_without_suffix.toInt(&is_successed);
 

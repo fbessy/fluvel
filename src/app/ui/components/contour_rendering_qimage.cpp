@@ -54,16 +54,17 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
     assert(img.format() == QImage::Format_RGB32);
 
     uchar* data = img.bits();
-    const int stride = img.bytesPerLine();
+    const qsizetype stride = img.bytesPerLine();
 
     for (const auto& p : list)
     {
-        assert(p.x() >= 0 && p.x() < img.width());
-        assert(p.y() >= 0 && p.y() < img.height());
+        const qsizetype x = p.x();
+        const qsizetype y = p.y();
 
-        uchar* px = data + p.y() * stride + 4 * p.x();
+        const qsizetype offset = y * stride + (x << 2);
 
-        // QImage::Format_RGB32: memory layout is B,G,R,0xFF
+        uchar* px = data + offset;
+
         px[0] = color.blue;
         px[1] = color.green;
         px[2] = color.red;
@@ -86,7 +87,7 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
     const int h = img.height();
 
     uchar* data = img.bits();
-    const int stride = img.bytesPerLine();
+    const qsizetype stride = img.bytesPerLine();
 
     const int kernel_radius = upscale_factor / 2;
 
@@ -103,11 +104,15 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
         {
             for (int dy = -kernel_radius + 1; dy <= kernel_radius; ++dy)
             {
-                uchar* line = data + (base_y + dy) * stride;
+                const qsizetype lineOffset =
+                    static_cast<qsizetype>(base_y + dy) * stride;
+
+                uchar* line = data + lineOffset;
 
                 for (int dx = -kernel_radius + 1; dx <= kernel_radius; ++dx)
                 {
-                    uchar* px = line + 4 * (base_x + dx);
+                    uchar* px =
+                        line + (static_cast<qsizetype>(base_x + dx) << 2);
 
                     px[0] = color.blue;
                     px[1] = color.green;
@@ -125,7 +130,10 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                 if (y < 0 || y >= h)
                     continue;
 
-                uchar* line = data + y * stride;
+                const qsizetype lineOffset =
+                    static_cast<qsizetype>(y) * stride;
+
+                uchar* line = data + lineOffset;
 
                 for (int dx = -kernel_radius + 1; dx <= kernel_radius; ++dx)
                 {
@@ -133,7 +141,8 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                     if (x < 0 || x >= w)
                         continue;
 
-                    uchar* px = line + 4 * x;
+                    uchar* px =
+                        line + (static_cast<qsizetype>(x) << 2);
 
                     px[0] = color.blue;
                     px[1] = color.green;

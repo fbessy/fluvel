@@ -83,25 +83,46 @@ void PixelInfoOverlay::updatePlacement(const QPointF& anchorScenePos,
 {
     constexpr int margin = 8;
 
-    const QSizeF overlaySize = boundingRect().size();
+    // Taille flottante réelle de l’overlay
+    const QSizeF overlaySizeF = boundingRect().size();
+
+    // Conversion explicite et géométriquement correcte
+    const int overlayW =
+        static_cast<int>(std::ceil(overlaySizeF.width()));
+    const int overlayH =
+        static_cast<int>(std::ceil(overlaySizeF.height()));
+
     const QRect viewRect = view.viewport()->rect();
 
-    QPoint anchorViewPos = view.mapFromScene(anchorScenePos);
+    const QPoint anchorViewPos =
+        view.mapFromScene(anchorScenePos);
 
     QPoint pos = anchorViewPos + QPoint(margin, margin);
-    QRectF rect(pos, overlaySize);
+
+    QRect rect(pos, QSize(overlayW, overlayH));
 
     if (rect.right() > viewRect.right())
-        pos.setX(anchorViewPos.x() - overlaySize.width() - margin);
+    {
+        const int newX =
+            anchorViewPos.x() - overlayW - margin;
+
+        pos.setX(newX);
+    }
 
     if (rect.bottom() > viewRect.bottom())
-        pos.setY(anchorViewPos.y() - overlaySize.height() - margin);
+    {
+        const int newY =
+            anchorViewPos.y() - overlayH - margin;
+
+        pos.setY(newY);
+    }
 
     pos.setX(std::max(pos.x(), viewRect.left()));
     pos.setY(std::max(pos.y(), viewRect.top()));
 
     setPos(view.mapToScene(pos));
 }
+
 
 void PixelInfoOverlay::showOverlay()
 {

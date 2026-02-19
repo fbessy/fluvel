@@ -9,7 +9,7 @@
 convertToQVector(const ofeli_ip::ExportedContour& contour)
 {
     QVector<QPoint> q_contour;
-    q_contour.reserve( contour.size() );
+    q_contour.reserve( static_cast<qsizetype>(contour.size()) );
 
     for ( const auto& point : contour )
     {

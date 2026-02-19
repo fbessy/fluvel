@@ -308,9 +308,11 @@ inline Xyz_f rgb_to_xyz(const Rgb_uc& rgb)
     rgb_f.green = INV_GAMMA_CORRECTION(rgb_f.green);
     rgb_f.blue  = INV_GAMMA_CORRECTION(rgb_f.blue);
 
-    return { (float)(0.4123955889674142161*rgb_f.red  + 0.3575834307637148171*rgb_f.green + 0.1804926473817015735*rgb_f.blue),
-             (float)(0.2125862307855955516*rgb_f.red  + 0.7151703037034108499*rgb_f.green + 0.07220049864333622685*rgb_f.blue),
-             (float)(0.01929721549174694484*rgb_f.red + 0.1191838645808485318*rgb_f.green + 0.9504971251315797660*rgb_f.blue) };
+    return {
+        0.4123956f   * rgb_f.red  + 0.35758343f * rgb_f.green + 0.18049265f * rgb_f.blue,
+        0.21258623f  * rgb_f.red  + 0.7151703f  * rgb_f.green + 0.0722005f  * rgb_f.blue,
+        0.019297216f * rgb_f.red  + 0.11918387f * rgb_f.green + 0.95049715f * rgb_f.blue
+    };
 }
 
 inline Lab_f xyz_to_Lab(const Xyz_f& xyz)

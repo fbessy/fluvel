@@ -120,7 +120,7 @@ private:
 
     QAction* openAct = nullptr;
     QAction* separatorAct = nullptr;
-    enum { MaxRecentFiles = 5 };
+    static constexpr qsizetype MaxRecentFiles = 5;
     QAction* recentFileActs[MaxRecentFiles];
     QAction* deleteAct = nullptr;
     QAction* saveAct = nullptr;

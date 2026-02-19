@@ -113,8 +113,8 @@ public:
     Point2D_i coord(size_t offset) const noexcept
     {
         return {
-            static_cast<int>(offset % width_),
-            static_cast<int>(offset / width_)
+            static_cast<int>(offset) % width_,
+            static_cast<int>(offset) / width_
         };
     }
 

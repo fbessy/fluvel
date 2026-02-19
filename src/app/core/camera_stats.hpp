@@ -1,15 +1,16 @@
 #pragma once
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 struct CameraStats
 {
-    float inputFps = 0.f;
-    float processingFps = 0.f;
-    float displayFps = 0.f;
-    float dropRate = 0.f;
-    float avgLatencyMs = 0.f;
-    float maxLatencyMs = 0.f;
+    double inputFps      = 0.0;
+    double processingFps = 0.0;
+    double displayFps    = 0.0;
+    double dropRate      = 0.0;
+    double avgLatencyMs  = 0.0;
+    double maxLatencyMs  = 0.0;
 };
 
 } // namespace

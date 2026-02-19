@@ -13,7 +13,7 @@
 namespace ofeli_app
 {
 
-ImageView::ImageView(QWidget* parent, Session session)
+ImageView::ImageView(QWidget* parent)
     : QGraphicsView(parent)
 {
     setRenderHint(QPainter::SmoothPixmapTransform, false);
@@ -98,7 +98,19 @@ void ImageView::setImage(const QImage& img)
     else
     {
         if (!throttleTimer->isActive())
-            throttleTimer->start(minDisplayIntervalMs - elapsed);
+        {
+            const qint64 remaining = minDisplayIntervalMs - elapsed;
+
+            if (remaining > 0)
+            {
+                const int interval =
+                    static_cast<int>(std::min<qint64>(
+                        remaining,
+                        std::numeric_limits<int>::max()));
+
+                throttleTimer->start(interval);
+            }
+        }
     }
 }
 
