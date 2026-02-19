@@ -467,6 +467,8 @@ bool ImageView::isGrayscale() const
 
 void ImageView::upscaleItems()
 {
+    clearOverlays();
+
     const bool has_ds = downscaleConfig_.hasDownscale;
     const int      df = downscaleConfig_.downscaleFactor;
 
@@ -500,10 +502,10 @@ void ImageView::updateDisplayWithConfig()
     else
         col_lin = Qt::transparent;
 
-    upscaleItems();
-
     l_out_->setColor( col_lout );
     l_in_->setColor( col_lin );
+
+    upscaleItems();
 
     updateFlip();
 }
@@ -534,7 +536,6 @@ void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
 {
     downscaleConfig_ = downscale;
 
-    clearOverlays();
     upscaleItems();
 }
 
