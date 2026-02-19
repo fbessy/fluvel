@@ -43,6 +43,7 @@
 #include <chrono>     // to generate a seed for the random generator
 #include <functional> // for function "std::bind" to link a generator and a distribution
 #include <iostream>   // std::cerr
+#include <algorithm>
 
 #include <cmath>      // std::exp
 #include <cstring>    // std::memcpy
@@ -1862,43 +1863,6 @@ void Filters::gaussian_filtering(int kernel_length, float sigma)
     filtered_modif = ptemp;
 }
 
-void Filters::quick_sort(unsigned char* array, int begin, int end)
-{
-    if( begin < end )
-    {
-        int left = begin-1;
-        int right = end+1;
-        const unsigned char pivot = array[begin];
-
-        while( 1 )
-        {
-            do
-            {
-                right--;
-            }
-            while( array[right] > pivot );
-
-            do
-            {
-                left++;
-            }
-            while( array[left] < pivot );
-
-            if( left < right )
-            {
-                swap(array, left, right);
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        quick_sort(array, begin, right);
-        quick_sort(array, right+1, end);
-    }
-}
-
 void Filters::median_filtering_oNlogN(int kernel_length) {
 
     // to protect the input : kernel_length impair and strictly positive
@@ -1967,7 +1931,8 @@ void Filters::median_filtering_oNlogN(int kernel_length) {
                 }
             }
 
-            quick_sort(median_kernel,0,length-1);
+            std::sort(median_kernel,
+                      median_kernel + length);
 
             filtered_modif[byte_per_pixel*offset+color_channel] = median_kernel[(length-1)/2];
         }

@@ -185,10 +185,6 @@ private :
 
     //! Swaps two values of an array.
     static void swap(unsigned char* const array, int a, int b);
-
-    //! Sorts an array with the quick sort algorithm.
-    static void quick_sort(unsigned char* array, int begin, int end);
-
 };
 
 inline int Filters::find_offset(int x, int y, int color_channel) const
