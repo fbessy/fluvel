@@ -66,7 +66,7 @@ struct DisplayConfig
 
     bool algorithm_overlay;
     bool input_displayed;
-    bool flip_horizontal;
+    bool mirrorMode;
 };
 
 struct ProcessingConfig

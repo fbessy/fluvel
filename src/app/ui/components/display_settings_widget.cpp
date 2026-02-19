@@ -61,8 +61,8 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     input_displayed_cb_ = new QCheckBox(tr("Input image"));
     input_displayed_cb_->setChecked( config_.input_displayed );
 
-    flip_cb_ = new QCheckBox(tr("Flip horizontally"));
-    flip_cb_->setChecked( config_.flip_horizontal );
+    flip_cb_ = new QCheckBox(tr("Selfie mirror"));
+    flip_cb_->setChecked( config_.mirrorMode );
 
     QVBoxLayout* widget_layout = new QVBoxLayout;
     widget_layout->addWidget(lout_gb);
@@ -124,7 +124,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
         connect(flip_cb_, &QCheckBox::toggled,
                 this, [this](bool checked)
                 {
-                    config_.flip_horizontal = checked;
+                    config_.mirrorMode = checked;
                     setConfig();
                 });
     }

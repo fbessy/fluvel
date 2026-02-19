@@ -503,7 +503,7 @@ void ImageView::updateFlip()
 
     contentRoot_->setTransformOriginPoint(0, 0);
 
-    if (displayConfig_.flip_horizontal)
+    if (displayConfig_.mirrorMode)
     {
         QTransform t;
         t.scale(-1, 1);

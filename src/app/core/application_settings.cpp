@@ -288,8 +288,8 @@ void ApplicationSettings::save_disp(const QString& scope,
     settings.setValue(scope + "/display/input_displayed",
                       disp_config.input_displayed);
 
-    settings.setValue(scope + "/display/flip_horizontal",
-                      disp_config.flip_horizontal);
+    settings.setValue(scope + "/display/mirrorMode",
+                      disp_config.mirrorMode);
 }
 
 void ApplicationSettings::load_img_session_config()
@@ -434,7 +434,7 @@ void ApplicationSettings::load_disp(const QString& scope,
 
     disp_config.algorithm_overlay = settings.value(scope + "/display/algorithm_overlay", true).toBool();
     disp_config.input_displayed   = settings.value(scope + "/display/input_displayed", false).toBool();
-    disp_config.flip_horizontal   = settings.value(scope + "/display/flip_horizontal", false).toBool();
+    disp_config.mirrorMode   = settings.value(scope + "/display/mirrorMode", false).toBool();
 }
 
 QDir ApplicationSettings::settingsDirectory()
