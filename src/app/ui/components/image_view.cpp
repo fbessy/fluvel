@@ -467,8 +467,6 @@ bool ImageView::isGrayscale() const
 
 void ImageView::upscaleItems()
 {
-    clearOverlays();
-
     const bool has_ds = downscaleConfig_.hasDownscale;
     const int      df = downscaleConfig_.downscaleFactor;
 
@@ -506,7 +504,6 @@ void ImageView::updateDisplayWithConfig()
     l_in_->setColor( col_lin );
 
     upscaleItems();
-
     updateFlip();
 }
 
