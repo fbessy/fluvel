@@ -35,6 +35,7 @@ protected:
 private:
 
     void setupUiDownscaleGb();
+    void updateUIFromConfig();
 
     QDialogButtonBox* dial_buttons;
     QTabWidget* tabs;

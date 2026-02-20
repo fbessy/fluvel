@@ -73,8 +73,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
 
     setLayout(layout);
 
-    // to initialize ui state in function of the configuration
-    reject();
+    updateUIFromConfig();
 
     connect(dial_buttons, &QDialogButtonBox::accepted,
             this,         &CameraSettingsWindow::accept);
@@ -114,7 +113,7 @@ void CameraSettingsWindow::accept()
     QDialog::accept();
 }
 
-void CameraSettingsWindow::reject()
+void CameraSettingsWindow::updateUIFromConfig()
 {
     downscale_gb->setChecked( config_.compute.downscale.hasDownscale );
 
@@ -127,6 +126,11 @@ void CameraSettingsWindow::reject()
 
     algoWidget->reject();
     phases_sb->setValue( config_.compute.cyclesNbr );
+}
+
+void CameraSettingsWindow::reject()
+{
+    updateUIFromConfig();
 
     QDialog::reject();
 }

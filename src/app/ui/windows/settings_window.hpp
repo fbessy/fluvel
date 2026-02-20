@@ -96,6 +96,8 @@ private :
     //   pour la fenêtre de configuration   //
     /////////////////////////////////////////
 
+    void updateUIFromConfig();
+
     ImageView* settingsView;
 
     // onglets a gauche

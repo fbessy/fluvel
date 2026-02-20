@@ -119,7 +119,7 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     settings_grid->setColumnStretch(1,1);
     setLayout(settings_grid);
 
-    reject();
+    updateUIFromConfig();
 
     setupConnections();
 }
@@ -833,7 +833,7 @@ void SettingsWindow::accept()
     QDialog::accept();
 }
 
-void SettingsWindow::reject()
+void SettingsWindow::updateUIFromConfig()
 {
     const auto& ds_config = AppSettings::instance().imgConfig.compute.downscale;
 
@@ -914,6 +914,11 @@ void SettingsWindow::reject()
     phiEditor_->reject();
 
     algo_widget->reject();
+}
+
+void SettingsWindow::reject()
+{
+    updateUIFromConfig();
 
     QDialog::reject();
 }
