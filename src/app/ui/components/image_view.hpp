@@ -121,9 +121,6 @@ private:
 
     QImage lastDisplayedImage;
 
-    QVector<QPoint> contourOut_;
-    QVector<QPoint> contourIn_;
-
     ContourPointsItem* l_out_ = nullptr;
     ContourPointsItem* l_in_  = nullptr;
 
