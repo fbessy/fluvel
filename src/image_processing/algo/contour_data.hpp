@@ -76,8 +76,8 @@ class ContourPoint
 {
 public:
 
-    ContourPoint(int x, int y): x_(x), y_(y) {}
-    ContourPoint(const Point2D_i& p): x_(p.x), y_(p.y) {}
+    ContourPoint(int x, int y): x_(x), y_(y), speed_(SpeedValue::NoMove) {}
+    ContourPoint(const Point2D_i& p): x_(p.x), y_(p.y), speed_(SpeedValue::NoMove) {}
 
     Point2D_i pos() const noexcept { return {x_, y_}; }
     int x() const noexcept { return x_; }
