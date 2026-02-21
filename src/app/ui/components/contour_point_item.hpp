@@ -12,17 +12,17 @@ class ContourPointsItem : public QGraphicsItem
 public:
     explicit ContourPointsItem(QGraphicsItem* parent = nullptr);
 
-    void setPoints(const QVector<QPointF>& pts);
+    void setPoints(const QVector<QPointF>& points);
     void clearPoints();
 
+    void setColor(QColor color) { color_ = color; update(); }
 
+protected:
     QRectF boundingRect() const override;
 
     void paint(QPainter* painter,
                const QStyleOptionGraphicsItem*,
                QWidget*) override;
-
-    void setColor(QColor color) { color_ = color; update(); }
 
 private:
     QVector<QPointF> points_;

@@ -17,10 +17,10 @@ ContourPointsItem::ContourPointsItem(QGraphicsItem* parent)
     setFlag(QGraphicsItem::ItemIsFocusable, false);
 }
 
-void ContourPointsItem::setPoints(const QVector<QPointF>& pts)
+void ContourPointsItem::setPoints(const QVector<QPointF>& points)
 {
     prepareGeometryChange();
-    points_ = pts;
+    points_ = points;
 }
 
 void ContourPointsItem::clearPoints()
@@ -52,7 +52,10 @@ QRectF ContourPointsItem::boundingRect() const
               maxX - minX,
               maxY - minY);
 
-    constexpr qreal margin = 5.0;
+    // Pixel (x, y) spans [x, x+1) × [y, y+1) in image space.
+    // Its geometric center is therefore at (x + 0.5, y + 0.5).
+
+    constexpr qreal margin = 0.5;
     rf.adjust(-margin, -margin, margin, margin);
 
     return rf;
