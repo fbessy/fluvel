@@ -72,7 +72,7 @@ constexpr size_t INITIAL_ARRAY_ALLOC_SIZE = 10000u;
 //! to compute in constant time ( complexity in 0(1) ), with an image or a matrix.
 HausdorffDistance::HausdorffDistance(Shape& shape_a1,
                                      Shape& shape_b1,
-                                     const std::unordered_set<Point2D_i>& intersection1):
+                                     const PointSet& intersection1):
     shape_a(shape_a1),
     shape_b(shape_b1),
     intersection_a_b(intersection1),

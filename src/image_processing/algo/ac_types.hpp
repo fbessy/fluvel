@@ -2,12 +2,11 @@
 #define AC_TYPES_HPP
 
 #include <vector>
-#include <unordered_set>
-#include "point_hash.hpp"
 #include <limits>
 
 #include "shape.hpp"
 #include "contour_data.hpp"
+#include "point_containers.hpp"
 
 namespace ofeli_ip
 {
@@ -241,7 +240,7 @@ struct EvolutionData
     float centroids_distance;
 
     //! Intersection, i.e common points between #l_out_shape and #previous_shape.
-    std::unordered_set<Point2D_i>intersection;
+    PointSet intersection;
 
     //! Stopping condition status.
     StoppingStatus stopping_status;

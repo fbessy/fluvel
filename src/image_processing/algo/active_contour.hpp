@@ -41,8 +41,6 @@
 #define ACTIVE_CONTOUR_HPP
 
 #include <vector>
-#include <unordered_set>
-#include "point_hash.hpp"
 #include <cstddef>
 #include <limits>
 

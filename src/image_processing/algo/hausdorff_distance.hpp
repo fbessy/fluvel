@@ -41,9 +41,8 @@
 #define HAUSDORFF_DISTANCE_HPP
 
 #include <vector>
-#include <unordered_set>
-#include "point_hash.hpp"
 
+#include "point_containers.hpp"
 #include "shape.hpp"
 
 namespace ofeli_ip
@@ -57,7 +56,7 @@ public :
     //! Constructor.
     HausdorffDistance(Shape& shape_a1,
                       Shape& shape_b1,
-                      const std::unordered_set<Point2D_i>& intersection1 = std::unordered_set<Point2D_i>());
+                      const PointSet& intersection1 = PointSet());
 
     //! Gets the hausdorff distance between #shape_a and #shape_b.
     float get_distance() const;
@@ -99,7 +98,7 @@ private:
     Shape& shape_b;
 
     //! Optional intersection with common points between #shape_a and #shape_b.
-    const std::unordered_set<Point2D_i>& intersection_a_b;
+    const PointSet& intersection_a_b;
 
     //! Directed or relative hausdorff distance from #shape_a (outer loop) to #shape_b (inner loop).
     float hd_a_to_b;

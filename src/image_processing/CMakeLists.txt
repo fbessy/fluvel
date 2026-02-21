@@ -43,6 +43,7 @@ set(ip_src
     ${CORE_DIR}/image_span.hpp
     ${CORE_DIR}/point.hpp
     ${CORE_DIR}/point_hash.hpp
+    ${CORE_DIR}/point_containers.hpp
     ${CORE_DIR}/ofeli_math.hpp
     ${CORE_DIR}/color.hpp
     ${CORE_DIR}/neighborhood.hpp

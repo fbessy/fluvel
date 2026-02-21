@@ -39,11 +39,11 @@
 
 #include <cmath>
 #include <cassert>
-#include <unordered_set>
-#include "point_hash.hpp"
 #include <iostream>
 
 #include "boundary_builder.hpp"
+
+#include "point_containers.hpp"
 #include "ofeli_math.hpp"
 
 
@@ -333,7 +333,7 @@ void BoundaryBuilder::build_inner_contiguous(int x0, int y0,
                                              const Contour& l_out,
                                              Contour& l_in)
 {
-    std::unordered_set<Point2D_i> seen;
+    PointSet seen;
     seen.reserve(l_out.size());
 
     for (const auto& p : l_out)
@@ -353,7 +353,7 @@ void BoundaryBuilder::build_inner_contiguous(int x0, int y0,
 
 void BoundaryBuilder::check_duplicates(const Contour& contour)
 {
-    std::unordered_set<Point2D_i> seen;
+    PointSet seen;
     seen.reserve(contour.size());
 
     for (const auto& p : contour)
