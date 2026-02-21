@@ -141,8 +141,8 @@ void CameraController::onFrameDisplayed(qint64 recvTsNs,
 
 void CameraController::onFrameResultReady(FrameResult result)
 {
-    QVector<QPoint> q_l_out = convertToQVector( result.l_out );
-    QVector<QPoint> q_l_in  = convertToQVector( result.l_in );
+    auto q_l_out = convertToQVector( result.l_out );
+    auto q_l_in  = convertToQVector( result.l_in );
 
     QImage img;
 

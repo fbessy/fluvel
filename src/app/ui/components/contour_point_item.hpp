@@ -12,7 +12,7 @@ class ContourPointsItem : public QGraphicsItem
 public:
     explicit ContourPointsItem(QGraphicsItem* parent = nullptr);
 
-    void setPoints(const QVector<QPoint>& pts);
+    void setPoints(const QVector<QPointF>& pts);
     void clearPoints();
 
 
@@ -25,7 +25,7 @@ public:
     void setColor(QColor color) { color_ = color; update(); }
 
 private:
-    QVector<QPoint> points_;
+    QVector<QPointF> points_;
     QColor color_ = Qt::red;
 };
 

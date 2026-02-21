@@ -17,7 +17,7 @@ ContourPointsItem::ContourPointsItem(QGraphicsItem* parent)
     setFlag(QGraphicsItem::ItemIsFocusable, false);
 }
 
-void ContourPointsItem::setPoints(const QVector<QPoint>& pts)
+void ContourPointsItem::setPoints(const QVector<QPointF>& pts)
 {
     prepareGeometryChange();
     points_ = pts;
@@ -32,23 +32,28 @@ void ContourPointsItem::clearPoints()
 QRectF ContourPointsItem::boundingRect() const
 {
     if (points_.isEmpty())
-        return QRectF(0.0, 0.0,
-                      1.0, 1.0);
+        return QRectF(0.0, 0.0, 1.0, 1.0);
 
-    QRect r(points_.first(), QSize(1,1));
+    qreal minX = points_.first().x();
+    qreal maxX = minX;
+    qreal minY = points_.first().y();
+    qreal maxY = minY;
+
     for (const auto& p : points_)
-        r |= QRect(p, QSize(1,1));
+    {
+        minX = std::min(minX, p.x());
+        maxX = std::max(maxX, p.x());
+        minY = std::min(minY, p.y());
+        maxY = std::max(maxY, p.y());
+    }
 
-    QRectF rf(r);
+    QRectF rf(minX,
+              minY,
+              maxX - minX,
+              maxY - minY);
 
     constexpr qreal margin = 5.0;
     rf.adjust(-margin, -margin, margin, margin);
-
-    constexpr qreal minSize = 20.0;
-    if (rf.width() < minSize)
-        rf.setWidth(minSize);
-    if (rf.height() < minSize)
-        rf.setHeight(minSize);
 
     return rf;
 }

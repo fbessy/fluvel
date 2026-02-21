@@ -135,8 +135,8 @@ void ImageController::refreshView()
 void ImageController::onContourUpdated(const ofeli_ip::ExportedContour& l_out,
                                        const ofeli_ip::ExportedContour& l_in)
 {
-    QVector<QPoint> q_l_out = convertToQVector( l_out );
-    QVector<QPoint> q_l_in  = convertToQVector( l_in );
+    auto q_l_out = convertToQVector( l_out );
+    auto q_l_in  = convertToQVector( l_in );
 
     emit contourUpdated( q_l_out, q_l_in );
 }

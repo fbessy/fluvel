@@ -34,8 +34,8 @@ signals:
     void frameSizeStr(const QString& str);
     void statsUpdated(const ofeli_app::CameraStats& stats);
     void imageAndContourUpdated(const QImage& img,
-                                const QVector<QPoint>& l_out,
-                                const QVector<QPoint>& l_in,
+                                const QVector<QPointF>& l_out,
+                                const QVector<QPointF>& l_in,
                                 qint64 receiveTs);
 private:
 

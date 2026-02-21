@@ -131,8 +131,8 @@ void ImageView::setImage(const QImage& img)
     }
 }
 
-void ImageView::setContour(const QVector<QPoint>& l_out,
-                           const QVector<QPoint>& l_in)
+void ImageView::setContour(const QVector<QPointF>& l_out,
+                           const QVector<QPointF>& l_in)
 {
     assert( l_out_ && l_in_ );
 
@@ -141,8 +141,8 @@ void ImageView::setContour(const QVector<QPoint>& l_out,
 }
 
 void ImageView::setImageAndContour(const QImage& image,
-                                   const QVector<QPoint>& l_out,
-                                   const QVector<QPoint>& l_in,
+                                   const QVector<QPointF>& l_out,
+                                   const QVector<QPointF>& l_in,
                                    qint64 receiveTs)
 {
     assert( l_out_ && l_in_ );
@@ -191,7 +191,10 @@ void ImageView::updatePixmap(const QImage& img)
     pixmapItem->setPixmap(QPixmap::fromImage(img));
     lastDisplayedImage = img;
 
-    scene->setSceneRect(0, 0, img.width(), img.height());
+    scene->setSceneRect( 0.0,
+                         0.0,
+                         static_cast<qreal>(img.width()),
+                         static_cast<qreal>(img.height()) );
 
     if (sizeChanged)
     {
@@ -543,7 +546,8 @@ void ImageView::updateFlip()
         t.scale(-1.0, 1.0);
         contentRoot_->setTransform(t);
 
-        contentRoot_->setPos(pixmapItem->pixmap().width(), 0.0);
+        contentRoot_->setPos(static_cast<qreal>(pixmapItem->pixmap().width()),
+                             0.0);
     }
     else
     {

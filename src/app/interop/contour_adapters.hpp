@@ -5,16 +5,16 @@
 #include <QVector>
 #include <QPoint>
 
-[[nodiscard]] inline QVector<QPoint>
+[[nodiscard]] inline QVector<QPointF>
 convertToQVector(const ofeli_ip::ExportedContour& contour)
 {
-    QVector<QPoint> q_contour;
+    QVector<QPointF> q_contour;
     q_contour.reserve( static_cast<qsizetype>(contour.size()) );
 
     for ( const auto& point : contour )
     {
-        q_contour.emplace_back( point.x,
-                                point.y );
+        q_contour.emplace_back( static_cast<qreal>(point.x) + 0.5,
+                                static_cast<qreal>(point.y) + 0.5 );
     }
 
     return q_contour;

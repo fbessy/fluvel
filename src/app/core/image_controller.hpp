@@ -33,8 +33,8 @@ signals:
     void imageReadyWithoutResize(const QImage& image);
     void displayedImageReady(const QImage& image);
 
-    void contourUpdated(const QVector<QPoint>& l_out,
-                        const QVector<QPoint>& l_in);
+    void contourUpdated(const QVector<QPointF>& l_out,
+                        const QVector<QPointF>& l_in);
     void stateChanged(ofeli_app::WorkerState state);
 
     void clearOverlaysRequested();

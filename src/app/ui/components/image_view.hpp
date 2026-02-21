@@ -68,12 +68,12 @@ public:
 public slots:
     void setImage(const QImage& img);
 
-    void setContour(const QVector<QPoint>& l_out,
-                    const QVector<QPoint>& l_in);
+    void setContour(const QVector<QPointF>& l_out,
+                    const QVector<QPointF>& l_in);
 
     void setImageAndContour(const QImage& image,
-                            const QVector<QPoint>& l_out,
-                            const QVector<QPoint>& l_in,
+                            const QVector<QPointF>& l_out,
+                            const QVector<QPointF>& l_in,
                             qint64 receiveTs);
 
     void applyDisplayConfig(const DisplayConfig& display);
