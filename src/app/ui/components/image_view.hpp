@@ -32,6 +32,10 @@ public:
 
     explicit ImageView(QWidget* parent = nullptr);
 
+    explicit ImageView(const DisplayConfig& displayConfig,
+                       const DownscaleConfig& downscaleConfig,
+                       QWidget* parent = nullptr);
+
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);
 
@@ -91,12 +95,18 @@ private slots:
     void flushPendingFrame();
 
 private:
+
+    void initialize();
+
     void updatePixmap(const QImage& img);
-    void upscaleItems();
     double getCurrentZoom() const;
+
+    void upscaleItems();
     void updateDisplayWithConfig();
 
+
     QGraphicsScene*        scene = nullptr;
+    QGraphicsItemGroup* contentRoot_ = nullptr;
     QGraphicsPixmapItem*  pixmapItem = nullptr;
 
     bool autoFitEnabled = true;
@@ -121,8 +131,7 @@ private:
 
     QImage lastDisplayedImage;
 
-    ContourPointsItem* l_out_ = nullptr;
-    ContourPointsItem* l_in_  = nullptr;
+    qint64 lastReceiveTs_;
 
     ImageViewInteraction* m_interaction = nullptr;
     ImageViewListener*        listener_ = nullptr;
@@ -130,9 +139,8 @@ private:
     DisplayConfig displayConfig_;
     DownscaleConfig downscaleConfig_;
 
-    qint64 lastReceiveTs_;
-
-    QGraphicsItemGroup* contentRoot_;
+    ContourPointsItem* l_out_ = nullptr;
+    ContourPointsItem* l_in_  = nullptr;
 
 signals:
     void imageClicked(int x, int y);

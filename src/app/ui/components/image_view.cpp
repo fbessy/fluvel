@@ -5,6 +5,8 @@
 #include "color_adapters.hpp"
 #include "frame_clock.hpp"
 
+#include <cassert>
+
 #include <QPainter>
 #include <QWheelEvent>
 #include <QMouseEvent>
@@ -15,6 +17,27 @@ namespace ofeli_app
 
 ImageView::ImageView(QWidget* parent)
     : QGraphicsView(parent)
+{
+    initialize();
+}
+
+ImageView::ImageView(const DisplayConfig& displayConfig,
+                     const DownscaleConfig& downscaleConfig,
+                     QWidget* parent)
+    : QGraphicsView(parent),
+    displayConfig_(displayConfig),
+    downscaleConfig_(downscaleConfig)
+{
+    initialize();
+
+    l_out_ = new ContourPointsItem(contentRoot_);
+    l_out_->setZValue(100);
+
+    l_in_ = new ContourPointsItem(contentRoot_);
+    l_in_->setZValue(100);
+}
+
+void ImageView::initialize()
 {
     setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
@@ -32,12 +55,6 @@ ImageView::ImageView(QWidget* parent)
     pixmapItem = new QGraphicsPixmapItem(contentRoot_);
     pixmapItem->setZValue(0);
     pixmapItem->setTransformationMode(Qt::FastTransformation);
-
-    l_out_ = new ContourPointsItem(contentRoot_);
-    l_out_->setZValue(100);
-
-    l_in_ = new ContourPointsItem(contentRoot_);
-    l_in_->setZValue(100);
 
     displayTimer.start();
 
@@ -117,8 +134,7 @@ void ImageView::setImage(const QImage& img)
 void ImageView::setContour(const QVector<QPoint>& l_out,
                            const QVector<QPoint>& l_in)
 {
-    if ( !l_out_ || !l_in_ )
-        return;
+    assert( l_out_ && l_in_ );
 
     l_out_->setPoints(l_out);
     l_in_->setPoints(l_in);
@@ -129,21 +145,20 @@ void ImageView::setImageAndContour(const QImage& image,
                                    const QVector<QPoint>& l_in,
                                    qint64 receiveTs)
 {
+    assert( l_out_ && l_in_ );
+
     setImage(image);
     setContour(l_out, l_in);
 
     lastReceiveTs_ = receiveTs;
-
-    update();
 }
 
 void ImageView::clearOverlays()
 {
-    if ( l_out_ )
-        l_out_->clearPoints();
+    assert( l_out_ && l_in_ );
 
-    if ( l_in_ )
-        l_in_->clearPoints();
+    l_out_->clearPoints();
+    l_in_->clearPoints();
 }
 
 // ------------------------------------------------------------
@@ -180,7 +195,10 @@ void ImageView::updatePixmap(const QImage& img)
 
     if (sizeChanged)
     {
-        updateDisplayWithConfig();
+        if ( l_out_ && l_in_ )
+            updateDisplayWithConfig();
+
+
         applyAutoFit();
     }
 }
@@ -370,8 +388,8 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 
     QPointF itemPos = pixmapItem->mapFromScene(scenePos);
 
-    const int x = static_cast<int>(std::floor(itemPos.x()));
-    const int y = static_cast<int>(std::floor(itemPos.y()));
+    const int x = static_cast<int>(itemPos.x());
+    const int y = static_cast<int>(itemPos.y());
     const QPoint p(x, y);
 
     if ( !lastDisplayedImage.valid(p) )
@@ -467,10 +485,12 @@ bool ImageView::isGrayscale() const
 
 void ImageView::upscaleItems()
 {
+    assert( l_out_ && l_in_ );
+
     const bool has_ds = downscaleConfig_.hasDownscale;
     const int      df = downscaleConfig_.downscaleFactor;
 
-    qreal factor = static_cast<qreal>(1.0);
+    qreal factor = 1.0;
 
     if ( has_ds && displayConfig_.input_displayed )
         factor = qreal( df );
@@ -481,6 +501,8 @@ void ImageView::upscaleItems()
 
 void ImageView::applyDisplayConfig(const DisplayConfig& display)
 {
+    assert( l_out_ && l_in_ );
+
     displayConfig_ = display;
 
     updateDisplayWithConfig();
@@ -488,6 +510,8 @@ void ImageView::applyDisplayConfig(const DisplayConfig& display)
 
 void ImageView::updateDisplayWithConfig()
 {
+    assert( l_out_ && l_in_ );
+
     QColor col_lout, col_lin;
 
     if ( displayConfig_.l_out_displayed )
@@ -509,28 +533,29 @@ void ImageView::updateDisplayWithConfig()
 
 void ImageView::updateFlip()
 {
-    if (!pixmapItem)
-        return;
+    assert( l_out_ && l_in_ );
 
-    contentRoot_->setTransformOriginPoint(0, 0);
+    contentRoot_->setTransformOriginPoint(0.0, 0.0);
 
     if (displayConfig_.mirrorMode)
     {
         QTransform t;
-        t.scale(-1, 1);
+        t.scale(-1.0, 1.0);
         contentRoot_->setTransform(t);
 
-        contentRoot_->setPos(pixmapItem->pixmap().width(), 0);
+        contentRoot_->setPos(pixmapItem->pixmap().width(), 0.0);
     }
     else
     {
         contentRoot_->setTransform(QTransform());
-        contentRoot_->setPos(0, 0);
+        contentRoot_->setPos(0.0, 0.0);
     }
 }
 
 void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
 {
+    assert( l_out_ && l_in_ );
+
     downscaleConfig_ = downscale;
 
     upscaleItems();

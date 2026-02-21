@@ -40,11 +40,12 @@
 #include <cmath>
 #include <cassert>
 #include <unordered_set>
+#include "point_hash.hpp"
 #include <iostream>
 
 #include "boundary_builder.hpp"
 #include "ofeli_math.hpp"
-#include "point_hash.hpp"
+
 
 namespace ofeli_ip
 {

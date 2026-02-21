@@ -42,9 +42,9 @@
 
 #include <vector>
 #include <unordered_set>
+#include "point_hash.hpp"
 
 #include "shape.hpp"
-#include "point_hash.hpp"
 
 namespace ofeli_ip
 {

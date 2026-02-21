@@ -90,7 +90,10 @@ CameraWindow::CameraWindow(QWidget* parent)
     blackImage.fill(Qt::black);
     blackLabel->setPixmap(QPixmap::fromImage(blackImage));
 
-    videoView = new ImageView(this);
+    videoView = new ImageView(AppSettings::instance().camConfig.display,
+                              AppSettings::instance().camConfig.compute.downscale,
+                              this);
+
     videoView->setMaxDisplayFps(60.0);
 
     auto interaction = std::make_unique<InteractionSet>();

@@ -4,7 +4,9 @@
 #include "point.hpp"
 #include <functional>
 
-namespace std {
+namespace std
+{
+
 template<>
 struct hash<ofeli_ip::Point2D_i>
 {
@@ -15,6 +17,7 @@ struct hash<ofeli_ip::Point2D_i>
         return h1 ^ (h2 << 1);
     }
 };
+
 }
 
 #endif // POINT_HASH_HPP

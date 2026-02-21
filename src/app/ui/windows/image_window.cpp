@@ -135,7 +135,9 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(settingsButton);
 
     // --- Image view ---
-    imageView = new ImageView(central);
+    imageView = new ImageView(AppSettings::instance().imgConfig.display,
+                              AppSettings::instance().imgConfig.compute.downscale,
+                              central);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());

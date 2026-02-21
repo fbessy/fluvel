@@ -42,13 +42,13 @@
 
 #include <vector>
 #include <unordered_set>
+#include "point_hash.hpp"
 #include <cstddef>
 #include <limits>
 
 #include "contour_data.hpp"
 #include "shape.hpp"
 #include "point.hpp"
-#include "point_hash.hpp"
 #include "ac_types.hpp"
 
 namespace ofeli_ip

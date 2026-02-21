@@ -43,71 +43,100 @@ enum class Session
     Camera
 };
 
-struct AlgoConfig
+struct DisplayConfig
 {
-    ofeli_ip::Connectivity connectivity;
-    ofeli_ip::AcConfig acConfig;
-    ofeli_ip::RegionColorConfig regionAcConfig;
+    static constexpr bool defaultListDisplayed = true;
+    static constexpr unsigned char defaultRedOut   = 0u;
+    static constexpr unsigned char defaultGreenOut = 0u;
+    static constexpr unsigned char defaultBlueOut  = 255u;
+    static constexpr unsigned char defaultRedIn    = 255u;
+    static constexpr unsigned char defaultGreenIn  = 0u;
+    static constexpr unsigned char defaultBlueIn   = 0u;
+
+    static constexpr bool defaultOverlay       = true;
+    static constexpr bool defaultOptions       = false;
+
+    bool l_out_displayed = defaultListDisplayed;
+    ofeli_ip::Rgb_uc l_out_color { defaultRedOut,
+                                   defaultGreenOut,
+                                   defaultBlueOut };
+
+    bool l_in_displayed = defaultListDisplayed;
+    ofeli_ip::Rgb_uc l_in_color { defaultRedIn,
+                                  defaultGreenIn,
+                                  defaultBlueIn };
+
+    bool algorithm_overlay = defaultOverlay;
+    bool input_displayed   = defaultOptions;
+    bool mirrorMode        = defaultOptions;
 };
 
 struct DownscaleConfig
 {
-    bool hasDownscale;
-    int downscaleFactor;
-};
+    static constexpr bool defaultHasDownscale    = false;
+    static constexpr int  defaultDownscaleFactor = 2;
 
-struct DisplayConfig
-{
-    bool l_out_displayed;
-    ofeli_ip::Rgb_uc l_out_color;
-
-    bool l_in_displayed;
-    ofeli_ip::Rgb_uc l_in_color;
-
-    bool algorithm_overlay;
-    bool input_displayed;
-    bool mirrorMode;
+    bool hasDownscale   = defaultHasDownscale;
+    int downscaleFactor = defaultDownscaleFactor;
 };
 
 struct ProcessingConfig
 {
-    bool has_gaussian_noise;
-    float std_noise;
+    static constexpr bool  defaultProcess       = false;
 
-    bool has_salt_noise;
-    float proba_noise;
+    static constexpr float defaultStdNoise      = 20.f;
+    static constexpr float defaultSaltNoise     = 0.05f;
+    static constexpr float defaultSpeckleNoise  = 0.16f;
 
-    bool has_speckle_noise;
-    float std_speckle_noise;
+    static constexpr int   defaultKernelLength  = 5;
+    static constexpr float defaultGaussianSigma = 2.f;
 
-    bool has_median_filt;
-    int kernel_median_length;
-    bool has_O1_algo;
+    static constexpr bool  default01Algo        = true;
 
-    bool has_mean_filt;
-    int kernel_mean_length;
+    static constexpr ofeli_ip::AnisoDiff defaultAnisoOption = ofeli_ip::AnisoDiff::FUNCTION1;
+    static constexpr int   defaultMaxItera      = 10;
+    static constexpr float defaultLambda        = 1.f/7.f;
+    static constexpr float defaultKappa         = 30.f;
 
-    bool has_gaussian_filt;
-    int kernel_gaussian_length;
-    float sigma;
+    static constexpr bool defaultWhiteTopHat    = true;
 
-    bool has_aniso_diff;
-    ofeli_ip::AnisoDiff aniso_option;
-    int max_itera;
-    float lambda;
-    float kappa;
+    bool has_gaussian_noise    = defaultProcess;
+    float std_noise            = defaultStdNoise;
 
-    bool has_open_filt;
-    int kernel_open_length;
+    bool has_salt_noise        = defaultProcess;
+    float proba_noise          = defaultSaltNoise;
 
-    bool has_close_filt;
-    int kernel_close_length;
+    bool has_speckle_noise     = defaultProcess;
+    float std_speckle_noise    = defaultSpeckleNoise;
 
-    bool has_top_hat_filt;
-    bool is_white_top_hat;
-    int kernel_tophat_length;
+    bool has_median_filt       = defaultProcess;
+    int kernel_median_length   = defaultKernelLength;
+    bool has_O1_algo           = default01Algo;
 
-    bool has_O1_morpho;
+    bool has_mean_filt         = defaultProcess;
+    int kernel_mean_length     = defaultKernelLength;
+
+    bool has_gaussian_filt     = defaultProcess;
+    int kernel_gaussian_length = defaultKernelLength;
+    float sigma                = defaultGaussianSigma;
+
+    bool has_aniso_diff              = defaultProcess;
+    ofeli_ip::AnisoDiff aniso_option = defaultAnisoOption;
+    int max_itera                    = defaultMaxItera;
+    float lambda                     = defaultLambda;
+    float kappa                      = defaultKappa;
+
+    bool has_open_filt       = defaultProcess;
+    int kernel_open_length   = defaultKernelLength;
+
+    bool has_close_filt      = defaultProcess;
+    int kernel_close_length  = defaultKernelLength;
+
+    bool has_top_hat_filt    = defaultProcess;
+    bool is_white_top_hat    = defaultWhiteTopHat;
+    int kernel_tophat_length = defaultKernelLength;
+
+    bool has_O1_morpho       = default01Algo;
 
     bool hasProcessing() const
     {
@@ -122,6 +151,16 @@ struct ProcessingConfig
                has_close_filt ||
                has_top_hat_filt;
     }
+};
+
+struct AlgoConfig
+{
+    static constexpr ofeli_ip::Connectivity defaultConnectivity
+        = ofeli_ip::Connectivity::Four;
+
+    ofeli_ip::Connectivity connectivity;
+    ofeli_ip::AcConfig acConfig;
+    ofeli_ip::RegionColorConfig regionAcConfig;
 };
 
 struct ImageComputeConfig
@@ -142,11 +181,14 @@ struct ImageSessionSettings
 
 struct VideoComputeConfig
 {
+    static constexpr int  defaultCyclesNbr = 3;
+    static constexpr bool defaultHasTemporalFiltering = true;
+
     AlgoConfig algo;
-    int cyclesNbr;
+    int cyclesNbr = defaultCyclesNbr;
 
     DownscaleConfig downscale;
-    bool hasTemporalFiltering;
+    bool hasTemporalFiltering = defaultHasTemporalFiltering;
 };
 
 struct VideoSessionSettings

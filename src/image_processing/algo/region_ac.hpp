@@ -52,6 +52,9 @@ namespace ofeli_ip
 //! Specific configuration for region based active contour
 struct RegionConfig
 {
+    static constexpr int default_lambda_in  = 1;
+    static constexpr int default_lambda_out = 1;
+
     //! Weight of the inside homogeneity criterion in the Chan-Vese model
     //! (called lambda 1 in the article "Active contour without edges.").
     int lambda_in;
@@ -68,7 +71,9 @@ struct RegionConfig
     }
 
     //! Default constructor.
-    RegionConfig() : lambda_in(1), lambda_out(1)
+    RegionConfig() :
+        lambda_in(default_lambda_in),
+        lambda_out(default_lambda_out)
     {
     }
 

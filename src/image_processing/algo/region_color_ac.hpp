@@ -62,6 +62,11 @@ enum class ColorSpaceOption
 //! Specific configuration for color region based active contour.
 struct RegionColorConfig : public RegionConfig
 {
+    static constexpr ColorSpaceOption default_color_space
+        = ColorSpaceOption::RGB;
+
+    static constexpr Components_3i default_weights { 1, 1, 1 };
+
     //! Color space option
     ColorSpaceOption color_space;
 
@@ -78,8 +83,8 @@ struct RegionColorConfig : public RegionConfig
 
     //! Default constructor.
     RegionColorConfig() : RegionConfig(),
-        color_space(ColorSpaceOption::RGB),
-        weights { 1, 1, 1 }
+        color_space(default_color_space),
+        weights { default_weights }
     {
     }
 

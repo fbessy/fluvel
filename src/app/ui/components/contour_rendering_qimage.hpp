@@ -61,9 +61,6 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                        const ofeli_ip::Rgb_uc& color,
                        int upscale_factor,
                        QImage& img_rgb32);
-
-QRgb get_QRgb(ofeli_ip::Rgb_uc col);
-
 }
 
 #endif // CONTOUR_RENDERING_QIMAGE_H

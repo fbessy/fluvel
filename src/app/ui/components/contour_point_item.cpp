@@ -9,7 +9,7 @@ namespace ofeli_app
 ContourPointsItem::ContourPointsItem(QGraphicsItem* parent)
     :  QGraphicsItem(parent)
 {
-    setTransformOriginPoint(0, 0);
+    setTransformOriginPoint(0.0, 0.0);
 
     setAcceptedMouseButtons(Qt::NoButton);
     setAcceptHoverEvents(false);
@@ -32,7 +32,8 @@ void ContourPointsItem::clearPoints()
 QRectF ContourPointsItem::boundingRect() const
 {
     if (points_.isEmpty())
-        return QRectF(0, 0, 1, 1);
+        return QRectF(0.0, 0.0,
+                      1.0, 1.0);
 
     QRect r(points_.first(), QSize(1,1));
     for (const auto& p : points_)

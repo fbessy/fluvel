@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <unordered_set>
+#include "point_hash.hpp"
 #include <limits>
 
 #include "shape.hpp"
@@ -53,6 +54,13 @@ enum class BoundarySwitch
 //! Active contour configuration
 struct AcConfig
 {
+    static constexpr bool default_is_cycle2 = true;
+    static constexpr int default_disk_radius = 2;
+    static constexpr int default_Na = 30;
+    static constexpr int default_Ns = 3;
+    static constexpr FailureHandlingMode default_failure_mode
+        = FailureHandlingMode::StopOnFailure;
+
     //! Boolean egals to \c true to have the curve smoothing, evolutions in the cycle 2 with the internal speed Fint.
     bool is_cycle2;
 
@@ -82,10 +90,10 @@ struct AcConfig
     }
 
     //! Default constructor.
-    AcConfig() : is_cycle2(true),
-        disk_radius(2),
-        Na(30), Ns(3),
-        failure_mode(FailureHandlingMode::StopOnFailure)
+    AcConfig() : is_cycle2(default_is_cycle2),
+        disk_radius(default_disk_radius),
+        Na(default_Na), Ns(default_Ns),
+        failure_mode(default_failure_mode)
     {
     }
 
