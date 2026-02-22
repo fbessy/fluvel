@@ -387,7 +387,7 @@ void ActiveContourWorker::initializeActiveContour()
 
     ac_.reset();
 
-    //assert( processedImage_.size() == config_.initialPhi.size() );
+    assert( processedImage_.size() == config_.initialPhi.size() );
 
     if ( processedImage_.size() != config_.initialPhi.size() )
     {

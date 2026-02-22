@@ -44,9 +44,10 @@ void ImageController::loadImage(const QString& path)
     else
         inputImage_ = inputImage_.convertToFormat( QImage::Format_RGB32 );
 
-    emit inputImageReady(inputImage_);
 
     reinitializeWorker();
+
+    emit inputImageReady(inputImage_);
 }
 
 void ImageController::downscaleImage()
@@ -55,7 +56,7 @@ void ImageController::downscaleImage()
         return;
 
     if (    inputImage_.format() != QImage::Format_Grayscale8
-        && inputImage_.format() != QImage::Format_RGB32 )
+         && inputImage_.format() != QImage::Format_RGB32 )
         return;
 
     if ( computeConfig_.downscale.hasDownscale )
@@ -73,18 +74,28 @@ void ImageController::downscaleImage()
     {
         downscaledImage_ = inputImage_;
     }
-
-    QImage& phi = computeConfig_.initialPhi;
-
-    phi = phi.scaled(downscaledImage_.width(),
-                     downscaledImage_.height(),
-                     Qt::IgnoreAspectRatio,
-                     Qt::FastTransformation);
 }
 
 void ImageController::reinitializeWorker()
 {
+    if ( inputImage_.isNull() )
+        return;
+
     downscaleImage();
+
+    if ( downscaledImage_.isNull() )
+        return;
+
+    if ( originalInitialPhi_.isNull() )
+        return;
+
+    computeConfig_.initialPhi = originalInitialPhi_.scaled(downscaledImage_.width(),
+                                                           downscaledImage_.height(),
+                                                           Qt::IgnoreAspectRatio,
+                                                           Qt::FastTransformation);
+
+    if ( computeConfig_.initialPhi.isNull() )
+        return;
 
     emit clearOverlaysRequested();
 
@@ -102,6 +113,7 @@ void ImageController::onProcessedImageReady(const QImage& processed)
 void ImageController::onImgSettingsChanged(const ImageSessionSettings& config)
 {
     computeConfig_ = config.compute;
+    originalInitialPhi_ = computeConfig_.initialPhi;
 
     reinitializeWorker();
 }
