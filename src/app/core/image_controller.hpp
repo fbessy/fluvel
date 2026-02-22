@@ -28,10 +28,8 @@ public slots:
     void converge();
 
 signals:
-    void inputImageReady(const QImage& image);
-    void imageReadyWithResize(const QImage& image);
-    void imageReadyWithoutResize(const QImage& image);
-    void displayedImageReady(const QImage& image);
+    void inputImageReady(const QImage& inputImage);
+    void displayedImageReady(const QImage& displayed);
 
     void contourUpdated(const QVector<QPointF>& l_out,
                         const QVector<QPointF>& l_in);
@@ -43,11 +41,17 @@ private:
 
     void onImgSettingsChanged(const ImageSessionSettings& conf);
     void onImgDisplaySettingsChanged(const DisplayConfig& display);
+
+    void downscaleImage();
+    void reinitializeWorker();
     void refreshView();
 
     QImage inputImage_;
+    QImage downscaledImage_;
     QImage processedImage_;
+
     DisplayConfig displayConfig_;
+    ImageComputeConfig computeConfig_;
 
     ActiveContourWorker acWorker;
 };

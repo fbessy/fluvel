@@ -24,7 +24,7 @@ class PhiEditor : public QObject
 
 public:
 
-    PhiEditor();
+    PhiEditor(const QImage& committedPhi);
 
     void addShape(const ShapeInfo& shape);
     void subtractShape(const ShapeInfo& shape);
@@ -33,22 +33,22 @@ public:
     void accept();
     void reject();
 
-    const QImage& phi() const { return current; }
+    void setSize(const QSize& size);
 
-public slots:
-    void onImageSizeReady(int width, int height);
+    const QImage& phi() const { return editedPhi_; }
 
 signals:
-    void phiChanged();
-    void phiCleared();
-    void phiResized(int width, int height);
+    void phiAccepted(const QImage& committedPhi);
+    void editedPhiChanged();
+    void editedPhiCleared();
 
 private:
 
     void changeShape(const ShapeInfo& shapeInfo,
                      const QColor& color);
 
-    QImage current;
+    QImage editedPhi_;
+    QImage committedPhi_;
 };
 
 } // namespace ofeli_app

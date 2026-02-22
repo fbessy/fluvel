@@ -1,33 +1,20 @@
 #include "phi_editor.hpp"
-#include "application_settings.hpp"
 
 #include <QPainter>
 
 namespace ofeli_app
 {
 
-PhiEditor::PhiEditor()
+PhiEditor::PhiEditor(const QImage& committedPhi):
+    committedPhi_(committedPhi)
 {
-    current = AppSettings::instance().imgConfig.compute.initialPhi;
-}
-
-void PhiEditor::onImageSizeReady(int width, int height)
-{
-    if ( !current.isNull() )
-    {
-        current = current.scaled( width,
-                                  height,
-                                  Qt::IgnoreAspectRatio,
-                                  Qt::FastTransformation);
-
-        emit phiResized( current.width(), current.height() );
-    }
+    editedPhi_ = committedPhi_;
 }
 
 void PhiEditor::changeShape(const ShapeInfo& shapeInfo,
                             const QColor& color)
 {
-    QPainter painter(&current);
+    QPainter painter(&editedPhi_);
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setBrush(color);
     painter.setPen(Qt::NoPen);
@@ -35,40 +22,60 @@ void PhiEditor::changeShape(const ShapeInfo& shapeInfo,
     if ( shapeInfo.type == ShapeType::Rectangle )
         painter.drawRect(shapeInfo.boundingBox);
     else if ( shapeInfo.type == ShapeType::Ellipse )
-    {
         painter.drawEllipse(shapeInfo.boundingBox);
-    }
 }
 
 void PhiEditor::addShape(const ShapeInfo& shapeInfo)
 {
     changeShape(shapeInfo, Qt::white);
-    emit phiChanged();
+    emit editedPhiChanged();
 }
 
 void PhiEditor::subtractShape(const ShapeInfo& shapeInfo)
 {
     changeShape(shapeInfo, Qt::black);
-    emit phiChanged();
+    emit editedPhiChanged();
 }
 
 void PhiEditor::clear()
 {
-    current.fill(Qt::black);
-    emit phiCleared();
+    editedPhi_.fill(Qt::black);
+    emit editedPhiCleared();
 }
 
 void PhiEditor::accept()
 {
-    AppSettings::instance().imgConfig.compute.initialPhi = current;
+    committedPhi_ = editedPhi_;
+
+    emit phiAccepted( committedPhi_ );
 }
 
 void PhiEditor::reject()
 {
-    if ( current != AppSettings::instance().imgConfig.compute.initialPhi )
+    editedPhi_ = committedPhi_;
+
+    emit editedPhiChanged();
+}
+
+void PhiEditor::setSize(const QSize& size)
+{
+    if ( editedPhi_.isNull() )
+        return;
+
+    if ( committedPhi_.isNull() )
+        return;
+
+    if ( size != editedPhi_.size() )
     {
-        current = AppSettings::instance().imgConfig.compute.initialPhi;
-        emit phiChanged();
+        editedPhi_ = editedPhi_.scaled(size,
+                                       Qt::IgnoreAspectRatio,
+                                       Qt::FastTransformation);
+
+        committedPhi_ = committedPhi_.scaled(size,
+                                             Qt::IgnoreAspectRatio,
+                                             Qt::FastTransformation);
+
+        emit phiAccepted( committedPhi_ );
     }
 }
 

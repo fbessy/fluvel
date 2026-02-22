@@ -49,9 +49,6 @@
 #include "language_window.hpp"
 
 #include "display_settings_widget.hpp"
-
-#include "phi_editor.hpp"
-#include "phi_view_model.hpp"
 #include "active_contour_worker.hpp"
 
 namespace ofeli_app {
@@ -71,11 +68,17 @@ public:
 
 public slots:
     void refreshAlgoOverlay();
-    void onDisplayedImageReady(const QImage& input);
+    void onInputImageReady(const QImage& inputImage);
+    void onDisplayedImageReady(const QImage& displayed);
     void onFileSelected(const QString& path);
     void onStateChanged(ofeli_app::WorkerState state);
     void onCameraWindowShown();
     void onCameraWindowClosed();
+
+signals:
+
+    void fileSelected(QString fileName);
+    void inputImageReady(const QImage& inputImage);
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -145,8 +148,7 @@ private:
 
     // --- Controllers / Workers ---
     ImageController* imageController = nullptr;
-    std::unique_ptr<PhiEditor> phiEditor;
-    std::unique_ptr<PhiViewModel> phiViewModel;
+
 
     QString m_fileName;
     QString m_fullPath;
@@ -157,10 +159,6 @@ private:
     QIcon restartIcon;
     QIcon pauseIcon;
     QIcon settingsIcon;
-
-signals:
-
-    void fileSelected(QString fileName);
 };
 
 }

@@ -3,7 +3,8 @@
 
 #include <QPainter>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 PhiViewModel::PhiViewModel(PhiEditor* editor,
                            QObject* parent)
@@ -21,31 +22,11 @@ PhiViewModel::PhiViewModel(PhiEditor* editor,
     updateLists();
     updatePhiFromLists();
 
-    connect(editor_, &PhiEditor::phiChanged,
+    connect(editor_, &PhiEditor::editedPhiChanged,
             this, &PhiViewModel::updateFromEditor);
 
-    connect(editor_, &PhiEditor::phiCleared,
+    connect(editor_, &PhiEditor::editedPhiCleared,
             this, &PhiViewModel::onClearFromEditor);
-
-    connect(editor_, &PhiEditor::phiResized,
-            this, &PhiViewModel::onPhiResized);
-
-    updateTimer_.setSingleShot(true);
-    updateTimer_.setTimerType(Qt::CoarseTimer);
-
-    connect(&updateTimer_, &QTimer::timeout, this, [this]()
-            {
-                updateListsFloodFill();
-                updatePhiFromLists();
-                composeView(false);
-            });
-}
-
-// called after an image reload with size change
-// and juste before the callback onPhiResized
-void PhiViewModel::setBackground(const QImage& image)
-{
-    background_ = image.convertToFormat(QImage::Format_RGB32);
 }
 
 void PhiViewModel::onConnectivityChanged(int index)
@@ -57,34 +38,27 @@ void PhiViewModel::onConnectivityChanged(int index)
     composeView(true);
 }
 
-// called after an image reload without size change
-void PhiViewModel::setBackgroundWithUpdate(const QImage& image)
+void PhiViewModel::setBackground(const QImage& image)
 {
     background_ = image.convertToFormat(QImage::Format_RGB32);
 
+    updateListsFloodFill();
     updatePhiFromLists();
     composeView(true);
 }
 
-void PhiViewModel::onPhiResized(int width, int height)
-{
-    assert( width  == background_.width() &&
-            height == background_.height() );
-
-
-    updateTimer_.start(0);
-}
-
 void PhiViewModel::updateFromEditor()
 {
-    updateTimer_.start(0);
+    updateListsFloodFill();
+    updatePhiFromLists();
+    composeView(false);
 }
 
 void PhiViewModel::onClearFromEditor()
 {
-    l_out.clear();
-    l_in.clear();
-    phiImage_ = background_;
+    l_out_.clear();
+    l_in_.clear();
+    displayedPhi_ = background_;
 
     composeView(true);
 }
@@ -94,13 +68,13 @@ void PhiViewModel::updateLists()
     if (!editor_)
         return;
 
-    const int w = editor_->phi().width();
-    const int h = editor_->phi().height();
+    const auto& phi = editor_->phi();
+    const int w = phi.width();
+    const int h = phi.height();
 
-    l_out.clear();
-    l_in.clear();
-
-    const auto phi = editor_->phi();
+    listsGridSize_ = phi.size();
+    l_out_.clear();
+    l_in_.clear();
 
     for ( int y = 0; y < h; ++y )
     {
@@ -114,11 +88,11 @@ void PhiViewModel::updateLists()
             {
                 if ( I == 0 )
                 {
-                    l_out.emplace_back(x, y);
+                    l_out_.emplace_back(x, y);
                 }
                 else if (I == 255)
                 {
-                    l_in.emplace_back(x, y);
+                    l_in_.emplace_back(x, y);
                 }
             }
         }
@@ -168,12 +142,13 @@ bool PhiViewModel::point_is_redundant(int x, int y)
 
 void PhiViewModel::updateListsFloodFill()
 {
-    l_out.clear();
-    l_in.clear();
-
-    const QImage& phi = editor_->phi();
+    const auto& phi = editor_->phi();
     const int w = phi.width();
     const int h = phi.height();
+
+    listsGridSize_ = phi.size();
+    l_out_.clear();
+    l_in_.clear();
 
     Q_ASSERT(phi.format() == QImage::Format_Grayscale8);
 
@@ -245,9 +220,9 @@ void PhiViewModel::updateListsFloodFill()
                     visited.scanLine(s.y)[xi] = 1;
 
                     if (value == 0)
-                        l_out.emplace_back(xi, s.y);
+                        l_out_.emplace_back(xi, s.y);
                     else
-                        l_in.emplace_back(xi, s.y);
+                        l_in_.emplace_back(xi, s.y);
                 }
 
                 // Examiner lignes au-dessus et en dessous
@@ -287,30 +262,38 @@ void PhiViewModel::updateListsFloodFill()
 
 void PhiViewModel::updatePhiFromLists()
 {
-    phiImage_ = background_;
+    displayedPhi_ = background_;
 
-    for( const auto& p : l_out )
+    if ( displayedPhi_.size() != listsGridSize_ )
+        return;
+
+    for( const auto& p : l_out_ )
     {
         QPoint point(p.x, p.y);
-        phiImage_.setPixel(point, qRgb(0, 0, 255));
+        displayedPhi_.setPixel(point, qRgb(0, 0, 255));
     }
 
-    for( const auto& p : l_in )
+    for( const auto& p : l_in_ )
     {
         QPoint point(p.x, p.y);
-        phiImage_.setPixel(point, qRgb(255, 0, 0));
+        displayedPhi_.setPixel(point, qRgb(255, 0, 0));
     }
 }
 
 void PhiViewModel::composeView(bool hasOverlay)
 {
-    QImage withOverlay = phiImage_;
+    QImage withOverlay = displayedPhi_;
 
     if (hasOverlay)
     {
         QPainter p(&withOverlay);
-        p.setRenderHint(QPainter::Antialiasing, false);
-        p.setPen(QPen(Qt::cyan, 2));
+        //p.setRenderHint(QPainter::Antialiasing, false);
+
+        QColor overlayColor = Qt::green;
+        overlayColor.setAlpha(150);
+
+        QPen pen(overlayColor, 3);
+        p.setPen(pen);
         p.setBrush(Qt::NoBrush);
 
         if (overlayShape_.type == ShapeType::Rectangle)

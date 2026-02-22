@@ -63,26 +63,19 @@ ContourData::ContourData(int phi_width, int phi_height,
     assert( is_valid() );
 }
 
-ContourData::ContourData(const unsigned char* phi_grayscale_img_data,
-                         int phi_width, int phi_height,
+ContourData::ContourData(ImageSpan grayscale_phi,
                          Connectivity connectivity)
-    : phi_(phi_width, phi_height),
+    : phi_(grayscale_phi.width(), grayscale_phi.height()),
     connectivity_(connectivity)
 {
-    assert( phi_grayscale_img_data != nullptr );
-    assert( phi_width  >= 1 );
-    assert( phi_height >= 1 );
-
-
-    for( size_t offset = 0; offset < phi_.size(); ++offset )
+    for (int y = 0; y < phi_.height(); ++y)
     {
-        if ( phi_grayscale_img_data[ offset ] >= 128u )
+        for (int x = 0; x < phi_.width(); ++x)
         {
-            phi_[offset] = PhiValue::InteriorBoundary;
-        }
-        else
-        {
-            phi_[offset] = PhiValue::ExteriorBoundary;
+            if ( grayscale_phi.at(x,y) >= 128u )
+                phi_.at(x,y) = PhiValue::InteriorBoundary;
+            else
+                phi_.at(x,y) = PhiValue::ExteriorBoundary;
         }
     }
 

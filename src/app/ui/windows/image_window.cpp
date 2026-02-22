@@ -16,7 +16,8 @@
 #include <QAction>
 #include <QFileDialog>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 ImageWindow::ImageWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -324,12 +325,7 @@ void ImageWindow::setupActions()
 
     imageController = new ImageController(this);
 
-    phiEditor = std::make_unique<PhiEditor>();
-    phiViewModel = std::make_unique<PhiViewModel>(phiEditor.get());
-
-    settings_window = new SettingsWindow(this, phiEditor.get(),
-                                               phiViewModel.get());
-
+    settings_window = new SettingsWindow(this);
     camera_window = new CameraWindow;
     evaluation_window = new AnalysisWindow(this);
     about_window = new AboutWindow(this);
@@ -443,6 +439,16 @@ void ImageWindow::setupConnections()
             &ImageView::setImage);
 
     connect(imageController,
+            &ImageController::inputImageReady,
+            this,
+            &ImageWindow::onInputImageReady);
+
+    connect(this,
+            &ImageWindow::inputImageReady,
+            settings_window,
+            &SettingsWindow::onInputImageReady);
+
+    connect(imageController,
             &ImageController::contourUpdated,
             imageView,
             &ImageView::setContour,
@@ -488,18 +494,6 @@ void ImageWindow::setupConnections()
 
     connect(imageController,    &ImageController::stateChanged,
             this,               &ImageWindow::onStateChanged);
-
-    connect(imageController,    &ImageController::imageReadyWithoutResize,
-            phiViewModel.get(), &PhiViewModel::setBackgroundWithUpdate);
-
-    connect(imageController,
-            &ImageController::imageReadyWithResize,
-            phiEditor.get(),
-            [this](const QImage &img)
-            {
-                phiViewModel->setBackground(img);
-                phiEditor->onImageSizeReady(img.width(), img.height());
-            });
 }
 
 QString ImageWindow::strippedName(const QString &fullFilename)
@@ -783,6 +777,11 @@ void ImageWindow::onCameraWindowShown()
 void ImageWindow::onCameraWindowClosed()
 {
     cameraSessionAct->setChecked(false);
+}
+
+void ImageWindow::onInputImageReady(const QImage& inputImage)
+{
+    emit inputImageReady(inputImage);
 }
 
 }

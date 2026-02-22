@@ -192,92 +192,46 @@ bool ActiveContourWorker::stepOnceAlgo()
     return ac_->is_stopped();
 }
 
-void ActiveContourWorker::applyPreprocess()
+void ActiveContourWorker::applyProcessing()
 {
+    if ( image_.isNull() )
+        return;
+
     timer_->stop();
     setState( WorkerState::Initializing );
 
-    applyDownscale();
-    applyProcessing();
-}
-
-void ActiveContourWorker::applyDownscale()
-{
-    if ( inputImage_.isNull() )
-        return;
-
-    if ( config_.initialPhi.isNull() )
-        return;
-
-    const bool hasDownscale = config_.downscale.hasDownscale;
-    const int downscale_fctr = config_.downscale.downscaleFactor;
-
-    scaledPhi_ = config_.initialPhi;
-
-#ifdef OFELI_DEBUG
-    int bpp = inputImage_.depth() / 8;  // ou 4 pour ARGB32
-    int expected = inputImage_.width() * bpp;
-
-    qDebug() << "bytesPerLine =" << inputImage_.bytesPerLine()
-             << "expected =" << expected
-             << "padding =" << inputImage_.bytesPerLine() - expected;
-#endif
-
-    if ( hasDownscale )
-    {
-        assert( downscale_fctr == 2 || downscale_fctr == 4 );
-
-        downscaledImage_ = inputImage_.scaled(inputImage_.width()/downscale_fctr,
-                                              inputImage_.height()/downscale_fctr,
-                                              Qt::IgnoreAspectRatio,
-                                              Qt::FastTransformation);
-
-        scaledPhi_ = scaledPhi_.scaled(downscaledImage_.width(),
-                                       downscaledImage_.height(),
-                                       Qt::IgnoreAspectRatio,
-                                       Qt::FastTransformation);
-    }
-    else
-    {
-        downscaledImage_ = inputImage_;
-    }
-
-#ifdef OFELI_DEBUG
-    int bpp2 = downscaledImage_.depth() / 8;  // ou 4 pour ARGB32
-    int expected2 = downscaledImage_.width() * bpp2;
-
-    qDebug() << "bytesPerLine =" << downscaledImage_.bytesPerLine()
-             << "expected =" << expected2
-             << "padding =" << downscaledImage_.bytesPerLine() - expected2;
-#endif
-}
-
-void ActiveContourWorker::applyProcessing()
-{
-    if ( downscaledImage_.isNull() )
-        return;
+    processedImage_ = image_;
 
     //float elapsed_time;
     //std::clock_t start_time, stop_time;
 
     QImage img;
 
-    if ( downscaledImage_.format() == QImage::Format_Grayscale8 )
-        img = downscaledImage_;
-    else if ( downscaledImage_.format() == QImage::Format_RGB32 )
-        img = downscaledImage_.convertToFormat( QImage::Format_RGB888 );
+    int channelsNbr = 3;
+
+    if ( image_.format() == QImage::Format_Grayscale8 )
+    {
+        img = image_;
+        channelsNbr = 1;
+    }
+    else if ( image_.format() == QImage::Format_RGB32 )
+    {
+        img = image_.convertToFormat( QImage::Format_RGB888 );
+        channelsNbr = 3;
+    }
 
     if ( img.isNull() )
         return;
 
-    const qsizetype stride = img.bytesPerLine();
     const int width = img.width();
+
+    if (img.bytesPerLine() != width * channelsNbr)
+        return;
+
+    const qsizetype stride = img.bytesPerLine();
 
     const int bytesPerPixel =
         static_cast<int>(stride / width);
-
-    if (img.bytesPerLine() != img.width() * 3)
-        return;
 
     ofeli_ip::Filters filters(img.constBits(),
                               width,
@@ -394,26 +348,23 @@ void ActiveContourWorker::applyProcessing()
                                      QImage::Format_Grayscale8).copy();
         }
     }
-    else
-    {
-        processedImage_ = downscaledImage_;
-    }
 
-    emit processedImageReady(processedImage_);
+    if ( !processedImage_.isNull() )
+        emit processedImageReady(processedImage_);
 
     //return elapsed_time;
 }
 
-void ActiveContourWorker::initializeFromInput(const QImage& input,
-                                              const ImageComputeConfig& config)
+void ActiveContourWorker::initialize(const QImage& image,
+                                     const ImageComputeConfig& config)
 {
     timer_->stop();
     setState( WorkerState::Initializing );
 
-    inputImage_ = input;
+    image_ = image;
     config_ = config;
 
-    applyPreprocess();
+    applyProcessing();
 
     initializeActiveContour();
 
@@ -436,9 +387,20 @@ void ActiveContourWorker::initializeActiveContour()
 
     ac_.reset();
 
-    ofeli_ip::ContourData initialCD(scaledPhi_.constBits(),
-                                    scaledPhi_.width(),
-                                    scaledPhi_.height(),
+    //assert( processedImage_.size() == config_.initialPhi.size() );
+
+    if ( processedImage_.size() != config_.initialPhi.size() )
+    {
+        config_.initialPhi = config_.initialPhi.scaled( processedImage_.size(),
+                                                        Qt::IgnoreAspectRatio,
+                                                        Qt::FastTransformation );
+    }
+
+    assert( !config_.initialPhi.isNull() );
+
+    auto initialPhi = image_span_from_qimage(config_.initialPhi);
+
+    ofeli_ip::ContourData initialCD(initialPhi,
                                     config_.algo.connectivity);
 
     bool is_rgb = ( processedImage_.format() != QImage::Format_Grayscale8 );
@@ -568,7 +530,7 @@ void ActiveContourWorker::setAlgoConfig(const ImageComputeConfig& config)
 {
     config_ = config;
 
-    applyPreprocess();
+    applyProcessing();
     initializeActiveContour();
 
     if ( state_ != WorkerState::Ready )

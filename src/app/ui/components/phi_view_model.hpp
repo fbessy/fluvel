@@ -11,7 +11,8 @@
 #include "grid2d.hpp"       // ofeli_ip::Grid2D
 #include "point.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 struct Span
 {
@@ -27,14 +28,12 @@ public:
     explicit PhiViewModel(PhiEditor* editor,
                           QObject* parent = nullptr);
 
-    const QImage& phiImage() const { return phiImage_; }
+    const QImage& phiImage() const { return displayedPhi_; }
     void setOverlay(const ShapeInfo& overlayShape);
 
 public slots:
-    void onPhiResized(int width, int height);
     void updateFromEditor();
     void onClearFromEditor();
-    void setBackgroundWithUpdate(const QImage& image);
     void setBackground(const QImage& image);
     void onConnectivityChanged(int index);
 
@@ -43,8 +42,6 @@ signals:
 
 private:
 
-    QTimer updateTimer_;
-
     void updateLists();
     void updateListsFloodFill();
     void updatePhiFromLists();
@@ -52,11 +49,13 @@ private:
     bool point_is_redundant(int x, int y);
 
     PhiEditor* editor_;   // non owning
-    QImage phiImage_;
+    QImage displayedPhi_;
     QImage background_;
 
-    std::vector<ofeli_ip::Point2D_i> l_out;
-    std::vector<ofeli_ip::Point2D_i> l_in;
+    std::vector<ofeli_ip::Point2D_i> l_out_;
+    std::vector<ofeli_ip::Point2D_i> l_in_;
+
+    QSize listsGridSize_;
 
     ShapeInfo overlayShape_;
 

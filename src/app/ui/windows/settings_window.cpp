@@ -48,7 +48,6 @@
 #include "active_contour.hpp"
 #include "shape_overlay_renderer.hpp"
 #include "phi_view_model.hpp"
-#include "shape_type.hpp"
 
 #include "interaction_set.hpp"
 #include "zoom_behavior.hpp"
@@ -62,14 +61,10 @@
 namespace ofeli_app
 {
 
-SettingsWindow::SettingsWindow(QWidget* parent,
-                               PhiEditor* phiEditor,
-                               PhiViewModel* phiViewModel) :
+SettingsWindow::SettingsWindow(QWidget* parent) :
     QDialog(parent),
     filters2(nullptr),
-    img2_filtered(nullptr),
-    phiEditor_(phiEditor),
-    phiViewModel_(phiViewModel)
+    img2_filtered(nullptr)
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -119,8 +114,9 @@ SettingsWindow::SettingsWindow(QWidget* parent,
     settings_grid->setColumnStretch(1,1);
     setLayout(settings_grid);
 
-    updateUIFromConfig();
+    imageSettingsController = new ImageSettingsController(this);
 
+    updateUIFromConfig();
     setupConnections();
 }
 
@@ -688,10 +684,10 @@ void SettingsWindow::setupConnections()
             this, &SettingsWindow::onSubtractShape);
 
     connect(clear_button, &QPushButton::clicked,
-            phiEditor_, &PhiEditor::clear);
+            this, &SettingsWindow::onClearPhi);
 
-    connect(phiViewModel_,
-            &PhiViewModel::viewChanged,
+    connect(imageSettingsController,
+            &ImageSettingsController::viewChanged,
             settingsView,
             &ImageView::setImage);
 
@@ -702,77 +698,49 @@ void SettingsWindow::setupConnections()
             phiViewModel_,
             &PhiViewModel::onConnectivityChanged);*/
 
-    auto updateOverlay = [this]()
-    {
-        phiViewModel_->setOverlay( computeShapeInfo() );
-    };
+    connect(rectangle_radio,   &QRadioButton::toggled,
+            this,  &SettingsWindow::onUiShapeChanged);
+    connect(ellipse_radio,     &QRadioButton::toggled,
+            this,  &SettingsWindow::onUiShapeChanged);
 
-    connect(abscissa_spin,     &QSpinBox::valueChanged, this, updateOverlay);
-    connect(ordinate_spin,     &QSpinBox::valueChanged, this, updateOverlay);
-    connect(width_shape_spin,  &QSpinBox::valueChanged, this, updateOverlay);
-    connect(height_shape_spin, &QSpinBox::valueChanged, this, updateOverlay);
-    connect(rectangle_radio,   &QRadioButton::toggled, this,  updateOverlay);
-    connect(ellipse_radio,     &QRadioButton::toggled, this,  updateOverlay);
+    connect(width_shape_spin,  &QSpinBox::valueChanged,
+            this,  &SettingsWindow::onUiShapeChanged);
+    connect(height_shape_spin, &QSpinBox::valueChanged,
+            this,  &SettingsWindow::onUiShapeChanged);
+
+    connect(abscissa_spin,     &QSpinBox::valueChanged,
+            this,  &SettingsWindow::onUiShapeChanged);
+    connect(ordinate_spin,     &QSpinBox::valueChanged,
+            this,  &SettingsWindow::onUiShapeChanged);
+
+    connect(this,
+            &SettingsWindow::updateOverlay,
+            imageSettingsController,
+            &ImageSettingsController::onUpdateOverlay);
 }
 
-ShapeInfo SettingsWindow::computeShapeInfo()
+void SettingsWindow::onUiShapeChanged()
 {
-    ShapeInfo info;
-
-    // --- Type de shape ---
-    info.type = rectangle_radio->isChecked()
-                    ? ShapeType::Rectangle
-                    : ShapeType::Ellipse;
-
-    const int canvasWidth = phiEditor_->phi().width();
-    const int canvasHeight = phiEditor_->phi().height();
-
-    // Récupération des valeurs des sliders (en pourcentage)
-    float centerXPercent = static_cast<float>(abscissa_spin->value()) / 100.0f; // De -500 à +500, donc normalisé autour de 0
-    float centerYPercent = static_cast<float>(ordinate_spin->value()) / 100.0f;
-
-    // Calcul de la position du centre en pixels
-    float centerX = (centerXPercent + 0.5f) * static_cast<float>(canvasWidth);
-    float centerY = (centerYPercent + 0.5f) * static_cast<float>(canvasHeight);
-
-    // Récupération des dimensions de la shape en pixels
-    float width  = static_cast<float>(width_shape_spin->value())
-                  / 100.0f * static_cast<float>(canvasWidth);
-
-    float height = static_cast<float>(height_shape_spin->value())
-                   / 100.0f * static_cast<float>(canvasHeight);
-
-    // Calcul de la bounding box à partir du centre et des dimensions
-    float topLeftX = centerX - ( width / 2.f );
-    float topLeftY = centerY - ( height / 2.f );
-
-    info.boundingBox = QRect(static_cast<int>(topLeftX),
-                             static_cast<int>(topLeftY),
-                             static_cast<int>(width),
-                             static_cast<int>(height));
-
-    return info;
+    emit updateOverlay( getUiShape() );
 }
 
-void SettingsWindow::onAddShape()
+UiShapeInfo SettingsWindow::getUiShape() const
 {
-    applyCurrentShape(true);   // true = add
-}
+    UiShapeInfo uiShape;
 
-void SettingsWindow::onSubtractShape()
-{
-    applyCurrentShape(false);  // false = subtract
-}
-
-void SettingsWindow::applyCurrentShape(bool add)
-{
-    if (!phiEditor_)
-        return;
-
-    if (add)
-        phiEditor_->addShape( computeShapeInfo() );
+    if ( rectangle_radio->isChecked() )
+        uiShape.shape = ShapeType::Rectangle;
+    else if ( ellipse_radio->isChecked() )
+        uiShape.shape = ShapeType::Ellipse;
     else
-        phiEditor_->subtractShape( computeShapeInfo() );
+        uiShape.shape = ShapeType::Rectangle;
+
+    uiShape.width = width_shape_spin->value();
+    uiShape.height = height_shape_spin->value();
+    uiShape.x = abscissa_spin->value();
+    uiShape.y = ordinate_spin->value();
+
+    return uiShape;
 }
 
 void SettingsWindow::accept()
@@ -823,7 +791,7 @@ void SettingsWindow::accept()
     filt_config.kernel_tophat_length = klength_tophat_spin->value();
     filt_config.has_O1_morpho = complex2_morpho_radio->isChecked();
 
-    phiEditor_->accept();
+    imageSettingsController->accept();
 
     algo_widget->accept();
 
@@ -911,7 +879,7 @@ void SettingsWindow::updateUIFromConfig()
         complex1_morpho_radio->setChecked(true);
     }
 
-    phiEditor_->reject();
+    imageSettingsController->reject();
 
     algo_widget->reject();
 }
@@ -1151,12 +1119,33 @@ float SettingsWindow::calculate_filtered_image()
     return elapsed_time;
 }*/
 
+void SettingsWindow::onAddShape()
+{
+    if ( imageSettingsController )
+        imageSettingsController->addShape( getUiShape() );
+}
+
+void SettingsWindow::onSubtractShape()
+{
+    if ( imageSettingsController )
+        imageSettingsController->subtractShape( getUiShape() );
+}
+
+void SettingsWindow::onClearPhi()
+{
+    if ( imageSettingsController )
+        imageSettingsController->clearPhi();
+}
+
+void SettingsWindow::onInputImageReady(const QImage& inputImage)
+{
+    if ( !inputImage.isNull() )
+        imageSettingsController->onInputImageReady(inputImage);
+}
+
 void SettingsWindow::showEvent(QShowEvent* /*event*/)
 {
-    if ( phiViewModel_ != nullptr )
-    {
-        phiViewModel_->setOverlay( computeShapeInfo() );
-    }
+    emit updateOverlay( getUiShape() );
 }
 
 void SettingsWindow::closeEvent(QCloseEvent* event)

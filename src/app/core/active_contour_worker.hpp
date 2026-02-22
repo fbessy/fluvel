@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QImage>
 #include <QMutex>
+#include <QTimer>
 
 #include "active_contour.hpp"
 #include "algo_stats.hpp"
@@ -37,8 +38,8 @@ public:
 
     ActiveContourWorker();
 
-    void initializeFromInput(const QImage& input,
-                             const ImageComputeConfig& config);
+    void initialize(const QImage& image,
+                    const ImageComputeConfig& config);
 
     void restart();        // reset + start
     void togglePause();    // suspend / resume
@@ -72,8 +73,6 @@ private:
     void performStep();
     bool stepOnceAlgo();
 
-    void applyPreprocess();
-    void applyDownscale();
     void applyProcessing();
     void initializeActiveContour();
     void finalizeAndPrepareNextRun();
@@ -89,10 +88,8 @@ private:
     mutable QMutex statsMutex_;
     AlgoStats currentStats_;
 
-    QImage inputImage_;
-    QImage downscaledImage_;
+    QImage image_;
     QImage processedImage_;
-    QImage scaledPhi_;
 
     qint64 timeSlice_ms_;
     bool initialShown_;

@@ -50,6 +50,8 @@
 #include "phi_view_model.hpp"
 #include "image_view.hpp"
 #include "algo_settings_widget.hpp"
+#include "image_settings_controller.hpp"
+#include "shape_type.hpp"
 
 #include <QtWidgets>
 
@@ -71,11 +73,17 @@ class SettingsWindow : public QDialog
 
 public :
 
-    SettingsWindow(QWidget* parent,
-                   PhiEditor* phiEditor,
-                   PhiViewModel* phiViewModel);
+    SettingsWindow(QWidget* parent);
 
-    //const unsigned char* get_filtered_img_data();
+public slots:
+    void onAddShape();
+    void onSubtractShape();
+    void onClearPhi();
+
+    void onInputImageReady(const QImage& inputImage);
+
+signals :
+    void changed(const QMimeData* mimeData = 0);
 
 protected:
 
@@ -88,17 +96,23 @@ protected:
     void showEvent(QShowEvent* /*event*/) override;
     void closeEvent(QCloseEvent* event) override;
 
-private :
+signals:
+    void updateOverlay(UiShapeInfo uiShape);
 
-    void applyCurrentShape(bool add);
+private :
 
     //////////////////////////////////////////
     //   pour la fenêtre de configuration   //
     /////////////////////////////////////////
 
+    void onUiShapeChanged();
+    UiShapeInfo getUiShape() const;
+
     void updateUIFromConfig();
 
     ImageView* settingsView;
+
+    ImageSettingsController* imageSettingsController = nullptr;
 
     // onglets a gauche
     QTabWidget* tabs;
@@ -236,9 +250,6 @@ private :
     AlgoSettingsWidget* algo_widget;
     QWidget* algo_page;
 
-    PhiEditor* phiEditor_;
-    PhiViewModel* phiViewModel_;
-
     // --- Setup ---
     void setupUiDownscaleTab();
     void setupUiPreprocessingTab();
@@ -246,8 +257,6 @@ private :
     void setupUiAlgoTab();
 
     void setupConnections();
-
-    ShapeInfo computeShapeInfo();
 
 private slots :
 
@@ -264,14 +273,6 @@ private slots :
     //void change_display_size();
     //void set_color_out();
     //void set_color_in();
-
-signals :
-
-    void changed(const QMimeData* mimeData = 0);
-
-public slots:
-    void onAddShape();
-    void onSubtractShape();
 };
 
 }

@@ -35,63 +35,61 @@ ImageController::ImageController(QObject* parent):
 void ImageController::loadImage(const QString& path)
 {
     inputImage_ = QImage(path);
-    bool isOk = false;
 
-    if ( !inputImage_.isNull() )
+    if ( inputImage_.isNull() )
+        return;
+
+    if ( inputImage_.isGrayscale() )
+        inputImage_ = inputImage_.convertToFormat( QImage::Format_Grayscale8 );
+    else
+        inputImage_ = inputImage_.convertToFormat( QImage::Format_RGB32 );
+
+    emit inputImageReady(inputImage_);
+
+    reinitializeWorker();
+}
+
+void ImageController::downscaleImage()
+{
+    if ( inputImage_.isNull() )
+        return;
+
+    if (    inputImage_.format() != QImage::Format_Grayscale8
+        && inputImage_.format() != QImage::Format_RGB32 )
+        return;
+
+    if ( computeConfig_.downscale.hasDownscale )
     {
-        if (    inputImage_.isGrayscale()
-            && inputImage_.format() != QImage::Format_Grayscale8 )
-        {
-            inputImage_ = inputImage_.convertToFormat( QImage::Format_Grayscale8 );
-        }
-        else if ( inputImage_.format() != QImage::Format_RGB32 )
-        {
-            inputImage_ = inputImage_.convertToFormat( QImage::Format_RGB32 );
-        }
+        const int df = computeConfig_.downscale.downscaleFactor;
+
+        assert( df == 2 || df == 4 );
+
+        downscaledImage_ = inputImage_.scaled(inputImage_.width() / df,
+                                              inputImage_.height() / df,
+                                              Qt::IgnoreAspectRatio,
+                                              Qt::FastTransformation);
+    }
+    else
+    {
+        downscaledImage_ = inputImage_;
     }
 
-    if (    !inputImage_.isNull()
-        &&
-        (    inputImage_.format() == QImage::Format_Grayscale8
-         || inputImage_.format() == QImage::Format_RGB32 ) )
-    {
-        isOk = true;
-    }
+    QImage& phi = computeConfig_.initialPhi;
 
-    if ( isOk )
-    {
-        bool isResize = false;
+    phi = phi.scaled(downscaledImage_.width(),
+                     downscaledImage_.height(),
+                     Qt::IgnoreAspectRatio,
+                     Qt::FastTransformation);
+}
 
-        if ( !AppSettings::instance().imgConfig.compute.initialPhi.isNull() )
-        {
-            if ( AppSettings::instance().imgConfig.compute.initialPhi.width()  != inputImage_.width() ||
-                 AppSettings::instance().imgConfig.compute.initialPhi.height() != inputImage_.height() )
-            {
-                AppSettings::instance().resize_initial_phi( inputImage_.width(),
-                                                            inputImage_.height() );
+void ImageController::reinitializeWorker()
+{
+    downscaleImage();
 
-                isResize = true;
-            }
-        }
+    emit clearOverlaysRequested();
 
-        if ( isResize )
-        {
-            emit imageReadyWithResize(inputImage_);
-        }
-        else
-        {
-            emit imageReadyWithoutResize(inputImage_);
-        }
-
-        if ( AppSettings::instance().imgConfig.compute.initialPhi.width()  == inputImage_.width() &&
-             AppSettings::instance().imgConfig.compute.initialPhi.height() == inputImage_.height() )
-        {
-            emit clearOverlaysRequested();
-
-            acWorker.initializeFromInput(inputImage_,
-                                         AppSettings::instance().imgConfig.compute);
-        }
-    }
+    acWorker.initialize(downscaledImage_,
+                        computeConfig_);
 }
 
 void ImageController::onProcessedImageReady(const QImage& processed)
@@ -103,7 +101,9 @@ void ImageController::onProcessedImageReady(const QImage& processed)
 
 void ImageController::onImgSettingsChanged(const ImageSessionSettings& config)
 {
-    acWorker.setAlgoConfig( config.compute );
+    computeConfig_ = config.compute;
+
+    reinitializeWorker();
 }
 
 void ImageController::onImgDisplaySettingsChanged(const DisplayConfig& display)

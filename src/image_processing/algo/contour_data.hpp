@@ -44,6 +44,7 @@
 
 #include <vector>
 
+#include "image_span.hpp"
 #include "grid2d.hpp"
 
 namespace ofeli_ip
@@ -118,9 +119,8 @@ public :
     ContourData(int phi_width, int phi_height,
                 Connectivity connectivity = Connectivity::Four);
 
-    //! Constructor to initialize the contour from a grayscale image data buffer of the levet-set function #phi.
-    ContourData(const unsigned char* phi_grayscale_img_data,
-                int phi_width, int phi_height,
+    //! Constructor to initialize the contour from a grayscale image of the levet-set function #phi.
+    ContourData(ImageSpan grayscale_phi,
                 Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of #l_out and #l_in.
