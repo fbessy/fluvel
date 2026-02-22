@@ -88,7 +88,6 @@ private:
     QPushButton* toggleStreamingButton;
 
     QStackedWidget* stacked;
-    QLabel* blackLabel;
     ImageView* videoView;
     CameraOverlayWidget* cameraOverlay;
 

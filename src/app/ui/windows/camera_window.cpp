@@ -69,8 +69,6 @@ CameraWindow::CameraWindow(QWidget* parent)
     : QMainWindow(parent),
     cameraSelector(nullptr),
     toggleStreamingButton(nullptr),
-    stacked(nullptr),
-    blackLabel(nullptr),
     videoView(nullptr),
     mediaDevices(nullptr)
 {
@@ -83,12 +81,6 @@ CameraWindow::CameraWindow(QWidget* parent)
         restoreGeometry(geo);
 
     currentCameraId = settings.value("Camera/last_id").toByteArray();
-
-    blackLabel = new QLabel(this);
-    blackLabel->setAlignment(Qt::AlignCenter);
-    QImage blackImage(640, 480, QImage::Format_RGB32);
-    blackImage.fill(Qt::black);
-    blackLabel->setPixmap(QPixmap::fromImage(blackImage));
 
     videoView = new ImageView(AppSettings::instance().camConfig.display,
                               AppSettings::instance().camConfig.compute.downscale,
@@ -118,7 +110,6 @@ CameraWindow::CameraWindow(QWidget* parent)
     cameraOverlay->raise();
 
     stacked = new QStackedWidget(this);
-    stacked->addWidget(blackLabel);
     stacked->addWidget(viewContainer);
 
     cameraSelector = new QComboBox(this);
@@ -343,7 +334,6 @@ void CameraWindow::onToggleStreaming()
         QSettings settings;
         settings.setValue("Camera/last_id", currentCameraId);
 
-        stacked->setCurrentIndex(1);
         controller->start(selectedId);
 
         toggleStreamingButton->setText(tr("Stop"));
@@ -356,7 +346,6 @@ void CameraWindow::stopCameraAndUi()
 {
     if ( controller && controller->isActive() )
     {
-        stacked->setCurrentIndex(0);
         controller->stop();
 
         toggleStreamingButton->setText( tr("Start") );
