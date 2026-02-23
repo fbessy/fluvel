@@ -68,7 +68,7 @@ void ImageController::downscaleImage()
         downscaledImage_ = inputImage_.scaled(inputImage_.width() / df,
                                               inputImage_.height() / df,
                                               Qt::IgnoreAspectRatio,
-                                              Qt::FastTransformation);
+                                              Qt::SmoothTransformation);
     }
     else
     {
@@ -92,7 +92,7 @@ void ImageController::reinitializeWorker()
     computeConfig_.initialPhi = originalInitialPhi_.scaled(downscaledImage_.width(),
                                                            downscaledImage_.height(),
                                                            Qt::IgnoreAspectRatio,
-                                                           Qt::FastTransformation);
+                                                           Qt::SmoothTransformation);
 
     if ( computeConfig_.initialPhi.isNull() )
         return;
@@ -120,7 +120,7 @@ void ImageController::onImgSettingsChanged(const ImageSessionSettings& config)
 
 void ImageController::onImgDisplaySettingsChanged(const DisplayConfig& display)
 {
-    bool needs_refresh = ( displayConfig_.input_displayed != display.input_displayed );
+    bool needs_refresh = ( displayConfig_.image != display.image );
 
     displayConfig_ = display;
 
@@ -135,9 +135,9 @@ void ImageController::refreshView()
 
     QImage img;
 
-    if ( displayConfig_.input_displayed )
+    if ( displayConfig_.image == ImageBase::Source )
         img = inputImage_;
-    else
+    else if ( displayConfig_.image == ImageBase::Preprocessed )
         img = processedImage_;
 
 

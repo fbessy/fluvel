@@ -146,9 +146,9 @@ void CameraController::onFrameResultReady(FrameResult result)
 
     QImage img;
 
-    if ( displayConfig_.input_displayed )
+    if ( displayConfig_.image == ImageBase::Source )
         img = result.input;
-    else
+    else if ( displayConfig_.image == ImageBase::Preprocessed )
         img = result.preprocessed;
 
     if ( !img.isNull() )

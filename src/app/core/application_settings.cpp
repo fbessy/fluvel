@@ -292,11 +292,14 @@ void ApplicationSettings::save_disp(Session session,
     settings.setValue(scope + "/display/algorithm_overlay",
                       disp_config.algorithm_overlay);
 
-    settings.setValue(scope + "/display/input_displayed",
-                      disp_config.input_displayed);
+    settings.setValue(scope + "/display/image",
+                      static_cast<int>(disp_config.image));
 
     settings.setValue(scope + "/display/mirrorMode",
                       disp_config.mirrorMode);
+
+    settings.setValue(scope + "/display/smoothDisplay",
+                      disp_config.smoothDisplay);
 }
 
 void ApplicationSettings::load_img_session_config()
@@ -504,9 +507,12 @@ void ApplicationSettings::load_disp(Session session,
 
     disp_config.algorithm_overlay = settings.value(scope + "/display/algorithm_overlay",
                                                    DisplayConfig::defaultOverlay).toBool();
-    disp_config.input_displayed   = settings.value(scope + "/display/input_displayed",
-                                                 DisplayConfig::defaultOptions).toBool();
+    disp_config.image   = static_cast<ImageBase>(settings.value(scope + "/display/image",
+                                                 static_cast<int>(DisplayConfig::defaultImage)).toInt());
     disp_config.mirrorMode        = settings.value(scope + "/display/mirrorMode",
+                                            DisplayConfig::defaultOptions).toBool();
+
+    disp_config.smoothDisplay     = settings.value(scope + "/display/smoothDisplay",
                                             DisplayConfig::defaultOptions).toBool();
 }
 
@@ -602,7 +608,7 @@ void ApplicationSettings::resize_initial_phi(int width, int height)
         {
             img = img.scaled( width, height,
                               Qt::IgnoreAspectRatio,
-                              Qt::FastTransformation );
+                              Qt::SmoothTransformation );
 
             emit resizedPhi( img );
         }

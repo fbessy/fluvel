@@ -393,7 +393,7 @@ void ActiveContourWorker::initializeActiveContour()
     {
         config_.initialPhi = config_.initialPhi.scaled( processedImage_.size(),
                                                         Qt::IgnoreAspectRatio,
-                                                        Qt::FastTransformation );
+                                                        Qt::SmoothTransformation );
     }
 
     assert( !config_.initialPhi.isNull() );

@@ -69,11 +69,11 @@ void PhiEditor::setSize(const QSize& size)
     {
         editedPhi_ = editedPhi_.scaled(size,
                                        Qt::IgnoreAspectRatio,
-                                       Qt::FastTransformation);
+                                       Qt::SmoothTransformation);
 
         committedPhi_ = committedPhi_.scaled(size,
                                              Qt::IgnoreAspectRatio,
-                                             Qt::FastTransformation);
+                                             Qt::SmoothTransformation);
 
         emit phiAccepted( committedPhi_ );
     }

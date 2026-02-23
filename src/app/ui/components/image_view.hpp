@@ -85,6 +85,8 @@ public slots:
     void applyDisplayConfig(const DisplayConfig& display);
     void applyDownscaleConfig(const DownscaleConfig& downscale);
     void updateFlip();
+    void updateSmoothDisplay();
+    void updateTextOverlayVisibility();
     void clearOverlays();
     void repositionOverlay();
 

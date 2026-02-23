@@ -43,8 +43,16 @@ enum class Session
     Camera
 };
 
+enum class ImageBase
+{
+    Source,
+    Preprocessed
+};
+
 struct DisplayConfig
 {
+    static constexpr ImageBase defaultImage = ImageBase::Preprocessed;
+
     static constexpr bool defaultListDisplayed = true;
     static constexpr unsigned char defaultRedOut   = 0u;
     static constexpr unsigned char defaultGreenOut = 0u;
@@ -53,8 +61,11 @@ struct DisplayConfig
     static constexpr unsigned char defaultGreenIn  = 0u;
     static constexpr unsigned char defaultBlueIn   = 0u;
 
-    static constexpr bool defaultOverlay       = true;
     static constexpr bool defaultOptions       = false;
+    static constexpr bool defaultOverlay       = true;
+
+
+    ImageBase image = defaultImage;
 
     bool l_out_displayed = defaultListDisplayed;
     ofeli_ip::Rgb_uc l_out_color { defaultRedOut,
@@ -66,9 +77,10 @@ struct DisplayConfig
                                   defaultGreenIn,
                                   defaultBlueIn };
 
-    bool algorithm_overlay = defaultOverlay;
-    bool input_displayed   = defaultOptions;
     bool mirrorMode        = defaultOptions;
+    bool smoothDisplay   = defaultOptions;
+
+    bool algorithm_overlay = defaultOverlay;
 };
 
 struct DownscaleConfig

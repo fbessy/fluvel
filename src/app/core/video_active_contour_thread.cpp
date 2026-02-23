@@ -93,7 +93,7 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
             fr.preprocessed = fr.input.scaled(fr.input.width() / downscale_fctr,
                                               fr.input.height() / downscale_fctr,
                                               Qt::IgnoreAspectRatio,
-                                              Qt::FastTransformation);
+                                              Qt::SmoothTransformation);
         }
         else
         {

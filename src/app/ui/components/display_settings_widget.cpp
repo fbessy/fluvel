@@ -2,11 +2,13 @@
 #include "application_settings.hpp"
 #include "color_selector_widget.hpp"
 #include "color_adapters.hpp"
+#include "common_settings.hpp"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QColorDialog>
+#include <QLabel>
 
 #include <cassert>
 
@@ -20,8 +22,19 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     if ( session_ == Session::Image )
         config_ = AppSettings::instance().imgConfig.display;
     else if ( session_ == Session::Camera )
-        config_ = AppSettings::instance().camConfig.display;;
+        config_ = AppSettings::instance().camConfig.display;
 
+
+    QGroupBox* pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
+    source_rb_ = new QRadioButton(tr("Source"));
+    preprocessed_rb_ = new QRadioButton(tr("Preprocessed"));
+    source_rb_->setChecked( config_.image == ImageBase::Source );
+    preprocessed_rb_->setChecked( config_.image == ImageBase::Preprocessed );
+
+    QVBoxLayout* pipeline_layout = new QVBoxLayout;
+    pipeline_layout->addWidget(source_rb_);
+    pipeline_layout->addWidget(preprocessed_rb_);
+    pipeline_displayed_gb_->setLayout(pipeline_layout);
 
     lout_selector_ = new ColorSelectorWidget(this,
                                              toQColor(config_.l_out_color) );
@@ -34,7 +47,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lout_layout->setContentsMargins(0, 0, 0, 0);
     lout_layout->setContentsMargins(0,0,0,0);
 
-    QGroupBox* lout_gb = new QGroupBox(tr("Lout"));
+    QGroupBox* lout_gb = new QGroupBox(tr("Outer Contour"));
     lout_gb->setLayout(lout_layout);
     lout_gb->setCheckable(true);
     lout_gb->setChecked( config_.l_out_displayed );
@@ -47,7 +60,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lin_layout->setContentsMargins(0, 0, 0, 0);
     lin_layout->setContentsMargins(0,0,0,0);
 
-    QGroupBox* lin_gb = new QGroupBox(tr("Lin"));
+    QGroupBox* lin_gb = new QGroupBox(tr("Inner Contour"));
     lin_gb->setLayout(lin_layout);
     lin_gb->setCheckable(true);
     lin_gb->setChecked( config_.l_in_displayed );
@@ -55,23 +68,34 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     lin_gb->setFlat(true);
     lin_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
-    display_overlay_cb_ = new QCheckBox(tr("Algorithm overlay"));
-    display_overlay_cb_->setChecked( config_.algorithm_overlay );
-
-    input_displayed_cb_ = new QCheckBox(tr("Input image"));
-    input_displayed_cb_->setChecked( config_.input_displayed );
-
-    flip_cb_ = new QCheckBox(tr("Selfie mirror"));
+    flip_cb_ = new QCheckBox(tr("Selfie Mirror"));
     flip_cb_->setChecked( config_.mirrorMode );
 
+    smooth_cb_ = new QCheckBox(tr("Smooth Display"));
+
+    QGroupBox* rendering_gb = new QGroupBox(tr("Rendering:"));
+    QVBoxLayout* rendering_layout = new QVBoxLayout;
+    rendering_layout->addWidget(flip_cb_);
+    rendering_layout->addWidget(smooth_cb_);
+    rendering_gb->setLayout(rendering_layout);
+
+    display_overlay_cb_ = new QCheckBox(tr("Algorithm Overlay"));
+    display_overlay_cb_->setChecked( config_.algorithm_overlay );
+
+    auto* title = new QLabel("View");
+    title->setStyleSheet("font-weight: bold; font-size: 14px;");
+
     QVBoxLayout* widget_layout = new QVBoxLayout;
+    widget_layout->addWidget(title);
+    widget_layout->addSpacing(12);
+    widget_layout->addWidget(pipeline_displayed_gb_);
     widget_layout->addWidget(lout_gb);
     widget_layout->addWidget(lin_gb);
+    widget_layout->addWidget(rendering_gb);
+    widget_layout->addSpacing(6);
     widget_layout->addWidget(display_overlay_cb_);
-    widget_layout->addWidget(input_displayed_cb_);
 
-    if ( session_ == Session::Camera )
-        widget_layout->addWidget(flip_cb_);
+
 
     widget_layout->addStretch();
 
@@ -112,24 +136,41 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
-    connect(input_displayed_cb_, &QCheckBox::toggled,
+    connect(source_rb_, &QRadioButton::toggled,
             this, [this](bool checked)
             {
-                config_.input_displayed = checked;
+                if (!checked)
+                    return;
+
+                config_.image = ImageBase::Source;
                 setConfig();
             });
 
-    if ( session_ == Session::Camera )
-    {
-        connect(flip_cb_, &QCheckBox::toggled,
-                this, [this](bool checked)
-                {
-                    config_.mirrorMode = checked;
-                    setConfig();
-                });
-    }
+    connect(preprocessed_rb_, &QRadioButton::toggled,
+            this, [this](bool checked)
+            {
+                if (!checked)
+                    return;
 
-    refresh_input_displayed_cb_availability();
+                config_.image = ImageBase::Preprocessed;
+                setConfig();
+            });
+
+    connect(flip_cb_, &QCheckBox::toggled,
+            this, [this](bool checked)
+            {
+                config_.mirrorMode = checked;
+                setConfig();
+            });
+
+    connect(smooth_cb_, &QCheckBox::toggled,
+            this, [this](bool checked)
+            {
+                config_.smoothDisplay = checked;
+                setConfig();
+            });
+
+    refresh_pipeline_displayed_gb_availability();
 
     connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged,
             this,                     &DisplaySettingsWidget::onImgSettingsChanged);
@@ -146,7 +187,7 @@ void DisplaySettingsWidget::setConfig()
         AppSettings::instance().set_cam_display_config(config_);
 }
 
-void DisplaySettingsWidget::refresh_input_displayed_cb_availability()
+void DisplaySettingsWidget::refresh_pipeline_displayed_gb_availability()
 {
     bool isEnabled = false;
 
@@ -168,21 +209,21 @@ void DisplaySettingsWidget::refresh_input_displayed_cb_availability()
         isEnabled = ( hasDownscale || has_filter );
     }
 
-    if ( !isEnabled )
-        input_displayed_cb_->setChecked(false);
+    //if ( !isEnabled )
+        //pipeline_displayed_gb_->setChecked(false);
 
 
-    input_displayed_cb_->setEnabled( isEnabled );
+    //pipeline_displayed_gb_->setEnabled( isEnabled );
 }
 
 void DisplaySettingsWidget::onImgSettingsChanged()
 {
-    refresh_input_displayed_cb_availability();
+    refresh_pipeline_displayed_gb_availability();
 }
 
 void DisplaySettingsWidget::onVideoSettingsChanged()
 {
-    refresh_input_displayed_cb_availability();
+    refresh_pipeline_displayed_gb_availability();
 }
 
 }

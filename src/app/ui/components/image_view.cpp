@@ -62,7 +62,7 @@ void ImageView::initialize()
 
     pixmapItem = new QGraphicsPixmapItem(contentRoot_);
     pixmapItem->setZValue(0);
-    pixmapItem->setTransformationMode(Qt::FastTransformation);
+    updateSmoothDisplay();
 
     blur_ = new QGraphicsBlurEffect;
     pixmapItem->setGraphicsEffect(blur_);
@@ -209,17 +209,14 @@ void ImageView::updatePixmap(const QImage& img)
 
     if (sizeChanged)
     {
+        if ( overlay_ )
+            overlay_->setPos(mapToScene(QPoint(0, 0)) + QPointF(10, 10));
+
         if ( l_out_ && l_in_ )
             updateDisplayWithConfig();
 
 
         applyAutoFit();
-
-        if ( overlay_ )
-        {
-            overlay_->setPos(mapToScene(QPoint(0, 0)) + QPointF(10, 10));
-            overlay_->show();
-        }
     }
 }
 
@@ -563,7 +560,8 @@ void ImageView::upscaleItems()
 
     qreal factor = 1.0;
 
-    if ( has_ds && displayConfig_.input_displayed )
+    if ( has_ds &&
+         displayConfig_.image == ImageBase::Source )
         factor = qreal( df );
 
     l_out_->setScale( factor );
@@ -584,6 +582,8 @@ void ImageView::updateDisplayWithConfig()
     updateContourColors();
     upscaleItems();
     updateFlip();
+    updateSmoothDisplay();
+    updateTextOverlayVisibility();
 }
 
 void ImageView::updateContourColors()
@@ -626,6 +626,25 @@ void ImageView::updateFlip()
         contentRoot_->setTransform(QTransform());
         contentRoot_->setPos(0.0, 0.0);
     }
+}
+
+void ImageView::updateSmoothDisplay()
+{
+    if ( !pixmapItem )
+        return;
+
+    if ( displayConfig_.smoothDisplay )
+        pixmapItem->setTransformationMode(Qt::SmoothTransformation);
+    else
+        pixmapItem->setTransformationMode(Qt::FastTransformation);
+}
+
+void ImageView::updateTextOverlayVisibility()
+{
+    if ( !overlay_ )
+        return;
+
+    overlay_->setVisible(displayConfig_.algorithm_overlay);
 }
 
 void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
@@ -697,6 +716,9 @@ QImage ImageView::darkenImage(const QImage& image)
 
 void ImageView::showPlaceholder(bool showEffect)
 {
+    if ( !blur_ )
+        return;
+
     if ( showEffect )
     {
         setImage(darkenImage( lastDisplayedImage) );
