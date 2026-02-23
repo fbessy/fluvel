@@ -78,7 +78,7 @@ struct DisplayConfig
                                   defaultBlueIn };
 
     bool mirrorMode        = defaultOptions;
-    bool smoothDisplay   = defaultOptions;
+    bool smoothDisplay     = defaultOptions;
 
     bool algorithm_overlay = defaultOverlay;
 };

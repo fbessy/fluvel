@@ -32,7 +32,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
         config_ = AppSettings::instance().camConfig.display;
 
 
-    QGroupBox* pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
+    pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
     source_rb_ = new QRadioButton(tr("Source"));
     preprocessed_rb_ = new QRadioButton(tr("Preprocessed"));
     source_rb_->setChecked( config_.image == ImageBase::Source );
@@ -79,6 +79,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     flip_cb_->setChecked( config_.mirrorMode );
 
     smooth_cb_ = new QCheckBox(tr("Smooth Display"));
+    smooth_cb_->setChecked( config_.smoothDisplay );
 
     QGroupBox* rendering_gb = new QGroupBox(tr("Rendering:"));
     QVBoxLayout* rendering_layout = new QVBoxLayout;
@@ -218,11 +219,13 @@ void DisplaySettingsWidget::refresh_pipeline_displayed_gb_availability()
         isEnabled = ( hasDownscale || has_filter );
     }
 
-    //if ( !isEnabled )
-        //pipeline_displayed_gb_->setChecked(false);
+    pipeline_displayed_gb_->setEnabled( isEnabled );
 
-
-    //pipeline_displayed_gb_->setEnabled( isEnabled );
+    if ( !isEnabled )
+    {
+        source_rb_->setChecked(true);
+        preprocessed_rb_->setChecked(false);
+    }
 }
 
 void DisplaySettingsWidget::onImgSettingsChanged()
