@@ -38,9 +38,9 @@ public:
         return active_;
     }
 
-    void mousePress(ImageView& view, QMouseEvent* event) override;
-    void mouseMove(ImageView& view, QMouseEvent* event) override;
-    void mouseRelease(ImageView& view, QMouseEvent* event) override;
+    bool mousePress(ImageView& view, QMouseEvent* event) override;
+    bool mouseMove(ImageView& view, QMouseEvent* event) override;
+    bool mouseRelease(ImageView& view, QMouseEvent* event) override;
 
 private:
     void updateOverlay(ImageView& view,

@@ -41,11 +41,11 @@ public:
                            const QMouseEvent* e) const;
 
 protected:
-    void wheel(ImageView& view, QWheelEvent* event) override;
-    void mousePress(ImageView& view, QMouseEvent* event) override;
-    void mouseMove(ImageView& view, QMouseEvent* event) override;
-    void mouseRelease(ImageView& view, QMouseEvent* event) override;
-    void mouseDoubleClick(ImageView& view, QMouseEvent* event) override;
+    bool wheel(ImageView& view, QWheelEvent* event) override;
+    bool mousePress(ImageView& view, QMouseEvent* event) override;
+    bool mouseMove(ImageView& view, QMouseEvent* event) override;
+    bool mouseRelease(ImageView& view, QMouseEvent* event) override;
+    bool mouseDoubleClick(ImageView& view, QMouseEvent* event) override;
 
     Qt::CursorShape cursorForEvent(
         const ImageView& view,

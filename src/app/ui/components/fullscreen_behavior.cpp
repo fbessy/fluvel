@@ -6,7 +6,7 @@
 namespace ofeli_app
 {
 
-void FullscreenBehavior::mouseDoubleClick(ImageView& view,
+bool FullscreenBehavior::mouseDoubleClick(ImageView& view,
                                           QMouseEvent* event)
 {
     Q_UNUSED(event);
@@ -16,7 +16,11 @@ void FullscreenBehavior::mouseDoubleClick(ImageView& view,
     {
         view.toggleFullscreen();
         event->accept();
+
+        return true;
     }
+
+    return false;
 }
 
 }

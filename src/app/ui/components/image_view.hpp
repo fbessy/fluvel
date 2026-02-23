@@ -7,11 +7,13 @@
 #include <QElapsedTimer>
 #include <QTimer>
 #include <QImage>
+#include <QGraphicsBlurEffect>
 
 #include "contour_point_item.hpp"
 #include "image_view_listener.hpp"
 #include "common_settings.hpp"
 #include "application_settings.hpp"
+#include "overlay_text_item.hpp"
 
 
 class QWheelEvent;
@@ -76,10 +78,15 @@ public slots:
                             const QVector<QPointF>& l_in,
                             qint64 receiveTs);
 
+    void setText(const QString& text);
+
+    void showPlaceholder(bool showEffect);
+
     void applyDisplayConfig(const DisplayConfig& display);
     void applyDownscaleConfig(const DownscaleConfig& downscale);
     void updateFlip();
     void clearOverlays();
+    void repositionOverlay();
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -101,9 +108,15 @@ private:
     void updatePixmap(const QImage& img);
     double getCurrentZoom() const;
 
+    void updateContourColors();
     void upscaleItems();
     void updateDisplayWithConfig();
 
+    QColor desaturateAndDarken(const QColor& original,
+                               qreal saturationFactor,
+                               qreal valueFactor);
+
+    QImage darkenImage(const QImage& image);
 
     QGraphicsScene*        scene = nullptr;
     QGraphicsItemGroup* contentRoot_ = nullptr;
@@ -139,8 +152,13 @@ private:
     DisplayConfig displayConfig_;
     DownscaleConfig downscaleConfig_;
 
-    ContourPointsItem* l_out_ = nullptr;
-    ContourPointsItem* l_in_  = nullptr;
+    ContourPointsItem* l_out_   = nullptr;
+    ContourPointsItem* l_in_    = nullptr;
+
+    OverlayTextItem*   overlay_ = nullptr;
+
+    bool paused_ = false;
+    QGraphicsBlurEffect* blur_ = nullptr;
 
 signals:
     void imageClicked(int x, int y);

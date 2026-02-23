@@ -11,7 +11,7 @@ PanBehavior::PanBehavior(Qt::MouseButton button)
 {
 }
 
-void PanBehavior::mousePress(ImageView&,
+bool PanBehavior::mousePress(ImageView&,
                              QMouseEvent* e)
 {
     if (e->button() == button_)
@@ -19,14 +19,18 @@ void PanBehavior::mousePress(ImageView&,
         capturing_ = true;
         lastPos_ = e->pos();
         // ❌ pas de accept ici
+
+        return true;
     }
+
+    return false;
 }
 
-void PanBehavior::mouseMove(ImageView& view,
+bool PanBehavior::mouseMove(ImageView& view,
                             QMouseEvent* e)
 {
     if (!capturing_)
-        return;
+        return false;
 
     QPoint delta = e->pos() - lastPos_;
     lastPos_ = e->pos();
@@ -37,15 +41,21 @@ void PanBehavior::mouseMove(ImageView& view,
 
     view.userInteracted();
     e->accept();
+
+    return true;
 }
 
-void PanBehavior::mouseRelease(ImageView&,
+bool PanBehavior::mouseRelease(ImageView&,
                                QMouseEvent* e)
 {
     if (e->button() == button_)
     {
         capturing_ = false;
         e->accept();
+
+        return true;
     }
+
+    return false;
 }
 } // namespace ofeli_app

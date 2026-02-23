@@ -171,7 +171,18 @@ void CameraController::updateStats()
         snap.maxLatencyMs
     };
 
-    emit statsUpdated(stats);
+    QString textStats = QString(
+                            "In: %1 fps | Proc: %2 fps | Disp: %3 fps\n"
+                            "Drop: %4 % | Avg: %5 ms | Max: %6 ms"
+                            )
+                            .arg(stats.inputFps, 0, 'f', 1)
+                            .arg(stats.processingFps, 0, 'f', 1)
+                            .arg(stats.displayFps, 0, 'f', 1)
+                            .arg(100.f * stats.dropRate, 0, 'f', 1)
+                            .arg(stats.avgLatencyMs, 0, 'f', 1)
+                            .arg(stats.maxLatencyMs, 0, 'f', 1);
+
+    emit textStatsUpdated(textStats);
 }
 
 void CameraController::onVideoSettingsChanged(const VideoSessionSettings& conf)

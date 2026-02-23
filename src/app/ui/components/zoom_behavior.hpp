@@ -9,7 +9,7 @@ class ZoomBehavior : public ViewBehavior
 public:
     explicit ZoomBehavior(double zoomFactor = 1.15);
 
-    void wheel(ImageView& /*view*/,
+    bool wheel(ImageView& /*view*/,
                QWheelEvent* event) override;
 
 private:

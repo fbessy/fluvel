@@ -16,11 +16,11 @@ class ViewBehavior
 public:
     virtual ~ViewBehavior() = default;
 
-    virtual void wheel(ImageView&, QWheelEvent*) {}
-    virtual void mousePress(ImageView&, QMouseEvent*) {}
-    virtual void mouseMove(ImageView&, QMouseEvent*) {}
-    virtual void mouseRelease(ImageView&, QMouseEvent*) {}
-    virtual void mouseDoubleClick(ImageView&, QMouseEvent*) {}
+    virtual bool wheel(ImageView&, QWheelEvent*) { return false; }
+    virtual bool mousePress(ImageView&, QMouseEvent*) { return false; }
+    virtual bool mouseMove(ImageView&, QMouseEvent*) { return false; }
+    virtual bool mouseRelease(ImageView&, QMouseEvent*) { return false; }
+    virtual bool mouseDoubleClick(ImageView&, QMouseEvent*) { return false; }
 
     virtual bool isCapturing() const { return false; }
 

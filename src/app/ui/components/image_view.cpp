@@ -4,6 +4,7 @@
 #include "common_settings.hpp"
 #include "color_adapters.hpp"
 #include "frame_clock.hpp"
+#include "overlay_text_item.hpp"
 
 #include <cassert>
 
@@ -31,10 +32,17 @@ ImageView::ImageView(const DisplayConfig& displayConfig,
     initialize();
 
     l_out_ = new ContourPointsItem(contentRoot_);
-    l_out_->setZValue(100);
+    l_out_->setZValue(100.0);
 
     l_in_ = new ContourPointsItem(contentRoot_);
-    l_in_->setZValue(100);
+    l_in_->setZValue(100.0);
+
+    overlay_ = new OverlayTextItem;
+    scene->addItem(overlay_);
+    overlay_->setZValue(100.0);
+    overlay_->setPos(10, 10);
+
+    overlay_->hide();
 }
 
 void ImageView::initialize()
@@ -55,6 +63,10 @@ void ImageView::initialize()
     pixmapItem = new QGraphicsPixmapItem(contentRoot_);
     pixmapItem->setZValue(0);
     pixmapItem->setTransformationMode(Qt::FastTransformation);
+
+    blur_ = new QGraphicsBlurEffect;
+    pixmapItem->setGraphicsEffect(blur_);
+    blur_->setBlurRadius(0);
 
     displayTimer.start();
 
@@ -187,7 +199,6 @@ void ImageView::updatePixmap(const QImage& img)
     bool sizeChanged =
         ( lastDisplayedImage.size() != img.size() );
 
-
     pixmapItem->setPixmap(QPixmap::fromImage(img));
     lastDisplayedImage = img;
 
@@ -203,6 +214,12 @@ void ImageView::updatePixmap(const QImage& img)
 
 
         applyAutoFit();
+
+        if ( overlay_ )
+        {
+            overlay_->setPos(mapToScene(QPoint(0, 0)) + QPointF(10, 10));
+            overlay_->show();
+        }
     }
 }
 
@@ -330,46 +347,97 @@ void ImageView::setInteraction(ImageViewInteraction* interaction)
 
 void ImageView::mousePressEvent(QMouseEvent* event)
 {
-    if ( m_interaction )
+    // 1️⃣ Cherche l’item le plus haut sous la souris (respecte le Z)
+    QGraphicsItem* itemUnderMouse = itemAt(event->pos());
+
+    // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
+    if (itemUnderMouse &&
+        (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
     {
-        m_interaction->mousePress(*this, event);
-        setCursor(m_interaction->cursorForEvent(*this,
-                                                hasImage(),
-                                                isPanRelevant(),
-                                                event));
+        QGraphicsView::mousePressEvent(event);
+        return;
     }
 
-    if ( !event->isAccepted() )
+    // 3️⃣ Sinon, on laisse l'interaction manager décider
+    bool handled = false;
+
+    if (m_interaction)
+    {
+        handled = m_interaction->mousePress(*this, event);
+
+        setCursor(m_interaction->cursorForEvent(
+                  *this,
+                  hasImage(),
+                  isPanRelevant(),
+                  event));
+    }
+
+    // 4️⃣ Si personne n’a géré, on passe à Qt
+    if (!handled)
         QGraphicsView::mousePressEvent(event);
 }
 
 void ImageView::mouseMoveEvent(QMouseEvent* event)
 {
-    if ( m_interaction )
+    // 1️⃣ Cherche l’item le plus haut sous la souris (respecte le Z)
+    QGraphicsItem* itemUnderMouse = itemAt(event->pos());
+
+    // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
+    if (itemUnderMouse &&
+        (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
     {
-        m_interaction->mouseMove(*this, event);
-        setCursor(m_interaction->cursorForEvent(*this,
-                                                hasImage(),
-                                                isPanRelevant(),
-                                                event));
+        QGraphicsView::mouseMoveEvent(event);
+        return;
     }
 
-    if ( !event->isAccepted() )
+    // 3️⃣ Sinon, on laisse l'interaction manager décider
+    bool handled = false;
+
+    if (m_interaction)
+    {
+        handled = m_interaction->mouseMove(*this, event);
+
+        setCursor(m_interaction->cursorForEvent(
+            *this,
+            hasImage(),
+            isPanRelevant(),
+            event));
+    }
+
+    // 4️⃣ Si personne n’a géré, on passe à Qt
+    if (!handled)
         QGraphicsView::mouseMoveEvent(event);
 }
 
 void ImageView::mouseReleaseEvent(QMouseEvent* event)
 {
-    if ( m_interaction )
+    // 1️⃣ Cherche l’item le plus haut sous la souris (respecte le Z)
+    QGraphicsItem* itemUnderMouse = itemAt(event->pos());
+
+    // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
+    if (itemUnderMouse &&
+        (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
     {
-        m_interaction->mouseRelease(*this, event);
-        setCursor(m_interaction->cursorForEvent(*this,
-                                                hasImage(),
-                                                isPanRelevant(),
-                                                event));
+        QGraphicsView::mouseReleaseEvent(event);
+        return;
     }
 
-    if ( !event->isAccepted() )
+    // 3️⃣ Sinon, on laisse l'interaction manager décider
+    bool handled = false;
+
+    if (m_interaction)
+    {
+        handled = m_interaction->mouseRelease(*this, event);
+
+        setCursor(m_interaction->cursorForEvent(
+            *this,
+            hasImage(),
+            isPanRelevant(),
+            event));
+    }
+
+    // 4️⃣ Si personne n’a géré, on passe à Qt
+    if (!handled)
         QGraphicsView::mouseReleaseEvent(event);
 }
 
@@ -513,6 +581,13 @@ void ImageView::applyDisplayConfig(const DisplayConfig& display)
 
 void ImageView::updateDisplayWithConfig()
 {
+    updateContourColors();
+    upscaleItems();
+    updateFlip();
+}
+
+void ImageView::updateContourColors()
+{
     assert( l_out_ && l_in_ );
 
     QColor col_lout, col_lin;
@@ -529,9 +604,6 @@ void ImageView::updateDisplayWithConfig()
 
     l_out_->setColor( col_lout );
     l_in_->setColor( col_lin );
-
-    upscaleItems();
-    updateFlip();
 }
 
 void ImageView::updateFlip()
@@ -563,6 +635,90 @@ void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
     downscaleConfig_ = downscale;
 
     upscaleItems();
+}
+
+void ImageView::repositionOverlay()
+{
+    if ( !overlay_ )
+        return;
+
+    QRectF visible = mapToScene(viewport()->rect()).boundingRect();
+    overlay_->setPos(visible.topLeft() + QPointF(10, 10));
+}
+
+void ImageView::setText(const QString& text)
+{
+    if ( overlay_ )
+        overlay_->setText(text);
+}
+
+QColor ImageView::desaturateAndDarken(const QColor& original,
+                                      qreal saturationFactor,
+                                      qreal valueFactor)
+{
+    // Clamp des facteurs pour éviter les aberrations
+    saturationFactor = std::clamp(saturationFactor, 0.0, 1.0);
+    valueFactor      = std::clamp(valueFactor,      0.0, 1.0);
+
+    QColor hsv = original.toHsv();
+
+    int h = hsv.hue();         // peut être -1 si gris
+    int s = hsv.saturation();  // 0 → gris pur
+    int v = hsv.value();
+    int a = hsv.alpha();
+
+    // Si gris pur → on ne touche qu'à la luminosité
+    if (s == 0)
+    {
+        v = static_cast<int>(v * valueFactor);
+        return QColor::fromHsv(0, 0, v, a);
+    }
+
+    // Couleur normale
+    s = static_cast<int>(s * saturationFactor);
+    v = static_cast<int>(v * valueFactor);
+
+    return QColor::fromHsv(h, s, v, a);
+}
+
+QImage ImageView::darkenImage(const QImage& image)
+{
+    QImage dark = image.convertToFormat(QImage::Format_ARGB32);
+
+    QPainter p(&dark);
+    p.setCompositionMode(QPainter::CompositionMode_Multiply);
+
+    // gris sombre plutôt que noir pur
+    p.fillRect(dark.rect(), QColor(100,100,100));
+    p.end();
+
+    return dark;
+}
+
+void ImageView::showPlaceholder(bool showEffect)
+{
+    if ( showEffect )
+    {
+        setImage(darkenImage( lastDisplayedImage) );
+
+        pixmapItem->update();
+        contentRoot_->update();
+        scene->update();
+
+        if ( l_out_ )
+            l_out_->setColor( desaturateAndDarken(toQColor(displayConfig_.l_out_color),
+                                                 0.4, 0.6) );
+
+        if ( l_in_ )
+            l_in_->setColor( desaturateAndDarken(toQColor(displayConfig_.l_in_color),
+                                                0.4, 0.6) );
+    }
+    else
+    {
+        updateContourColors();
+    }
+
+    blur_->setBlurRadius(showEffect ? 6 : 0);
 }
 
 } // namespace ofeli_app

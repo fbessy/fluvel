@@ -15,11 +15,11 @@ PixelInfoBehavior::~PixelInfoBehavior() = default;
 
 // ---------------------------------------------------------------------
 
-void PixelInfoBehavior::mousePress(ImageView& view,
+bool PixelInfoBehavior::mousePress(ImageView& view,
                                    QMouseEvent* event)
 {
     if (event->button() != Qt::RightButton)
-        return;
+        return false;
 
     active_ = true;
 
@@ -28,34 +28,40 @@ void PixelInfoBehavior::mousePress(ImageView& view,
 
     updateOverlay(view, event->pos());
     overlay_->showOverlay();
+
+    return true;
 }
 
 // ---------------------------------------------------------------------
 
-void PixelInfoBehavior::mouseMove(ImageView& view,
+bool PixelInfoBehavior::mouseMove(ImageView& view,
                                   QMouseEvent* event)
 {
     if (!active_)
-        return;
+        return false;
 
     if (!(event->buttons() & Qt::RightButton))
-        return;
+        return false;
 
     updateOverlay(view, event->pos());
+
+    return true;
 }
 
 // ---------------------------------------------------------------------
 
-void PixelInfoBehavior::mouseRelease(ImageView&,
+bool PixelInfoBehavior::mouseRelease(ImageView&,
                                      QMouseEvent* event)
 {
     if (event->button() != Qt::RightButton)
-        return;
+        return false;
 
     active_ = false;
 
     if (overlay_)
         overlay_->hideOverlay();
+
+    return true;
 }
 
 // ---------------------------------------------------------------------

@@ -8,45 +8,64 @@ void InteractionSet::addBehavior(std::unique_ptr<ViewBehavior> behavior)
         behaviors_.push_back(std::move(behavior));
 }
 
-void InteractionSet::wheel(ImageView& view,
+bool InteractionSet::wheel(ImageView& view,
                            QWheelEvent* event)
 {
     for (auto& b : behaviors_)
     {
-        b->wheel(view, event);
-        if (event->isAccepted())
-            return;
+        if ( b->wheel(view, event) )
+            return true;
     }
+
+    return false;
 }
 
-void InteractionSet::mousePress(ImageView& view,
+bool InteractionSet::mousePress(ImageView& view,
                                 QMouseEvent* event)
 {
     for (auto& b : behaviors_)
-        b->mousePress(view, event);
+    {
+        if ( b->mousePress(view, event) )
+            return true;
+    }
+
+    return false;
 }
 
-void InteractionSet::mouseMove(ImageView& view,
+bool InteractionSet::mouseMove(ImageView& view,
                                QMouseEvent* event)
 {
     for (auto& b : behaviors_)
     {
-        b->mouseMove(view, event);
+        if ( b->mouseMove(view, event) )
+            return true;
     }
+
+    return false;
 }
 
-void InteractionSet::mouseRelease(ImageView& view,
+bool InteractionSet::mouseRelease(ImageView& view,
                                   QMouseEvent* event)
 {
     for (auto& b : behaviors_)
-        b->mouseRelease(view, event);
+    {
+        if ( b->mouseRelease(view, event) )
+            return true;
+    }
+
+    return false;
 }
 
-void InteractionSet::mouseDoubleClick(ImageView& view,
+bool InteractionSet::mouseDoubleClick(ImageView& view,
                                       QMouseEvent* event)
 {
     for (auto& b : behaviors_)
-        b->mouseDoubleClick(view, event);
+    {
+        if ( b->mouseDoubleClick(view, event) )
+            return true;
+    }
+
+    return false;
 }
 
 const ViewBehavior* InteractionSet::capturingBehavior() const

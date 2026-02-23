@@ -34,7 +34,7 @@ public:
     int priority() const override { return 30; }
 
 protected:
-    void mousePress(ImageView& view, QMouseEvent* e) override;
+    bool mousePress(ImageView& view, QMouseEvent* e) override;
 
 private:
     Qt::MouseButton button_;

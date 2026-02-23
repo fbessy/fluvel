@@ -143,6 +143,7 @@ set(app_src
 qt_add_executable(${target_name}
     ${app_src}
     resources.qrc
+    ui/components/overlay_text_item.hpp ui/components/overlay_text_item.cpp
 )
 
 if(ANDROID)

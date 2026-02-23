@@ -32,7 +32,7 @@ public slots:
 
 signals:
     void frameSizeStr(const QString& str);
-    void statsUpdated(const ofeli_app::CameraStats& stats);
+    void textStatsUpdated(const QString& textStats);
     void imageAndContourUpdated(const QImage& img,
                                 const QVector<QPointF>& l_out,
                                 const QVector<QPointF>& l_in,

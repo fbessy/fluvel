@@ -7,7 +7,7 @@ ZoomBehavior::ZoomBehavior(double /*zoomFactor*/)
 {
 }
 
-void ZoomBehavior::wheel(ImageView& /*view*/,
+bool ZoomBehavior::wheel(ImageView& /*view*/,
                          QWheelEvent* event)
 {
     /*
@@ -19,6 +19,7 @@ void ZoomBehavior::wheel(ImageView& /*view*/,
                 delta > 0 ? f : 1.0 / f);
 */
     event->accept();
+    return true;
 }
 
 } // namespace ofeli_app

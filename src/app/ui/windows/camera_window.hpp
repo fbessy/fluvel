@@ -41,7 +41,6 @@
 #define CAMERA_WINDOW_HPP
 
 #include <QMainWindow>
-#include <QStackedWidget>
 #include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
@@ -52,7 +51,6 @@
 #include "image_view.hpp"
 #include "display_settings_widget.hpp"
 #include "camera_settings_window.hpp"
-#include "camera_overlay_widget.hpp"
 
 namespace ofeli_app
 {
@@ -74,6 +72,7 @@ private slots:
 
 private:
 
+    void connectFrameToView();
     void stopCameraAndUi();
 
 #ifdef Q_OS_ANDROID
@@ -87,9 +86,7 @@ private:
     QComboBox* cameraSelector;
     QPushButton* toggleStreamingButton;
 
-    QStackedWidget* stacked;
     ImageView* videoView;
-    CameraOverlayWidget* cameraOverlay;
 
     QMediaDevices*         mediaDevices;
 
@@ -105,6 +102,8 @@ private:
     DisplaySettingsWidget* displayBar;
 
     CameraSettingsWindow* settings_window;
+
+    QMetaObject::Connection frameConnection_;
 
 signals:
     void cameraWindowShown();

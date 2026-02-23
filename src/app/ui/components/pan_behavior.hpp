@@ -12,9 +12,9 @@ class PanBehavior : public ViewBehavior
 public:
     explicit PanBehavior(Qt::MouseButton button = Qt::LeftButton);
 
-    void mousePress(ImageView& view, QMouseEvent* event) override;
-    void mouseMove(ImageView& view, QMouseEvent* event) override;
-    void mouseRelease(ImageView& view, QMouseEvent* event) override;
+    bool mousePress(ImageView& view, QMouseEvent* event) override;
+    bool mouseMove(ImageView& view, QMouseEvent* event) override;
+    bool mouseRelease(ImageView& view, QMouseEvent* event) override;
 
     bool isCapturing() const override
     {

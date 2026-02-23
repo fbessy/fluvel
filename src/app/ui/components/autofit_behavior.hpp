@@ -13,7 +13,7 @@ class AutoFitBehavior : public ViewBehavior
 public:
     explicit AutoFitBehavior(Qt::MouseButton button = Qt::MiddleButton);
 
-    void mouseRelease(ImageView& view,
+    bool mouseRelease(ImageView& view,
                       QMouseEvent* event) override;
 
 private:

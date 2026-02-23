@@ -11,14 +11,17 @@ AutoFitBehavior::AutoFitBehavior(Qt::MouseButton button)
 {
 }
 
-void AutoFitBehavior::mouseRelease(ImageView& view,
+bool AutoFitBehavior::mouseRelease(ImageView& view,
                                    QMouseEvent* event)
 {
     if (event->button() == button_)
     {
         view.applyAutoFit();
         event->accept();
+        return true;
     }
+
+    return false;
 }
 
 }

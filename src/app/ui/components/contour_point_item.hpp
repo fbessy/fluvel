@@ -5,7 +5,8 @@
 #include <QVector>
 #include <QPoint>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 class ContourPointsItem : public QGraphicsItem
 {

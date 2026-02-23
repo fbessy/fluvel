@@ -9,22 +9,23 @@ ColorPickerBehavior::ColorPickerBehavior(Qt::MouseButton button)
 {
 }
 
-void ColorPickerBehavior::mousePress(ImageView& view, QMouseEvent* e)
+bool ColorPickerBehavior::mousePress(ImageView& view, QMouseEvent* e)
 {
     if (e->button() != button_)
-        return;
+        return false;
 
     QPoint imgPos = view.imageCoordinatesFromView(e->pos());
     if (imgPos.x() < 0)
-        return;
+        return false;
 
     QColor color = view.pixelColorAt(imgPos);
     if (!color.isValid())
-        return;
+        return false;
 
     view.onColorPicked(color, imgPos);
 
     e->accept();
+    return true;
 }
 
 }

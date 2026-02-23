@@ -82,36 +82,6 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     currentCameraId = settings.value("Camera/last_id").toByteArray();
 
-    videoView = new ImageView(AppSettings::instance().camConfig.display,
-                              AppSettings::instance().camConfig.compute.downscale,
-                              this);
-
-    videoView->setMaxDisplayFps(60.0);
-
-    auto interaction = std::make_unique<InteractionSet>();
-    interaction->addBehavior(std::make_unique<AutoFitBehavior>());
-    interaction->addBehavior(std::make_unique<FullscreenBehavior>());
-    interaction->addBehavior(std::make_unique<PanBehavior>());
-    interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
-    videoView->setInteraction(interaction.release());
-
-    cameraOverlay = new CameraOverlayWidget(this);
-
-
-
-    QString info = QString("=================================");
-
-    QWidget* viewContainer = new QWidget(this);
-    QStackedLayout* overlayStack = new QStackedLayout(viewContainer);
-    overlayStack->setStackingMode(QStackedLayout::StackAll);
-
-    overlayStack->addWidget(videoView);
-    overlayStack->addWidget(cameraOverlay);
-    cameraOverlay->raise();
-
-    stacked = new QStackedWidget(this);
-    stacked->addWidget(viewContainer);
-
     cameraSelector = new QComboBox(this);
     cameraSelector->setEnabled(false);
 
@@ -150,6 +120,11 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     QWidget* central = new QWidget(this);
 
+    // Layout principal vertical
+    QVBoxLayout* vLayout = new QVBoxLayout(central);
+    vLayout->setContentsMargins(0, 0, 0, 0);
+    vLayout->setSpacing(0);
+
     QWidget* controlBar = new QWidget(central);
     QHBoxLayout* controlLayout = new QHBoxLayout(controlBar);
     controlLayout->setContentsMargins(8, 4, 8, 4);
@@ -166,25 +141,34 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     controlLayout->addWidget(settingsButton);
 
+    videoView = new ImageView(AppSettings::instance().camConfig.display,
+                              AppSettings::instance().camConfig.compute.downscale,
+                              central);
+
+    videoView->setMaxDisplayFps(60.0);
+
+    auto interaction = std::make_unique<InteractionSet>();
+    interaction->addBehavior(std::make_unique<AutoFitBehavior>());
+    interaction->addBehavior(std::make_unique<FullscreenBehavior>());
+    interaction->addBehavior(std::make_unique<PanBehavior>());
+    interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
+    videoView->setInteraction(interaction.release());
+
     // --- Display bar ---
     displayBar = new DisplaySettingsWidget(central,
                                            Session::Camera);
 
     // --- Layout horizontal contenu principal ---
-    QHBoxLayout* contentLayout = new QHBoxLayout;
+    QHBoxLayout* contentLayout = new QHBoxLayout();
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    contentLayout->addWidget(stacked, 1);   // zone principale extensible
-    contentLayout->addWidget(displayBar);   // panneau droit
+    contentLayout->addWidget(videoView,  1);  // prend tout l'espace
+    contentLayout->addWidget(displayBar, 0); // largeur naturelle
 
-    // --- Layout vertical global ---
-    QVBoxLayout* mainLayout = new QVBoxLayout(central);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->setSpacing(0);
-
-    mainLayout->addWidget(controlBar);
-    mainLayout->addLayout(contentLayout);
+    // Assemblage global
+    vLayout->addWidget(controlBar);
+    vLayout->addLayout(contentLayout);
 
     setCentralWidget(central);
 
@@ -228,9 +212,9 @@ CameraWindow::CameraWindow(QWidget* parent)
             &CameraWindow::onFrameSizeStr);
 
     connect(controller,
-            &CameraController::statsUpdated,
-            cameraOverlay,
-            &CameraOverlayWidget::setStats);
+            &CameraController::textStatsUpdated,
+            videoView,
+            &ImageView::setText);
 
     videoView->applyDownscaleConfig( AppSettings::instance().camConfig.compute.downscale );
     videoView->applyDisplayConfig( AppSettings::instance().camConfig.display );
@@ -244,11 +228,6 @@ CameraWindow::CameraWindow(QWidget* parent)
             &ApplicationSettings::videoDisplaySettingsChanged,
             videoView,
             &ImageView::applyDisplayConfig);
-
-    connect(controller,
-            &CameraController::imageAndContourUpdated,
-            videoView,
-            &ImageView::setImageAndContour);
 
     connect(videoView,  &ImageView::frameDisplayed,
             controller, &CameraController::onFrameDisplayed);
@@ -334,7 +313,9 @@ void CameraWindow::onToggleStreaming()
         QSettings settings;
         settings.setValue("Camera/last_id", currentCameraId);
 
+        videoView->showPlaceholder(false);
         controller->start(selectedId);
+        connectFrameToView();
 
         toggleStreamingButton->setText(tr("Stop"));
         toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
@@ -346,7 +327,9 @@ void CameraWindow::stopCameraAndUi()
 {
     if ( controller && controller->isActive() )
     {
+        disconnect(frameConnection_);
         controller->stop();
+        videoView->showPlaceholder(true);
 
         toggleStreamingButton->setText( tr("Start") );
         toggleStreamingButton->setToolTip(tr("Start camera streaming."));
@@ -398,5 +381,13 @@ void CameraWindow::ensureCameraPermission()
     }
 }
 #endif
+
+void CameraWindow::connectFrameToView()
+{
+    frameConnection_ = connect(controller,
+                               &CameraController::imageAndContourUpdated,
+                               videoView,
+                               &ImageView::setImageAndContour);
+}
 
 }
