@@ -98,13 +98,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     toggleStreamingButton->setToolTip(tr("Start camera streaming."));
     toggleStreamingButton->setIcon( startIcon );
 
-    rightPanelToggle = new QPushButton;
-    rightPanelToggle->setCheckable(true);
-    rightPanelToggle->setChecked(true);
-    rightPanelToggle->setFocusPolicy(Qt::NoFocus);
-    rightPanelToggle->setToolTip(tr("Right panel is visible."));
-
-    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
+    rightPanelToggle = new RightPanelToggleButton;
 
     settingsButton = new QPushButton;
     settingsButton->setToolTip(tr("Segmentation settings"));
@@ -173,21 +167,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     setCentralWidget(central);
 
     connect(rightPanelToggle, &QPushButton::toggled,
-            this, [this](bool checked)
-            {
-                if ( checked )
-                {
-                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
-                    rightPanelToggle->setToolTip(tr("Right panel is visible."));
-                }
-                else
-                {
-                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_off.svg"));
-                    rightPanelToggle->setToolTip(tr("Right panel is hidden."));
-                }
-
-                displayBar->setVisible(checked);
-            });
+            displayBar, &DisplaySettingsWidget::setPanelVisible);
 
     connect(settingsButton,     &QPushButton::clicked,
             settings_window,    &CameraSettingsWindow::show);

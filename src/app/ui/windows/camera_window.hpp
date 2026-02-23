@@ -51,6 +51,7 @@
 #include "image_view.hpp"
 #include "display_settings_widget.hpp"
 #include "camera_settings_window.hpp"
+#include "right_panel_toggle_button.hpp"
 
 namespace ofeli_app
 {
@@ -96,7 +97,7 @@ private:
     QIcon stopIcon;
     QIcon settingsIcon;
 
-    QPushButton* rightPanelToggle;
+    RightPanelToggleButton* rightPanelToggle;
     QPushButton* settingsButton;
 
     DisplaySettingsWidget* displayBar;

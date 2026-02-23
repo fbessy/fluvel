@@ -22,6 +22,9 @@ public:
     DisplaySettingsWidget(QWidget* parent,
                           Session session);
 
+public slots:
+    void setPanelVisible(bool open);
+
 private slots:
     void onImgSettingsChanged();
     void onVideoSettingsChanged();
@@ -30,6 +33,9 @@ private:
 
     void setConfig();
     void refresh_pipeline_displayed_gb_availability();
+
+    void animate(bool open);
+    bool isAnimating_ = false;
 
     ColorSelectorWidget* lout_selector_;
     ColorSelectorWidget* lin_selector_;

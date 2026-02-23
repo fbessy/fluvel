@@ -92,13 +92,7 @@ void ImageWindow::setupUi()
     convergeButton->setEnabled(false);
 
 
-    rightPanelToggle = new QPushButton;
-    rightPanelToggle->setCheckable(true);
-    rightPanelToggle->setChecked(true);
-    rightPanelToggle->setFocusPolicy(Qt::NoFocus);
-    rightPanelToggle->setToolTip(tr("Right panel is visible."));
-
-    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
+    rightPanelToggle = new RightPanelToggleButton;
 
     settingsButton = new QPushButton;
     settingsButton->setToolTip(tr("Camera session settings"));
@@ -473,21 +467,7 @@ void ImageWindow::setupConnections()
             imageController,    &ImageController::converge);
 
     connect(rightPanelToggle, &QPushButton::toggled,
-            this, [this](bool checked)
-            {
-                if ( checked )
-                {
-                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_on.svg"));
-                    rightPanelToggle->setToolTip(tr("Right panel is visible."));
-                }
-                else
-                {
-                    rightPanelToggle->setIcon(QIcon(":/icons/toolbar/right_panel_off.svg"));
-                    rightPanelToggle->setToolTip(tr("Right panel is hidden."));
-                }
-
-                displayBar->setVisible(checked);
-            });
+            displayBar, &DisplaySettingsWidget::setPanelVisible);
 
     connect(settingsButton,     &QPushButton::clicked,
             settings_window,    &SettingsWindow::show);

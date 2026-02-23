@@ -9,6 +9,7 @@
 #include <QGroupBox>
 #include <QColorDialog>
 #include <QLabel>
+#include <QPropertyAnimation>
 
 #include <cassert>
 
@@ -19,6 +20,12 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                                              Session session)
     : QWidget(parent), session_(session)
 {
+    setSizePolicy(QSizePolicy::Preferred,
+                  QSizePolicy::Expanding);
+
+    // Important : au départ on limite la largeur max à la sizeHint
+    setMaximumWidth(minimumSizeHint().width());
+
     if ( session_ == Session::Image )
         config_ = AppSettings::instance().imgConfig.display;
     else if ( session_ == Session::Camera )
@@ -177,6 +184,8 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
 
     connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged,
             this,                     &DisplaySettingsWidget::onVideoSettingsChanged);
+
+    setMaximumWidth(QWIDGETSIZE_MAX);
 }
 
 void DisplaySettingsWidget::setConfig()
@@ -224,6 +233,54 @@ void DisplaySettingsWidget::onImgSettingsChanged()
 void DisplaySettingsWidget::onVideoSettingsChanged()
 {
     refresh_pipeline_displayed_gb_availability();
+}
+
+void DisplaySettingsWidget::setPanelVisible(bool visible)
+{
+    if (isAnimating_)
+        return;
+
+    const bool open = (maximumWidth() > 0);
+
+    if (visible == open)
+        return;
+
+    animate(visible);
+}
+
+void DisplaySettingsWidget::animate(bool open)
+{
+    isAnimating_ = true;
+
+    // On s'assure que le widget est visible avant de calculer
+    if (open)
+        show();
+
+    // Calcul dynamique basé sur le layout
+    adjustSize();
+    const int targetWidth = minimumSizeHint().width();
+
+    const int start = open ? 0 : width();
+    const int end   = open ? targetWidth : 0;
+
+    auto* anim = new QPropertyAnimation(this, "maximumWidth");
+    anim->setDuration(200);
+    anim->setStartValue(start);
+    anim->setEndValue(end);
+    anim->setEasingCurve(open
+                             ? QEasingCurve::OutCubic
+                             : QEasingCurve::InCubic);
+
+    connect(anim, &QPropertyAnimation::finished,
+            this, [this, open]()
+            {
+                if (!open)
+                    hide();
+
+                isAnimating_ = false;
+            });
+
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 }

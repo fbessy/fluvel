@@ -98,6 +98,12 @@ set(app_src
     ${UI_COMP_DIR}/contour_rendering_qimage.cpp
     ${UI_COMP_DIR}/contour_rendering_qimage.hpp
 
+    ${UI_COMP_DIR}/overlay_text_item.cpp
+    ${UI_COMP_DIR}/overlay_text_item.hpp
+
+    ${UI_COMP_DIR}/right_panel_toggle_button.cpp
+    ${UI_COMP_DIR}/right_panel_toggle_button.hpp
+
     ${UI_COMP_DIR}/image_view_listener.hpp
 
     ${CORE_DIR}/image_controller.cpp
@@ -142,9 +148,7 @@ set(app_src
 
 qt_add_executable(${target_name}
     ${app_src}
-    resources.qrc
-    ui/components/overlay_text_item.hpp ui/components/overlay_text_item.cpp
-)
+    resources.qrc)
 
 if(ANDROID)
     # qt_add_qml_module(${target_name}

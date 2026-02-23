@@ -48,6 +48,7 @@
 #include "about_window.hpp"
 #include "language_window.hpp"
 
+#include "right_panel_toggle_button.hpp"
 #include "display_settings_widget.hpp"
 #include "active_contour_worker.hpp"
 
@@ -113,7 +114,7 @@ private:
     QPushButton* togglePauseButton = nullptr;
     QPushButton* stepButton = nullptr;
     QPushButton* convergeButton = nullptr;
-    QPushButton* rightPanelToggle = nullptr;
+    RightPanelToggleButton* rightPanelToggle = nullptr;
     QPushButton* settingsButton = nullptr;
 
     ImageView* imageView = nullptr;
