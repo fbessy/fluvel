@@ -38,10 +38,10 @@ void AlgoInfoOverlay::paintEvent(QPaintEvent*)
         y += 16;
     };
 
-    drawLine(Qt::white, m_algoName);
+    drawLine(Qt::white, m_algoName_);
     drawLine(QColor(180, 180, 180), QString("Iteration: %1").arg(stats_.iteration));
-    drawLine(QColor(100, 220, 100), QString("Energy: %1").arg(m_energy, 0, 'f', 4));
-    drawLine(QColor(200, 200, 120), m_status);
+    drawLine(QColor(100, 220, 100), QString("Energy: %1").arg(m_energy_, 0, 'f', 4));
+    drawLine(QColor(200, 200, 120), m_status_);
 }
 
 void AlgoInfoOverlay::resizeEvent(QResizeEvent*)
@@ -52,13 +52,13 @@ void AlgoInfoOverlay::resizeEvent(QResizeEvent*)
 
 void AlgoInfoOverlay::setIteration(int iter)
 {
-    m_iteration = iter;
+    m_iteration_ = iter;
     update();
 }
 
 void AlgoInfoOverlay::setEnergy(double energy)
 {
-    m_energy = energy;
+    m_energy_ = energy;
     update();
 }
 

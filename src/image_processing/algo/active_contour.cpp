@@ -37,6 +37,7 @@
 **
 ****************************************************************************/
 
+#include <cstddef>
 #include <cstdlib>     // std::abs
 #include <cassert>
 
@@ -311,7 +312,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
     if ( x > 0 && x + 1 < w && y > 0 && y + 1 < h )
     {
         // voisins 4-connectés
-        for (const auto& d : neighbors4)
+        for (const auto& d : kNeighbors4)
         {
             promote_region_to_boundary( x + d.dx, y + d.dy );
         }
@@ -319,7 +320,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
         // extension diagonale
         if ( connected == Connectivity::Eight )
         {
-            for ( const auto& d : neighbors4_diag )
+            for ( const auto& d : kNeighbors4Diag )
             {
                 promote_region_to_boundary( x + d.dx, y + d.dy );
             }
@@ -328,7 +329,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
     else
     {
         // ---------- SLOW PATH (bords) ----------
-        for ( const auto& d : neighbors4 )
+        for ( const auto& d : kNeighbors4 )
         {
             const int nx = x + d.dx;
             const int ny = y + d.dy;
@@ -341,7 +342,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
 
         if ( connected == Connectivity::Eight )
         {
-            for ( const auto& d : neighbors4_diag )
+            for ( const auto& d : kNeighbors4Diag )
             {
                 const int nx = x + d.dx;
                 const int ny = y + d.dy;
@@ -437,7 +438,7 @@ InternalKernel ActiveContour::make_internal_kernel_offsets(int disk_radius,
     const int w = grid_width;
 
     InternalKernel kernel;
-    kernel.offsets.reserve( (2 * r + 1) * (2 * r + 1) );
+    kernel.offsets.reserve( static_cast<std::size_t>((2 * r + 1) * (2 * r + 1)) );
 
     kernel.support.min_dx =  r;
     kernel.support.max_dx = -r;

@@ -139,7 +139,7 @@ void CameraController::onFrameDisplayed(qint64 recvTsNs,
     frameStats_.frameDisplayed(recvTsNs, displayTsNs);
 }
 
-void CameraController::onFrameResultReady(FrameResult result)
+void CameraController::onFrameResultReady(const FrameResult& result)
 {
     auto q_l_out = convertToQVector( result.l_out );
     auto q_l_in  = convertToQVector( result.l_in );

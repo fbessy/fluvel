@@ -61,7 +61,7 @@ protected:
 private :
 
     //! A subwindow with the license application, displayed when the user clicks on the license button.
-    QDialog* license_window;
+    QDialog* license_window_;
 
 private slots :
 

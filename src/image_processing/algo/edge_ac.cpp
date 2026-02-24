@@ -45,7 +45,7 @@
 namespace ofeli_ip
 {
 
-constexpr auto GRAYSCALE_DEPTH = 256u;
+constexpr auto kGrayscaleDepth = 256u;
 
 void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
 {
@@ -124,9 +124,9 @@ unsigned char EdgeAc::do_otsu_method(ImageSpan image)
 {
     unsigned char threshold = 0;
 
-    unsigned int histogram[ GRAYSCALE_DEPTH ];
+    unsigned int histogram[ kGrayscaleDepth ];
 
-    std::memset( (void*)histogram, 0, GRAYSCALE_DEPTH * sizeof( unsigned int ) );
+    std::memset( (void*)histogram, 0, kGrayscaleDepth * sizeof( unsigned int ) );
 
     for (int y = 0; y < image.height(); ++y)
     {
@@ -138,7 +138,7 @@ unsigned char EdgeAc::do_otsu_method(ImageSpan image)
 
     unsigned int sum = 0;
     for( unsigned int intensity = 0;
-         intensity < GRAYSCALE_DEPTH;
+         intensity < kGrayscaleDepth;
          intensity++ )
     {
         sum += intensity * histogram[ intensity ];
@@ -158,7 +158,7 @@ unsigned char EdgeAc::do_otsu_method(ImageSpan image)
     t = 0;
     weight2 = image.size();
 
-    while( t < (GRAYSCALE_DEPTH-1) &&
+    while( t < (kGrayscaleDepth-1) &&
            weight2 != 0 )
     {
         weight1 += histogram[t];

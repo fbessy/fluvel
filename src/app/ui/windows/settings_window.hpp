@@ -83,7 +83,7 @@ public slots:
     void onInputImageReady(const QImage& inputImage);
 
 signals :
-    void changed(const QMimeData* mimeData = 0);
+    void changed(const QMimeData* mimeData = nullptr);
 
 protected:
 
@@ -110,15 +110,15 @@ private :
 
     void updateUIFromConfig();
 
-    ImageView* settingsView;
+    ImageView* settingsView_;
 
-    ImageSettingsController* imageSettingsController = nullptr;
+    ImageSettingsController* imageSettingsController_ = nullptr;
 
     // onglets a gauche
-    QTabWidget* tabs;
+    QTabWidget* tabs_;
 
     // Ok Cancel en bas
-    QDialogButtonBox* dial_buttons;
+    QDialogButtonBox* dial_buttons_;
 
     /////////////////////////////////////////
     //             onglets                 //
@@ -126,129 +126,129 @@ private :
 
     /////////////////////////////////////////
 
-    QGroupBox* downscale_page;
-    QComboBox* downscale_factor_cb;
+    QGroupBox* downscale_page_;
+    QComboBox* downscale_factor_cb_;
 
     // widgets et variables liés à l'onglet preprocessing :
 
-    QTabWidget* preprocess_tabs;
-    QGroupBox* preprocess_page;
+    QTabWidget* preprocess_tabs_;
+    QGroupBox* preprocess_page_;
 
     //QCheckBox* is_downscale_cb;
 
     QVBoxLayout* noise_layout();
 
-    QGroupBox* gaussian_noise_groupbox;
-    bool has_gaussian_noise2;
-    QDoubleSpinBox* std_noise_spin;
-    float std_noise2;
+    QGroupBox* gaussian_noise_groupbox_;
+    bool has_gaussian_noise2_;
+    QDoubleSpinBox* std_noise_spin_;
+    float std_noise2_;
 
-    QGroupBox* salt_noise_groupbox;
-    bool has_salt_noise2;
-    QDoubleSpinBox* proba_noise_spin;
-    float proba_noise2;
+    QGroupBox* salt_noise_groupbox_;
+    bool has_salt_noise2_;
+    QDoubleSpinBox* proba_noise_spin_;
+    float proba_noise2_;
 
-    QGroupBox* speckle_noise_groupbox;
-    bool has_speckle_noise2;
-    QDoubleSpinBox* std_speckle_noise_spin;
-    float std_speckle_noise2;
+    QGroupBox* speckle_noise_groupbox_;
+    bool has_speckle_noise2_;
+    QDoubleSpinBox* std_speckle_noise_spin_;
+    float std_speckle_noise2_;
 
     QVBoxLayout* filter_layout();
 
-    QGroupBox* median_groupbox;
-    KernelSizeSpinBox* klength_median_spin;
-    QRadioButton* complex_radio1;
-    QRadioButton* complex_radio2;
-    bool has_median_filt2;
-    bool has_O1_algo2;
-    int kernel_median_length2;
+    QGroupBox* median_groupbox_;
+    KernelSizeSpinBox* klength_median_spin_;
+    QRadioButton* complex_radio1_;
+    QRadioButton* complex_radio2_;
+    bool has_median_filt2_;
+    bool has_O1_algo2_;
+    int kernel_median_length2_;
 
-    QGroupBox* mean_groupbox;
-    KernelSizeSpinBox* klength_mean_spin;
-    bool has_mean_filt2;
-    int kernel_mean_length2;
+    QGroupBox* mean_groupbox_;
+    KernelSizeSpinBox* klength_mean_spin_;
+    bool has_mean_filt2_;
+    int kernel_mean_length2_;
 
-    QGroupBox* gaussian_groupbox;
-    KernelSizeSpinBox* klength_gaussian_spin;
-    QDoubleSpinBox* std_filter_spin;
-    bool has_gaussian_filt2;
-    int kernel_gaussian_length2;
-    float sigma2;
+    QGroupBox* gaussian_groupbox_;
+    KernelSizeSpinBox* klength_gaussian_spin_;
+    QDoubleSpinBox* std_filter_spin_;
+    bool has_gaussian_filt2_;
+    int kernel_gaussian_length2_;
+    float sigma2_;
 
-    QGroupBox* aniso_groupbox;
-    QRadioButton* aniso1_radio;
-    QRadioButton* aniso2_radio;
-    QSpinBox* iteration_filter_spin;
-    QDoubleSpinBox* lambda_spin;
-    QDoubleSpinBox* kappa_spin;
-    bool has_aniso_diff2;
-    int max_itera2;
-    float lambda2;
-    float kappa2;
-    ofeli_ip::AnisoDiff aniso_option2;
+    QGroupBox* aniso_groupbox_;
+    QRadioButton* aniso1_radio_;
+    QRadioButton* aniso2_radio_;
+    QSpinBox* iteration_filter_spin_;
+    QDoubleSpinBox* lambda_spin_;
+    QDoubleSpinBox* kappa_spin_;
+    bool has_aniso_diff2_;
+    int max_itera2_;
+    float lambda2_;
+    float kappa2_;
+    ofeli_ip::AnisoDiff aniso_option2_;
 
-    QGroupBox* open_groupbox;
-    KernelSizeSpinBox* klength_open_spin;
-    bool has_open_filt2;
-    int kernel_open_length2;
+    QGroupBox* open_groupbox_;
+    KernelSizeSpinBox* klength_open_spin_;
+    bool has_open_filt2_;
+    int kernel_open_length2_;
 
-    QGroupBox* close_groupbox;
-    KernelSizeSpinBox* klength_close_spin;
-    bool has_close_filt2;
-    int kernel_close_length2;
+    QGroupBox* close_groupbox_;
+    KernelSizeSpinBox* klength_close_spin_;
+    bool has_close_filt2_;
+    int kernel_close_length2_;
 
-    QGroupBox* tophat_groupbox;
-    QRadioButton* whitetophat_radio;
-    QRadioButton* blacktophat_radio;
-    KernelSizeSpinBox* klength_tophat_spin;
-    bool has_top_hat_filt2;
-    bool is_white_top_hat2;
-    int kernel_tophat_length2;
+    QGroupBox* tophat_groupbox_;
+    QRadioButton* whitetophat_radio_;
+    QRadioButton* blacktophat_radio_;
+    KernelSizeSpinBox* klength_tophat_spin_;
+    bool has_top_hat_filt2_;
+    bool is_white_top_hat2_;
+    int kernel_tophat_length2_;
 
-    QGroupBox* algo_groupbox;
-    QRadioButton* complex1_morpho_radio;
-    QRadioButton* complex2_morpho_radio;
-    bool has_O1_morpho2;
+    QGroupBox* algo_groupbox_;
+    QRadioButton* complex1_morpho_radio_;
+    QRadioButton* complex2_morpho_radio_;
+    bool has_O1_morpho2_;
 
-    bool has_preprocess2;
-    QLabel* time_filt;
+    bool has_preprocess2_;
+    QLabel* time_filt_;
 
 
-    ofeli_ip::Filters* filters2;
+    ofeli_ip::Filters* filters2_{nullptr};
     //float calculate_filtered_image();
-    const unsigned char* img2_filtered;
+    const unsigned char* img2_filtered_{nullptr};
 
     /////////////////////////////////////////
 
     // widgets et variables liés à l'onglet initialization :
 
-    QWidget* init_page;
+    QWidget* init_page_;
 
     void open_phi();
     void phiInit2imgPhi();
     void imgPhi2phiInit();
 
-    QRadioButton* rectangle_radio;
-    QRadioButton* ellipse_radio;
-    QSpinBox* width_shape_spin;
-    QSlider* width_slider;
-    QSpinBox* height_shape_spin;
-    QSlider* height_slider;
-    QSpinBox* abscissa_spin;
-    QSlider* abscissa_slider;
-    QSpinBox* ordinate_spin;
-    QSlider* ordinate_slider;
+    QRadioButton* rectangle_radio_;
+    QRadioButton* ellipse_radio_;
+    QSpinBox* width_shape_spin_;
+    QSlider* width_slider_;
+    QSpinBox* height_shape_spin_;
+    QSlider* height_slider_;
+    QSpinBox* abscissa_spin_;
+    QSlider* abscissa_slider_;
+    QSpinBox* ordinate_spin_;
+    QSlider* ordinate_slider_;
 
-    QPushButton* add_button;
-    QPushButton* subtract_button;
-    QPushButton* clear_button;
+    QPushButton* add_button_;
+    QPushButton* subtract_button_;
+    QPushButton* clear_button_;
 
     static unsigned char otsu_method(const int histogram[], unsigned int img_size);
 
     // widgets et variables liés à l'onglet algorithm :
 
-    AlgoSettingsWidget* algo_widget;
-    QWidget* algo_page;
+    AlgoSettingsWidget* algo_widget_;
+    QWidget* algo_page_;
 
     // --- Setup ---
     void setupUiDownscaleTab();

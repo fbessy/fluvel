@@ -1,4 +1,6 @@
 #include "video_active_contour_thread.hpp"
+
+#include <cstddef>
 #include "image_adapters.hpp"
 #include "frame_clock.hpp"
 #include "application_settings.hpp"
@@ -8,10 +10,8 @@
 namespace ofeli_app {
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
-    : QThread(parent),
-    frameAvailable(false),
-    running(true),
-    configChanged(false)
+    : QThread(parent)
+    
 {
 }
 
@@ -22,29 +22,29 @@ void VideoActiveContourThread::submitFrame(const QVideoFrame& frame)
     fd.receiveTs = FrameClock::nowNs();
 
     {
-        QMutexLocker locker(&frameMutex);
-        lastFrameData = fd;
-        frameAvailable = true;
+        QMutexLocker locker(&frameMutex_);
+        lastFrameData_ = fd;
+        frameAvailable_ = true;
     }
 
-    condition.wakeOne();
+    condition_.wakeOne();
 }
 
 void VideoActiveContourThread::run()
 {
-    QMutexLocker locker(&frameMutex);
-    running = true;
+    QMutexLocker locker(&frameMutex_);
+    running_ = true;
 
-    while (running)
+    while (running_)
     {
-        while (!frameAvailable && running)
-            condition.wait(&frameMutex);
+        while (!frameAvailable_ && running_)
+            condition_.wait(&frameMutex_);
 
-        if (!running)
+        if (!running_)
             break;
 
-        FrameData fd = lastFrameData;
-        frameAvailable = false;
+        FrameData fd = lastFrameData_;
+        frameAvailable_ = false;
         locker.unlock();
 
         FrameResult result = processFrame(fd.frame);
@@ -109,17 +109,17 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
             (newW != currentWidth_) ||
             (newH != currentHeight_);
 
-        if ( !region_ac || configChanged || sizeChanged )
+        if ( !region_ac_ || configChanged_ || sizeChanged )
         {
             if ( config.hasTemporalFiltering )
             {
-                smoother.reset( img_algo );
-                img_algo = smoother.outputSpan();
+                smoother_.reset( img_algo );
+                img_algo = smoother_.outputSpan();
             }
 
             const auto& algo_conf = config.algo;
 
-            region_ac = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
+            region_ac_ = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
                                                                   ofeli_ip::ContourData(img_algo.width(),
                                                                                         img_algo.height(),
                                                                                         algo_conf.connectivity),
@@ -128,7 +128,7 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
 
             currentWidth_  = newW;
             currentHeight_ = newH;
-            configChanged = false;
+            configChanged_ = false;
 
             QString size_str = QString("%1×%2")
                                    .arg(QString::number(fr.preprocessed.width()),
@@ -145,29 +145,29 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
         {
             if ( config.hasTemporalFiltering )
             {
-                smoother.update( img_algo );
-                img_algo = smoother.outputSpan();
+                smoother_.update( img_algo );
+                img_algo = smoother_.outputSpan();
             }
 
-            region_ac->resetExecutionState( img_algo );
+            region_ac_->resetExecutionState( img_algo );
         }
 
-        region_ac->run_cycles(config.cyclesNbr);
+        region_ac_->run_cycles(config.cyclesNbr);
         fr.processTs = FrameClock::nowNs() - startTs;
 
-        if ( region_ac )
+        if ( region_ac_ )
         {
             if ( config.hasTemporalFiltering )
             {
                 fr.preprocessed = QImage(img_algo.data(),
                                          img_algo.width(),
                                          img_algo.height(),
-                                         3 * img_algo.width(),
+                                         static_cast<qsizetype>(3 * img_algo.width()),
                                          QImage::Format_RGB888);
             }
 
-            fr.l_out = region_ac->export_l_out();
-            fr.l_in  = region_ac->export_l_in();
+            fr.l_out = region_ac_->export_l_out();
+            fr.l_in  = region_ac_->export_l_in();
         }
     }
 
@@ -176,16 +176,16 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
 
 void VideoActiveContourThread::stop()
 {
-    QMutexLocker locker(&frameMutex);
-    running = false;
-    condition.wakeAll();
+    QMutexLocker locker(&frameMutex_);
+    running_ = false;
+    condition_.wakeAll();
 }
 
 void VideoActiveContourThread::setAlgoConfig(const VideoComputeConfig& config)
 {
-    QMutexLocker locker(&frameMutex);
+    QMutexLocker locker(&frameMutex_);
     config_ = config;
-    configChanged = true;
+    configChanged_ = true;
 }
 
 } // namespace ofeli_app

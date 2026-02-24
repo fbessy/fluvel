@@ -139,43 +139,43 @@ public :
     void morphological_gradient_yuv(int kernel_length, int alpha, int beta, int gamma);
 
     //! Getter function for #filtered.
-    const unsigned char* get_filtered() const { return filtered; }
+    const unsigned char* get_filtered() const { return filtered_; }
 
     //! Getter function for #gradient.
-    const unsigned char* get_gradient() const { return gradient; }
+    const unsigned char* get_gradient() const { return gradient_; }
 
 private :
 
     //! Input pointer on the grayscale or grey-level image data buffer. This buffer must be row-wise.
-    const unsigned char* const img_data;
+    const unsigned char* const img_data_;
     //! Image width, i.e. number of columns.
-    const int img_width;
+    const int img_width_;
     //! Image height, i.e. number of rows.
-    const int img_height;
+    const int img_height_;
     //! Image size, i.e. number of pixels. Obviously, it egals to #img_width × #img_height.
-    const int img_size;
+    const int img_size_;
     //! Number of byte or octet per pixel, i.e number of channels. It is equal 1 for a grayscale or grey-level image and 3 for a color image.
-    const int byte_per_pixel;
+    const int byte_per_pixel_;
 
     //! Pointer on the current result image.
-    unsigned char* filtered;
+    unsigned char* filtered_;
     //! Pointer on the temporary result because the filters are not in place.
-    unsigned char* filtered_modif;
+    unsigned char* filtered_modif_;
     //! Pointer used by top-hat functions to keep in memory the previous result before opening or closing to subtract the both images then.
-    unsigned char* previous_filtered;
+    unsigned char* previous_filtered_;
     //! Pointer on the gradient used by the geodesic model in the case of an RGB image.
-    unsigned char* gradient;
+    unsigned char* gradient_;
 
     // pour le filtre anisotrope
     //! Pointer on the diffused image buffer for the anisotropic diffusion filter.
-    float* diff_img;
+    float* diff_img_;
     //! Pointer on the temporary diffused image buffer for the anisotropic diffusion filter because this filter is not in place
-    float* diff_img1;
+    float* diff_img1_;
 
     //! Columns histogram used by the Perreault's algorithm.
-    int* const columns_histo;
+    int* const columns_histo_;
     //! Kernel histogram used by the Perreault's algorithm.
-    int kernel_histo[256];
+    int kernel_histo_[256];
 
     //! Calculates the offset the image data buffer with the position (\a x,\a y, \a color_channel).
     int find_offset(int x, int y, int color_channel) const;
@@ -189,7 +189,7 @@ private :
 
 inline int Filters::find_offset(int x, int y, int color_channel) const
 {
-    return byte_per_pixel*(x+y*img_width)+color_channel;
+    return byte_per_pixel_*(x+y*img_width_)+color_channel;
 }
 
 inline void Filters::swap(unsigned char* const array, int a, int b)

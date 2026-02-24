@@ -30,7 +30,7 @@ ImageWindow::ImageWindow(QWidget* parent)
     updateCameraAction();
 
     QSettings settings;
-    last_directory_used = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
+    last_directory_used_ = settings.value("Main/Name/last_directory_used",QDir().homePath()).toString();
 }
 
 void ImageWindow::setupUi()
@@ -44,65 +44,65 @@ void ImageWindow::setupUi()
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
-    startResumeIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
+    startResumeIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                                    QStyle::SP_MediaPlay,
                                    ":/icons/toolbar/media-playback-start-symbolic.svg");
 
-    restartIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaylistRepeat,
+    restartIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaylistRepeat,
                                QStyle::SP_BrowserReload,
                                ":/icons/toolbar/media-playlist-repeat-symbolic.svg");
 
-    pauseIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause,
+    pauseIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause,
                              QStyle::SP_MediaPause,
                              ":/icons/toolbar/media-playback-pause-symbolic.svg");
 
-    restartButton = new QPushButton( tr("Start") );
-    restartButton->setToolTip(tr("Run the active contour."));
-    restartButton->setIcon( startResumeIcon );
+    restartButton_ = new QPushButton( tr("Start") );
+    restartButton_->setToolTip(tr("Run the active contour."));
+    restartButton_->setIcon( startResumeIcon_ );
 
-    togglePauseButton = new QPushButton( tr("Resume") );
-    togglePauseButton->setToolTip(tr("Resume the active contour execution."));
-    togglePauseButton->setIcon( startResumeIcon );
+    togglePauseButton_ = new QPushButton( tr("Resume") );
+    togglePauseButton_->setToolTip(tr("Resume the active contour execution."));
+    togglePauseButton_->setIcon( startResumeIcon_ );
 
-    stepButton = new QPushButton( tr("Step") );
-    stepButton->setToolTip(tr("Advance the active contour by one iteration."));
+    stepButton_ = new QPushButton( tr("Step") );
+    stepButton_->setToolTip(tr("Advance the active contour by one iteration."));
 
     QIcon stepIcon = il::loadIcon(QIcon::ThemeIcon::GoNext,
                                   QStyle::SP_ArrowRight,
                                   ":/icons/toolbar/go-next-symbolic.svg");
 
-    stepButton->setIcon( stepIcon );
+    stepButton_->setIcon( stepIcon );
 
-    stepButton->setAutoRepeat(true);
-    stepButton->setAutoRepeatDelay(300);
-    stepButton->setAutoRepeatInterval(100);
+    stepButton_->setAutoRepeat(true);
+    stepButton_->setAutoRepeatDelay(300);
+    stepButton_->setAutoRepeatInterval(100);
 
-    convergeButton = new QPushButton( tr("Converge") );
-    convergeButton->setToolTip(tr("Run until completion without displaying intermediate steps."));
+    convergeButton_ = new QPushButton( tr("Converge") );
+    convergeButton_->setToolTip(tr("Run until completion without displaying intermediate steps."));
 
     QIcon convergeIcon = il::loadIcon(QIcon::ThemeIcon::MediaSeekForward,
                                       QStyle::SP_MediaSeekForward,
                                       ":/icons/toolbar/media-seek-forward-symbolic.svg");
 
-    convergeButton->setIcon( convergeIcon );
+    convergeButton_->setIcon( convergeIcon );
 
-    restartButton->setEnabled(false);
-    togglePauseButton->setEnabled(false);
-    stepButton->setEnabled(false);
-    convergeButton->setEnabled(false);
+    restartButton_->setEnabled(false);
+    togglePauseButton_->setEnabled(false);
+    stepButton_->setEnabled(false);
+    convergeButton_->setEnabled(false);
 
 
-    rightPanelToggle = new RightPanelToggleButton;
+    rightPanelToggle_ = new RightPanelToggleButton;
 
-    settingsButton = new QPushButton;
-    settingsButton->setToolTip(tr("Image session settings"));
-    settingsButton->setFlat(true);
-    settingsButton->setFocusPolicy(Qt::NoFocus);
+    settingsButton_ = new QPushButton;
+    settingsButton_->setToolTip(tr("Image session settings"));
+    settingsButton_->setFlat(true);
+    settingsButton_->setFocusPolicy(Qt::NoFocus);
 
-    settingsIcon = il::loadIcon("configure",
+    settingsIcon_ = il::loadIcon("configure",
                                 ":/icons/toolbar/configure-symbolic.svg");
 
-    settingsButton->setIcon( settingsIcon );
+    settingsButton_->setIcon( settingsIcon_ );
 
     //settingsButton->setAutoDefault(false);
     //settingsButton->setFlat(true);
@@ -121,19 +121,19 @@ void ImageWindow::setupUi()
     controlLayout->setContentsMargins(8, 4, 8, 4);
     controlLayout->setSpacing(6);
 
-    controlLayout->addWidget(restartButton);
-    controlLayout->addWidget(togglePauseButton);
-    controlLayout->addWidget(stepButton);
-    controlLayout->addWidget(convergeButton);
+    controlLayout->addWidget(restartButton_);
+    controlLayout->addWidget(togglePauseButton_);
+    controlLayout->addWidget(stepButton_);
+    controlLayout->addWidget(convergeButton_);
     controlLayout->addStretch();
-    controlLayout->addWidget(rightPanelToggle);
+    controlLayout->addWidget(rightPanelToggle_);
     controlLayout->addSpacerItem(
         new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
         );
-    controlLayout->addWidget(settingsButton);
+    controlLayout->addWidget(settingsButton_);
 
     // --- Image view ---
-    imageView = new ImageView(AppSettings::instance().imgConfig.display,
+    imageView_ = new ImageView(AppSettings::instance().imgConfig.display,
                               AppSettings::instance().imgConfig.compute.downscale,
                               central);
 
@@ -142,21 +142,21 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
-    imageView->setInteraction(interaction.release());
+    imageView_->setInteraction(interaction.release());
 
-    imageOverlay = new AlgoInfoOverlay(imageView->viewport());
-    imageOverlay->raise();
+    imageOverlay_ = new AlgoInfoOverlay(imageView_->viewport());
+    imageOverlay_->raise();
 
     // --- Display bar (à droite) ---
-    displayBar = new DisplaySettingsWidget(central, Session::Image);
+    displayBar_ = new DisplaySettingsWidget(central, Session::Image);
 
     // --- Layout horizontal contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    contentLayout->addWidget(imageView, 1);  // prend tout l'espace
-    contentLayout->addWidget(displayBar, 0); // largeur naturelle
+    contentLayout->addWidget(imageView_, 1);  // prend tout l'espace
+    contentLayout->addWidget(displayBar_, 0); // largeur naturelle
 
     // Assemblage global
     vLayout->addWidget(controlBar);
@@ -171,162 +171,162 @@ void ImageWindow::setupActions()
     /////////////                          Create Actions                /////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    imageSessionAct = new QAction(tr("&Image"), this);
-    imageSessionAct->setShortcut(tr("Ctrl+I"));
+    imageSessionAct_ = new QAction(tr("&Image"), this);
+    imageSessionAct_->setShortcut(tr("Ctrl+I"));
 
     QIcon imageIcon = il::loadIcon("image-x-generic-symbolic",
                                    ":/icons/toolbar/view-preview-symbolic.svg");
 
-    imageSessionAct->setIcon( imageIcon );
-    imageSessionAct->setCheckable(true);
-    imageSessionAct->setChecked(true);
-    imageSessionAct->setEnabled(true);
+    imageSessionAct_->setIcon( imageIcon );
+    imageSessionAct_->setCheckable(true);
+    imageSessionAct_->setChecked(true);
+    imageSessionAct_->setEnabled(true);
 
-    cameraSessionAct = new QAction(tr("Came&ra"), this);
-    cameraSessionAct->setShortcut(tr("Ctrl+R"));
+    cameraSessionAct_ = new QAction(tr("Came&ra"), this);
+    cameraSessionAct_->setShortcut(tr("Ctrl+R"));
 
     QIcon cameraIcon = il::loadIcon(QIcon::ThemeIcon::CameraWeb,
                                     ":/icons/toolbar/camera-web-symbolic.svg");
 
-    cameraSessionAct->setIcon( cameraIcon );
+    cameraSessionAct_->setIcon( cameraIcon );
 
-    cameraSessionAct->setCheckable(true);
-    cameraSessionAct->setChecked(false);
-    cameraSessionAct->setEnabled(false);
+    cameraSessionAct_->setCheckable(true);
+    cameraSessionAct_->setChecked(false);
+    cameraSessionAct_->setEnabled(false);
 
-    quitAct = new QAction(tr("&Quit"), this);
-    quitAct->setShortcut(QKeySequence::Quit);
+    quitAct_ = new QAction(tr("&Quit"), this);
+    quitAct_->setShortcut(QKeySequence::Quit);
 
     QIcon quitIcon = il::loadIcon(QIcon::ThemeIcon::ApplicationExit,
                                   QStyle::SP_TitleBarCloseButton,
                                   ":/icons/toolbar/application-exit-symbolic.svg");
 
-    quitAct->setIcon( quitIcon );
+    quitAct_->setIcon( quitIcon );
 
-    openAct = new QAction(tr("&Open..."), this);
-    openAct->setShortcut(QKeySequence::Open);
-    openAct->setStatusTip(tr("Open an image file (*.png, *.bmp, *.jpg, *.jpeg, *.tiff, *.tif, *.gif, *.pbm, *.pgm, *.ppm, *.svg, *.svgz, *.mng, *.xbm, *.xpm)."));
+    openAct_ = new QAction(tr("&Open..."), this);
+    openAct_->setShortcut(QKeySequence::Open);
+    openAct_->setStatusTip(tr("Open an image file (*.png, *.bmp, *.jpg, *.jpeg, *.tiff, *.tif, *.gif, *.pbm, *.pgm, *.ppm, *.svg, *.svgz, *.mng, *.xbm, *.xpm)."));
 
     QIcon openIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpen,
                                   QStyle::SP_DirOpenIcon,
                                   ":/icons/toolbar/document-open-symbolic.svg");
 
-    openAct->setIcon( openIcon );
+    openAct_->setIcon( openIcon );
 
 
-    deleteAct = new QAction(tr("Clear list"), this);
-    deleteAct->setStatusTip(tr("Clean the recent files list."));
+    deleteAct_ = new QAction(tr("Clear list"), this);
+    deleteAct_->setStatusTip(tr("Clean the recent files list."));
 
     QIcon deleteIcon = il::loadIcon(QIcon::ThemeIcon::EditClear,
                                     QStyle::SP_LineEditClearButton,
                                     ":/icons/toolbar/edit-clear-history.svg");
 
-    deleteAct->setIcon( deleteIcon );
+    deleteAct_->setIcon( deleteIcon );
 
-    saveAct = new QAction(tr("&Save..."), this);
-    saveAct->setShortcut(QKeySequence::Save);
-    saveAct->setStatusTip(tr("Save the displayed image."));
+    saveAct_ = new QAction(tr("&Save..."), this);
+    saveAct_->setShortcut(QKeySequence::Save);
+    saveAct_->setStatusTip(tr("Save the displayed image."));
 
     QIcon saveIcon = il::loadIcon(QIcon::ThemeIcon::DocumentSaveAs,
                                   QStyle::SP_DialogSaveButton,
                                   ":/icons/toolbar/document-save-as-symbolic.svg");
 
-    saveAct->setIcon( saveIcon );
+    saveAct_->setIcon( saveIcon );
 
 
-    mediaDevices = new QMediaDevices(this);
+    mediaDevices_ = new QMediaDevices(this);
 
     QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent,
                                     QStyle::SP_DirOpenIcon,
                                     ":/icons/toolbar/document-open-recent-symbolic.svg");
 
-    for( int i = 0; i < MaxRecentFiles; ++i )
+    for( int i = 0; i < kMaxRecentFiles; ++i )
     {
-        recentFileActs[i] = new QAction(this);
-        recentFileActs[i]->setVisible(false);
+        recentFileActs_[i] = new QAction(this);
+        recentFileActs_[i]->setVisible(false);
 
-        recentFileActs[i]->setIcon( recentIcon );
+        recentFileActs_[i]->setIcon( recentIcon );
     }
 
-    analysisAct = new QAction(tr("&Analysis"), this);
-    analysisAct->setStatusTip(tr("Compute the Hausdorff distance."));
-    analysisAct->setShortcut(tr("Ctrl+A"));
+    analysisAct_ = new QAction(tr("&Analysis"), this);
+    analysisAct_->setStatusTip(tr("Compute the Hausdorff distance."));
+    analysisAct_->setShortcut(tr("Ctrl+A"));
 
-    analysisAct->setIcon( QIcon(":/icons/toolbar/measure-symbolic.svg") );
+    analysisAct_->setIcon( QIcon(":/icons/toolbar/measure-symbolic.svg") );
 
-    settingsAct = new QAction(tr("&Settings"), this);
-    settingsAct->setShortcut(QKeySequence::Preferences);
-    settingsAct->setStatusTip(tr("Image preprocessing and active contour initialization."));
-    settingsAct->setEnabled(true);
+    settingsAct_ = new QAction(tr("&Settings"), this);
+    settingsAct_->setShortcut(QKeySequence::Preferences);
+    settingsAct_->setStatusTip(tr("Image preprocessing and active contour initialization."));
+    settingsAct_->setEnabled(true);
 
-    settingsAct->setIcon( settingsIcon );
+    settingsAct_->setIcon( settingsIcon_ );
 
     menuBar()->addSeparator();
 
-    aboutAct = new QAction(tr("&About"), this);
-    aboutAct->setStatusTip(tr("Information, license and home page."));
+    aboutAct_ = new QAction(tr("&About"), this);
+    aboutAct_->setStatusTip(tr("Information, license and home page."));
 
     QIcon aboutIcon = il::loadIcon(QIcon::ThemeIcon::HelpAbout,
                                    QStyle::SP_MessageBoxInformation,
                                    ":/icons/toolbar/help-about-symbolic.svg");
 
-    aboutAct->setIcon( aboutIcon );
+    aboutAct_->setIcon( aboutIcon );
 
 
-    languageAct = new QAction(tr("&Language"), this);
-    languageAct->setStatusTip(tr("Choose the application language."));
+    languageAct_ = new QAction(tr("&Language"), this);
+    languageAct_->setStatusTip(tr("Choose the application language."));
 
     QIcon languageIcon = il::loadIcon("preferences-desktop-locale",
                                       ":/icons/toolbar/preferences-desktop-locale.svg");
 
-    languageAct->setIcon( languageIcon );
+    languageAct_->setIcon( languageIcon );
 
 
     ////////////////////////////////////////////////////////////////////////////////////////
     /////////////                          Create Menus                /////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    sessionMenu = new QMenu(tr("&Session"), this);
-    sessionMenu->addAction(imageSessionAct);
-    sessionMenu->addAction(cameraSessionAct);
-    sessionMenu->addSeparator();
-    sessionMenu->addAction(quitAct);
+    sessionMenu_ = new QMenu(tr("&Session"), this);
+    sessionMenu_->addAction(imageSessionAct_);
+    sessionMenu_->addAction(cameraSessionAct_);
+    sessionMenu_->addSeparator();
+    sessionMenu_->addAction(quitAct_);
 
-    fileMenu = new QMenu(tr("&File"), this);
-    fileMenu->addAction(openAct);
+    fileMenu_ = new QMenu(tr("&File"), this);
+    fileMenu_->addAction(openAct_);
 
-    separatorAct = fileMenu->addSeparator();
-    for( int i = 0; i < MaxRecentFiles; ++i )
+    separatorAct_ = fileMenu_->addSeparator();
+    for( int i = 0; i < kMaxRecentFiles; ++i )
     {
-        fileMenu->addAction(recentFileActs[i]);
+        fileMenu_->addAction(recentFileActs_[i]);
     }
 
-    fileMenu->addAction(deleteAct);
+    fileMenu_->addAction(deleteAct_);
 
-    fileMenu->addSeparator();
+    fileMenu_->addSeparator();
 
-    fileMenu->addAction(saveAct);
+    fileMenu_->addAction(saveAct_);
 
-    segmentationMenu = new QMenu(tr("&Segmentation"), this);
-    segmentationMenu->addAction(analysisAct);
-    segmentationMenu->addAction(settingsAct);
+    segmentationMenu_ = new QMenu(tr("&Segmentation"), this);
+    segmentationMenu_->addAction(analysisAct_);
+    segmentationMenu_->addAction(settingsAct_);
 
-    helpMenu = new QMenu(tr("&Help"), this);
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(languageAct);
+    helpMenu_ = new QMenu(tr("&Help"), this);
+    helpMenu_->addAction(aboutAct_);
+    helpMenu_->addAction(languageAct_);
 
-    menuBar()->addMenu(sessionMenu);
-    menuBar()->addMenu(fileMenu);
-    menuBar()->addMenu(segmentationMenu);
-    menuBar()->addMenu(helpMenu);
+    menuBar()->addMenu(sessionMenu_);
+    menuBar()->addMenu(fileMenu_);
+    menuBar()->addMenu(segmentationMenu_);
+    menuBar()->addMenu(helpMenu_);
 
-    imageController = new ImageController(this);
+    imageController_ = new ImageController(this);
 
-    settings_window = new SettingsWindow(this);
-    camera_window = new CameraWindow;
-    evaluation_window = new AnalysisWindow(this);
-    about_window = new AboutWindow(this);
-    language_window = new LanguageWindow(this);
+    settings_window_ = new SettingsWindow(this);
+    camera_window_ = new CameraWindow;
+    evaluation_window_ = new AnalysisWindow(this);
+    about_window_ = new AboutWindow(this);
+    language_window_ = new LanguageWindow(this);
 }
 
 void ImageWindow::setupConnections()
@@ -334,33 +334,33 @@ void ImageWindow::setupConnections()
     connect(this, &ImageWindow::fileSelected,
             this, &ImageWindow::onFileSelected);
 
-    connect(imageController, &ImageController::displayedImageReady,
+    connect(imageController_, &ImageController::displayedImageReady,
             this,            &ImageWindow::onDisplayedImageReady);
 
 
-    nameFilters << "*.bmp"
+    nameFilters_ << "*.bmp"
                 << "*.gif"
                 << "*.jpg" << "*.jpeg" << "*.mng"
                 << "*.pbm" << "*.png" << "*.pgm"
                 << "*.ppm" << "*.svg" << "*.svgz"
                 << "*.tiff" << "*.tif" << "*.xbm" << "*.xpm";
 
-    nameFilters.removeDuplicates();
+    nameFilters_.removeDuplicates();
 
-    connect(openAct, &QAction::triggered, this, [this]() {
+    connect(openAct_, &QAction::triggered, this, [this]() {
         QString fileName = QFileDialog::getOpenFileName(this,
                                                         tr("Open Image"),
-                                                        last_directory_used,
-                                                        tr("Image Files (%1)").arg(nameFilters.join(" ")));
+                                                        last_directory_used_,
+                                                        tr("Image Files (%1)").arg(nameFilters_.join(" ")));
         if ( !fileName.isEmpty() ) {
-            last_directory_used = QFileInfo(fileName).absolutePath();
+            last_directory_used_ = QFileInfo(fileName).absolutePath();
             emit fileSelected(fileName);
         }
     });
 
-    for( int i = 0; i < MaxRecentFiles; ++i )
+    for( int i = 0; i < kMaxRecentFiles; ++i )
     {
-        connect(recentFileActs[i], &QAction::triggered, this, [this]() {
+        connect(recentFileActs_[i], &QAction::triggered, this, [this]() {
             QAction* action = qobject_cast<QAction*>( sender() );
             QString fileName;
             if( action != nullptr )
@@ -373,81 +373,81 @@ void ImageWindow::setupConnections()
         });
     }
     connect(this,            &ImageWindow::fileSelected,
-            imageController, &ImageController::loadImage);
+            imageController_, &ImageController::loadImage);
 
-    connect(deleteAct, &QAction::triggered,
+    connect(deleteAct_, &QAction::triggered,
             this,      &ImageWindow::deleteList);
 
-    connect(saveAct, &QAction::triggered,
+    connect(saveAct_, &QAction::triggered,
             this,    &ImageWindow::saveDisplayed);
 
-    connect(quitAct, &QAction::triggered,
+    connect(quitAct_, &QAction::triggered,
             this,    &ImageWindow::close);
 
-    connect(imageSessionAct, &QAction::triggered, this, [this]() {
-        imageSessionAct->setChecked(true);
+    connect(imageSessionAct_, &QAction::triggered, this, [this]() {
+        imageSessionAct_->setChecked(true);
     });
 
-    connect(cameraSessionAct, &QAction::triggered,
+    connect(cameraSessionAct_, &QAction::triggered,
             this,             &ImageWindow::onStartCameraActionTriggered);
 
-    connect(camera_window, &CameraWindow::cameraWindowClosed,
+    connect(camera_window_, &CameraWindow::cameraWindowClosed,
             this,          &ImageWindow::onCameraWindowClosed);
-    connect(camera_window, &CameraWindow::cameraWindowShown,
+    connect(camera_window_, &CameraWindow::cameraWindowShown,
             this,          &ImageWindow::onCameraWindowShown);
 
 
-    connect(mediaDevices,      &QMediaDevices::videoInputsChanged,
+    connect(mediaDevices_,      &QMediaDevices::videoInputsChanged,
             this,              &ImageWindow::updateCameraAction);
 
-    connect(analysisAct,       &QAction::triggered,
-            evaluation_window, &AnalysisWindow::show);
+    connect(analysisAct_,       &QAction::triggered,
+            evaluation_window_, &AnalysisWindow::show);
 
-    connect(settingsAct,     &QAction::triggered,
-            settings_window, &SettingsWindow::show);
+    connect(settingsAct_,     &QAction::triggered,
+            settings_window_, &SettingsWindow::show);
 
-    connect(aboutAct,        &QAction::triggered,
-            about_window,    &AboutWindow::show);
+    connect(aboutAct_,        &QAction::triggered,
+            about_window_,    &AboutWindow::show);
 
-    connect(languageAct,     &QAction::triggered,
-            language_window, &LanguageWindow::show);
+    connect(languageAct_,     &QAction::triggered,
+            language_window_, &LanguageWindow::show);
 
-    imageView->applyDownscaleConfig( AppSettings::instance().imgConfig.compute.downscale );
-    imageView->applyDisplayConfig( AppSettings::instance().imgConfig.display );
+    imageView_->applyDownscaleConfig( AppSettings::instance().imgConfig.compute.downscale );
+    imageView_->applyDisplayConfig( AppSettings::instance().imgConfig.display );
 
     connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged,
             this, [this](const ImageSessionSettings& conf) {
-                imageView->applyDownscaleConfig( conf.compute.downscale );
+                imageView_->applyDownscaleConfig( conf.compute.downscale );
             });
 
     connect(&AppSettings::instance(),
             &ApplicationSettings::imgDisplaySettingsChanged,
-            imageView,
+            imageView_,
             &ImageView::applyDisplayConfig);
 
-    connect(imageController,
+    connect(imageController_,
             &ImageController::clearOverlaysRequested,
-            imageView,
+            imageView_,
             &ImageView::clearOverlays);
 
-    connect(imageController,
+    connect(imageController_,
             &ImageController::displayedImageReady,
-            imageView,
+            imageView_,
             &ImageView::setImage);
 
-    connect(imageController,
+    connect(imageController_,
             &ImageController::inputImageReady,
             this,
             &ImageWindow::onInputImageReady);
 
     connect(this,
             &ImageWindow::inputImageReady,
-            settings_window,
+            settings_window_,
             &SettingsWindow::onInputImageReady);
 
-    connect(imageController,
+    connect(imageController_,
             &ImageController::contourUpdated,
-            imageView,
+            imageView_,
             &ImageView::setContour,
             Qt::QueuedConnection);
 
@@ -457,25 +457,25 @@ void ImageWindow::setupConnections()
             this, &ImageWindow::refreshAlgoOverlay);
     m_statsTimer->start();
 
-    connect(restartButton,      &QPushButton::clicked,
-            imageController,    &ImageController::restart);
+    connect(restartButton_,      &QPushButton::clicked,
+            imageController_,    &ImageController::restart);
 
-    connect(togglePauseButton,  &QPushButton::clicked,
-            imageController,    &ImageController::togglePause);
+    connect(togglePauseButton_,  &QPushButton::clicked,
+            imageController_,    &ImageController::togglePause);
 
-    connect(stepButton,         &QPushButton::clicked,
-            imageController,    &ImageController::step);
+    connect(stepButton_,         &QPushButton::clicked,
+            imageController_,    &ImageController::step);
 
-    connect(convergeButton,     &QPushButton::clicked,
-            imageController,    &ImageController::converge);
+    connect(convergeButton_,     &QPushButton::clicked,
+            imageController_,    &ImageController::converge);
 
-    connect(rightPanelToggle, &QPushButton::toggled,
-            displayBar, &DisplaySettingsWidget::setPanelVisible);
+    connect(rightPanelToggle_, &QPushButton::toggled,
+            displayBar_, &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton,     &QPushButton::clicked,
-            settings_window,    &SettingsWindow::show);
+    connect(settingsButton_,     &QPushButton::clicked,
+            settings_window_,    &SettingsWindow::show);
 
-    connect(imageController,    &ImageController::stateChanged,
+    connect(imageController_,    &ImageController::stateChanged,
             this,               &ImageWindow::onStateChanged);
 }
 
@@ -490,7 +490,7 @@ void ImageWindow::setCurrentFile(const QString &fileName)
     QStringList files = settings.value("Main/Name/recentFileList").toStringList();
     files.removeAll(fileName);
     files.prepend(fileName);
-    while( files.size() > MaxRecentFiles )
+    while( files.size() > kMaxRecentFiles )
     {
         files.removeLast();
     }
@@ -505,31 +505,31 @@ void ImageWindow::updateRecentFileActions()
     QStringList files = settings.value("Main/Name/recentFileList").toStringList();
 
     qsizetype numRecentFiles = qMin(files.size(),
-                                    MaxRecentFiles);
+                                    kMaxRecentFiles);
 
     for( qsizetype i = 0; i < numRecentFiles; ++i )
     {
         QString text = tr("&%1").arg( strippedName(files[i]) );
-        recentFileActs[i]->setText(text);
-        recentFileActs[i]->setData(files[i]);
-        recentFileActs[i]->setVisible(true);
-        recentFileActs[i]->setStatusTip(files[i]);
+        recentFileActs_[i]->setText(text);
+        recentFileActs_[i]->setData(files[i]);
+        recentFileActs_[i]->setVisible(true);
+        recentFileActs_[i]->setStatusTip(files[i]);
     }
 
-    for( qsizetype j = numRecentFiles; j < MaxRecentFiles; ++j )
+    for( qsizetype j = numRecentFiles; j < kMaxRecentFiles; ++j )
     {
-        recentFileActs[j]->setVisible(false);
+        recentFileActs_[j]->setVisible(false);
     }
 
-    separatorAct->setVisible(numRecentFiles > 0);
+    separatorAct_->setVisible(numRecentFiles > 0);
 
     if( files.isEmpty() )
     {
-        deleteAct->setVisible(false);
+        deleteAct_->setVisible(false);
     }
     else
     {
-        deleteAct->setVisible(true);
+        deleteAct_->setVisible(true);
     }
 }
 
@@ -549,20 +549,20 @@ void ImageWindow::updateCameraAction()
     auto cameras = QMediaDevices::videoInputs();
 
     if ( cameras.isEmpty() )
-        cameraSessionAct->setEnabled(false);
+        cameraSessionAct_->setEnabled(false);
     else
-        cameraSessionAct->setEnabled(true);
+        cameraSessionAct_->setEnabled(true);
 }
 
 void ImageWindow::onStartCameraActionTriggered()
 {
-    if ( !cameraSessionAct )
+    if ( !cameraSessionAct_ )
         return;
 
-    if ( !camera_window )
+    if ( !camera_window_ )
         return;
 
-    cameraSessionAct->setChecked(camera_window && camera_window->isVisible());
+    cameraSessionAct_->setChecked(camera_window_ && camera_window_->isVisible());
 
     auto cameras = QMediaDevices::videoInputs();
 
@@ -574,13 +574,13 @@ void ImageWindow::onStartCameraActionTriggered()
     }
     else
     {
-        camera_window->setWindowState(
-            camera_window->windowState() & ~Qt::WindowMinimized
+        camera_window_->setWindowState(
+            camera_window_->windowState() & ~Qt::WindowMinimized
             );
 
-        camera_window->show();
-        camera_window->raise();
-        camera_window->activateWindow();
+        camera_window_->show();
+        camera_window_->raise();
+        camera_window_->activateWindow();
     }
 }
 
@@ -596,7 +596,7 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     QSettings settings;
 
     settings.setValue( "Main/Window/geometry", saveGeometry() );
-    settings.setValue( "Main/Name/last_directory_used", last_directory_used);
+    settings.setValue( "Main/Name/last_directory_used", last_directory_used_);
 
     config.save();
 
@@ -607,11 +607,11 @@ void ImageWindow::closeEvent(QCloseEvent* event)
 
 void ImageWindow::onDisplayedImageReady(const QImage& displayed)
 {
-    m_imageSize = displayed.size();
-    m_channels  = displayed.depth() / 8;
+    m_imageSize_ = displayed.size();
+    m_channels_  = displayed.depth() / 8;
 
-    if ( m_channels > 3 )
-        m_channels = 3; // because this application processes only 3 channels
+    if ( m_channels_ > 3 )
+        m_channels_ = 3; // because this application processes only 3 channels
                         // even there are 4 channels, for example.
 
     updateWindowTitle();
@@ -621,8 +621,8 @@ void ImageWindow::onFileSelected(const QString& path)
 {
     setCurrentFile(path); // for recent file
 
-    m_fileName = strippedName(path);
-    m_fullPath = path;
+    m_fileName_ = strippedName(path);
+    m_fullPath_ = path;
 
     updateWindowTitle();
 
@@ -633,18 +633,18 @@ void ImageWindow::updateWindowTitle()
 {
     QString title = "Ofeli";
 
-    if (    !m_fileName.isEmpty()
-         && m_imageSize.isValid()
-         && m_channels > 0 )
+    if (    !m_fileName_.isEmpty()
+         && m_imageSize_.isValid()
+         && m_channels_ > 0 )
     {
-        const QString colorText = (m_channels == 1) ? "Gray" : "RGB";
+        const QString colorText = (m_channels_ == 1) ? "Gray" : "RGB";
 
         const QString sizeStr = QString("%1×%2")
-                                    .arg(m_imageSize.width())
-                                    .arg(m_imageSize.height());
+                                    .arg(m_imageSize_.width())
+                                    .arg(m_imageSize_.height());
 
         title += QString(" - %1 - %2 - %3")
-                     .arg(m_fileName, sizeStr, colorText);
+                     .arg(m_fileName_, sizeStr, colorText);
     }
 
     setWindowTitle(title);
@@ -652,19 +652,19 @@ void ImageWindow::updateWindowTitle()
 
 void ImageWindow::saveDisplayed()
 {
-    QImage displayed = imageView->renderToImage();
+    QImage displayed = imageView_->renderToImage();
     if (displayed.isNull())
         return;
 
-    QString baseName = m_fileName.isEmpty()
+    QString baseName = m_fileName_.isEmpty()
                            ? "displayed"
-                           : QFileInfo(m_fileName).baseName();
+                           : QFileInfo(m_fileName_).baseName();
 
     QString selectedFilter;
     QString fileName = QFileDialog::getSaveFileName(
         this,
         tr("Save displayed image"),
-        last_directory_used + "/" + baseName,
+        last_directory_used_ + "/" + baseName,
         tr("PNG (*.png);;JPG (*.jpg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm)"),
         &selectedFilter
         );
@@ -717,49 +717,49 @@ void ImageWindow::onStateChanged(ofeli_app::WorkerState state)
     bool isEnable = ( state != WorkerState::Uninitialized &&
                       state != WorkerState::Initializing );
 
-    restartButton->setEnabled( isEnable );
-    togglePauseButton->setEnabled( isEnable );
-    stepButton->setEnabled( isEnable );
-    convergeButton->setEnabled( isEnable );
+    restartButton_->setEnabled( isEnable );
+    togglePauseButton_->setEnabled( isEnable );
+    stepButton_->setEnabled( isEnable );
+    convergeButton_->setEnabled( isEnable );
 
 
     if ( state == WorkerState::Running ||
          state == WorkerState::Suspended )
     {
-        restartButton->setText( tr("Restart") );
-        restartButton->setToolTip(tr("Restart the active contour from its initial state."));
-        restartButton->setIcon( restartIcon );
+        restartButton_->setText( tr("Restart") );
+        restartButton_->setToolTip(tr("Restart the active contour from its initial state."));
+        restartButton_->setIcon( restartIcon_ );
     }
     else if ( state == WorkerState::Ready )
     {
-        restartButton->setText( tr("Start") );
-        restartButton->setToolTip(tr("Run the active contour."));
-        restartButton->setIcon( startResumeIcon );
+        restartButton_->setText( tr("Start") );
+        restartButton_->setToolTip(tr("Run the active contour."));
+        restartButton_->setIcon( startResumeIcon_ );
     }
 
     if ( state == WorkerState::Running )
     {
-        togglePauseButton->setText( tr("Pause") );
-        togglePauseButton->setToolTip(tr("Suspend execution and display the current state."));
-        togglePauseButton->setIcon( pauseIcon );
+        togglePauseButton_->setText( tr("Pause") );
+        togglePauseButton_->setToolTip(tr("Suspend execution and display the current state."));
+        togglePauseButton_->setIcon( pauseIcon_ );
     }
     else if ( state == WorkerState::Suspended ||
               state == WorkerState::Ready )
     {
-        togglePauseButton->setText( tr("Resume") );
-        togglePauseButton->setToolTip(tr("Resume the active contour execution."));
-        togglePauseButton->setIcon( startResumeIcon );
+        togglePauseButton_->setText( tr("Resume") );
+        togglePauseButton_->setToolTip(tr("Resume the active contour execution."));
+        togglePauseButton_->setIcon( startResumeIcon_ );
     }
 }
 
 void ImageWindow::onCameraWindowShown()
 {
-    cameraSessionAct->setChecked(true);
+    cameraSessionAct_->setChecked(true);
 }
 
 void ImageWindow::onCameraWindowClosed()
 {
-    cameraSessionAct->setChecked(false);
+    cameraSessionAct_->setChecked(false);
 }
 
 void ImageWindow::onInputImageReady(const QImage& inputImage)

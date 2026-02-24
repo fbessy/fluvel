@@ -52,7 +52,7 @@
 namespace ofeli_ip
 {
 
-constexpr size_t INITIAL_SPEED_ARRAY_ALLOC_SIZE = 10000u;
+constexpr size_t kInitialSpeedArrayAllocSize = 10000u;
 
 class ActiveContour
 {

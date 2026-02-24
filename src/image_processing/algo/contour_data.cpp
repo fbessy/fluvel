@@ -37,6 +37,7 @@
 **
 ****************************************************************************/
 
+#include <cstddef>
 #include <stack>
 #include <iostream>
 
@@ -135,7 +136,7 @@ ContourData::ContourData(ContourData&& contour) noexcept
 
 void ContourData::allocate_lists()
 {
-    const size_t perimeter        = 2*( phi_.width() + phi_.height() );
+    const size_t perimeter        = static_cast<const size_t>(2*( phi_.width() + phi_.height() ));
     const size_t elem_alloc_size_ = 3 * perimeter;
 
     l_out_.reserve( elem_alloc_size_ );
@@ -323,7 +324,7 @@ bool ContourData::is_redundant(const ContourPoint& p) const
     {
         // FAST PATH: aucun valid(), aucune branche parasite
 
-        for ( const auto& d : neighbors4 )
+        for ( const auto& d : kNeighbors4 )
         {
             if ( phi_value::differentSide(phi_.at(x + d.dx, y + d.dy),
                                           phi_center) )
@@ -332,7 +333,7 @@ bool ContourData::is_redundant(const ContourPoint& p) const
 
         if ( connectivity == Connectivity::Eight )
         {
-            for ( const auto& d : neighbors4_diag )
+            for ( const auto& d : kNeighbors4Diag )
             {
                 if ( phi_value::differentSide(phi_.at(x + d.dx, y + d.dy),
                                               phi_center) )
@@ -346,7 +347,7 @@ bool ContourData::is_redundant(const ContourPoint& p) const
     {
         // SLOW PATH: bords
 
-        for ( const auto& d : neighbors4 )
+        for ( const auto& d : kNeighbors4 )
         {
             const int nx = x + d.dx;
             const int ny = y + d.dy;
@@ -361,7 +362,7 @@ bool ContourData::is_redundant(const ContourPoint& p) const
 
         if ( connectivity == Connectivity::Eight )
         {
-            for ( const auto& d : neighbors4_diag )
+            for ( const auto& d : kNeighbors4Diag )
             {
                 const int nx = x + d.dx;
                 const int ny = y + d.dy;

@@ -64,7 +64,7 @@
 namespace ofeli_ip
 {
 
-constexpr size_t INITIAL_ARRAY_ALLOC_SIZE = 10000u;
+constexpr size_t kInitialArrayAllocSize = 10000u;
 
 //! Constructor. The third parameter is the intersection between shape a and b, i.e.
 //! the points (offsets) in common. It's an optional parameter. It can speed up
@@ -73,36 +73,36 @@ constexpr size_t INITIAL_ARRAY_ALLOC_SIZE = 10000u;
 HausdorffDistance::HausdorffDistance(Shape& shape_a1,
                                      Shape& shape_b1,
                                      const PointSet& intersection1):
-    shape_a(shape_a1),
-    shape_b(shape_b1),
-    intersection_a_b(intersection1),
-    hd_a_to_b(std::numeric_limits<float>::max()),
-    hd_b_to_a(std::numeric_limits<float>::max()),
-    is_sorted(false)
+    shape_a_(shape_a1),
+    shape_b_(shape_b1),
+    intersection_a_b_(intersection1),
+    hd_a_to_b_(std::numeric_limits<float>::max()),
+    hd_b_to_a_(std::numeric_limits<float>::max())
+    
 {
-    min_dists_a_to_b.reserve( INITIAL_ARRAY_ALLOC_SIZE );
-    min_dists_b_to_a.reserve( INITIAL_ARRAY_ALLOC_SIZE );
+    min_dists_a_to_b_.reserve( kInitialArrayAllocSize );
+    min_dists_b_to_a_.reserve( kInitialArrayAllocSize );
 
     compute();
 }
 
 void HausdorffDistance::compute()
 {
-    if ( shape_a.is_valid() &&
-         shape_b.is_valid() )
+    if ( shape_a_.is_valid() &&
+         shape_b_.is_valid() )
     {
 
 #if defined(RANDOM_SAMPLING) && !defined(NAIVE_ALGO)
-        shape_a.shuffle_points();
-        shape_b.shuffle_points();
+        shape_a_.shuffle_points();
+        shape_b_.shuffle_points();
 #endif
 
         // compute the directed or relative hausdorff distance in the both directions
-        compute_directed_hd( shape_a, shape_b,
-                             hd_a_to_b, min_dists_a_to_b );
+        compute_directed_hd( shape_a_, shape_b_,
+                             hd_a_to_b_, min_dists_a_to_b_ );
 
-        compute_directed_hd( shape_b, shape_a,
-                             hd_b_to_a, min_dists_b_to_a );
+        compute_directed_hd( shape_b_, shape_a_,
+                             hd_b_to_a_, min_dists_b_to_a_ );
     }
 }
 
@@ -128,7 +128,7 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
         // due to the stl unordered set container.
 
 #if defined(INTERSECTION_EXCLUSION) && !defined(NAIVE_ALGO)
-        if( !intersection_a_b.contains( p1 ) )
+        if( !intersection_a_b_.contains( p1 ) )
         {
 #endif
             relative_p1.x = float(p1.x) - shape_1.get_centroid().x;
@@ -189,29 +189,29 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1,
 
 float HausdorffDistance::get_distance() const
 {
-    return std::max( hd_a_to_b,
-                     hd_b_to_a );
+    return std::max( hd_a_to_b_,
+                     hd_b_to_a_ );
 }
 
 float HausdorffDistance::get_modified() const
 {
-    return std::max( calculate_mean(min_dists_a_to_b),
-                     calculate_mean(min_dists_b_to_a) );
+    return std::max( calculate_mean(min_dists_a_to_b_),
+                     calculate_mean(min_dists_b_to_a_) );
 }
 
 float HausdorffDistance::get_hausdorff_quantile(int hundredth)
 {
-    if ( !is_sorted )
+    if ( !is_sorted_ )
     {
-        std::ranges::sort( min_dists_a_to_b );
-        std::ranges::sort( min_dists_b_to_a );
+        std::ranges::sort( min_dists_a_to_b_ );
+        std::ranges::sort( min_dists_b_to_a_ );
 
-        is_sorted = true;
+        is_sorted_ = true;
     }
 
-    return std::max( get_hausdorff_quantile( min_dists_a_to_b,
+    return std::max( get_hausdorff_quantile( min_dists_a_to_b_,
                                              hundredth ),
-                     get_hausdorff_quantile( min_dists_b_to_a,
+                     get_hausdorff_quantile( min_dists_b_to_a_,
                                              hundredth ) );
 }
 
@@ -265,11 +265,11 @@ float HausdorffDistance::get_centroids_distance() const
 {
     float gap_dist = std::numeric_limits<float>::max();
 
-    if( shape_a.is_valid() &&
-        shape_b.is_valid() )
+    if( shape_a_.is_valid() &&
+        shape_b_.is_valid() )
     {
-        gap_dist = math::euclidean_distance( shape_a.get_centroid(),
-                                             shape_b.get_centroid() );
+        gap_dist = math::euclidean_distance( shape_a_.get_centroid(),
+                                             shape_b_.get_centroid() );
     }
 
     return gap_dist;

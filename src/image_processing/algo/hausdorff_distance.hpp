@@ -92,38 +92,38 @@ private:
                                         int hundredth);
 
     //! Shape a defined by its points offsets.
-    Shape& shape_a;
+    Shape& shape_a_;
 
     //! Shape b defined by its points offsets.
-    Shape& shape_b;
+    Shape& shape_b_;
 
     //! Optional intersection with common points between #shape_a and #shape_b.
-    const PointSet& intersection_a_b;
+    const PointSet& intersection_a_b_;
 
     //! Directed or relative hausdorff distance from #shape_a (outer loop) to #shape_b (inner loop).
-    float hd_a_to_b;
+    float hd_a_to_b_;
 
     //! Directed or relative hausdorff distance from #shape_b (outer loop) to #shape_a (inner loop).
-    float hd_b_to_a;
+    float hd_b_to_a_;
 
     //! Minimum distances computed in the direction from #shape_a (outer loop) to #shape_b (inner loop).
-    std::vector<float> min_dists_a_to_b;
+    std::vector<float> min_dists_a_to_b_;
 
     //! Minimum distances computed in the direction from #shape_b (outer loop) to #shape_a (inner loop).
-    std::vector<float> min_dists_b_to_a;
+    std::vector<float> min_dists_b_to_a_;
 
     //! Position in x of the centroid of #shape_a.
-    int centroid_a_x;
+    int centroid_a_x_;
     //! Position in y of the centroid of #shape_a.
-    int centroid_a_y;
+    int centroid_a_y_;
 
     //! Position in x of the centroid of #shape_b.
-    int centroid_b_x;
+    int centroid_b_x_;
     //! Position in y of the centroid of #shape_b.
-    int centroid_b_y;
+    int centroid_b_y_;
 
     //! Boolean to know if min_dists are already sorted.
-    bool is_sorted;
+    bool is_sorted_{false};
 };
 
 }

@@ -21,14 +21,14 @@ ImageController::ImageController(QObject* parent):
             this,
             &ImageController::onImgDisplaySettingsChanged);
 
-    connect(&acWorker,  &ActiveContourWorker::processedImageReady,
+    connect(&acWorker_,  &ActiveContourWorker::processedImageReady,
             this,       &ImageController::onProcessedImageReady);
 
-    connect(&acWorker,  &ActiveContourWorker::contourUpdated,
+    connect(&acWorker_,  &ActiveContourWorker::contourUpdated,
             this,       &ImageController::onContourUpdated,
             Qt::QueuedConnection);
 
-    connect(&acWorker,  &ActiveContourWorker::stateChanged,
+    connect(&acWorker_,  &ActiveContourWorker::stateChanged,
             this,       &ImageController::onStateChanged);
 }
 
@@ -99,7 +99,7 @@ void ImageController::reinitializeWorker()
 
     emit clearOverlaysRequested();
 
-    acWorker.initialize(downscaledImage_,
+    acWorker_.initialize(downscaledImage_,
                         computeConfig_);
 }
 
@@ -155,22 +155,22 @@ void ImageController::onContourUpdated(const ofeli_ip::ExportedContour& l_out,
 
 void ImageController::restart()
 {
-    acWorker.restart();
+    acWorker_.restart();
 }
 
 void ImageController::togglePause()
 {
-    acWorker.togglePause();
+    acWorker_.togglePause();
 }
 
 void ImageController::step()
 {
-    acWorker.step();
+    acWorker_.step();
 }
 
 void ImageController::converge()
 {
-    acWorker.converge();
+    acWorker_.converge();
 }
 
 void ImageController::onStateChanged(ofeli_app::WorkerState state)

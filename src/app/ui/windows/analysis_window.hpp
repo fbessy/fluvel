@@ -71,24 +71,24 @@ private :
 
     void calculate_shapes_intersection();
 
-    AnalysisWidget* widget1;
-    AnalysisWidget* widget2;
-    QPushButton* compute_button;
+    AnalysisWidget* widget1_;
+    AnalysisWidget* widget2_;
+    QPushButton* compute_button_;
 
-    std::unordered_set<ofeli_ip::Point2D_i> intersection;
+    std::unordered_set<ofeli_ip::Point2D_i> intersection_;
 
-    QDialog* result_popup;
-    QLabel* hausdorff_label;
-    QSpinBox* hundredth_sp;
-    QLabel* quantile_label;
-    QLabel* hausdorff_ratio_label;
-    QLabel* quantile_ratio_label;
-    QLabel* centroids_dist_label;
-    QLabel* centroids_ratio_label;
-    QLabel* time_label;
+    QDialog* result_popup_;
+    QLabel* hausdorff_label_;
+    QSpinBox* hundredth_sp_;
+    QLabel* quantile_label_;
+    QLabel* hausdorff_ratio_label_;
+    QLabel* quantile_ratio_label_;
+    QLabel* centroids_dist_label_;
+    QLabel* centroids_ratio_label_;
+    QLabel* time_label_;
 
-    ofeli_ip::HausdorffDistance* hd;
-    float factor;
+    ofeli_ip::HausdorffDistance* hd_{nullptr};
+    float factor_{0.f};
 
 private slots :
 

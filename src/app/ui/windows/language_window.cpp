@@ -60,25 +60,25 @@ LanguageWindow::LanguageWindow(QWidget* parent)
         restoreGeometry(geo);
 
     // --- Combo box ---
-    combo = new QComboBox(this);
+    combo_ = new QComboBox(this);
 
     QString locale = QLocale::system().name().section('_', 0, 0);
 
-    combo->addItem(tr("System (%1)").arg(locale),
+    combo_->addItem(tr("System (%1)").arg(locale),
                    QVariant::fromValue(int(Language::System)));
 
-    combo->addItem(tr("English"),
+    combo_->addItem(tr("English"),
                    QVariant::fromValue(int(Language::English)));
 
-    combo->addItem(tr("French"),
+    combo_->addItem(tr("French"),
                    QVariant::fromValue(int(Language::French)));
 
     // sélectionner la langue actuelle indépendamment de l’index
     auto currentLanguage = AppSettings::instance().app_language;
 
-    int index = combo->findData(QVariant::fromValue(int(currentLanguage)));
+    int index = combo_->findData(QVariant::fromValue(int(currentLanguage)));
     if (index >= 0)
-        combo->setCurrentIndex(index);
+        combo_->setCurrentIndex(index);
 
     // --- Buttons ---
     QDialogButtonBox* buttons = new QDialogButtonBox(this);
@@ -100,7 +100,7 @@ LanguageWindow::LanguageWindow(QWidget* parent)
 
     // --- Layout ---
     QVBoxLayout* layout_this = new QVBoxLayout;
-    layout_this->addWidget(combo);
+    layout_this->addWidget(combo_);
     layout_this->addWidget(restart_label);
     layout_this->addWidget(buttons);
     layout_this->setSizeConstraint(QLayout::SetMinimumSize);
@@ -112,7 +112,7 @@ void LanguageWindow::accept()
 {
     // récupérer la valeur logique (pas l’index)
     Language language = Language(
-        combo->currentData().toInt()
+        combo_->currentData().toInt()
     );
 
     AppSettings::instance().app_language = language;
@@ -128,9 +128,9 @@ void LanguageWindow::reject()
     // restaurer la langue active
     auto language = AppSettings::instance().app_language;
 
-    int index = combo->findData(QVariant::fromValue(int(language)));
+    int index = combo_->findData(QVariant::fromValue(int(language)));
     if (index >= 0)
-        combo->setCurrentIndex(index);
+        combo_->setCurrentIndex(index);
 
     QDialog::reject();
 }

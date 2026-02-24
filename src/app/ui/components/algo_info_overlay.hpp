@@ -26,10 +26,10 @@ protected:
     void resizeEvent(QResizeEvent*) override;
 
 private:
-    QString m_algoName;
-    QString m_status;
-    int     m_iteration = 0;
-    double  m_energy    = 0.0;
+    QString m_algoName_;
+    QString m_status_;
+    int     m_iteration_ = 0;
+    double  m_energy_    = 0.0;
     AlgoStats stats_;
 };
 

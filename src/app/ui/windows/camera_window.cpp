@@ -66,11 +66,8 @@ namespace ofeli_app
 {
 
 CameraWindow::CameraWindow(QWidget* parent)
-    : QMainWindow(parent),
-    cameraSelector(nullptr),
-    toggleStreamingButton(nullptr),
-    videoView(nullptr),
-    mediaDevices(nullptr)
+    : QMainWindow(parent)
+    
 {
     setWindowIcon( QIcon(":/icons/app/Ofeli.svg") );
     setWindowTitle( tr("Ofeli - Camera") );
@@ -80,37 +77,37 @@ CameraWindow::CameraWindow(QWidget* parent)
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
-    currentCameraId = settings.value("Camera/last_id").toByteArray();
+    currentCameraId_ = settings.value("Camera/last_id").toByteArray();
 
-    cameraSelector = new QComboBox(this);
-    cameraSelector->setEnabled(false);
+    cameraSelector_ = new QComboBox(this);
+    cameraSelector_->setEnabled(false);
 
-    startIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
+    startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                              QStyle::SP_MediaPlay,
                              ":/icons/toolbar/media-playback-start-symbolic.svg");
 
-    stopIcon = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop,
+    stopIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop,
                             QStyle::SP_MediaStop,
                             ":/icons/toolbar/media-playback-stop-symbolic.svg");
 
-    toggleStreamingButton = new QPushButton( tr("Start") );
-    toggleStreamingButton->setEnabled(false);
-    toggleStreamingButton->setToolTip(tr("Start camera streaming."));
-    toggleStreamingButton->setIcon( startIcon );
+    toggleStreamingButton_ = new QPushButton( tr("Start") );
+    toggleStreamingButton_->setEnabled(false);
+    toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
+    toggleStreamingButton_->setIcon( startIcon_ );
 
-    rightPanelToggle = new RightPanelToggleButton;
+    rightPanelToggle_ = new RightPanelToggleButton;
 
-    settingsButton = new QPushButton;
-    settingsButton->setToolTip(tr("Camera session settings"));
-    settingsButton->setFlat(true);
-    settingsButton->setFocusPolicy(Qt::NoFocus);
+    settingsButton_ = new QPushButton;
+    settingsButton_->setToolTip(tr("Camera session settings"));
+    settingsButton_->setFlat(true);
+    settingsButton_->setFocusPolicy(Qt::NoFocus);
 
-    settingsIcon = il::loadIcon("configure",
+    settingsIcon_ = il::loadIcon("configure",
                                 ":/icons/toolbar/configure-symbolic.svg");
 
-    settingsButton->setIcon( settingsIcon );
+    settingsButton_->setIcon( settingsIcon_ );
 
-    settings_window = new CameraSettingsWindow(this);
+    settings_window_ = new CameraSettingsWindow(this);
 
     QWidget* central = new QWidget(this);
 
@@ -123,33 +120,33 @@ CameraWindow::CameraWindow(QWidget* parent)
     QHBoxLayout* controlLayout = new QHBoxLayout(controlBar);
     controlLayout->setContentsMargins(8, 4, 8, 4);
     controlLayout->setSpacing(6);
-    controlLayout->addWidget(cameraSelector);
-    controlLayout->addWidget(toggleStreamingButton);
+    controlLayout->addWidget(cameraSelector_);
+    controlLayout->addWidget(toggleStreamingButton_);
     controlLayout->addStretch();
 
-    controlLayout->addWidget(rightPanelToggle);
+    controlLayout->addWidget(rightPanelToggle_);
 
     controlLayout->addSpacerItem(
         new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum)
         );
 
-    controlLayout->addWidget(settingsButton);
+    controlLayout->addWidget(settingsButton_);
 
-    videoView = new ImageView(AppSettings::instance().camConfig.display,
-                              AppSettings::instance().camConfig.compute.downscale,
-                              central);
+    videoView_ = new ImageView(AppSettings::instance().camConfig.display,
+                               AppSettings::instance().camConfig.compute.downscale,
+                               central);
 
-    videoView->setMaxDisplayFps(60.0);
+    videoView_->setMaxDisplayFps(60.0);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
-    videoView->setInteraction(interaction.release());
+    videoView_->setInteraction(interaction.release());
 
     // --- Display bar ---
-    displayBar = new DisplaySettingsWidget(central,
+    displayBar_ = new DisplaySettingsWidget(central,
                                            Session::Camera);
 
     // --- Layout horizontal contenu principal ---
@@ -157,8 +154,8 @@ CameraWindow::CameraWindow(QWidget* parent)
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    contentLayout->addWidget(videoView,  1);  // prend tout l'espace
-    contentLayout->addWidget(displayBar, 0); // largeur naturelle
+    contentLayout->addWidget(videoView_,  1);  // prend tout l'espace
+    contentLayout->addWidget(displayBar_, 0); // largeur naturelle
 
     // Assemblage global
     vLayout->addWidget(controlBar);
@@ -166,154 +163,154 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     setCentralWidget(central);
 
-    connect(rightPanelToggle, &QPushButton::toggled,
-            displayBar, &DisplaySettingsWidget::setPanelVisible);
+    connect(rightPanelToggle_, &QPushButton::toggled,
+            displayBar_, &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton,     &QPushButton::clicked,
-            settings_window,    &CameraSettingsWindow::show);
+    connect(settingsButton_,     &QPushButton::clicked,
+            settings_window_,    &CameraSettingsWindow::show);
 
-    connect(toggleStreamingButton,  &QPushButton::clicked,
+    connect(toggleStreamingButton_,  &QPushButton::clicked,
             this,                   &CameraWindow::onToggleStreaming);
 
-    mediaDevices = new QMediaDevices(this);
+    mediaDevices_ = new QMediaDevices(this);
 
     updateCameraList();
 
-    connect(mediaDevices,
+    connect(mediaDevices_,
             &QMediaDevices::videoInputsChanged,
             this,
             &CameraWindow::updateCameraList);
 
-    controller = new CameraController(this);
+    controller_ = new CameraController(this);
 
-    connect(controller,
+    connect(controller_,
             &CameraController::frameSizeStr,
             this,
             &CameraWindow::onFrameSizeStr);
 
-    connect(controller,
+    connect(controller_,
             &CameraController::textStatsUpdated,
-            videoView,
+            videoView_,
             &ImageView::setText);
 
-    videoView->applyDownscaleConfig( AppSettings::instance().camConfig.compute.downscale );
-    videoView->applyDisplayConfig( AppSettings::instance().camConfig.display );
+    videoView_->applyDownscaleConfig( AppSettings::instance().camConfig.compute.downscale );
+    videoView_->applyDisplayConfig( AppSettings::instance().camConfig.display );
 
     connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged,
             this, [this](const VideoSessionSettings& conf) {
-                videoView->applyDownscaleConfig( conf.compute.downscale );
+                videoView_->applyDownscaleConfig( conf.compute.downscale );
             });
 
     connect(&AppSettings::instance(),
             &ApplicationSettings::videoDisplaySettingsChanged,
-            videoView,
+            videoView_,
             &ImageView::applyDisplayConfig);
 
-    connect(videoView,  &ImageView::frameDisplayed,
-            controller, &CameraController::onFrameDisplayed);
+    connect(videoView_,  &ImageView::frameDisplayed,
+            controller_, &CameraController::onFrameDisplayed);
 }
 
-void CameraWindow::onFrameSizeStr(QString str)
+void CameraWindow::onFrameSizeStr(const QString& str)
 {
-    setWindowTitle( deviceWindowTitle + str );
+    setWindowTitle( deviceWindowTitle_ + str );
 }
 
 void CameraWindow::updateCameraList()
 {
     const auto cameras = QMediaDevices::videoInputs();
 
-    cameraSelector->clear();
+    cameraSelector_->clear();
 
     for (const auto& cam : cameras)
     {
-        cameraSelector->addItem(
+        cameraSelector_->addItem(
             cam.description(),
             cam.id()
             );
     }
 
     const bool hasCamera = !cameras.isEmpty();
-    cameraSelector->setEnabled(hasCamera);
-    toggleStreamingButton->setEnabled(hasCamera);
+    cameraSelector_->setEnabled(hasCamera);
+    toggleStreamingButton_->setEnabled(hasCamera);
 
     if ( !hasCamera )
     {
         // plus aucune caméra disponible
         stopCameraAndUi();
-        currentCameraId.clear();
+        currentCameraId_.clear();
         return;
     }
 
     // 🔎 Vérifier si la caméra active existe encore
-    if (!currentCameraId.isEmpty())
+    if (!currentCameraId_.isEmpty())
     {
-        int index = cameraSelector->findData(currentCameraId);
+        int index = cameraSelector_->findData(currentCameraId_);
 
         if (index >= 0)
         {
             // caméra toujours présente → restaurer sélection
-            cameraSelector->setCurrentIndex(index);
+            cameraSelector_->setCurrentIndex(index);
         }
         else
         {
             // caméra débranchée à chaud
             stopCameraAndUi();
-            currentCameraId.clear();
+            currentCameraId_.clear();
 
             // fallback propre : sélectionner la première dispo
-            cameraSelector->setCurrentIndex(0);
+            cameraSelector_->setCurrentIndex(0);
         }
     }
     else
     {
         // aucun historique → sélectionner première caméra
-        cameraSelector->setCurrentIndex(0);
+        cameraSelector_->setCurrentIndex(0);
     }
 }
 
 void CameraWindow::onToggleStreaming()
 {
-    if ( !controller )
+    if ( !controller_ )
         return;
 
-    if ( controller->isActive() )
+    if ( controller_->isActive() )
     {
         stopCameraAndUi();
     }
     else
     {
         const QByteArray selectedId =
-            cameraSelector->currentData().toByteArray();
+            cameraSelector_->currentData().toByteArray();
 
         if (selectedId.isEmpty())
             return;
 
-        currentCameraId = selectedId;
+        currentCameraId_ = selectedId;
 
         QSettings settings;
-        settings.setValue("Camera/last_id", currentCameraId);
+        settings.setValue("Camera/last_id", currentCameraId_);
 
-        videoView->showPlaceholder(false);
-        controller->start(selectedId);
+        videoView_->showPlaceholder(false);
+        controller_->start(selectedId);
         connectFrameToView();
 
-        toggleStreamingButton->setText(tr("Stop"));
-        toggleStreamingButton->setToolTip(tr("Stop camera streaming."));
-        toggleStreamingButton->setIcon(stopIcon);
+        toggleStreamingButton_->setText(tr("Stop"));
+        toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
+        toggleStreamingButton_->setIcon(stopIcon_);
     }
 }
 
 void CameraWindow::stopCameraAndUi()
 {
-    if ( controller && controller->isActive() )
+    if ( controller_ && controller_->isActive() )
     {
         disconnect(frameConnection_);
-        controller->stop();
-        videoView->showPlaceholder(true);
+        controller_->stop();
+        videoView_->showPlaceholder(true);
 
-        toggleStreamingButton->setText( tr("Start") );
-        toggleStreamingButton->setToolTip(tr("Start camera streaming."));
-        toggleStreamingButton->setIcon( startIcon );
+        toggleStreamingButton_->setText( tr("Start") );
+        toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
+        toggleStreamingButton_->setIcon( startIcon_ );
 
         setWindowTitle( tr("Ofeli - Camera") );
     }
@@ -364,9 +361,9 @@ void CameraWindow::ensureCameraPermission()
 
 void CameraWindow::connectFrameToView()
 {
-    frameConnection_ = connect(controller,
+    frameConnection_ = connect(controller_,
                                &CameraController::imageAndContourUpdated,
-                               videoView,
+                               videoView_,
                                &ImageView::setImageAndContour);
 }
 

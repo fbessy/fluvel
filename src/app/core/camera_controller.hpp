@@ -19,7 +19,7 @@ class CameraController : public QObject
 
 public:
     explicit CameraController(QObject* parent = nullptr);
-    ~CameraController();
+    ~CameraController() override;
 
     void start(const QByteArray& deviceId);
     void stop();
@@ -39,7 +39,7 @@ signals:
                                 qint64 receiveTs);
 private:
 
-    void onFrameResultReady(FrameResult result);
+    void onFrameResultReady(const FrameResult& result);
     void onVideoSettingsChanged(const VideoSessionSettings& conf);
     void onVideoDisplaySettingsChanged(const DisplayConfig& displayConfig);
 

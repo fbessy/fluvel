@@ -55,18 +55,18 @@ private:
 
     FrameResult processFrame(QVideoFrame& frame);
 
-    QMutex frameMutex;
-    QWaitCondition condition;
-    FrameData lastFrameData;
-    bool frameAvailable;
-    bool running;
-    bool configChanged;
+    QMutex frameMutex_;
+    QWaitCondition condition_;
+    FrameData lastFrameData_;
+    bool frameAvailable_{false};
+    bool running_{true};
+    bool configChanged_{false};
 
-    std::unique_ptr<ofeli_ip::RegionColorAc> region_ac;
+    std::unique_ptr<ofeli_ip::RegionColorAc> region_ac_;
     int currentWidth_  = 0;
     int currentHeight_ = 0;
 
-    ofeli_ip::TemporalSmoother smoother;
+    ofeli_ip::TemporalSmoother smoother_;
 };
 
 } // namespace ofeli_app

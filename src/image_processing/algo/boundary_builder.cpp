@@ -39,6 +39,7 @@
 
 #include <cmath>
 #include <cassert>
+#include <cstddef>
 #include <iostream>
 
 #include "boundary_builder.hpp"
@@ -239,8 +240,8 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0,
     int y = b;
 
     // Carrés
-    int64_t a2 = a * a;
-    int64_t b2 = b * b;
+    int64_t a2 = static_cast<int64_t>(a * a);
+    int64_t b2 = static_cast<int64_t>(b * b);
 
     int64_t dx = 0;
     int64_t dy = 2 * a2 * y;

@@ -60,7 +60,7 @@ protected:
 
 private:
 
-    QValidator::State previous_result;
+    QValidator::State previous_result_{QValidator::Acceptable};
 
 };
 

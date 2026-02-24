@@ -39,6 +39,7 @@
 
 #include "filters.hpp"
 
+#include <cstddef>
 #include <random>     // random generator and normal/uniform distributions
 #include <chrono>     // to generate a seed for the random generator
 #include <functional> // for function "std::bind" to link a generator and a distribution
@@ -54,24 +55,24 @@ namespace ofeli_ip
 {
 
 Filters::Filters(const unsigned char* img_data1, int img_width1, int img_height1, int byte_per_pixel1) :
-    img_data(img_data1), img_width(img_width1), img_height(img_height1), img_size(img_width1*img_height1), byte_per_pixel(byte_per_pixel1),
-    filtered( new unsigned char[byte_per_pixel1*img_width1*img_height1] ),
-    filtered_modif( new unsigned char[byte_per_pixel1*img_width1*img_height1] ),
-    previous_filtered( new unsigned char[byte_per_pixel1*img_width1*img_height1] ),
-    diff_img( new float[img_width1*img_height1] ),
-    diff_img1( new float[img_width1*img_height1] ),
-    columns_histo( new int [256*img_width1] )
+    img_data_(img_data1), img_width_(img_width1), img_height_(img_height1), img_size_(img_width1*img_height1), byte_per_pixel_(byte_per_pixel1),
+    filtered_( new unsigned char[static_cast<unsigned long>(byte_per_pixel1*img_width1*img_height1)] ),
+    filtered_modif_( new unsigned char[static_cast<unsigned long>(byte_per_pixel1*img_width1*img_height1)] ),
+    previous_filtered_( new unsigned char[static_cast<unsigned long>(byte_per_pixel1*img_width1*img_height1)] ),
+    diff_img_( new float[static_cast<unsigned long>(img_width1*img_height1)] ),
+    diff_img1_( new float[static_cast<unsigned long>(img_width1*img_height1)] ),
+    columns_histo_( new int [static_cast<unsigned long>(256*img_width1)] )
 {
     if( img_data1 == nullptr )
     {
-        std::cerr << std::endl <<
-        " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << std::endl <<
+        std::cerr << '\n' <<
+        " ==> " <<  __FILE__ << " | " << __FUNCTION__ << " | " << __LINE__ << '\n' <<
         "The pointer img_data1 must be a non-null pointer, it must be allocated.";
     }
 
-    if( byte_per_pixel == 3 )
+    if( byte_per_pixel_ == 3 )
     {
-        gradient = new unsigned char[img_size];
+        gradient_ = new unsigned char[img_size_];
     }
 
     initialyze_filtered();
@@ -79,26 +80,26 @@ Filters::Filters(const unsigned char* img_data1, int img_width1, int img_height1
 
 void Filters::initialyze_filtered()
 {
-    std::memcpy(filtered,img_data,byte_per_pixel*img_size);
+    std::memcpy(filtered_,img_data_,static_cast<size_t>(byte_per_pixel_*img_size_));
 }
 
 Filters::~Filters()
 {
     // buffer deleted for the Perreault's algorithm
-    delete[] columns_histo;
+    delete[] columns_histo_;
 
     // buffers deleted for the anisotropic filter
-    delete[] diff_img1;
-    delete[] diff_img;
+    delete[] diff_img1_;
+    delete[] diff_img_;
 
-    if( byte_per_pixel == 3 )
+    if( byte_per_pixel_ == 3 )
     {
-        delete[] gradient;
+        delete[] gradient_;
     }
 
-    delete[] previous_filtered;
-    delete[] filtered_modif;
-    delete[] filtered;
+    delete[] previous_filtered_;
+    delete[] filtered_modif_;
+    delete[] filtered_;
 }
 
 void Filters::anisotropic_diffusion(int max_itera,
@@ -136,12 +137,12 @@ void Filters::anisotropic_diffusion(int max_itera,
 
     int x, y; // position of the current pixel
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
         // initial condition of the PDE
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            diff_img[offset] = float( filtered[byte_per_pixel*offset+color_channel] );
+            diff_img_[offset] = float( filtered_[byte_per_pixel_*offset+color_channel] );
         }
 
         // choice of the function of diffusion
@@ -154,17 +155,17 @@ void Filters::anisotropic_diffusion(int max_itera,
             for( int itera = 0; itera < max_itera; itera++ )
             {
                 // finite differences
-                for( int offset = 0; offset < img_size; offset++ )
+                for( int offset = 0; offset < img_size_; offset++ )
                 {
-                    y = offset/img_width;
-                    x = offset-y*img_width;
+                    y = offset/img_width_;
+                    x = offset-y*img_width_;
 
-                    centrI = diff_img[offset];
+                    centrI = diff_img_[offset];
 
                     index = 0;
 
                     // if the current pixel is not in the border
-                    if( x > 0 && x < img_width-1 && y > 0 && y < img_height-1 )
+                    if( x > 0 && x < img_width_-1 && y > 0 && y < img_height_-1 )
                     {
                         // no tests of neighbors
                         for( int dy = -1; dy <= 1; dy++ )
@@ -173,7 +174,7 @@ void Filters::anisotropic_diffusion(int max_itera,
                             {
                                 if( !( dx == 0 && dy == 0 ) )
                                 {
-                                    nabla[ index++ ] = diff_img[ (x+dx)+(y+dy)*img_width ]-centrI;
+                                    nabla[ index++ ] = diff_img_[ (x+dx)+(y+dy)*img_width_ ]-centrI;
                                 }
                             }
                         }
@@ -187,9 +188,9 @@ void Filters::anisotropic_diffusion(int max_itera,
                             {
                                 if( !( dx == 0 && dy == 0 ) )
                                 {
-                                    if( x+dx >= 0 && x+dx < img_width && y+dy >= 0 && y+dy < img_height )
+                                    if( x+dx >= 0 && x+dx < img_width_ && y+dy >= 0 && y+dy < img_height_ )
                                     {
-                                        nabla[ index++ ] = diff_img[ (x+dx)+(y+dy)*img_width ]-centrI;
+                                        nabla[ index++ ] = diff_img_[ (x+dx)+(y+dy)*img_width_ ]-centrI;
                                     }
                                     else
                                     {
@@ -210,13 +211,13 @@ void Filters::anisotropic_diffusion(int max_itera,
                     }
 
                     // solution of the discret PDE
-                    diff_img1[offset] = centrI+lambda*sigma;
+                    diff_img1_[offset] = centrI+lambda*sigma;
                 }
 
                 // swap pointers
-                ptemp_aniso = diff_img;
-                diff_img = diff_img1;
-                diff_img1 = ptemp_aniso;
+                ptemp_aniso = diff_img_;
+                diff_img_ = diff_img1_;
+                diff_img1_ = ptemp_aniso;
             }
 
             break;
@@ -229,15 +230,15 @@ void Filters::anisotropic_diffusion(int max_itera,
             for( int itera = 0; itera < max_itera; itera++ )
             {
                 // finite differences
-                for( int offset = 0; offset < img_size; offset++ )
+                for( int offset = 0; offset < img_size_; offset++ )
                 {
-                    y = offset/img_width;
-                    x = offset-y*img_width;
+                    y = offset/img_width_;
+                    x = offset-y*img_width_;
 
-                    centrI = diff_img[offset];
+                    centrI = diff_img_[offset];
 
                     // if the current pixel is not in the border
-                    if( x > 0 && x < img_width-1 && y > 0 && y < img_height-1 )
+                    if( x > 0 && x < img_width_-1 && y > 0 && y < img_height_-1 )
                     {
                         // no tests of neighbors
                         index = 0;
@@ -247,7 +248,7 @@ void Filters::anisotropic_diffusion(int max_itera,
                             {
                                 if( !( dx == 0 && dy == 0 ) )
                                 {
-                                    nabla[ index++ ] = diff_img[ (x+dx)+(y+dy)*img_width ]-centrI;
+                                    nabla[ index++ ] = diff_img_[ (x+dx)+(y+dy)*img_width_ ]-centrI;
                                 }
                             }
                         }
@@ -262,9 +263,9 @@ void Filters::anisotropic_diffusion(int max_itera,
                             {
                                 if( !( dx == 0 && dy == 0 ) )
                                 {
-                                    if( x+dx >= 0 && x+dx < img_width && y+dy >= 0 && y+dy < img_height )
+                                    if( x+dx >= 0 && x+dx < img_width_ && y+dy >= 0 && y+dy < img_height_ )
                                     {
-                                        nabla[ index++ ] = diff_img[ (x+dx)+(y+dy)*img_width ]-centrI;
+                                        nabla[ index++ ] = diff_img_[ (x+dx)+(y+dy)*img_width_ ]-centrI;
                                     }
                                     else
                                     {
@@ -285,21 +286,21 @@ void Filters::anisotropic_diffusion(int max_itera,
                     }
 
                     // solution of the discret PDE
-                    diff_img1[offset] = centrI+lambda*sigma;
+                    diff_img1_[offset] = centrI+lambda*sigma;
                 }
 
                 // swap pointers
-                ptemp_aniso = diff_img;
-                diff_img = diff_img1;
-                diff_img1 = ptemp_aniso;
+                ptemp_aniso = diff_img_;
+                diff_img_ = diff_img1_;
+                diff_img1_ = ptemp_aniso;
             }
         }
         }
 
         // result
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            result_f = roundf( diff_img[offset] );
+            result_f = roundf( diff_img_[offset] );
 
             if( result_f > 255.f )
             {
@@ -310,7 +311,7 @@ void Filters::anisotropic_diffusion(int max_itera,
                 result_f = 0.f;
             }
 
-            filtered[byte_per_pixel*offset+color_channel] = (unsigned char)(result_f);
+            filtered_[byte_per_pixel_*offset+color_channel] = (unsigned char)(result_f);
         }
     }
 }
@@ -333,32 +334,32 @@ void Filters::morphological_gradient(int kernel_length)
 
     unsigned char max, min;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             // initialization
             max = 0;
             min = 255;
 
             // if the current pixel is not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
                         // no tests of neighbors
-                        if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] > max )
+                        if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] > max )
                         {
-                            max = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                            max = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                         }
-                        if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] < min )
+                        if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] < min )
                         {
-                            min = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                            min = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                         }
                     }
                 }
@@ -371,28 +372,28 @@ void Filters::morphological_gradient(int kernel_length)
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
                         // neighbors tests
-                        if( x+dx >= 0 && x+dx < img_width && y+dy >= 0 && y+dy < img_height )
+                        if( x+dx >= 0 && x+dx < img_width_ && y+dy >= 0 && y+dy < img_height_ )
                         {
-                            if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] > max )
+                            if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] > max )
                             {
-                                max = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                                max = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                             }
-                            if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] < min )
+                            if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] < min )
                             {
-                                min = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                                min = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                             }
                         }
                     }
                 }
             }
-            filtered_modif[byte_per_pixel*offset+color_channel] = max-min;
+            filtered_modif_[byte_per_pixel_*offset+color_channel] = max-min;
         }
     }
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 void Filters::morphological_gradient_o1(int kernel_length)
@@ -417,24 +418,24 @@ void Filters::morphological_gradient_o1(int kernel_length)
 
     int x, y; // position of the current pixel
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
         /////////////////////////////////////////
         // processing of the top of the image //
         ////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
@@ -444,17 +445,17 @@ void Filters::morphological_gradient_o1(int kernel_length)
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -464,16 +465,16 @@ void Filters::morphological_gradient_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the maximum value in the kernel histogram
-                    for( max = 255; kernel_histo[max] == 0; max-- )
+                    for( max = 255; kernel_histo_[max] == 0; max-- )
                     {
                     }
 
                     // to find the minimum value in the kernel histogram
-                    for( min = 0; kernel_histo[min] == 0; min++ )
+                    for( min = 0; kernel_histo_[min] == 0; min++ )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = max-min;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = max-min;
                 }
             }
 
@@ -482,29 +483,29 @@ void Filters::morphological_gradient_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max-min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max-min;
             }
 
             ////////////////////////////
@@ -512,25 +513,25 @@ void Filters::morphological_gradient_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max-min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max-min;
             }
         }
 
@@ -539,37 +540,37 @@ void Filters::morphological_gradient_o1(int kernel_length)
         //////////////////////////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
         // downward moving in the image
-        for( y = kernel_radius+1; y <= img_height-kernel_radius-2; y++ )
+        for( y = kernel_radius+1; y <= img_height_-kernel_radius-2; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -579,16 +580,16 @@ void Filters::morphological_gradient_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the maximum value in the kernel histogram
-                    for( max = 255; kernel_histo[max] == 0; max-- )
+                    for( max = 255; kernel_histo_[max] == 0; max-- )
                     {
                     }
 
                     // to find the minimum value in the kernel histogram
-                    for( min = 0; kernel_histo[min] == 0; min++ )
+                    for( min = 0; kernel_histo_[min] == 0; min++ )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = max-min;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = max-min;
                 }
             }
 
@@ -597,29 +598,29 @@ void Filters::morphological_gradient_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max-min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max-min;
             }
 
             ////////////////////////////
@@ -627,25 +628,25 @@ void Filters::morphological_gradient_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max-min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max-min;
             }
         }
 
@@ -655,22 +656,22 @@ void Filters::morphological_gradient_o1(int kernel_length)
 
         // no need to clear and to initialize columns_histo
 
-        for( y = img_height-kernel_radius-1; y < img_height; y++ )
+        for( y = img_height_-kernel_radius-1; y < img_height_; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -680,16 +681,16 @@ void Filters::morphological_gradient_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the maximum value in the kernel histogram
-                    for( max = 255; kernel_histo[max] == 0; max-- )
+                    for( max = 255; kernel_histo_[max] == 0; max-- )
                     {
                     }
 
                     // to find the minimum value in the kernel histogram
-                    for( min = 0; kernel_histo[min] == 0; min++ )
+                    for( min = 0; kernel_histo_[min] == 0; min++ )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = max-min;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = max-min;
                 }
             }
 
@@ -698,29 +699,29 @@ void Filters::morphological_gradient_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max-min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max-min;
             }
 
             ////////////////////////////
@@ -728,25 +729,25 @@ void Filters::morphological_gradient_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max-min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max-min;
             }
         }
     }
@@ -754,9 +755,9 @@ void Filters::morphological_gradient_o1(int kernel_length)
     if( kernel_length != 1 )
     {
         // swap pointers
-        unsigned char* ptemp = filtered;
-        filtered = filtered_modif;
-        filtered_modif = ptemp;
+        unsigned char* ptemp = filtered_;
+        filtered_ = filtered_modif_;
+        filtered_modif_ = ptemp;
     }
 }
 
@@ -778,27 +779,27 @@ void Filters::dilation(int kernel_length)
 
     unsigned char max;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             // initialisation
             max = 0;
 
             // if the current pixel is not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
                         // no neighbors tests
-                        if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] > max )
+                        if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] > max )
                         {
-                            max = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                            max = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                         }
                     }
                 }
@@ -811,25 +812,25 @@ void Filters::dilation(int kernel_length)
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
                         // neighbors tests
-                        if( x+dx >= 0 && x+dx < img_width && y+dy >= 0 && y+dy < img_height )
+                        if( x+dx >= 0 && x+dx < img_width_ && y+dy >= 0 && y+dy < img_height_ )
                         {
-                            if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] > max )
+                            if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] > max )
                             {
-                                max = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                                max = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                             }
                         }
                     }
                 }
 
             }
-            filtered_modif[byte_per_pixel*offset+color_channel] = max;
+            filtered_modif_[byte_per_pixel_*offset+color_channel] = max;
         }
     }
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 void Filters::dilation_o1(int kernel_length)
@@ -854,24 +855,24 @@ void Filters::dilation_o1(int kernel_length)
 
     int x, y; // position of the current pixel
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
         /////////////////////////////////////////
         // processing of the top of the image //
         ////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
@@ -881,17 +882,17 @@ void Filters::dilation_o1(int kernel_length)
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -901,11 +902,11 @@ void Filters::dilation_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the maximum value in the kernel histogram
-                    for( max = 255; kernel_histo[max] == 0; max-- )
+                    for( max = 255; kernel_histo_[max] == 0; max-- )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = max;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = max;
                 }
             }
 
@@ -914,24 +915,24 @@ void Filters::dilation_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max;
             }
 
             ////////////////////////////
@@ -939,20 +940,20 @@ void Filters::dilation_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max;
             }
         }
 
@@ -961,37 +962,37 @@ void Filters::dilation_o1(int kernel_length)
         //////////////////////////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
         // downward moving in the image
-        for( y = kernel_radius+1; y <= img_height-kernel_radius-2; y++ )
+        for( y = kernel_radius+1; y <= img_height_-kernel_radius-2; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -1001,11 +1002,11 @@ void Filters::dilation_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the maximum value in the kernel histogram
-                    for( max = 255; kernel_histo[max] == 0; max-- )
+                    for( max = 255; kernel_histo_[max] == 0; max-- )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = max;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = max;
                 }
             }
 
@@ -1014,24 +1015,24 @@ void Filters::dilation_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max;
             }
 
             ////////////////////////////
@@ -1039,20 +1040,20 @@ void Filters::dilation_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max;
             }
         }
 
@@ -1062,22 +1063,22 @@ void Filters::dilation_o1(int kernel_length)
 
         // no need to clear and to initialize columns_histo
 
-        for( y = img_height-kernel_radius-1; y < img_height; y++ )
+        for( y = img_height_-kernel_radius-1; y < img_height_; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -1087,11 +1088,11 @@ void Filters::dilation_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the maximum value in the kernel histogram
-                    for( max = 255; kernel_histo[max] == 0; max-- )
+                    for( max = 255; kernel_histo_[max] == 0; max-- )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = max;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = max;
                 }
             }
 
@@ -1100,24 +1101,24 @@ void Filters::dilation_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max;
             }
 
             ////////////////////////////
@@ -1125,20 +1126,20 @@ void Filters::dilation_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the maximum value in the kernel histogram
-                for( max = 255; kernel_histo[max] == 0; max-- )
+                for( max = 255; kernel_histo_[max] == 0; max-- )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = max;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = max;
             }
         }
 
@@ -1147,9 +1148,9 @@ void Filters::dilation_o1(int kernel_length)
     if( kernel_length != 1 )
     {
         // swap pointers
-        unsigned char* ptemp = filtered;
-        filtered = filtered_modif;
-        filtered_modif = ptemp;
+        unsigned char* ptemp = filtered_;
+        filtered_ = filtered_modif_;
+        filtered_modif_ = ptemp;
     }
 }
 
@@ -1171,27 +1172,27 @@ void Filters::erosion(int kernel_length)
 
     unsigned char min;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             // initialization
             min = 255;
 
             // if the current pixel is not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
                         // no neighbors tests
-                        if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] < min )
+                        if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] < min )
                         {
-                            min = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                            min = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                         }
                     }
                 }
@@ -1204,24 +1205,24 @@ void Filters::erosion(int kernel_length)
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
                         // neighbors tests
-                        if( x+dx >= 0 && x+dx < img_width && y+dy >= 0 && y+dy < img_height )
+                        if( x+dx >= 0 && x+dx < img_width_ && y+dy >= 0 && y+dy < img_height_ )
                         {
-                            if( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] < min )
+                            if( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] < min )
                             {
-                                min = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                                min = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                             }
                         }
                     }
                 }
             }
-            filtered_modif[byte_per_pixel*offset+color_channel] = min;
+            filtered_modif_[byte_per_pixel_*offset+color_channel] = min;
         }
     }
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 void Filters::erosion_o1(int kernel_length)
@@ -1246,24 +1247,24 @@ void Filters::erosion_o1(int kernel_length)
 
     int x, y; // position of the current pixel
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
         /////////////////////////////////////////
         // processing of the top of the image //
         ////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
@@ -1273,17 +1274,17 @@ void Filters::erosion_o1(int kernel_length)
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -1293,11 +1294,11 @@ void Filters::erosion_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the minimum value in the kernel histogram
-                    for( min = 0; kernel_histo[min] == 0; min++ )
+                    for( min = 0; kernel_histo_[min] == 0; min++ )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = min;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = min;
                 }
             }
 
@@ -1306,24 +1307,24 @@ void Filters::erosion_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I]-columns_histo[256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I]-columns_histo_[256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = min;
             }
 
             ////////////////////////////
@@ -1331,20 +1332,20 @@ void Filters::erosion_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = min;
             }
         }
 
@@ -1353,37 +1354,37 @@ void Filters::erosion_o1(int kernel_length)
         //////////////////////////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
         // downward moving in the image
-        for( y = kernel_radius+1; y <= img_height-kernel_radius-2; y++ )
+        for( y = kernel_radius+1; y <= img_height_-kernel_radius-2; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -1393,11 +1394,11 @@ void Filters::erosion_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the minimum value in the kernel histogram
-                    for( min = 0; kernel_histo[min] == 0; min++ )
+                    for( min = 0; kernel_histo_[min] == 0; min++ )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = min;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = min;
                 }
             }
 
@@ -1406,24 +1407,24 @@ void Filters::erosion_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = min;
             }
 
             ////////////////////////////
@@ -1431,20 +1432,20 @@ void Filters::erosion_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = min;
             }
         }
 
@@ -1454,22 +1455,22 @@ void Filters::erosion_o1(int kernel_length)
 
         // no need to clear and to initialize columns_histo
 
-        for( y = img_height-kernel_radius-1; y < img_height; y++ )
+        for( y = img_height_-kernel_radius-1; y < img_height_; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -1479,11 +1480,11 @@ void Filters::erosion_o1(int kernel_length)
                 if( x >= kernel_radius )
                 {
                     // to find the minimum value in the kernel histogram
-                    for( min = 0; kernel_histo[min] == 0; min++ )
+                    for( min = 0; kernel_histo_[min] == 0; min++ )
                     {
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = min;
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = min;
                 }
             }
 
@@ -1492,24 +1493,24 @@ void Filters::erosion_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = min;
             }
 
             ////////////////////////////
@@ -1517,20 +1518,20 @@ void Filters::erosion_o1(int kernel_length)
             ////////////////////////////
 
             // rightward moving in the image
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the minimum value in the kernel histogram
-                for( min = 0; kernel_histo[min] == 0; min++ )
+                for( min = 0; kernel_histo_[min] == 0; min++ )
                 {
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = min;
+                filtered_modif_[ find_offset(x,y,color_channel) ] = min;
             }
         }
     }
@@ -1538,9 +1539,9 @@ void Filters::erosion_o1(int kernel_length)
     if( kernel_length != 1 )
     {
         // swap pointers
-        unsigned char* ptemp = filtered;
-        filtered = filtered_modif;
-        filtered_modif = ptemp;
+        unsigned char* ptemp = filtered_;
+        filtered_ = filtered_modif_;
+        filtered_modif_ = ptemp;
     }
 }
 
@@ -1549,9 +1550,9 @@ void Filters::closing(int kernel_length)
     dilation(kernel_length);
 
     // for the top-hat function eventually
-    unsigned char* ptemp = filtered_modif;
-    filtered_modif = previous_filtered;
-    previous_filtered = ptemp;
+    unsigned char* ptemp = filtered_modif_;
+    filtered_modif_ = previous_filtered_;
+    previous_filtered_ = ptemp;
 
     erosion(kernel_length);
 }
@@ -1561,9 +1562,9 @@ void Filters::closing_o1(int kernel_length)
     dilation_o1(kernel_length);
 
     // for the top-hat function eventually
-    unsigned char* ptemp = filtered_modif;
-    filtered_modif = previous_filtered;
-    previous_filtered = ptemp;
+    unsigned char* ptemp = filtered_modif_;
+    filtered_modif_ = previous_filtered_;
+    previous_filtered_ = ptemp;
 
     erosion_o1(kernel_length);
 }
@@ -1573,9 +1574,9 @@ void Filters::opening(int kernel_length)
     erosion(kernel_length);
 
     // for the top-hat function eventually
-    unsigned char* ptemp = filtered_modif;
-    filtered_modif = previous_filtered;
-    previous_filtered = ptemp;
+    unsigned char* ptemp = filtered_modif_;
+    filtered_modif_ = previous_filtered_;
+    previous_filtered_ = ptemp;
 
     dilation(kernel_length);
 }
@@ -1585,9 +1586,9 @@ void Filters::opening_o1(int kernel_length)
     erosion_o1(kernel_length);
 
     // for the top-hat function eventually
-    unsigned char* ptemp = filtered_modif;
-    filtered_modif = previous_filtered;
-    previous_filtered = ptemp;
+    unsigned char* ptemp = filtered_modif_;
+    filtered_modif_ = previous_filtered_;
+    previous_filtered_ = ptemp;
 
     dilation_o1(kernel_length);
 }
@@ -1596,15 +1597,15 @@ void Filters::black_top_hat(int kernel_length)
 {
     closing(kernel_length);
 
-    for( int offset = 0; offset < byte_per_pixel*img_size; offset++ )
+    for( int offset = 0; offset < byte_per_pixel_*img_size_; offset++ )
     {
-        if( filtered[offset] >= previous_filtered[offset] )
+        if( filtered_[offset] >= previous_filtered_[offset] )
         {
-            filtered[offset] -= previous_filtered[offset];
+            filtered_[offset] -= previous_filtered_[offset];
         }
         else
         {
-            filtered[offset] = 0;
+            filtered_[offset] = 0;
         }
     }
 }
@@ -1613,15 +1614,15 @@ void Filters::black_top_hat_o1(int kernel_length)
 {
     closing_o1(kernel_length);
 
-    for( int offset = 0; offset < byte_per_pixel*img_size; offset++ )
+    for( int offset = 0; offset < byte_per_pixel_*img_size_; offset++ )
     {
-        if( filtered[offset] >= previous_filtered[offset] )
+        if( filtered_[offset] >= previous_filtered_[offset] )
         {
-            filtered[offset] -= previous_filtered[offset];
+            filtered_[offset] -= previous_filtered_[offset];
         }
         else
         {
-            filtered[offset] = 0;
+            filtered_[offset] = 0;
         }
     }
 }
@@ -1630,15 +1631,15 @@ void Filters::white_top_hat(int kernel_length)
 {
     opening(kernel_length);
 
-    for( int offset = 0; offset < byte_per_pixel*img_size; offset++ )
+    for( int offset = 0; offset < byte_per_pixel_*img_size_; offset++ )
     {
-        if( previous_filtered[offset] >= filtered[offset] )
+        if( previous_filtered_[offset] >= filtered_[offset] )
         {
-            filtered[offset] = previous_filtered[offset]-filtered[offset];
+            filtered_[offset] = previous_filtered_[offset]-filtered_[offset];
         }
         else
         {
-            filtered[offset] = 0;
+            filtered_[offset] = 0;
         }
     }
 }
@@ -1647,15 +1648,15 @@ void Filters::white_top_hat_o1(int kernel_length)
 {
     opening_o1(kernel_length);
 
-    for( int offset = 0; offset < byte_per_pixel*img_size; offset++ )
+    for( int offset = 0; offset < byte_per_pixel_*img_size_; offset++ )
     {
-        if( previous_filtered[offset] >= filtered[offset] )
+        if( previous_filtered_[offset] >= filtered_[offset] )
         {
-            filtered[offset] = previous_filtered[offset]-filtered[offset];
+            filtered_[offset] = previous_filtered_[offset]-filtered_[offset];
         }
         else
         {
-            filtered[offset] = 0;
+            filtered_[offset] = 0;
         }
     }
 }
@@ -1677,23 +1678,23 @@ void Filters::mean_filtering(int kernel_length)
     const int kernel_radius = (kernel_length-1)/2;
     int sum;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             sum = 0;
 
             // if the current pixel is not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
-                        sum += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
             }
@@ -1704,33 +1705,33 @@ void Filters::mean_filtering(int kernel_length)
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
-                        if( (x+dx >= 0 && x+dx < img_width) && (y+dy >= 0 && y+dy < img_height) )
+                        if( (x+dx >= 0 && x+dx < img_width_) && (y+dy >= 0 && y+dy < img_height_) )
                         {
-                            sum += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                            sum += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                         }
-                        if( (x+dx >= 0 && x+dx < img_width) && ( !(y+dy >= 0 && y+dy < img_height) ) )
+                        if( (x+dx >= 0 && x+dx < img_width_) && ( !(y+dy >= 0 && y+dy < img_height_) ) )
                         {
-                            sum += int( filtered[ byte_per_pixel*((x+dx)+(y-dy)*img_width)+color_channel ] );
+                            sum += int( filtered_[ byte_per_pixel_*((x+dx)+(y-dy)*img_width_)+color_channel ] );
                         }
-                        if( ( !(x+dx >= 0 && x+dx < img_width) ) && (y+dy >= 0 && y+dy < img_height) )
+                        if( ( !(x+dx >= 0 && x+dx < img_width_) ) && (y+dy >= 0 && y+dy < img_height_) )
                         {
-                            sum += int( filtered[ byte_per_pixel*((x-dx)+(y+dy)*img_width)+color_channel ] );
+                            sum += int( filtered_[ byte_per_pixel_*((x-dx)+(y+dy)*img_width_)+color_channel ] );
                         }
-                        if( ( !(x+dx >= 0 && x+dx < img_width) ) && ( !(y+dy >= 0 && y+dy < img_height) ) )
+                        if( ( !(x+dx >= 0 && x+dx < img_width_) ) && ( !(y+dy >= 0 && y+dy < img_height_) ) )
                         {
-                            sum += int( filtered[ byte_per_pixel*((x-dx)+(y-dy)*img_width)+color_channel ] );
+                            sum += int( filtered_[ byte_per_pixel_*((x-dx)+(y-dy)*img_width_)+color_channel ] );
                         }
                     }
                 }
             }
-            filtered_modif[byte_per_pixel*offset+color_channel] = (unsigned char)(sum/(kernel_length*kernel_length));
+            filtered_modif_[byte_per_pixel_*offset+color_channel] = (unsigned char)(sum/(kernel_length*kernel_length));
         }
     }
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 const float* Filters::gaussian_kernel(int kernel_length, float sigma)
@@ -1805,23 +1806,23 @@ void Filters::gaussian_filtering(int kernel_length, float sigma)
     const int kernel_radius = (kernel_length-1)/2;
     float sum;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             sum = 0.f;
 
             // if the current pixel is not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
-                        sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
             }
@@ -1832,35 +1833,35 @@ void Filters::gaussian_filtering(int kernel_length, float sigma)
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
-                        if( (x+dx >= 0 && x+dx < img_width) && (y+dy >= 0 && y+dy < img_height) )
+                        if( (x+dx >= 0 && x+dx < img_width_) && (y+dy >= 0 && y+dy < img_height_) )
                         {
-                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                         }
-                        if( (x+dx >= 0 && x+dx < img_width) && ( !(y+dy >= 0 && y+dy < img_height) ) )
+                        if( (x+dx >= 0 && x+dx < img_width_) && ( !(y+dy >= 0 && y+dy < img_height_) ) )
                         {
-                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered[ byte_per_pixel*((x+dx)+(y-dy)*img_width)+color_channel ] );
+                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered_[ byte_per_pixel_*((x+dx)+(y-dy)*img_width_)+color_channel ] );
                         }
-                        if( ( !(x+dx >= 0 && x+dx < img_width) ) && (y+dy >= 0 && y+dy < img_height) )
+                        if( ( !(x+dx >= 0 && x+dx < img_width_) ) && (y+dy >= 0 && y+dy < img_height_) )
                         {
-                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered[ byte_per_pixel*((x-dx)+(y+dy)*img_width)+color_channel ] );
+                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered_[ byte_per_pixel_*((x-dx)+(y+dy)*img_width_)+color_channel ] );
                         }
-                        if( ( !(x+dx >= 0 && x+dx < img_width) ) && ( !(y+dy >= 0 && y+dy < img_height) ) )
+                        if( ( !(x+dx >= 0 && x+dx < img_width_) ) && ( !(y+dy >= 0 && y+dy < img_height_) ) )
                         {
-                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered[ byte_per_pixel*((x-dx)+(y-dy)*img_width)+color_channel ] );
+                            sum += mask[ (kernel_radius+dx)+(kernel_radius+dy)*kernel_length ]*float( filtered_[ byte_per_pixel_*((x-dx)+(y-dy)*img_width_)+color_channel ] );
                         }
                     }
                 }
             }
-            filtered_modif[byte_per_pixel*offset+color_channel] = (unsigned char)(sum);
+            filtered_modif_[byte_per_pixel_*offset+color_channel] = (unsigned char)(sum);
         }
     }
 
     delete[] mask;
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 void Filters::median_filtering_oNlogN(int kernel_length) {
@@ -1883,24 +1884,24 @@ void Filters::median_filtering_oNlogN(int kernel_length) {
     const int length = kernel_length*kernel_length;
     unsigned char* const median_kernel = new unsigned char[length];
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             // m : index of the kernel
             m = 0;
 
             // if the current pixel is not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
-                        median_kernel[m++] = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                        median_kernel[m++] = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                     }
                 }
             }
@@ -1911,21 +1912,21 @@ void Filters::median_filtering_oNlogN(int kernel_length) {
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
-                        if( (x+dx >= 0 && x+dx < img_width) && (y+dy >= 0 && y+dy < img_height) )
+                        if( (x+dx >= 0 && x+dx < img_width_) && (y+dy >= 0 && y+dy < img_height_) )
                         {
-                            median_kernel[m++] = filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ];
+                            median_kernel[m++] = filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ];
                         }
-                        if( (x+dx >= 0 && x+dx < img_width) && ( !(y+dy >= 0 && y+dy < img_height) ) )
+                        if( (x+dx >= 0 && x+dx < img_width_) && ( !(y+dy >= 0 && y+dy < img_height_) ) )
                         {
-                            median_kernel[m++] = filtered[ byte_per_pixel*((x+dx)+(y-dy)*img_width)+color_channel ];
+                            median_kernel[m++] = filtered_[ byte_per_pixel_*((x+dx)+(y-dy)*img_width_)+color_channel ];
                         }
-                        if( ( !(x+dx >= 0 && x+dx < img_width) ) && (y+dy >= 0 && y+dy < img_height) )
+                        if( ( !(x+dx >= 0 && x+dx < img_width_) ) && (y+dy >= 0 && y+dy < img_height_) )
                         {
-                            median_kernel[m++] = filtered[ byte_per_pixel*((x-dx)+(y+dy)*img_width)+color_channel ];
+                            median_kernel[m++] = filtered_[ byte_per_pixel_*((x-dx)+(y+dy)*img_width_)+color_channel ];
                         }
-                        if( ( !(x+dx >= 0 && x+dx < img_width) ) && ( !(y+dy >= 0 && y+dy < img_height) ) )
+                        if( ( !(x+dx >= 0 && x+dx < img_width_) ) && ( !(y+dy >= 0 && y+dy < img_height_) ) )
                         {
-                            median_kernel[m++] = filtered[ byte_per_pixel*((x-dx)+(y-dy)*img_width)+color_channel ];
+                            median_kernel[m++] = filtered_[ byte_per_pixel_*((x-dx)+(y-dy)*img_width_)+color_channel ];
                         }
                     }
                 }
@@ -1934,15 +1935,15 @@ void Filters::median_filtering_oNlogN(int kernel_length) {
             std::sort(median_kernel,
                       median_kernel + length);
 
-            filtered_modif[byte_per_pixel*offset+color_channel] = median_kernel[(length-1)/2];
+            filtered_modif_[byte_per_pixel_*offset+color_channel] = median_kernel[(length-1)/2];
         }
     }
     delete[] median_kernel;
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 // Simon Perreault, Patrick Hébert: Median Filtering in Constant Time. IEEE Transactions on Image Processing 16(9): 2389-2394 (2007)
@@ -1971,24 +1972,24 @@ void Filters::median_filtering_o1(int kernel_length)
 
     int rank, m;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
         /////////////////////////////////////////
         // processing of the top of the image //
         ////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
@@ -1998,17 +1999,17 @@ void Filters::median_filtering_o1(int kernel_length)
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -2022,10 +2023,10 @@ void Filters::median_filtering_o1(int kernel_length)
                     I = -1;
                     while( rank < 1+kernel_length*(x+1)/2 )
                     {
-                        rank += kernel_histo[++I];
+                        rank += kernel_histo_[++I];
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = (unsigned char)(I);
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = (unsigned char)(I);
                 }
             }
 
@@ -2034,16 +2035,16 @@ void Filters::median_filtering_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius+1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -2051,10 +2052,10 @@ void Filters::median_filtering_o1(int kernel_length)
                 I = -1;
                 while( rank < median_rank )
                 {
-                    rank += kernel_histo[++I];
+                    rank += kernel_histo_[++I];
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
+                filtered_modif_[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
             }
 
             ////////////////////////////
@@ -2063,12 +2064,12 @@ void Filters::median_filtering_o1(int kernel_length)
 
             // rightward moving in the image
             m = 1;
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -2076,10 +2077,10 @@ void Filters::median_filtering_o1(int kernel_length)
                 I = -1;
                 while( rank < 1+kernel_length*(kernel_length-m)/2 )
                 {
-                    rank += kernel_histo[++I];
+                    rank += kernel_histo_[++I];
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
+                filtered_modif_[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
                 m++;
             }
         }
@@ -2089,37 +2090,37 @@ void Filters::median_filtering_o1(int kernel_length)
         //////////////////////////////////////////////////////////////
 
         // clear
-        for( I = 0; I < 256*img_width; I++ )
+        for( I = 0; I < 256*img_width_; I++ )
         {
-            columns_histo[I] = 0;
+            columns_histo_[I] = 0;
         }
 
         // initialization
-        for( x = 0; x < img_width; x++ )
+        for( x = 0; x < img_width_; x++ )
         {
             for( y = 0; y < kernel_length; y++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y,color_channel)] ]++;
             }
         }
 
         // downward moving in the image
-        for( y = kernel_radius+1; y <= img_height-kernel_radius-2; y++ )
+        for( y = kernel_radius+1; y <= img_height_-kernel_radius-2; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y+kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -2133,10 +2134,10 @@ void Filters::median_filtering_o1(int kernel_length)
                     I = -1;
                     while( rank < 1+kernel_length*(x+1)/2 )
                     {
-                        rank += kernel_histo[++I];
+                        rank += kernel_histo_[++I];
                     }
 
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = (unsigned char)(I);
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = (unsigned char)(I);
                 }
             }
 
@@ -2145,16 +2146,16 @@ void Filters::median_filtering_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y+kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -2162,10 +2163,10 @@ void Filters::median_filtering_o1(int kernel_length)
                 I = -1;
                 while( rank < median_rank )
                 {
-                    rank += kernel_histo[++I];
+                    rank += kernel_histo_[++I];
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
+                filtered_modif_[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
             }
 
             ////////////////////////////
@@ -2174,12 +2175,12 @@ void Filters::median_filtering_o1(int kernel_length)
 
             // rightward moving in the image
             m = 1;
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -2187,9 +2188,9 @@ void Filters::median_filtering_o1(int kernel_length)
                 I = -1;
                 while( rank < 1+kernel_length*(kernel_length-m)/2 )
                 {
-                    rank += kernel_histo[++I];
+                    rank += kernel_histo_[++I];
                 }
-                filtered_modif[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
+                filtered_modif_[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
                 m++;
             }
         }
@@ -2200,22 +2201,22 @@ void Filters::median_filtering_o1(int kernel_length)
 
         // no need to clear and to initialize columns_histo
 
-        for( y = img_height-kernel_radius-1; y < img_height; y++ )
+        for( y = img_height_-kernel_radius-1; y < img_height_; y++ )
         {
             // clear
             for( I = 0; I < 256; I++ )
             {
-                kernel_histo[I] = 0;
+                kernel_histo_[I] = 0;
             }
 
             // initialization for each new current row
             for( x = 0; x < kernel_length; x++ )
             {
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*x+filtered[find_offset(x,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*x+filtered_[find_offset(x,y-kernel_radius,color_channel)] ]++;
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*x+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*x+I ];
                 }
 
                 ///////////////////////////
@@ -2229,9 +2230,9 @@ void Filters::median_filtering_o1(int kernel_length)
                     I = -1;
                     while( rank < 1+kernel_length*(x+1)/2 )
                     {
-                        rank += kernel_histo[++I];
+                        rank += kernel_histo_[++I];
                     }
-                    filtered_modif[ find_offset(x-kernel_radius,y,color_channel) ] = (unsigned char)(I);
+                    filtered_modif_[ find_offset(x-kernel_radius,y,color_channel) ] = (unsigned char)(I);
                 }
             }
 
@@ -2240,16 +2241,16 @@ void Filters::median_filtering_o1(int kernel_length)
             //////////////////////
 
             // rightward moving in the image
-            for( x = kernel_radius+1; x < img_width-kernel_radius-1; x++ )
+            for( x = kernel_radius+1; x < img_width_-kernel_radius-1; x++ )
             {
                 // to update the column histogram H(x+kernel_radius)
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
-                columns_histo[ 256*(x+kernel_radius)+filtered[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius-1,color_channel)] ]--;
+                columns_histo_[ 256*(x+kernel_radius)+filtered_[find_offset(x+kernel_radius,y-kernel_radius,color_channel)] ]++;
 
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] += columns_histo[ 256*(x+kernel_radius)+I ]-columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] += columns_histo_[ 256*(x+kernel_radius)+I ]-columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -2257,10 +2258,10 @@ void Filters::median_filtering_o1(int kernel_length)
                 I = -1;
                 while( rank < median_rank )
                 {
-                    rank += kernel_histo[++I];
+                    rank += kernel_histo_[++I];
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
+                filtered_modif_[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
             }
 
             ////////////////////////////
@@ -2269,12 +2270,12 @@ void Filters::median_filtering_o1(int kernel_length)
 
             // rightward moving in the image
             m = 1;
-            for(  ; x < img_width; x++ )
+            for(  ; x < img_width_; x++ )
             {
                 // to update the mask histogram from the column histograms H(x+kernel_radius) and H(x-kernel_radius-1)
                 for( I = 0; I < 256; I++ )
                 {
-                    kernel_histo[I] -= columns_histo[ 256*(x-kernel_radius-1)+I ];
+                    kernel_histo_[I] -= columns_histo_[ 256*(x-kernel_radius-1)+I ];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -2282,10 +2283,10 @@ void Filters::median_filtering_o1(int kernel_length)
                 I = -1;
                 while( rank < 1+kernel_length*(kernel_length-m)/2 )
                 {
-                    rank += kernel_histo[++I];
+                    rank += kernel_histo_[++I];
                 }
 
-                filtered_modif[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
+                filtered_modif_[ find_offset(x,y,color_channel) ] = (unsigned char)(I);
                 m++;
             }
         }
@@ -2294,9 +2295,9 @@ void Filters::median_filtering_o1(int kernel_length)
     if( kernel_length != 1 )
     {
         // swap pointers
-        unsigned char* ptemp = filtered;
-        filtered = filtered_modif;
-        filtered_modif = ptemp;
+        unsigned char* ptemp = filtered_;
+        filtered_ = filtered_modif_;
+        filtered_modif_ = ptemp;
     }
 }
 
@@ -2308,9 +2309,9 @@ void Filters::gaussian_white_noise(float sigma)
 
     int filtered_int;
 
-    for( int offset = 0; offset < byte_per_pixel*img_size; offset++ )
+    for( int offset = 0; offset < byte_per_pixel_*img_size_; offset++ )
     {
-        filtered_int = int( filtered[offset] ) + int( roundf( nd(gen) ) );
+        filtered_int = int( filtered_[offset] ) + int( roundf( nd(gen) ) );
 
         if( filtered_int < 0 )
         {
@@ -2321,7 +2322,7 @@ void Filters::gaussian_white_noise(float sigma)
             filtered_int = 255;
         }
 
-        filtered[offset] = (unsigned char)(filtered_int);
+        filtered_[offset] = (unsigned char)(filtered_int);
     }
 }
 
@@ -2332,19 +2333,19 @@ void Filters::salt_pepper_noise(float proba)
     std::bernoulli_distribution proba_distri{ static_cast<double>(proba) };
     std::bernoulli_distribution coin_flip_distri{ 0.5 };
 
-    for( int offset = 0; offset < img_size; offset++ )
+    for( int offset = 0; offset < img_size_; offset++ )
     {
         if( proba_distri(gen) )
         {
-            for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+            for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
             {
                 if( coin_flip_distri(gen) )
                 {
-                    filtered[byte_per_pixel*offset+color_channel] = 0;
+                    filtered_[byte_per_pixel_*offset+color_channel] = 0;
                 }
                 else
                 {
-                    filtered[byte_per_pixel*offset+color_channel] = 255;
+                    filtered_[byte_per_pixel_*offset+color_channel] = 255;
                 }
             }
         }
@@ -2359,14 +2360,14 @@ void Filters::speckle(float sigma)
 
     int filtered_int;
 
-    for( int offset = 0; offset < byte_per_pixel*img_size; offset++ )
+    for( int offset = 0; offset < byte_per_pixel_*img_size_; offset++ )
     {
         // img = img + X * img
         // with X a random variable from a uniform distribution centered at 0
         // and of a standard deviation sigma
         // sigma * sqrt(12) is the interval of the uniform distribution
-        filtered_int = int( filtered[offset] ) +
-                       int( std::roundf( float(filtered[offset]) * sigma * std::sqrt(12.f) * (ud(gen)-0.5f) ) );
+        filtered_int = int( filtered_[offset] ) +
+                       int( std::roundf( float(filtered_[offset]) * sigma * std::sqrt(12.f) * (ud(gen)-0.5f) ) );
 
         if( filtered_int < 0 )
         {
@@ -2376,7 +2377,7 @@ void Filters::speckle(float sigma)
         {
             filtered_int = 255;
         }
-        filtered[offset] = (unsigned char)(filtered_int);
+        filtered_[offset] = (unsigned char)(filtered_int);
     }
 }
 
@@ -2398,59 +2399,59 @@ void Filters::local_binary_pattern(int kernel_length)
 
     unsigned char Icentr;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
-            Icentr = filtered[byte_per_pixel*offset+color_channel];
+            Icentr = filtered_[byte_per_pixel_*offset+color_channel];
 
-            filtered_modif[byte_per_pixel*offset+color_channel] = 0;
+            filtered_modif_[byte_per_pixel_*offset+color_channel] = 0;
 
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
-                if( filtered[ byte_per_pixel*((x-kernel_radius)+(y-kernel_radius)*img_width)+color_channel ] >= Icentr )
+                if( filtered_[ byte_per_pixel_*((x-kernel_radius)+(y-kernel_radius)*img_width_)+color_channel ] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 1;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 1;
                 }
-                if( filtered[ find_offset(x,y-kernel_radius,color_channel) ] >= Icentr )
+                if( filtered_[ find_offset(x,y-kernel_radius,color_channel) ] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 2;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 2;
                 }
-                if( filtered[ find_offset(x+kernel_radius,y-kernel_radius,color_channel)] >= Icentr )
+                if( filtered_[ find_offset(x+kernel_radius,y-kernel_radius,color_channel)] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 4;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 4;
                 }
-                if( filtered[ find_offset(x-kernel_radius,y,color_channel) ] >= Icentr )
+                if( filtered_[ find_offset(x-kernel_radius,y,color_channel) ] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 8;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 8;
                 }
-                if( filtered[ byte_per_pixel*((x+kernel_radius)+y*img_width)+color_channel ] >= Icentr )
+                if( filtered_[ byte_per_pixel_*((x+kernel_radius)+y*img_width_)+color_channel ] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 16;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 16;
                 }
-                if( filtered[ byte_per_pixel*((x-kernel_radius)+(y+kernel_radius)*img_width)+color_channel ] >= Icentr )
+                if( filtered_[ byte_per_pixel_*((x-kernel_radius)+(y+kernel_radius)*img_width_)+color_channel ] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 32;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 32;
                 }
-                if( filtered[ find_offset(x,y+kernel_radius,color_channel) ] >= Icentr )
+                if( filtered_[ find_offset(x,y+kernel_radius,color_channel) ] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 64;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 64;
                 }
-                if( filtered[ find_offset(x+kernel_radius,y+kernel_radius,color_channel) ] >= Icentr )
+                if( filtered_[ find_offset(x+kernel_radius,y+kernel_radius,color_channel) ] >= Icentr )
                 {
-                    filtered_modif[ byte_per_pixel*offset+color_channel ] += 128;
+                    filtered_modif_[ byte_per_pixel_*offset+color_channel ] += 128;
                 }
             }
         }
     }
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 
@@ -2482,12 +2483,12 @@ void Filters::nagao_filtering(int kernel_length)
     }
     const int nagao_size = nagao_size_init;
 
-    for( int color_channel = 0; color_channel < byte_per_pixel; color_channel++ )
+    for( int color_channel = 0; color_channel < byte_per_pixel_; color_channel++ )
     {
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             for( int n = 0; n < 9; n++ )
             {
@@ -2496,34 +2497,34 @@ void Filters::nagao_filtering(int kernel_length)
             }
 
             // if not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius)
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius)
             {
                 for( int dy = 0; dy >= -kernel_radius; dy-- )
                 {
                     for( int dx = dy; dx <= -dy; dx++ )
                     {
-                        sum[0] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[0] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
                 for( int dx = 0; dx <= kernel_radius; dx++ )
                 {
                     for( int dy = -dx; dy <= dx; dy++ )
                     {
-                        sum[1] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[1] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -dy; dx <= dy; dx++ )
                     {
-                        sum[2] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[2] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
                 for( int dx = 0; dx >= -kernel_radius; dx-- )
                 {
                     for( int dy = dx; dy <= -dx; dy++ )
                     {
-                        sum[3] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[3] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
 
@@ -2531,28 +2532,28 @@ void Filters::nagao_filtering(int kernel_length)
                 {
                     for( int dx = 0; dx <= kernel_radius; dx++ )
                     {
-                        sum[4] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[4] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = 0; dx <= kernel_radius; dx++ )
                     {
-                        sum[5] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[5] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= 0; dx++ )
                     {
-                        sum[6] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[6] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
                 for( int dy = -kernel_radius; dy <= 0; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= 0; dx++ )
                     {
-                        sum[7] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[7] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
 
@@ -2560,40 +2561,40 @@ void Filters::nagao_filtering(int kernel_length)
                 {
                     for( int dx = -kernel_radius+1; dx <= kernel_radius-1; dx++ )
                     {
-                        sum[8] += int( filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] );
+                        sum[8] += int( filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] );
                     }
                 }
             }
 
             // if not in the border
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for(int dy = 0; dy >= -kernel_radius; dy-- )
                 {
                     for( int dx = dy; dx <= -dy; dx++ )
                     {
-                        var[0] += math::square( sum[0]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[0] += math::square( sum[0]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ]) );
                     }
                 }
                 for( int dx = 0; dx <= kernel_radius; dx++ )
                 {
                     for( int dy = -dx; dy <= dx; dy++ )
                     {
-                        var[1] += math::square( sum[1]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[1] += math::square( sum[1]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ]) );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for(int dx = -dy; dx <= dy; dx++ )
                     {
-                        var[2] += math::square( sum[2]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] ) );
+                        var[2] += math::square( sum[2]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] ) );
                     }
                 }
                 for( int dx = 0; dx >= -kernel_radius; dx-- )
                 {
                     for( int dy = dx; dy <= -dx; dy++ )
                     {
-                        var[3] += math::square( sum[3]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ] ) );
+                        var[3] += math::square( sum[3]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ] ) );
                     }
                 }
 
@@ -2601,28 +2602,28 @@ void Filters::nagao_filtering(int kernel_length)
                 {
                     for( int dx = 0; dx <= kernel_radius; dx++ )
                     {
-                        var[4] += math::square( sum[4]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[4] += math::square( sum[4]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ]) );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = 0; dx <= kernel_radius; dx++ )
                     {
-                        var[5] += math::square( sum[5]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[5] += math::square( sum[5]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ]) );
                     }
                 }
                 for( int dy = 0; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= 0; dx++ )
                     {
-                        var[6] += math::square( sum[6]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[6] += math::square( sum[6]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ]) );
                     }
                 }
                 for( int dy = -kernel_radius; dy <= 0; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= 0; dx++ )
                     {
-                        var[7] += math::square( sum[7]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]) );
+                        var[7] += math::square( sum[7]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ]) );
                     }
                 }
 
@@ -2630,7 +2631,7 @@ void Filters::nagao_filtering(int kernel_length)
                 {
                     for( int dx = -kernel_radius+1; dx <= kernel_radius-1; dx++ )
                     {
-                        var[8] += math::square(sum[8]-int(filtered[ byte_per_pixel*((x+dx)+(y+dy)*img_width)+color_channel ]));
+                        var[8] += math::square(sum[8]-int(filtered_[ byte_per_pixel_*((x+dx)+(y+dy)*img_width_)+color_channel ]));
                     }
                 }
             }
@@ -2648,22 +2649,22 @@ void Filters::nagao_filtering(int kernel_length)
             {
                 if( var[n] == min_var )
                 {
-                    filtered_modif[byte_per_pixel*offset+color_channel] = (unsigned char)(sum[n]/nagao_size);
+                    filtered_modif_[byte_per_pixel_*offset+color_channel] = (unsigned char)(sum[n]/nagao_size);
                 }
             }
         }
     }
 
     // swap pointers
-    unsigned char* ptemp = filtered;
-    filtered = filtered_modif;
-    filtered_modif = ptemp;
+    unsigned char* ptemp = filtered_;
+    filtered_ = filtered_modif_;
+    filtered_modif_ = ptemp;
 }
 
 //! Gradient morphologique avec un élement structurant carré de taille kernel_length
 void Filters::morphological_gradient_yuv(int kernel_length, int alpha, int beta, int gamma)
 {
-    if( byte_per_pixel == 3 )
+    if( byte_per_pixel_ == 3 )
     {
 
         // pour blinder l'entrée : kernel_length impair et strictement positif
@@ -2685,10 +2686,10 @@ void Filters::morphological_gradient_yuv(int kernel_length, int alpha, int beta,
 
         int maxY, minY, maxU, minU, maxV, minV;
 
-        for( int offset = 0; offset < img_size; offset++ )
+        for( int offset = 0; offset < img_size_; offset++ )
         {
-            y = offset/img_width;
-            x = offset-y*img_width;
+            y = offset/img_width_;
+            x = offset-y*img_width_;
 
             // initialisation
             maxY = 0;
@@ -2699,15 +2700,15 @@ void Filters::morphological_gradient_yuv(int kernel_length, int alpha, int beta,
             minV = 255;
 
             // si pas sur le bord
-            if( x > kernel_radius-1 && x < img_width-kernel_radius && y > kernel_radius-1 && y < img_height-kernel_radius )
+            if( x > kernel_radius-1 && x < img_width_-kernel_radius && y > kernel_radius-1 && y < img_height_-kernel_radius )
             {
                 for( int dy = -kernel_radius; dy <= kernel_radius; dy++ )
                 {
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
-                        R = int(filtered[4*((x+dx)+(y+dy)*img_width)+2]);
-                        G = int(filtered[4*((x+dx)+(y+dy)*img_width)+1]);
-                        B = int(filtered[4*((x+dx)+(y+dy)*img_width)]);
+                        R = int(filtered_[4*((x+dx)+(y+dy)*img_width_)+2]);
+                        G = int(filtered_[4*((x+dx)+(y+dy)*img_width_)+1]);
+                        B = int(filtered_[static_cast<ptrdiff_t>(4*((x+dx)+(y+dy)*img_width_))]);
 
                         Y = ( (  66 * R + 129 * G +  25 * B + 128) >> 8) +  16;
                         U = ( ( -38 * R -  74 * G + 112 * B + 128) >> 8) + 128;
@@ -2751,11 +2752,11 @@ void Filters::morphological_gradient_yuv(int kernel_length, int alpha, int beta,
                     for( int dx = -kernel_radius; dx <= kernel_radius; dx++ )
                     {
                         // tests des voisins
-                        if( x+dx >= 0 && x+dx < img_width && y+dy >= 0 && y+dy < img_height )
+                        if( x+dx >= 0 && x+dx < img_width_ && y+dy >= 0 && y+dy < img_height_ )
                         {
-                            R = int(filtered[4*((x+dx)+(y+dy)*img_width)+2]);
-                            G = int(filtered[4*((x+dx)+(y+dy)*img_width)+1]);
-                            B = int(filtered[4*((x+dx)+(y+dy)*img_width)]);
+                            R = int(filtered_[4*((x+dx)+(y+dy)*img_width_)+2]);
+                            G = int(filtered_[4*((x+dx)+(y+dy)*img_width_)+1]);
+                            B = int(filtered_[static_cast<ptrdiff_t>(4*((x+dx)+(y+dy)*img_width_))]);
 
                             Y = ( (  66 * R + 129 * G +  25 * B + 128) >> 8) +  16;
                             U = ( ( -38 * R -  74 * G + 112 * B + 128) >> 8) + 128;
@@ -2792,7 +2793,7 @@ void Filters::morphological_gradient_yuv(int kernel_length, int alpha, int beta,
                     }
                 }
             }
-            gradient[offset] = (unsigned char)((alpha*(maxY-minY)+beta*(maxU-minU)+gamma*(maxV-minV))/(alpha+beta+gamma));
+            gradient_[offset] = (unsigned char)((alpha*(maxY-minY)+beta*(maxU-minU)+gamma*(maxV-minV))/(alpha+beta+gamma));
         }
 
     }

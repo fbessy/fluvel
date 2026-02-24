@@ -11,7 +11,7 @@ struct Vec2i
 };
 
 // 4-connexité : voisins cardinaux (faces)
-constexpr Vec2i neighbors4[] = {
+constexpr Vec2i kNeighbors4[] = {
     { -1,  0 },
     {  1,  0 },
     {  0, -1 },
@@ -19,7 +19,7 @@ constexpr Vec2i neighbors4[] = {
 };
 
 // Complément diagonaux (pour passer à 8-connexité)
-constexpr Vec2i neighbors4_diag[] = {
+constexpr Vec2i kNeighbors4Diag[] = {
     { -1, -1 },
     {  1, -1 },
     { -1,  1 },

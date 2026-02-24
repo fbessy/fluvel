@@ -104,62 +104,62 @@ private:
     static QString makeUniqueFileName(const QString& filePath);
 
     // --- UI ---
-    CameraWindow* camera_window = nullptr;
-    AnalysisWindow* evaluation_window = nullptr;
-    SettingsWindow* settings_window = nullptr;
-    AboutWindow* about_window = nullptr;
-    LanguageWindow* language_window = nullptr;
+    CameraWindow* camera_window_ = nullptr;
+    AnalysisWindow* evaluation_window_ = nullptr;
+    SettingsWindow* settings_window_ = nullptr;
+    AboutWindow* about_window_ = nullptr;
+    LanguageWindow* language_window_ = nullptr;
 
-    QPushButton* restartButton = nullptr;
-    QPushButton* togglePauseButton = nullptr;
-    QPushButton* stepButton = nullptr;
-    QPushButton* convergeButton = nullptr;
-    RightPanelToggleButton* rightPanelToggle = nullptr;
-    QPushButton* settingsButton = nullptr;
+    QPushButton* restartButton_ = nullptr;
+    QPushButton* togglePauseButton_ = nullptr;
+    QPushButton* stepButton_ = nullptr;
+    QPushButton* convergeButton_ = nullptr;
+    RightPanelToggleButton* rightPanelToggle_ = nullptr;
+    QPushButton* settingsButton_ = nullptr;
 
-    ImageView* imageView = nullptr;
-    AlgoInfoOverlay* imageOverlay = nullptr;
+    ImageView* imageView_ = nullptr;
+    AlgoInfoOverlay* imageOverlay_ = nullptr;
 
-    DisplaySettingsWidget* displayBar = nullptr;
+    DisplaySettingsWidget* displayBar_ = nullptr;
 
-    QAction* openAct = nullptr;
-    QAction* separatorAct = nullptr;
-    static constexpr qsizetype MaxRecentFiles = 5;
-    QAction* recentFileActs[MaxRecentFiles];
-    QAction* deleteAct = nullptr;
-    QAction* saveAct = nullptr;
-    QAction* quitAct = nullptr;
+    QAction* openAct_ = nullptr;
+    QAction* separatorAct_ = nullptr;
+    static constexpr qsizetype kMaxRecentFiles = 5;
+    QAction* recentFileActs_[kMaxRecentFiles];
+    QAction* deleteAct_ = nullptr;
+    QAction* saveAct_ = nullptr;
+    QAction* quitAct_ = nullptr;
 
-    QAction* imageSessionAct = nullptr;
-    QAction* cameraSessionAct = nullptr;
-    QMediaDevices* mediaDevices = nullptr;
-    QAction* analysisAct = nullptr;
-    QAction* settingsAct = nullptr;
+    QAction* imageSessionAct_ = nullptr;
+    QAction* cameraSessionAct_ = nullptr;
+    QMediaDevices* mediaDevices_ = nullptr;
+    QAction* analysisAct_ = nullptr;
+    QAction* settingsAct_ = nullptr;
 
-    QAction* aboutAct = nullptr;
-    QAction* languageAct = nullptr;
+    QAction* aboutAct_ = nullptr;
+    QAction* languageAct_ = nullptr;
 
-    QMenu* fileMenu = nullptr;
-    QMenu* segmentationMenu = nullptr;
-    QMenu* sessionMenu = nullptr;
-    QMenu* helpMenu = nullptr;
+    QMenu* fileMenu_ = nullptr;
+    QMenu* segmentationMenu_ = nullptr;
+    QMenu* sessionMenu_ = nullptr;
+    QMenu* helpMenu_ = nullptr;
 
-    QStringList nameFilters;
-    QString last_directory_used;
+    QStringList nameFilters_;
+    QString last_directory_used_;
 
     // --- Controllers / Workers ---
-    ImageController* imageController = nullptr;
+    ImageController* imageController_ = nullptr;
 
 
-    QString m_fileName;
-    QString m_fullPath;
-    QSize   m_imageSize;
-    int     m_channels = 0;
+    QString m_fileName_;
+    QString m_fullPath_;
+    QSize   m_imageSize_;
+    int     m_channels_ = 0;
 
-    QIcon startResumeIcon;
-    QIcon restartIcon;
-    QIcon pauseIcon;
-    QIcon settingsIcon;
+    QIcon startResumeIcon_;
+    QIcon restartIcon_;
+    QIcon pauseIcon_;
+    QIcon settingsIcon_;
 };
 
 }

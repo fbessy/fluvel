@@ -51,104 +51,104 @@ enum class ImageBase
 
 struct DisplayConfig
 {
-    static constexpr ImageBase defaultImage = ImageBase::Preprocessed;
+    static constexpr ImageBase kDefaultImage = ImageBase::Preprocessed;
 
-    static constexpr bool defaultListDisplayed = true;
-    static constexpr unsigned char defaultRedOut   = 0u;
-    static constexpr unsigned char defaultGreenOut = 0u;
-    static constexpr unsigned char defaultBlueOut  = 255u;
-    static constexpr unsigned char defaultRedIn    = 255u;
-    static constexpr unsigned char defaultGreenIn  = 0u;
-    static constexpr unsigned char defaultBlueIn   = 0u;
+    static constexpr bool kDefaultListDisplayed = true;
+    static constexpr unsigned char kDefaultRedOut   = 0u;
+    static constexpr unsigned char kDefaultGreenOut = 0u;
+    static constexpr unsigned char kDefaultBlueOut  = 255u;
+    static constexpr unsigned char kDefaultRedIn    = 255u;
+    static constexpr unsigned char kDefaultGreenIn  = 0u;
+    static constexpr unsigned char kDefaultBlueIn   = 0u;
 
-    static constexpr bool defaultOptions       = false;
-    static constexpr bool defaultOverlay       = true;
+    static constexpr bool kDefaultOptions       = false;
+    static constexpr bool kDefaultOverlay       = true;
 
 
-    ImageBase image = defaultImage;
+    ImageBase image = kDefaultImage;
 
-    bool l_out_displayed = defaultListDisplayed;
-    ofeli_ip::Rgb_uc l_out_color { defaultRedOut,
-                                   defaultGreenOut,
-                                   defaultBlueOut };
+    bool l_out_displayed = kDefaultListDisplayed;
+    ofeli_ip::Rgb_uc l_out_color { kDefaultRedOut,
+                                   kDefaultGreenOut,
+                                   kDefaultBlueOut };
 
-    bool l_in_displayed = defaultListDisplayed;
-    ofeli_ip::Rgb_uc l_in_color { defaultRedIn,
-                                  defaultGreenIn,
-                                  defaultBlueIn };
+    bool l_in_displayed = kDefaultListDisplayed;
+    ofeli_ip::Rgb_uc l_in_color { kDefaultRedIn,
+                                  kDefaultGreenIn,
+                                  kDefaultBlueIn };
 
-    bool mirrorMode        = defaultOptions;
-    bool smoothDisplay     = defaultOptions;
+    bool mirrorMode        = kDefaultOptions;
+    bool smoothDisplay     = kDefaultOptions;
 
-    bool algorithm_overlay = defaultOverlay;
+    bool algorithm_overlay = kDefaultOverlay;
 };
 
 struct DownscaleConfig
 {
-    static constexpr bool defaultHasDownscale    = false;
-    static constexpr int  defaultDownscaleFactor = 2;
+    static constexpr bool kDefaultHasDownscale    = false;
+    static constexpr int  kDefaultDownscaleFactor = 2;
 
-    bool hasDownscale   = defaultHasDownscale;
-    int downscaleFactor = defaultDownscaleFactor;
+    bool hasDownscale   = kDefaultHasDownscale;
+    int downscaleFactor = kDefaultDownscaleFactor;
 };
 
 struct ProcessingConfig
 {
-    static constexpr bool  defaultProcess       = false;
+    static constexpr bool  kDefaultProcess       = false;
 
-    static constexpr float defaultStdNoise      = 20.f;
-    static constexpr float defaultSaltNoise     = 0.05f;
-    static constexpr float defaultSpeckleNoise  = 0.16f;
+    static constexpr float kDefaultStdNoise      = 20.f;
+    static constexpr float kDefaultSaltNoise     = 0.05f;
+    static constexpr float kDefaultSpeckleNoise  = 0.16f;
 
-    static constexpr int   defaultKernelLength  = 5;
-    static constexpr float defaultGaussianSigma = 2.f;
+    static constexpr int   kDefaultKernelLength  = 5;
+    static constexpr float kDefaultGaussianSigma = 2.f;
 
-    static constexpr bool  default01Algo        = true;
+    static constexpr bool  kDefault01Algo        = true;
 
-    static constexpr ofeli_ip::AnisoDiff defaultAnisoOption = ofeli_ip::AnisoDiff::FUNCTION1;
-    static constexpr int   defaultMaxItera      = 10;
-    static constexpr float defaultLambda        = 1.f/7.f;
-    static constexpr float defaultKappa         = 30.f;
+    static constexpr ofeli_ip::AnisoDiff kDefaultAnisoOption = ofeli_ip::AnisoDiff::FUNCTION1;
+    static constexpr int   kDefaultMaxItera      = 10;
+    static constexpr float kDefaultLambda        = 1.f/7.f;
+    static constexpr float kDefaultKappa         = 30.f;
 
-    static constexpr bool defaultWhiteTopHat    = true;
+    static constexpr bool kDefaultWhiteTopHat    = true;
 
-    bool has_gaussian_noise    = defaultProcess;
-    float std_noise            = defaultStdNoise;
+    bool has_gaussian_noise    = kDefaultProcess;
+    float std_noise            = kDefaultStdNoise;
 
-    bool has_salt_noise        = defaultProcess;
-    float proba_noise          = defaultSaltNoise;
+    bool has_salt_noise        = kDefaultProcess;
+    float proba_noise          = kDefaultSaltNoise;
 
-    bool has_speckle_noise     = defaultProcess;
-    float std_speckle_noise    = defaultSpeckleNoise;
+    bool has_speckle_noise     = kDefaultProcess;
+    float std_speckle_noise    = kDefaultSpeckleNoise;
 
-    bool has_median_filt       = defaultProcess;
-    int kernel_median_length   = defaultKernelLength;
-    bool has_O1_algo           = default01Algo;
+    bool has_median_filt       = kDefaultProcess;
+    int kernel_median_length   = kDefaultKernelLength;
+    bool has_O1_algo           = kDefault01Algo;
 
-    bool has_mean_filt         = defaultProcess;
-    int kernel_mean_length     = defaultKernelLength;
+    bool has_mean_filt         = kDefaultProcess;
+    int kernel_mean_length     = kDefaultKernelLength;
 
-    bool has_gaussian_filt     = defaultProcess;
-    int kernel_gaussian_length = defaultKernelLength;
-    float sigma                = defaultGaussianSigma;
+    bool has_gaussian_filt     = kDefaultProcess;
+    int kernel_gaussian_length = kDefaultKernelLength;
+    float sigma                = kDefaultGaussianSigma;
 
-    bool has_aniso_diff              = defaultProcess;
-    ofeli_ip::AnisoDiff aniso_option = defaultAnisoOption;
-    int max_itera                    = defaultMaxItera;
-    float lambda                     = defaultLambda;
-    float kappa                      = defaultKappa;
+    bool has_aniso_diff              = kDefaultProcess;
+    ofeli_ip::AnisoDiff aniso_option = kDefaultAnisoOption;
+    int max_itera                    = kDefaultMaxItera;
+    float lambda                     = kDefaultLambda;
+    float kappa                      = kDefaultKappa;
 
-    bool has_open_filt       = defaultProcess;
-    int kernel_open_length   = defaultKernelLength;
+    bool has_open_filt       = kDefaultProcess;
+    int kernel_open_length   = kDefaultKernelLength;
 
-    bool has_close_filt      = defaultProcess;
-    int kernel_close_length  = defaultKernelLength;
+    bool has_close_filt      = kDefaultProcess;
+    int kernel_close_length  = kDefaultKernelLength;
 
-    bool has_top_hat_filt    = defaultProcess;
-    bool is_white_top_hat    = defaultWhiteTopHat;
-    int kernel_tophat_length = defaultKernelLength;
+    bool has_top_hat_filt    = kDefaultProcess;
+    bool is_white_top_hat    = kDefaultWhiteTopHat;
+    int kernel_tophat_length = kDefaultKernelLength;
 
-    bool has_O1_morpho       = default01Algo;
+    bool has_O1_morpho       = kDefault01Algo;
 
     bool hasProcessing() const
     {
@@ -167,7 +167,7 @@ struct ProcessingConfig
 
 struct AlgoConfig
 {
-    static constexpr ofeli_ip::Connectivity defaultConnectivity
+    static constexpr ofeli_ip::Connectivity kDefaultConnectivity
         = ofeli_ip::Connectivity::Four;
 
     ofeli_ip::Connectivity connectivity;
@@ -193,14 +193,14 @@ struct ImageSessionSettings
 
 struct VideoComputeConfig
 {
-    static constexpr int  defaultCyclesNbr = 3;
-    static constexpr bool defaultHasTemporalFiltering = true;
+    static constexpr int  kDefaultCyclesNbr = 3;
+    static constexpr bool kDefaultHasTemporalFiltering = true;
 
     AlgoConfig algo;
-    int cyclesNbr = defaultCyclesNbr;
+    int cyclesNbr = kDefaultCyclesNbr;
 
     DownscaleConfig downscale;
-    bool hasTemporalFiltering = defaultHasTemporalFiltering;
+    bool hasTemporalFiltering = kDefaultHasTemporalFiltering;
 };
 
 struct VideoSessionSettings

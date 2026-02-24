@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <bit>
+#include <cstddef>
 #include <utility>
 
 #include "color.hpp"
@@ -56,7 +57,7 @@ public:
     const unsigned char* row(int y) const noexcept
     {
         assert(y >= 0 && y < heightPixels_);
-        return data_ + y * strideBytes_;
+        return data_ + static_cast<ptrdiff_t>(y * strideBytes_);
     }
 
     unsigned char at(int x, int y, int c = 0) const noexcept
@@ -81,22 +82,22 @@ public:
         }
         case ImageFormat::Rgb24:
         {
-            p +=  x * 3;
+            p +=  static_cast<ptrdiff_t>(x * 3);
             return { p[0], p[1], p[2] };
         }
         case ImageFormat::Bgr24:
         {
-            p += x * 3;
+            p += static_cast<ptrdiff_t>(x * 3);
             return { p[2], p[1], p[0] };
         }
         case ImageFormat::Bgr32:
         {
-            p += x * 4;
+            p += static_cast<ptrdiff_t>(x * 4);
             return { p[2], p[1], p[0] };
         }
         case ImageFormat::Rgba32:
         {
-            p += x * 4;
+            p += static_cast<ptrdiff_t>(x * 4);
             return { p[0], p[1], p[2] }; // ignore alpha
         }
         }

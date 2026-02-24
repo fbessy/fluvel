@@ -323,63 +323,63 @@ void ApplicationSettings::load_img_session_config()
     auto& fc = imgConfig.compute.processing;
 
     fc.has_gaussian_noise = settings.value("img/preprocess/has_gaussian_noise",
-                                           ProcessingConfig::defaultProcess).toBool();
+                                           ProcessingConfig::kDefaultProcess).toBool();
     fc.std_noise = settings.value("img/preprocess/std_noise",
-                                  ProcessingConfig::defaultStdNoise).toFloat();
+                                  ProcessingConfig::kDefaultStdNoise).toFloat();
     fc.has_salt_noise = settings.value("img/preprocess/has_salt_noise",
-                                       ProcessingConfig::defaultProcess).toBool();
+                                       ProcessingConfig::kDefaultProcess).toBool();
     fc.proba_noise = settings.value("img/preprocess/proba_noise",
-                                    ProcessingConfig::defaultSaltNoise).toFloat();
+                                    ProcessingConfig::kDefaultSaltNoise).toFloat();
     fc.has_speckle_noise = settings.value("img/preprocess/has_speckle_noise",
-                                          ProcessingConfig::defaultProcess).toBool();
+                                          ProcessingConfig::kDefaultProcess).toBool();
     fc.std_speckle_noise = settings.value("img/preprocess/std_speckle_noise",
-                                          ProcessingConfig::defaultSpeckleNoise).toFloat();
+                                          ProcessingConfig::kDefaultSpeckleNoise).toFloat();
 
     fc.has_median_filt = settings.value("img/preprocess/has_median_filt",
-                                        ProcessingConfig::defaultProcess).toBool();
+                                        ProcessingConfig::kDefaultProcess).toBool();
     fc.kernel_median_length = settings.value("img/preprocess/kernel_median_length",
-                                             ProcessingConfig::defaultKernelLength).toInt();
+                                             ProcessingConfig::kDefaultKernelLength).toInt();
     fc.has_O1_algo = settings.value("img/preprocess/has_O1_algo",
-                                    ProcessingConfig::default01Algo).toBool();
+                                    ProcessingConfig::kDefault01Algo).toBool();
     fc.has_mean_filt = settings.value("img/preprocess/has_mean_filt",
-                                      ProcessingConfig::defaultProcess).toBool();
+                                      ProcessingConfig::kDefaultProcess).toBool();
     fc.kernel_mean_length = settings.value("img/preprocess/kernel_mean_length",
-                                           ProcessingConfig::defaultKernelLength).toInt();
+                                           ProcessingConfig::kDefaultKernelLength).toInt();
     fc.has_gaussian_filt = settings.value("img/preprocess/has_gaussian_filt",
-                                          ProcessingConfig::defaultProcess).toBool();
+                                          ProcessingConfig::kDefaultProcess).toBool();
     fc.kernel_gaussian_length = settings.value("img/preprocess/kernel_gaussian_length",
-                                               ProcessingConfig::defaultKernelLength).toInt();
+                                               ProcessingConfig::kDefaultKernelLength).toInt();
     fc.sigma = settings.value("img/preprocess/sigma",
-                              ProcessingConfig::defaultGaussianSigma).toFloat();
+                              ProcessingConfig::kDefaultGaussianSigma).toFloat();
 
     fc.has_aniso_diff = settings.value("img/preprocess/has_aniso_diff",
-                                       ProcessingConfig::defaultProcess).toBool();
+                                       ProcessingConfig::kDefaultProcess).toBool();
     fc.aniso_option = ofeli_ip::AnisoDiff( settings.value("img/preprocess/aniso_option",
-                                                         ProcessingConfig::defaultAnisoOption).toUInt() );
+                                                         ProcessingConfig::kDefaultAnisoOption).toUInt() );
     fc.max_itera = settings.value("img/preprocess/max_itera",
-                                  ProcessingConfig::defaultMaxItera).toInt();
+                                  ProcessingConfig::kDefaultMaxItera).toInt();
     fc.lambda = settings.value("img/preprocess/lambda",
-                               ProcessingConfig::defaultLambda).toFloat();
+                               ProcessingConfig::kDefaultLambda).toFloat();
     fc.kappa = settings.value("img/preprocess/kappa",
-                              ProcessingConfig::defaultKappa).toFloat();
+                              ProcessingConfig::kDefaultKappa).toFloat();
 
     fc.has_open_filt = settings.value("img/preprocess/has_open_filt",
-                                      ProcessingConfig::defaultProcess).toBool();
+                                      ProcessingConfig::kDefaultProcess).toBool();
     fc.kernel_open_length = settings.value("img/preprocess/kernel_open_length",
-                                           ProcessingConfig::defaultKernelLength).toInt();
+                                           ProcessingConfig::kDefaultKernelLength).toInt();
     fc.has_close_filt = settings.value("img/preprocess/has_close_filt",
-                                       ProcessingConfig::defaultProcess).toBool();
+                                       ProcessingConfig::kDefaultProcess).toBool();
     fc.kernel_close_length = settings.value("img/preprocess/kernel_close_length",
-                                            ProcessingConfig::defaultKernelLength).toInt();
+                                            ProcessingConfig::kDefaultKernelLength).toInt();
     fc.has_top_hat_filt = settings.value("img/preprocess/has_top_hat_filt",
-                                         ProcessingConfig::defaultProcess).toBool();
+                                         ProcessingConfig::kDefaultProcess).toBool();
     fc.is_white_top_hat = settings.value("img/preprocess/is_white_top_hat",
-                                         ProcessingConfig::defaultWhiteTopHat).toBool();
+                                         ProcessingConfig::kDefaultWhiteTopHat).toBool();
     fc.kernel_tophat_length = settings.value("img/preprocess/kernel_tophat_length",
-                                             ProcessingConfig::defaultKernelLength).toInt();
+                                             ProcessingConfig::kDefaultKernelLength).toInt();
 
     fc.has_O1_morpho = settings.value("img/preprocess/has_O1_morpho",
-                                      ProcessingConfig::default01Algo).toBool();
+                                      ProcessingConfig::kDefault01Algo).toBool();
 
     // display
     load_disp(Session::Image,
@@ -394,14 +394,14 @@ void ApplicationSettings::load_cam_session_config()
               camConfig.compute.algo);
 
     camConfig.compute.cyclesNbr = settings.value("cam/algo/cyclesNbr",
-                                                 VideoComputeConfig::defaultCyclesNbr).toInt();
+                                                 VideoComputeConfig::kDefaultCyclesNbr).toInt();
 
     // preprocess
     load_downscale(Session::Camera,
                    camConfig.compute.downscale);
 
     camConfig.compute.hasTemporalFiltering = settings.value("cam/preprocess/hasTemporalFiltering",
-                                                            VideoComputeConfig::defaultHasTemporalFiltering).toBool();
+                                                            VideoComputeConfig::kDefaultHasTemporalFiltering).toBool();
 
     // display
     load_disp(Session::Camera,
@@ -416,15 +416,15 @@ void ApplicationSettings::load_algo(Session session,
     const QString scope = toSettingsPrefix(session);
 
     algo_config.connectivity = static_cast<ofeli_ip::Connectivity>(settings.value(scope + "/algo/connectivity",
-                                                                      int(AlgoConfig::defaultConnectivity)).toInt());
+                                                                      int(AlgoConfig::kDefaultConnectivity)).toInt());
     algo_config.acConfig.Na = settings.value(scope + "/algo/Na",
-                                             ofeli_ip::AcConfig::default_Na).toInt();
+                                             ofeli_ip::AcConfig::kDefaultNa).toInt();
     algo_config.acConfig.is_cycle2 = settings.value(scope + "/algo/has_smoothing_cycle",
-                                                    ofeli_ip::AcConfig::default_is_cycle2).toBool();
+                                                    ofeli_ip::AcConfig::kDefaultIsCycle2).toBool();
     algo_config.acConfig.Ns = settings.value(scope + "/algo/Ns",
-                                             ofeli_ip::AcConfig::default_Ns).toInt();
+                                             ofeli_ip::AcConfig::kDefaultNs).toInt();
     algo_config.acConfig.disk_radius = settings.value(scope + "/algo/disk_radius",
-                                                      ofeli_ip::AcConfig::default_disk_radius).toInt();
+                                                      ofeli_ip::AcConfig::kDefaultDiskRadius).toInt();
 
     switch (session)
     {
@@ -441,20 +441,20 @@ void ApplicationSettings::load_algo(Session session,
     }
 
     algo_config.regionAcConfig.lambda_out = settings.value(scope + "/algo/lambda_out",
-                                                           ofeli_ip::RegionConfig::default_lambda_out).toInt();
+                                                           ofeli_ip::RegionConfig::kDefaultLambdaOut).toInt();
     algo_config.regionAcConfig.lambda_in = settings.value(scope + "/algo/lambda_in",
-                                                          ofeli_ip::RegionConfig::default_lambda_in).toInt();
+                                                          ofeli_ip::RegionConfig::kDefaultLambdaIn).toInt();
 
     algo_config.regionAcConfig.color_space = ofeli_ip::ColorSpaceOption(settings.value(
         scope + "/algo/color_space",
-            int(ofeli_ip::RegionColorConfig::default_color_space)).toInt());
+            int(ofeli_ip::RegionColorConfig::kDefaultColorSpace)).toInt());
 
     algo_config.regionAcConfig.weights.c1 = settings.value(scope + "/algo/alpha",
-                                                           ofeli_ip::RegionColorConfig::default_weights.c1).toInt();
+                                                           ofeli_ip::RegionColorConfig::kDefaultWeights.c1).toInt();
     algo_config.regionAcConfig.weights.c2 = settings.value(scope + "/algo/beta",
-                                                           ofeli_ip::RegionColorConfig::default_weights.c2).toInt();
+                                                           ofeli_ip::RegionColorConfig::kDefaultWeights.c2).toInt();
     algo_config.regionAcConfig.weights.c3 = settings.value(scope + "/algo/gamma",
-                                                           ofeli_ip::RegionColorConfig::default_weights.c3).toInt();
+                                                           ofeli_ip::RegionColorConfig::kDefaultWeights.c3).toInt();
 }
 
 void ApplicationSettings::load_downscale(Session session,
@@ -471,7 +471,7 @@ void ApplicationSettings::load_downscale(Session session,
                                                    defaultIsDownscale).toBool();
 
     downscale_config.downscaleFactor = settings.value(scope + "/preprocess/downscaleFactor",
-                                                      DownscaleConfig::defaultDownscaleFactor).toInt();
+                                                      DownscaleConfig::kDefaultDownscaleFactor).toInt();
 }
 void ApplicationSettings::load_disp(Session session,
                                     DisplayConfig& disp_config)
@@ -488,32 +488,32 @@ void ApplicationSettings::load_disp(Session session,
     const QString scope = toSettingsPrefix(session);
 
     disp_config.l_out_displayed   = settings.value(scope + "/display/l_out_displayed",
-                                                 DisplayConfig::defaultListDisplayed).toBool();
+                                                 DisplayConfig::kDefaultListDisplayed).toBool();
     disp_config.l_out_color.red   = clampToByte( settings.value(scope + "/display/l_out_red",
-                                                             DisplayConfig::defaultRedOut).toInt() );
+                                                             DisplayConfig::kDefaultRedOut).toInt() );
     disp_config.l_out_color.green = clampToByte( settings.value(scope + "/display/l_out_green",
-                                                               DisplayConfig::defaultGreenOut).toInt() );
+                                                               DisplayConfig::kDefaultGreenOut).toInt() );
     disp_config.l_out_color.blue  = clampToByte( settings.value(scope + "/display/l_out_blue",
-                                                              DisplayConfig::defaultBlueOut).toInt() );
+                                                              DisplayConfig::kDefaultBlueOut).toInt() );
 
     disp_config.l_in_displayed    = settings.value(scope + "/display/l_in_displayed",
-                                                DisplayConfig::defaultListDisplayed).toBool();
+                                                DisplayConfig::kDefaultListDisplayed).toBool();
     disp_config.l_in_color.red    = clampToByte( settings.value(scope + "/display/l_in_red",
-                                                            DisplayConfig::defaultRedIn).toInt() );
+                                                            DisplayConfig::kDefaultRedIn).toInt() );
     disp_config.l_in_color.green  = clampToByte( settings.value(scope + "/display/l_in_green",
-                                                              DisplayConfig::defaultGreenIn).toInt() );
+                                                              DisplayConfig::kDefaultGreenIn).toInt() );
     disp_config.l_in_color.blue   = clampToByte( settings.value(scope + "/display/l_in_blue",
-                                                             DisplayConfig::defaultBlueIn).toInt() );
+                                                             DisplayConfig::kDefaultBlueIn).toInt() );
 
     disp_config.algorithm_overlay = settings.value(scope + "/display/algorithm_overlay",
-                                                   DisplayConfig::defaultOverlay).toBool();
+                                                   DisplayConfig::kDefaultOverlay).toBool();
     disp_config.image   = static_cast<ImageBase>(settings.value(scope + "/display/image",
-                                                 static_cast<int>(DisplayConfig::defaultImage)).toInt());
+                                                 static_cast<int>(DisplayConfig::kDefaultImage)).toInt());
     disp_config.mirrorMode        = settings.value(scope + "/display/mirrorMode",
-                                            DisplayConfig::defaultOptions).toBool();
+                                            DisplayConfig::kDefaultOptions).toBool();
 
     disp_config.smoothDisplay     = settings.value(scope + "/display/smoothDisplay",
-                                            DisplayConfig::defaultOptions).toBool();
+                                            DisplayConfig::kDefaultOptions).toBool();
 }
 
 QDir ApplicationSettings::settingsDirectory()

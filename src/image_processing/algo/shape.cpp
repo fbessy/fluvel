@@ -48,74 +48,74 @@
 namespace ofeli_ip
 {
 
-Shape::Shape() : centroid( std::numeric_limits<float>::min(),
+Shape::Shape() : centroid_( std::numeric_limits<float>::min(),
                            std::numeric_limits<float>::min() )
 {
 }
 
 void Shape::reserve(size_t elem_alloc_size)
 {
-    points.reserve( elem_alloc_size );
+    points_.reserve( elem_alloc_size );
 }
 
 void Shape::clear()
 {
-    points.clear();
+    points_.clear();
 }
 
 void Shape::push_back(int x, int y)
 {
-    points.emplace_back( x, y );
+    points_.emplace_back( x, y );
 }
 
 void Shape::push_back(const Point2D_i& p)
 {
-    points.push_back( p );
+    points_.push_back( p );
 }
 
 void Shape::push_back(Point2D_i&& p)
 {
-    points.emplace_back( std::move(p) );
+    points_.emplace_back( p );
 }
 
 void Shape::swap(Shape& other)
-{
-    this->points.swap(other.points);
+ noexcept {
+    this->points_.swap(other.points_);
 
-    std::swap(this->centroid.x,  other.centroid.x);
-    std::swap(this->centroid.y,  other.centroid.y);
+    std::swap(this->centroid_.x,  other.centroid_.x);
+    std::swap(this->centroid_.y,  other.centroid_.y);
 }
 
 void Shape::shuffle_points()
 {
     auto rng = std::default_random_engine{};
-    std::ranges::shuffle(points, rng);
+    std::ranges::shuffle(points_, rng);
 }
 
 void Shape::calculate_centroid()
 {
-    centroid.x = std::numeric_limits<float>::min();
-    centroid.y = std::numeric_limits<float>::min();
+    centroid_.x = std::numeric_limits<float>::min();
+    centroid_.y = std::numeric_limits<float>::min();
 
-    if( points.size() >= 1 )
+    if( points_.size() >= 1 )
     {
         Point2D_i sum( 0, 0 );
 
-        for( const auto& p : points )
+        for( const auto& p : points_ )
         {
             sum += p;
         }
 
-        centroid.x = float( sum.x ) / float( points.size() );
-        centroid.y = float( sum.y ) / float( points.size() );
+        centroid_.x = float( sum.x ) / float( points_.size() );
+        centroid_.y = float( sum.y ) / float( points_.size() );
     }
 }
 
 bool Shape::is_valid() const
 {
-    return ( !points.empty()         &&
-              centroid.x      >= 0.f &&
-              centroid.y      >= 0.f    );
+    return ( !points_.empty()         &&
+              centroid_.x      >= 0.f &&
+              centroid_.y      >= 0.f    );
 }
 
 float Shape::get_grid_diagonal(int grid_width, int grid_height)

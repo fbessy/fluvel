@@ -5,7 +5,9 @@ Checks: >
   modernize-use-nullptr,
   modernize-use-override,
   modernize-use-default-member-init,
-  readability-identifier-naming
+  modernize-use-static-cast,
+  readability-identifier-naming,
+  -bugprone-narrowing-conversions
 
 WarningsAsErrors: ''
 

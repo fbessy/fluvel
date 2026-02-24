@@ -38,6 +38,8 @@
 ****************************************************************************/
 
 #include "region_ac.hpp"
+
+#include <cmath>
 #include "ofeli_math.hpp"
 
 namespace ofeli_ip
@@ -70,14 +72,14 @@ void RegionAc::initialize_sums()
 void RegionAc::do_specific_cycle1()
 {
     if( pxl_nbr_out_ >= 1 )
-        average_out_ = lround( static_cast<float>(sum_out_) / pxl_nbr_out_ );
+        average_out_ = std::lround( static_cast<float>(sum_out_) / pxl_nbr_out_ );
 
 
     const int64_t sum_in = sum_total_ - sum_out_;
     const int64_t pxl_nbr_in = pxl_nbr_total_ - pxl_nbr_out_;
 
     if( pxl_nbr_in >= 1 )
-        average_in_ = lround( static_cast<float>(sum_in) / pxl_nbr_in );
+        average_in_ = std::lround( static_cast<float>(sum_in) / pxl_nbr_in );
 }
 
 void RegionAc::compute_external_speed_Fd(ContourPoint& point)

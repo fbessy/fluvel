@@ -31,7 +31,7 @@ protected:
 
 private :
 
-    QComboBox* combo;
+    QComboBox* combo_;
 };
 
 }

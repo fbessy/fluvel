@@ -38,7 +38,7 @@ ImageView::ImageView(const DisplayConfig& displayConfig,
     l_in_->setZValue(100.0);
 
     overlay_ = new OverlayTextItem;
-    scene->addItem(overlay_);
+    scene_->addItem(overlay_);
     overlay_->setZValue(100.0);
     overlay_->hide();
 }
@@ -52,26 +52,26 @@ void ImageView::initialize()
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
 
-    scene = new QGraphicsScene(this);
-    setScene(scene);
+    scene_ = new QGraphicsScene(this);
+    setScene(scene_);
 
     contentRoot_ = new QGraphicsItemGroup;
-    scene->addItem(contentRoot_);
+    scene_->addItem(contentRoot_);
 
-    pixmapItem = new QGraphicsPixmapItem(contentRoot_);
-    pixmapItem->setZValue(0);
+    pixmapItem_ = new QGraphicsPixmapItem(contentRoot_);
+    pixmapItem_->setZValue(0);
     updateSmoothDisplay();
 
     blur_ = new QGraphicsBlurEffect;
-    pixmapItem->setGraphicsEffect(blur_);
+    pixmapItem_->setGraphicsEffect(blur_);
     blur_->setBlurRadius(0);
 
-    displayTimer.start();
+    displayTimer_.start();
 
-    throttleTimer = new QTimer(this);
-    throttleTimer->setSingleShot(true);
+    throttleTimer_ = new QTimer(this);
+    throttleTimer_->setSingleShot(true);
 
-    connect(throttleTimer, &QTimer::timeout,
+    connect(throttleTimer_, &QTimer::timeout,
             this, &ImageView::flushPendingFrame);
 }
 
@@ -81,25 +81,25 @@ void ImageView::initialize()
 void ImageView::setMaxDisplayFps(double fps)
 {
     if (fps <= 0.0) {
-        minDisplayIntervalMs = 0;
+        minDisplayIntervalMs_ = 0;
         return;
     }
 
-    minDisplayIntervalMs = static_cast<int>(1000.0 / fps);
+    minDisplayIntervalMs_ = static_cast<int>(1000.0 / fps);
 }
 
 void ImageView::setImage(const QImage& img)
 {
     // Toujours garder la dernière image
-    pendingFrame = img;
-    hasPendingFrame = true;
+    pendingFrame_ = img;
+    hasPendingFrame_ = true;
 
     // Pas de throttling
-    if (minDisplayIntervalMs == 0)
+    if (minDisplayIntervalMs_ == 0)
     {
-        updatePixmap(pendingFrame);
-        hasPendingFrame = false;
-        displayTimer.restart();
+        updatePixmap(pendingFrame_);
+        hasPendingFrame_ = false;
+        displayTimer_.restart();
 
         qint64 displayTs = FrameClock::nowNs();
 
@@ -109,13 +109,13 @@ void ImageView::setImage(const QImage& img)
         return;
     }
 
-    const qint64 elapsed = displayTimer.elapsed();
+    const qint64 elapsed = displayTimer_.elapsed();
 
-    if (elapsed >= minDisplayIntervalMs)
+    if (elapsed >= minDisplayIntervalMs_)
     {
-        updatePixmap(pendingFrame);
-        hasPendingFrame = false;
-        displayTimer.restart();
+        updatePixmap(pendingFrame_);
+        hasPendingFrame_ = false;
+        displayTimer_.restart();
 
         qint64 displayTs = FrameClock::nowNs();
 
@@ -124,9 +124,9 @@ void ImageView::setImage(const QImage& img)
     }
     else
     {
-        if (!throttleTimer->isActive())
+        if (!throttleTimer_->isActive())
         {
-            const qint64 remaining = minDisplayIntervalMs - elapsed;
+            const qint64 remaining = minDisplayIntervalMs_ - elapsed;
 
             if (remaining > 0)
             {
@@ -135,7 +135,7 @@ void ImageView::setImage(const QImage& img)
                         remaining,
                         std::numeric_limits<int>::max()));
 
-                throttleTimer->start(interval);
+                throttleTimer_->start(interval);
             }
         }
     }
@@ -176,12 +176,12 @@ void ImageView::clearOverlays()
 // ------------------------------------------------------------
 void ImageView::flushPendingFrame()
 {
-    if (!hasPendingFrame)
+    if (!hasPendingFrame_)
         return;
 
-    updatePixmap(pendingFrame);
-    hasPendingFrame = false;
-    displayTimer.restart();
+    updatePixmap(pendingFrame_);
+    hasPendingFrame_ = false;
+    displayTimer_.restart();
 
     qint64 displayTs = FrameClock::nowNs();
 
@@ -191,16 +191,16 @@ void ImageView::flushPendingFrame()
 
 void ImageView::updatePixmap(const QImage& img)
 {
-    if ( img.isNull() || !pixmapItem )
+    if ( img.isNull() || !pixmapItem_ )
         return;
 
     bool sizeChanged =
-        ( lastDisplayedImage.size() != img.size() );
+        ( lastDisplayedImage_.size() != img.size() );
 
-    pixmapItem->setPixmap(QPixmap::fromImage(img));
-    lastDisplayedImage = img;
+    pixmapItem_->setPixmap(QPixmap::fromImage(img));
+    lastDisplayedImage_ = img;
 
-    scene->setSceneRect( 0.0,
+    scene_->setSceneRect( 0.0,
                          0.0,
                          static_cast<qreal>(img.width()),
                          static_cast<qreal>(img.height()) );
@@ -249,21 +249,21 @@ void ImageView::toggleFullscreen()
 {
     const QPoint overlayPosition = textPosition();
 
-    if (!isFullScreenMode)
+    if (!isFullScreenMode_)
     {
-        normalGeometry = window()->geometry();
-        normalWindowFlags = window()->windowFlags();
+        normalGeometry_ = window()->geometry();
+        normalWindowFlags_ = window()->windowFlags();
         window()->setWindowFlags(Qt::Window);
         window()->showFullScreen();
 
-        isFullScreenMode = true;
+        isFullScreenMode_ = true;
     }
     else
     {
-        window()->setWindowFlags(normalWindowFlags);
+        window()->setWindowFlags(normalWindowFlags_);
         window()->showNormal();
-        window()->setGeometry(normalGeometry);
-        isFullScreenMode = false;
+        window()->setGeometry(normalGeometry_);
+        isFullScreenMode_ = false;
     }
 
     setTextPosition(overlayPosition);
@@ -273,19 +273,19 @@ void ImageView::applyAutoFit()
 {
     const QPoint overlayPosition = textPosition();
 
-    if (!pixmapItem)
+    if (!pixmapItem_)
         return;
 
-    autoFitEnabled = true;
+    autoFitEnabled_ = true;
     resetTransform();
-    fitInView(pixmapItem, Qt::KeepAspectRatio);
+    fitInView(pixmapItem_, Qt::KeepAspectRatio);
 
     setTextPosition(overlayPosition);
 }
 
 void ImageView::userInteracted()
 {
-    autoFitEnabled = false;
+    autoFitEnabled_ = false;
 }
 
 QPoint ImageView::textPosition() const
@@ -330,7 +330,7 @@ void ImageView::wheelEvent(QWheelEvent* event)
     double currentZoom = getCurrentZoom();
     double newZoom = currentZoom * factor;
 
-    if (newZoom < minZoom || newZoom > maxZoom)
+    if (newZoom < minZoom_ || newZoom > maxZoom_)
         return;
 
     scale(factor, factor);
@@ -339,10 +339,10 @@ void ImageView::wheelEvent(QWheelEvent* event)
     QPointF delta = scenePosAfter - scenePosBefore;
     translate(delta.x(), delta.y());
 
-    autoFitEnabled = false;
+    autoFitEnabled_ = false;
 
-    if (m_interaction)
-        setCursor(m_interaction->cursorForEvent(*this,
+    if (m_interaction_)
+        setCursor(m_interaction_->cursorForEvent(*this,
                                                 hasImage(),
                                                 isPanRelevant(),
                                                 nullptr));
@@ -364,7 +364,7 @@ void ImageView::resizeEvent(QResizeEvent* event)
 
     QGraphicsView::resizeEvent(event);
 
-    if (autoFitEnabled)
+    if (autoFitEnabled_)
         applyAutoFit();
 
 
@@ -373,7 +373,7 @@ void ImageView::resizeEvent(QResizeEvent* event)
 
 void ImageView::setInteraction(ImageViewInteraction* interaction)
 {
-    m_interaction = interaction;
+    m_interaction_ = interaction;
 }
 
 /*void ImageView::wheelEvent(QWheelEvent* event)
@@ -404,11 +404,11 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     // 3️⃣ Sinon, on laisse l'interaction manager décider
     bool handled = false;
 
-    if (m_interaction)
+    if (m_interaction_)
     {
-        handled = m_interaction->mousePress(*this, event);
+        handled = m_interaction_->mousePress(*this, event);
 
-        setCursor(m_interaction->cursorForEvent(
+        setCursor(m_interaction_->cursorForEvent(
                   *this,
                   hasImage(),
                   isPanRelevant(),
@@ -436,11 +436,11 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     // 3️⃣ Sinon, on laisse l'interaction manager décider
     bool handled = false;
 
-    if (m_interaction)
+    if (m_interaction_)
     {
-        handled = m_interaction->mouseMove(*this, event);
+        handled = m_interaction_->mouseMove(*this, event);
 
-        setCursor(m_interaction->cursorForEvent(
+        setCursor(m_interaction_->cursorForEvent(
             *this,
             hasImage(),
             isPanRelevant(),
@@ -468,11 +468,11 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
     // 3️⃣ Sinon, on laisse l'interaction manager décider
     bool handled = false;
 
-    if (m_interaction)
+    if (m_interaction_)
     {
-        handled = m_interaction->mouseRelease(*this, event);
+        handled = m_interaction_->mouseRelease(*this, event);
 
-        setCursor(m_interaction->cursorForEvent(
+        setCursor(m_interaction_->cursorForEvent(
             *this,
             hasImage(),
             isPanRelevant(),
@@ -486,8 +486,8 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    if (m_interaction)
-        m_interaction->mouseDoubleClick(*this, event);
+    if (m_interaction_)
+        m_interaction_->mouseDoubleClick(*this, event);
 
     if ( !event->isAccepted() )
         QGraphicsView::mouseDoubleClickEvent(event);
@@ -495,18 +495,18 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 
 QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 {
-    if (!pixmapItem || lastDisplayedImage.isNull())
+    if (!pixmapItem_ || lastDisplayedImage_.isNull())
         return QPoint(-1, -1);
 
     const QPointF scenePos = mapToScene(viewPos);
 
-    QPointF itemPos = pixmapItem->mapFromScene(scenePos);
+    QPointF itemPos = pixmapItem_->mapFromScene(scenePos);
 
     const int x = static_cast<int>(itemPos.x());
     const int y = static_cast<int>(itemPos.y());
     const QPoint p(x, y);
 
-    if ( !lastDisplayedImage.valid(p) )
+    if ( !lastDisplayedImage_.valid(p) )
         return QPoint(-1, -1);
 
     return p;
@@ -514,8 +514,8 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 
 void ImageView::enterEvent(QEnterEvent*)
 {
-    if (m_interaction)
-        setCursor(m_interaction->cursorForEvent(*this,
+    if (m_interaction_)
+        setCursor(m_interaction_->cursorForEvent(*this,
                                                 hasImage(),
                                                 isPanRelevant(),
                                                 nullptr));
@@ -523,10 +523,10 @@ void ImageView::enterEvent(QEnterEvent*)
 
 QRgb ImageView::pixelColorAt(const QPoint& imagePos) const
 {
-    if (!lastDisplayedImage.valid(imagePos))
+    if (!lastDisplayedImage_.valid(imagePos))
         return QRgb();
 
-    return lastDisplayedImage.pixel(imagePos);
+    return lastDisplayedImage_.pixel(imagePos);
 }
 
 void ImageView::setListener(ImageViewListener* listener)
@@ -543,15 +543,15 @@ void ImageView::onColorPicked(const QColor& color,
 
 const QImage& ImageView::image() const
 {
-    return lastDisplayedImage;
+    return lastDisplayedImage_;
 }
 
 QImage ImageView::renderToImage() const
 {
-    if ( !scene || scene->sceneRect().isEmpty() )
+    if ( !scene_ || scene_->sceneRect().isEmpty() )
         return QImage();
 
-    QRectF rect = scene->sceneRect();
+    QRectF rect = scene_->sceneRect();
 
     QImage img(rect.size().toSize(),
                QImage::Format_ARGB32_Premultiplied);
@@ -561,7 +561,7 @@ QImage ImageView::renderToImage() const
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    scene->render(&painter,
+    scene_->render(&painter,
                   QRectF(img.rect()),
                   rect,
                   Qt::IgnoreAspectRatio);
@@ -571,7 +571,7 @@ QImage ImageView::renderToImage() const
 
 bool ImageView::hasImage() const
 {
-    return pixmapItem != nullptr && !lastDisplayedImage.isNull();
+    return pixmapItem_ != nullptr && !lastDisplayedImage_.isNull();
 }
 
 bool ImageView::isPanRelevant() const
@@ -579,7 +579,7 @@ bool ImageView::isPanRelevant() const
     if (!hasImage())
         return false;
 
-    const QRectF sceneRect = scene->sceneRect();
+    const QRectF sceneRect = scene_->sceneRect();
     const QRectF viewRect  = mapToScene(viewport()->rect()).boundingRect();
 
     return sceneRect.width()  > viewRect.width()
@@ -588,13 +588,13 @@ bool ImageView::isPanRelevant() const
 
 QGraphicsScene* ImageView::graphicsScene() const
 {
-    return scene;
+    return scene_;
 }
 
 bool ImageView::isGrayscale() const
 {
-    return lastDisplayedImage.format() == QImage::Format_Grayscale8 ||
-           lastDisplayedImage.format() == QImage::Format_Grayscale16;
+    return lastDisplayedImage_.format() == QImage::Format_Grayscale8 ||
+           lastDisplayedImage_.format() == QImage::Format_Grayscale16;
 }
 
 void ImageView::upscaleItems()
@@ -664,7 +664,7 @@ void ImageView::updateFlip()
         t.scale(-1.0, 1.0);
         contentRoot_->setTransform(t);
 
-        contentRoot_->setPos(static_cast<qreal>(pixmapItem->pixmap().width()),
+        contentRoot_->setPos(static_cast<qreal>(pixmapItem_->pixmap().width()),
                              0.0);
     }
     else
@@ -676,13 +676,13 @@ void ImageView::updateFlip()
 
 void ImageView::updateSmoothDisplay()
 {
-    if ( !pixmapItem )
+    if ( !pixmapItem_ )
         return;
 
     if ( displayConfig_.smoothDisplay )
-        pixmapItem->setTransformationMode(Qt::SmoothTransformation);
+        pixmapItem_->setTransformationMode(Qt::SmoothTransformation);
     else
-        pixmapItem->setTransformationMode(Qt::FastTransformation);
+        pixmapItem_->setTransformationMode(Qt::FastTransformation);
 }
 
 void ImageView::updateTextOverlayVisibility()
@@ -758,11 +758,11 @@ void ImageView::showPlaceholder(bool showEffect)
 
     if ( showEffect )
     {
-        setImage(darkenImage( lastDisplayedImage) );
+        setImage(darkenImage( lastDisplayedImage_) );
 
-        pixmapItem->update();
+        pixmapItem_->update();
         contentRoot_->update();
-        scene->update();
+        scene_->update();
 
         if ( l_out_ )
             l_out_->setColor( desaturateAndDarken(toQColor(displayConfig_.l_out_color),

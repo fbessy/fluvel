@@ -61,7 +61,7 @@ class ApplicationSettings : public QObject
 public:
 
     ApplicationSettings();
-    virtual ~ApplicationSettings();
+    ~ApplicationSettings() override;
 
     void save();
     void save_img_session_config();

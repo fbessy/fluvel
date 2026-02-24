@@ -68,12 +68,12 @@ public :
 
     AnalysisWidget(QWidget* parent = nullptr);
 
-    int get_img_width() const { return img_width; }
-    int get_img_height() const { return img_height; }
+    int get_img_width() const { return img_width_; }
+    int get_img_height() const { return img_height_; }
 
-    ofeli_ip::Shape& get_shape() { return shape; }
-    const QImage get_image() const { return img; }
-    const ofeli_ip::Rgb_uc& get_rgb() const { return rgb; }
+    ofeli_ip::Shape& get_shape() { return shape_; }
+    const QImage get_image() const { return img_; }
+    const ofeli_ip::Rgb_uc& get_rgb() const { return rgb_; }
 
     void save_settings() const;
     
@@ -81,29 +81,29 @@ private :
 
     void create_list();
 
-    QLabel* text_list_length;
-    QString absolute_name;
-    QLabel* name_label;
-    ImageView* imageView;
-    QPushButton* open_button;
+    QLabel* text_list_length_;
+    QString absolute_name_;
+    QLabel* name_label_;
+    ImageView* imageView_;
+    QPushButton* open_button_;
 
-    QComboBox* color_list;
-    ofeli_ip::Rgb_uc selected;
-    QSpinBox* noise_sp;
+    QComboBox* color_list_;
+    ofeli_ip::Rgb_uc selected_;
+    QSpinBox* noise_sp_;
 
-    QImage img;
-    QImage img_noise;
-    int img_width;
-    int img_height;
+    QImage img_;
+    QImage img_noise_;
+    int img_width_{0};
+    int img_height_{0};
 
-    ofeli_ip::Shape shape;
-    ofeli_ip::Rgb_uc rgb;
+    ofeli_ip::Shape shape_;
+    ofeli_ip::Rgb_uc rgb_;
 
-    QString last_directory_used;
-    QStringList name_filters;
+    QString last_directory_used_;
+    QStringList name_filters_;
 
     static int count_this;
-    int id_this;
+    int id_this_;
 
 private slots :
 

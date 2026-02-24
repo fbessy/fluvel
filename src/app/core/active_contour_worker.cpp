@@ -14,22 +14,22 @@
 #include <QDebug>
 
 #include <cassert>
+#include <cstddef>
 
 namespace ofeli_app
 {
 
-constexpr int    workerPeriod_ms            = 16;
-constexpr qint64 timeSliceInteractive_ms    = 10;
-constexpr qint64 timeSliceConverge_ms       = 15;
+constexpr int    kWorkerPeriodMs            = 16;
+constexpr qint64 kTimeSliceInteractiveMs    = 10;
+constexpr qint64 kTimeSliceConvergeMs       = 15;
 
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr),
-    state_(WorkerState::Uninitialized),
-    mode_(RunMode::Interactive),
+    
     timer_(new QTimer(this)),
-    timeSlice_ms_(timeSliceInteractive_ms)
+    timeSlice_ms_(kTimeSliceInteractiveMs)
 {
-    timer_->setInterval(workerPeriod_ms);
+    timer_->setInterval(kWorkerPeriodMs);
     connect(timer_, &QTimer::timeout,
             this, &ActiveContourWorker::onTimeout);
 }
@@ -225,7 +225,7 @@ void ActiveContourWorker::applyProcessing()
 
     const int width = img.width();
 
-    if (img.bytesPerLine() != width * channelsNbr)
+    if (img.bytesPerLine() != static_cast<qsizetype>(width * channelsNbr))
         return;
 
     const qsizetype stride = img.bytesPerLine();
@@ -515,9 +515,9 @@ void ActiveContourWorker::setMode(RunMode mode)
     mode_ = mode;
 
     if ( mode_ == RunMode::Interactive )
-        timeSlice_ms_ = timeSliceInteractive_ms;
+        timeSlice_ms_ = kTimeSliceInteractiveMs;
     else if ( mode_ == RunMode::Converge )
-        timeSlice_ms_ = timeSliceConverge_ms;
+        timeSlice_ms_ = kTimeSliceConvergeMs;
 }
 
 void ActiveContourWorker::setState(WorkerState state)

@@ -62,10 +62,10 @@ enum class ColorSpaceOption
 //! Specific configuration for color region based active contour.
 struct RegionColorConfig : public RegionConfig
 {
-    static constexpr ColorSpaceOption default_color_space
+    static constexpr ColorSpaceOption kDefaultColorSpace
         = ColorSpaceOption::RGB;
 
-    static constexpr Components_3i default_weights { 1, 1, 1 };
+    static constexpr Components_3i kDefaultWeights { 1, 1, 1 };
 
     //! Color space option
     ColorSpaceOption color_space;
@@ -83,8 +83,8 @@ struct RegionColorConfig : public RegionConfig
 
     //! Default constructor.
     RegionColorConfig() : RegionConfig(),
-        color_space(default_color_space),
-        weights { default_weights }
+        color_space(kDefaultColorSpace),
+        weights { kDefaultWeights }
     {
     }
 
@@ -193,7 +193,7 @@ private :
     //! Sum of component #R, #G, #B of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
     Rgb_64i sum_out_;
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    int64_t pxl_nbr_out_;
+    int64_t pxl_nbr_out_{0};
 
     Rgb_64i sum2_out_;
     Rgb_64i sum2_total_;
@@ -209,7 +209,7 @@ RegionColorAc::RegionColorAc(ImageSpan image,
     : ActiveContour(std::forward<T>(initial_contour), general_config),
     image_(image),
     region_config_(region_config),
-    pxl_nbr_total_(image.size()), pxl_nbr_out_(0)
+    pxl_nbr_total_(image.size()) 
 {
     assert( image.width()  == cd_.phi().width() &&
             image.height() == cd_.phi().height()   );

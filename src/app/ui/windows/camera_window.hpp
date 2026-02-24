@@ -69,7 +69,7 @@ protected:
 private slots:
     void updateCameraList();
     void onToggleStreaming();
-    void onFrameSizeStr(QString str);
+    void onFrameSizeStr(const QString& str);
 
 private:
 
@@ -80,29 +80,29 @@ private:
     void ensureCameraPermission();
 #endif
 
-    CameraController* controller;
+    CameraController* controller_;
 
-    QByteArray currentCameraId;
+    QByteArray currentCameraId_;
 
-    QComboBox* cameraSelector;
-    QPushButton* toggleStreamingButton;
+    QComboBox* cameraSelector_{nullptr};
+    QPushButton* toggleStreamingButton_{nullptr};
 
-    ImageView* videoView;
+    ImageView* videoView_{nullptr};
 
-    QMediaDevices*         mediaDevices;
+    QMediaDevices*         mediaDevices_{nullptr};
 
-    QString deviceWindowTitle;
+    QString deviceWindowTitle_;
 
-    QIcon startIcon;
-    QIcon stopIcon;
-    QIcon settingsIcon;
+    QIcon startIcon_;
+    QIcon stopIcon_;
+    QIcon settingsIcon_;
 
-    RightPanelToggleButton* rightPanelToggle;
-    QPushButton* settingsButton;
+    RightPanelToggleButton* rightPanelToggle_;
+    QPushButton* settingsButton_;
 
-    DisplaySettingsWidget* displayBar;
+    DisplaySettingsWidget* displayBar_;
 
-    CameraSettingsWindow* settings_window;
+    CameraSettingsWindow* settings_window_;
 
     QMetaObject::Connection frameConnection_;
 

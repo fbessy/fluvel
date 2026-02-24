@@ -277,18 +277,18 @@ constexpr float INV_GAMMA_CORRECTION(float val)
 }
 
 /** @brief XYZ color of the D65 white point */
-constexpr float WHITE_POINT_X = 0.950456f;
-constexpr float WHITE_POINT_Y = 1.f;
-constexpr float WHITE_POINT_Z = 1.088754f;
+constexpr float kWhitePointX = 0.950456f;
+constexpr float kWhitePointY = 1.f;
+constexpr float kWhitePointZ = 1.088754f;
 
 /** @brief *u*v color of the D65 white point */
-constexpr float WHITE_POINT_DENOM = WHITE_POINT_X + 15.f*WHITE_POINT_Y + 3.f*WHITE_POINT_Z;
-constexpr float WHITE_POINT_U     = 4.f*WHITE_POINT_X / WHITE_POINT_DENOM;
-constexpr float WHITE_POINT_V     = 9.f*WHITE_POINT_Y / WHITE_POINT_DENOM;
+constexpr float kWhitePointDenom = kWhitePointX + 15.f*kWhitePointY + 3.f*kWhitePointZ;
+constexpr float kWhitePointU     = 4.f*kWhitePointX / kWhitePointDenom;
+constexpr float kWhitePointV     = 9.f*kWhitePointY / kWhitePointDenom;
 
-constexpr float LAB_EPSILON = 216.f / 24389.f;
-constexpr float LAB_KAPPA   = 841.f / 108.f;
-constexpr float LAB_DELTA   = 4.f / 29.f;
+constexpr float kLabEpsilon = 216.f / 24389.f;
+constexpr float kLabKappa   = 841.f / 108.f;
+constexpr float kLabDelta   = 4.f / 29.f;
 
 /**
  * @brief CIE L*a*b* f function (used to convert XYZ to L*a*b*)
@@ -296,8 +296,8 @@ constexpr float LAB_DELTA   = 4.f / 29.f;
  */
 inline float LAB_FUNC(float val)
 {
-    return val >= LAB_EPSILON ?
-               std::cbrtf(val) : LAB_KAPPA*(val) + LAB_DELTA;
+    return val >= kLabEpsilon ?
+               std::cbrtf(val) : kLabKappa*(val) + kLabDelta;
 }
 
 inline Xyz_f rgb_to_xyz(const Rgb_uc& rgb)
@@ -319,9 +319,9 @@ inline Lab_f xyz_to_Lab(const Xyz_f& xyz)
 {
     Xyz_f tmp = xyz;
 
-    tmp.X /= WHITE_POINT_X;
-    tmp.Y /= WHITE_POINT_Y;
-    tmp.Z /= WHITE_POINT_Z;
+    tmp.X /= kWhitePointX;
+    tmp.Y /= kWhitePointY;
+    tmp.Z /= kWhitePointZ;
     tmp.X = LAB_FUNC(tmp.X);
     tmp.Y = LAB_FUNC(tmp.Y);
     tmp.Z = LAB_FUNC(tmp.Z);
@@ -357,14 +357,14 @@ inline Luv_f xyz_to_Luv(const Xyz_f& xyz)
         v1 = 0.f;
     }
 
-    tmp.Y /= WHITE_POINT_Y;
+    tmp.Y /= kWhitePointY;
     tmp.Y = LAB_FUNC(tmp.Y);
 
     float L = 116.f*tmp.Y - 16.f;
 
     return { L,
-             13.f*L*(u1 - WHITE_POINT_U),
-             13.f*L*(v1 - WHITE_POINT_V) };
+             13.f*L*(u1 - kWhitePointU),
+             13.f*L*(v1 - kWhitePointV) };
 }
 
 inline Lab_f rgb_to_Lab(const Rgb_uc& rgb)

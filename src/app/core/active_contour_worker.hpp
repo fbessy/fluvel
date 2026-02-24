@@ -80,8 +80,8 @@ private:
     void setMode(RunMode mode);
     void setState(WorkerState state);
 
-    WorkerState state_;
-    RunMode mode_;
+    WorkerState state_{WorkerState::Uninitialized};
+    RunMode mode_{RunMode::Interactive};
     QTimer* timer_;
     std::unique_ptr<ofeli_ip::ActiveContour> ac_;
 

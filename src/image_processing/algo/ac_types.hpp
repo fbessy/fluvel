@@ -53,11 +53,11 @@ enum class BoundarySwitch
 //! Active contour configuration
 struct AcConfig
 {
-    static constexpr bool default_is_cycle2 = true;
-    static constexpr int default_disk_radius = 2;
-    static constexpr int default_Na = 30;
-    static constexpr int default_Ns = 3;
-    static constexpr FailureHandlingMode default_failure_mode
+    static constexpr bool kDefaultIsCycle2 = true;
+    static constexpr int kDefaultDiskRadius = 2;
+    static constexpr int kDefaultNa = 30;
+    static constexpr int kDefaultNs = 3;
+    static constexpr FailureHandlingMode kDefaultFailureMode
         = FailureHandlingMode::StopOnFailure;
 
     //! Boolean egals to \c true to have the curve smoothing, evolutions in the cycle 2 with the internal speed Fint.
@@ -89,10 +89,10 @@ struct AcConfig
     }
 
     //! Default constructor.
-    AcConfig() : is_cycle2(default_is_cycle2),
-        disk_radius(default_disk_radius),
-        Na(default_Na), Ns(default_Ns),
-        failure_mode(default_failure_mode)
+    AcConfig() : is_cycle2(kDefaultIsCycle2),
+        disk_radius(kDefaultDiskRadius),
+        Na(kDefaultNa), Ns(kDefaultNs),
+        failure_mode(kDefaultFailureMode)
     {
     }
 
@@ -207,16 +207,16 @@ struct BoundarySwitchContext
 struct EvolutionData
 {
     //! Iterations number in a cycle (cycle 1 or cycle 2). It is set to 0 at the end of one cycle.
-    int phase_step_count;
+    int phase_step_count{ 0 };
 
     //! Total number of iterations the active contour has evolved from the initial contour.
-    int step_count;
+    int step_count{ 0 };
 
     //! Maximum number of times the active contour can evolve.
     const int max_step_count;
 
     //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
-    bool is_moving;
+    bool is_moving{ true };
 
     //! l_out shape at the end of the cycle 2.
     Shape l_out_shape;
@@ -226,11 +226,11 @@ struct EvolutionData
 
     //! Total number of iterations the active contour has evolved from the initial contour
     //! at the end of the previous cycle 2.
-    int previous_step_count;
+    int previous_step_count{0};
 
     //! Hausdorff quantile
     //! at the end of the previous cycle 2.
-    float previous_quantile;
+    float previous_quantile{0.f};
 
     //! Hausdorff quantile
     //! at the end of the cycle 2. It is a normalized value, divided by the diagonal size of #phi, in percent.
@@ -243,20 +243,17 @@ struct EvolutionData
     PointSet intersection;
 
     //! Stopping condition status.
-    StoppingStatus stopping_status;
+    StoppingStatus stopping_status{ StoppingStatus::None };
 
     //! Constructor.
     EvolutionData(const ContourData& cd)
-        : phase_step_count( 0 ),
-        step_count( 0 ),
+        : 
         max_step_count( 5*std::max(cd.phi().width(),
                                    cd.phi().height()) ),
-        is_moving( true ),
-        previous_step_count(0),
-        previous_quantile(0.f),
+        
         hausdorff_quantile(std::numeric_limits<float>().max()),
-        centroids_distance(std::numeric_limits<float>().max()),
-        stopping_status( StoppingStatus::None )
+        centroids_distance(std::numeric_limits<float>().max())
+        
     {
         l_out_shape.reserve( cd.l_out().capacity() );
         previous_shape.reserve( cd.l_out().capacity() );

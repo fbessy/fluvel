@@ -55,7 +55,7 @@ private:
     DisplayConfig displayConfig_;
     ImageComputeConfig computeConfig_;
 
-    ActiveContourWorker acWorker;
+    ActiveContourWorker acWorker_;
 };
 
 }

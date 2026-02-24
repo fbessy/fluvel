@@ -3,7 +3,7 @@
 namespace ofeli_app
 {
 
-static constexpr qint64 WINDOW_NS = 1'000'000'000LL; // 1 seconde
+static constexpr qint64 kWindowNs = 1'000'000'000LL; // 1 seconde
 
 FrameStatsView::FrameStatsView()
 {
@@ -12,102 +12,102 @@ FrameStatsView::FrameStatsView()
 
 void FrameStatsView::reset()
 {
-    QMutexLocker lock(&mutex);
+    QMutexLocker lock(&mutex_);
 
-    inputFrames = 0;
-    processedFrames = 0;
-    displayedFrames = 0;
-    droppedFrames = 0;
+    inputFrames_ = 0;
+    processedFrames_ = 0;
+    displayedFrames_ = 0;
+    droppedFrames_ = 0;
 
-    latencySumMs = 0.0;
-    latencyMaxMs = 0.0;
+    latencySumMs_ = 0.0;
+    latencyMaxMs_ = 0.0;
 
-    windowStartNs = 0;
-    lastSnapshot = {};
+    windowStartNs_ = 0;
+    lastSnapshot_ = {};
 }
 
 void FrameStatsView::frameReceived(qint64 recvTsNs)
 {
-    QMutexLocker lock(&mutex);
+    QMutexLocker lock(&mutex_);
 
-    if (windowStartNs == 0)
-        windowStartNs = recvTsNs;
+    if (windowStartNs_ == 0)
+        windowStartNs_ = recvTsNs;
 
-    ++inputFrames;
+    ++inputFrames_;
     updateWindowLocked(recvTsNs);
 }
 
 void FrameStatsView::frameProcessed()
 {
-    QMutexLocker lock(&mutex);
-    ++processedFrames;
+    QMutexLocker lock(&mutex_);
+    ++processedFrames_;
 }
 
 void FrameStatsView::frameDisplayed(qint64 recvTsNs,
                                     qint64 displayTsNs)
 {
-    QMutexLocker lock(&mutex);
+    QMutexLocker lock(&mutex_);
 
-    ++displayedFrames;
+    ++displayedFrames_;
 
     // latence affichage - réception
     double latencyMs = double(displayTsNs - recvTsNs) * 1e-6;
 
-    latencySumMs += latencyMs;
-    latencyMaxMs = std::max(latencyMaxMs, latencyMs);
+    latencySumMs_ += latencyMs;
+    latencyMaxMs_ = std::max(latencyMaxMs_, latencyMs);
 
     updateWindowLocked(displayTsNs);
 }
 
 FrameStatsView::Snapshot FrameStatsView::snapshot()
 {
-    QMutexLocker lock(&mutex);
-    return lastSnapshot;
+    QMutexLocker lock(&mutex_);
+    return lastSnapshot_;
 }
 
 void FrameStatsView::updateWindowLocked(qint64 nowNs)
 {
-    qint64 elapsed = nowNs - windowStartNs;
-    if (elapsed < WINDOW_NS)
+    qint64 elapsed = nowNs - windowStartNs_;
+    if (elapsed < kWindowNs)
         return;
 
     double seconds = double(elapsed) * 1e-9;
 
     Snapshot snap;
 
-    snap.inputFps      = double(inputFrames)     / seconds;
-    snap.processingFps = double(processedFrames) / seconds;
-    snap.displayFps    = double(displayedFrames) / seconds;
+    snap.inputFps      = double(inputFrames_)     / seconds;
+    snap.processingFps = double(processedFrames_) / seconds;
+    snap.displayFps    = double(displayedFrames_) / seconds;
 
-    droppedFrames =
-        (inputFrames > displayedFrames)
-            ? (inputFrames - displayedFrames)
+    droppedFrames_ =
+        (inputFrames_ > displayedFrames_)
+            ? (inputFrames_ - displayedFrames_)
             : 0;
 
     snap.dropRate =
-        inputFrames > 0
-            ? double(droppedFrames) / double(inputFrames)
+        inputFrames_ > 0
+            ? double(droppedFrames_) / double(inputFrames_)
             : 0.0;
 
     snap.avgLatencyMs =
-        displayedFrames > 0
-        ? latencySumMs / double(displayedFrames)
+        displayedFrames_ > 0
+        ? latencySumMs_ / double(displayedFrames_)
             : 0.0;
 
-    snap.maxLatencyMs = latencyMaxMs;
+    snap.maxLatencyMs = latencyMaxMs_;
 
-    lastSnapshot = snap;
+    lastSnapshot_ = snap;
 
     // reset fenêtre
-    inputFrames = 0;
-    processedFrames = 0;
-    displayedFrames = 0;
-    droppedFrames = 0;
+    inputFrames_ = 0;
+    processedFrames_ = 0;
+    displayedFrames_ = 0;
+    droppedFrames_ = 0;
 
-    latencySumMs = 0.0;
-    latencyMaxMs = 0.0;
+    latencySumMs_ = 0.0;
+    latencyMaxMs_ = 0.0;
 
-    windowStartNs = nowNs;
+    windowStartNs_ = nowNs;
 }
 
 }

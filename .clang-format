@@ -1,6 +1,6 @@
 ---
 Language: Cpp
-BasedOnStyle: Qt
+BasedOnStyle: LLVM
 
 # Indentation
 IndentWidth: 4

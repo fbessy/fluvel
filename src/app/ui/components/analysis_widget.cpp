@@ -53,125 +53,124 @@ namespace ofeli_app
 int AnalysisWidget::count_this = 0;
 
 AnalysisWidget::AnalysisWidget(QWidget *parent) :
-    QWidget(parent),
-    img_width(0), img_height(0)
+    QWidget(parent) 
 {
     ++count_this; // static variable to count the instances
-    id_this = count_this; // in order to know if *this is the first or the second widget of evaluation_window
+    id_this_ = count_this; // in order to know if *this is the first or the second widget of evaluation_window
 
     QSettings settings;
 
-    text_list_length = new QLabel(this);
-    text_list_length->setAlignment(Qt::AlignCenter);
-    if( id_this == 1 )
+    text_list_length_ = new QLabel(this);
+    text_list_length_->setAlignment(Qt::AlignCenter);
+    if( id_this_ == 1 )
     {
-        text_list_length->setText("<font color=red>"+tr("List 1 length = ")+QString::number(shape.get_points().size()));
+        text_list_length_->setText("<font color=red>"+tr("List 1 length = ")+QString::number(shape_.get_points().size()));
     }
-    else if( id_this == 2 )
+    else if( id_this_ == 2 )
     {
-        text_list_length->setText("<font color=red>"+tr("List 2 length = ")+QString::number(shape.get_points().size()));
+        text_list_length_->setText("<font color=red>"+tr("List 2 length = ")+QString::number(shape_.get_points().size()));
     }
 
     /////////////////////////////////////////////////////////////////////////////////
 
-    name_label = new QLabel(this);
-    name_label->setText( tr("Title - Size") );
-    name_label->setAlignment(Qt::AlignCenter);
+    name_label_ = new QLabel(this);
+    name_label_->setText( tr("Title - Size") );
+    name_label_->setAlignment(Qt::AlignCenter);
 
     ///////////////////////////////////////
 
-    imageView = new ImageView(this);
+    imageView_ = new ImageView(this);
     auto interaction = std::make_unique<InteractionSet>();
     //interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     //interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<ColorPickerBehavior>());
-    imageView->setInteraction(interaction.release());
+    imageView_->setInteraction(interaction.release());
 
-    imageView->setListener(this);
+    imageView_->setListener(this);
 
     ///////////////////////////////////////
 
-    open_button = new QPushButton( tr("Open image") + " " +
-                                   QString::number(id_this) );
+    open_button_ = new QPushButton( tr("Open image") + " " +
+                                   QString::number(id_this_) );
 
     QVBoxLayout* img_layout = new QVBoxLayout;
-    img_layout->addWidget(name_label);
-    img_layout->addWidget(imageView);
-    img_layout->addWidget(open_button);
+    img_layout->addWidget(name_label_);
+    img_layout->addWidget(imageView_);
+    img_layout->addWidget(open_button_);
     QGroupBox* img_group = new QGroupBox( tr("Image") + " " +
-                                          QString::number(id_this) );
+                                          QString::number(id_this_) );
     img_group->setLayout(img_layout);
 
     //////////////////////////////////////////////////////////////////////////////////
 
-    color_list = new QComboBox;
+    color_list_ = new QComboBox;
 
     QPixmap pm(12,12);
 
     pm.fill(Qt::red);
-    color_list->addItem( pm, tr("Red") );
+    color_list_->addItem( pm, tr("Red") );
     pm.fill(Qt::green);
-    color_list->addItem( pm, tr("Green") );
+    color_list_->addItem( pm, tr("Green") );
     pm.fill(Qt::blue);
-    color_list->addItem( pm, tr("Blue") );
+    color_list_->addItem( pm, tr("Blue") );
     pm.fill(Qt::cyan);
-    color_list->addItem( pm, tr("Cyan") );
+    color_list_->addItem( pm, tr("Cyan") );
     pm.fill(Qt::magenta);
-    color_list->addItem( pm, tr("Magenta") );
+    color_list_->addItem( pm, tr("Magenta") );
     pm.fill(Qt::yellow);
-    color_list->addItem( pm, tr("Yellow") );
+    color_list_->addItem( pm, tr("Yellow") );
     pm.fill(Qt::black);
-    color_list->addItem( pm, tr("Black") );
+    color_list_->addItem( pm, tr("Black") );
     pm.fill(Qt::white);
-    color_list->addItem( pm, tr("White") );
+    color_list_->addItem( pm, tr("White") );
 
-    selected.red = static_cast<unsigned char>( settings.value("Analysis/R"
-                                               + QString::number(id_this), 128).toInt() );
-    selected.green = static_cast<unsigned char>( settings.value("Analysis/G"
-                                                 + QString::number(id_this), 0).toInt() );
-    selected.blue = static_cast<unsigned char>( settings.value("Analysis/B"
-                                                + QString::number(id_this), 255).toInt() );
+    selected_.red = static_cast<unsigned char>( settings.value("Analysis/R"
+                                               + QString::number(id_this_), 128).toInt() );
+    selected_.green = static_cast<unsigned char>( settings.value("Analysis/G"
+                                                 + QString::number(id_this_), 0).toInt() );
+    selected_.blue = static_cast<unsigned char>( settings.value("Analysis/B"
+                                                + QString::number(id_this_), 255).toInt() );
 
-    pm.fill( toQColor(selected) );
-    color_list->addItem( pm, tr("Selected") );
+    pm.fill( toQColor(selected_) );
+    color_list_->addItem( pm, tr("Selected") );
 
-    color_list->setCurrentIndex( settings.value("Analysis/combo"
-                                                +QString::number(id_this), 0).toInt() );
+    color_list_->setCurrentIndex( settings.value("Analysis/combo"
+                                                +QString::number(id_this_), 0).toInt() );
 
     ///////////////////////////////////////
 
     QPushButton* color_select = new QPushButton( tr("Select") );
 
     QFormLayout* form = new QFormLayout;
-    form->addRow(tr("List from :"), color_list);
+    form->addRow(tr("List from :"), color_list_);
     form->addRow(tr("<click on image> |"), color_select);
 
     QGroupBox* color_group = new QGroupBox( tr("Color") + " "
-                                            + QString::number(id_this) );
+                                            + QString::number(id_this_) );
     color_group->setLayout(form);
 
-    noise_sp = new QSpinBox;
-    noise_sp->setSingleStep(1);
-    noise_sp->setMinimum(0);
-    noise_sp->setMaximum(100);
-    noise_sp->setSuffix(tr(" %"));
-    noise_sp->setValue(0);
+    noise_sp_ = new QSpinBox;
+    noise_sp_->setSingleStep(1);
+    noise_sp_->setMinimum(0);
+    noise_sp_->setMaximum(100);
+    noise_sp_->setSuffix(tr(" %"));
+    noise_sp_->setValue(0);
     QFormLayout* noise_layout = new QFormLayout;
-    noise_layout->addRow("noise =", noise_sp);
+    noise_layout->addRow("noise =", noise_sp_);
 
     QVBoxLayout* this_layout = new QVBoxLayout;
-    this_layout->addWidget(text_list_length);
+    this_layout->addWidget(text_list_length_);
     this_layout->addWidget(img_group);
     this_layout->addWidget(color_group);
     this_layout->addLayout(noise_layout);
 
     setLayout(this_layout);
 
-    last_directory_used = settings.value("Main/Name/last_directory_used",
+    last_directory_used_ = settings.value("Main/Name/last_directory_used",
                                          QDir().homePath()).toString();
 
-    name_filters << "*.bmp"
+    name_filters_ << "*.bmp"
                     //<< "*.dcm"
                  << "*.gif"
                  << "*.jpg" << "*.jpeg" << "*.mng"
@@ -179,14 +178,14 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
                  << "*.ppm" << "*.svg" << "*.svgz"
                  << "*.tiff" << "*.tif" << "*.xbm" << "*.xpm";
 
-    name_filters.removeDuplicates();
+    name_filters_.removeDuplicates();
 
-    imageView->setListener(this);
+    imageView_->setListener(this);
 
-    connect(open_button, &QPushButton::clicked,
+    connect(open_button_, &QPushButton::clicked,
             this, &AnalysisWidget::open_filename);
 
-    connect(color_list,
+    connect(color_list_,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &AnalysisWidget::refresh_rgb);
 
@@ -199,44 +198,44 @@ AnalysisWidget::AnalysisWidget(QWidget *parent) :
     connect(this,   &AnalysisWidget::change_list,
             analysisWindow, &AnalysisWindow::check_lists);
 
-    connect(noise_sp,
+    connect(noise_sp_,
             QOverload<int>::of(&QSpinBox::valueChanged),
             this, &AnalysisWidget::refresh_img_noise);
 }
 
 void AnalysisWidget::open_filename()
 {
-    absolute_name = QFileDialog::getOpenFileName(this,
-                                                 tr("Open File") + " " + QString::number(id_this),
-                                                 last_directory_used,
-                                                 tr("Image Files (%1)").arg(name_filters.join(" ")));
+    absolute_name_ = QFileDialog::getOpenFileName(this,
+                                                 tr("Open File") + " " + QString::number(id_this_),
+                                                 last_directory_used_,
+                                                 tr("Image Files (%1)").arg(name_filters_.join(" ")));
     open_img();
 }
 
 void AnalysisWidget::open_img()
 {
-    if( !absolute_name.isEmpty() )
+    if( !absolute_name_.isEmpty() )
     {
-        img = QImage(absolute_name);
-        img_height = img.height();
-        img_width = img.width();
+        img_ = QImage(absolute_name_);
+        img_height_ = img_.height();
+        img_width_ = img_.width();
 
-        if( img.isNull() )
+        if( img_.isNull() )
         {
             QMessageBox::information(this, tr("Opening error - Ofeli"),
-                                     tr("Cannot load %1.").arg(QDir::toNativeSeparators(absolute_name)));
+                                     tr("Cannot load %1.").arg(QDir::toNativeSeparators(absolute_name_)));
             return;
         }
 
-        refresh_rgb( color_list->currentIndex() );
+        refresh_rgb( color_list_->currentIndex() );
 
-        QFileInfo fi(absolute_name);
+        QFileInfo fi(absolute_name_);
         QString name = fi.fileName();
 
         QString string_lists_text;
-        string_lists_text=QString::number(img_width)+"×"
-                +QString::number(img_height);
-        name_label->setText(name +" - "+string_lists_text);
+        string_lists_text=QString::number(img_width_)+"×"
+                +QString::number(img_height_);
+        name_label_->setText(name +" - "+string_lists_text);
     }
 }
 
@@ -244,42 +243,42 @@ void AnalysisWidget::refresh_rgb(int color_list_index)
 {
     if ( color_list_index == ComboBoxColorIndex::SELECTED )
     {
-        rgb = selected;
+        rgb_ = selected_;
     }
     else
     {
-        rgb = get_color(color_list_index);
+        rgb_ = get_color(color_list_index);
     }
 
-    refresh_img_noise( noise_sp->value() );
+    refresh_img_noise( noise_sp_->value() );
 }
 
 void AnalysisWidget::create_list()
 {
-    shape.clear();
+    shape_.clear();
 
     QRgb pix;
 
-    for( int y = 0; y < img_height; ++y )
+    for( int y = 0; y < img_height_; ++y )
     {
-        for( int x = 0; x < img_width; ++x )
+        for( int x = 0; x < img_width_; ++x )
         {
-            pix = img_noise.pixel(x,y);
+            pix = img_noise_.pixel(x,y);
 
-            if( toRgb_uc(pix) == rgb )
+            if( toRgb_uc(pix) == rgb_ )
             {
-                shape.push_back( x, y );
+                shape_.push_back( x, y );
             }
         }
     }
 
-    shape.calculate_centroid();
+    shape_.calculate_centroid();
 
 
-    QString size_str = QString::number(shape.get_points().size());
+    QString size_str = QString::number(shape_.get_points().size());
 
     QString color_str;
-    if( shape.get_points().empty() )
+    if( shape_.get_points().empty() )
     {
         color_str = "<font color=red>";
     }
@@ -289,16 +288,16 @@ void AnalysisWidget::create_list()
     }
 
     QString list_str;
-    if( id_this == 1 )
+    if( id_this_ == 1 )
     {
         list_str = tr("List 1 length = ");
     }
-    else if( id_this == 2 )
+    else if( id_this_ == 2 )
     {
         list_str = tr("List 2 length = ");
     }
 
-    text_list_length->setText( color_str +
+    text_list_length_->setText( color_str +
                                list_str  +
                                size_str    );
 
@@ -307,32 +306,32 @@ void AnalysisWidget::create_list()
 
 void AnalysisWidget::refresh_img_noise(int noise_percent)
 {
-    if ( !img.isNull() )
+    if ( !img_.isNull() )
     {
-        img_noise = img;
+        img_noise_ = img_;
 
         std::random_device rd;
         std::mt19937 gen( rd() );
         std::bernoulli_distribution proba_distri{ float(noise_percent) / 100.f };
 
-        QColor color( int(rgb.red),
-                      int(rgb.green),
-                      int(rgb.blue) );
+        QColor color( int(rgb_.red),
+                      int(rgb_.green),
+                      int(rgb_.blue) );
 
         QRgb rgb_color = color.rgb();
 
-        for( int y = 0; y < img_height; ++y )
+        for( int y = 0; y < img_height_; ++y )
         {
-            for( int x = 0; x < img_width; ++x )
+            for( int x = 0; x < img_width_; ++x )
             {
                 if ( proba_distri(gen) )
                 {
-                    img_noise.setPixel(x, y, rgb_color);
+                    img_noise_.setPixel(x, y, rgb_color);
                 }
             }
         }
 
-        imageView->setImage(img_noise);
+        imageView_->setImage(img_noise_);
 
         create_list();
     }
@@ -341,15 +340,15 @@ void AnalysisWidget::refresh_img_noise(int noise_percent)
 void AnalysisWidget::onColorPicked(const QColor& color,
                                    const QPoint& /*imagePos*/)
 {
-    if ( img.isNull() )
+    if ( img_.isNull() )
         return;
 
-    selected = toRgb_uc( color );
+    selected_ = toRgb_uc( color );
 
     QPixmap pm(12,12);
-    pm.fill( toQColor(selected) );
-    color_list->setItemIcon(ComboBoxColorIndex::SELECTED, pm);
-    color_list->setCurrentIndex(ComboBoxColorIndex::SELECTED);
+    pm.fill( toQColor(selected_) );
+    color_list_->setItemIcon(ComboBoxColorIndex::SELECTED, pm);
+    color_list_->setCurrentIndex(ComboBoxColorIndex::SELECTED);
 
     refresh_rgb(ComboBoxColorIndex::SELECTED);
 }
@@ -359,11 +358,11 @@ void AnalysisWidget::get_list_color()
     QColor color;
     QString title_str;
 
-    if( id_this == 1 )
+    if( id_this_ == 1 )
     {
         title_str = tr("Select list 1 color");
     }
-    else if( id_this == 2 )
+    else if( id_this_ == 2 )
     {
         title_str = tr("Select list 2 color");
     }
@@ -373,13 +372,13 @@ void AnalysisWidget::get_list_color()
 
     if( color.isValid() )
     {
-        selected = toRgb_uc( color );
+        selected_ = toRgb_uc( color );
 
         QPixmap pm(12,12);
         pm.fill(color);
-        color_list->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
+        color_list_->setItemIcon(ComboBoxColorIndex::SELECTED,pm);
 
-        color_list->setCurrentIndex(ComboBoxColorIndex::SELECTED);
+        color_list_->setCurrentIndex(ComboBoxColorIndex::SELECTED);
 
         refresh_rgb( int(ComboBoxColorIndex::SELECTED) );
     }
@@ -389,17 +388,17 @@ void AnalysisWidget::save_settings() const
 {
     QSettings settings;
 
-    settings.setValue("Main/Name/last_directory_used", last_directory_used);
+    settings.setValue("Main/Name/last_directory_used", last_directory_used_);
 
-    settings.setValue( "Analysis/combo"+QString::number(id_this),
-                       color_list->currentIndex() );
+    settings.setValue( "Analysis/combo"+QString::number(id_this_),
+                       color_list_->currentIndex() );
 
-    settings.setValue( "Analysis/R"+QString::number(id_this),
-                       int(selected.red) );
-    settings.setValue( "Analysis/G"+QString::number(id_this),
-                       int(selected.green) );
-    settings.setValue( "Analysis/B"+ QString::number(id_this),
-                       int(selected.blue) );
+    settings.setValue( "Analysis/R"+QString::number(id_this_),
+                       int(selected_.red) );
+    settings.setValue( "Analysis/G"+QString::number(id_this_),
+                       int(selected_.green) );
+    settings.setValue( "Analysis/B"+ QString::number(id_this_),
+                       int(selected_.blue) );
 }
 
 }

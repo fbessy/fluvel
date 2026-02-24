@@ -43,7 +43,7 @@ namespace ofeli_app
 {
 
 KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent) :
-    QSpinBox(parent), previous_result(QValidator::Acceptable)
+    QSpinBox(parent) 
 {
     setSuffix(" × ");
 
@@ -107,7 +107,7 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
         }
         else if( result == QValidator::Invalid )
         {
-            if( previous_result == QValidator::Acceptable )
+            if( previous_result_ == QValidator::Acceptable )
             {
                 const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:green");
             }
@@ -124,7 +124,7 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
 
     if( result != QValidator::Invalid )
     {
-        const_cast<KernelSizeSpinBox*>(this)->previous_result = result;
+        const_cast<KernelSizeSpinBox*>(this)->previous_result_ = result;
     }
 
     return result;

@@ -52,8 +52,8 @@ namespace ofeli_ip
 //! Specific configuration for region based active contour
 struct RegionConfig
 {
-    static constexpr int default_lambda_in  = 1;
-    static constexpr int default_lambda_out = 1;
+    static constexpr int kDefaultLambdaIn  = 1;
+    static constexpr int kDefaultLambdaOut = 1;
 
     //! Weight of the inside homogeneity criterion in the Chan-Vese model
     //! (called lambda 1 in the article "Active contour without edges.").
@@ -72,8 +72,8 @@ struct RegionConfig
 
     //! Default constructor.
     RegionConfig() :
-        lambda_in(default_lambda_in),
-        lambda_out(default_lambda_out)
+        lambda_in(kDefaultLambdaIn),
+        lambda_out(kDefaultLambdaOut)
     {
     }
 
@@ -170,14 +170,14 @@ private :
     int average_in_;
 
     //! Sum of the intensities or grey-levels of the whole image's pixels.
-    int64_t sum_total_;
+    int64_t sum_total_{0};
     //! Number of pixels or bytes of #img_data.
     const int64_t pxl_nbr_total_;
 
     //! Sum of the intensities or grey-levels of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    int64_t sum_out_;
+    int64_t sum_out_{0};
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    int64_t pxl_nbr_out_;
+    int64_t pxl_nbr_out_{0};
 };
 
 template<typename T>
@@ -188,8 +188,7 @@ RegionAc::RegionAc(ImageSpan image,
     : ActiveContour(std::forward<T>(initial_contour), general_config),
     image_(image),
     region_config_(region_config),
-    sum_total_(0), pxl_nbr_total_(image.size()),
-    sum_out_(0), pxl_nbr_out_(0)
+     pxl_nbr_total_(image.size()) 
 {
     assert( image.width()  == cd_.phi().width() &&
             image.height() == cd_.phi().height()   );

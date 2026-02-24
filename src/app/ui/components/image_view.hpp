@@ -122,35 +122,35 @@ private:
 
     QImage darkenImage(const QImage& image);
 
-    QGraphicsScene*        scene = nullptr;
+    QGraphicsScene*        scene_ = nullptr;
     QGraphicsItemGroup* contentRoot_ = nullptr;
-    QGraphicsPixmapItem*  pixmapItem = nullptr;
+    QGraphicsPixmapItem*  pixmapItem_ = nullptr;
 
-    bool autoFitEnabled = true;
+    bool autoFitEnabled_ = true;
 
     // --- Zoom / Pan ---
-    const double minZoom = 0.1;
-    const double maxZoom = 20.0;
+    const double minZoom_ = 0.1;
+    const double maxZoom_ = 20.0;
 
     // --- Fullscreen ---
-    bool isFullScreenMode = false;
-    QRect normalGeometry;
-    Qt::WindowFlags normalWindowFlags;
+    bool isFullScreenMode_ = false;
+    QRect normalGeometry_;
+    Qt::WindowFlags normalWindowFlags_;
 
     // --- Throttling ---
-    QImage pendingFrame;
-    bool hasPendingFrame = false;
+    QImage pendingFrame_;
+    bool hasPendingFrame_ = false;
 
-    QElapsedTimer displayTimer;
-    int minDisplayIntervalMs = 0;
+    QElapsedTimer displayTimer_;
+    int minDisplayIntervalMs_ = 0;
 
-    QTimer* throttleTimer = nullptr;
+    QTimer* throttleTimer_ = nullptr;
 
-    QImage lastDisplayedImage;
+    QImage lastDisplayedImage_;
 
     qint64 lastReceiveTs_;
 
-    ImageViewInteraction* m_interaction = nullptr;
+    ImageViewInteraction* m_interaction_ = nullptr;
     ImageViewListener*        listener_ = nullptr;
 
     DisplayConfig displayConfig_;

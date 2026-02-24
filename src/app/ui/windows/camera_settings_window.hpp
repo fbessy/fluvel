@@ -37,14 +37,14 @@ private:
     void setupUiDownscaleGb();
     void updateUIFromConfig();
 
-    QDialogButtonBox* dial_buttons;
-    QTabWidget* tabs;
-    AlgoSettingsWidget* algoWidget;
-    QSpinBox* phases_sb;
+    QDialogButtonBox* dial_buttons_;
+    QTabWidget* tabs_;
+    AlgoSettingsWidget* algoWidget_;
+    QSpinBox* phases_sb_;
 
-    QGroupBox* downscale_gb;
-    QComboBox* downscale_factor_cb;
-    QCheckBox* filter_cb;
+    QGroupBox* downscale_gb_;
+    QComboBox* downscale_factor_cb_;
+    QCheckBox* filter_cb_;
 
     VideoSessionSettings& config_;
 };

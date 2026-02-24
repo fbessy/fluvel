@@ -35,23 +35,23 @@ private:
     void updateWindowLocked(qint64 nowNs);
 
 private:
-    QMutex mutex;
+    QMutex mutex_;
 
     // compteurs fenêtre courante
-    quint64 inputFrames;
-    quint64 processedFrames;
-    quint64 displayedFrames;
-    quint64 droppedFrames;
+    quint64 inputFrames_;
+    quint64 processedFrames_;
+    quint64 displayedFrames_;
+    quint64 droppedFrames_;
 
     // latence fenêtre
-    double latencySumMs;
-    double latencyMaxMs;
+    double latencySumMs_;
+    double latencyMaxMs_;
 
     // timestamps
-    qint64 windowStartNs;
+    qint64 windowStartNs_;
 
     // snapshot précédent (pour affichage stable)
-    Snapshot lastSnapshot;
+    Snapshot lastSnapshot_;
 };
 
 }
