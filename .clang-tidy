@@ -12,7 +12,12 @@ WarningsAsErrors: ''
 HeaderFilterRegex: 'src/.*'
 
 CheckOptions:
+
   # === Naming rules ===
+
+  # Namespaces → lower_case
+  - key: readability-identifier-naming.NamespaceCase
+    value: lower_case
 
   # Classes → PascalCase
   - key: readability-identifier-naming.ClassCase
@@ -24,6 +29,14 @@ CheckOptions:
 
   # Enums → PascalCase
   - key: readability-identifier-naming.EnumCase
+    value: PascalCase
+
+  # Enum values → PascalCase (Qt-style)
+  - key: readability-identifier-naming.EnumConstantCase
+    value: PascalCase
+
+  # Type aliases (using / typedef) → PascalCase
+  - key: readability-identifier-naming.TypeAliasCase
     value: PascalCase
 
   # Functions → camelCase
@@ -42,19 +55,19 @@ CheckOptions:
   - key: readability-identifier-naming.ParameterCase
     value: camelCase
 
-  # Membres privés → camelCase + trailing underscore
+  # Membres privés → camelCase_
   - key: readability-identifier-naming.PrivateMemberCase
     value: camelCase
   - key: readability-identifier-naming.PrivateMemberSuffix
     value: _
 
-  # Membres protégés → pareil
+  # Membres protégés → camelCase_
   - key: readability-identifier-naming.ProtectedMemberCase
     value: camelCase
   - key: readability-identifier-naming.ProtectedMemberSuffix
     value: _
 
-  # Membres publics → camelCase sans underscore
+  # Membres publics → camelCase
   - key: readability-identifier-naming.PublicMemberCase
     value: camelCase
 
@@ -63,3 +76,7 @@ CheckOptions:
     value: k
   - key: readability-identifier-naming.GlobalConstantCase
     value: CamelCase
+
+  # Macros → UPPER_CASE
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
