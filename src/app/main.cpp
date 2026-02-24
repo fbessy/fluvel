@@ -182,7 +182,6 @@ int main( int argc, char* argv[] )
     appIcon.addFile(":/icons/Ofeli_256.png", QSize(256,256));
 
     QApplication::setWindowIcon(appIcon);
-    qputenv("QT_QPA_PLATFORMTHEME", "kde");
 
     std::unique_ptr<QMainWindow> root;
 

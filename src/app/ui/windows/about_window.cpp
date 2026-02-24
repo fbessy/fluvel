@@ -69,7 +69,7 @@ AboutWindow::AboutWindow(QWidget* parent) :
     QLabel* name_label = new QLabel;
     name_label->setText("<b>Ofeli</b>");
     QFont font1;
-    font1.setPointSize(24);
+    font1.setPointSize(22);
     font1.setBold(true);
     name_label->setFont(font1);
     name_label->setAlignment(Qt::AlignCenter);
@@ -89,9 +89,11 @@ AboutWindow::AboutWindow(QWidget* parent) :
 
     QLabel* years_label = new QLabel;
     QFont font3;
-    font3.setPointSize(12);
+    font3.setPointSize(9);
     years_label->setFont(font3);
-    years_label->setText("2010-2025");
+    years_label->setText("© 2010–2015, 2024–2026"
+                         "\nFabien Bessy"
+                         "\nLicensed under CeCILL v2.1");
     years_label->setAlignment(Qt::AlignCenter);
     years_label->setTextInteractionFlags(Qt::TextSelectableByMouse
                                          | Qt::LinksAccessibleByMouse
@@ -117,11 +119,11 @@ AboutWindow::AboutWindow(QWidget* parent) :
         ( language == Language::System &&
           locale == "fr" ) )
     {
-        txt_file = QString(":/licenses/license_fr.txt");
+        txt_file = QString(":/licenses/Licence_CeCILL_V2.1-fr.txt");
     }
     else
     {
-        txt_file = QString(":/licenses/license_en.txt");
+        txt_file = QString(":/licenses/Licence_CeCILL_V2.1-en.txt");
     }
 
     QFile file(txt_file);
@@ -175,31 +177,63 @@ AboutWindow::AboutWindow(QWidget* parent) :
     //////         Right Part        //////
     ///////////////////////////////////////
 
-    QLabel* description_label = new QLabel;
-    description_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    description_label->setTextInteractionFlags(Qt::TextSelectableByMouse
+    QLabel* overview_label = new QLabel;
+    overview_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    overview_label->setTextInteractionFlags(Qt::TextSelectableByMouse
                                                | Qt::LinksAccessibleByMouse
                                                | Qt::LinksAccessibleByKeyboard);
 
-    description_label->setOpenExternalLinks(true);
-    description_label->setWordWrap(true);
+    overview_label->setOpenExternalLinks(true);
+    overview_label->setWordWrap(true);
 
-    description_label->setText(tr("<p>Ofeli, as an acronym for <b>O</b>pen, <b>F</b>ast and <b>E</b>fficient <b>L</b>evel set "
-                                 "<b>I</b>mplementation, demonstrates how to operate an image "
-                                 "segmentation algorithm of Y. Shi and W. C. Karl <b>[1]</b>, using a "
-                                 "discrete approach for the approximation of level-set-based "
-                                 "curve evolution (implicit active contours).</p>"
-                                 "<p>This is a fast algorithm without the need "
-                                 "of solving partial differential equations (PDE) while preserving the "
-                                 "advantages of level set methods, such as the automatic handling of "
-                                 "topological changes. Considerable speedups (×100) have been "
-                                 "demonstrated as compared to PDE-based narrow band level-set implementations.</p>"
-                                 "<hr>"
-                                 "<p><b>[1]</b> Y. Shi, W. C. Karl - <a href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_MGIwYmUwYzctYTRkMC00ODMwLWI3YmUtNTFjYThlMTBkOTIy&hl=en&authkey=CPT1xeYN'>A real-time algorithm for the approximation of level-set based curve evolution</a> - <i>IEEE Trans. Image Processing</i>, vol. 17, no. 5, May 2008</p>"
-                                 "<p><b>[2]</b> L. Suta, F. Bessy, C. Veja, M-F Vaida - <a href=':/docs/application_to_plant_recognition.pdf'>Active contours: Application to plant recognition - ICCP"));
+    overview_label->setText(tr(
+        "<p><b>Ofeli</b> is a research-oriented image segmentation application "
+        "designed for fast and efficient experimentation with level-set active contour methods.</p>"
 
-    QVBoxLayout* description_layout = new QVBoxLayout;
-    description_layout->addWidget(description_label);
+        "<p>The software integrates real-time image processing, video stream handling, "
+        "image pre-processing tools, and quantitative evaluation metrics such as "
+        "Hausdorff distance for segmentation analysis.</p>"
+
+        "<p>It provides an interactive environment for testing and analyzing "
+        "discrete level-set implementations in both static images and dynamic video scenarios.</p>"
+
+        "<p>Ofeli focuses on performance, reproducibility, and clarity, "
+        "making it suitable for research, teaching, and experimental validation.</p>"
+        ));
+
+    QVBoxLayout* overview_layout = new QVBoxLayout;
+    overview_layout->addWidget(overview_label);
+
+
+
+    QLabel* scientific_label = new QLabel;
+    scientific_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    scientific_label->setTextInteractionFlags(Qt::TextSelectableByMouse
+                                            | Qt::LinksAccessibleByMouse
+                                            | Qt::LinksAccessibleByKeyboard);
+
+    scientific_label->setOpenExternalLinks(true);
+    scientific_label->setWordWrap(true);
+
+    scientific_label->setText(tr(
+        "<p><b>Scientific Background</b></p>"
+
+        "<p>Ofeli integrates several fundamental methods in image segmentation, "
+        "including discrete level-set approximation (Shi & Karl, 2008), "
+        "region-based active contours (Chan & Vese, 2001), "
+        "anisotropic diffusion filtering (Perona & Malik, 1990), "
+        "and quantitative evaluation using the Hausdorff distance.</p>"
+
+        "<p>These methods provide a balance between computational efficiency, "
+        "topological flexibility, and rigorous segmentation assessment.</p>"
+        ));
+
+    QVBoxLayout* scientific_layout = new QVBoxLayout;
+    scientific_layout->addWidget(scientific_label);
+
+
+
+
 
 
     QLabel* author_label = new QLabel;
@@ -211,47 +245,39 @@ AboutWindow::AboutWindow(QWidget* parent) :
     author_label->setOpenExternalLinks(true);
     author_label->setWordWrap(true);
 
-    author_label->setText(tr("<p>This application has been developed by Fabien Bessy, under the supervision of Julien Olivier "
-                                 "and Romuald Boné, during an internship in the <i>pattern recognition and image analysis research</i> "
-                                 "<i>team (RFAI-LI)</i> of the <i>François Rabelais University's computer science laboratory</i>, at Tours, "
-                                 "as part of the MSc in medical imaging of the same university, in 2010.</p>"
-                                 "<p>If you have any questions, comments, or suggestions, please contact me via my email "
-                                 "address : <a href='mailto:fabien.bessy@gmail.com'>fabien.bessy@gmail.com</a>.</p>"));
+    author_label->setText(tr(
+        "<p><b>Author</b></p>"
+
+        "<p>Fabien Bessy</p>"
+
+        "<p>Originally developed in 2010 within the Pattern Recognition and "
+        "Image Analysis research team, Laboratory of Computer Science (LIFAT), "
+        "François Rabelais University, Tours, "
+        "as part of the MSc in Medical Imaging.</p>"
+
+        "<p>The project has been modernized and extended in 2024–2026.</p>"
+
+        "<p>Contact: "
+        "<a href='mailto:fabien.bessy@gmail.com'>fabien.bessy@gmail.com</a></p>"
+        ));
 
     QVBoxLayout* author_layout = new QVBoxLayout;
     author_layout->addWidget(author_label);
 
 
-    QLabel* acknowledgments_label = new QLabel;
-    acknowledgments_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    acknowledgments_label->setTextInteractionFlags(Qt::TextSelectableByMouse
-                                                   | Qt::LinksAccessibleByMouse
-                                                   | Qt::LinksAccessibleByKeyboard);
-    acknowledgments_label->setOpenExternalLinks(true);
-    acknowledgments_label->setWordWrap(true);
-
-    acknowledgments_label->setText(tr("<p>Thanks to :</p>"
-                                 "<p>- J. Olivier, R. Boné, J-M. Girault, F. Amed, A. Lissy, "
-                                 "C. Rouzière, L. Suta.</p>"
-                                 "<p>- <i>pattern recognition and image analysis research team</i>, <i>computer science laboratory</i>, "
-                                 "<i>François Rabelais University</i>.</p>"
-                                 "<p>- students and professors of the MSc in medical imaging.</p>"));
-
-    QVBoxLayout* acknowledgments_layout = new QVBoxLayout;
-    acknowledgments_layout->addWidget(acknowledgments_label);
 
 
     QWidget* page1 = new QWidget;
     QWidget* page2 = new QWidget;
     QWidget* page3 = new QWidget;
-    page1->setLayout(description_layout);
-    page2->setLayout(author_layout);
-    page3->setLayout(acknowledgments_layout);
+    page1->setLayout(overview_layout);
+    page2->setLayout(scientific_layout);
+    page3->setLayout(author_layout);
 
     QTabWidget* tabs = new QTabWidget;
-    tabs->addTab( page1, tr("Description") );
-    tabs->addTab( page2, tr("Author") );
-    tabs->addTab( page3, tr("Acknowledgments") );
+    tabs->addTab(page1, tr("Overview"));
+    tabs->addTab(page2, tr("Scientific"));
+    tabs->addTab(page3, tr("Author"));
 
     ///////////////////////////////////////
     ///////////////////////////////////////

@@ -1,0 +1,28 @@
+{
+  "id": "org.ofeli.App",
+  "runtime": "org.kde.Platform",
+  "runtime-version": "6.9",
+  "sdk": "org.kde.Sdk",
+  "command": "Ofeli",
+
+  "finish-args": [
+  "--share=ipc",
+  "--socket=wayland",
+  "--socket=fallback-x11",
+  "--device=dri",
+  "--device=all"
+  ],
+
+  "modules": [
+    {
+      "name": "ofeli",
+      "buildsystem": "cmake-ninja",
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
+        }
+      ]
+    }
+  ]
+}

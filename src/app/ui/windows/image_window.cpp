@@ -104,6 +104,9 @@ void ImageWindow::setupUi()
 
     settingsButton->setIcon( settingsIcon );
 
+    //settingsButton->setAutoDefault(false);
+    //settingsButton->setFlat(true);
+
     // Widget central
     QWidget* central = new QWidget(this);
 

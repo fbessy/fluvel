@@ -250,8 +250,8 @@ set(APP_RESOURCES
 
     ${OFELI_RESOURCES_DIR}/docs/application_to_plant_recognition.pdf
 
-    ${OFELI_RESOURCES_DIR}/licenses/license_en.txt
-    ${OFELI_RESOURCES_DIR}/licenses/license_fr.txt
+    ${OFELI_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-en.txt
+    ${OFELI_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-fr.txt
 )
 
 foreach(res ${APP_RESOURCES})
@@ -354,6 +354,17 @@ target_link_libraries(${target_name} PRIVATE
     ${APP_QT_LIBS}
     ofeli::image_processing
 )
+
+install(TARGETS ${target_name}
+        RUNTIME DESTINATION bin)
+
+if(UNIX AND NOT APPLE)
+install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.ofeli.App.desktop
+        DESTINATION share/applications)
+
+install(FILES ${CMAKE_SOURCE_DIR}/resources/icons/app/org.ofeli.App.svg
+        DESTINATION share/icons/hicolor/scalable/apps)
+endif()
 
 # target_compile_features(my_target PUBLIC cxx_std_23) au lieu de global dans le fichier projet
 # définir par projets chaque prérequis
