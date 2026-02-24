@@ -4,7 +4,62 @@ Checks: >
   performance-*,
   modernize-use-nullptr,
   modernize-use-override,
-  modernize-use-default-member-init
+  modernize-use-default-member-init,
+  readability-identifier-naming
 
 WarningsAsErrors: ''
+
 HeaderFilterRegex: 'src/.*'
+
+CheckOptions:
+  # === Naming rules ===
+
+  # Classes → PascalCase
+  - key: readability-identifier-naming.ClassCase
+    value: PascalCase
+
+  # Structs → PascalCase
+  - key: readability-identifier-naming.StructCase
+    value: PascalCase
+
+  # Enums → PascalCase
+  - key: readability-identifier-naming.EnumCase
+    value: PascalCase
+
+  # Functions → camelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: camelCase
+
+  # Methods → camelCase
+  - key: readability-identifier-naming.MethodCase
+    value: camelCase
+
+  # Variables locales → camelCase
+  - key: readability-identifier-naming.VariableCase
+    value: camelCase
+
+  # Paramètres → camelCase
+  - key: readability-identifier-naming.ParameterCase
+    value: camelCase
+
+  # Membres privés → camelCase + trailing underscore
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: camelCase
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: _
+
+  # Membres protégés → pareil
+  - key: readability-identifier-naming.ProtectedMemberCase
+    value: camelCase
+  - key: readability-identifier-naming.ProtectedMemberSuffix
+    value: _
+
+  # Membres publics → camelCase sans underscore
+  - key: readability-identifier-naming.PublicMemberCase
+    value: camelCase
+
+  # Constantes globales → kConstantCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: k
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: CamelCase
