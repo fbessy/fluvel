@@ -88,7 +88,6 @@ public slots:
     void updateSmoothDisplay();
     void updateTextOverlayVisibility();
     void clearOverlays();
-    void repositionOverlay();
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -109,6 +108,9 @@ private:
 
     void updatePixmap(const QImage& img);
     double getCurrentZoom() const;
+
+    QPoint textPosition() const;
+    void setTextPosition(QPoint position);
 
     void updateContourColors();
     void upscaleItems();

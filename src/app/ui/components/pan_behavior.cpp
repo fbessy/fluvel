@@ -36,8 +36,8 @@ bool PanBehavior::mouseMove(ImageView& view,
     lastPos_ = e->pos();
 
     const qreal zoom = view.transform().m11(); // scale X
-    view.translate(delta.x() / zoom,
-                   delta.y() / zoom);
+    view.translateView(delta.x() / zoom,
+                       delta.y() / zoom);
 
     view.userInteracted();
     e->accept();

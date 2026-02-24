@@ -40,8 +40,6 @@ ImageView::ImageView(const DisplayConfig& displayConfig,
     overlay_ = new OverlayTextItem;
     scene->addItem(overlay_);
     overlay_->setZValue(100.0);
-    overlay_->setPos(10, 10);
-
     overlay_->hide();
 }
 
@@ -209,8 +207,7 @@ void ImageView::updatePixmap(const QImage& img)
 
     if (sizeChanged)
     {
-        if ( overlay_ )
-            overlay_->setPos(mapToScene(QPoint(0, 0)) + QPointF(10, 10));
+        setTextPosition( { 10, 20 } );
 
         if ( l_out_ && l_in_ )
             updateDisplayWithConfig();
@@ -227,12 +224,20 @@ double ImageView::currentZoom() const
 
 void ImageView::scaleView(double sx, double sy)
 {
+    const QPoint overlayPosition = textPosition();
+
     scale(sx, sy);
+
+    setTextPosition(overlayPosition);
 }
 
 void ImageView::translateView(double dx, double dy)
 {
+    const QPoint overlayPosition = textPosition();
+
     translate(dx, dy);
+
+    setTextPosition(overlayPosition);
 }
 
 double ImageView::getCurrentZoom() const
@@ -242,6 +247,8 @@ double ImageView::getCurrentZoom() const
 
 void ImageView::toggleFullscreen()
 {
+    const QPoint overlayPosition = textPosition();
+
     if (!isFullScreenMode)
     {
         normalGeometry = window()->geometry();
@@ -258,16 +265,22 @@ void ImageView::toggleFullscreen()
         window()->setGeometry(normalGeometry);
         isFullScreenMode = false;
     }
+
+    setTextPosition(overlayPosition);
 }
 
 void ImageView::applyAutoFit()
 {
+    const QPoint overlayPosition = textPosition();
+
     if (!pixmapItem)
         return;
 
     autoFitEnabled = true;
     resetTransform();
     fitInView(pixmapItem, Qt::KeepAspectRatio);
+
+    setTextPosition(overlayPosition);
 }
 
 void ImageView::userInteracted()
@@ -275,11 +288,37 @@ void ImageView::userInteracted()
     autoFitEnabled = false;
 }
 
+QPoint ImageView::textPosition() const
+{
+    QPoint overlayPosition = { 0, 0 };
+
+    if ( overlay_ )
+    {
+        overlayPosition = mapFromScene(overlay_->pos());
+
+        if (    overlayPosition.x() < 0 || overlayPosition.x() >= width()
+             || overlayPosition.y() < 0 || overlayPosition.y() >= height() )
+        {
+            overlayPosition = { 10, 20 };
+        }
+    }
+
+    return overlayPosition;
+}
+
+void ImageView::setTextPosition(QPoint position)
+{
+    if ( overlay_ )
+        overlay_->setPos(mapToScene(position));
+}
+
 // ------------------------------------------------------------
 // Interaction
 // ------------------------------------------------------------
 void ImageView::wheelEvent(QWheelEvent* event)
 {
+    const QPoint overlayPosition = textPosition();
+
     constexpr double zoomFactor = 1.15;
 
     QPointF scenePosBefore = mapToScene(event->position().toPoint());
@@ -315,14 +354,21 @@ void ImageView::wheelEvent(QWheelEvent* event)
         << " new zoom =" << newZoom
         << "delta =" << delta.x() << delta.y();
 #endif
+
+    setTextPosition(overlayPosition);
 }
 
 void ImageView::resizeEvent(QResizeEvent* event)
 {
+    const QPoint overlayPosition = textPosition();
+
     QGraphicsView::resizeEvent(event);
 
     if (autoFitEnabled)
         applyAutoFit();
+
+
+    setTextPosition(overlayPosition);
 }
 
 void ImageView::setInteraction(ImageViewInteraction* interaction)
@@ -654,15 +700,6 @@ void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
     downscaleConfig_ = downscale;
 
     upscaleItems();
-}
-
-void ImageView::repositionOverlay()
-{
-    if ( !overlay_ )
-        return;
-
-    QRectF visible = mapToScene(viewport()->rect()).boundingRect();
-    overlay_->setPos(visible.topLeft() + QPointF(10, 10));
 }
 
 void ImageView::setText(const QString& text)
