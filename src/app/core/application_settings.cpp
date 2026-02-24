@@ -608,7 +608,7 @@ void ApplicationSettings::resize_initial_phi(int width, int height)
         {
             img = img.scaled( width, height,
                               Qt::IgnoreAspectRatio,
-                              Qt::SmoothTransformation );
+                              Qt::FastTransformation );
 
             emit resizedPhi( img );
         }

@@ -101,7 +101,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     rightPanelToggle = new RightPanelToggleButton;
 
     settingsButton = new QPushButton;
-    settingsButton->setToolTip(tr("Segmentation settings"));
+    settingsButton->setToolTip(tr("Camera session settings"));
     settingsButton->setFlat(true);
     settingsButton->setFocusPolicy(Qt::NoFocus);
 

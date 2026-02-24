@@ -92,7 +92,7 @@ void ImageController::reinitializeWorker()
     computeConfig_.initialPhi = originalInitialPhi_.scaled(downscaledImage_.width(),
                                                            downscaledImage_.height(),
                                                            Qt::IgnoreAspectRatio,
-                                                           Qt::SmoothTransformation);
+                                                           Qt::FastTransformation);
 
     if ( computeConfig_.initialPhi.isNull() )
         return;

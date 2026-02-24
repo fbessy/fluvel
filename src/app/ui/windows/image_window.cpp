@@ -95,7 +95,7 @@ void ImageWindow::setupUi()
     rightPanelToggle = new RightPanelToggleButton;
 
     settingsButton = new QPushButton;
-    settingsButton->setToolTip(tr("Camera session settings"));
+    settingsButton->setToolTip(tr("Image session settings"));
     settingsButton->setFlat(true);
     settingsButton->setFocusPolicy(Qt::NoFocus);
 
