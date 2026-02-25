@@ -77,3 +77,7 @@ Thumbs.db
 *~
 *.swp
 *.swo
+
+# Doxygen generated files
+docs/html/
+docs/latex/
