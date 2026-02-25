@@ -5,7 +5,7 @@
 
 #include "image_view.hpp"
 
-#include <QColor>
+#include <QtGui/qrgb.h>
 #include <QFont>
 #include <QGraphicsItem>
 #include <QPoint>

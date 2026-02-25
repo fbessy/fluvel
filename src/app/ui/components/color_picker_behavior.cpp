@@ -17,11 +17,11 @@ bool ColorPickerBehavior::mousePress(ImageView& view, QMouseEvent* e)
     if (e->button() != button_)
         return false;
 
-    QPoint imgPos = view.imageCoordinatesFromView(e->pos());
+    const QPoint imgPos = view.imageCoordinatesFromView(e->pos());
     if (imgPos.x() < 0)
         return false;
 
-    QColor color = view.pixelColorAt(imgPos);
+    const QColor color = view.pixelColorAt(imgPos);
     if (!color.isValid())
         return false;
 

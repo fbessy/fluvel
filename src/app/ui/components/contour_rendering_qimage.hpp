@@ -12,8 +12,6 @@
 namespace ofeli_app
 {
 
-void get_color(int index, ofeli_ip::Rgb_uc& color);
-
 void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
                       const ofeli_ip::Rgb_uc& color, QImage& img);
 

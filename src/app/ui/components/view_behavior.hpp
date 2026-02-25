@@ -4,9 +4,10 @@
 // view_behavior.hpp
 #pragma once
 
-#include <QMouseEvent>
 #include <QWheelEvent>
 #include <QtCore/Qt>
+
+class QMouseEvent;
 
 namespace ofeli_app
 {

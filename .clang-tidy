@@ -7,7 +7,9 @@ Checks: >
   modernize-use-default-member-init,
   modernize-use-static-cast,
   readability-identifier-naming,
-  -bugprone-narrowing-conversions
+  -bugprone-narrowing-conversions,
+  misc-unused-includes,
+  modernize-use-forward-declaration
 
 WarningsAsErrors: ''
 

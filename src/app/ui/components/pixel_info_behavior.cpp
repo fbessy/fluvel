@@ -6,7 +6,7 @@
 #include "pixel_info_overlay.hpp"
 #include "image_view.hpp"
 
-#include <QColor>
+#include <QtGui/qrgb.h>
 #include <QGraphicsScene>
 #include <QMouseEvent>
 

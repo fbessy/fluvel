@@ -11,7 +11,6 @@
 #include <QElapsedTimer>
 #include <QGraphicsBlurEffect>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QImage>
 #include <QTimer>
@@ -19,6 +18,7 @@
 class QWheelEvent;
 class QMouseEvent;
 class QResizeEvent;
+class QGraphicsScene;
 
 namespace ofeli_app
 {
