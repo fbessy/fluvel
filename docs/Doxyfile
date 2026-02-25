@@ -1,0 +1,25 @@
+PROJECT_NAME           = "Ofeli"
+PROJECT_BRIEF          = "Active contour image processing engine"
+
+OUTPUT_DIRECTORY       = docs
+CREATE_SUBDIRS         = NO
+
+INPUT                  = src
+FILE_PATTERNS          = *.hpp *.cpp
+RECURSIVE              = YES
+
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = NO
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+QUIET                  = NO
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+
+GENERATE_TREEVIEW      = YES
+FULL_PATH_NAMES        = NO
+
+USE_MDFILE_AS_MAINPAGE = README.md
