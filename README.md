@@ -1,4 +1,6 @@
-# Ofeli
+<p align="center">
+  <img src="Ofeli.svg" width="200">
+</p>
 
 Active contour (level-set) image processing engine written in modern C++.
 
@@ -10,7 +12,7 @@ The project is currently under active development.
 
 ---
 
-## Overview
+### Overview
 
 Ofeli implements region-based active contour algorithms operating on
 row-major image buffers. The goal is to provide:
@@ -25,7 +27,7 @@ Qt is used only for visualization and interaction.
 
 ---
 
-## Features
+### Features
 
 - Region-based active contour evolution
 - Row-major raw buffer image processing
@@ -36,7 +38,7 @@ Qt is used only for visualization and interaction.
 
 ---
 
-## Architecture
+### Architecture
 
 The project is organized into:
 
@@ -50,15 +52,15 @@ Visualization and UI components are separated from the core algorithmic logic.
 
 ---
 
-## Build
+### Build
 
-### Requirements
+#### Requirements
 
 - CMake ≥ 3.x
 - Clang (recommended)
 - Qt6 (for UI build)
 
-### Build with CMake
+#### Build with CMake
 
 ```bash
 cmake -S . -B build
