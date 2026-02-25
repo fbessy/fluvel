@@ -38,10 +38,6 @@
 ****************************************************************************/
 
 #include "application_settings.hpp"
-#include "boundary_builder.hpp"
-#include "contour_rendering_qimage.hpp"
-
-#include <utility>
 
 #include <QPainter>
 #include <QSettings>

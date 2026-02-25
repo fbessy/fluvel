@@ -41,13 +41,10 @@
 #define ACTIVE_CONTOUR_HPP
 
 #include <cstddef>
-#include <limits>
-#include <vector>
 
 #include "ac_types.hpp"
 #include "contour_data.hpp"
 #include "point.hpp"
-#include "shape.hpp"
 
 namespace ofeli_ip
 {

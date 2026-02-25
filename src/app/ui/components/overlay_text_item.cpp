@@ -21,8 +21,7 @@ OverlayTextItem::OverlayTextItem(QGraphicsItem* parent)
     font_ = font;
 }
 
-void OverlayTextItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                            QWidget* widget)
+void OverlayTextItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     painter->setRenderHint(QPainter::Antialiasing);
 

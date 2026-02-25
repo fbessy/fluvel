@@ -40,12 +40,9 @@
 #include "filters.hpp"
 
 #include <algorithm>
-#include <chrono> // to generate a seed for the random generator
 #include <cstddef>
-#include <functional> // for function "std::bind" to link a generator and a distribution
 #include <iostream>   // std::cerr
 #include <random>     // random generator and normal/uniform distributions
-
 #include <cmath>   // std::exp
 #include <cstring> // std::memcpy
 

@@ -1,11 +1,9 @@
 #include "active_contour_worker.hpp"
 
-#include "edge_ac.hpp"
 #include "region_ac.hpp"
 #include "region_color_ac.hpp"
 
 #include "algo_stats.hpp"
-#include "contour_rendering_qimage.hpp"
 #include "image_adapters.hpp"
 #include "image_span.hpp"
 
@@ -14,7 +12,6 @@
 #include <QTimer>
 
 #include <cassert>
-#include <cstddef>
 
 namespace ofeli_app
 {

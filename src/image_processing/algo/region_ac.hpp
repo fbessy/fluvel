@@ -43,8 +43,6 @@
 #include "active_contour.hpp"
 #include "image_span.hpp"
 
-#include <iostream>
-
 namespace ofeli_ip
 {
 

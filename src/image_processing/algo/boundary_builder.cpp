@@ -39,7 +39,6 @@
 
 #include <cassert>
 #include <cmath>
-#include <cstddef>
 #include <iostream>
 
 #include "boundary_builder.hpp"
