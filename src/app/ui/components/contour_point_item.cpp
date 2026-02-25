@@ -2,7 +2,6 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "contour_point_item.hpp"
-#include "application_settings.hpp"
 
 #include <QPainter>
 

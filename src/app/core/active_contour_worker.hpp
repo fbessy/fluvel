@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include <QImage>
-#include <QMutex>
-#include <QObject>
-#include <QTimer>
-
 #include "active_contour.hpp"
 #include "algo_stats.hpp"
 #include "common_settings.hpp"
+
+#include <QObject>
+#include <QImage>
+#include <QTimer>
+#include <QMutex>
 
 namespace ofeli_app
 {

@@ -5,9 +5,6 @@
 
 #include "image_view.hpp"
 #include "view_behavior.hpp"
-
-#include <functional>
-
 #include <QColor>
 
 class QMouseEvent;

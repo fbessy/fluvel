@@ -4,9 +4,9 @@
 #pragma once
 
 #include "color.hpp"
-#include "contour_rendering_qimage.hpp"
 #include "image_view_listener.hpp"
 #include "shape.hpp"
+
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE

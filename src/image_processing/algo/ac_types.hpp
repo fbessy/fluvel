@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <limits>
-#include <vector>
-
 #include "contour_data.hpp"
 #include "point_containers.hpp"
 #include "shape.hpp"
+
+#include <limits>
+#include <vector>
 
 namespace ofeli_ip
 {

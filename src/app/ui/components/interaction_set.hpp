@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
+#include "image_view_interaction.hpp"
+#include "view_behavior.hpp"
 
 #include <QtCore/Qt>
 
-#include "image_view_interaction.hpp"
-#include "view_behavior.hpp"
+#include <memory>
+#include <vector>
 
 namespace ofeli_app
 {

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include <QtWidgets>
-
 #include "settings_window.hpp"
 
 #include "application_settings.hpp"
 #include "filters.hpp"
 #include "image_window.hpp"
 #include "kernel_size_spinbox.hpp"
+
+#include <QtWidgets>
 
 namespace ofeli_app
 {
@@ -760,14 +760,8 @@ void SettingsWindow::updateUIFromConfig()
     iteration_filter_spin_->setValue(config_filter.max_itera);
     lambda_spin_->setValue(double(config_filter.lambda));
     kappa_spin_->setValue(double(config_filter.kappa));
-    if (config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION1)
-    {
-        aniso1_radio_->setChecked(true);
-    }
-    else if (config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION2)
-    {
-        aniso2_radio_->setChecked(true);
-    }
+    aniso1_radio_->setChecked(config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION1);
+    aniso2_radio_->setChecked(config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION2);
 
     open_groupbox_->setChecked(config_filter.has_open_filt);
     klength_open_spin_->setValue(config_filter.kernel_open_length);
@@ -865,6 +859,7 @@ void SettingsWindow::default_settings()
     aniso_groupbox_->setChecked(false);
     // AnisoDiff::FUNCTION1
     aniso1_radio_->setChecked(true);
+    aniso2_radio_->setChecked(false);
     iteration_filter_spin_->setValue(10);
     lambda_spin_->setValue(1.0 / 7.0);
     kappa_spin_->setValue(30.0);

@@ -3,11 +3,9 @@
 
 #pragma once
 
-#include <memory>
-
-#include <QPoint>
-
 #include "view_behavior.hpp"
+#include <QPoint>
+#include <memory>
 
 class QMouseEvent;
 

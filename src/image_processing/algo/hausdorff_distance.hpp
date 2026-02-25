@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <vector>
-
 #include "point_containers.hpp"
 #include "shape.hpp"
+
+#include <vector>
 
 namespace ofeli_ip
 {

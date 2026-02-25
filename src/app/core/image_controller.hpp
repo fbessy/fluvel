@@ -5,8 +5,8 @@
 
 #include "active_contour_worker.hpp"
 
-#include <QImage>
 #include <QObject>
+#include <QImage>
 
 namespace ofeli_app
 {

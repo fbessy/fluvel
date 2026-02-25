@@ -3,12 +3,11 @@
 
 #pragma once
 
-#include <cstdint>
-
-#include <vector>
-
 #include "grid2d.hpp"
 #include "image_span.hpp"
+
+#include <cstdint>
+#include <vector>
 
 namespace ofeli_ip
 {

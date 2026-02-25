@@ -3,14 +3,14 @@
 
 #pragma once
 
+#include "image_view.hpp"
+
 #include <QColor>
 #include <QFont>
 #include <QGraphicsItem>
 #include <QPoint>
 #include <QPointF>
 #include <QString>
-
-#include "image_view.hpp"
 
 namespace ofeli_app
 {

@@ -3,12 +3,12 @@
 
 #include "pixel_info_behavior.hpp"
 
+#include "pixel_info_overlay.hpp"
+#include "image_view.hpp"
+
 #include <QColor>
 #include <QGraphicsScene>
 #include <QMouseEvent>
-
-#include "image_view.hpp"
-#include "pixel_info_overlay.hpp"
 
 namespace ofeli_app
 {

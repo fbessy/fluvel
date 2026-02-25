@@ -50,7 +50,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 signals:
-    void updateOverlay(UiShapeInfo uiShape);
+    void updateOverlay(ofeli_app::UiShapeInfo uiShape);
 
 private:
     //////////////////////////////////////////

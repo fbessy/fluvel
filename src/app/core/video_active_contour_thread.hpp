@@ -5,9 +5,10 @@
 
 #include "common_settings.hpp"
 #include "temporal_smoother.hpp"
-#include <QMutex>
-#include <QThread>
+
 #include <QVideoFrame>
+#include <QThread>
+#include <QMutex>
 #include <QWaitCondition>
 
 namespace ofeli_app
@@ -43,7 +44,7 @@ public:
 signals:
     void frameProcessed(qint64 receiveTs, qint64 processTs);
 
-    void frameResultReady(FrameResult result);
+    void frameResultReady(ofeli_app::FrameResult result);
 
     void frameSizeStr(QString str);
 

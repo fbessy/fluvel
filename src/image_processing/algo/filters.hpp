@@ -6,9 +6,9 @@
 namespace ofeli_ip
 {
 
-enum AnisoDiff : unsigned int
+enum AnisoDiff
 {
-    FUNCTION1 = 0,
+    FUNCTION1,
     FUNCTION2
 };
 

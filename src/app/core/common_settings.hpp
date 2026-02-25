@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "active_contour.hpp"
-#include "color.hpp"
-#include "filters.hpp"
 #include "region_color_ac.hpp"
+#include "filters.hpp"
+#include "color.hpp"
+
 #include <QImage>
 
 namespace ofeli_app

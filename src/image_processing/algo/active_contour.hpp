@@ -3,11 +3,11 @@
 
 #pragma once
 
-#include <cstddef>
-
 #include "ac_types.hpp"
 #include "contour_data.hpp"
 #include "point.hpp"
+
+#include <cstddef>
 
 namespace ofeli_ip
 {

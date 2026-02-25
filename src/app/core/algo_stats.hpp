@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include <QColor>
 #include <QString>
+#include <QColor>
+
 #include <vector>
 
 namespace ofeli_app

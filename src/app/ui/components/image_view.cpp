@@ -2,19 +2,18 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "image_view.hpp"
-#include "application_settings.hpp"
 #include "color_adapters.hpp"
 #include "common_settings.hpp"
 #include "frame_clock.hpp"
 #include "image_view_interaction.hpp"
 #include "overlay_text_item.hpp"
 
-#include <cassert>
-
 #include <QMouseEvent>
 #include <QPainter>
 #include <QThread>
 #include <QWheelEvent>
+
+#include <cassert>
 
 namespace ofeli_app
 {

@@ -2,7 +2,9 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "camera_controller.hpp"
+
 #include "application_settings.hpp"
+#include "camera_stats.hpp"
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
 

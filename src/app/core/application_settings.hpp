@@ -5,9 +5,9 @@
 
 #include "common_settings.hpp"
 
-#include <QDir>
-#include <QImage>
 #include <QObject>
+#include <QImage>
+#include <QDir>
 
 namespace ofeli_app
 {

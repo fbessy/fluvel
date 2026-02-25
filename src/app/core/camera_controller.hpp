@@ -3,16 +3,15 @@
 
 #pragma once
 
+#include "video_active_contour_thread.hpp"
+#include "frame_stats_view.hpp"
+
 #include <QCamera>
 #include <QMediaCaptureSession>
 #include <QMediaDevices>
 #include <QObject>
 #include <QTimer>
 #include <QVideoSink>
-
-#include "camera_stats.hpp"
-#include "frame_stats_view.hpp"
-#include "video_active_contour_thread.hpp"
 
 namespace ofeli_app
 {

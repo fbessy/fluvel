@@ -6,8 +6,6 @@
 #include <QColor>
 #include <QWidget>
 
-#include "color.hpp"
-
 class QComboBox;
 class QPushButton;
 

@@ -4,13 +4,13 @@
 #include "algo_settings_widget.hpp"
 #include "application_settings.hpp"
 
-#include <cassert>
-#include <utility>
-
 #include <QComboBox>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QSpinBox>
+
+#include <cassert>
+#include <utility>
 
 namespace ofeli_app
 {

@@ -2,15 +2,14 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "filters.hpp"
+#include "ofeli_math.hpp"
 
 #include <algorithm>
+#include <cmath> // std::exp
 #include <cstddef>
-#include <iostream>   // std::cerr
-#include <random>     // random generator and normal/uniform distributions
-#include <cmath>   // std::exp
-#include <cstring> // std::memcpy
-
-#include "ofeli_math.hpp"
+#include <cstring>  // std::memcpy
+#include <iostream> // std::cerr
+#include <random>   // random generator and normal/uniform distributions
 
 namespace ofeli_ip
 {

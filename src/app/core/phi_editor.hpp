@@ -3,14 +3,11 @@
 
 #pragma once
 
-#include <QImage>
-#include <QObject>
-#include <QRect>
-#include <vector>
-
-#include "active_contour.hpp"
-#include "grid2d.hpp"
 #include "shape_type.hpp"
+
+#include <QObject>
+#include <QImage>
+#include <QRect>
 
 namespace ofeli_app
 {

@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <QObject>
-
-#include "phi_editor.hpp"
 #include "phi_view_model.hpp"
+#include "phi_editor.hpp"
+
+#include <QObject>
 
 namespace ofeli_app
 {
@@ -36,7 +36,7 @@ public:
     void reject();
 
 public slots:
-    void onUpdateOverlay(UiShapeInfo uiShape);
+    void onUpdateOverlay(ofeli_app::UiShapeInfo uiShape);
     void onViewChanged(const QImage& imageSettings);
 
 signals:

@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <QWidget>
-
 #include "phi_editor.hpp"
+
+#include <QWidget>
 
 namespace ofeli_app
 {

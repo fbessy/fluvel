@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include <utility>
-
 #include "image_span.hpp"
+
+#include <utility>
 
 #ifdef OFELI_USE_QT
 #include <QImage>

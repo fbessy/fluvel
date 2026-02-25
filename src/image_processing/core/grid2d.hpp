@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include "point.hpp"
+
 #include <cassert>
 #include <vector>
-
-#include "point.hpp"
 
 namespace ofeli_ip
 {

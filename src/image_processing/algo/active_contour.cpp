@@ -1,13 +1,13 @@
 ﻿// SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include <cassert>
-#include <cstddef>
-#include <cstdlib> // std::abs
-
 #include "active_contour.hpp"
 #include "hausdorff_distance.hpp"
 #include "neighborhood.hpp"
+
+#include <cassert>
+#include <cstddef>
+#include <cstdlib>
 
 namespace ofeli_ip
 {

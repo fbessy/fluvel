@@ -2,13 +2,14 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "analysis_widget.hpp"
+
 #include "analysis_window.hpp"
 #include "color_adapters.hpp"
 #include "color_picker_behavior.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
-
 #include "image_view.hpp"
+
 #include <QtWidgets>
 
 namespace ofeli_app

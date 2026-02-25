@@ -271,7 +271,7 @@ void ApplicationSettings::load_img_session_config()
         settings.value("img/preprocess/has_aniso_diff", ProcessingConfig::kDefaultProcess).toBool();
     fc.aniso_option = ofeli_ip::AnisoDiff(
         settings.value("img/preprocess/aniso_option", ProcessingConfig::kDefaultAnisoOption)
-            .toUInt());
+            .toInt());
     fc.max_itera =
         settings.value("img/preprocess/max_itera", ProcessingConfig::kDefaultMaxItera).toInt();
     fc.lambda = settings.value("img/preprocess/lambda", ProcessingConfig::kDefaultLambda).toFloat();

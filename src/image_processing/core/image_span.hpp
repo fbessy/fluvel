@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include "color.hpp"
+
 #include <cassert>
 #include <cstddef>
 #include <utility>
-
-#include "color.hpp"
 
 namespace ofeli_ip
 {

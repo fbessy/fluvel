@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include "algo_stats.hpp"
+
 #include <QString>
 #include <QWidget>
-
-#include "algo_stats.hpp"
 
 namespace ofeli_app
 {

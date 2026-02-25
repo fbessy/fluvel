@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "image_controller.hpp"
+
 #include "application_settings.hpp"
 #include "contour_adapters.hpp"
 

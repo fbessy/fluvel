@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include <cassert>
-#include <cmath>
-#include <iostream>
-
 #include "boundary_builder.hpp"
 
 #include "ofeli_math.hpp"
 #include "point_containers.hpp"
+
+#include <cassert>
+#include <cmath>
+#include <iostream>
 
 namespace ofeli_ip
 {

@@ -3,6 +3,11 @@
 
 #pragma once
 
+#include "common_settings.hpp"
+#include "contour_point_item.hpp"
+#include "image_view_listener.hpp"
+#include "overlay_text_item.hpp"
+
 #include <QElapsedTimer>
 #include <QGraphicsBlurEffect>
 #include <QGraphicsPixmapItem>
@@ -10,12 +15,6 @@
 #include <QGraphicsView>
 #include <QImage>
 #include <QTimer>
-
-#include "application_settings.hpp"
-#include "common_settings.hpp"
-#include "contour_point_item.hpp"
-#include "image_view_listener.hpp"
-#include "overlay_text_item.hpp"
 
 class QWheelEvent;
 class QMouseEvent;
@@ -76,8 +75,8 @@ public slots:
 
     void showPlaceholder(bool showEffect);
 
-    void applyDisplayConfig(const DisplayConfig& display);
-    void applyDownscaleConfig(const DownscaleConfig& downscale);
+    void applyDisplayConfig(const ofeli_app::DisplayConfig& display);
+    void applyDownscaleConfig(const ofeli_app::DownscaleConfig& downscale);
     void updateFlip();
     void updateSmoothDisplay();
     void updateTextOverlayVisibility();

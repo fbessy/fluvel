@@ -3,14 +3,15 @@
 
 #pragma once
 
+#include "phi_editor.hpp"
+#include "contour_data.hpp"
+#include "point.hpp"
+
 #include <QImage>
 #include <QObject>
 #include <QTimer>
 
 #include <vector>
-
-#include "phi_editor.hpp" // pour PhiEditor
-#include "point.hpp"
 
 namespace ofeli_app
 {

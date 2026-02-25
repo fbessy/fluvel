@@ -3,18 +3,16 @@
 
 #pragma once
 
-#include <QComboBox>
-#include <QLabel>
-#include <QMainWindow>
-#include <QPushButton>
-
-#include "application_settings.hpp"
 #include "camera_controller.hpp"
 #include "camera_settings_window.hpp"
 #include "display_settings_widget.hpp"
 #include "image_view.hpp"
 #include "right_panel_toggle_button.hpp"
-#include "video_active_contour_thread.hpp"
+
+#include <QComboBox>
+#include <QLabel>
+#include <QMainWindow>
+#include <QPushButton>
 
 namespace ofeli_app
 {

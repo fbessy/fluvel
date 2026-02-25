@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include <QLabel>
-#include <QWidget>
-
 #include "camera_stats.hpp"
+
+#include <QWidget>
+#include <QLabel>
 
 namespace ofeli_app
 {
@@ -19,7 +19,7 @@ public:
     explicit CameraOverlayWidget(QWidget* parent = nullptr);
 
 public slots:
-    void setStats(const CameraStats& stats);
+    void setStats(const ofeli_app::CameraStats& stats);
 
 protected:
     void resizeEvent(QResizeEvent* event) override;

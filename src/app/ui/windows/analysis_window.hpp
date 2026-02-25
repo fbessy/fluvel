@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <QDialog>
-#include <QLabel>
-#include <QSpinBox>
-
 #include "analysis_widget.hpp"
 #include "hausdorff_distance.hpp"
 #include "point.hpp"
+
+#include <QDialog>
+#include <QLabel>
+#include <QSpinBox>
 
 namespace ofeli_app
 {

@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "image_settings_controller.hpp"
+
 #include "application_settings.hpp"
 
 namespace ofeli_app

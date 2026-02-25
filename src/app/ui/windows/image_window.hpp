@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <QMainWindow>
-
 #include "about_window.hpp"
 #include "analysis_window.hpp"
 #include "camera_window.hpp"
@@ -14,6 +12,8 @@
 #include "active_contour_worker.hpp"
 #include "display_settings_widget.hpp"
 #include "right_panel_toggle_button.hpp"
+
+#include <QMainWindow>
 
 namespace ofeli_app
 {
