@@ -11,10 +11,9 @@ class ImageViewListener
 {
 public:
     virtual ~ImageViewListener() = default;
-    virtual void onColorPicked(const QColor& color,
-                               const QPoint& imagePos) = 0;
+    virtual void onColorPicked(const QColor& color, const QPoint& imagePos) = 0;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // IMAGE_VIEW_LISTENER_HPP

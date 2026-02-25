@@ -6,6 +6,8 @@ BasedOnStyle: LLVM
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
+IndentAccessModifiers: false
+AccessModifierOffset: -4
 
 # Brace style (Qt / Allman)
 BreakBeforeBraces: Allman
@@ -50,7 +52,7 @@ ReflowComments: true
 IndentCaseLabels: true
 
 # Namespace indentation
-NamespaceIndentation: All
+NamespaceIndentation: None
 
 # Keep empty lines clean
 KeepEmptyLinesAtTheStartOfBlocks: false

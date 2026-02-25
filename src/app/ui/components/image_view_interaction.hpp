@@ -1,8 +1,8 @@
 #ifndef IMAGE_VIEW_INTERACTION_HPP
 #define IMAGE_VIEW_INTERACTION_HPP
 
-#include <QWheelEvent>
 #include <QMouseEvent>
+#include <QWheelEvent>
 
 #include <QtCore/Qt>
 
@@ -16,17 +16,30 @@ class ImageViewInteraction
 public:
     virtual ~ImageViewInteraction() = default;
 
-    virtual bool wheel(ImageView&, QWheelEvent*) { return false; }
-    virtual bool mousePress(ImageView&, QMouseEvent*) { return false; }
-    virtual bool mouseMove(ImageView&, QMouseEvent*) { return false; }
-    virtual bool mouseRelease(ImageView&, QMouseEvent*) { return false; }
-    virtual bool mouseDoubleClick(ImageView&, QMouseEvent*) { return false; }
+    virtual bool wheel(ImageView&, QWheelEvent*)
+    {
+        return false;
+    }
+    virtual bool mousePress(ImageView&, QMouseEvent*)
+    {
+        return false;
+    }
+    virtual bool mouseMove(ImageView&, QMouseEvent*)
+    {
+        return false;
+    }
+    virtual bool mouseRelease(ImageView&, QMouseEvent*)
+    {
+        return false;
+    }
+    virtual bool mouseDoubleClick(ImageView&, QMouseEvent*)
+    {
+        return false;
+    }
 
-    virtual Qt::CursorShape cursorForEvent(
-        const ImageView& /*view*/,
-        bool /*hasImage*/,
-        bool /*isPanRelevant*/,
-        const QMouseEvent* /*event*/) const
+    virtual Qt::CursorShape cursorForEvent(const ImageView& /*view*/, bool /*hasImage*/,
+                                           bool /*isPanRelevant*/,
+                                           const QMouseEvent* /*event*/) const
     {
         return Qt::ArrowCursor;
     }

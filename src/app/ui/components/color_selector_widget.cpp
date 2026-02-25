@@ -1,29 +1,28 @@
 #include "color_selector_widget.hpp"
 
+#include <QColorDialog>
 #include <QComboBox>
-#include <QPushButton>
 #include <QHBoxLayout>
 #include <QPainter>
-#include <QColorDialog>
+#include <QPushButton>
 #include <QSignalBlocker>
 
 namespace ofeli_app
 {
 
-ColorSelectorWidget::ColorSelectorWidget(QWidget* parent,
-                                         QColor initialColor)
+ColorSelectorWidget::ColorSelectorWidget(QWidget* parent, QColor initialColor)
     : QWidget(parent)
 {
     color_cb_ = new QComboBox;
 
-    addColorItem(Qt::red,     tr("Red"));
-    addColorItem(Qt::green,   tr("Green"));
-    addColorItem(Qt::blue,    tr("Blue"));
-    addColorItem(Qt::cyan,    tr("Cyan"));
+    addColorItem(Qt::red, tr("Red"));
+    addColorItem(Qt::green, tr("Green"));
+    addColorItem(Qt::blue, tr("Blue"));
+    addColorItem(Qt::cyan, tr("Cyan"));
     addColorItem(Qt::magenta, tr("Magenta"));
-    addColorItem(Qt::yellow,  tr("Yellow"));
-    addColorItem(Qt::black,   tr("Black"));
-    addColorItem(Qt::white,   tr("White"));
+    addColorItem(Qt::yellow, tr("Yellow"));
+    addColorItem(Qt::black, tr("Black"));
+    addColorItem(Qt::white, tr("White"));
     addColorItem(Qt::transparent, tr("Custom"));
 
     custom_pb_ = new QPushButton(tr("Custom..."));
@@ -34,11 +33,9 @@ ColorSelectorWidget::ColorSelectorWidget(QWidget* parent,
 
     setSelectedColor(initialColor);
 
-    connect(color_cb_,  &QComboBox::currentIndexChanged,
-            this,       &ColorSelectorWidget::onIndexChanged);
+    connect(color_cb_, &QComboBox::currentIndexChanged, this, &ColorSelectorWidget::onIndexChanged);
 
-    connect(custom_pb_, &QPushButton::clicked,
-            this,       &ColorSelectorWidget::onCustomClicked);
+    connect(custom_pb_, &QPushButton::clicked, this, &ColorSelectorWidget::onCustomClicked);
 }
 
 QPixmap ColorSelectorWidget::drawColorSquare(const QColor& color, int size)
@@ -54,12 +51,9 @@ QPixmap ColorSelectorWidget::drawColorSquare(const QColor& color, int size)
     return pm;
 }
 
-void ColorSelectorWidget::addColorItem(const QColor& color,
-                                       const QString& name)
+void ColorSelectorWidget::addColorItem(const QColor& color, const QString& name)
 {
-    color_cb_->addItem(drawColorSquare(color),
-                       name,
-                       color);
+    color_cb_->addItem(drawColorSquare(color), name, color);
 }
 
 QColor ColorSelectorWidget::color() const
@@ -74,9 +68,7 @@ void ColorSelectorWidget::onIndexChanged()
 
 void ColorSelectorWidget::onCustomClicked()
 {
-    QColor chosen = QColorDialog::getColor(color(),
-                                           this,
-                                           tr("Custom color selection"));
+    QColor chosen = QColorDialog::getColor(color(), this, tr("Custom color selection"));
 
     if (!chosen.isValid())
         return;
@@ -119,4 +111,4 @@ void ColorSelectorWidget::setSelectedColor(const QColor& color)
     }
 }
 
-}
+} // namespace ofeli_app

@@ -5,16 +5,17 @@
 #include <utility>
 
 #include <QComboBox>
-#include <QSpinBox>
-#include <QGroupBox>
 #include <QFormLayout>
+#include <QGroupBox>
+#include <QSpinBox>
 
 namespace ofeli_app
 {
 
-AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
-                                       Session session)
-    : QWidget(parent), session_(session), config_(config(session))
+AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent, Session session)
+    : QWidget(parent)
+    , session_(session)
+    , config_(config(session))
 {
     connectivity_cb_ = new QComboBox;
 
@@ -35,7 +36,7 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     Na_spin_->setMaximum(999);
     Na_spin_->setSuffix(tr(" iterations"));
     Na_spin_->setToolTip(tr("Number of iterations of the data-driven evolution (Cycle 1)."));
-    QFormLayout *Na_layout = new QFormLayout;
+    QFormLayout* Na_layout = new QFormLayout;
     Na_layout->addRow("Na =", Na_spin_);
 
     lambda_out_spin_ = new QSpinBox;
@@ -54,16 +55,18 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
 
     auto& config = AppSettings::instance().imgConfig.display;
 
-    QColor RGBout_list( get_QRgb(config.l_out_color) );
-    QColor RGBin_list( get_QRgb(config.l_in_color) );
+    QColor RGBout_list(get_QRgb(config.l_out_color));
+    QColor RGBin_list(get_QRgb(config.l_in_color));
 
-    lambda_layout->addRow("<font color="+RGBout_list.name()+">"+"λout"+"<font color=black>"+" =", lambda_out_spin_);
-    lambda_layout->addRow("<font color="+RGBin_list.name()+">"+"λin"+"<font color=black>"+" =", lambda_in_spin_);
+    lambda_layout->addRow("<font color=" + RGBout_list.name() + ">" + "λout" +
+                              "<font color=black>" + " =",
+                          lambda_out_spin_);
+    lambda_layout->addRow("<font color=" + RGBin_list.name() + ">" + "λin" + "<font color=black>" +
+                              " =",
+                          lambda_in_spin_);
 
     QVBoxLayout* chanvese_layout = new QVBoxLayout;
     chanvese_layout->addLayout(lambda_layout);
-
-
 
     QHBoxLayout* speed_layout = new QHBoxLayout;
     speed_layout->addLayout(chanvese_layout);
@@ -72,11 +75,9 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     color_weights_groupbox_->setFlat(true);
 
     color_space_cb_ = new QComboBox;
-    color_space_cb_->addItem("RGB",
-                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::RGB));
+    color_space_cb_->addItem("RGB", QVariant::fromValue(ofeli_ip::ColorSpaceOption::RGB));
 
-    color_space_cb_->addItem("YUV",
-                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::YUV));
+    color_space_cb_->addItem("YUV", QVariant::fromValue(ofeli_ip::ColorSpaceOption::YUV));
 
     color_space_cb_->addItem("L*a*b* (CIELAB)",
                              QVariant::fromValue(ofeli_ip::ColorSpaceOption::Lab));
@@ -99,8 +100,6 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     gamma_spin_->setMinimum(1);
     gamma_spin_->setMaximum(100000);
 
-
-
     QFormLayout* color_weights_layout = new QFormLayout;
     color_weights_layout->addRow(tr("1st component weight ="), alpha_spin_);
     color_weights_layout->addRow(tr("2nd component weight ="), beta_spin_);
@@ -111,8 +110,6 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     vcolor_layout->addLayout(color_weights_layout);
 
     color_weights_groupbox_->setLayout(vcolor_layout);
-
-
 
     QVBoxLayout* externalspeed_layout = new QVBoxLayout;
 
@@ -138,7 +135,8 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent,
     disk_radius_spin_->setSingleStep(1);
     disk_radius_spin_->setMinimum(1);
     disk_radius_spin_->setMaximum(999);
-    disk_radius_spin_->setToolTip(tr("Radius of the disk-shaped neighborhood used for the majority vote during internal smoothing."));
+    disk_radius_spin_->setToolTip(tr("Radius of the disk-shaped neighborhood used for the "
+                                     "majority vote during internal smoothing."));
 
     QFormLayout* internalspeed_layout = new QFormLayout;
     internalspeed_layout->addRow("Ns =", Ns_spin_);
@@ -173,9 +171,10 @@ void AlgoSettingsWidget::accept()
     config_.acConfig.disk_radius = disk_radius_spin_->value();
 
     config_.regionAcConfig.lambda_out = lambda_out_spin_->value();
-    config_.regionAcConfig.lambda_in  = lambda_in_spin_->value();
+    config_.regionAcConfig.lambda_in = lambda_in_spin_->value();
 
-    config_.regionAcConfig.color_space = color_space_cb_->currentData().value<ofeli_ip::ColorSpaceOption>();
+    config_.regionAcConfig.color_space =
+        color_space_cb_->currentData().value<ofeli_ip::ColorSpaceOption>();
 
     config_.regionAcConfig.weights.c1 = alpha_spin_->value();
     config_.regionAcConfig.weights.c2 = beta_spin_->value();
@@ -185,38 +184,38 @@ void AlgoSettingsWidget::accept()
 void AlgoSettingsWidget::reject()
 {
     int index = connectivity_cb_->findData(QVariant::fromValue(config_.connectivity));
-    if ( index >= 0 )
-        connectivity_cb_->setCurrentIndex( index );
+    if (index >= 0)
+        connectivity_cb_->setCurrentIndex(index);
 
-    Na_spin_->setValue( config_.acConfig.Na );
-    Ns_spin_->setValue( config_.acConfig.Ns );
-    internalspeed_groupbox_->setChecked( config_.acConfig.is_cycle2 );
-    disk_radius_spin_->setValue( config_.acConfig.disk_radius );
+    Na_spin_->setValue(config_.acConfig.Na);
+    Ns_spin_->setValue(config_.acConfig.Ns);
+    internalspeed_groupbox_->setChecked(config_.acConfig.is_cycle2);
+    disk_radius_spin_->setValue(config_.acConfig.disk_radius);
 
-    lambda_out_spin_->setValue( config_.regionAcConfig.lambda_out );
-    lambda_in_spin_->setValue( config_.regionAcConfig.lambda_in );
+    lambda_out_spin_->setValue(config_.regionAcConfig.lambda_out);
+    lambda_in_spin_->setValue(config_.regionAcConfig.lambda_in);
 
     index = color_space_cb_->findData(QVariant::fromValue(config_.regionAcConfig.color_space));
-    if ( index >= 0 )
-        color_space_cb_->setCurrentIndex( index );
+    if (index >= 0)
+        color_space_cb_->setCurrentIndex(index);
 
-    alpha_spin_->setValue( config_.regionAcConfig.weights.c1 );
-    beta_spin_->setValue(  config_.regionAcConfig.weights.c2 );
-    gamma_spin_->setValue( config_.regionAcConfig.weights.c3 );
+    alpha_spin_->setValue(config_.regionAcConfig.weights.c1);
+    beta_spin_->setValue(config_.regionAcConfig.weights.c2);
+    gamma_spin_->setValue(config_.regionAcConfig.weights.c3);
 }
 
 AlgoConfig& AlgoSettingsWidget::config(Session session)
 {
     switch (session)
     {
-    case Session::Image:
-        return AppSettings::instance().imgConfig.compute.algo;
+        case Session::Image:
+            return AppSettings::instance().imgConfig.compute.algo;
 
-    case Session::Camera:
-        return AppSettings::instance().camConfig.compute.algo;
+        case Session::Camera:
+            return AppSettings::instance().camConfig.compute.algo;
     }
 
     std::unreachable();
 }
 
-}
+} // namespace ofeli_app

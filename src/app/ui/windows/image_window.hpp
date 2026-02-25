@@ -42,17 +42,18 @@
 
 #include <QMainWindow>
 
-#include "camera_window.hpp"
-#include "analysis_window.hpp"
-#include "settings_window.hpp"
 #include "about_window.hpp"
+#include "analysis_window.hpp"
+#include "camera_window.hpp"
 #include "language_window.hpp"
+#include "settings_window.hpp"
 
-#include "right_panel_toggle_button.hpp"
-#include "display_settings_widget.hpp"
 #include "active_contour_worker.hpp"
+#include "display_settings_widget.hpp"
+#include "right_panel_toggle_button.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 class ImageView;
 class AlgoInfoOverlay;
@@ -85,17 +86,16 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-
     // --- Setup ---
     void setupUi();
     void setupActions();
     void setupConnections();
 
     void updateWindowTitle();
-    void setCurrentFile(const QString &fileName);
+    void setCurrentFile(const QString& fileName);
     void updateRecentFileActions();
     void deleteList();
-    static QString strippedName(const QString &fullFileName);
+    static QString strippedName(const QString& fullFileName);
 
     void updateCameraAction();
     void onStartCameraActionTriggered();
@@ -150,11 +150,10 @@ private:
     // --- Controllers / Workers ---
     ImageController* imageController_ = nullptr;
 
-
     QString m_fileName_;
     QString m_fullPath_;
-    QSize   m_imageSize_;
-    int     m_channels_ = 0;
+    QSize m_imageSize_;
+    int m_channels_ = 0;
 
     QIcon startResumeIcon_;
     QIcon restartIcon_;
@@ -162,6 +161,6 @@ private:
     QIcon settingsIcon_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // IMAGE_WINDOW_H

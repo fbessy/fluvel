@@ -9,7 +9,8 @@
 #include "image_view_interaction.hpp"
 #include "view_behavior.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 /**
  * @brief Aggregates multiple ViewBehavior objects.
@@ -35,9 +36,7 @@ public:
 
     const ViewBehavior* capturingBehavior() const;
 
-    Qt::CursorShape cursor(const ImageView& view,
-                           bool hasImage,
-                           bool isPanRelevant,
+    Qt::CursorShape cursor(const ImageView& view, bool hasImage, bool isPanRelevant,
                            const QMouseEvent* e) const;
 
 protected:
@@ -47,11 +46,8 @@ protected:
     bool mouseRelease(ImageView& view, QMouseEvent* event) override;
     bool mouseDoubleClick(ImageView& view, QMouseEvent* event) override;
 
-    Qt::CursorShape cursorForEvent(
-        const ImageView& view,
-        bool hasImage,
-        bool isPanRelevant,
-        const QMouseEvent* event) const override;
+    Qt::CursorShape cursorForEvent(const ImageView& view, bool hasImage, bool isPanRelevant,
+                                   const QMouseEvent* event) const override;
 
 private:
     std::vector<std::unique_ptr<ViewBehavior>> behaviors_;

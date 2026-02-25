@@ -1,9 +1,9 @@
 #ifndef ACTIVE_CONTOUR_WORKER_HPP
 #define ACTIVE_CONTOUR_WORKER_HPP
 
-#include <QObject>
 #include <QImage>
 #include <QMutex>
+#include <QObject>
 #include <QTimer>
 
 #include "active_contour.hpp"
@@ -15,19 +15,19 @@ namespace ofeli_app
 
 enum class RunMode
 {
-    Interactive,  // UI updates
-    Converge      // full speed without freeze, no UI updates
+    Interactive, // UI updates
+    Converge     // full speed without freeze, no UI updates
 };
 
 enum class WorkerState
 {
     Uninitialized,
-    Initializing,    // prepare active contour
+    Initializing, // prepare active contour
     Ready,
     Suspended,
-    Running,         // timer is active
-    Finished,        // atomic state because the active contour is reset
-                     // to prepare the next run
+    Running,  // timer is active
+    Finished, // atomic state because the active contour is reset
+              // to prepare the next run
 };
 
 class ActiveContourWorker : public QObject
@@ -35,17 +35,15 @@ class ActiveContourWorker : public QObject
     Q_OBJECT
 
 public:
-
     ActiveContourWorker();
 
-    void initialize(const QImage& image,
-                    const ImageComputeConfig& config);
+    void initialize(const QImage& image, const ImageComputeConfig& config);
 
-    void restart();        // reset + start
-    void togglePause();    // suspend / resume
-    void step();           // one iteration
-    void converge();       // converge to the final state and
-                           // display only the final result
+    void restart();     // reset + start
+    void togglePause(); // suspend / resume
+    void step();        // one iteration
+    void converge();    // converge to the final state and
+                        // display only the final result
 
     void finish();
 
@@ -63,7 +61,6 @@ private slots:
     void onTimeout();
 
 private:
-
     void emitContour();
     void updateStats();
 
@@ -97,6 +94,6 @@ private:
     ImageComputeConfig config_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // ACTIVE_CONTOUR_WORKER_HPP

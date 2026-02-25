@@ -1,6 +1,7 @@
 #include "interaction_set.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 void InteractionSet::addBehavior(std::unique_ptr<ViewBehavior> behavior)
 {
@@ -8,60 +9,55 @@ void InteractionSet::addBehavior(std::unique_ptr<ViewBehavior> behavior)
         behaviors_.push_back(std::move(behavior));
 }
 
-bool InteractionSet::wheel(ImageView& view,
-                           QWheelEvent* event)
+bool InteractionSet::wheel(ImageView& view, QWheelEvent* event)
 {
     for (auto& b : behaviors_)
     {
-        if ( b->wheel(view, event) )
+        if (b->wheel(view, event))
             return true;
     }
 
     return false;
 }
 
-bool InteractionSet::mousePress(ImageView& view,
-                                QMouseEvent* event)
+bool InteractionSet::mousePress(ImageView& view, QMouseEvent* event)
 {
     for (auto& b : behaviors_)
     {
-        if ( b->mousePress(view, event) )
+        if (b->mousePress(view, event))
             return true;
     }
 
     return false;
 }
 
-bool InteractionSet::mouseMove(ImageView& view,
-                               QMouseEvent* event)
+bool InteractionSet::mouseMove(ImageView& view, QMouseEvent* event)
 {
     for (auto& b : behaviors_)
     {
-        if ( b->mouseMove(view, event) )
+        if (b->mouseMove(view, event))
             return true;
     }
 
     return false;
 }
 
-bool InteractionSet::mouseRelease(ImageView& view,
-                                  QMouseEvent* event)
+bool InteractionSet::mouseRelease(ImageView& view, QMouseEvent* event)
 {
     for (auto& b : behaviors_)
     {
-        if ( b->mouseRelease(view, event) )
+        if (b->mouseRelease(view, event))
             return true;
     }
 
     return false;
 }
 
-bool InteractionSet::mouseDoubleClick(ImageView& view,
-                                      QMouseEvent* event)
+bool InteractionSet::mouseDoubleClick(ImageView& view, QMouseEvent* event)
 {
     for (auto& b : behaviors_)
     {
-        if ( b->mouseDoubleClick(view, event) )
+        if (b->mouseDoubleClick(view, event))
             return true;
     }
 
@@ -74,14 +70,11 @@ const ViewBehavior* InteractionSet::capturingBehavior() const
     {
         if (b->isCapturing())
             return b.get();
-
     }
     return nullptr;
 }
 
-Qt::CursorShape InteractionSet::cursor(const ImageView& view,
-                                       bool hasImage,
-                                       bool isPanRelevant,
+Qt::CursorShape InteractionSet::cursor(const ImageView& view, bool hasImage, bool isPanRelevant,
                                        const QMouseEvent* e) const
 {
     // 1️⃣ Action en cours → priorité absolue
@@ -106,11 +99,8 @@ Qt::CursorShape InteractionSet::cursor(const ImageView& view,
     return result;
 }
 
-Qt::CursorShape InteractionSet::cursorForEvent(
-    const ImageView& view,
-    bool hasImage,
-    bool isPanRelevant,
-    const QMouseEvent* event) const
+Qt::CursorShape InteractionSet::cursorForEvent(const ImageView& view, bool hasImage,
+                                               bool isPanRelevant, const QMouseEvent* event) const
 {
     return cursor(view, hasImage, isPanRelevant, event);
 }

@@ -26,11 +26,8 @@ public:
         return Qt::ClosedHandCursor;
     }
 
-    Qt::CursorShape availableCursor(
-        bool hasImage,
-        bool isPanRelevant,
-        const ImageView&,
-        const QMouseEvent*) const override
+    Qt::CursorShape availableCursor(bool hasImage, bool isPanRelevant, const ImageView&,
+                                    const QMouseEvent*) const override
     {
         if (hasImage && isPanRelevant)
             return Qt::OpenHandCursor;
@@ -38,7 +35,10 @@ public:
         return Qt::ArrowCursor;
     }
 
-    int priority() const override { return 10; }
+    int priority() const override
+    {
+        return 10;
+    }
 
 private:
     Qt::MouseButton button_;

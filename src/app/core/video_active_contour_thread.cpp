@@ -1,17 +1,18 @@
 #include "video_active_contour_thread.hpp"
 
-#include <cstddef>
-#include "image_adapters.hpp"
-#include "frame_clock.hpp"
+#include "active_contour.hpp"
 #include "application_settings.hpp"
 #include "contour_rendering_qimage.hpp"
-#include "active_contour.hpp"
+#include "frame_clock.hpp"
+#include "image_adapters.hpp"
+#include <cstddef>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
     : QThread(parent)
-    
+
 {
 }
 
@@ -51,8 +52,7 @@ void VideoActiveContourThread::run()
 
         result.receiveTs = fd.receiveTs;
 
-        emit frameProcessed(fd.receiveTs,
-                            result.processTs);
+        emit frameProcessed(fd.receiveTs, result.processTs);
 
         emit frameResultReady(result);
 
@@ -67,18 +67,18 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
     FrameResult fr;
     fr.input = frame.toImage();
 
-    switch ( fr.input.format() )
+    switch (fr.input.format())
     {
-    case QImage::Format_RGB32:
-    case QImage::Format_RGB888:
-        break;
+        case QImage::Format_RGB32:
+        case QImage::Format_RGB888:
+            break;
 
-    default:
-        fr.input = fr.input.convertToFormat(QImage::Format_RGB32);
-        break;
+        default:
+            fr.input = fr.input.convertToFormat(QImage::Format_RGB32);
+            break;
     }
 
-    if ( !fr.input.isNull() )
+    if (!fr.input.isNull())
     {
         const auto& config = config_;
 
@@ -86,55 +86,49 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
         const bool hasDownscale = config.downscale.hasDownscale;
         const int downscale_fctr = config.downscale.downscaleFactor;
 
-        if ( hasDownscale )
+        if (hasDownscale)
         {
-            assert( downscale_fctr == 2 || downscale_fctr == 4 );
+            assert(downscale_fctr == 2 || downscale_fctr == 4);
 
             fr.preprocessed = fr.input.scaled(fr.input.width() / downscale_fctr,
                                               fr.input.height() / downscale_fctr,
-                                              Qt::IgnoreAspectRatio,
-                                              Qt::SmoothTransformation);
+                                              Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         }
         else
         {
             fr.preprocessed = fr.input;
         }
 
-        auto img_algo = image_span_from_qimage( fr.preprocessed );
+        auto img_algo = image_span_from_qimage(fr.preprocessed);
 
         const int newW = img_algo.width();
         const int newH = img_algo.height();
 
-        const bool sizeChanged =
-            (newW != currentWidth_) ||
-            (newH != currentHeight_);
+        const bool sizeChanged = (newW != currentWidth_) || (newH != currentHeight_);
 
-        if ( !region_ac_ || configChanged_ || sizeChanged )
+        if (!region_ac_ || configChanged_ || sizeChanged)
         {
-            if ( config.hasTemporalFiltering )
+            if (config.hasTemporalFiltering)
             {
-                smoother_.reset( img_algo );
+                smoother_.reset(img_algo);
                 img_algo = smoother_.outputSpan();
             }
 
             const auto& algo_conf = config.algo;
 
-            region_ac_ = std::make_unique<ofeli_ip::RegionColorAc>(img_algo,
-                                                                  ofeli_ip::ContourData(img_algo.width(),
-                                                                                        img_algo.height(),
-                                                                                        algo_conf.connectivity),
-                                                                  algo_conf.acConfig,
-                                                                  algo_conf.regionAcConfig);
+            region_ac_ = std::make_unique<ofeli_ip::RegionColorAc>(
+                img_algo,
+                ofeli_ip::ContourData(img_algo.width(), img_algo.height(), algo_conf.connectivity),
+                algo_conf.acConfig, algo_conf.regionAcConfig);
 
-            currentWidth_  = newW;
+            currentWidth_ = newW;
             currentHeight_ = newH;
             configChanged_ = false;
 
-            QString size_str = QString("%1×%2")
-                                   .arg(QString::number(fr.preprocessed.width()),
-                                        QString::number(fr.preprocessed.height()));
+            QString size_str = QString("%1×%2").arg(QString::number(fr.preprocessed.width()),
+                                                    QString::number(fr.preprocessed.height()));
 
-            if ( downscale_fctr >= 2 )
+            if (downscale_fctr >= 2)
             {
                 size_str += QString(" /%1").arg(downscale_fctr);
             }
@@ -143,31 +137,29 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
         }
         else
         {
-            if ( config.hasTemporalFiltering )
+            if (config.hasTemporalFiltering)
             {
-                smoother_.update( img_algo );
+                smoother_.update(img_algo);
                 img_algo = smoother_.outputSpan();
             }
 
-            region_ac_->resetExecutionState( img_algo );
+            region_ac_->resetExecutionState(img_algo);
         }
 
         region_ac_->run_cycles(config.cyclesNbr);
         fr.processTs = FrameClock::nowNs() - startTs;
 
-        if ( region_ac_ )
+        if (region_ac_)
         {
-            if ( config.hasTemporalFiltering )
+            if (config.hasTemporalFiltering)
             {
-                fr.preprocessed = QImage(img_algo.data(),
-                                         img_algo.width(),
-                                         img_algo.height(),
-                                         static_cast<qsizetype>(3 * img_algo.width()),
-                                         QImage::Format_RGB888);
+                fr.preprocessed =
+                    QImage(img_algo.data(), img_algo.width(), img_algo.height(),
+                           static_cast<qsizetype>(3 * img_algo.width()), QImage::Format_RGB888);
             }
 
             fr.l_out = region_ac_->export_l_out();
-            fr.l_in  = region_ac_->export_l_in();
+            fr.l_in = region_ac_->export_l_in();
         }
     }
 
@@ -189,4 +181,3 @@ void VideoActiveContourThread::setAlgoConfig(const VideoComputeConfig& config)
 }
 
 } // namespace ofeli_app
-

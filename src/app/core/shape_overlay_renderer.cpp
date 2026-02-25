@@ -21,8 +21,7 @@ void ShapeOverlayRenderer::setShape(const ShapeInfo& shape)
     lastBoundingBox_ = shape_.boundingBox;
 
     // zone minimale à repeindre
-    QRect dirty = oldRect.united(lastBoundingBox_)
-                      .adjusted(-3, -3, 3, 3); // marge pour le pen
+    QRect dirty = oldRect.united(lastBoundingBox_).adjusted(-3, -3, 3, 3); // marge pour le pen
 
     update(dirty);
 }

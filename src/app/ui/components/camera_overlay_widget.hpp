@@ -1,9 +1,8 @@
 #ifndef CAMERA_OVERLAY_WIDGET_HPP
 #define CAMERA_OVERLAY_WIDGET_HPP
 
-
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
 
 #include "camera_stats.hpp"
 
@@ -27,6 +26,6 @@ private:
     QLabel* label_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // CAMERA_OVERLAY_WIDGET_HPP

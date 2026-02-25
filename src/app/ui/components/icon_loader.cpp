@@ -8,8 +8,7 @@ namespace ofeli_app
 namespace il
 {
 
-QIcon loadIcon(const QString& themeName,
-               QStyle::StandardPixmap standardName,
+QIcon loadIcon(const QString& themeName, QStyle::StandardPixmap standardName,
                const QString& fallback)
 {
     QIcon icon;
@@ -29,8 +28,7 @@ QIcon loadIcon(const QString& themeName,
     return QIcon(fallback);
 }
 
-QIcon loadIcon(QIcon::ThemeIcon iconEnum,
-               QStyle::StandardPixmap standardName,
+QIcon loadIcon(QIcon::ThemeIcon iconEnum, QStyle::StandardPixmap standardName,
                const QString& fallback)
 {
     QIcon icon;
@@ -46,8 +44,7 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum,
     return QIcon(fallback);
 }
 
-QIcon loadIcon(const QString& themeName,
-               const QString& fallback)
+QIcon loadIcon(const QString& themeName, const QString& fallback)
 {
     QIcon icon;
 
@@ -62,8 +59,7 @@ QIcon loadIcon(const QString& themeName,
     return QIcon(fallback);
 }
 
-QIcon loadIcon(QIcon::ThemeIcon iconEnum,
-               const QString& fallback)
+QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback)
 {
     QIcon icon;
 
@@ -74,6 +70,6 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum,
     return QIcon(fallback);
 }
 
-}
+} // namespace il
 
-}
+} // namespace ofeli_app

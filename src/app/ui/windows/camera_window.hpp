@@ -40,18 +40,18 @@
 #ifndef CAMERA_WINDOW_HPP
 #define CAMERA_WINDOW_HPP
 
-#include <QMainWindow>
-#include <QLabel>
 #include <QComboBox>
+#include <QLabel>
+#include <QMainWindow>
 #include <QPushButton>
 
-#include "camera_controller.hpp"
-#include "video_active_contour_thread.hpp"
 #include "application_settings.hpp"
-#include "image_view.hpp"
-#include "display_settings_widget.hpp"
+#include "camera_controller.hpp"
 #include "camera_settings_window.hpp"
+#include "display_settings_widget.hpp"
+#include "image_view.hpp"
 #include "right_panel_toggle_button.hpp"
+#include "video_active_contour_thread.hpp"
 
 namespace ofeli_app
 {
@@ -72,7 +72,6 @@ private slots:
     void onFrameSizeStr(const QString& str);
 
 private:
-
     void connectFrameToView();
     void stopCameraAndUi();
 
@@ -89,7 +88,7 @@ private:
 
     ImageView* videoView_{nullptr};
 
-    QMediaDevices*         mediaDevices_{nullptr};
+    QMediaDevices* mediaDevices_{nullptr};
 
     QString deviceWindowTitle_;
 
@@ -111,6 +110,6 @@ signals:
     void cameraWindowClosed();
 };
 
-}
+} // namespace ofeli_app
 
 #endif // CAMERA_WINDOW_HPP

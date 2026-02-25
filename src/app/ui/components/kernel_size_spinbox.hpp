@@ -59,11 +59,9 @@ protected:
     void focusInEvent(QFocusEvent* event) override;
 
 private:
-
     QValidator::State previous_result_{QValidator::Acceptable};
-
 };
 
-}
+} // namespace ofeli_app
 
 #endif // KERNEL_SIZE_SPINBOX_H

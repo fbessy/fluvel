@@ -5,45 +5,38 @@
 namespace ofeli_app
 {
 
-ImageController::ImageController(QObject* parent):
-    QObject(parent)
+ImageController::ImageController(QObject* parent)
+    : QObject(parent)
 {
-    onImgSettingsChanged( AppSettings::instance().imgConfig );
-    onImgDisplaySettingsChanged( AppSettings::instance().imgConfig.display );
+    onImgSettingsChanged(AppSettings::instance().imgConfig);
+    onImgDisplaySettingsChanged(AppSettings::instance().imgConfig.display);
 
-    connect(&AppSettings::instance(),
-            &ApplicationSettings::imgSettingsChanged,
-            this,
+    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
             &ImageController::onImgSettingsChanged);
 
-    connect(&AppSettings::instance(),
-            &ApplicationSettings::imgDisplaySettingsChanged,
-            this,
+    connect(&AppSettings::instance(), &ApplicationSettings::imgDisplaySettingsChanged, this,
             &ImageController::onImgDisplaySettingsChanged);
 
-    connect(&acWorker_,  &ActiveContourWorker::processedImageReady,
-            this,       &ImageController::onProcessedImageReady);
+    connect(&acWorker_, &ActiveContourWorker::processedImageReady, this,
+            &ImageController::onProcessedImageReady);
 
-    connect(&acWorker_,  &ActiveContourWorker::contourUpdated,
-            this,       &ImageController::onContourUpdated,
-            Qt::QueuedConnection);
+    connect(&acWorker_, &ActiveContourWorker::contourUpdated, this,
+            &ImageController::onContourUpdated, Qt::QueuedConnection);
 
-    connect(&acWorker_,  &ActiveContourWorker::stateChanged,
-            this,       &ImageController::onStateChanged);
+    connect(&acWorker_, &ActiveContourWorker::stateChanged, this, &ImageController::onStateChanged);
 }
 
 void ImageController::loadImage(const QString& path)
 {
     inputImage_ = QImage(path);
 
-    if ( inputImage_.isNull() )
+    if (inputImage_.isNull())
         return;
 
-    if ( inputImage_.isGrayscale() )
-        inputImage_ = inputImage_.convertToFormat( QImage::Format_Grayscale8 );
+    if (inputImage_.isGrayscale())
+        inputImage_ = inputImage_.convertToFormat(QImage::Format_Grayscale8);
     else
-        inputImage_ = inputImage_.convertToFormat( QImage::Format_RGB32 );
-
+        inputImage_ = inputImage_.convertToFormat(QImage::Format_RGB32);
 
     reinitializeWorker();
 
@@ -52,23 +45,21 @@ void ImageController::loadImage(const QString& path)
 
 void ImageController::downscaleImage()
 {
-    if ( inputImage_.isNull() )
+    if (inputImage_.isNull())
         return;
 
-    if (    inputImage_.format() != QImage::Format_Grayscale8
-         && inputImage_.format() != QImage::Format_RGB32 )
+    if (inputImage_.format() != QImage::Format_Grayscale8 &&
+        inputImage_.format() != QImage::Format_RGB32)
         return;
 
-    if ( computeConfig_.downscale.hasDownscale )
+    if (computeConfig_.downscale.hasDownscale)
     {
         const int df = computeConfig_.downscale.downscaleFactor;
 
-        assert( df == 2 || df == 4 );
+        assert(df == 2 || df == 4);
 
-        downscaledImage_ = inputImage_.scaled(inputImage_.width() / df,
-                                              inputImage_.height() / df,
-                                              Qt::IgnoreAspectRatio,
-                                              Qt::SmoothTransformation);
+        downscaledImage_ = inputImage_.scaled(inputImage_.width() / df, inputImage_.height() / df,
+                                              Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
     else
     {
@@ -78,29 +69,27 @@ void ImageController::downscaleImage()
 
 void ImageController::reinitializeWorker()
 {
-    if ( inputImage_.isNull() )
+    if (inputImage_.isNull())
         return;
 
     downscaleImage();
 
-    if ( downscaledImage_.isNull() )
+    if (downscaledImage_.isNull())
         return;
 
-    if ( originalInitialPhi_.isNull() )
+    if (originalInitialPhi_.isNull())
         return;
 
-    computeConfig_.initialPhi = originalInitialPhi_.scaled(downscaledImage_.width(),
-                                                           downscaledImage_.height(),
-                                                           Qt::IgnoreAspectRatio,
-                                                           Qt::FastTransformation);
+    computeConfig_.initialPhi =
+        originalInitialPhi_.scaled(downscaledImage_.width(), downscaledImage_.height(),
+                                   Qt::IgnoreAspectRatio, Qt::FastTransformation);
 
-    if ( computeConfig_.initialPhi.isNull() )
+    if (computeConfig_.initialPhi.isNull())
         return;
 
     emit clearOverlaysRequested();
 
-    acWorker_.initialize(downscaledImage_,
-                        computeConfig_);
+    acWorker_.initialize(downscaledImage_, computeConfig_);
 }
 
 void ImageController::onProcessedImageReady(const QImage& processed)
@@ -120,37 +109,36 @@ void ImageController::onImgSettingsChanged(const ImageSessionSettings& config)
 
 void ImageController::onImgDisplaySettingsChanged(const DisplayConfig& display)
 {
-    bool needs_refresh = ( displayConfig_.image != display.image );
+    bool needs_refresh = (displayConfig_.image != display.image);
 
     displayConfig_ = display;
 
-    if ( needs_refresh )
+    if (needs_refresh)
         refreshView();
 }
 
 void ImageController::refreshView()
 {
-    if ( inputImage_.isNull() || processedImage_.isNull() )
+    if (inputImage_.isNull() || processedImage_.isNull())
         return;
 
     QImage img;
 
-    if ( displayConfig_.image == ImageBase::Source )
+    if (displayConfig_.image == ImageBase::Source)
         img = inputImage_;
-    else if ( displayConfig_.image == ImageBase::Preprocessed )
+    else if (displayConfig_.image == ImageBase::Preprocessed)
         img = processedImage_;
 
-
-    emit displayedImageReady( img );
+    emit displayedImageReady(img);
 }
 
 void ImageController::onContourUpdated(const ofeli_ip::ExportedContour& l_out,
                                        const ofeli_ip::ExportedContour& l_in)
 {
-    auto q_l_out = convertToQVector( l_out );
-    auto q_l_in  = convertToQVector( l_in );
+    auto q_l_out = convertToQVector(l_out);
+    auto q_l_in = convertToQVector(l_in);
 
-    emit contourUpdated( q_l_out, q_l_in );
+    emit contourUpdated(q_l_out, q_l_in);
 }
 
 void ImageController::restart()
@@ -175,7 +163,7 @@ void ImageController::converge()
 
 void ImageController::onStateChanged(ofeli_app::WorkerState state)
 {
-    emit stateChanged( state );
+    emit stateChanged(state);
 }
 
-}
+} // namespace ofeli_app

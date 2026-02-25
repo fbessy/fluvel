@@ -40,17 +40,17 @@
 #ifndef SETTINGS_WINDOW_HPP
 #define SETTINGS_WINDOW_HPP
 
+#include "algo_settings_widget.hpp"
 #include "application_settings.hpp"
-#include "filters.hpp"
-#include "kernel_size_spinbox.hpp"
-#include "grid2d.hpp"
-#include "contour_rendering_qimage.hpp"
 #include "contour_data.hpp"
+#include "contour_rendering_qimage.hpp"
+#include "filters.hpp"
+#include "grid2d.hpp"
+#include "image_settings_controller.hpp"
+#include "image_view.hpp"
+#include "kernel_size_spinbox.hpp"
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"
-#include "image_view.hpp"
-#include "algo_settings_widget.hpp"
-#include "image_settings_controller.hpp"
 #include "shape_type.hpp"
 
 #include <QtWidgets>
@@ -68,11 +68,9 @@ enum class TabIndex
 
 class SettingsWindow : public QDialog
 {
-
     Q_OBJECT
 
-public :
-
+public:
     SettingsWindow(QWidget* parent);
 
 public slots:
@@ -82,11 +80,10 @@ public slots:
 
     void onInputImageReady(const QImage& inputImage);
 
-signals :
+signals:
     void changed(const QMimeData* mimeData = nullptr);
 
 protected:
-
     //! Save the configuration chosen into the ApplicationSettings.
     void accept() override;
 
@@ -99,8 +96,7 @@ protected:
 signals:
     void updateOverlay(UiShapeInfo uiShape);
 
-private :
-
+private:
     //////////////////////////////////////////
     //   pour la fenêtre de configuration   //
     /////////////////////////////////////////
@@ -134,7 +130,7 @@ private :
     QTabWidget* preprocess_tabs_;
     QGroupBox* preprocess_page_;
 
-    //QCheckBox* is_downscale_cb;
+    // QCheckBox* is_downscale_cb;
 
     QVBoxLayout* noise_layout();
 
@@ -213,9 +209,8 @@ private :
     bool has_preprocess2_;
     QLabel* time_filt_;
 
-
     ofeli_ip::Filters* filters2_{nullptr};
-    //float calculate_filtered_image();
+    // float calculate_filtered_image();
     const unsigned char* img2_filtered_{nullptr};
 
     /////////////////////////////////////////
@@ -258,23 +253,24 @@ private :
 
     void setupConnections();
 
-private slots :
+private slots:
 
-    //void do_scale0(int value);
+    // void do_scale0(int value);
     void default_settings();
 
     // slot appelé à chaque changement d'onglet
-    //void tab_visu(int value);
+    // void tab_visu(int value);
 
     // slots appelés depuis l'onglet preprocessing
-    // slot appelé aussi une fois dans l'onglet algorithm pour voir le gradient de l'image pour le contour geodesique
-    //void show_phi_with_filtered_image();
+    // slot appelé aussi une fois dans l'onglet algorithm pour voir le gradient de l'image pour
+    // le contour geodesique
+    // void show_phi_with_filtered_image();
 
-    //void change_display_size();
-    //void set_color_out();
-    //void set_color_in();
+    // void change_display_size();
+    // void set_color_out();
+    // void set_color_in();
 };
 
-}
+} // namespace ofeli_app
 
 #endif // SETTINGS_WINDOW_HPP

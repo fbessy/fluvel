@@ -6,11 +6,12 @@
 #include <QImage>
 #include <QObject>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 class ImageController : public QObject
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     ImageController(QObject* parent);
@@ -31,14 +32,12 @@ signals:
     void inputImageReady(const QImage& inputImage);
     void displayedImageReady(const QImage& displayed);
 
-    void contourUpdated(const QVector<QPointF>& l_out,
-                        const QVector<QPointF>& l_in);
+    void contourUpdated(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in);
     void stateChanged(ofeli_app::WorkerState state);
 
     void clearOverlaysRequested();
 
 private:
-
     void onImgSettingsChanged(const ImageSessionSettings& conf);
     void onImgDisplaySettingsChanged(const DisplayConfig& display);
 
@@ -58,6 +57,6 @@ private:
     ActiveContourWorker acWorker_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // IMAGE_CONTROLLER_HPP

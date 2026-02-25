@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include "shape_type.hpp"
 #include "phi_editor.hpp"
+#include "shape_type.hpp"
 
 namespace ofeli_app
 {
@@ -25,6 +25,6 @@ private:
     QRect lastBoundingBox_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // SHAPE_OVERLAY_RENDERER_HPP

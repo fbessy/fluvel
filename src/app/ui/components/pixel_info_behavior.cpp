@@ -1,13 +1,14 @@
 #include "pixel_info_behavior.hpp"
 
-#include <QMouseEvent>
-#include <QGraphicsScene>
 #include <QColor>
+#include <QGraphicsScene>
+#include <QMouseEvent>
 
 #include "image_view.hpp"
 #include "pixel_info_overlay.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 PixelInfoBehavior::PixelInfoBehavior() = default;
 
@@ -15,8 +16,7 @@ PixelInfoBehavior::~PixelInfoBehavior() = default;
 
 // ---------------------------------------------------------------------
 
-bool PixelInfoBehavior::mousePress(ImageView& view,
-                                   QMouseEvent* event)
+bool PixelInfoBehavior::mousePress(ImageView& view, QMouseEvent* event)
 {
     if (event->button() != Qt::RightButton)
         return false;
@@ -34,8 +34,7 @@ bool PixelInfoBehavior::mousePress(ImageView& view,
 
 // ---------------------------------------------------------------------
 
-bool PixelInfoBehavior::mouseMove(ImageView& view,
-                                  QMouseEvent* event)
+bool PixelInfoBehavior::mouseMove(ImageView& view, QMouseEvent* event)
 {
     if (!active_)
         return false;
@@ -50,8 +49,7 @@ bool PixelInfoBehavior::mouseMove(ImageView& view,
 
 // ---------------------------------------------------------------------
 
-bool PixelInfoBehavior::mouseRelease(ImageView&,
-                                     QMouseEvent* event)
+bool PixelInfoBehavior::mouseRelease(ImageView&, QMouseEvent* event)
 {
     if (event->button() != Qt::RightButton)
         return false;
@@ -66,8 +64,7 @@ bool PixelInfoBehavior::mouseRelease(ImageView&,
 
 // ---------------------------------------------------------------------
 
-void PixelInfoBehavior::updateOverlay(ImageView& view,
-                                      const QPoint& viewPos)
+void PixelInfoBehavior::updateOverlay(ImageView& view, const QPoint& viewPos)
 {
     if (!overlay_)
         return;
@@ -81,11 +78,7 @@ void PixelInfoBehavior::updateOverlay(ImageView& view,
     // position ancre : exactement sous le curseur
     const QPointF anchorScenePos = view.mapToScene(viewPos);
 
-    overlay_->updateInfo(pixel,
-                         color,
-                         view.isGrayscale(),
-                         anchorScenePos,
-                         view);
+    overlay_->updateInfo(pixel, color, view.isGrayscale(), anchorScenePos, view);
 }
 
 } // namespace ofeli_app

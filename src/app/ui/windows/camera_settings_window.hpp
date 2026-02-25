@@ -25,7 +25,6 @@ public:
     CameraSettingsWindow(QWidget* parent);
 
 protected:
-
     //! Save the configuration chosen into the ApplicationSettings.
     void accept() override;
 
@@ -33,7 +32,6 @@ protected:
     void reject() override;
 
 private:
-
     void setupUiDownscaleGb();
     void updateUIFromConfig();
 
@@ -49,6 +47,6 @@ private:
     VideoSessionSettings& config_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // CAMERA_SETTINGS_WINDOW_HPP

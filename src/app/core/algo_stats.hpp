@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QString>
 #include <QColor>
+#include <QString>
 #include <vector>
 
 namespace ofeli_app
@@ -11,7 +11,7 @@ struct AlgoMetric
 {
     QString label;
     QString value;
-    QColor  color;
+    QColor color;
 };
 
 struct AlgoStats
@@ -25,4 +25,4 @@ struct AlgoStats
     std::vector<AlgoMetric> metrics; // dépendant du modèle
 };
 
-}
+} // namespace ofeli_app

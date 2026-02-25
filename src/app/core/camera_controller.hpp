@@ -1,17 +1,18 @@
 #pragma once
 
-#include <QObject>
 #include <QCamera>
 #include <QMediaCaptureSession>
-#include <QVideoSink>
 #include <QMediaDevices>
+#include <QObject>
 #include <QTimer>
+#include <QVideoSink>
 
-#include "video_active_contour_thread.hpp"
-#include "frame_stats_view.hpp"
 #include "camera_stats.hpp"
+#include "frame_stats_view.hpp"
+#include "video_active_contour_thread.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 class CameraController : public QObject
 {
@@ -27,18 +28,15 @@ public:
 
 public slots:
 
-    void onFrameDisplayed(qint64 recvTsNs,
-                          qint64 displayTsNs);
+    void onFrameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
 
 signals:
     void frameSizeStr(const QString& str);
     void textStatsUpdated(const QString& textStats);
-    void imageAndContourUpdated(const QImage& img,
-                                const QVector<QPointF>& l_out,
-                                const QVector<QPointF>& l_in,
-                                qint64 receiveTs);
-private:
+    void imageAndContourUpdated(const QImage& img, const QVector<QPointF>& l_out,
+                                const QVector<QPointF>& l_in, qint64 receiveTs);
 
+private:
     void onFrameResultReady(const FrameResult& result);
     void onVideoSettingsChanged(const VideoSessionSettings& conf);
     void onVideoDisplaySettingsChanged(const DisplayConfig& displayConfig);
@@ -58,4 +56,4 @@ private:
     DisplayConfig displayConfig_;
 };
 
-} // namespace
+} // namespace ofeli_app

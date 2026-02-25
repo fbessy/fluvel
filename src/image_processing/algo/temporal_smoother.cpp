@@ -1,8 +1,8 @@
 #include "temporal_smoother.hpp"
 
 #include <algorithm>
-#include <cmath>
 #include <chrono>
+#include <cmath>
 
 namespace ofeli_ip
 {
@@ -18,8 +18,7 @@ void TemporalSmoother::reset(ImageSpan first_src)
     noise_initialized_ = false;
     time_initialized_ = false;
 
-    accum_.resize(first_src.width(),
-                  first_src.height());
+    accum_.resize(first_src.width(), first_src.height());
 
     for (int y = 0; y < accum_.height(); ++y)
     {
@@ -27,11 +26,8 @@ void TemporalSmoother::reset(ImageSpan first_src)
         {
             const Rgb_uc color = first_src.atPixelRgb(x, y);
 
-            accum_.at(x, y) = Rgb_f {
-                static_cast<float>(color.red),
-                static_cast<float>(color.green),
-                static_cast<float>(color.blue)
-            };
+            accum_.at(x, y) = Rgb_f{static_cast<float>(color.red), static_cast<float>(color.green),
+                                    static_cast<float>(color.blue)};
         }
     }
 
@@ -40,8 +36,7 @@ void TemporalSmoother::reset(ImageSpan first_src)
     const int total_pixels = accum_.width() * accum_.height();
     constexpr int target_samples = 200000;
 
-    sampling_step_ = std::max(1,
-                              int(std::sqrt(float(total_pixels) / target_samples)));
+    sampling_step_ = std::max(1, int(std::sqrt(float(total_pixels) / target_samples)));
 }
 
 // ------------------------------------------------------------
@@ -83,14 +78,14 @@ void TemporalSmoother::update(ImageSpan src)
     {
         for (int x = 0; x < accum_.width(); x += sampling_step_)
         {
-            const Rgb_uc  s = src.atPixelRgb(x, y);
-            const Rgb_f&  a = accum_.at(x, y);
+            const Rgb_uc s = src.atPixelRgb(x, y);
+            const Rgb_f& a = accum_.at(x, y);
 
-            float dr = float(s.red)   - a.red;
+            float dr = float(s.red) - a.red;
             float dg = float(s.green) - a.green;
-            float db = float(s.blue)  - a.blue;
+            float db = float(s.blue) - a.blue;
 
-            motion += dr*dr + dg*dg + db*db;
+            motion += dr * dr + dg * dg + db * db;
             ++count;
         }
     }
@@ -123,24 +118,22 @@ void TemporalSmoother::update(ImageSpan src)
     const float tau_ratio = 0.1f;
     float alpha_ratio = 1.f - std::exp(-dt_seconds / tau_ratio);
 
-    motion_ratio_filtered_ +=
-        alpha_ratio * (motion_ratio - motion_ratio_filtered_);
+    motion_ratio_filtered_ += alpha_ratio * (motion_ratio - motion_ratio_filtered_);
 
     // --------------------------------------------------------
     // 5) Linear mapping to tau
     // --------------------------------------------------------
-    const float tau_min = 0.02f;  // very reactive
+    const float tau_min = 0.02f; // very reactive
     const float tau_max = 0.2f;  // stable
 
-    const float ratio_low  = 1.1f;
+    const float ratio_low = 1.1f;
     const float ratio_high = 1.6f;
 
     float t = 0.f;
 
     if (motion_ratio_filtered_ > ratio_low)
     {
-        t = (motion_ratio_filtered_ - ratio_low)
-        / (ratio_high - ratio_low);
+        t = (motion_ratio_filtered_ - ratio_low) / (ratio_high - ratio_low);
     }
 
     t = std::clamp(t, 0.f, 1.f);
@@ -164,9 +157,9 @@ void TemporalSmoother::update(ImageSpan src)
             const Rgb_uc s = src.atPixelRgb(x, y);
             Rgb_f& a = accum_.at(x, y);
 
-            a.red   += alpha * (float(s.red)   - a.red);
+            a.red += alpha * (float(s.red) - a.red);
             a.green += alpha * (float(s.green) - a.green);
-            a.blue  += alpha * (float(s.blue)  - a.blue);
+            a.blue += alpha * (float(s.blue) - a.blue);
         }
     }
 }
@@ -174,13 +167,12 @@ void TemporalSmoother::update(ImageSpan src)
 // ------------------------------------------------------------
 // Noise estimation (FPS independent)
 // ------------------------------------------------------------
-void TemporalSmoother::updateNoiseEstimate(float motion,
-                                           float dt_seconds)
+void TemporalSmoother::updateNoiseEstimate(float motion, float dt_seconds)
 {
     // Constantes de temps
-    const float tau_init  = 0.3f;  // convergence rapide au démarrage
-    const float tau_up    = 0.3f;  // si le bruit augmente
-    const float tau_down  = 2.0f;  // si le bruit diminue
+    const float tau_init = 0.3f; // convergence rapide au démarrage
+    const float tau_up = 0.3f;   // si le bruit augmente
+    const float tau_down = 2.0f; // si le bruit diminue
 
     if (!noise_initialized_)
     {
@@ -219,11 +211,9 @@ void TemporalSmoother::updateOutput()
         {
             const Rgb_f& a = accum_.at(x, y);
 
-            output_.at(x, y) = Rgb_uc {
-                static_cast<unsigned char>(a.red   + 0.5f),
-                static_cast<unsigned char>(a.green + 0.5f),
-                static_cast<unsigned char>(a.blue  + 0.5f)
-            };
+            output_.at(x, y) = Rgb_uc{static_cast<unsigned char>(a.red + 0.5f),
+                                      static_cast<unsigned char>(a.green + 0.5f),
+                                      static_cast<unsigned char>(a.blue + 0.5f)};
         }
     }
 }
@@ -232,16 +222,12 @@ ImageSpan TemporalSmoother::outputSpan()
 {
     updateOutput();
 
-    static_assert(sizeof(Rgb_uc)  == 3);
+    static_assert(sizeof(Rgb_uc) == 3);
     static_assert(alignof(Rgb_uc) == 1);
     static_assert(std::is_standard_layout_v<Rgb_uc>);
 
-    return {
-        reinterpret_cast<const unsigned char*>(output_.data()),
-        output_.width(),
-        output_.height(),
-        ImageFormat::Rgb24
-    };
+    return {reinterpret_cast<const unsigned char*>(output_.data()), output_.width(),
+            output_.height(), ImageFormat::Rgb24};
 }
 
 } // namespace ofeli_ip

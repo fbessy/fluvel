@@ -43,14 +43,17 @@
 namespace ofeli_ip
 {
 
-template <typename T>
-struct Point2D
+template <typename T> struct Point2D
 {
     T x;
     T y;
 
     Point2D() = default;
-    constexpr Point2D(T x_, T y_) noexcept : x(x_), y(y_) {}
+    constexpr Point2D(T x_, T y_) noexcept
+        : x(x_)
+        , y(y_)
+    {
+    }
 
     bool operator==(const Point2D& other) const noexcept
     {
@@ -59,7 +62,7 @@ struct Point2D
 
     bool operator!=(const Point2D& other) const noexcept
     {
-        return !( *this == other );
+        return !(*this == other);
     }
 
     Point2D& operator+=(const Point2D& rhs) noexcept
@@ -79,6 +82,6 @@ struct Point2D
 using Point2D_i = Point2D<int>;
 using Point2D_f = Point2D<float>;
 
-}
+} // namespace ofeli_ip
 
 #endif // POINT_HPP

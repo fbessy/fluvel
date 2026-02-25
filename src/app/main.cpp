@@ -61,7 +61,8 @@
 
  * \section structure_sec Structure
  *
- * In this project, the <b>G</b>raphical <b>U</b>ser <b>I</b>nterface (GUI) is clearly separated of the image processing part.
+ * In this project, the <b>G</b>raphical <b>U</b>ser <b>I</b>nterface (GUI) is clearly separated of
+the image processing part.
  *
  * GUI part :
  * - ImageWindow.cpp
@@ -86,46 +87,66 @@
  *
  * \section reusability_sec Reusability
  *
- * <p>This Qt project is built as an application and not as a static or shared library. So if you are interested to use this C++ code, especially for the image processing part of the project,
- * you must just include this file(s) thanks to the preprocessor directive in your file(s). After you must just pass to each constructor an input argument pointer on a row-wise image data buffer and for the class ACwithoutEdgesYUV, a pointer on a RGB interleaved data buffer (R1 G1 B1 R2 G2 B2 ...).</p>
- * <p>If you prefer a command-line interface or if you are interested in a tracking example of this algorithm, you can find a fork of this project interfaced with Matlab (MEX-file). Each constructor takes an input pointer on a column-wise image data buffer and for the class ACwithoutEdgesYUV, a pointer on a RGB planar data buffer (R1 R2 R3 ... G1 G2 G3 ... B1 B2 B3 ...).</p>
+ * <p>This Qt project is built as an application and not as a static or shared library. So if you
+are interested to use this C++ code, especially for the image processing part of the project,
+ * you must just include this file(s) thanks to the preprocessor directive in your file(s). After
+you must just pass to each constructor an input argument pointer on a row-wise image data buffer and
+for the class ACwithoutEdgesYUV, a pointer on a RGB interleaved data buffer (R1 G1 B1 R2 G2 B2
+...).</p>
+ * <p>If you prefer a command-line interface or if you are interested in a tracking example of this
+algorithm, you can find a fork of this project interfaced with Matlab (MEX-file). Each constructor
+takes an input pointer on a column-wise image data buffer and for the class ACwithoutEdgesYUV, a
+pointer on a RGB planar data buffer (R1 R2 R3 ... G1 G2 G3 ... B1 B2 B3 ...).</p>
  *
  *
  * \section license_sec License
  *
- * This software is distributed under the <a href='http://www.cecill.info/licences/Licence_CeCILL_V2-en.html'>CeCILL license version 2</a> <a href='http://www.cecill.info/licences/Licence_CeCILL_V2-fr.html'> (link to the french version here)</a>.
+ * This software is distributed under the <a
+href='http://www.cecill.info/licences/Licence_CeCILL_V2-en.html'>CeCILL license version 2</a> <a
+href='http://www.cecill.info/licences/Licence_CeCILL_V2-fr.html'> (link to the french version
+here)</a>.
  *
  * \section acknowl_sec Acknowledgments
  *
  * Thanks to :
  * - J. Olivier, R. Boné, J-M. Girault, F. Amed, A. Lissy, C. Rouzière, L. Suta.
- * - <i>pattern recognition and image analysis research team</i>, <i>computer science laboratory</i>,
+ * - <i>pattern recognition and image analysis research team</i>, <i>computer science
+laboratory</i>,
  * <i>François Rabelais University</i>.
  * - students and professors of the MSc in medical imaging.
 
 <hr></hr>
 * \section ref_sec References
-<p><b>[1]</b> Y. Shi, W. C. Karl - <a href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_MGIwYmUwYzctYTRkMC00ODMwLWI3YmUtNTFjYThlMTBkOTIy&hl=en&authkey=CPT1xeYN'>A real-time algorithm for the approximation of level-set based curve evolution</a> - <i>IEEE Trans. Image Processing</i>, vol. 17, no. 5, May 2008</p>
-<p><b>[2]</b> T. F. Chan, L. A. Vese - <a href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_NWY5ZGMyMmYtNzkwNi00NjI0LWE4ZGMtODllZTVmZWQ5NGRm&hl=en&authkey=CNfMkNEI'>Active contours without edges</a> - <i>IEEE Trans. Image Processing</i>, vol. 10, no. 2, Feb 2001</p>
-<p><b>[3]</b> V. Caselles, R. Kimmel, G. Sapiro - <a href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_ZWEzNzk2ZjgtNzlkMi00NDY0LTkzZjQtYWQ5N2EyNDA5NGE3&hl=en&authkey=CKi1w7cE'>Geodesic active contours</a> - <i>International Journal of Computer Vision</i>, 22(1), 61–79 (1997)</p>
-<p><b>[4]</b> P. Perona, J. Malik - <a href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_NmJmZWZkM2ItN2ZhZS00NjA4LTk3Y2UtNTNmYzkxYjFjNjU4&hl=en&authkey=CPDnxN8H'>Scale-space and edge detection using anistropic diffusion</a> - <i>IEEE Trans. Pattern Analysis and Machine Intelligence</i>, vol. 12, no. 17, Jul 1990</p>
+<p><b>[1]</b> Y. Shi, W. C. Karl - <a
+href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_MGIwYmUwYzctYTRkMC00ODMwLWI3YmUtNTFjYThlMTBkOTIy&hl=en&authkey=CPT1xeYN'>A
+real-time algorithm for the approximation of level-set based curve evolution</a> - <i>IEEE Trans.
+Image Processing</i>, vol. 17, no. 5, May 2008</p> <p><b>[2]</b> T. F. Chan, L. A. Vese - <a
+href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_NWY5ZGMyMmYtNzkwNi00NjI0LWE4ZGMtODllZTVmZWQ5NGRm&hl=en&authkey=CNfMkNEI'>Active
+contours without edges</a> - <i>IEEE Trans. Image Processing</i>, vol. 10, no. 2, Feb 2001</p>
+<p><b>[3]</b> V. Caselles, R. Kimmel, G. Sapiro - <a
+href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_ZWEzNzk2ZjgtNzlkMi00NDY0LTkzZjQtYWQ5N2EyNDA5NGE3&hl=en&authkey=CKi1w7cE'>Geodesic
+active contours</a> - <i>International Journal of Computer Vision</i>, 22(1), 61–79 (1997)</p>
+<p><b>[4]</b> P. Perona, J. Malik - <a
+href='https://docs.google.com/viewer?a=v&pid=explorer&chrome=true&srcid=0Bzx5IoqehNE_NmJmZWZkM2ItN2ZhZS00NjA4LTk3Y2UtNTNmYzkxYjFjNjU4&hl=en&authkey=CPDnxN8H'>Scale-space
+and edge detection using anistropic diffusion</a> - <i>IEEE Trans. Pattern Analysis and Machine
+Intelligence</i>, vol. 12, no. 17, Jul 1990</p>
  */
 
 #include "application_settings.hpp"
-#include "image_window.hpp"
 #include "frame_clock.hpp"
+#include "image_window.hpp"
 
-#include <QTranslator>
-#include <QLibraryInfo>
 #include <QApplication>
 #include <QCoreApplication>
+#include <QLibraryInfo>
+#include <QTranslator>
 
 #ifdef Q_OS_ANDROID
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #endif
 
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
 #ifdef Q_OS_ANDROID
     QGuiApplication app(argc, argv);
@@ -147,23 +168,22 @@ int main( int argc, char* argv[] )
     static QTranslator translator_ofeli;
 
     QString locale;
-    switch(language)
+    switch (language)
     {
-    case ofeli_app::Language::System:
-        locale = QLocale::system().name().section('_', 0, 0);
-        break;
-    case ofeli_app::Language::French:
-        locale = "fr";
-        break;
-    case ofeli_app::Language::English:
-    default:
-        locale = "en";
-        break;
+        case ofeli_app::Language::System:
+            locale = QLocale::system().name().section('_', 0, 0);
+            break;
+        case ofeli_app::Language::French:
+            locale = "fr";
+            break;
+        case ofeli_app::Language::English:
+        default:
+            locale = "en";
+            break;
     }
 
     // Traductions Qt
-    if (translator_qt.load("qt_" + locale,
-                           QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
+    if (translator_qt.load("qt_" + locale, QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
     {
         app.installTranslator(&translator_qt);
     }
@@ -175,45 +195,47 @@ int main( int argc, char* argv[] )
     }
 
     QIcon appIcon;
-    appIcon.addFile(":/icons/Ofeli_16.png", QSize(16,16));
-    appIcon.addFile(":/icons/Ofeli_32.png", QSize(32,32));
-    appIcon.addFile(":/icons/Ofeli_48.png", QSize(48,48));
-    appIcon.addFile(":/icons/Ofeli_128.png", QSize(128,128));
-    appIcon.addFile(":/icons/Ofeli_256.png", QSize(256,256));
+    appIcon.addFile(":/icons/Ofeli_16.png", QSize(16, 16));
+    appIcon.addFile(":/icons/Ofeli_32.png", QSize(32, 32));
+    appIcon.addFile(":/icons/Ofeli_48.png", QSize(48, 48));
+    appIcon.addFile(":/icons/Ofeli_128.png", QSize(128, 128));
+    appIcon.addFile(":/icons/Ofeli_256.png", QSize(256, 256));
 
     QApplication::setWindowIcon(appIcon);
 
     std::unique_ptr<QMainWindow> root;
 
 #ifdef Q_OS_ANDROID
-    //root = std::make_unique<ofeli_app::CameraWindow>();
-    //root->show();
+    // root = std::make_unique<ofeli_app::CameraWindow>();
+    // root->show();
     QQmlApplicationEngine engine;
-    //engine.loadFromModule("ofeli", "Main");
+    // engine.loadFromModule("ofeli", "Main");
 
-//#include <QDir>
-//#include <QDebug>
+    // #include <QDir>
+    // #include <QDebug>
 
-    //qDebug() << "Resources root:" << QDir(":/").entryList(QDir::Files | QDir::Dirs);
-    //qDebug() << "Resources qml:" << QDir(":/qml").entryList(QDir::Files | QDir::Dirs);
+    // qDebug() << "Resources root:" << QDir(":/").entryList(QDir::Files | QDir::Dirs);
+    // qDebug() << "Resources qml:" << QDir(":/qml").entryList(QDir::Files | QDir::Dirs);
 
     engine.load(QUrl("qrc:/qml/Main.qml"));
 
     QObject::connect(
-        &engine,
-        &QQmlApplicationEngine::objectCreationFailed,
-        &app,
-        []() { qDebug() << "QML CREATION FAILED"; QCoreApplication::exit(-1); },
+        &engine, &QQmlApplicationEngine::objectCreationFailed, &app,
+        []()
+        {
+            qDebug() << "QML CREATION FAILED";
+            QCoreApplication::exit(-1);
+        },
         Qt::QueuedConnection);
 
-    if (engine.rootObjects().isEmpty()) {
+    if (engine.rootObjects().isEmpty())
+    {
         return -1;
     }
 #else
     root = std::make_unique<ofeli_app::ImageWindow>();
     root->show();
 #endif
-
 
     return app.exec();
 }

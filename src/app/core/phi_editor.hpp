@@ -1,19 +1,20 @@
 #ifndef PHI_EDITOR_HPP
 #define PHI_EDITOR_HPP
 
-#include <QObject>
-#include <vector>
-#include <QRect>
 #include <QImage>
+#include <QObject>
+#include <QRect>
+#include <vector>
 
-#include "grid2d.hpp"
 #include "active_contour.hpp"
+#include "grid2d.hpp"
 #include "shape_type.hpp"
 
 namespace ofeli_app
 {
 
-struct ShapeInfo {
+struct ShapeInfo
+{
     ShapeType type;
     QRect boundingBox;
 };
@@ -23,7 +24,6 @@ class PhiEditor : public QObject
     Q_OBJECT
 
 public:
-
     PhiEditor(const QImage& committedPhi);
 
     void addShape(const ShapeInfo& shape);
@@ -35,7 +35,10 @@ public:
 
     void setSize(const QSize& size);
 
-    const QImage& phi() const { return editedPhi_; }
+    const QImage& phi() const
+    {
+        return editedPhi_;
+    }
 
 signals:
     void phiAccepted(const QImage& committedPhi);
@@ -43,9 +46,7 @@ signals:
     void editedPhiCleared();
 
 private:
-
-    void changeShape(const ShapeInfo& shapeInfo,
-                     const QColor& color);
+    void changeShape(const ShapeInfo& shapeInfo, const QColor& color);
 
     QImage editedPhi_;
     QImage committedPhi_;

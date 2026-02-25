@@ -49,6 +49,6 @@ private:
     std::unique_ptr<PhiViewModel> phiViewModel_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // IMAGE_SETTINGS_CONTROLLER_HPP

@@ -6,27 +6,22 @@
 namespace ofeli_app
 {
 
-PhiViewModel::PhiViewModel(PhiEditor* editor,
-                           QObject* parent)
-    : QObject(parent),
-    editor_(editor)
+PhiViewModel::PhiViewModel(PhiEditor* editor, QObject* parent)
+    : QObject(parent)
+    , editor_(editor)
 {
     Q_ASSERT(editor_);
 
-    background_ = QImage(editor_->phi().width(),
-                         editor_->phi().height(),
-                         QImage::Format_RGB32);
+    background_ = QImage(editor_->phi().width(), editor_->phi().height(), QImage::Format_RGB32);
 
     background_.fill(Qt::black);
 
     updateLists();
     updatePhiFromLists();
 
-    connect(editor_, &PhiEditor::editedPhiChanged,
-            this, &PhiViewModel::updateFromEditor);
+    connect(editor_, &PhiEditor::editedPhiChanged, this, &PhiViewModel::updateFromEditor);
 
-    connect(editor_, &PhiEditor::editedPhiCleared,
-            this, &PhiViewModel::onClearFromEditor);
+    connect(editor_, &PhiEditor::editedPhiCleared, this, &PhiViewModel::onClearFromEditor);
 }
 
 void PhiViewModel::onConnectivityChanged(int index)
@@ -76,17 +71,17 @@ void PhiViewModel::updateLists()
     l_out_.clear();
     l_in_.clear();
 
-    for ( int y = 0; y < h; ++y )
+    for (int y = 0; y < h; ++y)
     {
         const uchar* line = phi.constScanLine(y);
 
-        for ( int x = 0; x < w; ++x )
+        for (int x = 0; x < w; ++x)
         {
             uchar I = line[x];
 
-            if ( !point_is_redundant(x, y) )
+            if (!point_is_redundant(x, y))
             {
-                if ( I == 0 )
+                if (I == 0)
                 {
                     l_out_.emplace_back(x, y);
                 }
@@ -115,12 +110,10 @@ bool PhiViewModel::point_is_redundant(int x, int y)
     };
 
     // 4-connectivity
-    //connectivity_ == Connectivity::Four
-    if ( connectivity_ == ofeli_ip::Connectivity::Four )
+    // connectivity_ == Connectivity::Four
+    if (connectivity_ == ofeli_ip::Connectivity::Four)
     {
-        return same_value(x - 1, y) &&
-               same_value(x + 1, y) &&
-               same_value(x, y - 1) &&
+        return same_value(x - 1, y) && same_value(x + 1, y) && same_value(x, y - 1) &&
                same_value(x, y + 1);
     }
 
@@ -161,7 +154,8 @@ void PhiViewModel::updateListsFloodFill()
         return x >= 0 && x < w && y >= 0 && y < h;
     };*/
 
-    auto pixel = [&](int x, int y) -> uchar {
+    auto pixel = [&](int x, int y) -> uchar
+    {
         return phi.constScanLine(y)[x];
     };
 
@@ -186,7 +180,7 @@ void PhiViewModel::updateListsFloodFill()
                 continue;
 
             // Nouveau seed
-            stack.push_back({ y, x, x });
+            stack.push_back({y, x, x});
 
             while (!stack.empty())
             {
@@ -197,18 +191,14 @@ void PhiViewModel::updateListsFloodFill()
                 int xr = s.xRight;
 
                 // Étendre à gauche
-                while (xl - 1 >= 0 &&
-                       !visitedLine[xl - 1] &&
-                       !point_is_redundant(xl - 1, s.y) &&
+                while (xl - 1 >= 0 && !visitedLine[xl - 1] && !point_is_redundant(xl - 1, s.y) &&
                        pixel(xl - 1, s.y) == value)
                 {
                     --xl;
                 }
 
                 // Étendre à droite
-                while (xr + 1 < w &&
-                       !visitedLine[xr + 1] &&
-                       !point_is_redundant(xr + 1, s.y) &&
+                while (xr + 1 < w && !visitedLine[xr + 1] && !point_is_redundant(xr + 1, s.y) &&
                        pixel(xr + 1, s.y) == value)
                 {
                     ++xr;
@@ -226,7 +216,7 @@ void PhiViewModel::updateListsFloodFill()
                 }
 
                 // Examiner lignes au-dessus et en dessous
-                for (int ny : { s.y - 1, s.y + 1 })
+                for (int ny : {s.y - 1, s.y + 1})
                 {
                     if (ny < 0 || ny >= h)
                         continue;
@@ -237,20 +227,17 @@ void PhiViewModel::updateListsFloodFill()
                     int xscan = xl;
                     while (xscan <= xr)
                     {
-                        if (!vline[xscan] &&
-                            !point_is_redundant(xscan, ny) &&
+                        if (!vline[xscan] && !point_is_redundant(xscan, ny) &&
                             nline[xscan] == value)
                         {
                             int xstart = xscan;
-                            while (xscan + 1 <= xr &&
-                                   !vline[xscan + 1] &&
-                                   !point_is_redundant(xscan + 1, ny) &&
-                                   nline[xscan + 1] == value)
+                            while (xscan + 1 <= xr && !vline[xscan + 1] &&
+                                   !point_is_redundant(xscan + 1, ny) && nline[xscan + 1] == value)
                             {
                                 ++xscan;
                             }
 
-                            stack.push_back({ ny, xstart, xscan });
+                            stack.push_back({ny, xstart, xscan});
                         }
                         ++xscan;
                     }
@@ -264,16 +251,16 @@ void PhiViewModel::updatePhiFromLists()
 {
     displayedPhi_ = background_;
 
-    if ( displayedPhi_.size() != listsGridSize_ )
+    if (displayedPhi_.size() != listsGridSize_)
         return;
 
-    for( const auto& p : l_out_ )
+    for (const auto& p : l_out_)
     {
         QPoint point(p.x, p.y);
         displayedPhi_.setPixel(point, qRgb(0, 0, 255));
     }
 
-    for( const auto& p : l_in_ )
+    for (const auto& p : l_in_)
     {
         QPoint point(p.x, p.y);
         displayedPhi_.setPixel(point, qRgb(255, 0, 0));
@@ -287,7 +274,7 @@ void PhiViewModel::composeView(bool hasOverlay)
     if (hasOverlay)
     {
         QPainter p(&withOverlay);
-        //p.setRenderHint(QPainter::Antialiasing, false);
+        // p.setRenderHint(QPainter::Antialiasing, false);
 
         QColor overlayColor = Qt::green;
         overlayColor.setAlpha(150);

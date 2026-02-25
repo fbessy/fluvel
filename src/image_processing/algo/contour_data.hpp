@@ -44,45 +44,64 @@
 
 #include <vector>
 
-#include "image_span.hpp"
 #include "grid2d.hpp"
+#include "image_span.hpp"
 
 namespace ofeli_ip
 {
 
 //! Pixel connectivity of the neighborhood used by the algorithm (4- or 8-connected).
-enum class Connectivity {
+enum class Connectivity
+{
     Four,
     Eight
 };
 
 enum class PhiValue : int8_t
 {
-    InsideRegion      = -3,
-    InteriorBoundary  = -1,
-    ExteriorBoundary  =  1,
-    OutsideRegion     =  3
+    InsideRegion = -3,
+    InteriorBoundary = -1,
+    ExteriorBoundary = 1,
+    OutsideRegion = 3
 };
 
 using DiscreteLevelSet = Grid2D<PhiValue>;
 
 enum class SpeedValue : int8_t
 {
-    GoInward  = -1,
-    NoMove    =  0,
-    GoOutward =  1
+    GoInward = -1,
+    NoMove = 0,
+    GoOutward = 1
 };
 
 class ContourPoint
 {
 public:
+    ContourPoint(int x, int y)
+        : x_(x)
+        , y_(y)
+        , speed_(SpeedValue::NoMove)
+    {
+    }
+    ContourPoint(const Point2D_i& p)
+        : x_(p.x)
+        , y_(p.y)
+        , speed_(SpeedValue::NoMove)
+    {
+    }
 
-    ContourPoint(int x, int y): x_(x), y_(y), speed_(SpeedValue::NoMove) {}
-    ContourPoint(const Point2D_i& p): x_(p.x), y_(p.y), speed_(SpeedValue::NoMove) {}
-
-    Point2D_i pos() const noexcept { return {x_, y_}; }
-    int x() const noexcept { return x_; }
-    int y() const noexcept { return y_; }
+    Point2D_i pos() const noexcept
+    {
+        return {x_, y_};
+    }
+    int x() const noexcept
+    {
+        return x_;
+    }
+    int y() const noexcept
+    {
+        return y_;
+    }
 
     bool operator==(const ContourPoint& other) const noexcept
     {
@@ -107,26 +126,22 @@ private:
     friend class EdgeAc;
 };
 
-using Contour         = std::vector<ContourPoint>;
+using Contour = std::vector<ContourPoint>;
 using ExportedContour = std::vector<Point2D_i>;
 
 class ContourData
 {
-
-public :
-
+public:
     //! Constructor to initialize the contour with one ellipse.
-    ContourData(int phi_width, int phi_height,
-                Connectivity connectivity = Connectivity::Four);
+    ContourData(int phi_width, int phi_height, Connectivity connectivity = Connectivity::Four);
 
-    //! Constructor to initialize the contour from a grayscale image of the levet-set function #phi.
-    ContourData(ImageSpan grayscale_phi,
-                Connectivity connectivity = Connectivity::Four);
+    //! Constructor to initialize the contour from a grayscale image of the levet-set function
+    //! #phi.
+    ContourData(ImageSpan grayscale_phi, Connectivity connectivity = Connectivity::Four);
 
-    //! Constructor to initialize the contour with the both neighbouring boundaries lists of #l_out and #l_in.
-    ContourData(const Contour& l_out,
-                const Contour& l_in,
-                int phi_width, int phi_height,
+    //! Constructor to initialize the contour with the both neighbouring boundaries lists of
+    //! #l_out and #l_in.
+    ContourData(const Contour& l_out, const Contour& l_in, int phi_width, int phi_height,
                 Connectivity connectivity = Connectivity::Four);
 
     //! Copy constructor.
@@ -138,49 +153,76 @@ public :
     //! Wrapper to use directly with offset lists without the need to get the variable #phi.
     Point2D_i coord(size_t offet) const
     {
-        return phi_.coord( offet );
+        return phi_.coord(offet);
     }
 
     //! Export the boundary list l_out_ as a copied geometric representation.
-    ExportedContour export_l_out() const { return export_contour(l_out_); }
+    ExportedContour export_l_out() const
+    {
+        return export_contour(l_out_);
+    }
 
     //! Export the boundary list l_in_ as a copied geometric representation.
-    ExportedContour export_l_in() const  { return export_contour(l_in_); }
+    ExportedContour export_l_in() const
+    {
+        return export_contour(l_in_);
+    }
 
     //! Getter function for the discrete level-set function #phi.
-    DiscreteLevelSet& phi() { return phi_; }
-    const DiscreteLevelSet& phi() const { return phi_; }
+    DiscreteLevelSet& phi()
+    {
+        return phi_;
+    }
+    const DiscreteLevelSet& phi() const
+    {
+        return phi_;
+    }
     //! Getter function for the exterior boundary #l_out.
-    Contour& l_out() { return l_out_; }
-    const Contour& l_out() const { return l_out_; }
+    Contour& l_out()
+    {
+        return l_out_;
+    }
+    const Contour& l_out() const
+    {
+        return l_out_;
+    }
     //! Getter function for the interior boundary #l_in.
-    Contour& l_in() { return l_in_; }
-    const Contour& l_in() const { return l_in_; }
+    Contour& l_in()
+    {
+        return l_in_;
+    }
+    const Contour& l_in() const
+    {
+        return l_in_;
+    }
 
-    bool empty() const { return l_out_.empty() || l_in_.empty(); }
+    bool empty() const
+    {
+        return l_out_.empty() || l_in_.empty();
+    }
 
     bool is_valid() const;
 
-    Connectivity connectivity() const { return connectivity_; }
+    Connectivity connectivity() const
+    {
+        return connectivity_;
+    }
 
-private :
-
-    //! Initializes the contour *this with one ellipse. It is performed when the simplest constructor is called or when one or both boundary lists is/are empty.
+private:
+    //! Initializes the contour *this with one ellipse. It is performed when the simplest
+    //! constructor is called or when one or both boundary lists is/are empty.
     void define_from_ellipse();
 
     //! Eliminates redundant points to maintain a contiguous boundary.
-    void eliminate_redundant_points(Contour& boundary,
-                                    PhiValue region_value);
+    void eliminate_redundant_points(Contour& boundary, PhiValue region_value);
 
     //! To use define_from_ellipse and eliminate_redundant_points
     //! in ActiveContour.
     friend class ActiveContour;
 
-    //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a different phi value sign comparing to the given point.
+    //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a
+    //! different phi value sign comparing to the given point.
     bool is_redundant(const ContourPoint& point) const;
-
-
-
 
     //! Allocate lists.
     void allocate_lists();
@@ -192,9 +234,7 @@ private :
     void define_phi_from_lists();
 
     //! Performs a flood fill algorithm for the method #define_phi_from_lists().
-    void flood_fill(const Point2D_i& seed,
-                    PhiValue target_value,
-                    PhiValue replacement_value);
+    void flood_fill(const Point2D_i& seed, PhiValue target_value, PhiValue replacement_value);
 
     //! Eliminates redundant points for the both lists to maintain a contiguous boundary.
     void eliminate_redundant_points_if_needed();
@@ -202,8 +242,7 @@ private :
     //! Export a boundary list as a copied geometric representation.
     std::vector<Point2D_i> export_contour(const Contour& boundary) const;
 
-    template<typename T>
-    static bool has_duplicates(const std::vector<T>& v);
+    template <typename T> static bool has_duplicates(const std::vector<T>& v);
 
     //! Discrete level-set function with only 4 PhiValue possible.
     DiscreteLevelSet phi_;
@@ -217,9 +256,7 @@ private :
     const Connectivity connectivity_;
 };
 
-
-template<typename T>
-bool ContourData::has_duplicates(const std::vector<T>& v)
+template <typename T> bool ContourData::has_duplicates(const std::vector<T>& v)
 {
     for (std::size_t i = 0; i < v.size(); ++i)
         for (std::size_t j = i + 1; j < v.size(); ++j)
@@ -243,13 +280,13 @@ constexpr int phiSign(PhiValue v)
 {
     switch (v)
     {
-    case PhiValue::InsideRegion:
-    case PhiValue::InteriorBoundary:
-        return -1;
+        case PhiValue::InsideRegion:
+        case PhiValue::InteriorBoundary:
+            return -1;
 
-    case PhiValue::ExteriorBoundary:
-    case PhiValue::OutsideRegion:
-        return 1;
+        case PhiValue::ExteriorBoundary:
+        case PhiValue::OutsideRegion:
+            return 1;
     }
     return 0; // unreachable
 }
@@ -269,8 +306,8 @@ constexpr bool differentSide(PhiValue a, PhiValue b)
     return phiSign(a) * phiSign(b) < 0;
 }
 
-}
+} // namespace phi_value
 
-}
+} // namespace ofeli_ip
 
 #endif // CONTOUR_DATA_HPP

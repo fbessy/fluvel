@@ -11,8 +11,7 @@ AutoFitBehavior::AutoFitBehavior(Qt::MouseButton button)
 {
 }
 
-bool AutoFitBehavior::mouseRelease(ImageView& view,
-                                   QMouseEvent* event)
+bool AutoFitBehavior::mouseRelease(ImageView& view, QMouseEvent* event)
 {
     if (event->button() == button_)
     {
@@ -24,4 +23,4 @@ bool AutoFitBehavior::mouseRelease(ImageView& view,
     return false;
 }
 
-}
+} // namespace ofeli_app

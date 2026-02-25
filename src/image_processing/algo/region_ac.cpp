@@ -39,8 +39,8 @@
 
 #include "region_ac.hpp"
 
-#include <cmath>
 #include "ofeli_math.hpp"
+#include <cmath>
 
 namespace ofeli_ip
 {
@@ -56,11 +56,11 @@ void RegionAc::initialize_sums()
     {
         for (int x = 0; x < cd_.phi().width(); ++x)
         {
-            const int64_t intensity = static_cast<int64_t>( image_.at(x,y) );
+            const int64_t intensity = static_cast<int64_t>(image_.at(x, y));
 
             sum_total_ += intensity;
 
-            if( phi_value::isOutside( cd_.phi().at(x,y) ) )
+            if (phi_value::isOutside(cd_.phi().at(x, y)))
             {
                 sum_out_ += intensity;
                 ++pxl_nbr_out_;
@@ -71,47 +71,43 @@ void RegionAc::initialize_sums()
 
 void RegionAc::do_specific_cycle1()
 {
-    if( pxl_nbr_out_ >= 1 )
-        average_out_ = std::lround( static_cast<float>(sum_out_) / pxl_nbr_out_ );
-
+    if (pxl_nbr_out_ >= 1)
+        average_out_ = std::lround(static_cast<float>(sum_out_) / pxl_nbr_out_);
 
     const int64_t sum_in = sum_total_ - sum_out_;
     const int64_t pxl_nbr_in = pxl_nbr_total_ - pxl_nbr_out_;
 
-    if( pxl_nbr_in >= 1 )
-        average_in_ = std::lround( static_cast<float>(sum_in) / pxl_nbr_in );
+    if (pxl_nbr_in >= 1)
+        average_in_ = std::lround(static_cast<float>(sum_in) / pxl_nbr_in);
 }
 
 void RegionAc::compute_external_speed_Fd(ContourPoint& point)
 {
-    const int pxl = static_cast<int>( image_.at( point.x(),
-                                                 point.y() ) );
+    const int pxl = static_cast<int>(image_.at(point.x(), point.y()));
 
     const int diff_out = pxl - average_out_;
-    const int diff_in  = pxl - average_in_;
+    const int diff_in = pxl - average_in_;
 
-    const int speed =   region_config_.lambda_out * ( math::square(diff_out) )
-                      - region_config_.lambda_in  * ( math::square(diff_in) );
+    const int speed = region_config_.lambda_out * (math::square(diff_out)) -
+                      region_config_.lambda_in * (math::square(diff_in));
 
-    point.speed_ = speed_value::get_discrete_speed( speed );
+    point.speed_ = speed_value::get_discrete_speed(speed);
 }
 
-void RegionAc::do_specific_when_switch(const ContourPoint& point,
-                                       BoundarySwitch ctx_choice)
+void RegionAc::do_specific_when_switch(const ContourPoint& point, BoundarySwitch ctx_choice)
 {
-    const int64_t intensity = static_cast<int64_t>( image_.at( point.x(),
-                                                               point.y() ) );
+    const int64_t intensity = static_cast<int64_t>(image_.at(point.x(), point.y()));
 
-    if ( ctx_choice == BoundarySwitch::In )
+    if (ctx_choice == BoundarySwitch::In)
     {
         sum_out_ -= intensity;
         --pxl_nbr_out_;
     }
-    else if ( ctx_choice == BoundarySwitch::Out )
+    else if (ctx_choice == BoundarySwitch::Out)
     {
         sum_out_ += intensity;
         ++pxl_nbr_out_;
     }
 }
 
-}
+} // namespace ofeli_ip

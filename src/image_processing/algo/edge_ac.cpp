@@ -57,15 +57,16 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
 
     int dd;
 
-    for( int dx = -1; dx <= 1; dx++ )
+    for (int dx = -1; dx <= 1; dx++)
     {
-        for( int dy = -1; dy <= 1; dy++ )
+        for (int dy = -1; dy <= 1; dy++)
         {
-            if( cd_.phi().valid(x+dx, y+dy) )
+            if (cd_.phi().valid(x + dx, y + dy))
             {
-                dd = std::abs( int( gradient_image_.at(x,y) ) - int( gradient_image_.at(x + dx, y + dy)  ) );
+                dd = std::abs(int(gradient_image_.at(x, y)) -
+                              int(gradient_image_.at(x + dx, y + dy)));
 
-                if( phi_value::isOutside( cd_.phi().at(x + dx, y + dy) ) )
+                if (phi_value::isOutside(cd_.phi().at(x + dx, y + dy)))
                 {
                     max_out = std::max(max_out, dd);
                 }
@@ -79,9 +80,9 @@ void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
 
     int local_speed = max_out - max_in;
 
-    int global_speed = global_speed_sign_ * (int(threshold_) - int(gradient_image_.at(x,y)));
+    int global_speed = global_speed_sign_ * (int(threshold_) - int(gradient_image_.at(x, y)));
 
-    point.speed_ = speed_value::get_discrete_speed( 3*local_speed + global_speed );
+    point.speed_ = speed_value::get_discrete_speed(3 * local_speed + global_speed);
 }
 
 int EdgeAc::get_global_speed_sign() const
@@ -97,18 +98,18 @@ int EdgeAc::get_global_speed_sign() const
     {
         for (int x = 0; x < w; ++x)
         {
-            if( phi_value::isInside( cd_.phi().at(x,y) ) )
+            if (phi_value::isInside(cd_.phi().at(x, y)))
             {
-                sum_in += (unsigned int)(gradient_image_.at(x,y));
+                sum_in += (unsigned int)(gradient_image_.at(x, y));
             }
             else
             {
-                sum_out += (unsigned int)(gradient_image_.at(x,y));
+                sum_out += (unsigned int)(gradient_image_.at(x, y));
             }
         }
     }
 
-    if ( sum_out > sum_in )
+    if (sum_out > sum_in)
     {
         sign = 1;
     }
@@ -124,24 +125,22 @@ unsigned char EdgeAc::do_otsu_method(ImageSpan image)
 {
     unsigned char threshold = 0;
 
-    unsigned int histogram[ kGrayscaleDepth ];
+    unsigned int histogram[kGrayscaleDepth];
 
-    std::memset( (void*)histogram, 0, kGrayscaleDepth * sizeof( unsigned int ) );
+    std::memset((void*)histogram, 0, kGrayscaleDepth * sizeof(unsigned int));
 
     for (int y = 0; y < image.height(); ++y)
     {
         for (int x = 0; x < image.width(); ++x)
         {
-            histogram[ image.gray(x,y) ]++;
+            histogram[image.gray(x, y)]++;
         }
     }
 
     unsigned int sum = 0;
-    for( unsigned int intensity = 0;
-         intensity < kGrayscaleDepth;
-         intensity++ )
+    for (unsigned int intensity = 0; intensity < kGrayscaleDepth; intensity++)
     {
-        sum += intensity * histogram[ intensity ];
+        sum += intensity * histogram[intensity];
     }
 
     unsigned int weight1, weight2, sum1;
@@ -158,23 +157,21 @@ unsigned char EdgeAc::do_otsu_method(ImageSpan image)
     t = 0;
     weight2 = image.size();
 
-    while( t < (kGrayscaleDepth-1) &&
-           weight2 != 0 )
+    while (t < (kGrayscaleDepth - 1) && weight2 != 0)
     {
         weight1 += histogram[t];
-        weight2 = image.size()-weight1;
+        weight2 = image.size() - weight1;
 
-        if( weight1 != 0 &&
-            weight2 != 0 )
+        if (weight1 != 0 && weight2 != 0)
         {
-            sum1 += t*histogram[t];
+            sum1 += t * histogram[t];
 
-            mean1 = (unsigned char) (sum1 / weight1);
-            mean2 = (unsigned char) ( (sum-sum1) / weight2 ); // sum2 = sum-sum1
+            mean1 = (unsigned char)(sum1 / weight1);
+            mean2 = (unsigned char)((sum - sum1) / weight2); // sum2 = sum-sum1
 
-            var_t = (float)weight1 * (float)weight2 * (float)math::square( int(mean1)-int(mean2) );
+            var_t = (float)weight1 * (float)weight2 * (float)math::square(int(mean1) - int(mean2));
 
-            if( var_t > var_max )
+            if (var_t > var_max)
             {
                 var_max = var_t;
                 threshold = t;
@@ -187,4 +184,4 @@ unsigned char EdgeAc::do_otsu_method(ImageSpan image)
     return threshold;
 }
 
-}
+} // namespace ofeli_ip

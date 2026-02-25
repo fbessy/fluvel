@@ -28,4 +28,4 @@ bool ColorPickerBehavior::mousePress(ImageView& view, QMouseEvent* e)
     return true;
 }
 
-}
+} // namespace ofeli_app

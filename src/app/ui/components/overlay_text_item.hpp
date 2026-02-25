@@ -1,8 +1,8 @@
 #ifndef OVERLAY_TEXT_ITEM_HPP
 #define OVERLAY_TEXT_ITEM_HPP
 
-#include <QGraphicsItem>
 #include <QFont>
+#include <QGraphicsItem>
 #include <QPainter>
 
 namespace ofeli_app
@@ -16,14 +16,12 @@ public:
     void setText(const QString& text);
 
 protected:
-    void paint(QPainter* painter,
-               const QStyleOptionGraphicsItem* option,
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;
 
     QRectF boundingRect() const override;
 
 private:
-
     QString text_;
 
     QFont font_;
@@ -31,6 +29,6 @@ private:
     int padding_ = 8;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // OVERLAY_TEXT_ITEM_HPP

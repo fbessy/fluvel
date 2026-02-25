@@ -7,8 +7,7 @@
 namespace std
 {
 
-template<>
-struct hash<ofeli_ip::Point2D_i>
+template <> struct hash<ofeli_ip::Point2D_i>
 {
     size_t operator()(const ofeli_ip::Point2D_i& p) const noexcept
     {
@@ -18,6 +17,6 @@ struct hash<ofeli_ip::Point2D_i>
     }
 };
 
-}
+} // namespace std
 
 #endif // POINT_HASH_HPP

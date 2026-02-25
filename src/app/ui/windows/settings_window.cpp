@@ -38,32 +38,32 @@
 ****************************************************************************/
 
 #include "settings_window.hpp"
-#include "contour_rendering_qimage.hpp"
 #include "application_settings.hpp"
+#include "contour_rendering_qimage.hpp"
 
-#include "image_window.hpp"
-#include "filters.hpp"
-#include "kernel_size_spinbox.hpp"
-#include "boundary_builder.hpp"
 #include "active_contour.hpp"
-#include "shape_overlay_renderer.hpp"
+#include "boundary_builder.hpp"
+#include "filters.hpp"
+#include "image_window.hpp"
+#include "kernel_size_spinbox.hpp"
 #include "phi_view_model.hpp"
+#include "shape_overlay_renderer.hpp"
 
 #include "interaction_set.hpp"
 #include "zoom_behavior.hpp"
 
 #include <QtWidgets>
 
+#include <cstring> // for std::memcpy
+#include <ctime>   // for std::clock_t, std::clock() and CLOCKS_PER_SEC
 #include <stack>
-#include <ctime>         // for std::clock_t, std::clock() and CLOCKS_PER_SEC
-#include <cstring>       // for std::memcpy
 
 namespace ofeli_app
 {
 
-SettingsWindow::SettingsWindow(QWidget* parent) :
-    QDialog(parent)
-    
+SettingsWindow::SettingsWindow(QWidget* parent)
+    : QDialog(parent)
+
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -85,32 +85,31 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
 
     tabs_ = new QTabWidget(this);
 
-    auto *tabBar = tabs_->tabBar();
+    auto* tabBar = tabs_->tabBar();
 
     tabBar->setExpanding(false);
     tabBar->setUsesScrollButtons(false);
     tabBar->setElideMode(Qt::ElideNone);
 
-    tabs_->addTab( downscale_page_, tr("Downscale") );
-    tabs_->addTab( preprocess_page_, tr("Processing") );
-    tabs_->addTab( init_page_, tr("Initialization") );
-    tabs_->addTab( algo_page_, tr("Algorithm") );
-
+    tabs_->addTab(downscale_page_, tr("Downscale"));
+    tabs_->addTab(preprocess_page_, tr("Processing"));
+    tabs_->addTab(init_page_, tr("Initialization"));
+    tabs_->addTab(algo_page_, tr("Algorithm"));
 
     settingsView_ = new ImageView(this);
 
-    //auto interaction = std::make_unique<InteractionSet>();
-    //interaction->addBehavior(std::make_unique<ZoomBehavior>());
+    // auto interaction = std::make_unique<InteractionSet>();
+    // interaction->addBehavior(std::make_unique<ZoomBehavior>());
 
-    //settingsView->setInteraction(interaction.release());
+    // settingsView->setInteraction(interaction.release());
 
-    QGridLayout *settings_grid = new QGridLayout;
-    settings_grid->addWidget(tabs_,0,0);
-    settings_grid->addWidget(settingsView_,0,1);
+    QGridLayout* settings_grid = new QGridLayout;
+    settings_grid->addWidget(tabs_, 0, 0);
+    settings_grid->addWidget(settingsView_, 0, 1);
 
-    settings_grid->addWidget(dial_buttons_,1,1);
+    settings_grid->addWidget(dial_buttons_, 1, 1);
 
-    settings_grid->setColumnStretch(1,1);
+    settings_grid->setColumnStretch(1, 1);
     setLayout(settings_grid);
 
     imageSettingsController_ = new ImageSettingsController(this);
@@ -121,8 +120,7 @@ SettingsWindow::SettingsWindow(QWidget* parent) :
 
 void SettingsWindow::setupUiAlgoTab()
 {
-    algo_widget_ = new AlgoSettingsWidget(this,
-                                         Session::Image);
+    algo_widget_ = new AlgoSettingsWidget(this, Session::Image);
 
     QVBoxLayout* algo_layout = new QVBoxLayout;
     algo_layout->addWidget(algo_widget_);
@@ -141,9 +139,11 @@ void SettingsWindow::setupUiInitTab()
     shape_groupbox->setFlat(true);
 
     rectangle_radio_ = new QRadioButton(tr("rectangle"));
-    rectangle_radio_->setToolTip(tr("or click on the middle mouse button when the cursor is in the image"));
+    rectangle_radio_->setToolTip(
+        tr("or click on the middle mouse button when the cursor is in the image"));
     ellipse_radio_ = new QRadioButton(tr("ellipse"));
-    ellipse_radio_->setToolTip(tr("or click on the middle mouse button when the cursor is in the image"));
+    ellipse_radio_->setToolTip(
+        tr("or click on the middle mouse button when the cursor is in the image"));
 
     rectangle_radio_->setChecked(false);
     ellipse_radio_->setChecked(true);
@@ -156,7 +156,7 @@ void SettingsWindow::setupUiInitTab()
     ////////////////////////////////////////////
 
     QGroupBox* shape_size_groupbox = new QGroupBox(tr("Size"));
-    shape_size_groupbox ->setToolTip(tr("or roll the mouse wheel when the cursor is in the image"));
+    shape_size_groupbox->setToolTip(tr("or roll the mouse wheel when the cursor is in the image"));
 
     width_shape_spin_ = new QSpinBox;
     width_shape_spin_->setSingleStep(15);
@@ -178,8 +178,6 @@ void SettingsWindow::setupUiInitTab()
     width_slider_->setSingleStep(15);
     width_slider_->setValue(65);
 
-
-
     height_shape_spin_ = new QSpinBox;
     height_shape_spin_->setSingleStep(15);
     height_shape_spin_->setMinimum(0);
@@ -199,8 +197,6 @@ void SettingsWindow::setupUiInitTab()
     height_slider_->setTickInterval(25);
     height_slider_->setSingleStep(15);
     height_slider_->setValue(65);
-
-
 
     QVBoxLayout* shape_size_layout = new QVBoxLayout;
     shape_size_layout->addLayout(width_spin_layout);
@@ -234,8 +230,6 @@ void SettingsWindow::setupUiInitTab()
     abscissa_slider_->setSingleStep(15);
     abscissa_slider_->setValue(0);
 
-
-
     ordinate_spin_ = new QSpinBox;
     ordinate_spin_->setSingleStep(15);
     ordinate_spin_->setMinimum(-200);
@@ -256,8 +250,6 @@ void SettingsWindow::setupUiInitTab()
     ordinate_slider_->setSingleStep(15);
     ordinate_slider_->setValue(0);
 
-
-
     QVBoxLayout* position_layout = new QVBoxLayout;
     position_layout->addLayout(abscissa_spin_layout);
     position_layout->addWidget(abscissa_slider_);
@@ -271,10 +263,12 @@ void SettingsWindow::setupUiInitTab()
     modify_groupbox->setFlat(true);
 
     add_button_ = new QPushButton(tr("Add"));
-    add_button_->setToolTip(tr("or click on the left mouse button when the cursor is in the image"));
+    add_button_->setToolTip(
+        tr("or click on the left mouse button when the cursor is in the image"));
 
     subtract_button_ = new QPushButton(tr("Subtract"));
-    subtract_button_->setToolTip(tr("or click on the right mouse button when the cursor is in the image"));
+    subtract_button_->setToolTip(
+        tr("or click on the right mouse button when the cursor is in the image"));
 
     clear_button_ = new QPushButton(tr("Clear"));
 
@@ -306,9 +300,9 @@ void SettingsWindow::setupUiDownscaleTab()
     downscale_factor_cb_->addItem("2", 2);
     downscale_factor_cb_->addItem("4", 4);
 
-    auto *label = new QLabel(tr("Factor:"));
+    auto* label = new QLabel(tr("Factor:"));
 
-    auto *hbox = new QHBoxLayout;
+    auto* hbox = new QHBoxLayout;
     hbox->addWidget(label);
     hbox->addWidget(downscale_factor_cb_);
     hbox->addStretch();
@@ -326,8 +320,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     /// Preprocessing tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    //is_downscale_cb = new QCheckBox("Downscale :");
-    //is_downscale_cb->setChecked(false);
+    // is_downscale_cb = new QCheckBox("Downscale :");
+    // is_downscale_cb->setChecked(false);
 
     gaussian_noise_groupbox_ = new QGroupBox(tr("Gaussian white noise"));
     gaussian_noise_groupbox_->setCheckable(true);
@@ -337,7 +331,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     std_noise_spin_->setMinimum(0.0);
     std_noise_spin_->setMaximum(10000.0);
     std_noise_spin_->setToolTip(tr("standard deviation"));
-
 
     QFormLayout* gaussian_noise_layout = new QFormLayout;
     gaussian_noise_layout->addRow("σ =", std_noise_spin_);
@@ -352,7 +345,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     proba_noise_spin_->setSuffix(" %");
     proba_noise_spin_->setToolTip(tr("impulsional noise probability for each pixel"));
 
-
     QFormLayout* salt_noise_layout = new QFormLayout;
     salt_noise_layout->addRow(tr("d ="), proba_noise_spin_);
 
@@ -364,7 +356,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     std_speckle_noise_spin_->setMinimum(0.0);
     std_speckle_noise_spin_->setMaximum(1000.0);
     std_speckle_noise_spin_->setToolTip(tr("standard deviation"));
-
 
     QFormLayout* speckle_noise_layout = new QFormLayout;
     speckle_noise_layout->addRow("σ =", std_speckle_noise_spin_);
@@ -388,7 +379,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     klength_mean_spin_->setSingleStep(2);
     klength_mean_spin_->setMinimum(3);
     klength_mean_spin_->setMaximum(499);
-
 
     QFormLayout* mean_layout = new QFormLayout;
     mean_layout->addRow(tr("kernel size ="), klength_mean_spin_);
@@ -419,9 +409,9 @@ void SettingsWindow::setupUiPreprocessingTab()
     klength_median_spin_->setSingleStep(2);
     klength_median_spin_->setMinimum(3);
     klength_median_spin_->setMaximum(499);
-    //klength_median_spin->setSuffix("²");
-    complex_radio1_= new QRadioButton("O(r log r)×O(n)");
-    complex_radio2_= new QRadioButton("O(1)×O(n)");
+    // klength_median_spin->setSuffix("²");
+    complex_radio1_ = new QRadioButton("O(r log r)×O(n)");
+    complex_radio2_ = new QRadioButton("O(1)×O(n)");
 
     QFormLayout* median_layout = new QFormLayout;
     median_layout->addRow(tr("kernel size ="), klength_median_spin_);
@@ -440,7 +430,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     lambda_spin_ = new QDoubleSpinBox;
     lambda_spin_->setSingleStep(0.01);
     lambda_spin_->setMinimum(0.0);
-    lambda_spin_->setMaximum(1.0/4.0);
+    lambda_spin_->setMaximum(1.0 / 4.0);
     kappa_spin_ = new QDoubleSpinBox;
     kappa_spin_->setSingleStep(1.0);
     kappa_spin_->setMinimum(0.0);
@@ -462,7 +452,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     klength_open_spin_->setSingleStep(2);
     klength_open_spin_->setMinimum(3);
     klength_open_spin_->setMaximum(499);
-    klength_open_spin_->setToolTip(tr("the structuring element shape is a square and its origin is the center of the square"));
+    klength_open_spin_->setToolTip(tr("the structuring element shape is a square and its "
+                                      "origin is the center of the square"));
 
     QFormLayout* open_layout = new QFormLayout;
     open_layout->addRow(tr("SE size ="), klength_open_spin_);
@@ -474,7 +465,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     klength_close_spin_->setSingleStep(2);
     klength_close_spin_->setMinimum(3);
     klength_close_spin_->setMaximum(499);
-    klength_close_spin_->setToolTip(tr("the structuring element shape is a square and its origin is the center of the square"));
+    klength_close_spin_->setToolTip(tr("the structuring element shape is a square and its "
+                                       "origin is the center of the square"));
 
     QFormLayout* close_layout = new QFormLayout;
     close_layout->addRow(tr("SE size ="), klength_close_spin_);
@@ -492,7 +484,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     klength_tophat_spin_->setSingleStep(2);
     klength_tophat_spin_->setMinimum(3);
     klength_tophat_spin_->setMaximum(499);
-    klength_tophat_spin_->setToolTip(tr("the structuring element shape is a square and its origin is the center of the square"));
+    klength_tophat_spin_->setToolTip(tr("the structuring element shape is a square and its "
+                                        "origin is the center of the square"));
 
     QFormLayout* tophat_layout = new QFormLayout;
     tophat_layout->addRow(" ", whitetophat_radio_);
@@ -564,7 +557,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     preprocess_page_->setCheckable(true);
     preprocess_page_->setChecked(false);
 
-
     time_filt_ = new QLabel(this);
     time_filt_->setText(tr("time = "));
     QGroupBox* time_filt_groupbox = new QGroupBox(tr("Processing time"));
@@ -580,156 +572,130 @@ void SettingsWindow::setupUiPreprocessingTab()
 
 void SettingsWindow::setupConnections()
 {
-    //connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
+    // connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
 
-    connect(dial_buttons_, &QDialogButtonBox::accepted,
-            this, &SettingsWindow::accept);
+    connect(dial_buttons_, &QDialogButtonBox::accepted, this, &SettingsWindow::accept);
 
-    connect(dial_buttons_, &QDialogButtonBox::rejected,
-            this, &SettingsWindow::reject);
+    connect(dial_buttons_, &QDialogButtonBox::rejected, this, &SettingsWindow::reject);
 
-    auto* restoreBtn =
-        dial_buttons_->button(QDialogButtonBox::RestoreDefaults);
+    auto* restoreBtn = dial_buttons_->button(QDialogButtonBox::RestoreDefaults);
 
-    connect(restoreBtn, &QPushButton::clicked,
-            this, &SettingsWindow::default_settings);
+    connect(restoreBtn, &QPushButton::clicked, this, &SettingsWindow::default_settings);
 
-    //connect(klength_gradient_spin,SIGNAL(valueChanged(int)),this,
-    //SLOT(show_phi_with_filtered_image()));
+    // connect(klength_gradient_spin,SIGNAL(valueChanged(int)),this,
+    // SLOT(show_phi_with_filtered_image()));
 
-    //connect(alpha_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    //connect(beta_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    //connect(gamma_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(alpha_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(beta_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(gamma_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
 
-    connect(width_slider_,      &QSlider::valueChanged,
-            width_shape_spin_,  &QSpinBox::setValue);
+    connect(width_slider_, &QSlider::valueChanged, width_shape_spin_, &QSpinBox::setValue);
 
-    connect(width_shape_spin_,  QOverload<int>::of(&QSpinBox::valueChanged),
-            width_slider_,      &QSlider::setValue);
+    connect(width_shape_spin_, QOverload<int>::of(&QSpinBox::valueChanged), width_slider_,
+            &QSlider::setValue);
 
-    connect(height_slider_,      &QSlider::valueChanged,
-            height_shape_spin_,  &QSpinBox::setValue);
+    connect(height_slider_, &QSlider::valueChanged, height_shape_spin_, &QSpinBox::setValue);
 
-    connect(height_shape_spin_,  QOverload<int>::of(&QSpinBox::valueChanged),
-            height_slider_,      &QSlider::setValue);
+    connect(height_shape_spin_, QOverload<int>::of(&QSpinBox::valueChanged), height_slider_,
+            &QSlider::setValue);
 
-    connect(ordinate_slider_,      &QSlider::valueChanged,
-            ordinate_spin_,  &QSpinBox::setValue);
+    connect(ordinate_slider_, &QSlider::valueChanged, ordinate_spin_, &QSpinBox::setValue);
 
-    connect(ordinate_spin_,  QOverload<int>::of(&QSpinBox::valueChanged),
-            ordinate_slider_,      &QSlider::setValue);
+    connect(ordinate_spin_, QOverload<int>::of(&QSpinBox::valueChanged), ordinate_slider_,
+            &QSlider::setValue);
 
-    connect(abscissa_slider_,      &QSlider::valueChanged,
-            abscissa_spin_,  &QSpinBox::setValue);
+    connect(abscissa_slider_, &QSlider::valueChanged, abscissa_spin_, &QSpinBox::setValue);
 
-    connect(abscissa_spin_,  QOverload<int>::of(&QSpinBox::valueChanged),
-            abscissa_slider_,      &QSlider::setValue);
+    connect(abscissa_spin_, QOverload<int>::of(&QSpinBox::valueChanged), abscissa_slider_,
+            &QSlider::setValue);
 
+    // connect(gaussian_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(std_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
 
+    // connect(salt_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(proba_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
 
+    // connect(speckle_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(std_speckle_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
 
+    // connect(mean_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(klength_mean_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(gaussian_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(std_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(gaussian_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(klength_gaussian_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(std_filter_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(salt_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(proba_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(median_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(klength_median_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(complex_radio1,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(complex_radio2,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(speckle_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(std_speckle_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(aniso_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(aniso1_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(aniso2_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(iteration_filter_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(lambda_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(kappa_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(mean_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(klength_mean_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(open_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(klength_open_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(gaussian_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(klength_gaussian_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    //connect(std_filter_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(close_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(klength_close_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(median_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(klength_median_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    //connect(complex_radio1,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(complex_radio2,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(tophat_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(whitetophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(blacktophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(klength_tophat_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(aniso_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(aniso1_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(aniso2_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(iteration_filter_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    //connect(lambda_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
-    //connect(kappa_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(complex1_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    // connect(complex2_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(open_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(klength_open_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(preprocess_page,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(close_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(klength_close_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    // connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
 
-    //connect(tophat_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(whitetophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(blacktophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(klength_tophat_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
+    connect(add_button_, &QPushButton::clicked, this, &SettingsWindow::onAddShape);
 
-    //connect(complex1_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    //connect(complex2_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    connect(subtract_button_, &QPushButton::clicked, this, &SettingsWindow::onSubtractShape);
 
-        //connect(preprocess_page,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    connect(clear_button_, &QPushButton::clicked, this, &SettingsWindow::onClearPhi);
 
-        //connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-
-
-    connect(add_button_, &QPushButton::clicked,
-            this, &SettingsWindow::onAddShape);
-
-    connect(subtract_button_, &QPushButton::clicked,
-            this, &SettingsWindow::onSubtractShape);
-
-    connect(clear_button_, &QPushButton::clicked,
-            this, &SettingsWindow::onClearPhi);
-
-    connect(imageSettingsController_,
-            &ImageSettingsController::viewChanged,
-            settingsView_,
+    connect(imageSettingsController_, &ImageSettingsController::viewChanged, settingsView_,
             &ImageView::setImage);
 
-    //phiViewModel_->onConnectivityChanged( connectivity_cb->currentIndex() );
+    // phiViewModel_->onConnectivityChanged( connectivity_cb->currentIndex() );
 
     /*connect(connectivity_cb,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             phiViewModel_,
             &PhiViewModel::onConnectivityChanged);*/
 
-    connect(rectangle_radio_,   &QRadioButton::toggled,
-            this,  &SettingsWindow::onUiShapeChanged);
-    connect(ellipse_radio_,     &QRadioButton::toggled,
-            this,  &SettingsWindow::onUiShapeChanged);
+    connect(rectangle_radio_, &QRadioButton::toggled, this, &SettingsWindow::onUiShapeChanged);
+    connect(ellipse_radio_, &QRadioButton::toggled, this, &SettingsWindow::onUiShapeChanged);
 
-    connect(width_shape_spin_,  &QSpinBox::valueChanged,
-            this,  &SettingsWindow::onUiShapeChanged);
-    connect(height_shape_spin_, &QSpinBox::valueChanged,
-            this,  &SettingsWindow::onUiShapeChanged);
+    connect(width_shape_spin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
+    connect(height_shape_spin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
 
-    connect(abscissa_spin_,     &QSpinBox::valueChanged,
-            this,  &SettingsWindow::onUiShapeChanged);
-    connect(ordinate_spin_,     &QSpinBox::valueChanged,
-            this,  &SettingsWindow::onUiShapeChanged);
+    connect(abscissa_spin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
+    connect(ordinate_spin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
 
-    connect(this,
-            &SettingsWindow::updateOverlay,
-            imageSettingsController_,
+    connect(this, &SettingsWindow::updateOverlay, imageSettingsController_,
             &ImageSettingsController::onUpdateOverlay);
 }
 
 void SettingsWindow::onUiShapeChanged()
 {
-    emit updateOverlay( getUiShape() );
+    emit updateOverlay(getUiShape());
 }
 
 UiShapeInfo SettingsWindow::getUiShape() const
 {
     UiShapeInfo uiShape;
 
-    if ( rectangle_radio_->isChecked() )
+    if (rectangle_radio_->isChecked())
         uiShape.shape = ShapeType::Rectangle;
-    else if ( ellipse_radio_->isChecked() )
+    else if (ellipse_radio_->isChecked())
         uiShape.shape = ShapeType::Ellipse;
     else
         uiShape.shape = ShapeType::Rectangle;
@@ -752,11 +718,11 @@ void SettingsWindow::accept()
     auto& filt_config = AppSettings::instance().imgConfig.compute.processing;
 
     filt_config.has_gaussian_noise = gaussian_noise_groupbox_->isChecked();
-    filt_config.std_noise = float( std_noise_spin_->value() );
+    filt_config.std_noise = float(std_noise_spin_->value());
     filt_config.has_salt_noise = salt_noise_groupbox_->isChecked();
-    filt_config.proba_noise = float( proba_noise_spin_->value() ) / 100.f;
+    filt_config.proba_noise = float(proba_noise_spin_->value()) / 100.f;
     filt_config.has_speckle_noise = speckle_noise_groupbox_->isChecked();
-    filt_config.std_speckle_noise = float( std_speckle_noise_spin_->value() );
+    filt_config.std_speckle_noise = float(std_speckle_noise_spin_->value());
     filt_config.has_median_filt = median_groupbox_->isChecked();
     filt_config.kernel_median_length = klength_median_spin_->value();
     filt_config.has_O1_algo = complex_radio2_->isChecked();
@@ -766,17 +732,17 @@ void SettingsWindow::accept()
 
     filt_config.has_gaussian_filt = gaussian_groupbox_->isChecked();
     filt_config.kernel_gaussian_length = klength_gaussian_spin_->value();
-    filt_config.sigma = float( std_filter_spin_->value() );
+    filt_config.sigma = float(std_filter_spin_->value());
     filt_config.has_aniso_diff = aniso_groupbox_->isChecked();
 
     filt_config.max_itera = iteration_filter_spin_->value();
-    filt_config.lambda = float( lambda_spin_->value() );
-    filt_config.kappa = float( kappa_spin_->value() );
-    if( aniso1_radio_->isChecked() )
+    filt_config.lambda = float(lambda_spin_->value());
+    filt_config.kappa = float(kappa_spin_->value());
+    if (aniso1_radio_->isChecked())
     {
         filt_config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION1;
     }
-    else if( aniso2_radio_->isChecked() )
+    else if (aniso2_radio_->isChecked())
     {
         filt_config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION2;
     }
@@ -804,25 +770,25 @@ void SettingsWindow::updateUIFromConfig()
 {
     const auto& ds_config = AppSettings::instance().imgConfig.compute.downscale;
 
-    downscale_page_->setChecked( ds_config.hasDownscale );
+    downscale_page_->setChecked(ds_config.hasDownscale);
 
-    int index = downscale_factor_cb_->findData( ds_config.downscaleFactor );
-    if ( index >= 0 )
-        downscale_factor_cb_->setCurrentIndex( index );
+    int index = downscale_factor_cb_->findData(ds_config.downscaleFactor);
+    if (index >= 0)
+        downscale_factor_cb_->setCurrentIndex(index);
 
     const auto& config_filter = AppSettings::instance().imgConfig.compute.processing;
 
     gaussian_noise_groupbox_->setChecked(config_filter.has_gaussian_noise);
-    std_noise_spin_->setValue( double( config_filter.std_noise ) );
+    std_noise_spin_->setValue(double(config_filter.std_noise));
     salt_noise_groupbox_->setChecked(config_filter.has_salt_noise);
-    proba_noise_spin_->setValue( double( 100.f*config_filter.proba_noise ) );
+    proba_noise_spin_->setValue(double(100.f * config_filter.proba_noise));
     speckle_noise_groupbox_->setChecked(config_filter.has_speckle_noise);
-    std_speckle_noise_spin_->setValue( double( config_filter.std_speckle_noise ) );
+    std_speckle_noise_spin_->setValue(double(config_filter.std_speckle_noise));
 
     median_groupbox_->setChecked(config_filter.has_median_filt);
     klength_median_spin_->setValue(config_filter.kernel_median_length);
 
-    if( config_filter.has_O1_algo )
+    if (config_filter.has_O1_algo)
     {
         complex_radio2_->setChecked(true);
     }
@@ -836,17 +802,17 @@ void SettingsWindow::updateUIFromConfig()
 
     gaussian_groupbox_->setChecked(config_filter.has_gaussian_filt);
     klength_gaussian_spin_->setValue(config_filter.kernel_gaussian_length);
-    std_filter_spin_->setValue( double( config_filter.sigma ) );
+    std_filter_spin_->setValue(double(config_filter.sigma));
 
     aniso_groupbox_->setChecked(config_filter.has_aniso_diff);
     iteration_filter_spin_->setValue(config_filter.max_itera);
-    lambda_spin_->setValue( double( config_filter.lambda ) );
-    kappa_spin_->setValue( double( config_filter.kappa ) );
-    if( config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION1 )
+    lambda_spin_->setValue(double(config_filter.lambda));
+    kappa_spin_->setValue(double(config_filter.kappa));
+    if (config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION1)
     {
         aniso1_radio_->setChecked(true);
     }
-    else if( config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION2 )
+    else if (config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION2)
     {
         aniso2_radio_->setChecked(true);
     }
@@ -859,7 +825,7 @@ void SettingsWindow::updateUIFromConfig()
 
     tophat_groupbox_->setChecked(config_filter.has_top_hat_filt);
 
-    if( config_filter.is_white_top_hat )
+    if (config_filter.is_white_top_hat)
     {
         whitetophat_radio_->setChecked(true);
     }
@@ -869,7 +835,7 @@ void SettingsWindow::updateUIFromConfig()
     }
     klength_tophat_spin_->setValue(config_filter.kernel_tophat_length);
 
-    if( config_filter.has_O1_morpho )
+    if (config_filter.has_O1_morpho)
     {
         complex2_morpho_radio_->setChecked(true);
     }
@@ -895,80 +861,80 @@ void SettingsWindow::default_settings()
     ///////////////////////////////////
     //          Algorithm            //
     ///////////////////////////////////
-/*
-    connectivity_cb->setCurrentIndex( int(ofeli_ip::Connectivity::Four) );
+    /*
+        connectivity_cb->setCurrentIndex( int(ofeli_ip::Connectivity::Four) );
 
-    Na_spin->setValue( 30 );
-    lambda_in_spin->setValue( 1 );
-    lambda_out_spin->setValue( 1 );
+        Na_spin->setValue( 30 );
+        lambda_in_spin->setValue( 1 );
+        lambda_out_spin->setValue( 1 );
 
-    color_space_cb->setCurrentIndex( int(ofeli_ip::ColorSpaceOption::RGB) );
+        color_space_cb->setCurrentIndex( int(ofeli_ip::ColorSpaceOption::RGB) );
 
-    alpha_spin->setValue( 1 );
-    beta_spin->setValue( 1 );
-    gamma_spin->setValue( 1 );
+        alpha_spin->setValue( 1 );
+        beta_spin->setValue( 1 );
+        gamma_spin->setValue( 1 );
 
-    downscale_factor_cb->setCurrentIndex( 1 );
-    //has_temporal_smoothing_cb->setChecked( true );
-    //cycles_nbr_sb->setValue( 3 );
+        downscale_factor_cb->setCurrentIndex( 1 );
+        //has_temporal_smoothing_cb->setChecked( true );
+        //cycles_nbr_sb->setValue( 3 );
 
-    internalspeed_groupbox->setChecked( true );
-    Ns_spin->setValue( 3 );
-    disk_radius_spin->setValue( 2 );*/
+        internalspeed_groupbox->setChecked( true );
+        Ns_spin->setValue( 3 );
+        disk_radius_spin->setValue( 2 );*/
 
     ///////////////////////////////////
     //        Preprocessing          //
     ///////////////////////////////////
 
-    preprocess_page_->setChecked( false );
+    preprocess_page_->setChecked(false);
 
-    gaussian_noise_groupbox_->setChecked( false );
-    std_noise_spin_->setValue( 20.0 );
+    gaussian_noise_groupbox_->setChecked(false);
+    std_noise_spin_->setValue(20.0);
 
-    salt_noise_groupbox_->setChecked( false );
-    proba_noise_spin_->setValue( 0.05 );
+    salt_noise_groupbox_->setChecked(false);
+    proba_noise_spin_->setValue(0.05);
 
     speckle_noise_groupbox_->setChecked(false);
-    std_speckle_noise_spin_->setValue( 0.16 );
+    std_speckle_noise_spin_->setValue(0.16);
 
-    median_groupbox_->setChecked( false );
-    klength_median_spin_->setValue( 5 );
+    median_groupbox_->setChecked(false);
+    klength_median_spin_->setValue(5);
 
     // has_O1_algo
-    complex_radio2_->setChecked( true );
+    complex_radio2_->setChecked(true);
 
-    mean_groupbox_->setChecked( false );
-    klength_mean_spin_->setValue( 5 );
+    mean_groupbox_->setChecked(false);
+    klength_mean_spin_->setValue(5);
 
-    gaussian_groupbox_->setChecked( false );
-    klength_gaussian_spin_->setValue( 5 );
-    std_filter_spin_->setValue( 2.0 );
+    gaussian_groupbox_->setChecked(false);
+    klength_gaussian_spin_->setValue(5);
+    std_filter_spin_->setValue(2.0);
 
-    aniso_groupbox_->setChecked( false );
+    aniso_groupbox_->setChecked(false);
     // AnisoDiff::FUNCTION1
-    aniso1_radio_->setChecked( true );
-    iteration_filter_spin_->setValue( 10 );
-    lambda_spin_->setValue( 1.0/7.0 );
-    kappa_spin_->setValue( 30.0 );
+    aniso1_radio_->setChecked(true);
+    iteration_filter_spin_->setValue(10);
+    lambda_spin_->setValue(1.0 / 7.0);
+    kappa_spin_->setValue(30.0);
 
-    open_groupbox_->setChecked( false );
-    klength_open_spin_->setValue( 5 );
+    open_groupbox_->setChecked(false);
+    klength_open_spin_->setValue(5);
 
-    close_groupbox_->setChecked( false );
-    klength_close_spin_->setValue( 5 );
+    close_groupbox_->setChecked(false);
+    klength_close_spin_->setValue(5);
 
-    tophat_groupbox_->setChecked( false );
-    whitetophat_radio_->setChecked( true );
-    klength_tophat_spin_->setValue( 5 );
+    tophat_groupbox_->setChecked(false);
+    whitetophat_radio_->setChecked(true);
+    klength_tophat_spin_->setValue(5);
 
     // config.has_O1_morpho
-    complex2_morpho_radio_->setChecked( true );
+    complex2_morpho_radio_->setChecked(true);
 
     ///////////////////////////////////
     //       Initialization          //
     ///////////////////////////////////
 
-    ellipse_radio_->setChecked( true );
+    ellipse_radio_->setChecked(true);
 
     // 65% width and 65% height by default
     width_shape_spin_->setValue(65);
@@ -1120,40 +1086,40 @@ float SettingsWindow::calculate_filtered_image()
 
 void SettingsWindow::onAddShape()
 {
-    if ( imageSettingsController_ )
-        imageSettingsController_->addShape( getUiShape() );
+    if (imageSettingsController_)
+        imageSettingsController_->addShape(getUiShape());
 }
 
 void SettingsWindow::onSubtractShape()
 {
-    if ( imageSettingsController_ )
-        imageSettingsController_->subtractShape( getUiShape() );
+    if (imageSettingsController_)
+        imageSettingsController_->subtractShape(getUiShape());
 }
 
 void SettingsWindow::onClearPhi()
 {
-    if ( imageSettingsController_ )
+    if (imageSettingsController_)
         imageSettingsController_->clearPhi();
 }
 
 void SettingsWindow::onInputImageReady(const QImage& inputImage)
 {
-    if ( !inputImage.isNull() )
+    if (!inputImage.isNull())
         imageSettingsController_->onInputImageReady(inputImage);
 }
 
 void SettingsWindow::showEvent(QShowEvent* /*event*/)
 {
-    emit updateOverlay( getUiShape() );
+    emit updateOverlay(getUiShape());
 }
 
 void SettingsWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue( "Settings/Window/geometry", saveGeometry() );
+    settings.setValue("Settings/Window/geometry", saveGeometry());
 
     QDialog::closeEvent(event);
 }
 
-}
+} // namespace ofeli_app

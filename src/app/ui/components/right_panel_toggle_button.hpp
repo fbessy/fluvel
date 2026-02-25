@@ -1,8 +1,8 @@
 #pragma once
 
+#include <QIcon>
 #include <QPushButton>
 #include <QWidget>
-#include <QIcon>
 
 namespace ofeli_app
 {
@@ -22,4 +22,4 @@ private:
     QIcon iconOff_;
 };
 
-}
+} // namespace ofeli_app

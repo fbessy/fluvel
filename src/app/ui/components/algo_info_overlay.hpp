@@ -1,8 +1,8 @@
 #ifndef ALGO_INFO_OVERLAY_HPP
 #define ALGO_INFO_OVERLAY_HPP
 
-#include <QWidget>
 #include <QString>
+#include <QWidget>
 
 #include "algo_stats.hpp"
 
@@ -28,11 +28,11 @@ protected:
 private:
     QString m_algoName_;
     QString m_status_;
-    int     m_iteration_ = 0;
-    double  m_energy_    = 0.0;
+    int m_iteration_ = 0;
+    double m_energy_ = 0.0;
     AlgoStats stats_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // ALGO_INFO_OVERLAY_HPP

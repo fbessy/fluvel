@@ -1,25 +1,23 @@
 #ifndef IMAGE_VIEW_HPP
 #define IMAGE_VIEW_HPP
 
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsPixmapItem>
 #include <QElapsedTimer>
-#include <QTimer>
-#include <QImage>
 #include <QGraphicsBlurEffect>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QImage>
+#include <QTimer>
 
+#include "application_settings.hpp"
+#include "common_settings.hpp"
 #include "contour_point_item.hpp"
 #include "image_view_listener.hpp"
-#include "common_settings.hpp"
-#include "application_settings.hpp"
 #include "overlay_text_item.hpp"
-
 
 class QWheelEvent;
 class QMouseEvent;
 class QResizeEvent;
-
 
 namespace ofeli_app
 {
@@ -31,11 +29,9 @@ class ImageView : public QGraphicsView
     Q_OBJECT
 
 public:
-
     explicit ImageView(QWidget* parent = nullptr);
 
-    explicit ImageView(const DisplayConfig& displayConfig,
-                       const DownscaleConfig& downscaleConfig,
+    explicit ImageView(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
                        QWidget* parent = nullptr);
 
     // Throttling : fps max (0 = désactivé)
@@ -58,8 +54,7 @@ public:
     QRgb pixelColorAt(const QPoint& imagePos) const;
 
     void setListener(ImageViewListener* listener);
-    void onColorPicked(const QColor& color,
-                       const QPoint& imagePos);
+    void onColorPicked(const QColor& color, const QPoint& imagePos);
 
     bool hasImage() const;
     bool isPanRelevant() const;
@@ -70,13 +65,10 @@ public:
 public slots:
     void setImage(const QImage& img);
 
-    void setContour(const QVector<QPointF>& l_out,
-                    const QVector<QPointF>& l_in);
+    void setContour(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in);
 
-    void setImageAndContour(const QImage& image,
-                            const QVector<QPointF>& l_out,
-                            const QVector<QPointF>& l_in,
-                            qint64 receiveTs);
+    void setImageAndContour(const QImage& image, const QVector<QPointF>& l_out,
+                            const QVector<QPointF>& l_in, qint64 receiveTs);
 
     void setText(const QString& text);
 
@@ -103,7 +95,6 @@ private slots:
     void flushPendingFrame();
 
 private:
-
     void initialize();
 
     void updatePixmap(const QImage& img);
@@ -116,15 +107,13 @@ private:
     void upscaleItems();
     void updateDisplayWithConfig();
 
-    QColor desaturateAndDarken(const QColor& original,
-                               qreal saturationFactor,
-                               qreal valueFactor);
+    QColor desaturateAndDarken(const QColor& original, qreal saturationFactor, qreal valueFactor);
 
     QImage darkenImage(const QImage& image);
 
-    QGraphicsScene*        scene_ = nullptr;
+    QGraphicsScene* scene_ = nullptr;
     QGraphicsItemGroup* contentRoot_ = nullptr;
-    QGraphicsPixmapItem*  pixmapItem_ = nullptr;
+    QGraphicsPixmapItem* pixmapItem_ = nullptr;
 
     bool autoFitEnabled_ = true;
 
@@ -151,23 +140,22 @@ private:
     qint64 lastReceiveTs_;
 
     ImageViewInteraction* m_interaction_ = nullptr;
-    ImageViewListener*        listener_ = nullptr;
+    ImageViewListener* listener_ = nullptr;
 
     DisplayConfig displayConfig_;
     DownscaleConfig downscaleConfig_;
 
-    ContourPointsItem* l_out_   = nullptr;
-    ContourPointsItem* l_in_    = nullptr;
+    ContourPointsItem* l_out_ = nullptr;
+    ContourPointsItem* l_in_ = nullptr;
 
-    OverlayTextItem*   overlay_ = nullptr;
+    OverlayTextItem* overlay_ = nullptr;
 
     bool paused_ = false;
     QGraphicsBlurEffect* blur_ = nullptr;
 
 signals:
     void imageClicked(int x, int y);
-    void frameDisplayed(qint64 receiveTs,
-                        qint64 displayTs);
+    void frameDisplayed(qint64 receiveTs, qint64 displayTs);
 };
 
 } // namespace ofeli_app

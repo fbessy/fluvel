@@ -41,9 +41,9 @@
 #include "application_settings.hpp"
 
 #include <QComboBox>
-#include <QSettings>
 #include <QDialogButtonBox>
 #include <QLabel>
+#include <QSettings>
 #include <QVBoxLayout>
 
 namespace ofeli_app
@@ -64,14 +64,11 @@ LanguageWindow::LanguageWindow(QWidget* parent)
 
     QString locale = QLocale::system().name().section('_', 0, 0);
 
-    combo_->addItem(tr("System (%1)").arg(locale),
-                   QVariant::fromValue(int(Language::System)));
+    combo_->addItem(tr("System (%1)").arg(locale), QVariant::fromValue(int(Language::System)));
 
-    combo_->addItem(tr("English"),
-                   QVariant::fromValue(int(Language::English)));
+    combo_->addItem(tr("English"), QVariant::fromValue(int(Language::English)));
 
-    combo_->addItem(tr("French"),
-                   QVariant::fromValue(int(Language::French)));
+    combo_->addItem(tr("French"), QVariant::fromValue(int(Language::French)));
 
     // sélectionner la langue actuelle indépendamment de l’index
     auto currentLanguage = AppSettings::instance().app_language;
@@ -86,11 +83,9 @@ LanguageWindow::LanguageWindow(QWidget* parent)
     buttons->addButton(QDialogButtonBox::Cancel);
     buttons->setCenterButtons(true);
 
-    connect(buttons, &QDialogButtonBox::accepted,
-            this,    &LanguageWindow::accept);
+    connect(buttons, &QDialogButtonBox::accepted, this, &LanguageWindow::accept);
 
-    connect(buttons, &QDialogButtonBox::rejected,
-            this,    &LanguageWindow::reject);
+    connect(buttons, &QDialogButtonBox::rejected, this, &LanguageWindow::reject);
 
     // --- Restart label ---
     QLabel* restart_label = new QLabel(this);
@@ -111,9 +106,7 @@ LanguageWindow::LanguageWindow(QWidget* parent)
 void LanguageWindow::accept()
 {
     // récupérer la valeur logique (pas l’index)
-    Language language = Language(
-        combo_->currentData().toInt()
-    );
+    Language language = Language(combo_->currentData().toInt());
 
     AppSettings::instance().app_language = language;
 
@@ -143,4 +136,4 @@ void LanguageWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-}
+} // namespace ofeli_app

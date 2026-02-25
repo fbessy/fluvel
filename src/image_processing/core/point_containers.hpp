@@ -1,9 +1,9 @@
 #pragma once
 
-#include <unordered_set>
 #include "point_hash.hpp"
+#include <unordered_set>
 
 namespace ofeli_ip
 {
-    using PointSet = std::unordered_set<Point2D_i>;
+using PointSet = std::unordered_set<Point2D_i>;
 }

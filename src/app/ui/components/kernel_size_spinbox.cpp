@@ -42,22 +42,19 @@
 namespace ofeli_app
 {
 
-KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent) :
-    QSpinBox(parent) 
+KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent)
+    : QSpinBox(parent)
 {
     setSuffix(" × ");
 
-    connect(this,
-            QOverload<const QString &>::of(&QSpinBox::textChanged),
-            this,
-            &KernelSizeSpinBox::set_suffix,
-            Qt::UniqueConnection);
+    connect(this, QOverload<const QString&>::of(&QSpinBox::textChanged), this,
+            &KernelSizeSpinBox::set_suffix, Qt::UniqueConnection);
 }
 
 QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
 {
     QString text_without_suffix(text);
-    text_without_suffix.chop( suffix().size() );
+    text_without_suffix.chop(suffix().size());
 
     qsizetype size = text_without_suffix.size();
     bool is_successed;
@@ -65,27 +62,27 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
 
     QValidator::State result;
 
-    if( text_without_suffix.isEmpty() )
+    if (text_without_suffix.isEmpty())
     {
         result = QValidator::Intermediate;
     }
-    else if( !is_successed )
+    else if (!is_successed)
     {
         result = QValidator::Invalid;
     }
-    else if( value > maximum() )
+    else if (value > maximum())
     {
         result = QValidator::Invalid;
     }
-    else if( value < minimum() )
+    else if (value < minimum())
     {
         result = QValidator::Intermediate;
     }
-    else if( value % 2 == 1 )
+    else if (value % 2 == 1)
     {
         result = QValidator::Acceptable;
     }
-    else if( pos == size )
+    else if (pos == size)
     {
         result = QValidator::Intermediate;
     }
@@ -94,20 +91,19 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
         result = QValidator::Invalid;
     }
 
-    if( hasFocus() )
+    if (hasFocus())
     {
-
-        if( result == QValidator::Acceptable )
+        if (result == QValidator::Acceptable)
         {
             const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:green");
         }
-        else if( result == QValidator::Intermediate )
+        else if (result == QValidator::Intermediate)
         {
             const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:orange");
         }
-        else if( result == QValidator::Invalid )
+        else if (result == QValidator::Invalid)
         {
-            if( previous_result_ == QValidator::Acceptable )
+            if (previous_result_ == QValidator::Acceptable)
             {
                 const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:green");
             }
@@ -122,7 +118,7 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
         const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("");
     }
 
-    if( result != QValidator::Invalid )
+    if (result != QValidator::Invalid)
     {
         const_cast<KernelSizeSpinBox*>(this)->previous_result_ = result;
     }
@@ -133,7 +129,7 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
 void KernelSizeSpinBox::set_suffix(const QString& text)
 {
     QString text_without_suffix(text);
-    text_without_suffix.chop( suffix().size() );
+    text_without_suffix.chop(suffix().size());
 
     text_without_suffix = " × " + text_without_suffix;
     const_cast<KernelSizeSpinBox*>(this)->setSuffix(text_without_suffix);
@@ -145,4 +141,4 @@ void KernelSizeSpinBox::focusInEvent(QFocusEvent* event)
     QAbstractSpinBox::focusInEvent(event);
 }
 
-}
+} // namespace ofeli_app

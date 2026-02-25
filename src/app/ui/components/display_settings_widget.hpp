@@ -3,12 +3,12 @@
 
 #include "common_settings.hpp"
 
-#include <QWidget>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QGroupBox>
 #include <QPushButton>
 #include <QRadioButton>
-#include <QGroupBox>
+#include <QWidget>
 
 namespace ofeli_app
 {
@@ -20,8 +20,7 @@ class DisplaySettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    DisplaySettingsWidget(QWidget* parent,
-                          Session session);
+    DisplaySettingsWidget(QWidget* parent, Session session);
 
 public slots:
     void setPanelVisible(bool open);
@@ -31,7 +30,6 @@ private slots:
     void onVideoSettingsChanged();
 
 private:
-
     void setConfig();
     void refresh_pipeline_displayed_gb_availability();
 
@@ -54,6 +52,6 @@ private:
     Session session_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // DISPLAY_SETTINGS_WIDGET_HPP

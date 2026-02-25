@@ -2,7 +2,8 @@
 
 #include <QPainter>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 AlgoInfoOverlay::AlgoInfoOverlay(QWidget* parent)
     : QWidget(parent)
@@ -68,4 +69,4 @@ void AlgoInfoOverlay::setStats(const AlgoStats& stats)
     update();
 }
 
-}
+} // namespace ofeli_app

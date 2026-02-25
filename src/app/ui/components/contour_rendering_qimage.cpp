@@ -38,8 +38,8 @@
 ****************************************************************************/
 
 #include "contour_rendering_qimage.hpp"
-#include "contour_data.hpp"
 #include "common_settings.hpp"
+#include "contour_data.hpp"
 
 #include <QImage>
 
@@ -47,8 +47,7 @@ namespace ofeli_app
 {
 
 void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                      const ofeli_ip::Rgb_uc& color,
-                      QImage& img)
+                      const ofeli_ip::Rgb_uc& color, QImage& img)
 {
     assert(!img.isNull());
     assert(img.format() == QImage::Format_RGB32);
@@ -73,9 +72,7 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
 }
 
 void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const ofeli_ip::Rgb_uc& color,
-                       int upscale_factor,
-                       QImage& img)
+                       const ofeli_ip::Rgb_uc& color, int upscale_factor, QImage& img)
 {
     if (upscale_factor != 2 && upscale_factor != 4)
         return;
@@ -97,22 +94,18 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
         const int base_y = upscale_factor * point.y();
 
         // fast path: whole kernel inside image
-        if (   base_x + kernel_radius < w
-            && base_y + kernel_radius < h
-            && base_x - kernel_radius + 1 >= 0
-            && base_y - kernel_radius + 1 >= 0 )
+        if (base_x + kernel_radius < w && base_y + kernel_radius < h &&
+            base_x - kernel_radius + 1 >= 0 && base_y - kernel_radius + 1 >= 0)
         {
             for (int dy = -kernel_radius + 1; dy <= kernel_radius; ++dy)
             {
-                const qsizetype lineOffset =
-                    static_cast<qsizetype>(base_y + dy) * stride;
+                const qsizetype lineOffset = static_cast<qsizetype>(base_y + dy) * stride;
 
                 uchar* line = data + lineOffset;
 
                 for (int dx = -kernel_radius + 1; dx <= kernel_radius; ++dx)
                 {
-                    uchar* px =
-                        line + (static_cast<qsizetype>(base_x + dx) << 2);
+                    uchar* px = line + (static_cast<qsizetype>(base_x + dx) << 2);
 
                     px[0] = color.blue;
                     px[1] = color.green;
@@ -130,8 +123,7 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                 if (y < 0 || y >= h)
                     continue;
 
-                const qsizetype lineOffset =
-                    static_cast<qsizetype>(y) * stride;
+                const qsizetype lineOffset = static_cast<qsizetype>(y) * stride;
 
                 uchar* line = data + lineOffset;
 
@@ -141,8 +133,7 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
                     if (x < 0 || x >= w)
                         continue;
 
-                    uchar* px =
-                        line + (static_cast<qsizetype>(x) << 2);
+                    uchar* px = line + (static_cast<qsizetype>(x) << 2);
 
                     px[0] = color.blue;
                     px[1] = color.green;
@@ -154,4 +145,4 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
     }
 }
 
-}
+} // namespace ofeli_app

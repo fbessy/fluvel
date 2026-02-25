@@ -11,9 +11,8 @@ namespace ofeli_app
 class FullscreenBehavior : public ViewBehavior
 {
 public:
-    bool mouseDoubleClick(ImageView& view,
-                          QMouseEvent* event) override;
+    bool mouseDoubleClick(ImageView& view, QMouseEvent* event) override;
 };
 
-}
+} // namespace ofeli_app
 #endif // FULLSCREEN_BEHAVIOR_HPP

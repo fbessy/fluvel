@@ -1,8 +1,8 @@
 #ifndef IMAGE_SPAN_HPP
 #define IMAGE_SPAN_HPP
 
-#include <cassert>
 #include <bit>
+#include <cassert>
 #include <cstddef>
 #include <utility>
 
@@ -23,36 +23,53 @@ enum class ImageFormat
 class ImageSpan final
 {
 public:
-
     ImageSpan() = default;
 
-    ImageSpan(const unsigned char* data,
-              int widthPixels, int heightPixels,
-              ImageFormat format = ImageFormat::Gray8,
-              int strideBytes = 0)
-        : data_(data),
-        widthPixels_(widthPixels), heightPixels_(heightPixels),
-        format_(format),
-        channelsPerPixel_(channels_from_format(format)),
-        strideBytes_(compute_stride(widthPixels_,
-                                    channelsPerPixel_,
-                                    strideBytes))
+    ImageSpan(const unsigned char* data, int widthPixels, int heightPixels,
+              ImageFormat format = ImageFormat::Gray8, int strideBytes = 0)
+        : data_(data)
+        , widthPixels_(widthPixels)
+        , heightPixels_(heightPixels)
+        , format_(format)
+        , channelsPerPixel_(channels_from_format(format))
+        , strideBytes_(compute_stride(widthPixels_, channelsPerPixel_, strideBytes))
     {
-        assert( data != nullptr );
-        assert( widthPixels  > 0 );
-        assert( heightPixels > 0 );
-        assert( strideBytes >= 0 );
+        assert(data != nullptr);
+        assert(widthPixels > 0);
+        assert(heightPixels > 0);
+        assert(strideBytes >= 0);
 
         assert(strideBytes_ >= widthPixels_ * channelsPerPixel_);
     }
 
-    const unsigned char* data()   const noexcept { return data_; }
-    int width()                   const noexcept { return widthPixels_; }
-    int height()                  const noexcept { return heightPixels_; }
-    int size()                  const noexcept   { return widthPixels_*heightPixels_; }
-    ImageFormat format() const noexcept { return format_; }
-    int channels()                const noexcept { return channelsPerPixel_; }
-    int strideBytes()             const noexcept { return strideBytes_; }
+    const unsigned char* data() const noexcept
+    {
+        return data_;
+    }
+    int width() const noexcept
+    {
+        return widthPixels_;
+    }
+    int height() const noexcept
+    {
+        return heightPixels_;
+    }
+    int size() const noexcept
+    {
+        return widthPixels_ * heightPixels_;
+    }
+    ImageFormat format() const noexcept
+    {
+        return format_;
+    }
+    int channels() const noexcept
+    {
+        return channelsPerPixel_;
+    }
+    int strideBytes() const noexcept
+    {
+        return strideBytes_;
+    }
 
     const unsigned char* row(int y) const noexcept
     {
@@ -71,35 +88,35 @@ public:
 
     inline Rgb_uc atPixelRgb(int x, int y) const noexcept
     {
-        const unsigned char* p = row( y );
+        const unsigned char* p = row(y);
 
         switch (format_)
         {
-        case ImageFormat::Gray8:
-        {
-            const unsigned char v = p[x];
-            return { v, v, v };
-        }
-        case ImageFormat::Rgb24:
-        {
-            p +=  static_cast<ptrdiff_t>(x * 3);
-            return { p[0], p[1], p[2] };
-        }
-        case ImageFormat::Bgr24:
-        {
-            p += static_cast<ptrdiff_t>(x * 3);
-            return { p[2], p[1], p[0] };
-        }
-        case ImageFormat::Bgr32:
-        {
-            p += static_cast<ptrdiff_t>(x * 4);
-            return { p[2], p[1], p[0] };
-        }
-        case ImageFormat::Rgba32:
-        {
-            p += static_cast<ptrdiff_t>(x * 4);
-            return { p[0], p[1], p[2] }; // ignore alpha
-        }
+            case ImageFormat::Gray8:
+            {
+                const unsigned char v = p[x];
+                return {v, v, v};
+            }
+            case ImageFormat::Rgb24:
+            {
+                p += static_cast<ptrdiff_t>(x * 3);
+                return {p[0], p[1], p[2]};
+            }
+            case ImageFormat::Bgr24:
+            {
+                p += static_cast<ptrdiff_t>(x * 3);
+                return {p[2], p[1], p[0]};
+            }
+            case ImageFormat::Bgr32:
+            {
+                p += static_cast<ptrdiff_t>(x * 4);
+                return {p[2], p[1], p[0]};
+            }
+            case ImageFormat::Rgba32:
+            {
+                p += static_cast<ptrdiff_t>(x * 4);
+                return {p[0], p[1], p[2]}; // ignore alpha
+            }
         }
 
         // Violation de contrat : format_ invalide
@@ -120,32 +137,33 @@ private:
     int heightPixels_;
     ImageFormat format_;
     int channelsPerPixel_;
-    int strideBytes_;       // bytes per row
+    int strideBytes_; // bytes per row
 
-    static int compute_stride(int width,
-                              int channels,
-                              int strideBytes)
+    static int compute_stride(int width, int channels, int strideBytes)
     {
-        return (strideBytes == 0)
-        ? width * channels
-        : strideBytes;
+        return (strideBytes == 0) ? width * channels : strideBytes;
     }
 
     static constexpr int channels_from_format(ImageFormat fmt) noexcept
     {
         switch (fmt)
         {
-        case ImageFormat::Gray8:  return 1;
-        case ImageFormat::Rgb24:  return 3;
-        case ImageFormat::Bgr24:  return 3;
-        case ImageFormat::Bgr32:  return 4;
-        case ImageFormat::Rgba32: return 4;
+            case ImageFormat::Gray8:
+                return 1;
+            case ImageFormat::Rgb24:
+                return 3;
+            case ImageFormat::Bgr24:
+                return 3;
+            case ImageFormat::Bgr32:
+                return 4;
+            case ImageFormat::Rgba32:
+                return 4;
         }
 
         std::unreachable();
     }
 };
 
-}
+} // namespace ofeli_ip
 
 #endif // IMAGE_SPAN_HPP

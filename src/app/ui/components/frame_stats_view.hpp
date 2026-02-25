@@ -1,21 +1,23 @@
 #ifndef FRAME_STATS_VIEW_HPP
 #define FRAME_STATS_VIEW_HPP
 
-#include <QtGlobal>
 #include <QMutex>
+#include <QtGlobal>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 class FrameStatsView
 {
 public:
-    struct Snapshot {
-        double inputFps      = 0.0;
+    struct Snapshot
+    {
+        double inputFps = 0.0;
         double processingFps = 0.0;
-        double displayFps    = 0.0;
-        double dropRate      = 0.0;
-        double avgLatencyMs  = 0.0;
-        double maxLatencyMs  = 0.0;
+        double displayFps = 0.0;
+        double dropRate = 0.0;
+        double avgLatencyMs = 0.0;
+        double maxLatencyMs = 0.0;
     };
 
     FrameStatsView();
@@ -23,8 +25,7 @@ public:
     // événements
     void frameReceived(qint64 recvTsNs);
     void frameProcessed();
-    void frameDisplayed(qint64 recvTsNs,
-                        qint64 displayTsNs);
+    void frameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
 
     // lecture stable (fenêtre ~1s)
     Snapshot snapshot();
@@ -54,6 +55,6 @@ private:
     Snapshot lastSnapshot_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // FRAME_STATS_VIEW_HPP

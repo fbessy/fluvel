@@ -1,22 +1,23 @@
 #include "camera_settings_window.hpp"
 #include "algo_settings_widget.hpp"
 
-#include <QDialogButtonBox>
-#include <QTabWidget>
-#include <QTabBar>
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QComboBox>
-#include <QLabel>
 #include <QCheckBox>
-#include <QSpinBox>
+#include <QComboBox>
+#include <QDialogButtonBox>
 #include <QFormLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QSpinBox>
+#include <QTabBar>
+#include <QTabWidget>
+#include <QVBoxLayout>
 
 namespace ofeli_app
 {
 
-CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
-    QDialog(parent), config_(AppSettings::instance().camConfig)
+CameraSettingsWindow::CameraSettingsWindow(QWidget* parent)
+    : QDialog(parent)
+    , config_(AppSettings::instance().camConfig)
 {
     setWindowTitle(tr("Camera session settings"));
 
@@ -27,7 +28,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
 
     tabs_ = new QTabWidget(this);
 
-    auto *tabBar = tabs_->tabBar();
+    auto* tabBar = tabs_->tabBar();
 
     tabBar->setExpanding(false);
     tabBar->setUsesScrollButtons(false);
@@ -37,17 +38,15 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
 
     filter_cb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
 
-    auto *preprocess_layout = new QVBoxLayout(this);
+    auto* preprocess_layout = new QVBoxLayout(this);
     preprocess_layout->addWidget(downscale_gb_);
     preprocess_layout->addWidget(filter_cb_);
     preprocess_layout->addStretch(1);
 
-    auto * preprocess_gb = new QGroupBox;
+    auto* preprocess_gb = new QGroupBox;
     preprocess_gb->setLayout(preprocess_layout);
 
-
-    algoWidget_ = new AlgoSettingsWidget(this,
-                                        Session::Camera);
+    algoWidget_ = new AlgoSettingsWidget(this, Session::Camera);
 
     phases_sb_ = new QSpinBox;
     phases_sb_->setMinimum(1);
@@ -64,8 +63,8 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
     auto* algo_gb = new QGroupBox;
     algo_gb->setLayout(algoLayout);
 
-    tabs_->addTab( preprocess_gb, tr("Preprocessing") );
-    tabs_->addTab( algo_gb, tr("Algorithm") );
+    tabs_->addTab(preprocess_gb, tr("Preprocessing"));
+    tabs_->addTab(algo_gb, tr("Algorithm"));
 
     auto* layout = new QVBoxLayout;
     layout->addWidget(tabs_);
@@ -75,11 +74,9 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent):
 
     updateUIFromConfig();
 
-    connect(dial_buttons_, &QDialogButtonBox::accepted,
-            this,         &CameraSettingsWindow::accept);
+    connect(dial_buttons_, &QDialogButtonBox::accepted, this, &CameraSettingsWindow::accept);
 
-    connect(dial_buttons_, &QDialogButtonBox::rejected,
-            this,         &CameraSettingsWindow::reject);
+    connect(dial_buttons_, &QDialogButtonBox::rejected, this, &CameraSettingsWindow::reject);
 }
 
 void CameraSettingsWindow::setupUiDownscaleGb()
@@ -92,8 +89,7 @@ void CameraSettingsWindow::setupUiDownscaleGb()
     downscale_factor_cb_->addItem("4", 4);
 
     auto* fl = new QFormLayout;
-    fl->addRow(tr("Factor:"),
-               downscale_factor_cb_);
+    fl->addRow(tr("Factor:"), downscale_factor_cb_);
 
     downscale_gb_->setLayout(fl);
 }
@@ -115,17 +111,16 @@ void CameraSettingsWindow::accept()
 
 void CameraSettingsWindow::updateUIFromConfig()
 {
-    downscale_gb_->setChecked( config_.compute.downscale.hasDownscale );
+    downscale_gb_->setChecked(config_.compute.downscale.hasDownscale);
 
-    int index = downscale_factor_cb_->findData( config_.compute.downscale.downscaleFactor );
-    if ( index >= 0 )
-        downscale_factor_cb_->setCurrentIndex( index );
+    int index = downscale_factor_cb_->findData(config_.compute.downscale.downscaleFactor);
+    if (index >= 0)
+        downscale_factor_cb_->setCurrentIndex(index);
 
-    filter_cb_->setChecked( config_.compute.hasTemporalFiltering );
-
+    filter_cb_->setChecked(config_.compute.hasTemporalFiltering);
 
     algoWidget_->reject();
-    phases_sb_->setValue( config_.compute.cyclesNbr );
+    phases_sb_->setValue(config_.compute.cyclesNbr);
 }
 
 void CameraSettingsWindow::reject()
@@ -135,4 +130,4 @@ void CameraSettingsWindow::reject()
     QDialog::reject();
 }
 
-}
+} // namespace ofeli_app

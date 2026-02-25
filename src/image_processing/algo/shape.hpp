@@ -40,17 +40,15 @@
 #ifndef SHAPE_HPP
 #define SHAPE_HPP
 
-#include <vector>
 #include "point.hpp"
+#include <vector>
 
 namespace ofeli_ip
 {
 
 class Shape
 {
-
 public:
-
     //! Constructor.
     Shape();
 
@@ -70,7 +68,7 @@ public:
     void push_back(Point2D_i&& p);
 
     //! Swap the shape *this with an other shape in constant time, i.e. O(1) complexity.
-    void swap(Shape& other) noexcept ;
+    void swap(Shape& other) noexcept;
 
     //! Shuffles points of the shape.
     void shuffle_points();
@@ -82,22 +80,27 @@ public:
     bool is_valid() const;
 
     //! Gets the vector of points.
-    const std::vector<Point2D_i>& get_points() const { return points_; }
+    const std::vector<Point2D_i>& get_points() const
+    {
+        return points_;
+    }
 
     //! Gets the centroid of the shape.
-    const Point2D_f& get_centroid() const { return centroid_; }
+    const Point2D_f& get_centroid() const
+    {
+        return centroid_;
+    }
 
     //! Gets grid diagonal.
     static float get_grid_diagonal(int grid_width, int grid_height);
 
 private:
-
     std::vector<Point2D_i> points_;
 
     //! Position of the shape's centroid.
     Point2D_f centroid_;
 };
 
-}
+} // namespace ofeli_ip
 
 #endif // SHAPE_HPP

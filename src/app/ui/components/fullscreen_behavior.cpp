@@ -6,13 +6,11 @@
 namespace ofeli_app
 {
 
-bool FullscreenBehavior::mouseDoubleClick(ImageView& view,
-                                          QMouseEvent* event)
+bool FullscreenBehavior::mouseDoubleClick(ImageView& view, QMouseEvent* event)
 {
     Q_UNUSED(event);
 
-    if (event->type() == QEvent::MouseButtonDblClick &&
-        event->button() == Qt::LeftButton)
+    if (event->type() == QEvent::MouseButtonDblClick && event->button() == Qt::LeftButton)
     {
         view.toggleFullscreen();
         event->accept();
@@ -23,4 +21,4 @@ bool FullscreenBehavior::mouseDoubleClick(ImageView& view,
     return false;
 }
 
-}
+} // namespace ofeli_app

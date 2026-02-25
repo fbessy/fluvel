@@ -40,14 +40,14 @@
 #ifndef ACTIVE_CONTOUR_HPP
 #define ACTIVE_CONTOUR_HPP
 
-#include <vector>
 #include <cstddef>
 #include <limits>
+#include <vector>
 
-#include "contour_data.hpp"
-#include "shape.hpp"
-#include "point.hpp"
 #include "ac_types.hpp"
+#include "contour_data.hpp"
+#include "point.hpp"
+#include "shape.hpp"
 
 namespace ofeli_ip
 {
@@ -56,21 +56,19 @@ constexpr size_t kInitialSpeedArrayAllocSize = 10000u;
 
 class ActiveContour
 {
+public:
+    //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and
+    //! #l_out) with a copy semantic.
+    ActiveContour(const ContourData& initial_state, const AcConfig& config);
 
-public :
-
-    //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and #l_out)
-    //! with a copy semantic.
-    ActiveContour(const ContourData& initial_state,
-                  const AcConfig& config);
-
-    //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and #l_out)
-    //! with a move semantic.
-    ActiveContour(ContourData&& initial_state,
-                  const AcConfig& config);
+    //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and
+    //! #l_out) with a move semantic.
+    ActiveContour(ContourData&& initial_state, const AcConfig& config);
 
     //! Destructor.
-    virtual ~ActiveContour() {}
+    virtual ~ActiveContour()
+    {
+    }
 
     //! Handles a failure case.
     void handle_failure();
@@ -82,44 +80,76 @@ public :
     void step();
 
     //! Runs the active contour for a fixed number of full cycles (cycle1 + cycle2).
-    //! Ensures the contour is geometrically stable at the end of each cycle2 (used for video tracking).
+    //! Ensures the contour is geometrically stable at the end of each cycle2 (used for video
+    //! tracking).
     void run_cycles(int n_cycles);
 
-
     //! Export the boundary list l_out_ as a copied geometric representation.
-    ExportedContour export_l_out() const { return cd_.export_l_out(); }
+    ExportedContour export_l_out() const
+    {
+        return cd_.export_l_out();
+    }
 
     //! Export the boundary list l_in_ as a copied geometric representation.
-    ExportedContour export_l_in() const  { return cd_.export_l_in(); }
+    ExportedContour export_l_in() const
+    {
+        return cd_.export_l_in();
+    }
 
     //! Getter for the discrete level-set function with only 4 PhiValue possible.
-    const DiscreteLevelSet& phi() const { return cd_.phi(); }
+    const DiscreteLevelSet& phi() const
+    {
+        return cd_.phi();
+    }
 
     //! Getter for the list of offset points representing the exterior boundary.
-    const Contour& l_out() const { return cd_.l_out(); }
+    const Contour& l_out() const
+    {
+        return cd_.l_out();
+    }
     //! Getter for the list of offset points representing the interior boundary.
-    const Contour& l_in() const { return cd_.l_in(); }
+    const Contour& l_in() const
+    {
+        return cd_.l_in();
+    }
 
     //! Getter method for #state.
-    PhaseState state() const { return state_; }
+    PhaseState state() const
+    {
+        return state_;
+    }
 
     //! Gets if the active contour reaches the final state.
-    bool is_stopped() const { return state_ == PhaseState::Stopped; }
+    bool is_stopped() const
+    {
+        return state_ == PhaseState::Stopped;
+    }
 
     //! Getter method for #stopping_status.
-    StoppingStatus stop_reason() const { return ed_.stopping_status; }
+    StoppingStatus stop_reason() const
+    {
+        return ed_.stopping_status;
+    }
 
     //! Getter method for #step_count.
-    int step_count() const { return ed_.step_count; }
+    int step_count() const
+    {
+        return ed_.step_count;
+    }
 
     //! Getter method for #hausdorff_quantile.
-    float hausdorff_quantile() const { return ed_.hausdorff_quantile; }
+    float hausdorff_quantile() const
+    {
+        return ed_.hausdorff_quantile;
+    }
 
     //! Getter method for #centroids_distance.
-    float centroids_distance() const { return ed_.centroids_distance; }
+    float centroids_distance() const
+    {
+        return ed_.centroids_distance;
+    }
 
-protected :
-
+protected:
     //! restart the active contour, used for video tracking.
     void restart();
 
@@ -127,8 +157,7 @@ protected :
     //! (discret level-set function phi, Lin and Lout)
     ContourData cd_;
 
-private :
-
+private:
     //! Runs the active contour for a fixed number of elementary steps.
     //! Intended for incremental updates (e.g. video tracking).
     void run_steps(int n_steps);
@@ -143,7 +172,10 @@ private :
     void select_context(BoundarySwitch ctx_choice);
 
     //! Get the selected context.
-    const BoundarySwitchContext& context() { return *ctx_; }
+    const BoundarySwitchContext& context()
+    {
+        return *ctx_;
+    }
 
     //! Performs one directional topological update step (in or out).
     //! The step includes velocity computation, boundary switching,
@@ -165,18 +197,22 @@ private :
     //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
     void compute_internal_speed_Fint(ContourPoint& point);
 
-    //! Generic method to handle outward / inward local movement of a current boundary point (of #l_out or #l_in) and to switch it from one boundary list to the other.
+    //! Generic method to handle outward / inward local movement of a current boundary point (of
+    //! #l_out or #l_in) and to switch it from one boundary list to the other.
     void switch_boundary_point(ContourPoint& point);
 
     //! Promote a neighboring region point to boundary.
     void promote_region_to_boundary(int nx, int ny);
 
     //! Specific step for each iteration in cycle 1.
-    virtual void do_specific_cycle1() { }
+    virtual void do_specific_cycle1()
+    {
+    }
 
     //! Specific step when switch in or a switch out procedure is performed.
-    virtual void do_specific_when_switch(const ContourPoint& /*point*/,
-                                         BoundarySwitch) { }
+    virtual void do_specific_when_switch(const ContourPoint& /*point*/, BoundarySwitch)
+    {
+    }
 
     //! Stops the active contour and puts it in a terminal state.
     //! After this call, step(), converge(), and run_cycles() have no effect.
@@ -200,8 +236,7 @@ private :
     void calculate_shapes_intersection();
 
     //! Build kernel offsets.
-    static InternalKernel make_internal_kernel_offsets(int disk_radius,
-                                                       int grid_width);
+    static InternalKernel make_internal_kernel_offsets(int disk_radius, int grid_width);
 
     //! To transformate active contour data point to the points for the Hausdorff distance.
     static Point2D_i from_ContourPoint(const ContourPoint& point);
@@ -238,7 +273,7 @@ private :
 
 inline Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point)
 {
-    return { point.x(), point.y() };
+    return {point.x(), point.y()};
 }
 
 namespace speed_value
@@ -249,66 +284,92 @@ constexpr SpeedValue get_discrete_speed(int speed);
 
 constexpr SpeedValue get_discrete_speed(int speed)
 {
-    if (speed < 0) return SpeedValue::GoInward;
-    if (speed > 0) return SpeedValue::GoOutward;
+    if (speed < 0)
+        return SpeedValue::GoInward;
+    if (speed > 0)
+        return SpeedValue::GoOutward;
     return SpeedValue::NoMove;
 }
 
-}
+} // namespace speed_value
 
-}
+} // namespace ofeli_ip
 
 #endif // ACTIVE_CONTOUR_HPP
 
-
-
 //! \class ofeli::ActiveContour
-//! The class ActiveContour contains the implementation of the Fast-Two-Cycle (FTC) algorithm of Shi and Karl as it describes in their article "A real-time algorithm for the approximation of level-set based curve evolution" published in IEEE Transactions on Image Processing in may 2008.
-//! This class should be never instantiated because the function to calculate the external speed \a Fd is too general. The 3 classes #ofeli::ACwithoutEdges, #ofeli::ACwithoutEdgesYUV and #ofeli::GeodesicAC, inherit of the class ActiveContour, with for each class it own implementation of this function.
+//! The class ActiveContour contains the implementation of the Fast-Two-Cycle (FTC) algorithm of Shi
+//! and Karl as it describes in their article "A real-time algorithm for the approximation of
+//! level-set based curve evolution" published in IEEE Transactions on Image Processing in may 2008.
+//! This class should be never instantiated because the function to calculate the external speed \a
+//! Fd is too general. The 3 classes #ofeli::ACwithoutEdges, #ofeli::ACwithoutEdgesYUV and
+//! #ofeli::GeodesicAC, inherit of the class ActiveContour, with for each class it own
+//! implementation of this function.
 
 /**
  * \fn ActiveContour::ActiveContour(const unsigned char* img_data1, int img_width1, int img_height1,
-                                    bool has_ellipse1, double shape_width_ratio1, double shape_height_ratio1, double center_x_ratio1, double center_y_ratio1,
-                                    bool has_cycle2_1, int kernel_length1, double sigma1, unsigned int Na1, unsigned int Ns1)
- * \param img_data1 Input pointer on the image data buffer. This buffer must be row-wise, except if you define the macro COLUMN_WISE_IMAGE_DATA_BUFFER. Passed to #img_data.
+                                    bool has_ellipse1, double shape_width_ratio1, double
+ shape_height_ratio1, double center_x_ratio1, double center_y_ratio1, bool has_cycle2_1, int
+ kernel_length1, double sigma1, unsigned int Na1, unsigned int Ns1)
+ * \param img_data1 Input pointer on the image data buffer. This buffer must be row-wise, except if
+ you define the macro COLUMN_WISE_IMAGE_DATA_BUFFER. Passed to #img_data.
  * \param img_width1 Image width, i.e. number of columns. Passed to #img_width.
  * \param img_height1 Image height, i.e. number of rows. Passed to #img_height.
- * \param has_ellipse1 Boolean to choose the shape of the active contour initialization, \c true for an ellipse or \c false for a rectangle.
+ * \param has_ellipse1 Boolean to choose the shape of the active contour initialization, \c true for
+ an ellipse or \c false for a rectangle.
  * \param shape_width_ratio1 Width of the shape divided by the image #img_width.
  * \param shape_height_ratio1 Height of the shape divided by the image #img_height.
- * \param center_x_ratio1 X-axis position or column index of the center of the shape divided by the image #img_width subtracted by 0.5.
- * \param center_y_ratio1 Y-axis position or row index of the center of the shape divided by the image #img_height subtracted by 0.5.\n
-          To have the center of the shape into the image : -0.5 < center_x1 < 0.5 and -0.5 < center_y_ratio1 < 0.5.
- * \param has_cycle2_1 Boolean to have or not the curve smoothing, evolutions in the cycle 2 with an internal speed Fint. Passed to #is_cycle2.
- * \param kernel_length1 Kernel length of the gaussian filter for the curve smoothing. Passed to #kernel_length.
- * \param sigma1 Standard deviation of the gaussian kernel for the curve smoothing. Passed to #sigma.
- * \param Na1 Number of maximum iterations the active contour evolves in the cycle 1, external or data dependant evolutions with \a Fd speed. Passed to #Na_max.
- * \param Ns1 Number of maximum iterations the active contour evolves in the cycle 2, curve smoothing or internal evolutions with \a Fint speed. Passed to #Ns_max.
+ * \param center_x_ratio1 X-axis position or column index of the center of the shape divided by the
+ image #img_width subtracted by 0.5.
+ * \param center_y_ratio1 Y-axis position or row index of the center of the shape divided by the
+ image #img_height subtracted by 0.5.\n To have the center of the shape into the image : -0.5 <
+ center_x1 < 0.5 and -0.5 < center_y_ratio1 < 0.5.
+ * \param has_cycle2_1 Boolean to have or not the curve smoothing, evolutions in the cycle 2 with an
+ internal speed Fint. Passed to #is_cycle2.
+ * \param kernel_length1 Kernel length of the gaussian filter for the curve smoothing. Passed to
+ #kernel_length.
+ * \param sigma1 Standard deviation of the gaussian kernel for the curve smoothing. Passed to
+ #sigma.
+ * \param Na1 Number of maximum iterations the active contour evolves in the cycle 1, external or
+ data dependant evolutions with \a Fd speed. Passed to #Na_max.
+ * \param Ns1 Number of maximum iterations the active contour evolves in the cycle 2, curve
+ smoothing or internal evolutions with \a Fint speed. Passed to #Ns_max.
  */
 
 /**
  * \fn ActiveContour::ActiveContour(const unsigned char* img_data1, int img_width1, int img_height1,
                                     const char* phi_init1,
-                                    bool has_cycle2_1, int kernel_length1, double sigma1, unsigned int Na1, unsigned int Ns1)
- * \param img_data1 Input pointer on the image data buffer. This buffer must be row-wise, except if you define the macro COLUMN_WISE_IMAGE_DATA_BUFFER. Passed to #img_data.
+                                    bool has_cycle2_1, int kernel_length1, double sigma1, unsigned
+ int Na1, unsigned int Ns1)
+ * \param img_data1 Input pointer on the image data buffer. This buffer must be row-wise, except if
+ you define the macro COLUMN_WISE_IMAGE_DATA_BUFFER. Passed to #img_data.
  * \param img_width1 Image width, i.e. number of columns. Passed to #img_width.
  * \param img_height1 Image height, i.e. number of rows. Passed to #img_height.
- * \param phi_init1 Pointer on the initialized level-set function buffer. Copied to #phi. #phi is checked and cleaned if needed after so \a phi_init1 can be a binarized buffer with 1 for outside region and -1 for inside region to simplify your task.
- * \param has_cycle2_1 Boolean to have or not the curve smoothing, evolutions in the cycle 2 with an internal speed Fint. Passed to #is_cycle2.
- * \param kernel_length1 Kernel length of the gaussian filter for the curve smoothing. Passed to #kernel_length.
- * \param sigma1 Standard deviation of the gaussian kernel for the curve smoothing. Passed to #sigma.
- * \param Na1 Number of maximum iterations the active contour evolves in the cycle 1, external or data dependant evolutions with \a Fd speed. Passed to #Na_max.
- * \param Ns1 Number of maximum iterations the active contour evolves in the cycle 2, curve smoothing or internal evolutions with \a Fint speed. Passed to #Ns_max.
+ * \param phi_init1 Pointer on the initialized level-set function buffer. Copied to #phi. #phi is
+ checked and cleaned if needed after so \a phi_init1 can be a binarized buffer with 1 for outside
+ region and -1 for inside region to simplify your task.
+ * \param has_cycle2_1 Boolean to have or not the curve smoothing, evolutions in the cycle 2 with an
+ internal speed Fint. Passed to #is_cycle2.
+ * \param kernel_length1 Kernel length of the gaussian filter for the curve smoothing. Passed to
+ #kernel_length.
+ * \param sigma1 Standard deviation of the gaussian kernel for the curve smoothing. Passed to
+ #sigma.
+ * \param Na1 Number of maximum iterations the active contour evolves in the cycle 1, external or
+ data dependant evolutions with \a Fd speed. Passed to #Na_max.
+ * \param Ns1 Number of maximum iterations the active contour evolves in the cycle 2, curve
+ smoothing or internal evolutions with \a Fint speed. Passed to #Ns_max.
  */
 
 /**
  * \fn void ActiveContour::switch_in(ofeli::list<int>::iterator l_out_point)
- * \param l_out_point iterator which contains offset of the buffer pointed by #phi with \a offset = \a x + \a y × #img_width
+ * \param l_out_point iterator which contains offset of the buffer pointed by #phi with \a offset =
+ * \a x + \a y × #img_width
  */
 
 /**
  * \fn void ActiveContour::switch_out(ofeli::list<int>::iterator l_in_point)
- * \param l_in_point which contains offset of the buffer pointed by #phi with \a offset = \a x + \a y × #img_width
+ * \param l_in_point which contains offset of the buffer pointed by #phi with \a offset = \a x + \a
+ * y × #img_width
  */
 
 /**
@@ -320,7 +381,8 @@ constexpr SpeedValue get_discrete_speed(int speed)
 /**
  * \fn virtual signed char ActiveContour::compute_external_speed_Fd(ContourPoint& point)
  * \param offset offset of the image data buffer with \a offset = \a x + \a y × #img_width
- * \return Fd, the external speed for the data dependant evolution of the active contour used in the cycle 1
+ * \return Fd, the external speed for the data dependant evolution of the active contour used in the
+ * cycle 1
  */
 
 /**
@@ -371,7 +433,7 @@ constexpr SpeedValue get_discrete_speed(int speed)
  * ofeli::ACwithoutEdges ac(img1, img_width1, img_height1);
  *
  *
- * -----------------------------   Display the initial active contour   -----------------------------
+ * -----------------------------   Display the initial active contour -----------------------------
  *
  * const ofeli::list<int>* Lout = &ac.l_out();
  * const ofeli::list<int>* Lin = &ac.l_in();

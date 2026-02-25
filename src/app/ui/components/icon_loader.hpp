@@ -10,18 +10,14 @@ namespace ofeli_app
 namespace il
 {
 
-QIcon loadIcon(const QString& themeName,
-               QStyle::StandardPixmap standardName,
+QIcon loadIcon(const QString& themeName, QStyle::StandardPixmap standardName,
                const QString& fallback);
-QIcon loadIcon(QIcon::ThemeIcon iconEnum,
-               QStyle::StandardPixmap standardName,
+QIcon loadIcon(QIcon::ThemeIcon iconEnum, QStyle::StandardPixmap standardName,
                const QString& fallback);
-QIcon loadIcon(const QString& themeName,
-               const QString& fallback);
-QIcon loadIcon(QIcon::ThemeIcon iconEnum,
-               const QString& fallback);
-}
+QIcon loadIcon(const QString& themeName, const QString& fallback);
+QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback);
+} // namespace il
 
-}
+} // namespace ofeli_app
 
 #endif // ICON_LOADER_HPP

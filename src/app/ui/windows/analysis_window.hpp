@@ -55,20 +55,18 @@ class AnalysisWindow : public QDialog
 {
     Q_OBJECT
 
-public :
-
+public:
     //! A parametric constructor with a pointer on the QWidget parent.
     AnalysisWindow(QWidget* parent);
 
-public slots :
+public slots:
 
     void check_lists();
 
 protected:
     void closeEvent(QCloseEvent* event) override;
 
-private :
-
+private:
     void calculate_shapes_intersection();
 
     AnalysisWidget* widget1_;
@@ -90,15 +88,16 @@ private :
     ofeli_ip::HausdorffDistance* hd_{nullptr};
     float factor_{0.f};
 
-private slots :
+private slots:
 
     void compute_hd();
     void refresh_quantile(int hundredth);
 };
 
-}
+} // namespace ofeli_app
 
 #endif // ANALYSIS_WINDOW_HPP
 
 //! \class ofeli::AnalysisWindow
-//! The class AnalysisWindow is a QDialog window that informs the user about Ofeli . An instance of this class is created by #ofeli::ImageWindow and displayed when the user clicks on menu About.
+//! The class AnalysisWindow is a QDialog window that informs the user about Ofeli . An instance of
+//! this class is created by #ofeli::ImageWindow and displayed when the user clicks on menu About.

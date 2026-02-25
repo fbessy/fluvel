@@ -40,11 +40,11 @@
 #ifndef ANALYSIS_WIDGET_HPP
 #define ANALYSIS_WIDGET_HPP
 
-#include <QWidget>
-#include "shape.hpp"
+#include "color.hpp"
 #include "contour_rendering_qimage.hpp"
 #include "image_view_listener.hpp"
-#include "color.hpp"
+#include "shape.hpp"
+#include <QWidget>
 
 QT_BEGIN_NAMESPACE
 class QSpinBox;
@@ -59,26 +59,38 @@ namespace ofeli_app
 
 class ImageView;
 
-class AnalysisWidget : public QWidget,
-                       public ImageViewListener
+class AnalysisWidget : public QWidget, public ImageViewListener
 {
     Q_OBJECT
 
-public :
-
+public:
     AnalysisWidget(QWidget* parent = nullptr);
 
-    int get_img_width() const { return img_width_; }
-    int get_img_height() const { return img_height_; }
+    int get_img_width() const
+    {
+        return img_width_;
+    }
+    int get_img_height() const
+    {
+        return img_height_;
+    }
 
-    ofeli_ip::Shape& get_shape() { return shape_; }
-    const QImage get_image() const { return img_; }
-    const ofeli_ip::Rgb_uc& get_rgb() const { return rgb_; }
+    ofeli_ip::Shape& get_shape()
+    {
+        return shape_;
+    }
+    const QImage get_image() const
+    {
+        return img_;
+    }
+    const ofeli_ip::Rgb_uc& get_rgb() const
+    {
+        return rgb_;
+    }
 
     void save_settings() const;
-    
-private :
 
+private:
     void create_list();
 
     QLabel* text_list_length_;
@@ -105,22 +117,20 @@ private :
     static int count_this;
     int id_this_;
 
-private slots :
+private slots:
 
     void open_filename();
     void open_img();
     void get_list_color();
     void refresh_rgb(int);
     void refresh_img_noise(int noise_percent);
-    void onColorPicked(const QColor& color,
-                       const QPoint& /*imagePos*/) override;
+    void onColorPicked(const QColor& color, const QPoint& /*imagePos*/) override;
 
-signals :
+signals:
 
     void change_list();
-
 };
 
-}
+} // namespace ofeli_app
 
 #endif // ANALYSIS_WIDGET_H

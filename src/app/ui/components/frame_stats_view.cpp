@@ -43,8 +43,7 @@ void FrameStatsView::frameProcessed()
     ++processedFrames_;
 }
 
-void FrameStatsView::frameDisplayed(qint64 recvTsNs,
-                                    qint64 displayTsNs)
+void FrameStatsView::frameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
 {
     QMutexLocker lock(&mutex_);
 
@@ -75,24 +74,15 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
 
     Snapshot snap;
 
-    snap.inputFps      = double(inputFrames_)     / seconds;
+    snap.inputFps = double(inputFrames_) / seconds;
     snap.processingFps = double(processedFrames_) / seconds;
-    snap.displayFps    = double(displayedFrames_) / seconds;
+    snap.displayFps = double(displayedFrames_) / seconds;
 
-    droppedFrames_ =
-        (inputFrames_ > displayedFrames_)
-            ? (inputFrames_ - displayedFrames_)
-            : 0;
+    droppedFrames_ = (inputFrames_ > displayedFrames_) ? (inputFrames_ - displayedFrames_) : 0;
 
-    snap.dropRate =
-        inputFrames_ > 0
-            ? double(droppedFrames_) / double(inputFrames_)
-            : 0.0;
+    snap.dropRate = inputFrames_ > 0 ? double(droppedFrames_) / double(inputFrames_) : 0.0;
 
-    snap.avgLatencyMs =
-        displayedFrames_ > 0
-        ? latencySumMs_ / double(displayedFrames_)
-            : 0.0;
+    snap.avgLatencyMs = displayedFrames_ > 0 ? latencySumMs_ / double(displayedFrames_) : 0.0;
 
     snap.maxLatencyMs = latencyMaxMs_;
 
@@ -110,4 +100,4 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
     windowStartNs_ = nowNs;
 }
 
-}
+} // namespace ofeli_app

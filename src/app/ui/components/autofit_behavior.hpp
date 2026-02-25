@@ -13,13 +13,12 @@ class AutoFitBehavior : public ViewBehavior
 public:
     explicit AutoFitBehavior(Qt::MouseButton button = Qt::MiddleButton);
 
-    bool mouseRelease(ImageView& view,
-                      QMouseEvent* event) override;
+    bool mouseRelease(ImageView& view, QMouseEvent* event) override;
 
 private:
     Qt::MouseButton button_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // AUTOFIT_BEHAVIOR_HPP

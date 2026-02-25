@@ -1,63 +1,59 @@
 #include "display_settings_widget.hpp"
 #include "application_settings.hpp"
-#include "color_selector_widget.hpp"
 #include "color_adapters.hpp"
+#include "color_selector_widget.hpp"
 #include "common_settings.hpp"
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QGroupBox>
 #include <QColorDialog>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QPropertyAnimation>
+#include <QVBoxLayout>
 
 #include <cassert>
 
 namespace ofeli_app
 {
 
-DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
-                                             Session session)
-    : QWidget(parent), session_(session)
+DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
+    : QWidget(parent)
+    , session_(session)
 {
-    setSizePolicy(QSizePolicy::Preferred,
-                  QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
     // Important : au départ on limite la largeur max à la sizeHint
     setMaximumWidth(minimumSizeHint().width());
 
-    if ( session_ == Session::Image )
+    if (session_ == Session::Image)
         config_ = AppSettings::instance().imgConfig.display;
-    else if ( session_ == Session::Camera )
+    else if (session_ == Session::Camera)
         config_ = AppSettings::instance().camConfig.display;
-
 
     pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
     source_rb_ = new QRadioButton(tr("Source"));
     preprocessed_rb_ = new QRadioButton(tr("Preprocessed"));
-    source_rb_->setChecked( config_.image == ImageBase::Source );
-    preprocessed_rb_->setChecked( config_.image == ImageBase::Preprocessed );
+    source_rb_->setChecked(config_.image == ImageBase::Source);
+    preprocessed_rb_->setChecked(config_.image == ImageBase::Preprocessed);
 
     QVBoxLayout* pipeline_layout = new QVBoxLayout;
     pipeline_layout->addWidget(source_rb_);
     pipeline_layout->addWidget(preprocessed_rb_);
     pipeline_displayed_gb_->setLayout(pipeline_layout);
 
-    lout_selector_ = new ColorSelectorWidget(this,
-                                             toQColor(config_.l_out_color) );
+    lout_selector_ = new ColorSelectorWidget(this, toQColor(config_.l_out_color));
 
-    lin_selector_ = new ColorSelectorWidget(this,
-                                            toQColor(config_.l_in_color) );
+    lin_selector_ = new ColorSelectorWidget(this, toQColor(config_.l_in_color));
 
     QVBoxLayout* lout_layout = new QVBoxLayout;
     lout_layout->addWidget(lout_selector_);
     lout_layout->setContentsMargins(0, 0, 0, 0);
-    lout_layout->setContentsMargins(0,0,0,0);
+    lout_layout->setContentsMargins(0, 0, 0, 0);
 
     QGroupBox* lout_gb = new QGroupBox(tr("Outer Contour"));
     lout_gb->setLayout(lout_layout);
     lout_gb->setCheckable(true);
-    lout_gb->setChecked( config_.l_out_displayed );
+    lout_gb->setChecked(config_.l_out_displayed);
 
     lout_gb->setFlat(true);
     lout_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -65,21 +61,21 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     QVBoxLayout* lin_layout = new QVBoxLayout;
     lin_layout->addWidget(lin_selector_);
     lin_layout->setContentsMargins(0, 0, 0, 0);
-    lin_layout->setContentsMargins(0,0,0,0);
+    lin_layout->setContentsMargins(0, 0, 0, 0);
 
     QGroupBox* lin_gb = new QGroupBox(tr("Inner Contour"));
     lin_gb->setLayout(lin_layout);
     lin_gb->setCheckable(true);
-    lin_gb->setChecked( config_.l_in_displayed );
+    lin_gb->setChecked(config_.l_in_displayed);
 
     lin_gb->setFlat(true);
     lin_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
     flip_cb_ = new QCheckBox(tr("Selfie Mirror"));
-    flip_cb_->setChecked( config_.mirrorMode );
+    flip_cb_->setChecked(config_.mirrorMode);
 
     smooth_cb_ = new QCheckBox(tr("Smooth Display"));
-    smooth_cb_->setChecked( config_.smoothDisplay );
+    smooth_cb_->setChecked(config_.smoothDisplay);
 
     QGroupBox* rendering_gb = new QGroupBox(tr("Rendering:"));
     QVBoxLayout* rendering_layout = new QVBoxLayout;
@@ -88,7 +84,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     rendering_gb->setLayout(rendering_layout);
 
     display_overlay_cb_ = new QCheckBox(tr("Algorithm Overlay"));
-    display_overlay_cb_->setChecked( config_.algorithm_overlay );
+    display_overlay_cb_->setChecked(config_.algorithm_overlay);
 
     auto* title = new QLabel("View");
     title->setStyleSheet("font-weight: bold; font-size: 14px;");
@@ -103,49 +99,47 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
     widget_layout->addSpacing(6);
     widget_layout->addWidget(display_overlay_cb_);
 
-
-
     widget_layout->addStretch();
 
-    setLayout( widget_layout );
+    setLayout(widget_layout);
 
-    connect(lout_gb, &QGroupBox::toggled,
-            this, [this](bool checked)
+    connect(lout_gb, &QGroupBox::toggled, this,
+            [this](bool checked)
             {
                 config_.l_out_displayed = checked;
                 setConfig();
             });
 
-    connect(lout_selector_, &ColorSelectorWidget::colorSelected,
-            this, [this](const QColor& color)
+    connect(lout_selector_, &ColorSelectorWidget::colorSelected, this,
+            [this](const QColor& color)
             {
                 config_.l_out_color = toRgb_uc(color);
                 setConfig();
             });
 
-    connect(lin_gb, &QGroupBox::toggled,
-            this, [this](bool checked)
+    connect(lin_gb, &QGroupBox::toggled, this,
+            [this](bool checked)
             {
                 config_.l_in_displayed = checked;
                 setConfig();
             });
 
-    connect(lin_selector_, &ColorSelectorWidget::colorSelected,
-            this, [this](const QColor& color)
+    connect(lin_selector_, &ColorSelectorWidget::colorSelected, this,
+            [this](const QColor& color)
             {
                 config_.l_in_color = toRgb_uc(color);
                 setConfig();
             });
 
-    connect(display_overlay_cb_, &QCheckBox::toggled,
-            this, [this](bool checked)
+    connect(display_overlay_cb_, &QCheckBox::toggled, this,
+            [this](bool checked)
             {
                 config_.algorithm_overlay = checked;
                 setConfig();
             });
 
-    connect(source_rb_, &QRadioButton::toggled,
-            this, [this](bool checked)
+    connect(source_rb_, &QRadioButton::toggled, this,
+            [this](bool checked)
             {
                 if (!checked)
                     return;
@@ -154,8 +148,8 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
-    connect(preprocessed_rb_, &QRadioButton::toggled,
-            this, [this](bool checked)
+    connect(preprocessed_rb_, &QRadioButton::toggled, this,
+            [this](bool checked)
             {
                 if (!checked)
                     return;
@@ -164,15 +158,15 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
                 setConfig();
             });
 
-    connect(flip_cb_, &QCheckBox::toggled,
-            this, [this](bool checked)
+    connect(flip_cb_, &QCheckBox::toggled, this,
+            [this](bool checked)
             {
                 config_.mirrorMode = checked;
                 setConfig();
             });
 
-    connect(smooth_cb_, &QCheckBox::toggled,
-            this, [this](bool checked)
+    connect(smooth_cb_, &QCheckBox::toggled, this,
+            [this](bool checked)
             {
                 config_.smoothDisplay = checked;
                 setConfig();
@@ -180,20 +174,20 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent,
 
     refresh_pipeline_displayed_gb_availability();
 
-    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged,
-            this,                     &DisplaySettingsWidget::onImgSettingsChanged);
+    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
+            &DisplaySettingsWidget::onImgSettingsChanged);
 
-    connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged,
-            this,                     &DisplaySettingsWidget::onVideoSettingsChanged);
+    connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
+            &DisplaySettingsWidget::onVideoSettingsChanged);
 
     setMaximumWidth(QWIDGETSIZE_MAX);
 }
 
 void DisplaySettingsWidget::setConfig()
 {
-    if ( session_ == Session::Image )
+    if (session_ == Session::Image)
         AppSettings::instance().set_img_display_config(config_);
-    else if ( session_ == Session::Camera )
+    else if (session_ == Session::Camera)
         AppSettings::instance().set_cam_display_config(config_);
 }
 
@@ -201,27 +195,27 @@ void DisplaySettingsWidget::refresh_pipeline_displayed_gb_availability()
 {
     bool isEnabled = false;
 
-    if ( session_ == Session::Image )
+    if (session_ == Session::Image)
     {
         const bool hasDownscale = AppSettings::instance().imgConfig.compute.downscale.hasDownscale;
         const auto& fc = AppSettings::instance().imgConfig.compute.processing;
 
-        if ( hasDownscale || fc.hasProcessing() )
+        if (hasDownscale || fc.hasProcessing())
         {
             isEnabled = true;
         }
     }
-    else if ( session_ == Session::Camera )
+    else if (session_ == Session::Camera)
     {
         const bool hasDownscale = AppSettings::instance().camConfig.compute.downscale.hasDownscale;
         const bool has_filter = AppSettings::instance().camConfig.compute.hasTemporalFiltering;
 
-        isEnabled = ( hasDownscale || has_filter );
+        isEnabled = (hasDownscale || has_filter);
     }
 
-    pipeline_displayed_gb_->setEnabled( isEnabled );
+    pipeline_displayed_gb_->setEnabled(isEnabled);
 
-    if ( !isEnabled )
+    if (!isEnabled)
     {
         source_rb_->setChecked(true);
         preprocessed_rb_->setChecked(false);
@@ -264,18 +258,16 @@ void DisplaySettingsWidget::animate(bool open)
     const int targetWidth = minimumSizeHint().width();
 
     const int start = open ? 0 : width();
-    const int end   = open ? targetWidth : 0;
+    const int end = open ? targetWidth : 0;
 
     auto* anim = new QPropertyAnimation(this, "maximumWidth");
     anim->setDuration(200);
     anim->setStartValue(start);
     anim->setEndValue(end);
-    anim->setEasingCurve(open
-                             ? QEasingCurve::OutCubic
-                             : QEasingCurve::InCubic);
+    anim->setEasingCurve(open ? QEasingCurve::OutCubic : QEasingCurve::InCubic);
 
-    connect(anim, &QPropertyAnimation::finished,
-            this, [this, open]()
+    connect(anim, &QPropertyAnimation::finished, this,
+            [this, open]()
             {
                 if (!open)
                     hide();
@@ -286,4 +278,4 @@ void DisplaySettingsWidget::animate(bool open)
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-}
+} // namespace ofeli_app

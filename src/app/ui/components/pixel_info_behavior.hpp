@@ -8,7 +8,8 @@
 
 class QMouseEvent;
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 class ImageView;
 class PixelInfoOverlay;
@@ -43,8 +44,7 @@ public:
     bool mouseRelease(ImageView& view, QMouseEvent* event) override;
 
 private:
-    void updateOverlay(ImageView& view,
-                       const QPoint& viewPos);
+    void updateOverlay(ImageView& view, const QPoint& viewPos);
 
 private:
     bool active_ = false;

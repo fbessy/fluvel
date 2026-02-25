@@ -1,14 +1,14 @@
 #include "zoom_behavior.hpp"
 #include "image_view.hpp"
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 ZoomBehavior::ZoomBehavior(double /*zoomFactor*/)
 {
 }
 
-bool ZoomBehavior::wheel(ImageView& /*view*/,
-                         QWheelEvent* event)
+bool ZoomBehavior::wheel(ImageView& /*view*/, QWheelEvent* event)
 {
     /*
     const int delta = event->angleDelta().y();

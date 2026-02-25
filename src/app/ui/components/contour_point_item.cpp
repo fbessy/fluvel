@@ -7,7 +7,7 @@ namespace ofeli_app
 {
 
 ContourPointsItem::ContourPointsItem(QGraphicsItem* parent)
-    :  QGraphicsItem(parent)
+    : QGraphicsItem(parent)
 {
     setTransformOriginPoint(0.0, 0.0);
 
@@ -47,10 +47,7 @@ QRectF ContourPointsItem::boundingRect() const
         maxY = std::max(maxY, p.y());
     }
 
-    QRectF rf(minX,
-              minY,
-              maxX - minX,
-              maxY - minY);
+    QRectF rf(minX, minY, maxX - minX, maxY - minY);
 
     // Pixel (x, y) spans [x, x+1) × [y, y+1) in image space.
     // Its geometric center is therefore at (x + 0.5, y + 0.5).
@@ -61,9 +58,7 @@ QRectF ContourPointsItem::boundingRect() const
     return rf;
 }
 
-void ContourPointsItem::paint(QPainter* painter,
-                              const QStyleOptionGraphicsItem*,
-                              QWidget*)
+void ContourPointsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     painter->setRenderHint(QPainter::Antialiasing, false);
     painter->setRenderHint(QPainter::TextAntialiasing, false);
@@ -71,10 +66,7 @@ void ContourPointsItem::paint(QPainter* painter,
     painter->setPen(color_);
     painter->setBrush(Qt::NoBrush);
 
-    painter->drawPoints(
-        points_.data(),
-        static_cast<int>(points_.size())
-        );
+    painter->drawPoints(points_.data(), static_cast<int>(points_.size()));
 }
 
-}
+} // namespace ofeli_app

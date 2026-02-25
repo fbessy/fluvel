@@ -41,14 +41,14 @@
 #define APPLICATION_SETTINGS_HPP
 
 #include "active_contour.hpp"
-#include "region_color_ac.hpp"
-#include "filters.hpp"
 #include "color.hpp"
 #include "common_settings.hpp"
+#include "filters.hpp"
+#include "region_color_ac.hpp"
 
-#include <QObject>
 #include <QDir>
 #include <QImage>
+#include <QObject>
 
 namespace ofeli_app
 {
@@ -59,7 +59,6 @@ class ApplicationSettings : public QObject
     Q_OBJECT
 
 public:
-
     ApplicationSettings();
     ~ApplicationSettings() override;
 
@@ -67,22 +66,16 @@ public:
     void save_img_session_config();
     void save_cam_session_config();
 
-    void save_algo(Session session,
-                   const AlgoConfig& algo);
-    void save_downscale(Session session,
-                        const DownscaleConfig& downscale_config);
-    void save_disp(Session session,
-                   const DisplayConfig& disp_config);
+    void save_algo(Session session, const AlgoConfig& algo);
+    void save_downscale(Session session, const DownscaleConfig& downscale_config);
+    void save_disp(Session session, const DisplayConfig& disp_config);
 
     void load_img_session_config();
     void load_cam_session_config();
 
-    void load_algo(Session session,
-                   AlgoConfig& algo);
-    void load_downscale(Session session,
-                        DownscaleConfig& downscale_config);
-    void load_disp(Session session,
-                   DisplayConfig& disp_config);
+    void load_algo(Session session, AlgoConfig& algo);
+    void load_downscale(Session session, DownscaleConfig& downscale_config);
+    void load_disp(Session session, DisplayConfig& disp_config);
 
     void set_img_display_config(const DisplayConfig& disp_config);
     void set_cam_display_config(const DisplayConfig& disp_config);
@@ -118,6 +111,6 @@ public:
 
 QString toSettingsPrefix(Session scope);
 
-}
+} // namespace ofeli_app
 
 #endif // APPLICATION_SETTINGS_HPP

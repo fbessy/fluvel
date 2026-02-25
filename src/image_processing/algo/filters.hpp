@@ -51,12 +51,10 @@ enum AnisoDiff : unsigned int
 
 class Filters
 {
-
-public :
-
-    //! Constructor with an input pointer on a row-wise image data buffer and the dimensions of the image.
-    Filters(const unsigned char* img_data1,
-            int img_width1, int img_height1, int byte_per_pixel1);
+public:
+    //! Constructor with an input pointer on a row-wise image data buffer and the dimensions of
+    //! the image.
+    Filters(const unsigned char* img_data1, int img_width1, int img_height1, int byte_per_pixel1);
 
     //! Desctructor.
     ~Filters();
@@ -65,14 +63,13 @@ public :
     void initialyze_filtered();
 
     //! Performs a Perona-Malik anisotropic diffusion with a 8-connected neighborhood.
-    void anisotropic_diffusion(int max_itera,
-                               float lambda,
-                               float kappa,
-                               AnisoDiff option);
+    void anisotropic_diffusion(int max_itera, float lambda, float kappa, AnisoDiff option);
 
-    //! Performs a morphological_gradient with a square structuring element with a naïve algorithm.
+    //! Performs a morphological_gradient with a square structuring element with a naïve
+    //! algorithm.
     void morphological_gradient(int kernel_length);
-    //! Performs a morphological_gradient with a square structuring element with the Perreault's algorithm.
+    //! Performs a morphological_gradient with a square structuring element with the Perreault's
+    //! algorithm.
     void morphological_gradient_o1(int kernel_length);
 
     //! Performs a dilation with a square structuring element with a naïve algorithm.
@@ -95,14 +92,18 @@ public :
     //! Performs an opening with a square structuring element with the Perreault's algorithm.
     void opening_o1(int kernel_length);
 
-    //! Performs a black top hat transform with a square structuring element with a naïve algorithm.
+    //! Performs a black top hat transform with a square structuring element with a naïve
+    //! algorithm.
     void black_top_hat(int kernel_length);
-    //! Performs a black top hat transform with a square structuring element with the Perreault's algorithm.
+    //! Performs a black top hat transform with a square structuring element with the
+    //! Perreault's algorithm.
     void black_top_hat_o1(int kernel_length);
 
-    //! Performs a white top hat transform with a square structuring element with a naïve algorithm.
+    //! Performs a white top hat transform with a square structuring element with a naïve
+    //! algorithm.
     void white_top_hat(int kernel_length);
-    //! Performs a white top hat transform with a square structuring element with the Perreault's algorithm.
+    //! Performs a white top hat transform with a square structuring element with the
+    //! Perreault's algorithm.
     void white_top_hat_o1(int kernel_length);
 
     //! Performs a filter alternate sequential.
@@ -114,13 +115,16 @@ public :
     //! Performs a Nagao filtering.
     void nagao_filtering(int kernel_length);
 
-    //! Performs a gaussian filtering with the kernel length and the standard deviation \c sigma.
+    //! Performs a gaussian filtering with the kernel length and the standard deviation \c
+    //! sigma.
     void gaussian_filtering(int kernel_length, float sigma);
 
-    //! Performs a median filtering based on the quick sort algorithm. Complexity is in \c O(kernel_length×log(kernel_length)).
+    //! Performs a median filtering based on the quick sort algorithm. Complexity is in \c
+    //! O(kernel_length×log(kernel_length)).
     void median_filtering_oNlogN(int kernel_length);
 
-    //! Performs a median filtering based on the Perreault's algorithm. Complexity is in \c O(1).
+    //! Performs a median filtering based on the Perreault's algorithm. Complexity is in \c
+    //! O(1).
     void median_filtering_o1(int kernel_length);
 
     //! Adds a gaussian white noise with the standard deviation \c sigma.
@@ -139,14 +143,20 @@ public :
     void morphological_gradient_yuv(int kernel_length, int alpha, int beta, int gamma);
 
     //! Getter function for #filtered.
-    const unsigned char* get_filtered() const { return filtered_; }
+    const unsigned char* get_filtered() const
+    {
+        return filtered_;
+    }
 
     //! Getter function for #gradient.
-    const unsigned char* get_gradient() const { return gradient_; }
+    const unsigned char* get_gradient() const
+    {
+        return gradient_;
+    }
 
-private :
-
-    //! Input pointer on the grayscale or grey-level image data buffer. This buffer must be row-wise.
+private:
+    //! Input pointer on the grayscale or grey-level image data buffer. This buffer must be
+    //! row-wise.
     const unsigned char* const img_data_;
     //! Image width, i.e. number of columns.
     const int img_width_;
@@ -154,14 +164,16 @@ private :
     const int img_height_;
     //! Image size, i.e. number of pixels. Obviously, it egals to #img_width × #img_height.
     const int img_size_;
-    //! Number of byte or octet per pixel, i.e number of channels. It is equal 1 for a grayscale or grey-level image and 3 for a color image.
+    //! Number of byte or octet per pixel, i.e number of channels. It is equal 1 for a grayscale
+    //! or grey-level image and 3 for a color image.
     const int byte_per_pixel_;
 
     //! Pointer on the current result image.
     unsigned char* filtered_;
     //! Pointer on the temporary result because the filters are not in place.
     unsigned char* filtered_modif_;
-    //! Pointer used by top-hat functions to keep in memory the previous result before opening or closing to subtract the both images then.
+    //! Pointer used by top-hat functions to keep in memory the previous result before opening
+    //! or closing to subtract the both images then.
     unsigned char* previous_filtered_;
     //! Pointer on the gradient used by the geodesic model in the case of an RGB image.
     unsigned char* gradient_;
@@ -169,7 +181,8 @@ private :
     // pour le filtre anisotrope
     //! Pointer on the diffused image buffer for the anisotropic diffusion filter.
     float* diff_img_;
-    //! Pointer on the temporary diffused image buffer for the anisotropic diffusion filter because this filter is not in place
+    //! Pointer on the temporary diffused image buffer for the anisotropic diffusion filter
+    //! because this filter is not in place
     float* diff_img1_;
 
     //! Columns histogram used by the Perreault's algorithm.
@@ -177,7 +190,8 @@ private :
     //! Kernel histogram used by the Perreault's algorithm.
     int kernel_histo_[256];
 
-    //! Calculates the offset the image data buffer with the position (\a x,\a y, \a color_channel).
+    //! Calculates the offset the image data buffer with the position (\a x,\a y, \a
+    //! color_channel).
     int find_offset(int x, int y, int color_channel) const;
 
     //! Creates a gaussian kernel with the kernel length and the standard deviation sigma.
@@ -189,7 +203,7 @@ private :
 
 inline int Filters::find_offset(int x, int y, int color_channel) const
 {
-    return byte_per_pixel_*(x+y*img_width_)+color_channel;
+    return byte_per_pixel_ * (x + y * img_width_) + color_channel;
 }
 
 inline void Filters::swap(unsigned char* const array, int a, int b)
@@ -199,25 +213,31 @@ inline void Filters::swap(unsigned char* const array, int a, int b)
     array[b] = temp;
 }
 
-}
+} // namespace ofeli_ip
 
 #endif // FILTERS_HPP
 
 //! \class ofeli::Filters
 //! This class implements filters and noise functions for RGB images. \n
 //! There are two linear filters : a mean filter and a gaussian filter. \n
-//! Moreover, there are seven operators of mathematical morphology (erosion, dilation, morphological gradient, opening, closing and the both top-hat transforms) with a square for a structuring element. \n
-//! Furthermore, there are two edge preserving filters : a median filter and a Perona-Malik anisotropic diffusion. \n
-//! The order filters (i.e. the median filter and the morphological filters) are implemented in a naïve version and in an optimized version (using Simon Perreault's algorithm). \n
-//! In addition, there are three functions to add noise, implemented with the random variables of Boost library : gaussian white noise, impulsional noise or salt and pepper and speckle.
+//! Moreover, there are seven operators of mathematical morphology (erosion, dilation, morphological
+//! gradient, opening, closing and the both top-hat transforms) with a square for a structuring
+//! element. \n Furthermore, there are two edge preserving filters : a median filter and a
+//! Perona-Malik anisotropic diffusion. \n The order filters (i.e. the median filter and the
+//! morphological filters) are implemented in a naïve version and in an optimized version (using
+//! Simon Perreault's algorithm). \n In addition, there are three functions to add noise,
+//! implemented with the random variables of Boost library : gaussian white noise, impulsional noise
+//! or salt and pepper and speckle.
 
 /**
  * \fn void Filters::anisotropic_diffusion(int max_itera, double lambda, double kappa, int option)
  *
  * \param max_itera maximum number of iterations
- * \param lambda constant of integration ( \f$0\leq \lambda \leq \frac {1} {4}\f$ ), max value for the numerical stability
+ * \param lambda constant of integration ( \f$0\leq \lambda \leq \frac {1} {4}\f$ ), max value for
+ * the numerical stability
  * \param kappa constant of diffusion
  * \param option choice of the function of conduction coefficient : \n
- * 1 - \f$g\left( \nabla I\right) =e^{\left( -\left( \left\| \nabla I\right\| / \kappa\right) ^{2}\right) }\f$ \n
- * 2 - \f$g\left( \nabla I\right) =\frac {1} {1+\left( \frac {\left\| \nabla I\right\| } {\kappa}\right) ^{2}}\f$
+ * 1 - \f$g\left( \nabla I\right) =e^{\left( -\left( \left\| \nabla I\right\| / \kappa\right)
+ * ^{2}\right) }\f$ \n 2 - \f$g\left( \nabla I\right) =\frac {1} {1+\left( \frac {\left\| \nabla
+ * I\right\| } {\kappa}\right) ^{2}}\f$
  */

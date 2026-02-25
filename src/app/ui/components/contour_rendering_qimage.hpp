@@ -40,27 +40,23 @@
 #ifndef CONTOUR_RENDERING_QIMAGE_HPP
 #define CONTOUR_RENDERING_QIMAGE_HPP
 
-#include "contour_data.hpp"
-#include "common_settings.hpp"
 #include "color.hpp"
+#include "common_settings.hpp"
+#include "contour_data.hpp"
 
-#include <QRgb>
 #include <QImage>
+#include <QRgb>
 
 namespace ofeli_app
 {
 
-void get_color(int index,
-               ofeli_ip::Rgb_uc& color);
+void get_color(int index, ofeli_ip::Rgb_uc& color);
 
 void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                      const ofeli_ip::Rgb_uc& color,
-                      QImage& img);
+                      const ofeli_ip::Rgb_uc& color, QImage& img);
 
 void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const ofeli_ip::Rgb_uc& color,
-                       int upscale_factor,
-                       QImage& img_rgb32);
-}
+                       const ofeli_ip::Rgb_uc& color, int upscale_factor, QImage& img_rgb32);
+} // namespace ofeli_app
 
 #endif // CONTOUR_RENDERING_QIMAGE_H

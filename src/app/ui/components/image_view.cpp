@@ -1,17 +1,17 @@
 #include "image_view.hpp"
-#include "image_view_interaction.hpp"
 #include "application_settings.hpp"
-#include "common_settings.hpp"
 #include "color_adapters.hpp"
+#include "common_settings.hpp"
 #include "frame_clock.hpp"
+#include "image_view_interaction.hpp"
 #include "overlay_text_item.hpp"
 
 #include <cassert>
 
-#include <QPainter>
-#include <QWheelEvent>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QThread>
+#include <QWheelEvent>
 
 namespace ofeli_app
 {
@@ -22,12 +22,11 @@ ImageView::ImageView(QWidget* parent)
     initialize();
 }
 
-ImageView::ImageView(const DisplayConfig& displayConfig,
-                     const DownscaleConfig& downscaleConfig,
+ImageView::ImageView(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
                      QWidget* parent)
-    : QGraphicsView(parent),
-    displayConfig_(displayConfig),
-    downscaleConfig_(downscaleConfig)
+    : QGraphicsView(parent)
+    , displayConfig_(displayConfig)
+    , downscaleConfig_(downscaleConfig)
 {
     initialize();
 
@@ -71,8 +70,7 @@ void ImageView::initialize()
     throttleTimer_ = new QTimer(this);
     throttleTimer_->setSingleShot(true);
 
-    connect(throttleTimer_, &QTimer::timeout,
-            this, &ImageView::flushPendingFrame);
+    connect(throttleTimer_, &QTimer::timeout, this, &ImageView::flushPendingFrame);
 }
 
 // ------------------------------------------------------------
@@ -80,7 +78,8 @@ void ImageView::initialize()
 // ------------------------------------------------------------
 void ImageView::setMaxDisplayFps(double fps)
 {
-    if (fps <= 0.0) {
+    if (fps <= 0.0)
+    {
         minDisplayIntervalMs_ = 0;
         return;
     }
@@ -103,8 +102,7 @@ void ImageView::setImage(const QImage& img)
 
         qint64 displayTs = FrameClock::nowNs();
 
-        emit frameDisplayed(lastReceiveTs_,
-                            displayTs);
+        emit frameDisplayed(lastReceiveTs_, displayTs);
 
         return;
     }
@@ -119,8 +117,7 @@ void ImageView::setImage(const QImage& img)
 
         qint64 displayTs = FrameClock::nowNs();
 
-        emit frameDisplayed(lastReceiveTs_,
-                            displayTs);
+        emit frameDisplayed(lastReceiveTs_, displayTs);
     }
     else
     {
@@ -131,9 +128,7 @@ void ImageView::setImage(const QImage& img)
             if (remaining > 0)
             {
                 const int interval =
-                    static_cast<int>(std::min<qint64>(
-                        remaining,
-                        std::numeric_limits<int>::max()));
+                    static_cast<int>(std::min<qint64>(remaining, std::numeric_limits<int>::max()));
 
                 throttleTimer_->start(interval);
             }
@@ -141,21 +136,18 @@ void ImageView::setImage(const QImage& img)
     }
 }
 
-void ImageView::setContour(const QVector<QPointF>& l_out,
-                           const QVector<QPointF>& l_in)
+void ImageView::setContour(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in)
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     l_out_->setPoints(l_out);
     l_in_->setPoints(l_in);
 }
 
-void ImageView::setImageAndContour(const QImage& image,
-                                   const QVector<QPointF>& l_out,
-                                   const QVector<QPointF>& l_in,
-                                   qint64 receiveTs)
+void ImageView::setImageAndContour(const QImage& image, const QVector<QPointF>& l_out,
+                                   const QVector<QPointF>& l_in, qint64 receiveTs)
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     setImage(image);
     setContour(l_out, l_in);
@@ -165,7 +157,7 @@ void ImageView::setImageAndContour(const QImage& image,
 
 void ImageView::clearOverlays()
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     l_out_->clearPoints();
     l_in_->clearPoints();
@@ -185,33 +177,28 @@ void ImageView::flushPendingFrame()
 
     qint64 displayTs = FrameClock::nowNs();
 
-    emit frameDisplayed(lastReceiveTs_,
-                        displayTs);
+    emit frameDisplayed(lastReceiveTs_, displayTs);
 }
 
 void ImageView::updatePixmap(const QImage& img)
 {
-    if ( img.isNull() || !pixmapItem_ )
+    if (img.isNull() || !pixmapItem_)
         return;
 
-    bool sizeChanged =
-        ( lastDisplayedImage_.size() != img.size() );
+    bool sizeChanged = (lastDisplayedImage_.size() != img.size());
 
     pixmapItem_->setPixmap(QPixmap::fromImage(img));
     lastDisplayedImage_ = img;
 
-    scene_->setSceneRect( 0.0,
-                         0.0,
-                         static_cast<qreal>(img.width()),
-                         static_cast<qreal>(img.height()) );
+    scene_->setSceneRect(0.0, 0.0, static_cast<qreal>(img.width()),
+                         static_cast<qreal>(img.height()));
 
     if (sizeChanged)
     {
-        setTextPosition( { 10, 20 } );
+        setTextPosition({10, 20});
 
-        if ( l_out_ && l_in_ )
+        if (l_out_ && l_in_)
             updateDisplayWithConfig();
-
 
         applyAutoFit();
     }
@@ -290,16 +277,16 @@ void ImageView::userInteracted()
 
 QPoint ImageView::textPosition() const
 {
-    QPoint overlayPosition = { 0, 0 };
+    QPoint overlayPosition = {0, 0};
 
-    if ( overlay_ )
+    if (overlay_)
     {
         overlayPosition = mapFromScene(overlay_->pos());
 
-        if (    overlayPosition.x() < 0 || overlayPosition.x() >= width()
-             || overlayPosition.y() < 0 || overlayPosition.y() >= height() )
+        if (overlayPosition.x() < 0 || overlayPosition.x() >= width() || overlayPosition.y() < 0 ||
+            overlayPosition.y() >= height())
         {
-            overlayPosition = { 10, 20 };
+            overlayPosition = {10, 20};
         }
     }
 
@@ -308,7 +295,7 @@ QPoint ImageView::textPosition() const
 
 void ImageView::setTextPosition(QPoint position)
 {
-    if ( overlay_ )
+    if (overlay_)
         overlay_->setPos(mapToScene(position));
 }
 
@@ -323,9 +310,7 @@ void ImageView::wheelEvent(QWheelEvent* event)
 
     QPointF scenePosBefore = mapToScene(event->position().toPoint());
 
-    double factor = (event->angleDelta().y() > 0)
-                        ? zoomFactor
-                        : 1.0 / zoomFactor;
+    double factor = (event->angleDelta().y() > 0) ? zoomFactor : 1.0 / zoomFactor;
 
     double currentZoom = getCurrentZoom();
     double newZoom = currentZoom * factor;
@@ -342,17 +327,12 @@ void ImageView::wheelEvent(QWheelEvent* event)
     autoFitEnabled_ = false;
 
     if (m_interaction_)
-        setCursor(m_interaction_->cursorForEvent(*this,
-                                                hasImage(),
-                                                isPanRelevant(),
-                                                nullptr));
+        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
 
 #ifdef OFELI_DEBUG
-    qDebug()
-        << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
-        << "zoom =" << currentZoom
-        << " new zoom =" << newZoom
-        << "delta =" << delta.x() << delta.y();
+    qDebug() << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
+             << "zoom =" << currentZoom << " new zoom =" << newZoom << "delta =" << delta.x()
+             << delta.y();
 #endif
 
     setTextPosition(overlayPosition);
@@ -366,7 +346,6 @@ void ImageView::resizeEvent(QResizeEvent* event)
 
     if (autoFitEnabled_)
         applyAutoFit();
-
 
     setTextPosition(overlayPosition);
 }
@@ -394,8 +373,7 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     QGraphicsItem* itemUnderMouse = itemAt(event->pos());
 
     // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
-    if (itemUnderMouse &&
-        (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
+    if (itemUnderMouse && (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
     {
         QGraphicsView::mousePressEvent(event);
         return;
@@ -408,11 +386,7 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     {
         handled = m_interaction_->mousePress(*this, event);
 
-        setCursor(m_interaction_->cursorForEvent(
-                  *this,
-                  hasImage(),
-                  isPanRelevant(),
-                  event));
+        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
     }
 
     // 4️⃣ Si personne n’a géré, on passe à Qt
@@ -426,8 +400,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     QGraphicsItem* itemUnderMouse = itemAt(event->pos());
 
     // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
-    if (itemUnderMouse &&
-        (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
+    if (itemUnderMouse && (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
     {
         QGraphicsView::mouseMoveEvent(event);
         return;
@@ -440,11 +413,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     {
         handled = m_interaction_->mouseMove(*this, event);
 
-        setCursor(m_interaction_->cursorForEvent(
-            *this,
-            hasImage(),
-            isPanRelevant(),
-            event));
+        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
     }
 
     // 4️⃣ Si personne n’a géré, on passe à Qt
@@ -458,8 +427,7 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
     QGraphicsItem* itemUnderMouse = itemAt(event->pos());
 
     // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
-    if (itemUnderMouse &&
-        (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
+    if (itemUnderMouse && (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
     {
         QGraphicsView::mouseReleaseEvent(event);
         return;
@@ -472,11 +440,7 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
     {
         handled = m_interaction_->mouseRelease(*this, event);
 
-        setCursor(m_interaction_->cursorForEvent(
-            *this,
-            hasImage(),
-            isPanRelevant(),
-            event));
+        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
     }
 
     // 4️⃣ Si personne n’a géré, on passe à Qt
@@ -489,7 +453,7 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
     if (m_interaction_)
         m_interaction_->mouseDoubleClick(*this, event);
 
-    if ( !event->isAccepted() )
+    if (!event->isAccepted())
         QGraphicsView::mouseDoubleClickEvent(event);
 }
 
@@ -506,7 +470,7 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
     const int y = static_cast<int>(itemPos.y());
     const QPoint p(x, y);
 
-    if ( !lastDisplayedImage_.valid(p) )
+    if (!lastDisplayedImage_.valid(p))
         return QPoint(-1, -1);
 
     return p;
@@ -515,10 +479,7 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 void ImageView::enterEvent(QEnterEvent*)
 {
     if (m_interaction_)
-        setCursor(m_interaction_->cursorForEvent(*this,
-                                                hasImage(),
-                                                isPanRelevant(),
-                                                nullptr));
+        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
 }
 
 QRgb ImageView::pixelColorAt(const QPoint& imagePos) const
@@ -534,8 +495,7 @@ void ImageView::setListener(ImageViewListener* listener)
     listener_ = listener;
 }
 
-void ImageView::onColorPicked(const QColor& color,
-                              const QPoint& imagePos)
+void ImageView::onColorPicked(const QColor& color, const QPoint& imagePos)
 {
     if (listener_)
         listener_->onColorPicked(color, imagePos);
@@ -548,23 +508,19 @@ const QImage& ImageView::image() const
 
 QImage ImageView::renderToImage() const
 {
-    if ( !scene_ || scene_->sceneRect().isEmpty() )
+    if (!scene_ || scene_->sceneRect().isEmpty())
         return QImage();
 
     QRectF rect = scene_->sceneRect();
 
-    QImage img(rect.size().toSize(),
-               QImage::Format_ARGB32_Premultiplied);
+    QImage img(rect.size().toSize(), QImage::Format_ARGB32_Premultiplied);
     img.fill(Qt::transparent);
 
     QPainter painter(&img);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
-    scene_->render(&painter,
-                  QRectF(img.rect()),
-                  rect,
-                  Qt::IgnoreAspectRatio);
+    scene_->render(&painter, QRectF(img.rect()), rect, Qt::IgnoreAspectRatio);
 
     return img;
 }
@@ -580,10 +536,9 @@ bool ImageView::isPanRelevant() const
         return false;
 
     const QRectF sceneRect = scene_->sceneRect();
-    const QRectF viewRect  = mapToScene(viewport()->rect()).boundingRect();
+    const QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
 
-    return sceneRect.width()  > viewRect.width()
-           || sceneRect.height() > viewRect.height();
+    return sceneRect.width() > viewRect.width() || sceneRect.height() > viewRect.height();
 }
 
 QGraphicsScene* ImageView::graphicsScene() const
@@ -599,24 +554,23 @@ bool ImageView::isGrayscale() const
 
 void ImageView::upscaleItems()
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     const bool has_ds = downscaleConfig_.hasDownscale;
-    const int      df = downscaleConfig_.downscaleFactor;
+    const int df = downscaleConfig_.downscaleFactor;
 
     qreal factor = 1.0;
 
-    if ( has_ds &&
-         displayConfig_.image == ImageBase::Source )
-        factor = qreal( df );
+    if (has_ds && displayConfig_.image == ImageBase::Source)
+        factor = qreal(df);
 
-    l_out_->setScale( factor );
-    l_in_->setScale( factor );
+    l_out_->setScale(factor);
+    l_in_->setScale(factor);
 }
 
 void ImageView::applyDisplayConfig(const DisplayConfig& display)
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     displayConfig_ = display;
 
@@ -634,27 +588,27 @@ void ImageView::updateDisplayWithConfig()
 
 void ImageView::updateContourColors()
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     QColor col_lout, col_lin;
 
-    if ( displayConfig_.l_out_displayed )
+    if (displayConfig_.l_out_displayed)
         col_lout = toQColor(displayConfig_.l_out_color);
     else
         col_lout = Qt::transparent;
 
-    if ( displayConfig_.l_in_displayed )
+    if (displayConfig_.l_in_displayed)
         col_lin = toQColor(displayConfig_.l_in_color);
     else
         col_lin = Qt::transparent;
 
-    l_out_->setColor( col_lout );
-    l_in_->setColor( col_lin );
+    l_out_->setColor(col_lout);
+    l_in_->setColor(col_lin);
 }
 
 void ImageView::updateFlip()
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     contentRoot_->setTransformOriginPoint(0.0, 0.0);
 
@@ -664,8 +618,7 @@ void ImageView::updateFlip()
         t.scale(-1.0, 1.0);
         contentRoot_->setTransform(t);
 
-        contentRoot_->setPos(static_cast<qreal>(pixmapItem_->pixmap().width()),
-                             0.0);
+        contentRoot_->setPos(static_cast<qreal>(pixmapItem_->pixmap().width()), 0.0);
     }
     else
     {
@@ -676,10 +629,10 @@ void ImageView::updateFlip()
 
 void ImageView::updateSmoothDisplay()
 {
-    if ( !pixmapItem_ )
+    if (!pixmapItem_)
         return;
 
-    if ( displayConfig_.smoothDisplay )
+    if (displayConfig_.smoothDisplay)
         pixmapItem_->setTransformationMode(Qt::SmoothTransformation);
     else
         pixmapItem_->setTransformationMode(Qt::FastTransformation);
@@ -687,7 +640,7 @@ void ImageView::updateSmoothDisplay()
 
 void ImageView::updateTextOverlayVisibility()
 {
-    if ( !overlay_ )
+    if (!overlay_)
         return;
 
     overlay_->setVisible(displayConfig_.algorithm_overlay);
@@ -695,7 +648,7 @@ void ImageView::updateTextOverlayVisibility()
 
 void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
 {
-    assert( l_out_ && l_in_ );
+    assert(l_out_ && l_in_);
 
     downscaleConfig_ = downscale;
 
@@ -704,22 +657,21 @@ void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
 
 void ImageView::setText(const QString& text)
 {
-    if ( overlay_ )
+    if (overlay_)
         overlay_->setText(text);
 }
 
-QColor ImageView::desaturateAndDarken(const QColor& original,
-                                      qreal saturationFactor,
+QColor ImageView::desaturateAndDarken(const QColor& original, qreal saturationFactor,
                                       qreal valueFactor)
 {
     // Clamp des facteurs pour éviter les aberrations
     saturationFactor = std::clamp(saturationFactor, 0.0, 1.0);
-    valueFactor      = std::clamp(valueFactor,      0.0, 1.0);
+    valueFactor = std::clamp(valueFactor, 0.0, 1.0);
 
     QColor hsv = original.toHsv();
 
-    int h = hsv.hue();         // peut être -1 si gris
-    int s = hsv.saturation();  // 0 → gris pur
+    int h = hsv.hue();        // peut être -1 si gris
+    int s = hsv.saturation(); // 0 → gris pur
     int v = hsv.value();
     int a = hsv.alpha();
 
@@ -745,7 +697,7 @@ QImage ImageView::darkenImage(const QImage& image)
     p.setCompositionMode(QPainter::CompositionMode_Multiply);
 
     // gris sombre plutôt que noir pur
-    p.fillRect(dark.rect(), QColor(100,100,100));
+    p.fillRect(dark.rect(), QColor(100, 100, 100));
     p.end();
 
     return dark;
@@ -753,24 +705,22 @@ QImage ImageView::darkenImage(const QImage& image)
 
 void ImageView::showPlaceholder(bool showEffect)
 {
-    if ( !blur_ )
+    if (!blur_)
         return;
 
-    if ( showEffect )
+    if (showEffect)
     {
-        setImage(darkenImage( lastDisplayedImage_) );
+        setImage(darkenImage(lastDisplayedImage_));
 
         pixmapItem_->update();
         contentRoot_->update();
         scene_->update();
 
-        if ( l_out_ )
-            l_out_->setColor( desaturateAndDarken(toQColor(displayConfig_.l_out_color),
-                                                 0.4, 0.6) );
+        if (l_out_)
+            l_out_->setColor(desaturateAndDarken(toQColor(displayConfig_.l_out_color), 0.4, 0.6));
 
-        if ( l_in_ )
-            l_in_->setColor( desaturateAndDarken(toQColor(displayConfig_.l_in_color),
-                                                0.4, 0.6) );
+        if (l_in_)
+            l_in_->setColor(desaturateAndDarken(toQColor(displayConfig_.l_in_color), 0.4, 0.6));
     }
     else
     {

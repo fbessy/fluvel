@@ -50,46 +50,39 @@ namespace ofeli_ip
 
 class HausdorffDistance
 {
-
-public :
-
+public:
     //! Constructor.
-    HausdorffDistance(Shape& shape_a1,
-                      Shape& shape_b1,
-                      const PointSet& intersection1 = PointSet());
+    HausdorffDistance(Shape& shape_a1, Shape& shape_b1, const PointSet& intersection1 = PointSet());
 
     //! Gets the hausdorff distance between #shape_a and #shape_b.
     float get_distance() const;
 
     //! Gets the modified hausdorff distance between #shape_a and #shape_b.
-    //! Note : the result of the modified hausdorff distance is not exact (and higher than the exact value)
-    //! if the optimization EARLY_BREAKING is applied.
+    //! Note : the result of the modified hausdorff distance is not exact (and higher than the
+    //! exact value) if the optimization EARLY_BREAKING is applied.
     float get_modified() const;
 
     //! Gets the hausdorff quantile between #shape_a and #shape_b.
     float get_hausdorff_quantile(int hundredth);
 
-    //! Gets the centroids distance, i.e. the gap between the #shape_a 's centroid and the #shape_b 's centroid.
+    //! Gets the centroids distance, i.e. the gap between the #shape_a 's centroid and the
+    //! #shape_b 's centroid.
     float get_centroids_distance() const;
 
 private:
-
     //! Computes the hausdorff distance (and minimum distances in same time).
     void compute();
 
     //! Computes the directed or relative hausdorff distance
     //! (and minimum distances in same time, in one direction).
-    void compute_directed_hd(const Shape& shape_1,
-                             const Shape& shape_2,
-                             float& directed_hd,
+    void compute_directed_hd(const Shape& shape_1, const Shape& shape_2, float& directed_hd,
                              std::vector<float>& directed_min_dists);
 
     //! Mean or average of the directed/relative minimum distances.
     static float calculate_mean(const std::vector<float>& min_dists);
 
     //! Gets the directed/relative minimum Hausdforff quantile.
-    static float get_hausdorff_quantile(const std::vector<float>& min_dists,
-                                        int hundredth);
+    static float get_hausdorff_quantile(const std::vector<float>& min_dists, int hundredth);
 
     //! Shape a defined by its points offsets.
     Shape& shape_a_;
@@ -100,16 +93,20 @@ private:
     //! Optional intersection with common points between #shape_a and #shape_b.
     const PointSet& intersection_a_b_;
 
-    //! Directed or relative hausdorff distance from #shape_a (outer loop) to #shape_b (inner loop).
+    //! Directed or relative hausdorff distance from #shape_a (outer loop) to #shape_b (inner
+    //! loop).
     float hd_a_to_b_;
 
-    //! Directed or relative hausdorff distance from #shape_b (outer loop) to #shape_a (inner loop).
+    //! Directed or relative hausdorff distance from #shape_b (outer loop) to #shape_a (inner
+    //! loop).
     float hd_b_to_a_;
 
-    //! Minimum distances computed in the direction from #shape_a (outer loop) to #shape_b (inner loop).
+    //! Minimum distances computed in the direction from #shape_a (outer loop) to #shape_b
+    //! (inner loop).
     std::vector<float> min_dists_a_to_b_;
 
-    //! Minimum distances computed in the direction from #shape_b (outer loop) to #shape_a (inner loop).
+    //! Minimum distances computed in the direction from #shape_b (outer loop) to #shape_a
+    //! (inner loop).
     std::vector<float> min_dists_b_to_a_;
 
     //! Position in x of the centroid of #shape_a.
@@ -126,6 +123,6 @@ private:
     bool is_sorted_{false};
 };
 
-}
+} // namespace ofeli_ip
 
 #endif // HAUSDORFF_DISTANCE_HPP

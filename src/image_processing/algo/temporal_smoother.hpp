@@ -1,9 +1,9 @@
 #ifndef TEMPORAL_SMOOTHER_HPP
 #define TEMPORAL_SMOOTHER_HPP
 
-#include "image_span.hpp"
-#include "grid2d.hpp"
 #include "color.hpp"
+#include "grid2d.hpp"
+#include "image_span.hpp"
 
 #include <chrono>
 
@@ -15,18 +15,18 @@ namespace ofeli_ip
 class TemporalSmoother
 {
 public:
-
     void reset(ImageSpan first_src);
     void update(ImageSpan src);
 
-    const Grid2D<Rgb_f>& accum() const { return accum_; }
+    const Grid2D<Rgb_f>& accum() const
+    {
+        return accum_;
+    }
 
     ImageSpan outputSpan();
 
 private:
-
-    void updateNoiseEstimate(float motion,
-                             float dt_seconds);
+    void updateNoiseEstimate(float motion, float dt_seconds);
     void updateOutput();
 
     Grid2D<Rgb_f> accum_;
@@ -48,6 +48,6 @@ private:
     float motion_ratio_filtered_ = 1.f;
 };
 
-}
+} // namespace ofeli_ip
 
 #endif // TEMPORAL_SMOOTHER_HPP

@@ -4,9 +4,9 @@ namespace ofeli_app
 {
 
 RightPanelToggleButton::RightPanelToggleButton(QWidget* parent)
-    : QPushButton(parent),
-    iconOn_(":/icons/toolbar/right_panel_on.svg"),
-    iconOff_(":/icons/toolbar/right_panel_off.svg")
+    : QPushButton(parent)
+    , iconOn_(":/icons/toolbar/right_panel_on.svg")
+    , iconOff_(":/icons/toolbar/right_panel_off.svg")
 {
     setCheckable(true);
     setChecked(true);
@@ -15,17 +15,14 @@ RightPanelToggleButton::RightPanelToggleButton(QWidget* parent)
     // Initial state
     updateAppearance(isChecked());
 
-    connect(this, &QPushButton::toggled,
-            this, &RightPanelToggleButton::updateAppearance);
+    connect(this, &QPushButton::toggled, this, &RightPanelToggleButton::updateAppearance);
 }
 
 void RightPanelToggleButton::updateAppearance(bool checked)
 {
     setIcon(checked ? iconOn_ : iconOff_);
 
-    setToolTip(checked
-                   ? tr("Right panel is visible.")
-                   : tr("Right panel is hidden."));
+    setToolTip(checked ? tr("Right panel is visible.") : tr("Right panel is hidden."));
 }
 
-}
+} // namespace ofeli_app

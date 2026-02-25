@@ -2,8 +2,8 @@
 #define CONTOUR_POINT_ITEM_HPP
 
 #include <QGraphicsItem>
-#include <QVector>
 #include <QPoint>
+#include <QVector>
 
 namespace ofeli_app
 {
@@ -16,20 +16,22 @@ public:
     void setPoints(const QVector<QPointF>& points);
     void clearPoints();
 
-    void setColor(QColor color) { color_ = color; update(); }
+    void setColor(QColor color)
+    {
+        color_ = color;
+        update();
+    }
 
 protected:
     QRectF boundingRect() const override;
 
-    void paint(QPainter* painter,
-               const QStyleOptionGraphicsItem*,
-               QWidget*) override;
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*) override;
 
 private:
     QVector<QPointF> points_;
     QColor color_ = Qt::red;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // CONTOUR_POINT_ITEM_HPP

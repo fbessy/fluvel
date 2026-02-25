@@ -3,8 +3,8 @@
 namespace ofeli_app
 {
 
-OverlayTextItem::OverlayTextItem(QGraphicsItem* parent):
-    QGraphicsItem(parent)
+OverlayTextItem::OverlayTextItem(QGraphicsItem* parent)
+    : QGraphicsItem(parent)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
     setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -21,8 +21,7 @@ OverlayTextItem::OverlayTextItem(QGraphicsItem* parent):
     font_ = font;
 }
 
-void OverlayTextItem::paint(QPainter* painter,
-                            const QStyleOptionGraphicsItem* option,
+void OverlayTextItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                             QWidget* widget)
 {
     painter->setRenderHint(QPainter::Antialiasing);
@@ -36,11 +35,8 @@ void OverlayTextItem::paint(QPainter* painter,
 
     // Texte
     painter->setPen(Qt::white);
-    painter->drawText(
-        boundingRect().adjusted(8, 6, -8, -6),
-        Qt::AlignCenter | Qt::AlignVCenter,
-        text_
-        );
+    painter->drawText(boundingRect().adjusted(8, 6, -8, -6), Qt::AlignCenter | Qt::AlignVCenter,
+                      text_);
 }
 
 QRectF OverlayTextItem::boundingRect() const
@@ -57,22 +53,14 @@ void OverlayTextItem::setText(const QString& text)
 
     QFontMetrics fm(font_);
 
-    QRect textRect = fm.boundingRect(
-        QRect(0, 0, 1000, 1000),      // zone large
-        Qt::TextWordWrap,
-        text_
-        );
+    QRect textRect = fm.boundingRect(QRect(0, 0, 1000, 1000), // zone large
+                                     Qt::TextWordWrap, text_);
 
     prepareGeometryChange();
 
-    rect_ = QRectF(
-        0,
-        0,
-        textRect.width()  + 2 * padding_,
-        textRect.height() + 2 * padding_
-        );
+    rect_ = QRectF(0, 0, textRect.width() + 2 * padding_, textRect.height() + 2 * padding_);
 
     update();
 }
 
-}
+} // namespace ofeli_app

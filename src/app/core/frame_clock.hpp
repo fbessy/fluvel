@@ -3,7 +3,8 @@
 
 #include <QElapsedTimer>
 
-namespace ofeli_app {
+namespace ofeli_app
+{
 
 class FrameClock
 {
@@ -15,6 +16,6 @@ private:
     static QElapsedTimer timer;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // FRAME_CLOCK_HPP

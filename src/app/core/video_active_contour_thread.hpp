@@ -1,13 +1,13 @@
 #ifndef VIDEO_ACTIVE_CONTOUR_THREAD_HPP
 #define VIDEO_ACTIVE_CONTOUR_THREAD_HPP
 
-#include <QThread>
-#include <QMutex>
-#include <QWaitCondition>
-#include <QVideoFrame>
+#include "common_settings.hpp"
 #include "frame_stats_view.hpp"
 #include "temporal_smoother.hpp"
-#include "common_settings.hpp"
+#include <QMutex>
+#include <QThread>
+#include <QVideoFrame>
+#include <QWaitCondition>
 
 namespace ofeli_app
 {
@@ -22,7 +22,8 @@ struct FrameResult
     qint64 processTs;
 };
 
-struct FrameData {
+struct FrameData
+{
     QVideoFrame frame;
     qint64 receiveTs;
 };
@@ -39,8 +40,7 @@ public:
     void setAlgoConfig(const VideoComputeConfig& config);
 
 signals:
-    void frameProcessed(qint64 receiveTs,
-                        qint64 processTs);
+    void frameProcessed(qint64 receiveTs, qint64 processTs);
 
     void frameResultReady(FrameResult result);
 
@@ -50,7 +50,6 @@ protected:
     void run() override;
 
 private:
-
     VideoComputeConfig config_;
 
     FrameResult processFrame(QVideoFrame& frame);
@@ -63,7 +62,7 @@ private:
     bool configChanged_{false};
 
     std::unique_ptr<ofeli_ip::RegionColorAc> region_ac_;
-    int currentWidth_  = 0;
+    int currentWidth_ = 0;
     int currentHeight_ = 0;
 
     ofeli_ip::TemporalSmoother smoother_;

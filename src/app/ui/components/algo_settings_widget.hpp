@@ -17,14 +17,12 @@ class AlgoSettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    AlgoSettingsWidget(QWidget* parent,
-                       Session session);
+    AlgoSettingsWidget(QWidget* parent, Session session);
 
     void accept();
     void reject();
 
 private:
-
     static AlgoConfig& config(Session session);
 
     QComboBox* connectivity_cb_;
@@ -49,6 +47,6 @@ private:
     AlgoConfig& config_;
 };
 
-}
+} // namespace ofeli_app
 
 #endif // ALGO_SETTINGS_WIDGET_HPP
