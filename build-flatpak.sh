@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 BUILD_DIR="build"
 MANIFEST="ofeli.json"
