@@ -1,5 +1,7 @@
-#ifndef INTERACTION_SET_HPP
-#define INTERACTION_SET_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -54,5 +56,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // INTERACTION_SET_HPP

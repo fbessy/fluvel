@@ -1,5 +1,7 @@
-#ifndef CONTOUR_ADAPTERS_HPP
-#define CONTOUR_ADAPTERS_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "contour_data.hpp"
 #include <QPoint>
@@ -25,5 +27,3 @@
 
     return q_contour;
 }
-
-#endif // CONTOUR_ADAPTERS_HPP

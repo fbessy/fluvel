@@ -1,5 +1,7 @@
-#ifndef TEMPORAL_SMOOTHER_HPP
-#define TEMPORAL_SMOOTHER_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "color.hpp"
 #include "grid2d.hpp"
@@ -49,5 +51,3 @@ private:
 };
 
 } // namespace ofeli_ip
-
-#endif // TEMPORAL_SMOOTHER_HPP

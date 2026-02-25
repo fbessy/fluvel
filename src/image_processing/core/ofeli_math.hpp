@@ -1,5 +1,7 @@
-#ifndef OFELI_MATH_HPP
-#define OFELI_MATH_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <cmath>
 
@@ -38,5 +40,3 @@ template <typename P> inline float euclidean_distance(const P& a, const P& b)
 } // namespace math
 
 } // namespace ofeli_ip
-
-#endif // OFELI_MATH_HPP

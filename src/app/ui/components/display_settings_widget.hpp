@@ -1,5 +1,7 @@
-#ifndef DISPLAY_SETTINGS_WIDGET_HPP
-#define DISPLAY_SETTINGS_WIDGET_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "common_settings.hpp"
 
@@ -53,5 +55,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // DISPLAY_SETTINGS_WIDGET_HPP

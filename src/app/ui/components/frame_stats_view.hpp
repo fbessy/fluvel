@@ -1,5 +1,7 @@
-#ifndef FRAME_STATS_VIEW_HPP
-#define FRAME_STATS_VIEW_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QMutex>
 #include <QtGlobal>
@@ -56,5 +58,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // FRAME_STATS_VIEW_HPP

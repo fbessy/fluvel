@@ -1,6 +1,9 @@
-#include "algo_info_overlay.hpp"
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
 
 #include <QPainter>
+
+#include "algo_info_overlay.hpp"
 
 namespace ofeli_app
 {

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
 #include "algo_settings_widget.hpp"
 #include "application_settings.hpp"
 

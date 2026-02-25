@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
 #include "right_panel_toggle_button.hpp"
 
 namespace ofeli_app

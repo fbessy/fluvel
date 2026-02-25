@@ -1,5 +1,7 @@
-#ifndef NEIGHBORHOOD_HPP
-#define NEIGHBORHOOD_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 namespace ofeli_ip
 {
@@ -22,5 +24,3 @@ inline bool fully_inside_8(int x, int y, int w, int h)
 }
 
 } // namespace ofeli_ip
-
-#endif // NEIGHBORHOOD_HPP

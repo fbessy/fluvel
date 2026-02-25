@@ -1,5 +1,7 @@
-#ifndef ALGO_INFO_OVERLAY_HPP
-#define ALGO_INFO_OVERLAY_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QString>
 #include <QWidget>
@@ -34,5 +36,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // ALGO_INFO_OVERLAY_HPP

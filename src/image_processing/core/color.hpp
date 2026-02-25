@@ -1,5 +1,7 @@
-#ifndef COLOR_HPP
-#define COLOR_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <cmath>
 #include <concepts>
@@ -350,5 +352,3 @@ inline Color_3i rgb_to_yuv(const Rgb_uc& rgb)
 } // namespace color
 
 } // namespace ofeli_ip
-
-#endif // COLOR_HPP

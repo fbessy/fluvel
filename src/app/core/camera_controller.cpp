@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
 #include "camera_controller.hpp"
 #include "application_settings.hpp"
 #include "contour_adapters.hpp"

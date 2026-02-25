@@ -1,8 +1,9 @@
-#ifndef VIDEO_ACTIVE_CONTOUR_THREAD_HPP
-#define VIDEO_ACTIVE_CONTOUR_THREAD_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "common_settings.hpp"
-#include "frame_stats_view.hpp"
 #include "temporal_smoother.hpp"
 #include <QMutex>
 #include <QThread>
@@ -69,5 +70,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // VIDEO_ACTIVE_CONTOUR_THREAD_H

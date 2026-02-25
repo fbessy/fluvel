@@ -1,5 +1,7 @@
-#ifndef AC_TYPES_HPP
-#define AC_TYPES_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <limits>
 #include <vector>
@@ -265,5 +267,3 @@ struct EvolutionData
 };
 
 } // namespace ofeli_ip
-
-#endif // AC_TYPES_HPP

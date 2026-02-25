@@ -1,5 +1,7 @@
-#ifndef IMAGE_ADAPTERS_HPP
-#define IMAGE_ADAPTERS_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <utility>
 
@@ -117,5 +119,3 @@ inline ofeli_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int w
     }
 }
 #endif
-
-#endif // IMAGE_ADAPTERS_HPP

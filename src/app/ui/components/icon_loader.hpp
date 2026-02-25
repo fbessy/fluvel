@@ -1,5 +1,7 @@
-#ifndef ICON_LOADER_HPP
-#define ICON_LOADER_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QIcon>
 #include <QStyle>
@@ -19,5 +21,3 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback);
 } // namespace il
 
 } // namespace ofeli_app
-
-#endif // ICON_LOADER_HPP

@@ -1,5 +1,7 @@
-#ifndef OVERLAY_TEXT_ITEM_HPP
-#define OVERLAY_TEXT_ITEM_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QFont>
 #include <QGraphicsItem>
@@ -30,5 +32,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // OVERLAY_TEXT_ITEM_HPP

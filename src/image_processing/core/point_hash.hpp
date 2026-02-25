@@ -1,5 +1,7 @@
-#ifndef POINT_HASH_HPP
-#define POINT_HASH_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "point.hpp"
 #include <functional>
@@ -18,5 +20,3 @@ template <> struct hash<ofeli_ip::Point2D_i>
 };
 
 } // namespace std
-
-#endif // POINT_HASH_HPP

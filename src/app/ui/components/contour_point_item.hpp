@@ -1,5 +1,7 @@
-#ifndef CONTOUR_POINT_ITEM_HPP
-#define CONTOUR_POINT_ITEM_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QGraphicsItem>
 #include <QPoint>
@@ -33,5 +35,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // CONTOUR_POINT_ITEM_HPP

@@ -1,5 +1,7 @@
-#ifndef IMAGE_VIEW_HPP
-#define IMAGE_VIEW_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QElapsedTimer>
 #include <QGraphicsBlurEffect>
@@ -159,5 +161,3 @@ signals:
 };
 
 } // namespace ofeli_app
-
-#endif // IMAGE_VIEW_BASE_HPP

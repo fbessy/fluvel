@@ -1,5 +1,7 @@
-#ifndef COLOR_SELECTOR_WIDGET_HPP
-#define COLOR_SELECTOR_WIDGET_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QColor>
 #include <QWidget>
@@ -38,5 +40,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // COLOR_SELECTOR_WIDGET_HPP

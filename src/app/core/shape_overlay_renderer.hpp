@@ -1,10 +1,11 @@
-#ifndef SHAPE_OVERLAY_RENDERER_HPP
-#define SHAPE_OVERLAY_RENDERER_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QWidget>
 
 #include "phi_editor.hpp"
-#include "shape_type.hpp"
 
 namespace ofeli_app
 {
@@ -26,5 +27,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // SHAPE_OVERLAY_RENDERER_HPP

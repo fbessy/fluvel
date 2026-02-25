@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
 #include "camera_settings_window.hpp"
 #include "algo_settings_widget.hpp"
 

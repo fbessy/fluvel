@@ -1,5 +1,7 @@
-#ifndef COMMON_SETTINGS_HPP
-#define COMMON_SETTINGS_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "active_contour.hpp"
 #include "color.hpp"
@@ -305,5 +307,3 @@ inline QRgb get_QRgb(ofeli_ip::Rgb_uc col)
 }
 
 } // namespace ofeli_app
-
-#endif // COMMON_SETTINGS_HPP

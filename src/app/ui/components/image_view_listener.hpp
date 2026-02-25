@@ -1,5 +1,7 @@
-#ifndef IMAGE_VIEW_LISTENER_HPP
-#define IMAGE_VIEW_LISTENER_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QColor>
 #include <QPoint>
@@ -15,5 +17,3 @@ public:
 };
 
 } // namespace ofeli_app
-
-#endif // IMAGE_VIEW_LISTENER_HPP

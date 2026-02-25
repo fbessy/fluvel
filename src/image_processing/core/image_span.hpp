@@ -1,7 +1,8 @@
-#ifndef IMAGE_SPAN_HPP
-#define IMAGE_SPAN_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
 
-#include <bit>
+#pragma once
+
 #include <cassert>
 #include <cstddef>
 #include <utility>
@@ -165,5 +166,3 @@ private:
 };
 
 } // namespace ofeli_ip
-
-#endif // IMAGE_SPAN_HPP

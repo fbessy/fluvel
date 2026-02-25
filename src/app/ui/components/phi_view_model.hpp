@@ -1,5 +1,7 @@
-#ifndef PHI_VIEW_MODEL_HPP
-#define PHI_VIEW_MODEL_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QImage>
 #include <QObject>
@@ -7,7 +9,6 @@
 
 #include <vector>
 
-#include "grid2d.hpp"     // ofeli_ip::Grid2D
 #include "phi_editor.hpp" // pour PhiEditor
 #include "point.hpp"
 
@@ -64,5 +65,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // PHI_VIEW_MODEL_HPP

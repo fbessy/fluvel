@@ -1,5 +1,9 @@
-#include "shape_overlay_renderer.hpp"
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
 #include <QPainter>
+
+#include "shape_overlay_renderer.hpp"
 
 namespace ofeli_app
 {

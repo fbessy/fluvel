@@ -1,5 +1,7 @@
-#ifndef LANGUAGE_WINDOW_HPP
-#define LANGUAGE_WINDOW_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QDialog>
 
@@ -30,8 +32,6 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // LANGUAGE_WINDOW_HPP
 
 //! \class ofeli::LanguageWindow
 //! The class LanguageWindow is a QDialog window to choose the application langage for the user. An

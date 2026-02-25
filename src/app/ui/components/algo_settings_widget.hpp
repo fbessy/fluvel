@@ -1,5 +1,7 @@
-#ifndef ALGO_SETTINGS_WIDGET_HPP
-#define ALGO_SETTINGS_WIDGET_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "common_settings.hpp"
 
@@ -48,5 +50,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // ALGO_SETTINGS_WIDGET_HPP

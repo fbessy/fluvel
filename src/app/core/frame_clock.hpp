@@ -1,5 +1,7 @@
-#ifndef FRAME_CLOCK_HPP
-#define FRAME_CLOCK_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QElapsedTimer>
 
@@ -17,5 +19,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // FRAME_CLOCK_HPP

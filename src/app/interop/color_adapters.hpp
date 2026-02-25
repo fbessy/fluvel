@@ -1,5 +1,7 @@
-#ifndef COLOR_ADAPTERS_HPP
-#define COLOR_ADAPTERS_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include "color.hpp"
 #include <QColor>
@@ -21,5 +23,3 @@ inline ofeli_ip::Rgb_uc toRgb_uc(QRgb pixel)
     return {static_cast<unsigned char>(qRed(pixel)), static_cast<unsigned char>(qGreen(pixel)),
             static_cast<unsigned char>(qBlue(pixel))};
 }
-
-#endif // COLOR_ADAPTERS_HPP

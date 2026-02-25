@@ -1,11 +1,10 @@
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
 #include "video_active_contour_thread.hpp"
 
-#include "active_contour.hpp"
-#include "application_settings.hpp"
-#include "contour_rendering_qimage.hpp"
 #include "frame_clock.hpp"
 #include "image_adapters.hpp"
-#include <cstddef>
 
 namespace ofeli_app
 {

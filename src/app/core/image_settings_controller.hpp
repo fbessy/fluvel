@@ -1,5 +1,7 @@
-#ifndef IMAGE_SETTINGS_CONTROLLER_HPP
-#define IMAGE_SETTINGS_CONTROLLER_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QObject>
 
@@ -50,5 +52,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // IMAGE_SETTINGS_CONTROLLER_HPP

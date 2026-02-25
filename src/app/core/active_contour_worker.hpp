@@ -1,5 +1,7 @@
-#ifndef ACTIVE_CONTOUR_WORKER_HPP
-#define ACTIVE_CONTOUR_WORKER_HPP
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
 
 #include <QImage>
 #include <QMutex>
@@ -95,5 +97,3 @@ private:
 };
 
 } // namespace ofeli_app
-
-#endif // ACTIVE_CONTOUR_WORKER_HPP
