@@ -329,7 +329,8 @@ void ImageView::wheelEvent(QWheelEvent* event)
     autoFitEnabled_ = false;
 
     if (m_interaction_)
-        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
+        viewport()->setCursor(
+            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
 
 #ifdef OFELI_DEBUG
     qDebug() << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
@@ -388,7 +389,8 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     {
         handled = m_interaction_->mousePress(*this, event);
 
-        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
+        viewport()->setCursor(
+            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
     }
 
     // 4️⃣ Si personne n’a géré, on passe à Qt
@@ -415,7 +417,8 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     {
         handled = m_interaction_->mouseMove(*this, event);
 
-        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
+        viewport()->setCursor(
+            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
     }
 
     // 4️⃣ Si personne n’a géré, on passe à Qt
@@ -442,7 +445,8 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
     {
         handled = m_interaction_->mouseRelease(*this, event);
 
-        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
+        viewport()->setCursor(
+            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
     }
 
     // 4️⃣ Si personne n’a géré, on passe à Qt
@@ -481,7 +485,8 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 void ImageView::enterEvent(QEnterEvent*)
 {
     if (m_interaction_)
-        setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
+        viewport()->setCursor(
+            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
 }
 
 QRgb ImageView::pixelColorAt(const QPoint& imagePos) const
