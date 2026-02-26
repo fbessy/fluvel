@@ -38,9 +38,6 @@ set(app_src
     ${UI_COMP_DIR}/display_settings_widget.cpp
     ${UI_COMP_DIR}/display_settings_widget.hpp
 
-    ${UI_COMP_DIR}/camera_overlay_widget.cpp
-    ${UI_COMP_DIR}/camera_overlay_widget.hpp
-
     ${UI_COMP_DIR}/analysis_widget.cpp
     ${UI_COMP_DIR}/analysis_widget.hpp
 
