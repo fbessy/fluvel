@@ -4,16 +4,20 @@
 #pragma once
 
 #include "active_contour.hpp"
-#include "algo_stats.hpp"
 #include "common_settings.hpp"
+#include "contour_diagnostics.hpp"
 
 #include <QObject>
 #include <QImage>
 #include <QTimer>
 #include <QMutex>
 
+#include <chrono>
+
 namespace ofeli_app
 {
+
+using clock_type = std::chrono::steady_clock;
 
 enum class RunMode
 {
@@ -49,8 +53,6 @@ public:
 
     void finish();
 
-    AlgoStats currentStats() const;
-
     void setAlgoConfig(const ImageComputeConfig& config);
 
 signals:
@@ -58,13 +60,14 @@ signals:
     void contourUpdated(const ofeli_ip::ExportedContour& l_out,
                         const ofeli_ip::ExportedContour& l_in);
     void stateChanged(ofeli_app::WorkerState state);
+    void diagnosticsUpdated(ofeli_ip::ContourDiagnostics diag);
 
 private slots:
     void onTimeout();
 
 private:
     void emitContour();
-    void updateStats();
+    void updateDiagnostics();
 
     void suspend();
     void resume();
@@ -79,21 +82,24 @@ private:
     void setMode(RunMode mode);
     void setState(WorkerState state);
 
+    void resetMeasurement();
+
     WorkerState state_{WorkerState::Uninitialized};
     RunMode mode_{RunMode::Interactive};
-    QTimer* timer_;
+    QTimer* workerTimer_;
     std::unique_ptr<ofeli_ip::ActiveContour> ac_;
-
-    mutable QMutex statsMutex_;
-    AlgoStats currentStats_;
 
     QImage image_;
     QImage processedImage_;
 
-    qint64 timeSlice_ms_;
+    qint64 timeSliceMs_;
     bool initialShown_;
 
     ImageComputeConfig config_;
+
+    ofeli_ip::ContourDiagnostics diag_;
+    clock_type::time_point measurementStartTime_;
+    bool isMeasuring_ = false;
 };
 
 } // namespace ofeli_app

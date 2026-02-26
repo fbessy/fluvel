@@ -36,42 +36,50 @@ void RegionAc::initialize_sums()
 void RegionAc::do_specific_cycle1()
 {
     if (pxl_nbr_out_ >= 1)
-        average_out_ = std::lround(static_cast<float>(sum_out_) / pxl_nbr_out_);
+        meanOut_ = std::lround(static_cast<float>(sum_out_) / pxl_nbr_out_);
 
     const int64_t sum_in = sum_total_ - sum_out_;
     const int64_t pxl_nbr_in = pxl_nbr_total_ - pxl_nbr_out_;
 
     if (pxl_nbr_in >= 1)
-        average_in_ = std::lround(static_cast<float>(sum_in) / pxl_nbr_in);
+        meanIn_ = std::lround(static_cast<float>(sum_in) / pxl_nbr_in);
 }
 
-void RegionAc::compute_external_speed_Fd(ContourPoint& point)
+void RegionAc::computeExternalSpeedFd(ContourPoint& point)
 {
     const int pxl = static_cast<int>(image_.at(point.x(), point.y()));
 
-    const int diff_out = pxl - average_out_;
-    const int diff_in = pxl - average_in_;
+    const int diffOut = pxl - meanOut_;
+    const int diffIn = pxl - meanIn_;
 
-    const int speed = region_config_.lambda_out * (math::square(diff_out)) -
-                      region_config_.lambda_in * (math::square(diff_in));
+    const int speed = regionConfig_.lambdaOut * (math::square(diffOut)) -
+                      regionConfig_.lambdaIn * (math::square(diffIn));
 
     point.speed_ = speed_value::get_discrete_speed(speed);
 }
 
-void RegionAc::do_specific_when_switch(const ContourPoint& point, BoundarySwitch ctx_choice)
+void RegionAc::doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
 {
     const int64_t intensity = static_cast<int64_t>(image_.at(point.x(), point.y()));
 
-    if (ctx_choice == BoundarySwitch::In)
+    if (ctxChoice == BoundarySwitch::In)
     {
         sum_out_ -= intensity;
         --pxl_nbr_out_;
     }
-    else if (ctx_choice == BoundarySwitch::Out)
+    else if (ctxChoice == BoundarySwitch::Out)
     {
         sum_out_ += intensity;
         ++pxl_nbr_out_;
     }
+}
+
+void RegionAc::fillDiagnostics(ContourDiagnostics& d) const
+{
+    ActiveContour::fillDiagnostics(d);
+
+    d.averageIn = ChannelVector(meanIn_);
+    d.averageOut = ChannelVector(meanOut_);
 }
 
 } // namespace ofeli_ip

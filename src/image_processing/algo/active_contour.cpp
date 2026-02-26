@@ -13,20 +13,19 @@ namespace ofeli_ip
 {
 
 // Definitions
-ActiveContour::ActiveContour(const ContourData& initial_state, const AcConfig& config)
-    : cd_(initial_state)
+ActiveContour::ActiveContour(const ContourData& initialState, const AcConfig& config)
+    : cd_(initialState)
     , config_(config)
-    , internal_kernel_(
-          make_internal_kernel_offsets(config.disk_radius, initial_state.phi().width()))
-    , ctx_in_(BoundarySwitchContext::make_switch_in(cd_))
-    , ctx_out_(BoundarySwitchContext::make_switch_out(cd_))
-    , ctx_(&ctx_in_)
+    , internalKernel_(makeInternalKernelOffsets(config.diskRadius, initialState.phi().width()))
+    , ctxIn_(BoundarySwitchContext::makeSwitchIn(cd_))
+    , ctxOut_(BoundarySwitchContext::makeSwitchOut(cd_))
+    , ctx_(&ctxIn_)
     , state_(PhaseState::Cycle1)
     , ed_(cd_)
 {
-    active_boundary_staging_.reserve(cd_.l_out().capacity());
+    activeBoundaryStaging_.reserve(cd_.l_out().capacity());
 
-    if (config_.is_cycle2)
+    if (config_.hasCycle2)
     {
         steps_per_cycle_ = config_.Na + config_.Ns;
     }
@@ -36,19 +35,19 @@ ActiveContour::ActiveContour(const ContourData& initial_state, const AcConfig& c
     }
 }
 
-ActiveContour::ActiveContour(ContourData&& initial_state, const AcConfig& config)
-    : cd_(std::move(initial_state))
+ActiveContour::ActiveContour(ContourData&& initialState, const AcConfig& config)
+    : cd_(std::move(initialState))
     , config_(config)
-    , internal_kernel_(make_internal_kernel_offsets(config.disk_radius, cd_.phi().width()))
-    , ctx_in_(BoundarySwitchContext::make_switch_in(cd_))
-    , ctx_out_(BoundarySwitchContext::make_switch_out(cd_))
-    , ctx_(&ctx_in_)
+    , internalKernel_(makeInternalKernelOffsets(config.diskRadius, cd_.phi().width()))
+    , ctxIn_(BoundarySwitchContext::makeSwitchIn(cd_))
+    , ctxOut_(BoundarySwitchContext::makeSwitchOut(cd_))
+    , ctx_(&ctxIn_)
     , state_(PhaseState::Cycle1)
     , ed_(cd_)
 {
-    active_boundary_staging_.reserve(cd_.l_out().capacity());
+    activeBoundaryStaging_.reserve(cd_.l_out().capacity());
 
-    if (config_.is_cycle2)
+    if (config_.hasCycle2)
     {
         steps_per_cycle_ = config_.Na + config_.Ns;
     }
@@ -58,31 +57,31 @@ ActiveContour::ActiveContour(ContourData&& initial_state, const AcConfig& config
     }
 }
 
-void ActiveContour::handle_failure()
+void ActiveContour::handleFailure()
 {
     if (!cd_.empty())
         return;
 
-    ed_.stopping_status = StoppingStatus::EmptyListFailure;
+    ed_.stoppingStatus = StoppingStatus::EmptyListFailure;
     stop();
 
     // Recovery mode: the failure stops the current iteration,
     // but contour data are repaired to allow a future restart.
-    if (config_.failure_mode == FailureHandlingMode::RecoverOnFailure)
+    if (config_.failureMode == FailureHandlingMode::RecoverOnFailure)
         cd_.define_from_ellipse();
 }
 
-void ActiveContour::enforce_iteration_limit()
+void ActiveContour::enforceIterationLimit()
 {
     assert(state_ == PhaseState::Cycle1);
 
     // Condition to handle and avoid infinite loop of the method converge(),
     // The convergence is data-dependent and therefore not guaranteed.
-    if (ed_.step_count >= ed_.max_step_count)
+    if (ed_.stepCount >= ed_.maxStepCount)
     {
-        ed_.stopping_status = StoppingStatus::MaxIteration;
+        ed_.stoppingStatus = StoppingStatus::MaxIteration;
 
-        if (config_.is_cycle2)
+        if (config_.hasCycle2)
         {
             state_ = PhaseState::FinalCycle2;
         }
@@ -97,21 +96,21 @@ void ActiveContour::converge()
 {
     // Fast Two Cycle algorithm
 
-    while (!is_stopped())
+    while (!isStopped())
     {
         while (state_ == PhaseState::Cycle1)
         {
-            step_cycle1();
+            stepCycle1();
         }
 
         while (state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2)
         {
-            step_cycle2();
+            stepCycle2();
         }
     }
 }
 
-void ActiveContour::run_steps(int n_steps)
+void ActiveContour::runSteps(int n_steps)
 {
     if (n_steps < 1)
     {
@@ -120,26 +119,26 @@ void ActiveContour::run_steps(int n_steps)
 
     for (int i = 0; i < n_steps; ++i)
     {
-        if (is_stopped())
+        if (isStopped())
             return;
 
         if (state_ == PhaseState::Cycle1)
         {
-            step_cycle1();
+            stepCycle1();
         }
         else if (state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2)
         {
-            step_cycle2();
+            stepCycle2();
         }
     }
 }
 
 void ActiveContour::step()
 {
-    run_steps(1);
+    runSteps(1);
 }
 
-void ActiveContour::run_cycles(int n_cycles)
+void ActiveContour::runCycles(int n_cycles)
 {
     if (n_cycles < 1)
     {
@@ -148,88 +147,88 @@ void ActiveContour::run_cycles(int n_cycles)
 
     int n_steps = n_cycles * steps_per_cycle_;
 
-    run_steps(n_steps);
+    runSteps(n_steps);
 }
 
-void ActiveContour::step_cycle1()
+void ActiveContour::stepCycle1()
 {
     assert(state_ == PhaseState::Cycle1);
 
-    handle_failure();
-    if (is_stopped())
+    handleFailure();
+    if (isStopped())
         return;
 
-    enforce_iteration_limit();
-    if (is_stopped())
+    enforceIterationLimit();
+    if (state_ != PhaseState::Cycle1)
         return;
 
     do_specific_cycle1();
 
-    bool is_outward_moving = directional_substep(BoundarySwitch::In);
-    bool is_inward_moving = directional_substep(BoundarySwitch::Out);
+    bool isOutwardMoving = directionalSubstep(BoundarySwitch::In);
+    bool isInwardMoving = directionalSubstep(BoundarySwitch::Out);
 
-    ++ed_.step_count;
-    ++ed_.phase_step_count;
+    ++ed_.stepCount;
+    ++ed_.phaseStepCount;
 
-    ed_.is_moving = is_outward_moving || is_inward_moving;
+    ed_.isMoving = (isOutwardMoving || isInwardMoving);
 
-    check_state_step1();
+    checkStateStep1();
 }
 
-void ActiveContour::step_cycle2()
+void ActiveContour::stepCycle2()
 {
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 
-    handle_failure();
-    if (is_stopped())
+    handleFailure();
+    if (isStopped())
         return;
 
-    directional_substep(BoundarySwitch::In);
-    directional_substep(BoundarySwitch::Out);
+    directionalSubstep(BoundarySwitch::In);
+    directionalSubstep(BoundarySwitch::Out);
 
-    ++ed_.step_count;
-    ++ed_.phase_step_count;
+    ++ed_.stepCount;
+    ++ed_.phaseStepCount;
 
-    update_state_cycle2();
+    updateStateCycle2();
 }
 
-void ActiveContour::select_context(BoundarySwitch ctx_choice)
+void ActiveContour::selectContext(BoundarySwitch ctxChoice)
 {
-    assert(!is_stopped());
+    assert(!isStopped());
 
-    if (ctx_choice == BoundarySwitch::In)
-        ctx_ = &ctx_in_;
-    else if (ctx_choice == BoundarySwitch::Out)
-        ctx_ = &ctx_out_;
+    if (ctxChoice == BoundarySwitch::In)
+        ctx_ = &ctxIn_;
+    else if (ctxChoice == BoundarySwitch::Out)
+        ctx_ = &ctxOut_;
 }
 
-bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
+bool ActiveContour::directionalSubstep(BoundarySwitch ctxChoice)
 {
-    assert(!is_stopped());
+    assert(!isStopped());
 
-    bool is_moving = false;
+    bool isMoving = false;
 
-    select_context(ctx_choice);
+    selectContext(ctxChoice);
     const auto& ctx = context();
 
-    auto& active = ctx.active_boundary;
-    auto& adjacent = ctx.adjacent_boundary;
+    auto& active = ctx.activeBoundary;
+    auto& adjacent = ctx.adjacentBoundary;
 
-    active_boundary_staging_.clear();
+    activeBoundaryStaging_.clear();
 
-    compute_speed(active);
+    computeSpeed(active);
 
     for (std::size_t i = 0; i < active.size();)
     {
         auto& point = active[i];
 
-        if (point.speed_ == ctx.required_speed_sign)
+        if (point.speed_ == ctx.requiredSpeedSign)
         {
-            is_moving = true;
+            isMoving = true;
 
-            do_specific_when_switch(point, ctx_choice);
+            doSpecificWhenSwitch(point, ctxChoice);
 
-            switch_boundary_point(point);
+            switchBoundaryPoint(point);
         }
         else
         {
@@ -237,19 +236,19 @@ bool ActiveContour::directional_substep(BoundarySwitch ctx_choice)
         }
     }
 
-    active.insert(active.end(), active_boundary_staging_.begin(), active_boundary_staging_.end());
+    active.insert(active.end(), activeBoundaryStaging_.begin(), activeBoundaryStaging_.end());
 
-    if (is_moving)
+    if (isMoving)
     {
-        cd_.eliminate_redundant_points(adjacent, ctx.redundant_to_region_val);
+        cd_.eliminateRedundantPoints(adjacent, ctx.redundantToRegionVal);
     }
 
-    return is_moving;
+    return isMoving;
 }
 
-void ActiveContour::switch_boundary_point(ContourPoint& point)
+void ActiveContour::switchBoundaryPoint(ContourPoint& point)
 {
-    assert(!is_stopped());
+    assert(!isStopped());
 
     const int x = point.x();
     const int y = point.y();
@@ -265,7 +264,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
         // voisins 4-connectés
         for (const auto& d : kNeighbors4)
         {
-            promote_region_to_boundary(x + d.dx, y + d.dy);
+            promoteRegionToBoundary(x + d.dx, y + d.dy);
         }
 
         // extension diagonale
@@ -273,7 +272,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
         {
             for (const auto& d : kNeighbors4Diag)
             {
-                promote_region_to_boundary(x + d.dx, y + d.dy);
+                promoteRegionToBoundary(x + d.dx, y + d.dy);
             }
         }
     }
@@ -288,7 +287,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
             if (nx < 0 || nx >= w || ny < 0 || ny >= h)
                 continue;
 
-            promote_region_to_boundary(nx, ny);
+            promoteRegionToBoundary(nx, ny);
         }
 
         if (connected == Connectivity::Eight)
@@ -301,7 +300,7 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
                 if (nx < 0 || nx >= w || ny < 0 || ny >= h)
                     continue;
 
-                promote_region_to_boundary(nx, ny);
+                promoteRegionToBoundary(nx, ny);
             }
         }
     }
@@ -309,59 +308,59 @@ void ActiveContour::switch_boundary_point(ContourPoint& point)
     const auto& ctx = context();
 
     // bascule du point courant
-    cd_.phi().at(x, y) = ctx.current_to_adjacent_val;
+    cd_.phi().at(x, y) = ctx.currentToAdjacentVal;
 
     // passage dans la boundary adjacente
-    ctx.adjacent_boundary.emplace_back(x, y);
+    ctx.adjacentBoundary.emplace_back(x, y);
 
-    point = ctx.active_boundary.back();
-    ctx.active_boundary.pop_back();
+    point = ctx.activeBoundary.back();
+    ctx.activeBoundary.pop_back();
 }
 
-void ActiveContour::promote_region_to_boundary(int nx, int ny)
+void ActiveContour::promoteRegionToBoundary(int nx, int ny)
 {
-    assert(!is_stopped());
+    assert(!isStopped());
 
     const auto& ctx = context();
 
-    auto& phi_neighbor = cd_.phi().at(nx, ny);
+    auto& phiNeighbor = cd_.phi().at(nx, ny);
 
     // neighbor ∈ region ?
-    if (phi_neighbor == ctx.neighbor_from_region_val)
+    if (phiNeighbor == ctx.neighborFromRegionVal)
     {
-        phi_neighbor = ctx.neighbor_to_boundary_val;
+        phiNeighbor = ctx.neighbor_to_boundary_val;
 
         // neighbor pending to boundary active
-        active_boundary_staging_.emplace_back(nx, ny);
+        activeBoundaryStaging_.emplace_back(nx, ny);
     }
 }
 
-void ActiveContour::compute_speed(Contour& boundary)
+void ActiveContour::computeSpeed(Contour& boundary)
 {
-    assert(!is_stopped());
+    assert(!isStopped());
 
     if (state_ == PhaseState::Cycle1)
     {
-        compute_external_speed_Fd(boundary);
+        computeExternalSpeedFd(boundary);
     }
     else if (state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2)
     {
-        compute_internal_speed_Fint(boundary);
+        computeInternalSpeedFint(boundary);
     }
 }
 
-void ActiveContour::compute_external_speed_Fd(Contour& boundary)
+void ActiveContour::computeExternalSpeedFd(Contour& boundary)
 {
     assert(state_ == PhaseState::Cycle1);
 
     for (auto& point : boundary)
     {
-        compute_external_speed_Fd(point);
+        computeExternalSpeedFd(point);
     }
 }
 
 // input integer is an offset
-void ActiveContour::compute_external_speed_Fd(ContourPoint& point)
+void ActiveContour::computeExternalSpeedFd(ContourPoint& point)
 {
     assert(state_ == PhaseState::Cycle1);
 
@@ -370,19 +369,19 @@ void ActiveContour::compute_external_speed_Fd(ContourPoint& point)
     point.speed_ = SpeedValue::GoInward;
 }
 
-void ActiveContour::compute_internal_speed_Fint(Contour& boundary)
+void ActiveContour::computeInternalSpeedFint(Contour& boundary)
 {
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 
     for (auto& point : boundary)
     {
-        compute_internal_speed_Fint(point);
+        computeInternalSpeedFint(point);
     }
 }
 
-InternalKernel ActiveContour::make_internal_kernel_offsets(int disk_radius, int grid_width)
+InternalKernel ActiveContour::makeInternalKernelOffsets(int diskRadius, int grid_width)
 {
-    const int r = disk_radius;
+    const int r = diskRadius;
     const int w = grid_width;
 
     InternalKernel kernel;
@@ -412,7 +411,7 @@ InternalKernel ActiveContour::make_internal_kernel_offsets(int disk_radius, int 
     return kernel;
 }
 
-void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
+void ActiveContour::computeInternalSpeedFint(ContourPoint& point)
 {
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 
@@ -427,20 +426,20 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
 
     const int base = cd_.phi().offset(point.x(), point.y());
 
-    int neighbor_offset;
+    int neighborOffset;
 
     int inside = 0;
     int outside = 0;
 
-    if (internal_kernel_.fully_inside(point.x(), point.y(), cd_.phi().width(), cd_.phi().height()))
+    if (internalKernel_.fully_inside(point.x(), point.y(), cd_.phi().width(), cd_.phi().height()))
     {
         // fast path without all neighbors existence checks
 
-        for (int delta : internal_kernel_.offsets)
+        for (int delta : internalKernel_.offsets)
         {
-            neighbor_offset = base + delta;
+            neighborOffset = base + delta;
 
-            PhiValue v = cd_.phi()[neighbor_offset];
+            PhiValue v = cd_.phi()[neighborOffset];
 
             if (phi_value::isInside(v))
                 ++inside;
@@ -450,13 +449,13 @@ void ActiveContour::compute_internal_speed_Fint(ContourPoint& point)
     }
     else
     {
-        for (int delta : internal_kernel_.offsets)
+        for (int delta : internalKernel_.offsets)
         {
-            neighbor_offset = base + delta;
+            neighborOffset = base + delta;
 
-            if (cd_.phi().valid(neighbor_offset) /* all checks */)
+            if (cd_.phi().valid(neighborOffset) /* all checks */)
             {
-                PhiValue v = cd_.phi()[neighbor_offset];
+                PhiValue v = cd_.phi()[neighborOffset];
 
                 if (phi_value::isInside(v))
                     ++inside;
@@ -482,17 +481,17 @@ void ActiveContour::stop()
     state_ = PhaseState::Stopped;
 }
 
-void ActiveContour::check_state_step1()
+void ActiveContour::checkStateStep1()
 {
     assert(state_ == PhaseState::Cycle1);
 
-    if (!ed_.is_moving)
+    if (!ed_.isMoving)
     {
-        ed_.stopping_status = StoppingStatus::ListsConverged;
+        ed_.stoppingStatus = StoppingStatus::ListsConverged;
 
-        if (config_.is_cycle2)
+        if (config_.hasCycle2)
         {
-            ed_.phase_step_count = 0;
+            ed_.phaseStepCount = 0;
             state_ = PhaseState::FinalCycle2;
         }
         else
@@ -500,33 +499,33 @@ void ActiveContour::check_state_step1()
             stop();
         }
     }
-    else if (ed_.phase_step_count >= config_.Na && config_.is_cycle2)
+    else if (ed_.phaseStepCount >= config_.Na && config_.hasCycle2)
     {
-        ed_.phase_step_count = 0;
+        ed_.phaseStepCount = 0;
         state_ = PhaseState::Cycle2;
     }
 }
 
-void ActiveContour::update_state_cycle2()
+void ActiveContour::updateStateCycle2()
 {
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 
     // if at the end of one cycle 2
-    if (ed_.phase_step_count >= config_.Ns)
+    if (ed_.phaseStepCount >= config_.Ns)
     {
         if (state_ == PhaseState::FinalCycle2)
         {
             stop();
         }
         else if (state_ == PhaseState::Cycle2 &&
-                 config_.failure_mode == FailureHandlingMode::StopOnFailure)
+                 config_.failureMode == FailureHandlingMode::StopOnFailure)
         {
             check_hausdorff_stopping_condition();
         }
 
-        if (!is_stopped())
+        if (!isStopped())
         {
-            ed_.phase_step_count = 0;
+            ed_.phaseStepCount = 0;
             state_ = PhaseState::Cycle1;
         }
     }
@@ -535,9 +534,9 @@ void ActiveContour::update_state_cycle2()
 void ActiveContour::check_hausdorff_stopping_condition()
 {
     assert(state_ == PhaseState::Cycle2 &&
-           config_.failure_mode == FailureHandlingMode::StopOnFailure);
+           config_.failureMode == FailureHandlingMode::StopOnFailure);
 
-    const float step_delta = float(ed_.step_count - ed_.previous_step_count);
+    const float stepDelta = float(ed_.stepCount - ed_.previous_step_count);
 
     const int w = cd_.phi().width();
     const int h = cd_.phi().height();
@@ -545,7 +544,7 @@ void ActiveContour::check_hausdorff_stopping_condition()
 
     // normalize in function of l_outshape/phi size
     // to handle different images sizes.
-    if (step_delta >= diagonal / 20.f)
+    if (stepDelta >= diagonal / 20.f)
     {
         ed_.l_out_shape.clear();
 
@@ -556,39 +555,39 @@ void ActiveContour::check_hausdorff_stopping_condition()
 
         ed_.l_out_shape.calculate_centroid();
 
-        calculate_shapes_intersection();
+        calculateShapesIntersection();
 
-        HausdorffDistance hd(ed_.l_out_shape, ed_.previous_shape, ed_.intersection);
+        HausdorffDistance hd(ed_.l_out_shape, ed_.previousShape, ed_.intersection);
 
-        const float size_factor = 100.f / diagonal;
-        ed_.hausdorff_quantile = size_factor * hd.get_hausdorff_quantile(80);
-        ed_.centroids_distance = size_factor * hd.get_centroids_distance();
-        const float delta_quantile = ed_.previous_quantile - ed_.hausdorff_quantile;
+        const float sizeFactor = 100.f / diagonal;
+        ed_.hausdorffQuantile = sizeFactor * hd.hausdorffQuantile(80);
+        ed_.centroidsDistance = sizeFactor * hd.get_centroids_distance();
+        const float delta_quantile = ed_.previousQuantile - ed_.hausdorffQuantile;
 
-        if ((ed_.centroids_distance < 1.f && ed_.hausdorff_quantile < 1.f) ||
-            (ed_.centroids_distance < 1.f && ed_.hausdorff_quantile < 2.f && delta_quantile < 0.f))
+        if ((ed_.centroidsDistance < 1.f && ed_.hausdorffQuantile < 1.f) ||
+            (ed_.centroidsDistance < 1.f && ed_.hausdorffQuantile < 2.f && delta_quantile < 0.f))
         {
-            ed_.stopping_status = StoppingStatus::Hausdorff;
+            ed_.stoppingStatus = StoppingStatus::Hausdorff;
             stop();
         }
 
         // swap the shapes in constant time O(1)
         // to prepare data for the next periodic check of the hausdorff condition
-        ed_.l_out_shape.swap(ed_.previous_shape);
-        ed_.previous_step_count = ed_.step_count;
-        ed_.previous_quantile = ed_.hausdorff_quantile;
+        ed_.l_out_shape.swap(ed_.previousShape);
+        ed_.previous_step_count = ed_.stepCount;
+        ed_.previousQuantile = ed_.hausdorffQuantile;
     }
 }
 
-void ActiveContour::calculate_shapes_intersection()
+void ActiveContour::calculateShapesIntersection()
 {
     assert(state_ == PhaseState::Cycle2);
 
     ed_.intersection.clear();
 
-    for (const auto& point : ed_.previous_shape.get_points())
+    for (const auto& point : ed_.previousShape.get_points())
     {
-        // if a point of ed.previous_shape ∈ ed.l_out_shape
+        // if a point of ed.previousShape ∈ ed.l_out_shape
         if (cd_.phi().at(point.x, point.y) == PhiValue::ExteriorBoundary)
         {
             ed_.intersection.insert(point);
@@ -602,6 +601,19 @@ void ActiveContour::restart()
 
     state_ = PhaseState::Cycle1;
     ed_.resetExecutionState();
+}
+
+void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const
+{
+    d.stepCount = ed_.stepCount;
+    d.state = state_;
+    d.stoppingStatus = ed_.stoppingStatus;
+
+    d.hausdorffQuantile = ed_.hausdorffQuantile;
+    d.centroidsDistance = ed_.centroidsDistance;
+
+    // d.elapsedSec = ed.elapsedSec_;
+    d.listsSize = cd_.l_out().size() + cd_.l_in().size();
 }
 
 } // namespace ofeli_ip

@@ -6,7 +6,6 @@
 #include "region_ac.hpp"
 #include "region_color_ac.hpp"
 
-#include "algo_stats.hpp"
 #include "image_adapters.hpp"
 #include "image_span.hpp"
 
@@ -27,11 +26,11 @@ ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr)
     ,
 
-    timer_(new QTimer(this))
-    , timeSlice_ms_(kTimeSliceInteractiveMs)
+    workerTimer_(new QTimer(this))
+    , timeSliceMs_(kTimeSliceInteractiveMs)
 {
-    timer_->setInterval(kWorkerPeriodMs);
-    connect(timer_, &QTimer::timeout, this, &ActiveContourWorker::onTimeout);
+    workerTimer_->setInterval(kWorkerPeriodMs);
+    connect(workerTimer_, &QTimer::timeout, this, &ActiveContourWorker::onTimeout);
 }
 
 void ActiveContourWorker::restart()
@@ -55,7 +54,7 @@ void ActiveContourWorker::restart()
     if (state_ != WorkerState::Ready)
         return;
 
-    updateStats();
+    updateDiagnostics();
     emitContour();
 
     initialShown_ = true;
@@ -69,7 +68,7 @@ void ActiveContourWorker::start()
         return;
 
     setState(WorkerState::Running);
-    timer_->start();
+    workerTimer_->start();
 }
 
 void ActiveContourWorker::togglePause()
@@ -91,7 +90,7 @@ void ActiveContourWorker::togglePause()
     {
         if (!initialShown_)
         {
-            updateStats();
+            updateDiagnostics();
             emitContour();
 
             initialShown_ = true;
@@ -122,7 +121,7 @@ void ActiveContourWorker::step()
     {
         if (!initialShown_)
         {
-            updateStats();
+            updateDiagnostics();
             emitContour();
 
             initialShown_ = true;
@@ -142,7 +141,7 @@ void ActiveContourWorker::performStep()
     }
     else
     {
-        updateStats();
+        updateDiagnostics();
         emitContour();
     }
 }
@@ -154,7 +153,7 @@ void ActiveContourWorker::converge()
 
     if (state_ == WorkerState::Ready)
     {
-        updateStats();
+        updateDiagnostics();
         emitContour();
 
         initialShown_ = true;
@@ -170,16 +169,22 @@ bool ActiveContourWorker::stepOnceAlgo()
 {
     assert(ac_ != nullptr);
 
-    if (ac_->is_stopped())
+    if (ac_->isStopped())
     {
         initializeActiveContour();
     }
     else
     {
+        if (ac_->isFirstIteration())
+        {
+            isMeasuring_ = true;
+            measurementStartTime_ = clock_type::now();
+        }
+
         ac_->step();
     }
 
-    return ac_->is_stopped();
+    return ac_->isStopped();
 }
 
 void ActiveContourWorker::applyProcessing()
@@ -187,7 +192,7 @@ void ActiveContourWorker::applyProcessing()
     if (image_.isNull())
         return;
 
-    timer_->stop();
+    workerTimer_->stop();
     setState(WorkerState::Initializing);
 
     processedImage_ = image_;
@@ -343,7 +348,7 @@ void ActiveContourWorker::applyProcessing()
 
 void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConfig& config)
 {
-    timer_->stop();
+    workerTimer_->stop();
     setState(WorkerState::Initializing);
 
     image_ = image;
@@ -356,7 +361,7 @@ void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConf
     if (state_ != WorkerState::Ready)
         return;
 
-    updateStats();
+    updateDiagnostics();
     emitContour();
 
     initialShown_ = true;
@@ -367,10 +372,11 @@ void ActiveContourWorker::initializeActiveContour()
     if (processedImage_.isNull())
         return;
 
-    timer_->stop();
+    workerTimer_->stop();
     setState(WorkerState::Initializing);
 
     ac_.reset();
+    resetMeasurement();
 
     assert(processedImage_.size() == config_.initialPhi.size());
 
@@ -407,7 +413,7 @@ void ActiveContourWorker::initializeActiveContour()
 
 void ActiveContourWorker::finish()
 {
-    timer_->stop();
+    workerTimer_->stop();
     setState(WorkerState::Finished);
 }
 
@@ -415,7 +421,7 @@ void ActiveContourWorker::finalizeAndPrepareNextRun()
 {
     finish();
 
-    updateStats();
+    updateDiagnostics();
     emitContour();
 
     initializeActiveContour();
@@ -425,10 +431,10 @@ void ActiveContourWorker::suspend()
 {
     if (state_ == WorkerState::Running)
     {
-        timer_->stop();
+        workerTimer_->stop();
         setState(WorkerState::Suspended);
 
-        updateStats();
+        updateDiagnostics();
         emitContour();
     }
 }
@@ -444,10 +450,10 @@ void ActiveContourWorker::onTimeout()
     assert(ac_ != nullptr);
     assert(state_ == WorkerState::Running);
 
-    QElapsedTimer timer;
-    timer.start();
+    QElapsedTimer timeSliceBudgetMs;
+    timeSliceBudgetMs.start();
 
-    while (timer.elapsed() < timeSlice_ms_)
+    while (timeSliceBudgetMs.elapsed() < timeSliceMs_)
     {
         if (stepOnceAlgo())
         {
@@ -458,32 +464,39 @@ void ActiveContourWorker::onTimeout()
 
     if (mode_ == RunMode::Interactive)
     {
-        updateStats();
+        updateDiagnostics();
         emitContour();
     }
 }
 
-void ActiveContourWorker::updateStats()
+void ActiveContourWorker::updateDiagnostics()
 {
-    AlgoStats stats;
-    stats.iteration = ac_ ? ac_->step_count() : 0;
+    if (!ac_)
+        return;
 
-    QMutexLocker lock(&statsMutex_);
-    currentStats_ = stats;
+    ofeli_ip::ContourDiagnostics diag;
+
+    if (isMeasuring_)
+    {
+        auto endTime = clock_type::now();
+        diag.elapsedSec = std::chrono::duration<double>(endTime - measurementStartTime_).count();
+    }
+    else
+    {
+        diag.elapsedSec = 0.0;
+    }
+
+    ac_->fillDiagnostics(diag);
+
+    emit diagnosticsUpdated(diag);
 }
 
 void ActiveContourWorker::emitContour()
 {
-    if (ac_ == nullptr)
+    if (!ac_)
         return;
 
     emit contourUpdated(ac_->export_l_out(), ac_->export_l_in());
-}
-
-AlgoStats ActiveContourWorker::currentStats() const
-{
-    QMutexLocker lock(&statsMutex_);
-    return currentStats_;
 }
 
 void ActiveContourWorker::setMode(RunMode mode)
@@ -491,9 +504,9 @@ void ActiveContourWorker::setMode(RunMode mode)
     mode_ = mode;
 
     if (mode_ == RunMode::Interactive)
-        timeSlice_ms_ = kTimeSliceInteractiveMs;
+        timeSliceMs_ = kTimeSliceInteractiveMs;
     else if (mode_ == RunMode::Converge)
-        timeSlice_ms_ = kTimeSliceConvergeMs;
+        timeSliceMs_ = kTimeSliceConvergeMs;
 }
 
 void ActiveContourWorker::setState(WorkerState state)
@@ -512,10 +525,16 @@ void ActiveContourWorker::setAlgoConfig(const ImageComputeConfig& config)
     if (state_ != WorkerState::Ready)
         return;
 
-    updateStats();
+    updateDiagnostics();
     emitContour();
 
     initialShown_ = true;
+}
+
+void ActiveContourWorker::resetMeasurement()
+{
+    isMeasuring_ = false;
+    measurementStartTime_ = clock_type::time_point{};
 }
 
 } // namespace ofeli_app

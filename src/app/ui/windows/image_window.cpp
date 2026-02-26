@@ -4,7 +4,6 @@
 #include "image_window.hpp"
 
 #include "active_contour_worker.hpp"
-#include "algo_info_overlay.hpp"
 #include "autofit_behavior.hpp"
 #include "fullscreen_behavior.hpp"
 #include "icon_loader.hpp"
@@ -138,9 +137,6 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
     imageView_->setInteraction(interaction.release());
-
-    imageOverlay_ = new AlgoInfoOverlay(imageView_->viewport());
-    imageOverlay_->raise();
 
     // --- Display bar (à droite) ---
     displayBar_ = new DisplaySettingsWidget(central, Session::Image);
@@ -422,11 +418,6 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageView::setContour,
             Qt::QueuedConnection);
 
-    QTimer* m_statsTimer = new QTimer(this);
-    m_statsTimer->setInterval(30); // ~33 FPS
-    connect(m_statsTimer, &QTimer::timeout, this, &ImageWindow::refreshAlgoOverlay);
-    m_statsTimer->start();
-
     connect(restartButton_, &QPushButton::clicked, imageController_, &ImageController::restart);
 
     connect(togglePauseButton_, &QPushButton::clicked, imageController_,
@@ -442,6 +433,9 @@ void ImageWindow::setupConnections()
     connect(settingsButton_, &QPushButton::clicked, settings_window_, &SettingsWindow::show);
 
     connect(imageController_, &ImageController::stateChanged, this, &ImageWindow::onStateChanged);
+
+    connect(imageController_, &ImageController::textDiagnosticsUpdated, imageView_,
+            &ImageView::setText);
 }
 
 QString ImageWindow::strippedName(const QString& fullFilename)
@@ -542,12 +536,6 @@ void ImageWindow::onStartCameraActionTriggered()
         camera_window_->raise();
         camera_window_->activateWindow();
     }
-}
-
-void ImageWindow::refreshAlgoOverlay()
-{
-    // if (imageOverlay)
-    // imageOverlay->setStats(acWorker->currentStats());
 }
 
 void ImageWindow::closeEvent(QCloseEvent* event)

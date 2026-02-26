@@ -65,10 +65,10 @@ struct AcConfig
 
     //! Boolean egals to \c true to have the curve smoothing, evolutions in the cycle 2 with the
     //! internal speed Fint.
-    bool is_cycle2;
+    bool hasCycle2;
 
     //!  Disk radius for the curve smoothing.
-    int disk_radius;
+    int diskRadius;
 
     //! Maximum number of times the active contour can evolve in a cycle 1 with \a Fd speed.
     int Na;
@@ -77,13 +77,13 @@ struct AcConfig
     int Ns;
 
     ///! Defines how the algorithm handles degraded or failure cases.
-    FailureHandlingMode failure_mode;
+    FailureHandlingMode failureMode;
 
     //! Normalize values of a configuration.
     void normalize()
     {
-        if (disk_radius < 1)
-            disk_radius = 1;
+        if (diskRadius < 1)
+            diskRadius = 1;
 
         if (Na < 1)
             Na = 1;
@@ -94,21 +94,21 @@ struct AcConfig
 
     //! Default constructor.
     AcConfig()
-        : is_cycle2(kDefaultIsCycle2)
-        , disk_radius(kDefaultDiskRadius)
+        : hasCycle2(kDefaultIsCycle2)
+        , diskRadius(kDefaultDiskRadius)
         , Na(kDefaultNa)
         , Ns(kDefaultNs)
-        , failure_mode(kDefaultFailureMode)
+        , failureMode(kDefaultFailureMode)
     {
     }
 
     //! Copy constructor.
     AcConfig(const AcConfig& copied)
-        : is_cycle2(copied.is_cycle2)
-        , disk_radius(copied.disk_radius)
+        : hasCycle2(copied.hasCycle2)
+        , diskRadius(copied.diskRadius)
         , Na(copied.Na)
         , Ns(copied.Ns)
-        , failure_mode(copied.failure_mode)
+        , failureMode(copied.failureMode)
     {
         this->normalize();
     }
@@ -116,11 +116,11 @@ struct AcConfig
     //! Copy assignement operator.
     AcConfig& operator=(const AcConfig& rhs)
     {
-        this->is_cycle2 = rhs.is_cycle2;
-        this->disk_radius = rhs.disk_radius;
+        this->hasCycle2 = rhs.hasCycle2;
+        this->diskRadius = rhs.diskRadius;
         this->Na = rhs.Na;
         this->Ns = rhs.Ns;
-        this->failure_mode = rhs.failure_mode;
+        this->failureMode = rhs.failureMode;
 
         this->normalize();
 
@@ -130,8 +130,8 @@ struct AcConfig
     //! \a Equal operator overloading.
     friend bool operator==(const AcConfig& lhs, const AcConfig& rhs)
     {
-        return (lhs.is_cycle2 == rhs.is_cycle2 && lhs.disk_radius == rhs.disk_radius &&
-                lhs.Na == rhs.Na && lhs.Ns == rhs.Ns && lhs.failure_mode == rhs.failure_mode);
+        return (lhs.hasCycle2 == rhs.hasCycle2 && lhs.diskRadius == rhs.diskRadius &&
+                lhs.Na == rhs.Na && lhs.Ns == rhs.Ns && lhs.failureMode == rhs.failureMode);
     }
 
     //! \a Not equal operator overloading.
@@ -166,15 +166,15 @@ struct InternalKernel
 //! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
 struct BoundarySwitchContext
 {
-    Contour& active_boundary;
-    Contour& adjacent_boundary;
-    SpeedValue required_speed_sign;
-    PhiValue current_to_adjacent_val;
-    PhiValue neighbor_from_region_val;
+    Contour& activeBoundary;
+    Contour& adjacentBoundary;
+    SpeedValue requiredSpeedSign;
+    PhiValue currentToAdjacentVal;
+    PhiValue neighborFromRegionVal;
     PhiValue neighbor_to_boundary_val;
-    PhiValue redundant_to_region_val;
+    PhiValue redundantToRegionVal;
 
-    static BoundarySwitchContext make_switch_in(ContourData& cd)
+    static BoundarySwitchContext makeSwitchIn(ContourData& cd)
     {
         return {cd.l_out(),
                 cd.l_in(),
@@ -185,7 +185,7 @@ struct BoundarySwitchContext
                 PhiValue::InsideRegion};
     }
 
-    static BoundarySwitchContext make_switch_out(ContourData& cd)
+    static BoundarySwitchContext makeSwitchOut(ContourData& cd)
     {
         return {cd.l_in(),
                 cd.l_out(),
@@ -203,22 +203,22 @@ struct EvolutionData
 {
     //! Iterations number in a cycle (cycle 1 or cycle 2). It is set to 0 at the end of one
     //! cycle.
-    int phase_step_count{0};
+    int phaseStepCount{0};
 
     //! Total number of iterations the active contour has evolved from the initial contour.
-    int step_count{0};
+    int stepCount{0};
 
     //! Maximum number of times the active contour can evolve.
-    const int max_step_count;
+    const int maxStepCount;
 
     //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
-    bool is_moving{true};
+    bool isMoving{true};
 
     //! l_out shape at the end of the cycle 2.
     Shape l_out_shape;
 
     //! l_out shape at the end of the previous cycle 2.
-    Shape previous_shape;
+    Shape previousShape;
 
     //! Total number of iterations the active contour has evolved from the initial contour
     //! at the end of the previous cycle 2.
@@ -226,43 +226,38 @@ struct EvolutionData
 
     //! Hausdorff quantile
     //! at the end of the previous cycle 2.
-    float previous_quantile{0.f};
+    float previousQuantile{std::numeric_limits<float>::quiet_NaN()};
 
     //! Hausdorff quantile
     //! at the end of the cycle 2. It is a normalized value, divided by the diagonal size of
     //! #phi, in percent.
-    float hausdorff_quantile;
+    float hausdorffQuantile{std::numeric_limits<float>::quiet_NaN()};
 
-    //! Centroids gap between #l_out_shape and previous_shape#. It is a normalized value,
+    //! Centroids gap between #l_out_shape and previousShape#. It is a normalized value,
     //! divided by the diagonal size of #phi, in percent.
-    float centroids_distance;
+    float centroidsDistance{std::numeric_limits<float>::quiet_NaN()};
 
-    //! Intersection, i.e common points between #l_out_shape and #previous_shape.
+    //! Intersection, i.e common points between #l_out_shape and #previousShape.
     PointSet intersection;
 
     //! Stopping condition status.
-    StoppingStatus stopping_status{StoppingStatus::None};
+    StoppingStatus stoppingStatus{StoppingStatus::None};
 
     //! Constructor.
     EvolutionData(const ContourData& cd)
-        : max_step_count(5 * std::max(cd.phi().width(), cd.phi().height()))
-        ,
-
-        hausdorff_quantile(std::numeric_limits<float>().max())
-        , centroids_distance(std::numeric_limits<float>().max())
-
+        : maxStepCount(5 * std::max(cd.phi().width(), cd.phi().height()))
     {
         l_out_shape.reserve(cd.l_out().capacity());
-        previous_shape.reserve(cd.l_out().capacity());
+        previousShape.reserve(cd.l_out().capacity());
         intersection.reserve(cd.l_out().capacity());
     }
 
     //! Reset execution state of evolution data. Used for video tracking.
     void resetExecutionState()
     {
-        phase_step_count = 0;
-        step_count = 0;
-        stopping_status = StoppingStatus::None;
+        phaseStepCount = 0;
+        stepCount = 0;
+        stoppingStatus = StoppingStatus::None;
     }
 };
 

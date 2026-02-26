@@ -140,15 +140,15 @@ void ApplicationSettings::save_algo(Session session, const AlgoConfig& algo_conf
 
     settings.setValue(scope + "/algo/Na", algo_config.acConfig.Na);
 
-    settings.setValue(scope + "/algo/has_smoothing_cycle", algo_config.acConfig.is_cycle2);
+    settings.setValue(scope + "/algo/has_smoothing_cycle", algo_config.acConfig.hasCycle2);
 
     settings.setValue(scope + "/algo/Ns", algo_config.acConfig.Ns);
 
-    settings.setValue(scope + "/algo/disk_radius", algo_config.acConfig.disk_radius);
+    settings.setValue(scope + "/algo/diskRadius", algo_config.acConfig.diskRadius);
 
-    settings.setValue(scope + "/algo/lambda_out", algo_config.regionAcConfig.lambda_out);
+    settings.setValue(scope + "/algo/lambdaOut", algo_config.regionAcConfig.lambdaOut);
 
-    settings.setValue(scope + "/algo/lambda_in", algo_config.regionAcConfig.lambda_in);
+    settings.setValue(scope + "/algo/lambdaIn", algo_config.regionAcConfig.lambdaIn);
 
     settings.setValue(scope + "/algo/color_space", int(algo_config.regionAcConfig.color_space));
 
@@ -338,31 +338,31 @@ void ApplicationSettings::load_algo(Session session, AlgoConfig& algo_config)
             .toInt());
     algo_config.acConfig.Na =
         settings.value(scope + "/algo/Na", ofeli_ip::AcConfig::kDefaultNa).toInt();
-    algo_config.acConfig.is_cycle2 =
+    algo_config.acConfig.hasCycle2 =
         settings.value(scope + "/algo/has_smoothing_cycle", ofeli_ip::AcConfig::kDefaultIsCycle2)
             .toBool();
     algo_config.acConfig.Ns =
         settings.value(scope + "/algo/Ns", ofeli_ip::AcConfig::kDefaultNs).toInt();
-    algo_config.acConfig.disk_radius =
-        settings.value(scope + "/algo/disk_radius", ofeli_ip::AcConfig::kDefaultDiskRadius).toInt();
+    algo_config.acConfig.diskRadius =
+        settings.value(scope + "/algo/diskRadius", ofeli_ip::AcConfig::kDefaultDiskRadius).toInt();
 
     switch (session)
     {
         case Session::Camera:
-            algo_config.acConfig.failure_mode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
+            algo_config.acConfig.failureMode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
             break;
 
         case Session::Image:
         default:
-            algo_config.acConfig.failure_mode = ofeli_ip::FailureHandlingMode::StopOnFailure;
+            algo_config.acConfig.failureMode = ofeli_ip::FailureHandlingMode::StopOnFailure;
             break;
     }
 
-    algo_config.regionAcConfig.lambda_out =
-        settings.value(scope + "/algo/lambda_out", ofeli_ip::RegionConfig::kDefaultLambdaOut)
+    algo_config.regionAcConfig.lambdaOut =
+        settings.value(scope + "/algo/lambdaOut", ofeli_ip::RegionConfig::kDefaultLambdaOut)
             .toInt();
-    algo_config.regionAcConfig.lambda_in =
-        settings.value(scope + "/algo/lambda_in", ofeli_ip::RegionConfig::kDefaultLambdaIn).toInt();
+    algo_config.regionAcConfig.lambdaIn =
+        settings.value(scope + "/algo/lambdaIn", ofeli_ip::RegionConfig::kDefaultLambdaIn).toInt();
 
     algo_config.regionAcConfig.color_space =
         ofeli_ip::ColorSpaceOption(settings

@@ -24,6 +24,7 @@ public slots:
     void onContourUpdated(const ofeli_ip::ExportedContour& l_out,
                           const ofeli_ip::ExportedContour& l_in);
     void onStateChanged(ofeli_app::WorkerState state);
+    void onDiagnosticsUpdated(const ofeli_ip::ContourDiagnostics& diag);
 
     void restart();
     void togglePause();
@@ -36,6 +37,8 @@ signals:
 
     void contourUpdated(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in);
     void stateChanged(ofeli_app::WorkerState state);
+
+    void textDiagnosticsUpdated(QString string);
 
     void clearOverlaysRequested();
 

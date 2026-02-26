@@ -30,7 +30,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    void calculate_shapes_intersection();
+    void calculateShapesIntersection();
 
     AnalysisWidget* widget1_;
     AnalysisWidget* widget2_;

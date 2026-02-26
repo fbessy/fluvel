@@ -51,6 +51,8 @@ struct RegionColorConfig : public RegionConfig
     {
     }
 
+    ~RegionColorConfig() override = default;
+
     //! Copy constructor.
     RegionColorConfig(const RegionColorConfig& copied)
         : RegionConfig(copied)
@@ -76,8 +78,8 @@ struct RegionColorConfig : public RegionConfig
     //! \a Equal operator overloading.
     friend bool operator==(const RegionColorConfig& lhs, const RegionColorConfig& rhs)
     {
-        return (lhs.color_space == rhs.color_space && lhs.lambda_in == rhs.lambda_in &&
-                lhs.lambda_out == rhs.lambda_out && lhs.weights == rhs.weights);
+        return (lhs.color_space == rhs.color_space && lhs.lambdaIn == rhs.lambdaIn &&
+                lhs.lambdaOut == rhs.lambdaOut && lhs.weights == rhs.weights);
     }
 
     //! \a Not equal operator overloading.
@@ -95,7 +97,9 @@ public:
     RegionColorAc(
         ImageSpan image, T&& initial_contour,
         const AcConfig& general_config = AcConfig(),                   /* optional parameter */
-        const RegionColorConfig& region_config = RegionColorConfig()); /* optional parameter */
+        const RegionColorConfig& regionConfig = RegionColorConfig()); /* optional parameter */
+
+    ~RegionColorAc() override = default;
 
     //! Reset the execution state with a new image buffer. Used for video tracking.
     void resetExecutionState(ImageSpan image);
@@ -103,14 +107,16 @@ public:
     //! Getter function for #average_rgb_out
     const Rgb_uc& get_Cout() const
     {
-        return average_out_;
+        return meanOut_;
     }
 
     //! Getter function for #average_rgb_in
     const Rgb_uc& get_Cin() const
     {
-        return average_in_;
+        return meanIn_;
     }
+
+    void fillDiagnostics(ContourDiagnostics& d) const override;
 
 private:
     //! Initializes the six sums and #n_in and #n_out with scanning through the image.
@@ -123,11 +129,11 @@ private:
 
     //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of
     //! #l_out or #l_in.
-    void compute_external_speed_Fd(ContourPoint& point) override;
+    void computeExternalSpeedFd(ContourPoint& point) override;
 
     //! Updates the six sums, #n_in and #n_out, before each #switch_in, in the cycle 1, in order
     //! to calculate means #CoutYUV and #CinYUV.
-    void do_specific_when_switch(const ContourPoint& point, BoundarySwitch ctx_choice) override;
+    void doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice) override;
 
     //! Calculates components \a of a color space (in function of the color space option) with a
     //! rgb value.
@@ -137,7 +143,7 @@ private:
     ImageSpan image_;
 
     //! Specific configuration for YUV region based active contour.
-    const RegionColorConfig region_config_;
+    const RegionColorConfig regionConfig_;
 
     //! Mean of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right)
     //! >0\f$ .
@@ -149,11 +155,11 @@ private:
 
     //! RGB mean of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left(
     //! i\right) >0\f$ .
-    Rgb_uc average_out_;
+    Rgb_uc meanOut_;
 
     //! RGB mean of the pixels inside the curve, i.e. pixels \f$i\f$ with \f$\phi \left(
     //! i\right) <0\f$ .
-    Rgb_uc average_in_;
+    Rgb_uc meanIn_;
 
     //! Sum of component #R, #G, #B of the pixels intside the curve, i.e. pixels \f$i\f$ with
     //! \f$\phi \left( i\right) <0\f$ .
@@ -178,10 +184,10 @@ template <typename T>
 RegionColorAc::RegionColorAc(
     ImageSpan image, T&& initial_contour,
     const AcConfig& general_config,         /* optional parameter with AcConfig() */
-    const RegionColorConfig& region_config) /* optional parameter with RegionColorConfig() */
+    const RegionColorConfig& regionConfig) /* optional parameter with RegionColorConfig() */
     : ActiveContour(std::forward<T>(initial_contour), general_config)
     , image_(image)
-    , region_config_(region_config)
+    , regionConfig_(regionConfig)
     , pxl_nbr_total_(image.size())
 {
     assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
@@ -247,7 +253,7 @@ RegionColorAc::RegionColorAc(
  image #img_height subtracted by 0.5\n To have the center of the shape in the image : -0.5 <
  center_x_ratio1 < 0.5 and -0.5 < center_y_ratio1 < 0.5
  * \param has_cycle2_1 Boolean to have or not the curve smoothing, evolutions in the cycle 2 with an
- internal speed \a Fint. Passed to #is_cycle2.
+ internal speed \a Fint. Passed to #hasCycle2.
  * \param kernel_length1 Kernel length of the gaussian filter for the curve smoothing. Passed to
  #kernel_length.
  * \param sigma1 Standard deviation of the gaussian kernel for the curve smoothing. Passed to
@@ -256,8 +262,8 @@ RegionColorAc::RegionColorAc(
  evolutions with \a Fd speed. Passed to #Na_max.
  * \param Ns1 Number of times the active contour evolves in the cycle 2, curve smoothing or internal
  evolutions with \a Fint speed. Passed to #Ns_max.
- * \param lambda_out1 Weight of the outside homogeneity criterion. Passed to #lambda_out.
- * \param lambda_in1 Weight of the inside homogeneity criterion. Passed to #lambda_in.
+ * \param lambda_out1 Weight of the outside homogeneity criterion. Passed to #lambdaOut.
+ * \param lambda_in1 Weight of the inside homogeneity criterion. Passed to #lambdaIn.
  * \param alpha1 Weight of luminance Y. Passed to #alpha.
  * \param beta1 Weight of chrominance U. Passed to #beta.
  * \param gamma1 Weight of chrominance V. Passed to #gamma.
@@ -273,7 +279,7 @@ RegionColorAc::RegionColorAc(
  * \param img_height1 Image height, i.e. number of rows. Passed to #img_height.
  * \param phi_init1 Pointer on the initialized level-set function buffer. Copied to #phi.
  * \param has_cycle2_1 Boolean to have or not the curve smoothing, evolutions in the cycle 2 with an
- internal speed \a Fint. Passed to #is_cycle2.
+ internal speed \a Fint. Passed to #hasCycle2.
  * \param kernel_length1 Kernel length of the gaussian filter for the curve smoothing. Passed to
  #kernel_length.
  * \param sigma1 Standard deviation of the gaussian kernel for the curve smoothing. Passed to
@@ -282,15 +288,15 @@ RegionColorAc::RegionColorAc(
  evolutions with \a Fd speed. Passed to #Na_max.
  * \param Ns1 Number of times the active contour evolves in the cycle 2, curve smoothing or internal
  evolutions with \a Fint speed. Passed to #Ns_max.
- * \param lambda_out1 Weight of the outside homogeneity criterion. Passed to #lambda_out.
- * \param lambda_in1 Weight of the inside homogeneity criterion. Passed to #lambda_in.
+ * \param lambda_out1 Weight of the outside homogeneity criterion. Passed to #lambdaOut.
+ * \param lambda_in1 Weight of the inside homogeneity criterion. Passed to #lambdaIn.
  * \param alpha1 Weight of luminance Y. Passed to #alpha.
  * \param beta1 Weight of chrominance U. Passed to #beta.
  * \param gamma1 Weight of chrominance V. Passed to #gamma.
  */
 
 /**
- * \fn virtual signed char RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
+ * \fn virtual signed char RegionColorAc::computeExternalSpeedFd(ContourPoint& point)
  * \param offset offset of the image data buffer with \a offset = \a x + \a y × #img_width
  */
 

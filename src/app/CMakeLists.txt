@@ -92,9 +92,6 @@ set(app_src
     ${UI_COMP_DIR}/phi_view_model.cpp
     ${UI_COMP_DIR}/phi_view_model.hpp
 
-    ${UI_COMP_DIR}/algo_info_overlay.cpp
-    ${UI_COMP_DIR}/algo_info_overlay.hpp
-
     ${UI_COMP_DIR}/contour_rendering_qimage.cpp
     ${UI_COMP_DIR}/contour_rendering_qimage.hpp
 
@@ -136,9 +133,6 @@ set(app_src
     ${CORE_DIR}/shape_overlay_renderer.hpp
 
     ${CORE_DIR}/shape_type.hpp
-    ${CORE_DIR}/algo_stats.hpp
-
-    ${CORE_DIR}/algo_stats.hpp
     ${CORE_DIR}/camera_stats.hpp
 
     ${INTEROP_DIR}/image_adapters.hpp

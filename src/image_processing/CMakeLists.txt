@@ -39,6 +39,8 @@ set(ip_src
     ${ALGO_DIR}/temporal_smoother.cpp
     ${ALGO_DIR}/temporal_smoother.hpp
 
+    ${ALGO_DIR}/contour_diagnostics.hpp
+
     ${CORE_DIR}/grid2d.hpp
     ${CORE_DIR}/image_span.hpp
     ${CORE_DIR}/point.hpp

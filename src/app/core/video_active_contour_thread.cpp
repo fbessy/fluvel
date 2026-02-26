@@ -145,7 +145,7 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
             region_ac_->resetExecutionState(img_algo);
         }
 
-        region_ac_->run_cycles(config.cyclesNbr);
+        region_ac_->runCycles(config.cyclesNbr);
         fr.processTs = FrameClock::nowNs() - startTs;
 
         if (region_ac_)

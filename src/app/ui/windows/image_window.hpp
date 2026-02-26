@@ -32,7 +32,6 @@ public:
     explicit ImageWindow(QWidget* parent = nullptr);
 
 public slots:
-    void refreshAlgoOverlay();
     void onInputImageReady(const QImage& inputImage);
     void onDisplayedImageReady(const QImage& displayed);
     void onFileSelected(const QString& path);
@@ -81,7 +80,6 @@ private:
     QPushButton* settingsButton_ = nullptr;
 
     ImageView* imageView_ = nullptr;
-    AlgoInfoOverlay* imageOverlay_ = nullptr;
 
     DisplaySettingsWidget* displayBar_ = nullptr;
 

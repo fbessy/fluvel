@@ -170,11 +170,11 @@ void AlgoSettingsWidget::accept()
 
     config_.acConfig.Na = Na_spin_->value();
     config_.acConfig.Ns = Ns_spin_->value();
-    config_.acConfig.is_cycle2 = internalspeed_groupbox_->isChecked();
-    config_.acConfig.disk_radius = disk_radius_spin_->value();
+    config_.acConfig.hasCycle2 = internalspeed_groupbox_->isChecked();
+    config_.acConfig.diskRadius = disk_radius_spin_->value();
 
-    config_.regionAcConfig.lambda_out = lambda_out_spin_->value();
-    config_.regionAcConfig.lambda_in = lambda_in_spin_->value();
+    config_.regionAcConfig.lambdaOut = lambda_out_spin_->value();
+    config_.regionAcConfig.lambdaIn = lambda_in_spin_->value();
 
     config_.regionAcConfig.color_space =
         color_space_cb_->currentData().value<ofeli_ip::ColorSpaceOption>();
@@ -192,11 +192,11 @@ void AlgoSettingsWidget::reject()
 
     Na_spin_->setValue(config_.acConfig.Na);
     Ns_spin_->setValue(config_.acConfig.Ns);
-    internalspeed_groupbox_->setChecked(config_.acConfig.is_cycle2);
-    disk_radius_spin_->setValue(config_.acConfig.disk_radius);
+    internalspeed_groupbox_->setChecked(config_.acConfig.hasCycle2);
+    disk_radius_spin_->setValue(config_.acConfig.diskRadius);
 
-    lambda_out_spin_->setValue(config_.regionAcConfig.lambda_out);
-    lambda_in_spin_->setValue(config_.regionAcConfig.lambda_in);
+    lambda_out_spin_->setValue(config_.regionAcConfig.lambdaOut);
+    lambda_in_spin_->setValue(config_.regionAcConfig.lambdaIn);
 
     index = color_space_cb_->findData(QVariant::fromValue(config_.regionAcConfig.color_space));
     if (index >= 0)

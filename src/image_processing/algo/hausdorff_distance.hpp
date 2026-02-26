@@ -26,7 +26,7 @@ public:
     float get_modified() const;
 
     //! Gets the hausdorff quantile between #shape_a and #shape_b.
-    float get_hausdorff_quantile(int hundredth);
+    float hausdorffQuantile(int hundredth);
 
     //! Gets the centroids distance, i.e. the gap between the #shape_a 's centroid and the
     //! #shape_b 's centroid.
@@ -45,7 +45,7 @@ private:
     static float calculate_mean(const std::vector<float>& min_dists);
 
     //! Gets the directed/relative minimum Hausdforff quantile.
-    static float get_hausdorff_quantile(const std::vector<float>& min_dists, int hundredth);
+    static float hausdorffQuantile(const std::vector<float>& min_dists, int hundredth);
 
     //! Shape a defined by its points offsets.
     Shape& shape_a_;
@@ -58,11 +58,11 @@ private:
 
     //! Directed or relative hausdorff distance from #shape_a (outer loop) to #shape_b (inner
     //! loop).
-    float hd_a_to_b_;
+    float hd_a_to_b_{0.f};
 
     //! Directed or relative hausdorff distance from #shape_b (outer loop) to #shape_a (inner
     //! loop).
-    float hd_b_to_a_;
+    float hd_b_to_a_{0.f};
 
     //! Minimum distances computed in the direction from #shape_a (outer loop) to #shape_b
     //! (inner loop).
@@ -71,16 +71,6 @@ private:
     //! Minimum distances computed in the direction from #shape_b (outer loop) to #shape_a
     //! (inner loop).
     std::vector<float> min_dists_b_to_a_;
-
-    //! Position in x of the centroid of #shape_a.
-    int centroid_a_x_;
-    //! Position in y of the centroid of #shape_a.
-    int centroid_a_y_;
-
-    //! Position in x of the centroid of #shape_b.
-    int centroid_b_x_;
-    //! Position in y of the centroid of #shape_b.
-    int centroid_b_y_;
 
     //! Boolean to know if min_dists are already sorted.
     bool is_sorted_{false};

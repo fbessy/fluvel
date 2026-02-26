@@ -44,7 +44,7 @@ private:
     void onVideoDisplaySettingsChanged(const DisplayConfig& displayConfig);
 
     void onFrameProcessed();
-    void updateStats();
+    void updateDiagnostics();
 
     QCamera* camera_ = nullptr;
     QMediaCaptureSession* captureSession_ = nullptr;

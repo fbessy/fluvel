@@ -229,11 +229,11 @@ void ContourData::flood_fill(const Point2D_i& seed, PhiValue target_value,
 
 void ContourData::eliminate_redundant_points_if_needed()
 {
-    eliminate_redundant_points(l_out_, PhiValue::OutsideRegion);
-    eliminate_redundant_points(l_in_, PhiValue::InsideRegion);
+    eliminateRedundantPoints(l_out_, PhiValue::OutsideRegion);
+    eliminateRedundantPoints(l_in_, PhiValue::InsideRegion);
 }
 
-void ContourData::eliminate_redundant_points(Contour& boundary, PhiValue region_value)
+void ContourData::eliminateRedundantPoints(Contour& boundary, PhiValue region_value)
 {
     for (std::size_t i = 0; i < boundary.size();)
     {

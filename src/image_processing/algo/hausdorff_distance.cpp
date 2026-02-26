@@ -19,7 +19,6 @@
 #endif
 
 #include <algorithm>
-#include <cmath>
 #include <cstddef>
 #include <numeric>
 
@@ -39,9 +38,6 @@ HausdorffDistance::HausdorffDistance(Shape& shape_a1, Shape& shape_b1,
     : shape_a_(shape_a1)
     , shape_b_(shape_b1)
     , intersection_a_b_(intersection1)
-    , hd_a_to_b_(std::numeric_limits<float>::max())
-    , hd_b_to_a_(std::numeric_limits<float>::max())
-
 {
     min_dists_a_to_b_.reserve(kInitialArrayAllocSize);
     min_dists_b_to_a_.reserve(kInitialArrayAllocSize);
@@ -154,7 +150,7 @@ float HausdorffDistance::get_modified() const
     return std::max(calculate_mean(min_dists_a_to_b_), calculate_mean(min_dists_b_to_a_));
 }
 
-float HausdorffDistance::get_hausdorff_quantile(int hundredth)
+float HausdorffDistance::hausdorffQuantile(int hundredth)
 {
     if (!is_sorted_)
     {
@@ -164,13 +160,13 @@ float HausdorffDistance::get_hausdorff_quantile(int hundredth)
         is_sorted_ = true;
     }
 
-    return std::max(get_hausdorff_quantile(min_dists_a_to_b_, hundredth),
-                    get_hausdorff_quantile(min_dists_b_to_a_, hundredth));
+    return std::max(hausdorffQuantile(min_dists_a_to_b_, hundredth),
+                    hausdorffQuantile(min_dists_b_to_a_, hundredth));
 }
 
 float HausdorffDistance::calculate_mean(const std::vector<float>& min_dists)
 {
-    float mean = std::numeric_limits<float>::max();
+    float mean = std::numeric_limits<float>::quiet_NaN();
 
     float sum = std::accumulate(min_dists.cbegin(), min_dists.cend(), 0.f);
 
@@ -182,9 +178,9 @@ float HausdorffDistance::calculate_mean(const std::vector<float>& min_dists)
     return mean;
 }
 
-float HausdorffDistance::get_hausdorff_quantile(const std::vector<float>& min_dists, int hundredth)
+float HausdorffDistance::hausdorffQuantile(const std::vector<float>& min_dists, int hundredth)
 {
-    float quantile = std::numeric_limits<float>::max();
+    float quantile = std::numeric_limits<float>::quiet_NaN();
     int idx;
 
     if (hundredth < 0)
@@ -212,7 +208,7 @@ float HausdorffDistance::get_hausdorff_quantile(const std::vector<float>& min_di
 
 float HausdorffDistance::get_centroids_distance() const
 {
-    float gap_dist = std::numeric_limits<float>::max();
+    float gap_dist = std::numeric_limits<float>::quiet_NaN();
 
     if (shape_a_.is_valid() && shape_b_.is_valid())
     {

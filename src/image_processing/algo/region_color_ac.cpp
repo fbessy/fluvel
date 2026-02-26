@@ -38,8 +38,8 @@ void RegionColorAc::do_specific_cycle1()
     if (pxl_nbr_out_ >= 1)
     {
         const auto rgb_f = sum_out_ / pxl_nbr_out_;
-        average_out_ = rgb_f.rounded<unsigned char>();
-        average_color_out_ = rgb_to_color(average_out_);
+        meanOut_ = rgb_f.rounded<unsigned char>();
+        average_color_out_ = rgb_to_color(meanOut_);
     }
 
     const Rgb_64i sum_in = sum_total_ - sum_out_;
@@ -48,14 +48,14 @@ void RegionColorAc::do_specific_cycle1()
     if (pxl_nbr_in >= 1)
     {
         const auto rgb_f = sum_in / pxl_nbr_in;
-        average_in_ = rgb_f.rounded<unsigned char>();
-        average_color_in_ = rgb_to_color(average_in_);
+        meanIn_ = rgb_f.rounded<unsigned char>();
+        average_color_in_ = rgb_to_color(meanIn_);
     }
 }
 
 Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
 {
-    switch (region_config_.color_space)
+    switch (regionConfig_.color_space)
     {
         case ColorSpaceOption::YUV:
             return color::rgb_to_yuv(rgb);
@@ -80,16 +80,16 @@ Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
     std::unreachable();
 }
 
-void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
+void RegionColorAc::computeExternalSpeedFd(ContourPoint& point)
 {
     const Rgb_uc rgb = image_.atPixelRgb(point.x(), point.y());
 
     const auto col = rgb_to_color(rgb);
 
-    const int lambda_out = region_config_.lambda_out;
-    const int lambda_in = region_config_.lambda_in;
+    const int lambdaOut = regionConfig_.lambdaOut;
+    const int lambdaIn = regionConfig_.lambdaIn;
 
-    const auto weights = region_config_.weights;
+    const auto weights = regionConfig_.weights;
     const auto avg_out = average_color_out_;
     const auto avg_in = average_color_in_;
 
@@ -99,19 +99,19 @@ void RegionColorAc::compute_external_speed_Fd(ContourPoint& point)
     const int speed_out = veloc_out.scalar();
     const int speed_in = veloc_in.scalar();
 
-    point.speed_ = speed_value::get_discrete_speed(lambda_out * speed_out - lambda_in * speed_in);
+    point.speed_ = speed_value::get_discrete_speed(lambdaOut * speed_out - lambdaIn * speed_in);
 }
 
-void RegionColorAc::do_specific_when_switch(const ContourPoint& point, BoundarySwitch ctx_choice)
+void RegionColorAc::doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
 {
     const Rgb_64i rgb = static_cast<Rgb_64i>(image_.atPixelRgb(point.x(), point.y()));
 
-    if (ctx_choice == BoundarySwitch::In)
+    if (ctxChoice == BoundarySwitch::In)
     {
         sum_out_ -= rgb;
         --pxl_nbr_out_;
     }
-    else if (ctx_choice == BoundarySwitch::Out)
+    else if (ctxChoice == BoundarySwitch::Out)
     {
         sum_out_ += rgb;
         ++pxl_nbr_out_;
@@ -126,6 +126,19 @@ void RegionColorAc::resetExecutionState(ImageSpan image)
 
     initialize_sums();
     do_specific_cycle1();
+}
+
+void RegionColorAc::fillDiagnostics(ContourDiagnostics& d) const
+{
+    ActiveContour::fillDiagnostics(d);
+
+    d.averageIn =
+        ChannelVector(static_cast<int>(meanIn_.red), static_cast<int>(meanIn_.green),
+                      static_cast<int>(meanIn_.blue));
+
+    d.averageOut =
+        ChannelVector(static_cast<int>(meanOut_.red), static_cast<int>(meanOut_.green),
+                      static_cast<int>(meanOut_.blue));
 }
 
 } // namespace ofeli_ip

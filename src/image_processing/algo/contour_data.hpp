@@ -176,9 +176,9 @@ private:
     void define_from_ellipse();
 
     //! Eliminates redundant points to maintain a contiguous boundary.
-    void eliminate_redundant_points(Contour& boundary, PhiValue region_value);
+    void eliminateRedundantPoints(Contour& boundary, PhiValue region_value);
 
-    //! To use define_from_ellipse and eliminate_redundant_points
+    //! To use define_from_ellipse and eliminateRedundantPoints
     //! in ActiveContour.
     friend class ActiveContour;
 

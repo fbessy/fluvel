@@ -11,7 +11,7 @@ namespace ofeli_ip
 
 constexpr auto kGrayscaleDepth = 256u;
 
-void EdgeAc::compute_external_speed_Fd(ContourPoint& point)
+void EdgeAc::computeExternalSpeedFd(ContourPoint& point)
 {
     const int x = point.x();
     const int y = point.y();

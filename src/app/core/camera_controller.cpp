@@ -36,7 +36,7 @@ CameraController::CameraController(QObject* parent)
     statsTimer_ = new QTimer(this);
     statsTimer_->setInterval(500);
 
-    connect(statsTimer_, &QTimer::timeout, this, &CameraController::updateStats);
+    connect(statsTimer_, &QTimer::timeout, this, &CameraController::updateDiagnostics);
 
     // Thread → controller
     connect(&ac_thread_, &VideoActiveContourThread::frameProcessed, this,
@@ -141,7 +141,7 @@ void CameraController::onFrameResultReady(const FrameResult& result)
         emit imageAndContourUpdated(img, q_l_out, q_l_in, result.receiveTs);
 }
 
-void CameraController::updateStats()
+void CameraController::updateDiagnostics()
 {
     auto snap = frameStats_.snapshot();
 

@@ -17,6 +17,8 @@ public:
     EdgeAc(ImageSpan gradient_image, T&& initial_contour,
            const AcConfig& config = AcConfig()); /* optional parameter */
 
+    ~EdgeAc() override = default;
+
     //! Getter function for #threshold
     unsigned char get_threshold() const
     {
@@ -26,7 +28,7 @@ public:
 private:
     //! Computes external speed \a Fd with a geodesic model for a current point \a (x,y) of
     //! #l_out or #l_in.
-    void compute_external_speed_Fd(ContourPoint& point) override;
+    void computeExternalSpeedFd(ContourPoint& point) override;
 
     //! Gets the global speed sign to evolve the initial active contour is the good way.
     int get_global_speed_sign() const;

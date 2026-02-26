@@ -1,0 +1,90 @@
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
+#pragma once
+
+#include "ac_types.hpp"
+
+#include <cstddef>
+#include <vector>
+
+namespace ofeli_ip
+{
+
+class ChannelVector
+{
+public:
+    ChannelVector(int v)
+    {
+        values_ = {v};
+    }
+
+    ChannelVector(int r, int g, int b)
+    {
+        values_ = {r, g, b};
+    }
+
+    size_t dimension() const
+    {
+        return values_.size();
+    }
+
+    const std::vector<int>& values() const
+    {
+        return values_;
+    }
+
+private:
+    std::vector<int> values_;
+};
+
+struct ContourDiagnostics
+{
+    int stepCount = 0;
+    ofeli_ip::PhaseState state{ofeli_ip::PhaseState::Cycle1};
+    ChannelVector averageIn{0, 0, 0};
+    ChannelVector averageOut{0, 0, 0};
+    ofeli_ip::StoppingStatus stoppingStatus{ofeli_ip::StoppingStatus::None};
+    float hausdorffQuantile = 0.f;
+    float centroidsDistance = 0.f;
+    double elapsedSec = 0.0;
+    std::size_t listsSize = 0;
+};
+
+inline const char* toString(PhaseState state)
+{
+    switch (state)
+    {
+        case PhaseState::Cycle1:
+            return "Cycle 1";
+        case PhaseState::Cycle2:
+            return "Cycle 2";
+        case PhaseState::FinalCycle2:
+            return "Final Cycle 2";
+        case PhaseState::Stopped:
+            return "Stopped";
+    }
+
+    return "Unknown";
+}
+
+inline const char* toString(StoppingStatus status)
+{
+    switch (status)
+    {
+        case StoppingStatus::None:
+            return "None";
+        case StoppingStatus::ListsConverged:
+            return "ListsConverged";
+        case StoppingStatus::Hausdorff:
+            return "Hausdorff";
+        case StoppingStatus::MaxIteration:
+            return "MaxIteration";
+        case StoppingStatus::EmptyListFailure:
+            return "EmptyListFailure";
+    }
+
+    return "Unknown";
+}
+
+} // namespace ofeli_ip

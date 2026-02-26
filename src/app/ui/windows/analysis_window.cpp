@@ -152,7 +152,7 @@ void AnalysisWindow::compute_hd()
     }
 
     float hausdorff_dist = hd_->get_distance();
-    float hausdorff_quantile = hd_->get_hausdorff_quantile(hundredth_sp_->value());
+    float hausdorffQuantile = hd_->hausdorffQuantile(hundredth_sp_->value());
     float centr_gap = hd_->get_centroids_distance();
 
     factor_ = 100.f / ofeli_ip::Shape::get_grid_diagonal(
@@ -160,14 +160,14 @@ void AnalysisWindow::compute_hd()
                           std::max(widget1_->get_img_height(), widget2_->get_img_height()));
 
     float hd_ratio = factor_ * hausdorff_dist;
-    float quantile_ratio = factor_ * hausdorff_quantile;
+    float quantile_ratio = factor_ * hausdorffQuantile;
     float gap_ratio = factor_ * centr_gap;
 
     hausdorff_label_->setText(tr("Hausdorff distance = ") + QString::number(hausdorff_dist) +
                               (tr(" pixels")));
     hausdorff_ratio_label_->setText(tr("Hausdorff ratio = ") + QString::number(hd_ratio) + (" %"));
 
-    quantile_label_->setText(tr("Hausdorff quantile = ") + QString::number(hausdorff_quantile) +
+    quantile_label_->setText(tr("Hausdorff quantile = ") + QString::number(hausdorffQuantile) +
                              (tr(" pixels")));
     quantile_ratio_label_->setText(tr("Hausdorff quantile ratio = ") +
                                    QString::number(quantile_ratio) + (" %"));
@@ -186,10 +186,10 @@ void AnalysisWindow::refresh_quantile(int hundredth)
 {
     if (hd_ != nullptr)
     {
-        float hausdorff_quantile = hd_->get_hausdorff_quantile(hundredth);
-        float quantile_ratio = factor_ * hausdorff_quantile;
+        float hausdorffQuantile = hd_->hausdorffQuantile(hundredth);
+        float quantile_ratio = factor_ * hausdorffQuantile;
 
-        quantile_label_->setText(tr("Hausdorff quantile = ") + QString::number(hausdorff_quantile) +
+        quantile_label_->setText(tr("Hausdorff quantile = ") + QString::number(hausdorffQuantile) +
                                  (tr(" pixels")));
         quantile_ratio_label_->setText(tr("Hausdorff quantile ratio = ") +
                                        QString::number(quantile_ratio) + (" %"));
@@ -200,7 +200,7 @@ void AnalysisWindow::check_lists()
 {
     if (widget1_->get_shape().is_valid() && widget2_->get_shape().is_valid())
     {
-        calculate_shapes_intersection();
+        calculateShapesIntersection();
         compute_button_->setEnabled(true);
     }
     else
@@ -209,7 +209,7 @@ void AnalysisWindow::check_lists()
     }
 }
 
-void AnalysisWindow::calculate_shapes_intersection()
+void AnalysisWindow::calculateShapesIntersection()
 {
     std::size_t size1 = widget1_->get_shape().get_points().size();
     std::size_t size2 = widget2_->get_shape().get_points().size();

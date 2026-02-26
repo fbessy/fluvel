@@ -28,6 +28,9 @@ ImageController::ImageController(QObject* parent)
             &ImageController::onContourUpdated, Qt::QueuedConnection);
 
     connect(&acWorker_, &ActiveContourWorker::stateChanged, this, &ImageController::onStateChanged);
+
+    connect(&acWorker_, &ActiveContourWorker::diagnosticsUpdated, this,
+            &ImageController::onDiagnosticsUpdated);
 }
 
 void ImageController::loadImage(const QString& path)
@@ -168,6 +171,55 @@ void ImageController::converge()
 void ImageController::onStateChanged(ofeli_app::WorkerState state)
 {
     emit stateChanged(state);
+}
+
+void ImageController::onDiagnosticsUpdated(const ofeli_ip::ContourDiagnostics& diag)
+{
+    auto formatChannels = [](const ofeli_ip::ChannelVector& v)
+    {
+        const auto& values = v.values();
+
+        if (values.empty())
+            return QString("n/a");
+
+        if (values.size() == 1)
+            return QString::number(values[0]);
+
+        QString s("(");
+        for (std::size_t i = 0; i < values.size(); ++i)
+        {
+            s += QString::number(values[i]);
+            if (i + 1 < values.size())
+                s += ", ";
+        }
+        s += ")";
+        return s;
+    };
+
+    QString s;
+
+    s += QString("Step: %1\n").arg(diag.stepCount);
+    s += QString("State: %1\n").arg(ofeli_ip::toString(diag.state));
+
+    if (diag.stoppingStatus != ofeli_ip::StoppingStatus::None)
+        s += QString("Reason: %1\n").arg(ofeli_ip::toString(diag.stoppingStatus));
+
+    if (!diag.averageIn.values().empty())
+    {
+        s += QString("Mean in: %1\n").arg(formatChannels(diag.averageIn));
+
+        s += QString("Mean out: %1\n").arg(formatChannels(diag.averageOut));
+    }
+
+    s += QString("Hausdorff q: %1 %\n").arg(diag.hausdorffQuantile, 0, 'g', 3);
+
+    s += QString("Centroid dist: %1 %\n").arg(diag.centroidsDistance, 0, 'g', 3);
+
+    s += QString("Elapsed: %1 s\n").arg(diag.elapsedSec, 0, 'f', 2);
+
+    s += QString("Lists size: %1").arg(diag.listsSize);
+
+    emit textDiagnosticsUpdated(s);
 }
 
 } // namespace ofeli_app
