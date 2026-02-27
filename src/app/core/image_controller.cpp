@@ -203,21 +203,23 @@ void ImageController::onDiagnosticsUpdated(const ofeli_ip::ContourDiagnostics& d
 
     if (diag.stoppingStatus != ofeli_ip::StoppingStatus::None)
         s += QString("Reason: %1\n").arg(ofeli_ip::toString(diag.stoppingStatus));
+    else
+        s += QString("\n");
 
-    if (!diag.averageIn.values().empty())
+    if (!diag.meanIn.values().empty())
     {
-        s += QString("Mean in: %1\n").arg(formatChannels(diag.averageIn));
+        s += QString("Mean in: %1\n").arg(formatChannels(diag.meanIn));
 
-        s += QString("Mean out: %1\n").arg(formatChannels(diag.averageOut));
+        s += QString("Mean out: %1\n").arg(formatChannels(diag.meanOut));
     }
 
     s += QString("Hausdorff q: %1 %\n").arg(diag.hausdorffQuantile, 0, 'g', 3);
 
-    s += QString("Centroid dist: %1 %\n").arg(diag.centroidsDistance, 0, 'g', 3);
+    s += QString("Centroid dist: %1 %\n").arg(diag.relativeCentroidDistance, 0, 'g', 3);
 
     s += QString("Elapsed: %1 s\n").arg(diag.elapsedSec, 0, 'f', 2);
 
-    s += QString("Lists size: %1").arg(diag.listsSize);
+    s += QString("Contour: %1 pts").arg(diag.contourSize);
 
     emit textDiagnosticsUpdated(s);
 }

@@ -561,11 +561,12 @@ void ActiveContour::check_hausdorff_stopping_condition()
 
         const float sizeFactor = 100.f / diagonal;
         ed_.hausdorffQuantile = sizeFactor * hd.hausdorffQuantile(80);
-        ed_.centroidsDistance = sizeFactor * hd.get_centroids_distance();
+        ed_.relativeCentroidDistance = sizeFactor * hd.get_centroids_distance();
         const float delta_quantile = ed_.previousQuantile - ed_.hausdorffQuantile;
 
-        if ((ed_.centroidsDistance < 1.f && ed_.hausdorffQuantile < 1.f) ||
-            (ed_.centroidsDistance < 1.f && ed_.hausdorffQuantile < 2.f && delta_quantile < 0.f))
+        if ((ed_.relativeCentroidDistance < 1.f && ed_.hausdorffQuantile < 1.f) ||
+            (ed_.relativeCentroidDistance < 1.f && ed_.hausdorffQuantile < 2.f &&
+             delta_quantile < 0.f))
         {
             ed_.stoppingStatus = StoppingStatus::Hausdorff;
             stop();
@@ -610,10 +611,10 @@ void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const
     d.stoppingStatus = ed_.stoppingStatus;
 
     d.hausdorffQuantile = ed_.hausdorffQuantile;
-    d.centroidsDistance = ed_.centroidsDistance;
+    d.relativeCentroidDistance = ed_.relativeCentroidDistance;
 
     // d.elapsedSec = ed.elapsedSec_;
-    d.listsSize = cd_.l_out().size() + cd_.l_in().size();
+    d.contourSize = cd_.l_out().size() + cd_.l_in().size();
 }
 
 } // namespace ofeli_ip

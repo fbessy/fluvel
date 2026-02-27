@@ -78,8 +78,8 @@ void RegionAc::fillDiagnostics(ContourDiagnostics& d) const
 {
     ActiveContour::fillDiagnostics(d);
 
-    d.averageIn = ChannelVector(meanIn_);
-    d.averageOut = ChannelVector(meanOut_);
+    d.meanIn = ChannelVector(meanIn_);
+    d.meanOut = ChannelVector(meanOut_);
 }
 
 } // namespace ofeli_ip

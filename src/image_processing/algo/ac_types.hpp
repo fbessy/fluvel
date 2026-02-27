@@ -235,7 +235,7 @@ struct EvolutionData
 
     //! Centroids gap between #l_out_shape and previousShape#. It is a normalized value,
     //! divided by the diagonal size of #phi, in percent.
-    float centroidsDistance{std::numeric_limits<float>::quiet_NaN()};
+    float relativeCentroidDistance{std::numeric_limits<float>::quiet_NaN()};
 
     //! Intersection, i.e common points between #l_out_shape and #previousShape.
     PointSet intersection;

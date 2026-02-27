@@ -132,11 +132,11 @@ void RegionColorAc::fillDiagnostics(ContourDiagnostics& d) const
 {
     ActiveContour::fillDiagnostics(d);
 
-    d.averageIn =
+    d.meanIn =
         ChannelVector(static_cast<int>(meanIn_.red), static_cast<int>(meanIn_.green),
                       static_cast<int>(meanIn_.blue));
 
-    d.averageOut =
+    d.meanOut =
         ChannelVector(static_cast<int>(meanOut_.red), static_cast<int>(meanOut_.green),
                       static_cast<int>(meanOut_.blue));
 }

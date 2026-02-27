@@ -42,13 +42,13 @@ struct ContourDiagnostics
 {
     int stepCount = 0;
     ofeli_ip::PhaseState state{ofeli_ip::PhaseState::Cycle1};
-    ChannelVector averageIn{0, 0, 0};
-    ChannelVector averageOut{0, 0, 0};
+    ChannelVector meanIn{0, 0, 0};
+    ChannelVector meanOut{0, 0, 0};
     ofeli_ip::StoppingStatus stoppingStatus{ofeli_ip::StoppingStatus::None};
     float hausdorffQuantile = 0.f;
-    float centroidsDistance = 0.f;
+    float relativeCentroidDistance = 0.f;
     double elapsedSec = 0.0;
-    std::size_t listsSize = 0;
+    std::size_t contourSize = 0;
 };
 
 inline const char* toString(PhaseState state)
