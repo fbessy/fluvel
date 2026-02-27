@@ -22,6 +22,8 @@ void FrameStatsView::reset()
     displayedFrames_ = 0;
     droppedFrames_ = 0;
 
+    contourSizeSum_ = 0;
+
     latencySumMs_ = 0.0;
     latencyMaxMs_ = 0.0;
 
@@ -40,9 +42,11 @@ void FrameStatsView::frameReceived(qint64 recvTsNs)
     updateWindowLocked(recvTsNs);
 }
 
-void FrameStatsView::frameProcessed()
+void FrameStatsView::frameProcessed(qint64 contourSize)
 {
     QMutexLocker lock(&mutex_);
+
+    contourSizeSum_ += contourSize;
     ++processedFrames_;
 }
 
@@ -89,6 +93,8 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
 
     snap.maxLatencyMs = latencyMaxMs_;
 
+    snap.avgContourSize = double(contourSizeSum_) / double(processedFrames_);
+
     lastSnapshot_ = snap;
 
     // reset fenêtre
@@ -96,6 +102,7 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
     processedFrames_ = 0;
     displayedFrames_ = 0;
     droppedFrames_ = 0;
+    contourSizeSum_ = 0;
 
     latencySumMs_ = 0.0;
     latencyMaxMs_ = 0.0;

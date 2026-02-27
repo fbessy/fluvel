@@ -20,13 +20,14 @@ public:
         double dropRate = 0.0;
         double avgLatencyMs = 0.0;
         double maxLatencyMs = 0.0;
+        double avgContourSize = 0.0;
     };
 
     FrameStatsView();
 
     // événements
     void frameReceived(qint64 recvTsNs);
-    void frameProcessed();
+    void frameProcessed(qint64 contourSize);
     void frameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
 
     // lecture stable (fenêtre ~1s)
@@ -45,6 +46,8 @@ private:
     quint64 processedFrames_;
     quint64 displayedFrames_;
     quint64 droppedFrames_;
+
+    quint64 contourSizeSum_;
 
     // latence fenêtre
     double latencySumMs_;

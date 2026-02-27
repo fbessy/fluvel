@@ -115,9 +115,9 @@ void CameraController::stop()
     }
 }
 
-void CameraController::onFrameProcessed()
+void CameraController::onFrameProcessed(qint64 contourSize)
 {
-    frameStats_.frameProcessed();
+    frameStats_.frameProcessed(contourSize);
 }
 
 void CameraController::onFrameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
@@ -145,17 +145,19 @@ void CameraController::updateDiagnostics()
 {
     auto snap = frameStats_.snapshot();
 
-    CameraStats stats{snap.inputFps, snap.processingFps, snap.displayFps,
-                      snap.dropRate, snap.avgLatencyMs,  snap.maxLatencyMs};
+    CameraStats stats{snap.inputFps,     snap.processingFps, snap.displayFps,    snap.dropRate,
+                      snap.avgLatencyMs, snap.maxLatencyMs,  snap.avgContourSize};
 
-    QString textStats = QString("In: %1 fps | Proc: %2 fps | Disp: %3 fps\n"
-                                "Drop: %4 % | Avg: %5 ms | Max: %6 ms")
+    QString textStats = QString(tr("In | Proc | Disp: %1 | %2 | %3 fps\n"
+                                   "Lat: %4 ms (max %5) | Drop: %6 %\n"
+                                   "Contour: %7 pts"))
                             .arg(stats.inputFps, 0, 'f', 1)
                             .arg(stats.processingFps, 0, 'f', 1)
                             .arg(stats.displayFps, 0, 'f', 1)
-                            .arg(100.f * stats.dropRate, 0, 'f', 1)
                             .arg(stats.avgLatencyMs, 0, 'f', 1)
-                            .arg(stats.maxLatencyMs, 0, 'f', 1);
+                            .arg(stats.maxLatencyMs, 0, 'f', 1)
+                            .arg(100.f * stats.dropRate, 0, 'f', 1)
+                            .arg(stats.avgContourSize, 0, 'f', 0);
 
     emit textStatsUpdated(textStats);
 }

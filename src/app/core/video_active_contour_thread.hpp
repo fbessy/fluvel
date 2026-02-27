@@ -42,7 +42,7 @@ public:
     void setAlgoConfig(const VideoComputeConfig& config);
 
 signals:
-    void frameProcessed(qint64 receiveTs, qint64 processTs);
+    void frameProcessed(qint64 contourSize);
 
     void frameResultReady(ofeli_app::FrameResult result);
 

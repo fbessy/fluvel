@@ -14,6 +14,7 @@ struct CameraStats
     double dropRate = 0.0;
     double avgLatencyMs = 0.0;
     double maxLatencyMs = 0.0;
+    double avgContourSize = 0.0;
 };
 
 } // namespace ofeli_app
