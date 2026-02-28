@@ -310,6 +310,12 @@ void ImageView::setTextPosition(QPoint position)
 // ------------------------------------------------------------
 void ImageView::wheelEvent(QWheelEvent* event)
 {
+    if (!hasImage())
+    {
+        event->ignore();
+        return;
+    }
+
     const QPoint overlayPosition = textPosition();
 
     constexpr double zoomFactor = 1.15;
