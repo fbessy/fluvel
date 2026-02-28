@@ -14,14 +14,12 @@ PanBehavior::PanBehavior(Qt::MouseButton button)
 {
 }
 
-bool PanBehavior::mousePress(ImageView&, QMouseEvent* e)
+bool PanBehavior::mousePress(ImageView& view, QMouseEvent* e)
 {
-    if (e->button() == button_)
+    if (e->button() == button_ && view.isPanRelevant())
     {
         capturing_ = true;
         lastPos_ = e->pos();
-        // ❌ pas de accept ici
-
         return true;
     }
 
@@ -30,13 +28,13 @@ bool PanBehavior::mousePress(ImageView&, QMouseEvent* e)
 
 bool PanBehavior::mouseMove(ImageView& view, QMouseEvent* e)
 {
-    if (!capturing_)
+    if (!capturing_ || !view.isPanRelevant())
         return false;
 
     QPoint delta = e->pos() - lastPos_;
     lastPos_ = e->pos();
 
-    const qreal zoom = view.transform().m11(); // scale X
+    const qreal zoom = view.transform().m11();
     view.translateView(delta.x() / zoom, delta.y() / zoom);
 
     view.userInteracted();
@@ -47,11 +45,10 @@ bool PanBehavior::mouseMove(ImageView& view, QMouseEvent* e)
 
 bool PanBehavior::mouseRelease(ImageView&, QMouseEvent* e)
 {
-    if (e->button() == button_)
+    if (e->button() == button_ && capturing_)
     {
         capturing_ = false;
         e->accept();
-
         return true;
     }
 
