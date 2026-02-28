@@ -13,14 +13,13 @@
 namespace ofeli_app
 {
 
-PixelInfoBehavior::PixelInfoBehavior() = default;
-
-PixelInfoBehavior::~PixelInfoBehavior() = default;
-
 // ---------------------------------------------------------------------
 
 bool PixelInfoBehavior::mousePress(ImageView& view, QMouseEvent* event)
 {
+    if (!view.hasImage())
+        return false;
+
     if (event->button() != Qt::RightButton)
         return false;
 

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "pixel_info_overlay.hpp"
 #include "view_behavior.hpp"
 #include <QPoint>
 #include <memory>
@@ -13,7 +14,6 @@ namespace ofeli_app
 {
 
 class ImageView;
-class PixelInfoOverlay;
 
 /**
  * @brief Passive behavior that displays pixel information
@@ -27,8 +27,8 @@ class PixelInfoOverlay;
 class PixelInfoBehavior final : public ViewBehavior
 {
 public:
-    explicit PixelInfoBehavior();
-    ~PixelInfoBehavior() override;
+    PixelInfoBehavior() = default;
+    ~PixelInfoBehavior() override = default;
 
     Qt::CursorShape activeCursor() const override
     {
