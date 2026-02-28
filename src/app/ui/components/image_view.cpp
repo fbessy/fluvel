@@ -504,6 +504,18 @@ void ImageView::dropEvent(QDropEvent* event)
         event->ignore();
 }
 
+void ImageView::drawForeground(QPainter* painter, const QRectF&)
+{
+    if (!dragHighlight_)
+        return;
+
+    painter->save();
+
+    painter->fillRect(viewport()->rect(), QColor(100, 150, 255, 40));
+
+    painter->restore();
+}
+
 QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 {
     if (!pixmapItem_ || lastDisplayedImage_.isNull())
@@ -781,6 +793,12 @@ void ImageView::showPlaceholder(bool showEffect)
 void ImageView::notifyImageDropped(const QString& path)
 {
     emit imageDropped(path);
+}
+
+void ImageView::setDragHighlight(bool enabled)
+{
+    dragHighlight_ = enabled;
+    viewport()->update();
 }
 
 } // namespace ofeli_app

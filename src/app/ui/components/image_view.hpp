@@ -69,6 +69,7 @@ public:
     bool isGrayscale() const;
 
     void notifyImageDropped(const QString& path);
+    void setDragHighlight(bool enabled);
 
 public slots:
     void setImage(const QImage& img);
@@ -101,6 +102,7 @@ protected:
     void dragMoveEvent(QDragMoveEvent* event) override;
     void dragLeaveEvent(QDragLeaveEvent* event) override;
     void dropEvent(QDropEvent* event) override;
+    void drawForeground(QPainter* painter, const QRectF& rect) override;
 
     void enterEvent(QEnterEvent*) override;
 
@@ -167,6 +169,8 @@ private:
 
     bool paused_ = false;
     QGraphicsBlurEffect* blur_ = nullptr;
+
+    bool dragHighlight_ = false;
 
 signals:
     void imageClicked(int x, int y);

@@ -12,10 +12,12 @@
 namespace ofeli_app
 {
 
-bool DragDropBehavior::dragEnter(ImageView&, QDragEnterEvent* e)
+bool DragDropBehavior::dragEnter(ImageView& view, QDragEnterEvent* e)
 {
     if (!e->mimeData()->hasUrls())
         return false;
+
+    view.setDragHighlight(true);
 
     e->acceptProposedAction();
     return true;
@@ -27,13 +29,16 @@ bool DragDropBehavior::dragMove(ImageView&, QDragMoveEvent* e)
     return true;
 }
 
-bool DragDropBehavior::dragLeave(ImageView&, QDragLeaveEvent*)
+bool DragDropBehavior::dragLeave(ImageView& view, QDragLeaveEvent*)
 {
+    view.setDragHighlight(false);
     return true;
 }
 
 bool DragDropBehavior::drop(ImageView& view, QDropEvent* e)
 {
+    view.setDragHighlight(false);
+
     const auto urls = e->mimeData()->urls();
     if (urls.isEmpty())
         return false;
