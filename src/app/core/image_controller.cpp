@@ -6,6 +6,8 @@
 #include "application_settings.hpp"
 #include "contour_adapters.hpp"
 
+#include <QImageReader>
+
 namespace ofeli_app
 {
 
@@ -35,10 +37,25 @@ ImageController::ImageController(QObject* parent)
 
 void ImageController::loadImage(const QString& path)
 {
-    inputImage_ = QImage(path);
-
-    if (inputImage_.isNull())
+    if (path.isEmpty())
         return;
+
+    if (!isSupportedImage(path))
+    {
+        emit errorOccurred(tr("Unsupported image format."));
+        return;
+    }
+
+    QImageReader reader(path);
+    QImage img = reader.read();
+
+    if (img.isNull())
+    {
+        emit errorOccurred(tr("Failed to load image."));
+        return;
+    }
+
+    inputImage_ = img;
 
     if (inputImage_.isGrayscale())
         inputImage_ = inputImage_.convertToFormat(QImage::Format_Grayscale8);
@@ -48,6 +65,7 @@ void ImageController::loadImage(const QString& path)
     reinitializeWorker();
 
     emit inputImageReady(inputImage_);
+    emit imageOpened(path);
 }
 
 void ImageController::downscaleImage()
@@ -222,6 +240,12 @@ void ImageController::onDiagnosticsUpdated(const ofeli_ip::ContourDiagnostics& d
     s += QString("Contour: %1 pts").arg(diag.contourSize);
 
     emit textDiagnosticsUpdated(s);
+}
+
+bool isSupportedImage(const QString& path)
+{
+    QImageReader reader(path);
+    return reader.canRead();
 }
 
 } // namespace ofeli_app

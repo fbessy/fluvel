@@ -34,7 +34,7 @@ public:
 public slots:
     void onInputImageReady(const QImage& inputImage);
     void onDisplayedImageReady(const QImage& displayed);
-    void onFileSelected(const QString& path);
+    void onFileOpened(const QString& path);
     void onStateChanged(ofeli_app::WorkerState state);
     void onCameraWindowShown();
     void onCameraWindowClosed();
@@ -43,6 +43,7 @@ signals:
 
     void fileSelected(QString fileName);
     void inputImageReady(const QImage& inputImage);
+    void imageDropped(const QString& path);
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -58,6 +59,8 @@ private:
     void updateRecentFileActions();
     void deleteList();
     static QString strippedName(const QString& fullFileName);
+
+    void showErrorMessage(const QString& msg);
 
     void updateCameraAction();
     void onStartCameraActionTriggered();
@@ -105,7 +108,6 @@ private:
     QMenu* sessionMenu_ = nullptr;
     QMenu* helpMenu_ = nullptr;
 
-    QStringList nameFilters_;
     QString last_directory_used_;
 
     // --- Controllers / Workers ---
@@ -121,5 +123,8 @@ private:
     QIcon pauseIcon_;
     QIcon settingsIcon_;
 };
+
+QString buildImageFilter();
+bool isSupportedImage(const QString& path);
 
 } // namespace ofeli_app

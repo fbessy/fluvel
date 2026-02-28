@@ -3,6 +3,11 @@
 
 #include "interaction_set.hpp"
 
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+
 namespace ofeli_app
 {
 
@@ -106,6 +111,46 @@ Qt::CursorShape InteractionSet::cursorForEvent(const ImageView& view, bool hasIm
                                                bool isPanRelevant, const QMouseEvent* event) const
 {
     return cursor(view, hasImage, isPanRelevant, event);
+}
+
+bool InteractionSet::dragEnter(ImageView& view, QDragEnterEvent* event)
+{
+    for (auto& behavior : behaviors_)
+    {
+        if (behavior->dragEnter(view, event))
+            return true;
+    }
+    return false;
+}
+
+bool InteractionSet::dragMove(ImageView& view, QDragMoveEvent* event)
+{
+    for (auto& behavior : behaviors_)
+    {
+        if (behavior->dragMove(view, event))
+            return true;
+    }
+    return false;
+}
+
+bool InteractionSet::dragLeave(ImageView& view, QDragLeaveEvent* event)
+{
+    for (auto& behavior : behaviors_)
+    {
+        if (behavior->dragLeave(view, event))
+            return true;
+    }
+    return false;
+}
+
+bool InteractionSet::drop(ImageView& view, QDropEvent* event)
+{
+    for (auto& behavior : behaviors_)
+    {
+        if (behavior->drop(view, event))
+            return true;
+    }
+    return false;
 }
 
 } // namespace ofeli_app

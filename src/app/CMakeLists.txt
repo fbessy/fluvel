@@ -77,6 +77,9 @@ set(app_src
     ${UI_COMP_DIR}/pixel_info_behavior.cpp
     ${UI_COMP_DIR}/pixel_info_behavior.hpp
 
+    ${UI_COMP_DIR}/drag_drop_behavior.cpp
+    ${UI_COMP_DIR}/drag_drop_behavior.hpp
+
     ${UI_COMP_DIR}/pixel_info_overlay.cpp
     ${UI_COMP_DIR}/pixel_info_overlay.hpp
 

@@ -52,6 +52,8 @@ void ImageView::initialize()
     setTransformationAnchor(QGraphicsView::NoAnchor);
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
+    setAcceptDrops(true);
+    // viewport()->setAcceptDrops(true);
 
     scene_ = new QGraphicsScene(this);
     setScene(scene_);
@@ -463,6 +465,45 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
         QGraphicsView::mouseDoubleClickEvent(event);
 }
 
+void ImageView::dragEnterEvent(QDragEnterEvent* event)
+{
+    bool handled = false;
+
+    if (m_interaction_)
+        handled = m_interaction_->dragEnter(*this, event);
+
+    if (!handled)
+        event->ignore();
+}
+
+void ImageView::dragMoveEvent(QDragMoveEvent* event)
+{
+    bool handled = false;
+
+    if (m_interaction_)
+        handled = m_interaction_->dragMove(*this, event);
+
+    if (!handled)
+        event->ignore();
+}
+
+void ImageView::dragLeaveEvent(QDragLeaveEvent* event)
+{
+    if (m_interaction_)
+        m_interaction_->dragLeave(*this, event);
+}
+
+void ImageView::dropEvent(QDropEvent* event)
+{
+    bool handled = false;
+
+    if (m_interaction_)
+        handled = m_interaction_->drop(*this, event);
+
+    if (!handled)
+        event->ignore();
+}
+
 QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 {
     if (!pixmapItem_ || lastDisplayedImage_.isNull())
@@ -735,6 +776,11 @@ void ImageView::showPlaceholder(bool showEffect)
     }
 
     blur_->setBlurRadius(showEffect ? 6 : 0);
+}
+
+void ImageView::notifyImageDropped(const QString& path)
+{
+    emit imageDropped(path);
 }
 
 } // namespace ofeli_app

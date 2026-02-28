@@ -7,6 +7,11 @@
 #include <QWheelEvent>
 #include <QtCore/Qt>
 
+#include <QDragEnterEvent>
+#include <QDragLeaveEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+
 class QMouseEvent;
 
 namespace ofeli_app
@@ -36,6 +41,26 @@ public:
         return false;
     }
     virtual bool mouseDoubleClick(ImageView&, QMouseEvent*)
+    {
+        return false;
+    }
+
+    virtual bool dragEnter(ImageView&, QDragEnterEvent*)
+    {
+        return false;
+    }
+
+    virtual bool dragMove(ImageView&, QDragMoveEvent*)
+    {
+        return false;
+    }
+
+    virtual bool dragLeave(ImageView&, QDragLeaveEvent*)
+    {
+        return false;
+    }
+
+    virtual bool drop(ImageView&, QDropEvent*)
     {
         return false;
     }

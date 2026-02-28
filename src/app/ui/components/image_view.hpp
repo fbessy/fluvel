@@ -20,6 +20,11 @@ class QMouseEvent;
 class QResizeEvent;
 class QGraphicsScene;
 
+class QDragEnterEvent;
+class QDragMoveEvent;
+class QDragLeaveEvent;
+class QDropEvent;
+
 namespace ofeli_app
 {
 
@@ -63,6 +68,8 @@ public:
 
     bool isGrayscale() const;
 
+    void notifyImageDropped(const QString& path);
+
 public slots:
     void setImage(const QImage& img);
 
@@ -84,10 +91,17 @@ public slots:
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
+
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseDoubleClickEvent(QMouseEvent* event) override;
+
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dragMoveEvent(QDragMoveEvent* event) override;
+    void dragLeaveEvent(QDragLeaveEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
+
     void enterEvent(QEnterEvent*) override;
 
     void resizeEvent(QResizeEvent* event) override;
@@ -157,6 +171,7 @@ private:
 signals:
     void imageClicked(int x, int y);
     void frameDisplayed(qint64 receiveTs, qint64 displayTs);
+    void imageDropped(const QString& path);
 };
 
 } // namespace ofeli_app

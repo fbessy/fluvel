@@ -11,6 +11,11 @@
 #include <memory>
 #include <vector>
 
+class QDragEnterEvent;
+class QDragMoveEvent;
+class QDragLeaveEvent;
+class QDropEvent;
+
 namespace ofeli_app
 {
 
@@ -50,6 +55,11 @@ protected:
 
     Qt::CursorShape cursorForEvent(const ImageView& view, bool hasImage, bool isPanRelevant,
                                    const QMouseEvent* event) const override;
+
+    bool dragEnter(ImageView& view, QDragEnterEvent* event) override;
+    bool dragMove(ImageView& view, QDragMoveEvent* event) override;
+    bool dragLeave(ImageView& view, QDragLeaveEvent* event) override;
+    bool drop(ImageView& view, QDropEvent* event) override;
 
 private:
     std::vector<std::unique_ptr<ViewBehavior>> behaviors_;

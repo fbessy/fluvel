@@ -8,6 +8,11 @@
 
 #include <QtCore/Qt>
 
+class QDragEnterEvent;
+class QDragMoveEvent;
+class QDragLeaveEvent;
+class QDropEvent;
+
 namespace ofeli_app
 {
 
@@ -44,6 +49,26 @@ public:
                                            const QMouseEvent* /*event*/) const
     {
         return Qt::ArrowCursor;
+    }
+
+    virtual bool dragEnter(ImageView&, QDragEnterEvent*)
+    {
+        return false;
+    }
+
+    virtual bool dragMove(ImageView&, QDragMoveEvent*)
+    {
+        return false;
+    }
+
+    virtual bool dragLeave(ImageView&, QDragLeaveEvent*)
+    {
+        return false;
+    }
+
+    virtual bool drop(ImageView&, QDropEvent*)
+    {
+        return false;
     }
 };
 

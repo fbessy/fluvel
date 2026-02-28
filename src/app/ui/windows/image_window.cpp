@@ -5,6 +5,7 @@
 
 #include "active_contour_worker.hpp"
 #include "autofit_behavior.hpp"
+#include "drag_drop_behavior.hpp"
 #include "fullscreen_behavior.hpp"
 #include "icon_loader.hpp"
 #include "image_controller.hpp"
@@ -16,6 +17,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QToolBar>
 
 namespace ofeli_app
@@ -136,6 +138,7 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
+    interaction->addBehavior(std::make_unique<DragDropBehavior>());
     imageView_->setInteraction(interaction.release());
 
     // --- Display bar (à droite) ---
@@ -314,31 +317,17 @@ void ImageWindow::setupActions()
 
 void ImageWindow::setupConnections()
 {
-    connect(this, &ImageWindow::fileSelected, this, &ImageWindow::onFileSelected);
-
     connect(imageController_, &ImageController::displayedImageReady, this,
             &ImageWindow::onDisplayedImageReady);
-
-    nameFilters_ << "*.bmp"
-                 << "*.gif"
-                 << "*.jpg" << "*.jpeg" << "*.mng"
-                 << "*.pbm" << "*.png" << "*.pgm"
-                 << "*.ppm" << "*.svg" << "*.svgz"
-                 << "*.tiff" << "*.tif" << "*.xbm" << "*.xpm";
-
-    nameFilters_.removeDuplicates();
 
     connect(openAct_, &QAction::triggered, this,
             [this]()
             {
                 QString fileName = QFileDialog::getOpenFileName(
-                    this, tr("Open Image"), last_directory_used_,
-                    tr("Image Files (%1)").arg(nameFilters_.join(" ")));
+                    this, tr("Open Image"), last_directory_used_, buildImageFilter());
+
                 if (!fileName.isEmpty())
-                {
-                    last_directory_used_ = QFileInfo(fileName).absolutePath();
                     emit fileSelected(fileName);
-                }
             });
 
     for (int i = 0; i < kMaxRecentFiles; ++i)
@@ -352,12 +341,14 @@ void ImageWindow::setupConnections()
                     {
                         fileName = action->data().toString();
                     }
+
                     if (!fileName.isEmpty())
-                    {
                         emit fileSelected(fileName);
-                    }
                 });
     }
+
+    connect(imageController_, &ImageController::imageOpened, this, &ImageWindow::onFileOpened);
+
     connect(this, &ImageWindow::fileSelected, imageController_, &ImageController::loadImage);
 
     connect(deleteAct_, &QAction::triggered, this, &ImageWindow::deleteList);
@@ -436,6 +427,11 @@ void ImageWindow::setupConnections()
 
     connect(imageController_, &ImageController::textDiagnosticsUpdated, imageView_,
             &ImageView::setText);
+
+    connect(imageView_, &ImageView::imageDropped, imageController_, &ImageController::loadImage);
+
+    connect(imageController_, &ImageController::errorOccurred, this,
+            &ImageWindow::showErrorMessage);
 }
 
 QString ImageWindow::strippedName(const QString& fullFilename)
@@ -565,9 +561,11 @@ void ImageWindow::onDisplayedImageReady(const QImage& displayed)
     updateWindowTitle();
 }
 
-void ImageWindow::onFileSelected(const QString& path)
+void ImageWindow::onFileOpened(const QString& path)
 {
     setCurrentFile(path); // for recent file
+
+    last_directory_used_ = QFileInfo(path).absolutePath();
 
     m_fileName_ = strippedName(path);
     m_fullPath_ = path;
@@ -701,6 +699,26 @@ void ImageWindow::onCameraWindowClosed()
 void ImageWindow::onInputImageReady(const QImage& inputImage)
 {
     emit inputImageReady(inputImage);
+}
+
+void ImageWindow::showErrorMessage(const QString& msg)
+{
+    QMessageBox::warning(this, tr("Error"), msg);
+}
+
+QString buildImageFilter()
+{
+    QStringList patterns;
+
+    const auto formats = QImageReader::supportedImageFormats();
+    for (const QByteArray& format : formats)
+    {
+        patterns << "*." + QString::fromLatin1(format);
+    }
+
+    patterns.sort();
+
+    return QObject::tr("Image Files (%1)").arg(patterns.join(' '));
 }
 
 } // namespace ofeli_app

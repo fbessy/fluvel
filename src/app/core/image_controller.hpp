@@ -32,6 +32,9 @@ public slots:
     void converge();
 
 signals:
+    void errorOccurred(const QString& msg);
+    void imageOpened(const QString& path);
+
     void inputImageReady(const QImage& inputImage);
     void displayedImageReady(const QImage& displayed);
 
@@ -61,5 +64,7 @@ private:
 
     ActiveContourWorker acWorker_;
 };
+
+bool isSupportedImage(const QString& path);
 
 } // namespace ofeli_app
