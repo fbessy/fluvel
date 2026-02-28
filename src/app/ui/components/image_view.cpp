@@ -4,8 +4,10 @@
 #include "image_view.hpp"
 #include "color_adapters.hpp"
 #include "common_settings.hpp"
+#include "drag_drop_behavior.hpp"
 #include "frame_clock.hpp"
 #include "image_view_interaction.hpp"
+#include "interaction_set.hpp"
 #include "overlay_text_item.hpp"
 
 #include <QMouseEvent>
@@ -504,14 +506,28 @@ void ImageView::dropEvent(QDropEvent* event)
         event->ignore();
 }
 
-void ImageView::drawForeground(QPainter* painter, const QRectF&)
+void ImageView::drawForeground(QPainter* painter, const QRectF& rect)
 {
-    if (!dragHighlight_)
+    if (!supportsDragDrop())
         return;
 
     painter->save();
 
-    painter->fillRect(viewport()->rect(), QColor(100, 150, 255, 40));
+    if (dragHighlight_)
+    {
+        painter->fillRect(rect, QColor(100, 150, 255, 40));
+    }
+
+    if (!hasImage())
+    {
+        painter->setPen(QColor(150, 150, 150));
+
+        QFont f = painter->font();
+        f.setPointSize(f.pointSize() + 2);
+        painter->setFont(f);
+
+        painter->drawText(rect, Qt::AlignCenter, tr("Drop an image here\nor\nFile → Open"));
+    }
 
     painter->restore();
 }
@@ -799,6 +815,13 @@ void ImageView::setDragHighlight(bool enabled)
 {
     dragHighlight_ = enabled;
     viewport()->update();
+}
+
+bool ImageView::supportsDragDrop() const
+{
+    auto set = dynamic_cast<const InteractionSet*>(m_interaction_);
+
+    return set && set->hasBehavior<DragDropBehavior>();
 }
 
 } // namespace ofeli_app

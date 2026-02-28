@@ -46,6 +46,16 @@ public:
     Qt::CursorShape cursor(const ImageView& view, bool hasImage, bool isPanRelevant,
                            const QMouseEvent* e) const;
 
+    template <typename T> bool hasBehavior() const
+    {
+        for (const auto& b : behaviors_)
+        {
+            if (dynamic_cast<const T*>(b.get()))
+                return true;
+        }
+        return false;
+    }
+
 protected:
     bool wheel(ImageView& view, QWheelEvent* event) override;
     bool mousePress(ImageView& view, QMouseEvent* event) override;

@@ -125,8 +125,9 @@ private:
     void updateDisplayWithConfig();
 
     QColor desaturateAndDarken(const QColor& original, qreal saturationFactor, qreal valueFactor);
-
     QImage darkenImage(const QImage& image);
+
+    bool supportsDragDrop() const;
 
     QGraphicsScene* scene_ = nullptr;
     QGraphicsItemGroup* contentRoot_ = nullptr;
