@@ -18,7 +18,6 @@
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QToolBar>
 
 namespace ofeli_app
 {
