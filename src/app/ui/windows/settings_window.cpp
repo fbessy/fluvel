@@ -15,20 +15,32 @@ namespace ofeli_app
 
 SettingsWindow::SettingsWindow(QWidget* parent)
     : QDialog(parent)
-
 {
     setWindowTitle(tr("Image session settings"));
 
     QSettings settings;
 
-    const auto geo = settings.value("Settings/Window/geometry").toByteArray();
-    if (!geo.isEmpty())
-        restoreGeometry(geo);
+    if (settings.contains("ui_geometry/settings_window"))
+    {
+        restoreGeometry(settings.value("ui_geometry/settings_window").toByteArray());
+    }
+    else
+    {
+        resize(980, 660);
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Dialog buttons
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     dial_buttons_ = new QDialogButtonBox(this);
     dial_buttons_->addButton(QDialogButtonBox::Ok);
     dial_buttons_->addButton(QDialogButtonBox::Cancel);
     dial_buttons_->addButton(QDialogButtonBox::RestoreDefaults);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Tabs
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     setupUiDownscaleTab();
     setupUiPreprocessingTab();
@@ -38,7 +50,6 @@ SettingsWindow::SettingsWindow(QWidget* parent)
     tabs_ = new QTabWidget(this);
 
     auto* tabBar = tabs_->tabBar();
-
     tabBar->setExpanding(false);
     tabBar->setUsesScrollButtons(false);
     tabBar->setElideMode(Qt::ElideNone);
@@ -48,21 +59,34 @@ SettingsWindow::SettingsWindow(QWidget* parent)
     tabs_->addTab(init_page_, tr("Initialization"));
     tabs_->addTab(algo_page_, tr("Algorithm"));
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Image preview
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     settingsView_ = new ImageView(this);
 
-    // auto interaction = std::make_unique<InteractionSet>();
-    // interaction->addBehavior(std::make_unique<ZoomBehavior>());
+    statusLabel = new QLabel(this);
 
-    // settingsView->setInteraction(interaction.release());
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Layouts
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    QGridLayout* settings_grid = new QGridLayout;
-    settings_grid->addWidget(tabs_, 0, 0);
-    settings_grid->addWidget(settingsView_, 0, 1);
+    // Horizontal content: tabs | image
+    QHBoxLayout* content_layout = new QHBoxLayout;
+    content_layout->addWidget(tabs_);
+    content_layout->addWidget(settingsView_, 1); // l'image prend l'espace restant
 
-    settings_grid->addWidget(dial_buttons_, 1, 1);
+    // Vertical root layout: content + buttons
+    QVBoxLayout* root_layout = new QVBoxLayout;
+    root_layout->addLayout(content_layout);
+    root_layout->addWidget(dial_buttons_);
+    root_layout->addWidget(statusLabel);
 
-    settings_grid->setColumnStretch(1, 1);
-    setLayout(settings_grid);
+    setLayout(root_layout);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Controller
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     imageSettingsController_ = new ImageSettingsController(this);
 
@@ -1055,16 +1079,40 @@ void SettingsWindow::onInputImageReady(const QImage& inputImage)
         imageSettingsController_->onInputImageReady(inputImage);
 }
 
-void SettingsWindow::showEvent(QShowEvent* /*event*/)
+void SettingsWindow::showEvent(QShowEvent* event)
 {
+    QDialog::showEvent(event);
+
     emit updateOverlay(getUiShape());
+
+    if (!statusLabel)
+        return;
+
+    QSettings settings;
+    QString confPath = settings.fileName();
+
+    QFileInfo imgInfo(confPath);
+
+    QString text = QString("%1\n"
+                           " ├ image : %2\n"
+                           " └ config: %3")
+                       .arg(imgInfo.absolutePath(), "phi_init.png", imgInfo.fileName());
+
+    // statusLabel->setStyleSheet("font-family: monospace;");
+
+    statusLabel->setText(text);
+
+    // statusLabel->setText(confPath);
+    statusLabel->show();
+
+    QTimer::singleShot(7000, statusLabel, &QWidget::hide);
 }
 
 void SettingsWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("Settings/Window/geometry", saveGeometry());
+    settings.setValue("ui_geometry/settings_window", saveGeometry());
 
     QDialog::closeEvent(event);
 }

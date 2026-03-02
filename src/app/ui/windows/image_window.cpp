@@ -33,8 +33,7 @@ ImageWindow::ImageWindow(QWidget* parent)
     updateCameraAction();
 
     QSettings settings;
-    last_directory_used_ =
-        settings.value("Main/Name/last_directory_used", QDir().homePath()).toString();
+    last_directory_used_ = settings.value("history/last_directory", QDir().homePath()).toString();
 }
 
 void ImageWindow::setupUi()
@@ -44,9 +43,14 @@ void ImageWindow::setupUi()
 
     QSettings settings;
 
-    const auto geo = settings.value("Main/Window/geometry").toByteArray();
-    if (!geo.isEmpty())
-        restoreGeometry(geo);
+    if (settings.contains("ui_geometry/image_window"))
+    {
+        restoreGeometry(settings.value("ui_geometry/image_window").toByteArray());
+    }
+    else
+    {
+        resize(900, 600);
+    }
 
     startResumeIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
                                     ":/icons/toolbar/media-playback-start-symbolic.svg");
@@ -441,7 +445,7 @@ QString ImageWindow::strippedName(const QString& fullFilename)
 void ImageWindow::setCurrentFile(const QString& fileName)
 {
     QSettings settings;
-    QStringList files = settings.value("Main/Name/recentFileList").toStringList();
+    QStringList files = settings.value("history/recent_files").toStringList();
     files.removeAll(fileName);
     files.prepend(fileName);
     while (files.size() > kMaxRecentFiles)
@@ -449,14 +453,14 @@ void ImageWindow::setCurrentFile(const QString& fileName)
         files.removeLast();
     }
 
-    settings.setValue("Main/Name/recentFileList", files);
+    settings.setValue("history/recent_files", files);
     updateRecentFileActions();
 }
 
 void ImageWindow::updateRecentFileActions()
 {
     QSettings settings;
-    QStringList files = settings.value("Main/Name/recentFileList").toStringList();
+    QStringList files = settings.value("history/recent_files").toStringList();
 
     qsizetype numRecentFiles = qMin(files.size(), kMaxRecentFiles);
 
@@ -492,7 +496,7 @@ void ImageWindow::deleteList()
     files.clear();
 
     QSettings settings;
-    settings.setValue("Main/Name/recentFileList", files);
+    settings.setValue("history/recent_files", files);
 
     updateRecentFileActions();
 }
@@ -538,8 +542,8 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     auto& config = AppSettings::instance();
     QSettings settings;
 
-    settings.setValue("Main/Window/geometry", saveGeometry());
-    settings.setValue("Main/Name/last_directory_used", last_directory_used_);
+    settings.setValue("ui_geometry/image_window", saveGeometry());
+    settings.setValue("history/last_directory", last_directory_used_);
 
     config.save();
 

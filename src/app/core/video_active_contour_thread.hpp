@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include "ac_types.hpp"
 #include "common_settings.hpp"
+#include "region_color_ac.hpp"
 #include "temporal_smoother.hpp"
 
 #include <QVideoFrame>

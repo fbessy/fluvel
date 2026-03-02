@@ -33,6 +33,8 @@ protected:
     //! Restore the ui states in function of the ApplicationSettings.
     void reject() override;
 
+    void closeEvent(QCloseEvent* event) override;
+
 private:
     void setupUiDownscaleGb();
     void updateUIFromConfig();

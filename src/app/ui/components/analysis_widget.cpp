@@ -6,9 +6,10 @@
 #include "analysis_window.hpp"
 #include "color_adapters.hpp"
 #include "color_picker_behavior.hpp"
+#include "drag_drop_behavior.hpp"
+#include "image_view.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
-#include "image_view.hpp"
 
 #include <QtWidgets>
 
@@ -53,6 +54,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     // interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<ColorPickerBehavior>());
+    interaction->addBehavior(std::make_unique<DragDropBehavior>());
     imageView_->setInteraction(interaction.release());
 
     imageView_->setListener(this);
@@ -132,8 +134,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     setLayout(this_layout);
 
-    last_directory_used_ =
-        settings.value("Main/Name/last_directory_used", QDir().homePath()).toString();
+    last_directory_used_ = settings.value("history/last_directory", QDir().homePath()).toString();
 
     name_filters_ << "*.bmp"
                   //<< "*.dcm"
@@ -340,7 +341,7 @@ void AnalysisWidget::save_settings() const
 {
     QSettings settings;
 
-    settings.setValue("Main/Name/last_directory_used", last_directory_used_);
+    settings.setValue("history/last_directory", last_directory_used_);
 
     settings.setValue("Analysis/combo" + QString::number(id_this_), color_list_->currentIndex());
 

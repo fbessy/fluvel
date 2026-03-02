@@ -22,9 +22,14 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
     setWindowTitle(tr("Analysis : input"));
 
-    const auto geo = settings.value("Analysis/Window/geometry").toByteArray();
-    if (!geo.isEmpty())
-        restoreGeometry(geo);
+    if (settings.contains("ui_geometry/analysis_window"))
+    {
+        restoreGeometry(settings.value("ui_geometry/analysis_window").toByteArray());
+    }
+    else
+    {
+        resize(900, 600);
+    }
 
     ///////////////////////////////////////////////////////////////
     ///          Input evaluation QDialog window (this)         ///
@@ -246,7 +251,7 @@ void AnalysisWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("Analysis/Window/geometry", saveGeometry());
+    settings.setValue("ui_geometry/analysis_window", saveGeometry());
 
     widget1_->save_settings();
     widget2_->save_settings();

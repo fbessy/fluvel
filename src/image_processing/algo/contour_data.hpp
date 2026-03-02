@@ -3,93 +3,13 @@
 
 #pragma once
 
-#include "grid2d.hpp"
+#include "ac_types.hpp"
 #include "image_span.hpp"
 
-#include <cstdint>
 #include <vector>
 
 namespace ofeli_ip
 {
-
-//! Pixel connectivity of the neighborhood used by the algorithm (4- or 8-connected).
-enum class Connectivity
-{
-    Four,
-    Eight
-};
-
-enum class PhiValue : int8_t
-{
-    InsideRegion = -3,
-    InteriorBoundary = -1,
-    ExteriorBoundary = 1,
-    OutsideRegion = 3
-};
-
-using DiscreteLevelSet = Grid2D<PhiValue>;
-
-enum class SpeedValue : int8_t
-{
-    GoInward = -1,
-    NoMove = 0,
-    GoOutward = 1
-};
-
-class ContourPoint
-{
-public:
-    ContourPoint(int x, int y)
-        : x_(x)
-        , y_(y)
-        , speed_(SpeedValue::NoMove)
-    {
-    }
-    ContourPoint(const Point2D_i& p)
-        : x_(p.x)
-        , y_(p.y)
-        , speed_(SpeedValue::NoMove)
-    {
-    }
-
-    Point2D_i pos() const noexcept
-    {
-        return {x_, y_};
-    }
-    int x() const noexcept
-    {
-        return x_;
-    }
-    int y() const noexcept
-    {
-        return y_;
-    }
-
-    bool operator==(const ContourPoint& other) const noexcept
-    {
-        return x_ == other.x_ && y_ == other.y_;
-    }
-
-    bool operator!=(const ContourPoint& other) const noexcept
-    {
-        return !(*this == other);
-    }
-
-private:
-    int x_;
-    int y_;
-
-    //! Pending sign speed of the algorithm to drive the contour
-    SpeedValue speed_;
-
-    friend class ActiveContour;
-    friend class RegionAc;
-    friend class RegionColorAc;
-    friend class EdgeAc;
-};
-
-using Contour = std::vector<ContourPoint>;
-using ExportedContour = std::vector<Point2D_i>;
 
 class ContourData
 {

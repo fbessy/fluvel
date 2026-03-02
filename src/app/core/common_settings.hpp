@@ -3,11 +3,12 @@
 
 #pragma once
 
-#include "region_color_ac.hpp"
-#include "filters.hpp"
+#include "ac_types.hpp"
 #include "color.hpp"
+#include "filters.hpp"
 
 #include <QImage>
+#include <string_view>
 
 namespace ofeli_app
 {
@@ -24,6 +25,29 @@ enum class Language
     English,
     French
 };
+
+inline constexpr const char* to_string(Language lang)
+{
+    switch (lang)
+    {
+        case Language::System:
+            return "system";
+        case Language::English:
+            return "en";
+        case Language::French:
+            return "fr";
+    }
+    return "system";
+}
+
+inline Language language_from_string(std::string_view s)
+{
+    if (s == "en")
+        return Language::English;
+    if (s == "fr")
+        return Language::French;
+    return Language::System;
+}
 
 enum ComboBoxColorIndex : int
 {
@@ -50,28 +74,45 @@ enum class ImageBase
     Preprocessed
 };
 
+inline constexpr const char* to_string(ImageBase ib)
+{
+    switch (ib)
+    {
+        case ImageBase::Source:
+            return "source";
+        case ImageBase::Preprocessed:
+            return "preprocessed";
+    }
+    return "source";
+}
+
+inline ImageBase ib_from_string(std::string_view s)
+{
+    if (s == "source")
+        return ImageBase::Source;
+    if (s == "preprocessed")
+        return ImageBase::Preprocessed;
+    return ImageBase::Source;
+}
+
 struct DisplayConfig
 {
-    static constexpr ImageBase kDefaultImage = ImageBase::Preprocessed;
+    static constexpr ImageBase kDefaultImageBase = ImageBase::Preprocessed;
 
     static constexpr bool kDefaultListDisplayed = true;
-    static constexpr unsigned char kDefaultRedOut = 0u;
-    static constexpr unsigned char kDefaultGreenOut = 0u;
-    static constexpr unsigned char kDefaultBlueOut = 255u;
-    static constexpr unsigned char kDefaultRedIn = 255u;
-    static constexpr unsigned char kDefaultGreenIn = 0u;
-    static constexpr unsigned char kDefaultBlueIn = 0u;
+    static constexpr ofeli_ip::Rgb_uc kDefaultOut{0u, 0u, 255u};
+    static constexpr ofeli_ip::Rgb_uc kDefaultIn{255u, 0u, 0u};
 
     static constexpr bool kDefaultOptions = false;
     static constexpr bool kDefaultOverlay = true;
 
-    ImageBase image = kDefaultImage;
+    ImageBase image = kDefaultImageBase;
 
     bool l_out_displayed = kDefaultListDisplayed;
-    ofeli_ip::Rgb_uc l_out_color{kDefaultRedOut, kDefaultGreenOut, kDefaultBlueOut};
+    ofeli_ip::Rgb_uc l_out_color{kDefaultOut};
 
     bool l_in_displayed = kDefaultListDisplayed;
-    ofeli_ip::Rgb_uc l_in_color{kDefaultRedIn, kDefaultGreenIn, kDefaultBlueIn};
+    ofeli_ip::Rgb_uc l_in_color{kDefaultIn};
 
     bool mirrorMode = kDefaultOptions;
     bool smoothDisplay = kDefaultOptions;

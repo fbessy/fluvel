@@ -19,7 +19,7 @@ LanguageWindow::LanguageWindow(QWidget* parent)
     setWindowTitle(tr("Language"));
 
     QSettings settings;
-    const auto geo = settings.value("Language/Window/geometry").toByteArray();
+    const auto geo = settings.value("ui_geometry/language_window").toByteArray();
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
@@ -75,7 +75,7 @@ void LanguageWindow::accept()
     AppSettings::instance().app_language = language;
 
     QSettings settings;
-    settings.setValue("Language/current", int(language));
+    settings.setValue("ui/language", int(language));
 
     QDialog::accept();
 }
@@ -95,7 +95,7 @@ void LanguageWindow::reject()
 void LanguageWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
-    settings.setValue("Language/Window/geometry", saveGeometry());
+    settings.setValue("ui_geometry/language_window", saveGeometry());
 
     QDialog::closeEvent(event);
 }

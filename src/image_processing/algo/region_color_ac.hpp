@@ -6,88 +6,11 @@
 #include "active_contour.hpp"
 #include "color.hpp"
 #include "image_span.hpp"
-#include "region_ac.hpp"
 
 #include <cstdint>
 
 namespace ofeli_ip
 {
-
-enum class ColorSpaceOption
-{
-    RGB,
-    YUV,
-    Lab,
-    Luv
-};
-
-//! \class RegionColorConfig
-//! Specific configuration for color region based active contour.
-struct RegionColorConfig : public RegionConfig
-{
-    static constexpr ColorSpaceOption kDefaultColorSpace = ColorSpaceOption::RGB;
-
-    static constexpr Components_3i kDefaultWeights{1, 1, 1};
-
-    //! Color space option
-    ColorSpaceOption color_space;
-
-    //! Weights \a to calculate external speed \a Fd.
-    Components_3i weights;
-
-    //! Normalize values of a configuration.
-    void normalize_region_color()
-    {
-        weights.c1 = normalize(weights.c1);
-        weights.c2 = normalize(weights.c2);
-        weights.c3 = normalize(weights.c3);
-    }
-
-    //! Default constructor.
-    RegionColorConfig()
-        : RegionConfig()
-        , color_space(kDefaultColorSpace)
-        , weights{kDefaultWeights}
-    {
-    }
-
-    ~RegionColorConfig() override = default;
-
-    //! Copy constructor.
-    RegionColorConfig(const RegionColorConfig& copied)
-        : RegionConfig(copied)
-        , color_space(copied.color_space)
-        , weights(copied.weights)
-    {
-        this->normalize_region_color();
-    }
-
-    //! Copy assignement operator.
-    RegionColorConfig& operator=(const RegionColorConfig& rhs)
-    {
-        RegionConfig::operator=(rhs);
-
-        this->color_space = rhs.color_space;
-        this->weights = rhs.weights;
-
-        this->normalize_region_color();
-
-        return *this;
-    }
-
-    //! \a Equal operator overloading.
-    friend bool operator==(const RegionColorConfig& lhs, const RegionColorConfig& rhs)
-    {
-        return (lhs.color_space == rhs.color_space && lhs.lambdaIn == rhs.lambdaIn &&
-                lhs.lambdaOut == rhs.lambdaOut && lhs.weights == rhs.weights);
-    }
-
-    //! \a Not equal operator overloading.
-    friend bool operator!=(const RegionColorConfig& lhs, const RegionColorConfig& rhs)
-    {
-        return !(lhs == rhs);
-    }
-};
 
 class RegionColorAc : public ActiveContour
 {

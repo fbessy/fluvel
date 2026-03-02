@@ -7,6 +7,8 @@
 #include "contour_data.hpp"
 #include "contour_diagnostics.hpp"
 #include "point.hpp"
+#include "point_containers.hpp"
+#include "shape.hpp"
 
 #include <cstddef>
 
@@ -14,6 +16,104 @@ namespace ofeli_ip
 {
 
 constexpr size_t kInitialSpeedArrayAllocSize = 10000u;
+
+//! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
+struct BoundarySwitchContext
+{
+    Contour& activeBoundary;
+    Contour& adjacentBoundary;
+    SpeedValue requiredSpeedSign;
+    PhiValue currentToAdjacentVal;
+    PhiValue neighborFromRegionVal;
+    PhiValue neighbor_to_boundary_val;
+    PhiValue redundantToRegionVal;
+
+    static BoundarySwitchContext makeSwitchIn(ContourData& cd)
+    {
+        return {cd.l_out(),
+                cd.l_in(),
+                SpeedValue::GoOutward,
+                PhiValue::InteriorBoundary,
+                PhiValue::OutsideRegion,
+                PhiValue::ExteriorBoundary,
+                PhiValue::InsideRegion};
+    }
+
+    static BoundarySwitchContext makeSwitchOut(ContourData& cd)
+    {
+        return {cd.l_in(),
+                cd.l_out(),
+                SpeedValue::GoInward,
+                PhiValue::ExteriorBoundary,
+                PhiValue::InsideRegion,
+                PhiValue::InteriorBoundary,
+                PhiValue::OutsideRegion};
+    }
+};
+
+//! \class EvolutionData
+//! Holds the evolution data of the active contour.
+struct EvolutionData
+{
+    //! Iterations number in a cycle (cycle 1 or cycle 2). It is set to 0 at the end of one
+    //! cycle.
+    int phaseStepCount{0};
+
+    //! Total number of iterations the active contour has evolved from the initial contour.
+    int stepCount{0};
+
+    //! Maximum number of times the active contour can evolve.
+    const int maxStepCount;
+
+    //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
+    bool isMoving{true};
+
+    //! l_out shape at the end of the cycle 2.
+    Shape l_out_shape;
+
+    //! l_out shape at the end of the previous cycle 2.
+    Shape previousShape;
+
+    //! Total number of iterations the active contour has evolved from the initial contour
+    //! at the end of the previous cycle 2.
+    int previous_step_count{0};
+
+    //! Hausdorff quantile
+    //! at the end of the previous cycle 2.
+    float previousQuantile{std::numeric_limits<float>::quiet_NaN()};
+
+    //! Hausdorff quantile
+    //! at the end of the cycle 2. It is a normalized value, divided by the diagonal size of
+    //! #phi, in percent.
+    float hausdorffQuantile{std::numeric_limits<float>::quiet_NaN()};
+
+    //! Centroids gap between #l_out_shape and previousShape#. It is a normalized value,
+    //! divided by the diagonal size of #phi, in percent.
+    float relativeCentroidDistance{std::numeric_limits<float>::quiet_NaN()};
+
+    //! Intersection, i.e common points between #l_out_shape and #previousShape.
+    PointSet intersection;
+
+    //! Stopping condition status.
+    StoppingStatus stoppingStatus{StoppingStatus::None};
+
+    //! Constructor.
+    EvolutionData(const ContourData& cd)
+        : maxStepCount(5 * std::max(cd.phi().width(), cd.phi().height()))
+    {
+        l_out_shape.reserve(cd.l_out().capacity());
+        previousShape.reserve(cd.l_out().capacity());
+        intersection.reserve(cd.l_out().capacity());
+    }
+
+    //! Reset execution state of evolution data. Used for video tracking.
+    void resetExecutionState()
+    {
+        phaseStepCount = 0;
+        stepCount = 0;
+        stoppingStatus = StoppingStatus::None;
+    }
+};
 
 class ActiveContour
 {

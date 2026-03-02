@@ -10,6 +10,7 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QSettings>
 #include <QSpinBox>
 #include <QTabBar>
 #include <QTabWidget>
@@ -23,6 +24,17 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent)
     , config_(AppSettings::instance().camConfig)
 {
     setWindowTitle(tr("Camera session settings"));
+
+    QSettings settings;
+
+    if (settings.contains("ui_geometry/camera_settings_window"))
+    {
+        restoreGeometry(settings.value("ui_geometry/camera_settings_window").toByteArray());
+    }
+    else
+    {
+        resize(350, 650);
+    }
 
     dial_buttons_ = new QDialogButtonBox(this);
     dial_buttons_->addButton(QDialogButtonBox::Ok);
@@ -131,6 +143,15 @@ void CameraSettingsWindow::reject()
     updateUIFromConfig();
 
     QDialog::reject();
+}
+
+void CameraSettingsWindow::closeEvent(QCloseEvent* event)
+{
+    QSettings settings;
+
+    settings.setValue("ui_geometry/camera_settings_window", saveGeometry());
+
+    QDialog::closeEvent(event);
 }
 
 } // namespace ofeli_app

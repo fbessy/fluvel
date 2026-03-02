@@ -16,9 +16,14 @@ AboutWindow::AboutWindow(QWidget* parent)
 
     setWindowTitle(tr("About Ofeli"));
 
-    const auto geo_about = settings.value("About/Window/geometry").toByteArray();
-    if (!geo_about.isEmpty())
-        restoreGeometry(geo_about);
+    if (settings.contains("ui_geometry/about_window"))
+    {
+        restoreGeometry(settings.value("ui_geometry/about_window").toByteArray());
+    }
+    else
+    {
+        resize(700, 400);
+    }
 
     ///////////////////////////////////////
     //////         Left Part        ///////
@@ -100,12 +105,17 @@ AboutWindow::AboutWindow(QWidget* parent)
 
     license_window_ = new QDialog(this);
     license_window_->setWindowTitle(tr("License"));
-
-    const auto geo_license = settings.value("About/License/geometry").toByteArray();
-    if (!geo_license.isEmpty())
-        license_window_->restoreGeometry(geo_license);
-
     license_window_->setLayout(layout_license);
+
+    if (settings.contains("ui_geometry/license_window"))
+    {
+        license_window_->restoreGeometry(
+            settings.value("ui_geometry/license_window").toByteArray());
+    }
+    else
+    {
+        license_window_->resize(500, 500);
+    }
 
     connect(license, &QPushButton::clicked, license_window_, &QDialog::show);
 
@@ -237,8 +247,8 @@ void AboutWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("About/Window/geometry", saveGeometry());
-    settings.setValue("About/License/geometry", license_window_->saveGeometry());
+    settings.setValue("ui_geometry/about_window", saveGeometry());
+    settings.setValue("ui_geometry/license_window", license_window_->saveGeometry());
 
     QDialog::closeEvent(event);
 }

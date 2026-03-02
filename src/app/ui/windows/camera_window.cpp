@@ -36,11 +36,17 @@ CameraWindow::CameraWindow(QWidget* parent)
     setWindowTitle(tr("Ofeli - Camera"));
 
     QSettings settings;
-    const auto geo = settings.value("Camera/Window/geometry").toByteArray();
-    if (!geo.isEmpty())
-        restoreGeometry(geo);
 
-    currentCameraId_ = settings.value("Camera/last_id").toByteArray();
+    if (settings.contains("ui_geometry/camera_window"))
+    {
+        restoreGeometry(settings.value("ui_geometry/camera_window").toByteArray());
+    }
+    else
+    {
+        resize(900, 600);
+    }
+
+    currentCameraId_ = settings.value("camera/device").toByteArray();
 
     cameraSelector_ = new QComboBox(this);
     cameraSelector_->setEnabled(false);
@@ -229,7 +235,7 @@ void CameraWindow::onToggleStreaming()
         currentCameraId_ = selectedId;
 
         QSettings settings;
-        settings.setValue("Camera/last_id", currentCameraId_);
+        settings.setValue("camera/device", currentCameraId_);
 
         videoView_->showPlaceholder(false);
         controller_->start(selectedId);
@@ -269,7 +275,7 @@ void CameraWindow::closeEvent(QCloseEvent* event)
 
     QSettings settings;
 
-    settings.setValue("Camera/Window/geometry", saveGeometry());
+    settings.setValue("ui_geometry/camera_window", saveGeometry());
 
     emit cameraWindowClosed();
     QMainWindow::closeEvent(event);

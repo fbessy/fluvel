@@ -3,15 +3,116 @@
 
 #pragma once
 
-#include "contour_data.hpp"
-#include "point_containers.hpp"
-#include "shape.hpp"
+#include "color.hpp"
+#include "grid2d.hpp"
 
-#include <limits>
+#include <string_view>
 #include <vector>
 
 namespace ofeli_ip
 {
+
+enum class PhiValue : int8_t
+{
+    InsideRegion = -3,
+    InteriorBoundary = -1,
+    ExteriorBoundary = 1,
+    OutsideRegion = 3
+};
+
+using DiscreteLevelSet = Grid2D<PhiValue>;
+
+enum class SpeedValue : int8_t
+{
+    GoInward = -1,
+    NoMove = 0,
+    GoOutward = 1
+};
+
+class ContourPoint
+{
+public:
+    ContourPoint(int x, int y)
+        : x_(x)
+        , y_(y)
+        , speed_(SpeedValue::NoMove)
+    {
+    }
+    ContourPoint(const Point2D_i& p)
+        : x_(p.x)
+        , y_(p.y)
+        , speed_(SpeedValue::NoMove)
+    {
+    }
+
+    Point2D_i pos() const noexcept
+    {
+        return {x_, y_};
+    }
+    int x() const noexcept
+    {
+        return x_;
+    }
+    int y() const noexcept
+    {
+        return y_;
+    }
+
+    bool operator==(const ContourPoint& other) const noexcept
+    {
+        return x_ == other.x_ && y_ == other.y_;
+    }
+
+    bool operator!=(const ContourPoint& other) const noexcept
+    {
+        return !(*this == other);
+    }
+
+private:
+    int x_;
+    int y_;
+
+    //! Pending sign speed of the algorithm to drive the contour
+    SpeedValue speed_;
+
+    friend class ActiveContour;
+    friend class RegionAc;
+    friend class RegionColorAc;
+    friend class EdgeAc;
+};
+
+using Contour = std::vector<ContourPoint>;
+using ExportedContour = std::vector<Point2D_i>;
+
+//! Pixel connectivity of the neighborhood used by the algorithm (4- or 8-connected).
+enum class Connectivity
+{
+    Four,
+    Eight
+};
+
+inline constexpr const char* to_string(Connectivity connectivity)
+{
+    switch (connectivity)
+    {
+        case Connectivity::Four:
+            return "4";
+        case Connectivity::Eight:
+            return "8";
+    }
+
+    return "4";
+}
+
+inline Connectivity connectivity_from_string(std::string_view c)
+{
+    if (c == "4")
+        return Connectivity::Four;
+    if (c == "8")
+        return Connectivity::Eight;
+
+    return Connectivity::Four;
+}
 
 //! Defines how the algorithm handles degraded or failure cases.
 //! Typically used for image segmentation (StopOnFailure)
@@ -141,6 +242,187 @@ struct AcConfig
     }
 };
 
+//! \class RegionConfig
+//! Specific configuration for region based active contour
+struct RegionConfig
+{
+    static constexpr int kDefaultLambdaIn = 1;
+    static constexpr int kDefaultLambdaOut = 1;
+
+    //! Weight of the inside homogeneity criterion in the Chan-Vese model
+    //! (called lambda 1 in the article "Active contour without edges.").
+    int lambdaIn;
+
+    //! Weight of the outside homogeneity criterion in the Chan-Vese model
+    //! (called lambda 2 in the article "Active contour without edges.").
+    int lambdaOut;
+
+    //! Check values of a configuration.
+    void normalize()
+    {
+        lambdaIn = normalize(lambdaIn);
+        lambdaOut = normalize(lambdaOut);
+    }
+
+    //! Default constructor.
+    RegionConfig()
+        : lambdaIn(kDefaultLambdaIn)
+        , lambdaOut(kDefaultLambdaOut)
+    {
+    }
+
+    //! Destructor.
+    virtual ~RegionConfig() = default;
+
+    //! Copy constructor.
+    RegionConfig(const RegionConfig& copied)
+        : lambdaIn(copied.lambdaIn)
+        , lambdaOut(copied.lambdaOut)
+    {
+        this->normalize();
+    }
+
+    //! Copy assignement operator.
+    RegionConfig& operator=(const RegionConfig& rhs)
+    {
+        this->lambdaIn = rhs.lambdaIn;
+        this->lambdaOut = rhs.lambdaOut;
+
+        this->normalize();
+
+        return *this;
+    }
+
+    //! \a Equal operator overloading.
+    friend bool operator==(const RegionConfig& lhs, const RegionConfig& rhs)
+    {
+        return (lhs.lambdaIn == rhs.lambdaIn && lhs.lambdaOut == rhs.lambdaOut);
+    }
+
+    //! \a Not equal operator overloading.
+    friend bool operator!=(const RegionConfig& lhs, const RegionConfig& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+protected:
+    //! Normalize value weight and returns the same value or a default value.
+    static int normalize(int weight)
+    {
+        if (weight < 1)
+            weight = 1;
+
+        return weight;
+    }
+};
+
+enum class ColorSpaceOption
+{
+    RGB,
+    YUV,
+    Lab,
+    Luv
+};
+
+inline constexpr const char* to_string(ColorSpaceOption clrOpt)
+{
+    switch (clrOpt)
+    {
+        case ColorSpaceOption::RGB:
+            return "RGB";
+        case ColorSpaceOption::YUV:
+            return "YUV";
+        case ColorSpaceOption::Lab:
+            return "Lab";
+        case ColorSpaceOption::Luv:
+            return "Luv";
+    }
+
+    return "RGB";
+}
+
+inline ColorSpaceOption color_space_from_string(std::string_view s)
+{
+    if (s == "RGB")
+        return ColorSpaceOption::RGB;
+    if (s == "YUV")
+        return ColorSpaceOption::YUV;
+    if (s == "Lab")
+        return ColorSpaceOption::Lab;
+    if (s == "Luv")
+        return ColorSpaceOption::Luv;
+
+    return ColorSpaceOption::RGB;
+}
+
+//! \class RegionColorConfig
+//! Specific configuration for color region based active contour.
+struct RegionColorConfig : public RegionConfig
+{
+    static constexpr ColorSpaceOption kDefaultColorSpace = ColorSpaceOption::RGB;
+
+    static constexpr Components_3i kDefaultWeights{1, 1, 1};
+
+    //! Color space option
+    ColorSpaceOption color_space;
+
+    //! Weights \a to calculate external speed \a Fd.
+    Components_3i weights;
+
+    //! Normalize values of a configuration.
+    void normalize_region_color()
+    {
+        weights.c1 = normalize(weights.c1);
+        weights.c2 = normalize(weights.c2);
+        weights.c3 = normalize(weights.c3);
+    }
+
+    //! Default constructor.
+    RegionColorConfig()
+        : RegionConfig()
+        , color_space(kDefaultColorSpace)
+        , weights{kDefaultWeights}
+    {
+    }
+
+    ~RegionColorConfig() override = default;
+
+    //! Copy constructor.
+    RegionColorConfig(const RegionColorConfig& copied)
+        : RegionConfig(copied)
+        , color_space(copied.color_space)
+        , weights(copied.weights)
+    {
+        this->normalize_region_color();
+    }
+
+    //! Copy assignement operator.
+    RegionColorConfig& operator=(const RegionColorConfig& rhs)
+    {
+        RegionConfig::operator=(rhs);
+
+        this->color_space = rhs.color_space;
+        this->weights = rhs.weights;
+
+        this->normalize_region_color();
+
+        return *this;
+    }
+
+    //! \a Equal operator overloading.
+    friend bool operator==(const RegionColorConfig& lhs, const RegionColorConfig& rhs)
+    {
+        return (lhs.color_space == rhs.color_space && lhs.lambdaIn == rhs.lambdaIn &&
+                lhs.lambdaOut == rhs.lambdaOut && lhs.weights == rhs.weights);
+    }
+
+    //! \a Not equal operator overloading.
+    friend bool operator!=(const RegionColorConfig& lhs, const RegionColorConfig& rhs)
+    {
+        return !(lhs == rhs);
+    }
+};
+
 //! Kernel support to know the geometry limit of the internal kernel.
 struct KernelSupport
 {
@@ -160,104 +442,6 @@ struct InternalKernel
     {
         return x + support.min_dx >= 0 && x + support.max_dx < width && y + support.min_dy >= 0 &&
                y + support.max_dy < height;
-    }
-};
-
-//! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
-struct BoundarySwitchContext
-{
-    Contour& activeBoundary;
-    Contour& adjacentBoundary;
-    SpeedValue requiredSpeedSign;
-    PhiValue currentToAdjacentVal;
-    PhiValue neighborFromRegionVal;
-    PhiValue neighbor_to_boundary_val;
-    PhiValue redundantToRegionVal;
-
-    static BoundarySwitchContext makeSwitchIn(ContourData& cd)
-    {
-        return {cd.l_out(),
-                cd.l_in(),
-                SpeedValue::GoOutward,
-                PhiValue::InteriorBoundary,
-                PhiValue::OutsideRegion,
-                PhiValue::ExteriorBoundary,
-                PhiValue::InsideRegion};
-    }
-
-    static BoundarySwitchContext makeSwitchOut(ContourData& cd)
-    {
-        return {cd.l_in(),
-                cd.l_out(),
-                SpeedValue::GoInward,
-                PhiValue::ExteriorBoundary,
-                PhiValue::InsideRegion,
-                PhiValue::InteriorBoundary,
-                PhiValue::OutsideRegion};
-    }
-};
-
-//! \class EvolutionData
-//! Holds the evolution data of the active contour.
-struct EvolutionData
-{
-    //! Iterations number in a cycle (cycle 1 or cycle 2). It is set to 0 at the end of one
-    //! cycle.
-    int phaseStepCount{0};
-
-    //! Total number of iterations the active contour has evolved from the initial contour.
-    int stepCount{0};
-
-    //! Maximum number of times the active contour can evolve.
-    const int maxStepCount;
-
-    //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
-    bool isMoving{true};
-
-    //! l_out shape at the end of the cycle 2.
-    Shape l_out_shape;
-
-    //! l_out shape at the end of the previous cycle 2.
-    Shape previousShape;
-
-    //! Total number of iterations the active contour has evolved from the initial contour
-    //! at the end of the previous cycle 2.
-    int previous_step_count{0};
-
-    //! Hausdorff quantile
-    //! at the end of the previous cycle 2.
-    float previousQuantile{std::numeric_limits<float>::quiet_NaN()};
-
-    //! Hausdorff quantile
-    //! at the end of the cycle 2. It is a normalized value, divided by the diagonal size of
-    //! #phi, in percent.
-    float hausdorffQuantile{std::numeric_limits<float>::quiet_NaN()};
-
-    //! Centroids gap between #l_out_shape and previousShape#. It is a normalized value,
-    //! divided by the diagonal size of #phi, in percent.
-    float relativeCentroidDistance{std::numeric_limits<float>::quiet_NaN()};
-
-    //! Intersection, i.e common points between #l_out_shape and #previousShape.
-    PointSet intersection;
-
-    //! Stopping condition status.
-    StoppingStatus stoppingStatus{StoppingStatus::None};
-
-    //! Constructor.
-    EvolutionData(const ContourData& cd)
-        : maxStepCount(5 * std::max(cd.phi().width(), cd.phi().height()))
-    {
-        l_out_shape.reserve(cd.l_out().capacity());
-        previousShape.reserve(cd.l_out().capacity());
-        intersection.reserve(cd.l_out().capacity());
-    }
-
-    //! Reset execution state of evolution data. Used for video tracking.
-    void resetExecutionState()
-    {
-        phaseStepCount = 0;
-        stepCount = 0;
-        stoppingStatus = StoppingStatus::None;
     }
 };
 

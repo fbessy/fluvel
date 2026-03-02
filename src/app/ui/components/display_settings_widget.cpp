@@ -182,8 +182,6 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
 
     connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
             &DisplaySettingsWidget::onVideoSettingsChanged);
-
-    setMaximumWidth(QWIDGETSIZE_MAX);
 }
 
 void DisplaySettingsWidget::setConfig()
