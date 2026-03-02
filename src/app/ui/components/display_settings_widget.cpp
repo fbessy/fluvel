@@ -25,9 +25,6 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-    // Important : au départ on limite la largeur max à la sizeHint
-    setMaximumWidth(minimumSizeHint().width());
-
     if (session_ == Session::Image)
         config_ = AppSettings::instance().imgConfig.display;
     else if (session_ == Session::Camera)
