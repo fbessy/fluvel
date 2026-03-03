@@ -65,8 +65,6 @@ SettingsWindow::SettingsWindow(QWidget* parent)
 
     settingsView_ = new ImageView(this);
 
-    statusLabel = new QLabel(this);
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Layouts
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +78,6 @@ SettingsWindow::SettingsWindow(QWidget* parent)
     QVBoxLayout* root_layout = new QVBoxLayout;
     root_layout->addLayout(content_layout);
     root_layout->addWidget(dial_buttons_);
-    root_layout->addWidget(statusLabel);
 
     setLayout(root_layout);
 
@@ -1084,28 +1081,6 @@ void SettingsWindow::showEvent(QShowEvent* event)
     QDialog::showEvent(event);
 
     emit updateOverlay(getUiShape());
-
-    if (!statusLabel)
-        return;
-
-    QSettings settings;
-    QString confPath = settings.fileName();
-
-    QFileInfo imgInfo(confPath);
-
-    QString text = QString("%1\n"
-                           " ├ image : %2\n"
-                           " └ config: %3")
-                       .arg(imgInfo.absolutePath(), "phi_init.png", imgInfo.fileName());
-
-    // statusLabel->setStyleSheet("font-family: monospace;");
-
-    statusLabel->setText(text);
-
-    // statusLabel->setText(confPath);
-    statusLabel->show();
-
-    QTimer::singleShot(7000, statusLabel, &QWidget::hide);
 }
 
 void SettingsWindow::closeEvent(QCloseEvent* event)

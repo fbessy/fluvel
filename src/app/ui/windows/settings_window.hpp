@@ -209,8 +209,6 @@ private:
 
     void setupConnections();
 
-    QLabel* statusLabel;
-
 private slots:
 
     // void do_scale0(int value);
