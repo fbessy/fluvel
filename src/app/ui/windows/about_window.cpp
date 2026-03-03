@@ -237,20 +237,58 @@ AboutWindow::AboutWindow(QWidget* parent)
     QVBoxLayout* tech_layout = new QVBoxLayout;
     tech_layout->addWidget(tech_label);
 
+    QLabel* support_label = new QLabel;
+
+    support_label->setText(
+        tr("<p><b>Support Ofeli</b></p>"
+
+           "<p>Ofeli is developed and maintained as an independent "
+           "research-oriented project.</p>"
+
+           "<p>If you find the software useful for research, teaching, "
+           "or experimentation, you may support its continued development "
+           "through a voluntary donation.</p>"
+
+           "<p>Your support helps sustain long-term maintenance, "
+           "improvements, and future extensions of the project.</p>"
+
+           "<p><i>No features are restricted. Donations are entirely optional.</i></p>"));
+
+    QPushButton* donate = new QPushButton(tr("Donate via PayPal"));
+    donate->setAutoDefault(false);
+    donate->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+
+    connect(donate, &QPushButton::clicked, this,
+            []()
+            {
+                QDesktopServices::openUrl(
+                    QUrl("https://www.paypal.me/fabienbessy", QUrl::TolerantMode));
+            });
+
+    QVBoxLayout* support_layout = new QVBoxLayout;
+    support_layout->addStretch();
+    support_layout->addWidget(support_label);
+    support_layout->addSpacing(16);
+    support_layout->addWidget(donate);
+    support_layout->addStretch();
+
     QWidget* page1 = new QWidget;
     QWidget* page2 = new QWidget;
     QWidget* page3 = new QWidget;
     QWidget* page4 = new QWidget;
+    QWidget* page5 = new QWidget;
     page1->setLayout(overview_layout);
     page2->setLayout(scientific_layout);
     page3->setLayout(author_layout);
     page4->setLayout(tech_layout);
+    page5->setLayout(support_layout);
 
     QTabWidget* tabs = new QTabWidget;
     tabs->addTab(page1, tr("Overview"));
     tabs->addTab(page2, tr("Scientific"));
     tabs->addTab(page3, tr("Author"));
     tabs->addTab(page4, tr("Technical"));
+    tabs->addTab(page5, tr("Support"));
 
     ///////////////////////////////////////
     ///////////////////////////////////////
