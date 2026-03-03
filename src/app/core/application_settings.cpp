@@ -13,7 +13,7 @@ namespace ofeli_app
 
 namespace
 {
-static constexpr const char* kPhiInitFilename = "phi_init.png";
+static constexpr const char* kPhiInitFilename = "initial_phi.png";
 
 QSettings userSettings()
 {
