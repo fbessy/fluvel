@@ -4,7 +4,18 @@
 #include "about_window.hpp"
 #include "application_settings.hpp"
 
-#include <QtWidgets>
+#include <QCoreApplication>
+#include <QDesktopServices>
+#include <QFileInfo>
+#include <QHBoxLayout>
+#include <QImageReader>
+#include <QImageWriter>
+#include <QLabel>
+#include <QPushButton>
+#include <QSettings>
+#include <QSysInfo>
+#include <QTabWidget>
+#include <QTextEdit>
 
 namespace ofeli_app
 {
@@ -213,17 +224,33 @@ AboutWindow::AboutWindow(QWidget* parent)
     QVBoxLayout* author_layout = new QVBoxLayout;
     author_layout->addWidget(author_label);
 
+    QLabel* tech_label = new QLabel;
+    tech_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    tech_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                        Qt::LinksAccessibleByKeyboard);
+
+    tech_label->setOpenExternalLinks(true);
+    tech_label->setWordWrap(true);
+
+    tech_label->setText(buildTechnicalSection());
+
+    QVBoxLayout* tech_layout = new QVBoxLayout;
+    tech_layout->addWidget(tech_label);
+
     QWidget* page1 = new QWidget;
     QWidget* page2 = new QWidget;
     QWidget* page3 = new QWidget;
+    QWidget* page4 = new QWidget;
     page1->setLayout(overview_layout);
     page2->setLayout(scientific_layout);
     page3->setLayout(author_layout);
+    page4->setLayout(tech_layout);
 
     QTabWidget* tabs = new QTabWidget;
     tabs->addTab(page1, tr("Overview"));
     tabs->addTab(page2, tr("Scientific"));
     tabs->addTab(page3, tr("Author"));
+    tabs->addTab(page4, tr("Technical"));
 
     ///////////////////////////////////////
     ///////////////////////////////////////
@@ -235,6 +262,119 @@ AboutWindow::AboutWindow(QWidget* parent)
     layout_this->setSizeConstraint(QLayout::SetMinimumSize);
 
     this->setLayout(layout_this);
+}
+
+QString buildTechnicalSection()
+{
+    QStringList readFormats;
+    for (const QByteArray& f : QImageReader::supportedImageFormats())
+        readFormats << QString::fromLatin1(f).toUpper();
+
+    QStringList writeFormats;
+    for (const QByteArray& f : QImageWriter::supportedImageFormats())
+        writeFormats << QString::fromLatin1(f).toUpper();
+
+    readFormats.sort();
+    writeFormats.sort();
+
+    QSettings s;
+    QFileInfo info(s.fileName());
+    QString configDir = info.dir().absolutePath();
+
+    QString html;
+
+    html += "<p style='font-size:14pt; font-weight:bold; margin:0;'>"
+            "Technical information"
+            "</p><br>";
+
+    html += "<b>Configuration directory</b><br>";
+    html += "<pre style='margin:0;'>" + configDir + "</pre><br>";
+
+    html += "<b>Image formats (Qt plugins)</b><br>";
+    html += "<span style='font-size:9pt;'>"
+            "Image format support is provided by Qt image format plugins.<br>"
+            "Available formats depend on the Qt installation and platform."
+            "</span><br><br>";
+
+    html += "<pre style='margin:0;'>";
+    html += "Read  : " + readFormats.join(", ") + "\n";
+    html += "Write : " + writeFormats.join(", ");
+    html += "</pre>";
+
+    html += "<br><b>Build information</b><br>";
+    html += "<pre style='margin:0;'>";
+
+    html += "Qt (build)   : " + QString(QT_VERSION_STR) + "\n";
+    html += "Qt (runtime) : " + QString(qVersion()) + "\n";
+    html += "Architecture : " + QSysInfo::currentCpuArchitecture() + "\n";
+    html += "OS           : " + QSysInfo::prettyProductName() + "\n";
+
+#ifdef NDEBUG
+    html += "Build type   : Release\n";
+#else
+    html += "Build type   : Debug\n";
+#endif
+
+    html += "</pre>";
+
+    html += "<br><b>Toolchain</b><br>";
+    html += "<pre style='margin:0;'>";
+
+#if defined(__clang__)
+    html += "Compiler : Clang ";
+    html += __clang_version__;
+    html += "\n";
+#elif defined(__GNUC__)
+    html += "Compiler : GCC ";
+    html += __VERSION__;
+    html += "\n";
+#elif defined(_MSC_VER)
+    html += "Compiler : MSVC ";
+    html += QString::number(_MSC_VER);
+    html += "\n";
+#else
+    html += "Compiler : Unknown\n";
+#endif
+
+    QString cppStandardPretty;
+
+#if __cplusplus >= 202302L
+    cppStandardPretty = "C++23";
+#elif __cplusplus >= 202002L
+    cppStandardPretty = "C++20";
+#elif __cplusplus >= 201703L
+    cppStandardPretty = "C++17";
+#elif __cplusplus >= 201402L
+    cppStandardPretty = "C++14";
+#elif __cplusplus >= 201103L
+    cppStandardPretty = "C++11";
+#else
+    cppStandardPretty = "Pre-C++11";
+#endif
+
+    html += "C++ standard : " + cppStandardPretty + "\n";
+
+#ifdef OFELI_CMAKE_VERSION
+    html += "CMake version : ";
+    html += OFELI_CMAKE_VERSION;
+    html += "\n";
+#endif
+
+#ifdef OFELI_CMAKE_GENERATOR
+    html += "CMake generator : ";
+    html += OFELI_CMAKE_GENERATOR;
+    html += "\n";
+#endif
+
+#ifdef OFELI_CMAKE_BUILD_TYPE
+    html += "CMake build type : ";
+    html += OFELI_CMAKE_BUILD_TYPE;
+    html += "\n";
+#endif
+
+    html += "</pre>";
+
+    return html;
 }
 
 void AboutWindow::open_webpage()

@@ -32,6 +32,8 @@ private slots:
     void open_webpage();
 };
 
+QString buildTechnicalSection();
+
 } // namespace ofeli_app
 
 //! \class ofeli::AboutWindow

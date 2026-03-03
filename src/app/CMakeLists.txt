@@ -349,6 +349,12 @@ target_link_libraries(${target_name} PRIVATE
     ofeli::image_processing
 )
 
+target_compile_definitions(Ofeli PRIVATE
+    OFELI_CMAKE_VERSION="${CMAKE_VERSION}"
+    OFELI_CMAKE_GENERATOR="${CMAKE_GENERATOR}"
+    OFELI_CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+)
+
 install(TARGETS ${target_name}
         RUNTIME DESTINATION bin)
 
