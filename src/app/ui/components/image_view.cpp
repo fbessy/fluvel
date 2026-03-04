@@ -603,22 +603,6 @@ bool ImageView::isPanRelevant() const
     return sceneRect.width() > viewRect.width() || sceneRect.height() > viewRect.height();
 }
 
-bool ImageView::isPanRelevantAt(const QPoint& viewPos) const
-{
-    if (!isPanRelevant())
-        return false;
-
-    const QList<QGraphicsItem*> itemsUnder = items(viewPos);
-
-    for (auto* item : itemsUnder)
-    {
-        if (item->flags() & QGraphicsItem::ItemIsMovable)
-            return false; // un item interactif bloque le pan
-    }
-
-    return true;
-}
-
 QGraphicsScene* ImageView::graphicsScene() const
 {
     return scene_;
