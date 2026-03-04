@@ -349,10 +349,21 @@ target_link_libraries(${target_name} PRIVATE
     ofeli::image_processing
 )
 
-target_compile_definitions(Ofeli PRIVATE
+execute_process(
+    COMMAND git rev-parse --short HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE OFELI_GIT_COMMIT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+string(TIMESTAMP OFELI_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+
+add_compile_definitions(
+    OFELI_VERSION="${PROJECT_VERSION}"
+    OFELI_GIT_COMMIT="${OFELI_GIT_COMMIT}"
+    OFELI_BUILD_TIMESTAMP="${OFELI_BUILD_TIMESTAMP}"
     OFELI_CMAKE_VERSION="${CMAKE_VERSION}"
-    OFELI_CMAKE_GENERATOR="${CMAKE_GENERATOR}"
-    OFELI_CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+    OFELI_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
 )
 
 install(TARGETS ${target_name}

@@ -5,6 +5,7 @@
 #include "application_settings.hpp"
 
 #include <QCoreApplication>
+#include <QCryptographicHash>
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QHBoxLayout>
@@ -19,6 +20,181 @@
 
 namespace ofeli_app
 {
+
+namespace
+{
+
+static QString packageType()
+{
+#ifdef OFELI_PACKAGE_TYPE
+    return QString(OFELI_PACKAGE_TYPE);
+#else
+    if (qEnvironmentVariableIsSet("FLATPAK_ID"))
+        return "Flatpak";
+    return "Native";
+#endif
+}
+
+static QString runtimeInfo()
+{
+    QString info;
+    info += QSysInfo::prettyProductName() + "\n";
+    info += "CPU: " + QSysInfo::currentCpuArchitecture();
+    return info;
+}
+
+static QString compilerInfo()
+{
+#if defined(__clang__)
+    return QString("Clang %1.%2.%3")
+        .arg(__clang_major__)
+        .arg(__clang_minor__)
+        .arg(__clang_patchlevel__);
+#elif defined(__GNUC__)
+    return QString("GCC %1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__);
+#elif defined(_MSC_VER)
+    return QString("MSVC %1").arg(_MSC_VER);
+#else
+    return "Unknown compiler";
+#endif
+}
+
+static QString buildFingerprint()
+{
+    QString data;
+
+    data += "Version:" OFELI_VERSION "\n";
+    data += "Git:" OFELI_GIT_COMMIT "\n";
+    data += "BuildType:" OFELI_BUILD_TYPE "\n";
+    data += "Qt:" + QString(qVersion()) + "\n";
+    data += "Compiler:" + QString(__VERSION__) + "\n";
+    data += "CMake:" OFELI_CMAKE_VERSION "\n";
+    data += "Package:" + packageType() + "\n";
+    data += "Runtime:" + runtimeInfo() + "\n";
+
+    QByteArray hash = QCryptographicHash::hash(data.toUtf8(), QCryptographicHash::Sha256);
+
+    return hash.toHex().left(16).toUpper();
+}
+
+QString buildTechnicalSection()
+{
+    QStringList readFormats;
+    for (const QByteArray& f : QImageReader::supportedImageFormats())
+        readFormats << QString::fromLatin1(f).toUpper();
+
+    QStringList writeFormats;
+    for (const QByteArray& f : QImageWriter::supportedImageFormats())
+        writeFormats << QString::fromLatin1(f).toUpper();
+
+    readFormats.sort();
+    writeFormats.sort();
+
+    QSettings s;
+    QFileInfo info(s.fileName());
+    QString configDir = info.dir().absolutePath();
+
+    QString html;
+
+    // =========================
+    // Title
+    // =========================
+
+    html += "<div style='font-size:14pt; font-weight:bold; margin-bottom:12px;'>"
+            "Technical information"
+            "</div>";
+
+    // =========================
+    // Application
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:8px;'>"
+            "Application"
+            "</div>";
+
+    html += "<div style='margin-left:12px;'>";
+
+    html += "<div style='margin-bottom:6px;'>"
+            "<b>Version:</b> " OFELI_VERSION "</div>";
+
+    html += "<div style='margin-bottom:4px;'><b>Configuration directory</b></div>";
+    html += "<div style='font-family:monospace; margin-bottom:8px;'>" + configDir + "</div>";
+
+    html += "<div style='margin-bottom:4px;'><b>Image formats</b></div>";
+
+    html += "<div style='margin-left:12px; font-size:9pt; color:#444; margin-bottom:6px;'>"
+            "Image format support is provided by Qt image format plugins.<br>"
+            "Available formats depend on the Qt installation and platform."
+            "</div>";
+
+    html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word;'>";
+    html += "<b>Read :</b> " + readFormats.join(", ") + "<br>";
+    html += "<b>Write:</b> " + writeFormats.join(", ");
+    html += "</div>";
+
+    html += "</div>"; // end Application block
+
+    // =========================
+    // Environment
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
+            "Environment"
+            "</div>";
+
+    html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>" +
+            runtimeInfo() +
+            "<br>"
+            "Qt (runtime): " +
+            QString(qVersion()) + "</div>";
+
+    // =========================
+    // Package
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
+            "Package"
+            "</div>";
+
+    html += "<div style='margin-left:12px; font-family:monospace;'>"
+            "Type: " +
+            packageType() + "</div>";
+
+    // =========================
+    // Build
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
+            "Build"
+            "</div>";
+
+    html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>"
+            "Git commit: " OFELI_GIT_COMMIT "<br>"
+            "Build type: " OFELI_BUILD_TYPE "<br>"
+            "Qt (build): " +
+            QString(QT_VERSION_STR) +
+            "<br>"
+            "Compiler: " +
+            compilerInfo() +
+            "<br>"
+            "CMake: " OFELI_CMAKE_VERSION +
+            "</div>";
+
+    // =========================
+    // Fingerprint
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
+            "Build fingerprint"
+            "</div>";
+
+    html +=
+        "<div style='margin-left:12px; font-family:monospace;'>" + buildFingerprint() + "</div>";
+
+    return html;
+}
+
+} // namespace
 
 AboutWindow::AboutWindow(QWidget* parent)
     : QDialog(parent)
@@ -224,20 +400,21 @@ AboutWindow::AboutWindow(QWidget* parent)
     QVBoxLayout* author_layout = new QVBoxLayout;
     author_layout->addWidget(author_label);
 
-    QLabel* tech_label = new QLabel;
-    tech_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    tech_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                        Qt::LinksAccessibleByKeyboard);
-
-    tech_label->setOpenExternalLinks(true);
-    tech_label->setWordWrap(true);
-
-    tech_label->setText(buildTechnicalSection());
+    QTextEdit* tech_text = new QTextEdit;
+    tech_text->setReadOnly(true);
+    tech_text->setWordWrapMode(QTextOption::WordWrap);
+    tech_text->setHtml(buildTechnicalSection());
 
     QVBoxLayout* tech_layout = new QVBoxLayout;
-    tech_layout->addWidget(tech_label);
+    tech_layout->addWidget(tech_text);
 
     QLabel* support_label = new QLabel;
+    support_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    support_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                           Qt::LinksAccessibleByKeyboard);
+
+    support_label->setOpenExternalLinks(true);
+    support_label->setWordWrap(true);
 
     support_label->setText(
         tr("<p><b>Support Ofeli</b></p>"
@@ -300,119 +477,6 @@ AboutWindow::AboutWindow(QWidget* parent)
     layout_this->setSizeConstraint(QLayout::SetMinimumSize);
 
     this->setLayout(layout_this);
-}
-
-QString buildTechnicalSection()
-{
-    QStringList readFormats;
-    for (const QByteArray& f : QImageReader::supportedImageFormats())
-        readFormats << QString::fromLatin1(f).toUpper();
-
-    QStringList writeFormats;
-    for (const QByteArray& f : QImageWriter::supportedImageFormats())
-        writeFormats << QString::fromLatin1(f).toUpper();
-
-    readFormats.sort();
-    writeFormats.sort();
-
-    QSettings s;
-    QFileInfo info(s.fileName());
-    QString configDir = info.dir().absolutePath();
-
-    QString html;
-
-    html += "<p style='font-size:14pt; font-weight:bold; margin:0;'>"
-            "Technical information"
-            "</p><br>";
-
-    html += "<b>Configuration directory</b><br>";
-    html += "<pre style='margin:0;'>" + configDir + "</pre><br>";
-
-    html += "<b>Image formats (Qt plugins)</b><br>";
-    html += "<span style='font-size:9pt;'>"
-            "Image format support is provided by Qt image format plugins.<br>"
-            "Available formats depend on the Qt installation and platform."
-            "</span><br><br>";
-
-    html += "<pre style='margin:0;'>";
-    html += "Read  : " + readFormats.join(", ") + "\n";
-    html += "Write : " + writeFormats.join(", ");
-    html += "</pre>";
-
-    html += "<br><b>Build information</b><br>";
-    html += "<pre style='margin:0;'>";
-
-    html += "Qt (build)   : " + QString(QT_VERSION_STR) + "\n";
-    html += "Qt (runtime) : " + QString(qVersion()) + "\n";
-    html += "Architecture : " + QSysInfo::currentCpuArchitecture() + "\n";
-    html += "OS           : " + QSysInfo::prettyProductName() + "\n";
-
-#ifdef NDEBUG
-    html += "Build type   : Release\n";
-#else
-    html += "Build type   : Debug\n";
-#endif
-
-    html += "</pre>";
-
-    html += "<br><b>Toolchain</b><br>";
-    html += "<pre style='margin:0;'>";
-
-#if defined(__clang__)
-    html += "Compiler : Clang ";
-    html += __clang_version__;
-    html += "\n";
-#elif defined(__GNUC__)
-    html += "Compiler : GCC ";
-    html += __VERSION__;
-    html += "\n";
-#elif defined(_MSC_VER)
-    html += "Compiler : MSVC ";
-    html += QString::number(_MSC_VER);
-    html += "\n";
-#else
-    html += "Compiler : Unknown\n";
-#endif
-
-    QString cppStandardPretty;
-
-#if __cplusplus >= 202302L
-    cppStandardPretty = "C++23";
-#elif __cplusplus >= 202002L
-    cppStandardPretty = "C++20";
-#elif __cplusplus >= 201703L
-    cppStandardPretty = "C++17";
-#elif __cplusplus >= 201402L
-    cppStandardPretty = "C++14";
-#elif __cplusplus >= 201103L
-    cppStandardPretty = "C++11";
-#else
-    cppStandardPretty = "Pre-C++11";
-#endif
-
-    html += "C++ standard : " + cppStandardPretty + "\n";
-
-#ifdef OFELI_CMAKE_VERSION
-    html += "CMake version : ";
-    html += OFELI_CMAKE_VERSION;
-    html += "\n";
-#endif
-
-#ifdef OFELI_CMAKE_GENERATOR
-    html += "CMake generator : ";
-    html += OFELI_CMAKE_GENERATOR;
-    html += "\n";
-#endif
-
-#ifdef OFELI_CMAKE_BUILD_TYPE
-    html += "CMake build type : ";
-    html += OFELI_CMAKE_BUILD_TYPE;
-    html += "\n";
-#endif
-
-    html += "</pre>";
-
-    return html;
 }
 
 void AboutWindow::open_webpage()
