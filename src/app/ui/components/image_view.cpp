@@ -44,6 +44,7 @@ ImageView::ImageView(const DisplayConfig& displayConfig, const DownscaleConfig& 
     scene_->addItem(overlay_);
     overlay_->setZValue(100.0);
     overlay_->hide();
+    overlay_->setCursor(Qt::ArrowCursor);
 }
 
 void ImageView::initialize()
@@ -56,6 +57,9 @@ void ImageView::initialize()
     setDragMode(QGraphicsView::NoDrag);
     setAcceptDrops(true);
     // viewport()->setAcceptDrops(true);
+
+    setMouseTracking(true);
+    viewport()->setMouseTracking(true);
 
     scene_ = new QGraphicsScene(this);
     setScene(scene_);
@@ -338,9 +342,7 @@ void ImageView::wheelEvent(QWheelEvent* event)
 
     autoFitEnabled_ = false;
 
-    if (m_interaction_)
-        viewport()->setCursor(
-            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
+    updateCursor(nullptr);
 
 #ifdef OFELI_DEBUG
     qDebug() << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
@@ -382,86 +384,35 @@ void ImageView::setInteraction(ImageViewInteraction* interaction)
 
 void ImageView::mousePressEvent(QMouseEvent* event)
 {
-    // 1️⃣ Cherche l’item le plus haut sous la souris (respecte le Z)
-    QGraphicsItem* itemUnderMouse = itemAt(event->pos());
+    QGraphicsItem* item = itemAt(event->pos());
+    bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
-    // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
-    if (itemUnderMouse && (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
-    {
-        QGraphicsView::mousePressEvent(event);
-        return;
-    }
+    if (!itemMovable && m_interaction_)
+        m_interaction_->mousePress(*this, event);
 
-    // 3️⃣ Sinon, on laisse l'interaction manager décider
-    bool handled = false;
-
-    if (m_interaction_)
-    {
-        handled = m_interaction_->mousePress(*this, event);
-
-        viewport()->setCursor(
-            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
-    }
-
-    // 4️⃣ Si personne n’a géré, on passe à Qt
-    if (!handled)
-        QGraphicsView::mousePressEvent(event);
+    QGraphicsView::mousePressEvent(event);
 }
 
 void ImageView::mouseMoveEvent(QMouseEvent* event)
 {
-    // 1️⃣ Cherche l’item le plus haut sous la souris (respecte le Z)
-    QGraphicsItem* itemUnderMouse = itemAt(event->pos());
+    QGraphicsItem* item = itemAt(event->pos());
+    bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
-    // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
-    if (itemUnderMouse && (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
-    {
-        QGraphicsView::mouseMoveEvent(event);
-        return;
-    }
+    if (!itemMovable && m_interaction_)
+        m_interaction_->mouseMove(*this, event);
 
-    // 3️⃣ Sinon, on laisse l'interaction manager décider
-    bool handled = false;
-
-    if (m_interaction_)
-    {
-        handled = m_interaction_->mouseMove(*this, event);
-
-        viewport()->setCursor(
-            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
-    }
-
-    // 4️⃣ Si personne n’a géré, on passe à Qt
-    if (!handled)
-        QGraphicsView::mouseMoveEvent(event);
+    QGraphicsView::mouseMoveEvent(event);
 }
 
 void ImageView::mouseReleaseEvent(QMouseEvent* event)
 {
-    // 1️⃣ Cherche l’item le plus haut sous la souris (respecte le Z)
-    QGraphicsItem* itemUnderMouse = itemAt(event->pos());
+    QGraphicsItem* item = itemAt(event->pos());
+    bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
-    // 2️⃣ Si on clique sur un item draggable, on laisse Qt gérer
-    if (itemUnderMouse && (itemUnderMouse->flags() & QGraphicsItem::ItemIsMovable))
-    {
-        QGraphicsView::mouseReleaseEvent(event);
-        return;
-    }
+    if (!itemMovable && m_interaction_)
+        m_interaction_->mouseRelease(*this, event);
 
-    // 3️⃣ Sinon, on laisse l'interaction manager décider
-    bool handled = false;
-
-    if (m_interaction_)
-    {
-        handled = m_interaction_->mouseRelease(*this, event);
-
-        viewport()->setCursor(
-            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), event));
-    }
-
-    // 4️⃣ Si personne n’a géré, on passe à Qt
-    if (!handled)
-        QGraphicsView::mouseReleaseEvent(event);
+    QGraphicsView::mouseReleaseEvent(event);
 }
 
 void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
@@ -471,6 +422,30 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
 
     if (!event->isAccepted())
         QGraphicsView::mouseDoubleClickEvent(event);
+}
+
+void ImageView::updateCursor(const QMouseEvent* e)
+{
+    if (!m_interaction_)
+        return;
+
+    viewport()->setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), e));
+}
+
+bool ImageView::viewportEvent(QEvent* event)
+{
+    if (!m_interaction_)
+        return QGraphicsView::viewportEvent(event);
+
+    if (event->type() == QEvent::MouseMove || event->type() == QEvent::HoverMove ||
+        event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease)
+    {
+        auto* me = dynamic_cast<QMouseEvent*>(event);
+
+        updateCursor(me);
+    }
+
+    return QGraphicsView::viewportEvent(event);
 }
 
 void ImageView::dragEnterEvent(QDragEnterEvent* event)
@@ -559,9 +534,14 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
 
 void ImageView::enterEvent(QEnterEvent*)
 {
-    if (m_interaction_)
-        viewport()->setCursor(
-            m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), nullptr));
+    if (!m_interaction_)
+        return;
+
+    QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
+
+    QMouseEvent fake(QEvent::MouseMove, pos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+
+    updateCursor(&fake);
 }
 
 QRgb ImageView::pixelColorAt(const QPoint& imagePos) const
@@ -621,6 +601,22 @@ bool ImageView::isPanRelevant() const
     const QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
 
     return sceneRect.width() > viewRect.width() || sceneRect.height() > viewRect.height();
+}
+
+bool ImageView::isPanRelevantAt(const QPoint& viewPos) const
+{
+    if (!isPanRelevant())
+        return false;
+
+    const QList<QGraphicsItem*> itemsUnder = items(viewPos);
+
+    for (auto* item : itemsUnder)
+    {
+        if (item->flags() & QGraphicsItem::ItemIsMovable)
+            return false; // un item interactif bloque le pan
+    }
+
+    return true;
 }
 
 QGraphicsScene* ImageView::graphicsScene() const

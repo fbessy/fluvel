@@ -97,6 +97,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseDoubleClickEvent(QMouseEvent* event) override;
+    bool viewportEvent(QEvent* event) override;
 
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dragMoveEvent(QDragMoveEvent* event) override;
@@ -119,6 +120,8 @@ private:
 
     QPoint textPosition() const;
     void setTextPosition(QPoint position);
+
+    void updateCursor(const QMouseEvent* e);
 
     void updateContourColors();
     void upscaleItems();

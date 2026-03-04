@@ -3,7 +3,10 @@
 
 #pragma once
 
+#include "image_view.hpp"
 #include "view_behavior.hpp"
+
+#include <QPoint>
 
 class QMouseEvent;
 
@@ -29,13 +32,23 @@ public:
         return Qt::ClosedHandCursor;
     }
 
-    Qt::CursorShape availableCursor(bool hasImage, bool isPanRelevant, const ImageView&,
-                                    const QMouseEvent*) const override
+    Qt::CursorShape availableCursor(bool hasImage, bool isPanRelevant, const ImageView& view,
+                                    const QMouseEvent* e) const
     {
-        if (hasImage && isPanRelevant)
-            return Qt::OpenHandCursor;
+        if (!hasImage || !isPanRelevant)
+            return Qt::ArrowCursor;
 
-        return Qt::ArrowCursor;
+        QPoint pos = e ? e->pos() : view.mapFromGlobal(QCursor::pos());
+
+        const auto items = view.items(pos);
+
+        for (auto* item : items)
+        {
+            if (item->flags() & QGraphicsItem::ItemIsMovable)
+                return Qt::ArrowCursor;
+        }
+
+        return Qt::OpenHandCursor;
     }
 
     int priority() const override
