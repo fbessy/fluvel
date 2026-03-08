@@ -454,14 +454,16 @@ void ApplicationSettings::load_disp(Session session, DisplayConfig& disp_config)
     disp_config.l_out_displayed =
         settings.value("display/contour_out/enabled", DisplayConfig::kDefaultListDisplayed)
             .toBool();
-    disp_config.l_out_color =
-        rgbFromString(settings.value("display/contour_out/rgb", "0,0,255").toString(),
-                      DisplayConfig::kDefaultOut);
+    disp_config.l_out_color = rgbFromString(
+        settings.value("display/contour_out/rgb", rgbToString(DisplayConfig::kDefaultOut))
+            .toString(),
+        DisplayConfig::kDefaultOut);
 
     disp_config.l_in_displayed =
         settings.value("display/contour_in/enabled", DisplayConfig::kDefaultListDisplayed).toBool();
     disp_config.l_in_color = rgbFromString(
-        settings.value("display/contour_in/rgb", "255,0,0").toString(), DisplayConfig::kDefaultIn);
+        settings.value("display/contour_in/rgb", rgbToString(DisplayConfig::kDefaultIn)).toString(),
+        DisplayConfig::kDefaultIn);
 
     disp_config.algorithm_overlay =
         settings.value("display/algorithm_overlay", DisplayConfig::kDefaultOverlay).toBool();

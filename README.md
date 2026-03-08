@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="Ofeli.svg" width="200">
+  <img src="fluvel.svg" width="200">
 </p>
 
 Active contour (level-set) image processing engine written in modern C++.
 
-Ofeli is a region-based active contour engine focused on clarity, performance,
+Fluvel is a region-based active contour engine focused on clarity, performance,
 and clean architecture. The core processing logic is independent from the UI,
 allowing reuse as a standalone library.
 
@@ -14,7 +14,7 @@ The project is currently under active development.
 
 ### Overview
 
-Ofeli implements region-based active contour algorithms operating on
+Fluvel implements region-based active contour algorithms operating on
 row-major image buffers. The goal is to provide:
 
 - A clear and maintainable implementation of active contour models

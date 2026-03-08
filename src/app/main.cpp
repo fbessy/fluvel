@@ -57,18 +57,19 @@ int main(int argc, char* argv[])
         app.installTranslator(&translator_qt);
     }
 
-    // Traductions Ofeli
+    // Traductions Fluvel
     if (translator_ofeli.load(QString(":/i18n/Ofeli_%1.qm").arg(locale)))
     {
         app.installTranslator(&translator_ofeli);
     }
 
     QIcon appIcon;
-    appIcon.addFile(":/icons/Ofeli_16.png", QSize(16, 16));
-    appIcon.addFile(":/icons/Ofeli_32.png", QSize(32, 32));
-    appIcon.addFile(":/icons/Ofeli_48.png", QSize(48, 48));
-    appIcon.addFile(":/icons/Ofeli_128.png", QSize(128, 128));
-    appIcon.addFile(":/icons/Ofeli_256.png", QSize(256, 256));
+    appIcon.addFile(":/icons/fluvel_16.png", QSize(16, 16));
+    appIcon.addFile(":/icons/fluvel_22.png", QSize(22, 22));
+    appIcon.addFile(":/icons/fluvel_32.png", QSize(32, 32));
+    appIcon.addFile(":/icons/fluvel_48.png", QSize(48, 48));
+    appIcon.addFile(":/icons/fluvel_128.png", QSize(128, 128));
+    appIcon.addFile(":/icons/fluvel_256.png", QSize(256, 256));
 
     QApplication::setWindowIcon(appIcon);
 

@@ -100,8 +100,8 @@ struct DisplayConfig
     static constexpr ImageBase kDefaultImageBase = ImageBase::Preprocessed;
 
     static constexpr bool kDefaultListDisplayed = true;
-    static constexpr ofeli_ip::Rgb_uc kDefaultOut{0u, 0u, 255u};
-    static constexpr ofeli_ip::Rgb_uc kDefaultIn{255u, 0u, 0u};
+    static constexpr ofeli_ip::Rgb_uc kDefaultOut{64u, 0u, 255u};
+    static constexpr ofeli_ip::Rgb_uc kDefaultIn{0u, 230u, 118u};
 
     static constexpr bool kDefaultOptions = false;
     static constexpr bool kDefaultOverlay = true;

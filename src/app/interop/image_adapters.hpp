@@ -7,19 +7,19 @@
 
 #include <utility>
 
-#ifdef OFELI_USE_QT
+#ifdef FLUVEL_USE_QT
 #include <QImage>
 #endif
 
-#ifdef OFELI_USE_OPENCV
+#ifdef FLUVEL_USE_OPENCV
 #include <opencv2/core.hpp>
 #endif
 
-#ifdef OFELI_USE_QT
+#ifdef FLUVEL_USE_QT
 ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img);
 #endif
 
-#ifdef OFELI_USE_OPENCV
+#ifdef FLUVEL_USE_OPENCV
 ofeli_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat);
 #endif
 
@@ -28,7 +28,7 @@ ofeli_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int width, i
                                          int channels);
 #endif
 
-#ifdef OFELI_USE_QT
+#ifdef FLUVEL_USE_QT
 inline ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img)
 {
     assert(!img.isNull());
@@ -58,7 +58,7 @@ inline ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img)
 }
 #endif
 
-#ifdef OFELI_USE_OPENCV
+#ifdef FLUVEL_USE_OPENCV
 inline ofeli_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
 {
     assert(!mat.empty());

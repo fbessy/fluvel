@@ -35,6 +35,6 @@ private slots:
 } // namespace ofeli_app
 
 //! \class ofeli::AboutWindow
-//! The class AboutWindow is a QDialog window that informs the user about Ofeli application. An
+//! The class AboutWindow is a QDialog window that informs the user about Fluvel application. An
 //! instance of this class is created by #ofeli::ImageWindow and displayed when the user clicks on
 //! menu About.

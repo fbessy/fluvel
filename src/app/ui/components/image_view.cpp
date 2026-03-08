@@ -342,7 +342,7 @@ void ImageView::wheelEvent(QWheelEvent* event)
 
     autoFitEnabled_ = false;
 
-#ifdef OFELI_DEBUG
+#ifdef FLUVEL_DEBUG
     qDebug() << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
              << "zoom =" << currentZoom << " new zoom =" << newZoom << "delta =" << delta.x()
              << delta.y();

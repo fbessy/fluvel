@@ -183,7 +183,7 @@ void AnalysisWidget::open_img()
         if (img_.isNull())
         {
             QMessageBox::information(
-                this, tr("Opening error - Ofeli"),
+                this, tr("Opening error - Fluvel"),
                 tr("Cannot load %1.").arg(QDir::toNativeSeparators(absolute_name_)));
             return;
         }

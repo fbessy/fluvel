@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <key>CFBundleName</key>
-    <string>Ofeli</string>
-    <key>CFBundleDisplayName</key>
-    <string>Ofeli</string>
-    <key>CFBundleVersion</key>
-    <string>2.0</string>
-    <key>CFBundleShortVersionString</key>
-    <string>2.0</string>
-    <NSCameraUsageDescription>This app requires access to the camera for video tracking.</NSCameraUsageDescription>
-</dict>
+    <dict>
+        <key>CFBundleName</key>
+        <string>Fluvel</string>
+
+        <key>CFBundleDisplayName</key>
+        <string>Fluvel</string>
+
+        <key>CFBundleVersion</key>
+        <string>1.0</string>
+
+        <key>CFBundleShortVersionString</key>
+        <string>1.0</string>
+
+        <key>NSCameraUsageDescription</key>
+        <string>Fluvel requires access to the camera for real-time image segmentation.</string>
+    </dict>
 </plist>

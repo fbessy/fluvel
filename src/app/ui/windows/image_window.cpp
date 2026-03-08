@@ -39,7 +39,7 @@ ImageWindow::ImageWindow(QWidget* parent)
 void ImageWindow::setupUi()
 {
     updateWindowTitle();
-    setWindowIcon(QIcon(":/icons/app/Ofeli.svg"));
+    setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
 
     QSettings settings;
 
@@ -580,7 +580,7 @@ void ImageWindow::onFileOpened(const QString& path)
 
 void ImageWindow::updateWindowTitle()
 {
-    QString title = "Ofeli";
+    QString title = "Fluvel";
 
     if (!m_fileName_.isEmpty() && m_imageSize_.isValid() && m_channels_ > 0)
     {

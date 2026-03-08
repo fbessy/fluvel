@@ -32,8 +32,8 @@ CameraWindow::CameraWindow(QWidget* parent)
     : QMainWindow(parent)
 
 {
-    setWindowIcon(QIcon(":/icons/app/Ofeli.svg"));
-    setWindowTitle(tr("Ofeli - Camera"));
+    setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
+    setWindowTitle(tr("Fluvel - Camera"));
 
     QSettings settings;
 
@@ -259,7 +259,7 @@ void CameraWindow::stopCameraAndUi()
         toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
         toggleStreamingButton_->setIcon(startIcon_);
 
-        setWindowTitle(tr("Ofeli - Camera"));
+        setWindowTitle(tr("Fluvel - Camera"));
     }
 }
 

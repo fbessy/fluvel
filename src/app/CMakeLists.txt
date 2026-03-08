@@ -1,4 +1,4 @@
-set(target_name Ofeli)
+set(target_name fluvel)
 
 set(APP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -146,7 +146,7 @@ qt_add_executable(${target_name}
 
 if(ANDROID)
     # qt_add_qml_module(${target_name}
-    #     URI ofeli
+    #     URI fluvel
     #     VERSION 1.0
     #     QML_FILES
     #         qml/Main.qml
@@ -160,10 +160,10 @@ if(ANDROID)
 endif()
 
 if(APPLE)
-    set(MACOSX_BUNDLE_ICON_FILE Ofeli.icns)
+    set(MACOSX_BUNDLE_ICON_FILE Fluvel.icns)
 
     set(app_icon_macos
-        ${OFELI_RESOURCES_DIR}/icons/app/Ofeli.icns
+        ${FLUVEL_RESOURCES_DIR}/resources/platforms/macos/Fluvel.icns
     )
 
     set_source_files_properties(${app_icon_macos} PROPERTIES
@@ -178,7 +178,7 @@ if(APPLE)
 
 elseif(WIN32)
     set(app_icon_resource_windows
-        ${OFELI_RESOURCES_DIR}/icons/app/Ofeli.rc
+        ${FLUVEL_RESOURCES_DIR}/resources/platforms/windows/fluvel.rc
     )
 
     target_sources(${target_name} PRIVATE
@@ -192,7 +192,7 @@ endif()
 
 # --- TS ---
 file(GLOB TS_FILES
-    "${OFELI_TRANSLATIONS_DIR}/*.ts"
+    "${FLUVEL_TRANSLATIONS_DIR}/*.ts"
 )
 
 # --- TS -> QM ---
@@ -207,49 +207,47 @@ foreach(qm ${QM_FILES})
 endforeach()
 
 # --- Resources ---
-qt_add_resources(${target_name} ofeli_translations
+qt_add_resources(${target_name} fluvel_translations
     PREFIX "/i18n"
     FILES ${QM_FILES}
 )
 
 set(APP_RESOURCES
-    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli.svg
-    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli.png
-    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_16.png
-    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_32.png
-    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_48.png
-    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_128.png
-    ${OFELI_RESOURCES_DIR}/icons/app/Ofeli_256.png
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-16.png
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-22.png
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-32.png
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-48.png
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-128.png
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-256.png
 
 
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/application-exit-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/right_panel_off.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/right_panel_on.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/camera-web-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/configure-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-open-recent-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-open-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/document-save-as-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/edit-clear-history.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/go-next-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/help-about-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/measure-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playback-pause-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playback-start-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playback-stop-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-playlist-repeat-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/media-seek-forward-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/preferences-desktop-locale-symbolic.svg
-    ${OFELI_RESOURCES_DIR}/icons/toolbar/view-preview-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/application-exit-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/right_panel_off.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/right_panel_on.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/camera-web-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/configure-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-open-recent-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-open-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-save-as-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/edit-clear-history.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/go-next-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/help-about-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/measure-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playback-pause-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playback-start-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playback-stop-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playlist-repeat-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-seek-forward-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/preferences-desktop-locale-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/view-preview-symbolic.svg
 
-    ${OFELI_RESOURCES_DIR}/docs/application_to_plant_recognition.pdf
-
-    ${OFELI_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-en.txt
-    ${OFELI_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-fr.txt
+    ${FLUVEL_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-en.txt
+    ${FLUVEL_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-fr.txt
 )
 
 foreach(res ${APP_RESOURCES})
-    file(RELATIVE_PATH rel_path ${OFELI_RESOURCES_DIR} ${res})
+    file(RELATIVE_PATH rel_path ${FLUVEL_RESOURCES_DIR} ${res})
     set_source_files_properties(
         ${res}
         PROPERTIES QT_RESOURCE_ALIAS ${rel_path}
@@ -263,7 +261,7 @@ qt_add_resources(${target_name} app_resources
 
 if(APPLE AND NOT IOS)
     set_target_properties(${target_name} PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST "${OFELI_RESOURCES_DIR}/platforms/macos/Info.plist.in"
+        MACOSX_BUNDLE_INFO_PLIST "${FLUVEL_RESOURCES_DIR}/platforms/macos/Info.plist.in"
     )
 endif()
 
@@ -275,19 +273,19 @@ target_include_directories(${target_name} PRIVATE
 )
 
 if(OpenCV_FOUND)
-    target_compile_definitions(${target_name} PRIVATE OFELI_USE_OPENCV)
+    target_compile_definitions(${target_name} PRIVATE FLUVEL_USE_OPENCV)
 endif()
 
 if(Qt6_FOUND)
-    target_compile_definitions(${target_name} PRIVATE OFELI_USE_QT)
+    target_compile_definitions(${target_name} PRIVATE FLUVEL_USE_QT)
 endif()
 
 
 if(ENABLE_ASAN)
-    target_compile_definitions(${target_name} PRIVATE OFELI_ASAN)
+    target_compile_definitions(${target_name} PRIVATE FLUVEL_ASAN)
 else()
     target_compile_definitions(${target_name} PRIVATE
-        $<$<CONFIG:Debug>:OFELI_DEBUG>
+        $<$<CONFIG:Debug>:FLUVEL_DEBUG>
     )
 endif()
 
@@ -352,28 +350,28 @@ target_link_libraries(${target_name} PRIVATE
 execute_process(
     COMMAND git rev-parse --short HEAD
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE OFELI_GIT_COMMIT
+    OUTPUT_VARIABLE FLUVEL_GIT_COMMIT
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-string(TIMESTAMP OFELI_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
 
 add_compile_definitions(
     OFELI_VERSION="${PROJECT_VERSION}"
-    OFELI_GIT_COMMIT="${OFELI_GIT_COMMIT}"
-    OFELI_BUILD_TIMESTAMP="${OFELI_BUILD_TIMESTAMP}"
-    OFELI_CMAKE_VERSION="${CMAKE_VERSION}"
-    OFELI_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+    FLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}"
+    FLUVEL_BUILD_TIMESTAMP="${FLUVEL_BUILD_TIMESTAMP}"
+    FLUVEL_CMAKE_VERSION="${CMAKE_VERSION}"
+    FLUVEL_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
 )
 
 install(TARGETS ${target_name}
         RUNTIME DESTINATION bin)
 
 if(UNIX AND NOT APPLE)
-install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.ofeli.App.desktop
+install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.desktop
         DESTINATION share/applications)
 
-install(FILES ${CMAKE_SOURCE_DIR}/resources/icons/app/org.ofeli.App.svg
+install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.svg
         DESTINATION share/icons/hicolor/scalable/apps)
 endif()
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Ofeli VERSION 2.0.0 LANGUAGES CXX)
+project(Fluvel VERSION 1.0.0 LANGUAGES CXX)
 
 option(ENABLE_ASAN "Enable Sanitizers" OFF)
 
@@ -26,16 +26,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-set(OFELI_ROOT_DIR
+set(FLUVEL_ROOT_DIR
     ${PROJECT_SOURCE_DIR}
 )
 
-set(OFELI_RESOURCES_DIR
-    ${OFELI_ROOT_DIR}/resources
+set(FLUVEL_RESOURCES_DIR
+    ${FLUVEL_ROOT_DIR}/resources
 )
 
-set(OFELI_TRANSLATIONS_DIR
-    ${OFELI_ROOT_DIR}/translations
+set(FLUVEL_TRANSLATIONS_DIR
+    ${FLUVEL_ROOT_DIR}/translations
 )
 
 set(QT_COMPONENTS

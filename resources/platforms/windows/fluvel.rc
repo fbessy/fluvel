@@ -1,4 +1,4 @@
-IDI_ICON1 ICON "Ofeli.ico"
+IDI_ICON1 ICON "fluvel.ico"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 1,0,0,0
@@ -17,9 +17,9 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "FileDescription", "Ofeli Application\0"
+            VALUE "FileDescription", "Fluvel Application\0"
             VALUE "FileVersion", "1.0.0.0\0"
-            VALUE "ProductName", "Ofeli\0"
+            VALUE "ProductName", "Fluvel\0"
             VALUE "ProductVersion", "1.0.0.0\0"
         END
     END

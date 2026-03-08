@@ -64,11 +64,11 @@ static QString buildFingerprint()
     QString data;
 
     data += "Version:" OFELI_VERSION "\n";
-    data += "Git:" OFELI_GIT_COMMIT "\n";
-    data += "BuildType:" OFELI_BUILD_TYPE "\n";
+    data += "Git:" FLUVEL_GIT_COMMIT "\n";
+    data += "BuildType:" FLUVEL_BUILD_TYPE "\n";
     data += "Qt:" + QString(qVersion()) + "\n";
     data += "Compiler:" + QString(__VERSION__) + "\n";
-    data += "CMake:" OFELI_CMAKE_VERSION "\n";
+    data += "CMake:" FLUVEL_CMAKE_VERSION "\n";
     data += "Package:" + packageType() + "\n";
     data += "Runtime:" + runtimeInfo() + "\n";
 
@@ -169,15 +169,15 @@ QString buildTechnicalSection()
             "</div>";
 
     html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>"
-            "Git commit: " OFELI_GIT_COMMIT "<br>"
-            "Build type: " OFELI_BUILD_TYPE "<br>"
+            "Git commit: " FLUVEL_GIT_COMMIT "<br>"
+            "Build type: " FLUVEL_BUILD_TYPE "<br>"
             "Qt (build): " +
             QString(QT_VERSION_STR) +
             "<br>"
             "Compiler: " +
             compilerInfo() +
             "<br>"
-            "CMake: " OFELI_CMAKE_VERSION +
+            "CMake: " FLUVEL_CMAKE_VERSION +
             "</div>";
 
     // =========================
@@ -201,7 +201,7 @@ AboutWindow::AboutWindow(QWidget* parent)
 {
     QSettings settings;
 
-    setWindowTitle(tr("About Ofeli"));
+    setWindowTitle(tr("About Fluvel"));
 
     if (settings.contains("ui_geometry/about_window"))
     {
@@ -217,12 +217,12 @@ AboutWindow::AboutWindow(QWidget* parent)
     ///////////////////////////////////////
 
     QLabel* icon_label = new QLabel;
-    QIcon ofeli_icon(":/icons/app/Ofeli.svg");
+    QIcon ofeli_icon(":/icons/app/fluvel.svg");
     icon_label->setPixmap(ofeli_icon.pixmap(48 * 3, 48 * 3));
     icon_label->setAlignment(Qt::AlignCenter);
 
     QLabel* name_label = new QLabel;
-    name_label->setText("<b>Ofeli</b>");
+    name_label->setText("<b>Fluvel</b>");
     QFont font1;
     font1.setPointSize(22);
     font1.setBold(true);
@@ -328,7 +328,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     overview_label->setWordWrap(true);
 
     overview_label->setText(
-        tr("<p><b>Ofeli</b> is a research-oriented image segmentation application "
+        tr("<p><b>Fluvel</b> is a research-oriented image segmentation application "
            "designed for fast and efficient experimentation with level-set active contour "
            "methods.</p>"
 
@@ -340,7 +340,7 @@ AboutWindow::AboutWindow(QWidget* parent)
            "discrete level-set implementations in both static images and dynamic video "
            "scenarios.</p>"
 
-           "<p>Ofeli focuses on performance, reproducibility, and clarity, "
+           "<p>Fluvel focuses on performance, reproducibility, and clarity, "
            "making it suitable for research, teaching, and experimental validation.</p>"));
 
     QVBoxLayout* overview_layout = new QVBoxLayout;
@@ -357,7 +357,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     scientific_label->setText(
         tr("<p><b>Scientific Background</b></p>"
 
-           "<p>Ofeli integrates several fundamental methods in image segmentation, "
+           "<p>Fluvel integrates several fundamental methods in image segmentation, "
            "including discrete level-set approximation (Shi & Karl, 2008), "
            "region-based active contours (Chan & Vese, 2001), "
            "anisotropic diffusion filtering (Perona & Malik, 1990), "
@@ -412,9 +412,9 @@ AboutWindow::AboutWindow(QWidget* parent)
     support_label->setWordWrap(true);
 
     support_label->setText(
-        tr("<p><b>Support Ofeli</b></p>"
+        tr("<p><b>Support Fluvel</b></p>"
 
-           "<p>Ofeli is developed and maintained as an independent "
+           "<p>Fluvel is developed and maintained as an independent "
            "research-oriented project.</p>"
 
            "<p>If you find the software useful for research, teaching, "

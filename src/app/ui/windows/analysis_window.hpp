@@ -60,5 +60,5 @@ private slots:
 } // namespace ofeli_app
 
 //! \class ofeli::AnalysisWindow
-//! The class AnalysisWindow is a QDialog window that informs the user about Ofeli . An instance of
+//! The class AnalysisWindow is a QDialog window that informs the user about Fluvel . An instance of
 //! this class is created by #ofeli::ImageWindow and displayed when the user clicks on menu About.

@@ -2,6 +2,6 @@
 set -euo pipefail
 
 BUILD_DIR="build"
-MANIFEST="ofeli.json"
+MANIFEST="fluvel.json"
 
 flatpak-builder --install --user --force-clean "$BUILD_DIR" "$MANIFEST"
