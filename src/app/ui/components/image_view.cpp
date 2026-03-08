@@ -356,7 +356,12 @@ void ImageView::wheelEvent(QWheelEvent* event)
     {
         QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
 
-        QMouseEvent fake(QEvent::MouseMove, pos, Qt::NoButton, Qt::RightButton, Qt::NoModifier);
+        QPointF localPos = pos;
+        QPointF scenePos = mapToScene(pos);
+        QPointF globalPos = QCursor::pos();
+
+        QMouseEvent fake(QEvent::MouseMove, localPos, scenePos, globalPos, Qt::NoButton,
+                         Qt::RightButton, Qt::NoModifier);
 
         m_interaction_->mouseMove(*this, &fake);
     }
@@ -597,7 +602,12 @@ void ImageView::enterEvent(QEnterEvent*)
 
     QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
 
-    QMouseEvent fake(QEvent::MouseMove, pos, Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+    QPointF localPos = pos;
+    QPointF scenePos = mapToScene(pos);
+    QPointF globalPos = QCursor::pos();
+
+    QMouseEvent fake(QEvent::MouseMove, localPos, scenePos, globalPos, Qt::NoButton, Qt::NoButton,
+                     Qt::NoModifier);
 
     updateCursor(&fake);
 }
