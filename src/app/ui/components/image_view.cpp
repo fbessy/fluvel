@@ -351,6 +351,15 @@ void ImageView::wheelEvent(QWheelEvent* event)
     setTextPosition(overlayPosition);
 
     updateCursor(nullptr);
+
+    if (m_interaction_)
+    {
+        QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
+
+        QMouseEvent fake(QEvent::MouseMove, pos, Qt::NoButton, Qt::RightButton, Qt::NoModifier);
+
+        m_interaction_->mouseMove(*this, &fake);
+    }
 }
 
 void ImageView::resizeEvent(QResizeEvent* event)

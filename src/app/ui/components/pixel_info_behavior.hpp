@@ -30,6 +30,11 @@ public:
     PixelInfoBehavior() = default;
     ~PixelInfoBehavior() override = default;
 
+    bool isActive() const
+    {
+        return active_;
+    }
+
     Qt::CursorShape activeCursor() const override
     {
         return Qt::CrossCursor;
