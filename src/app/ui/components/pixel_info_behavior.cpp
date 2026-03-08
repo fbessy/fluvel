@@ -17,19 +17,17 @@ namespace ofeli_app
 
 bool PixelInfoBehavior::mousePress(ImageView& view, QMouseEvent* event)
 {
-    if (!view.hasImage())
-        return false;
-
     if (event->button() != Qt::RightButton)
         return false;
 
-    const auto items = view.items(event->pos());
+    if (!view.hasImage())
+        return false;
 
-    for (auto* item : items)
-    {
-        if (item->flags() & QGraphicsItem::ItemIsMovable)
-            return false; // ne pas activer le pixel info sur overlay
-    }
+    const QPoint pixel = view.imageCoordinatesFromView(event->pos());
+
+    // 👇 clic hors image → on refuse d'activer
+    if (pixel.x() < 0)
+        return false;
 
     active_ = true;
 
@@ -61,21 +59,6 @@ bool PixelInfoBehavior::mouseMove(ImageView& view, QMouseEvent* event)
         return false;
     }
 
-    // 👇 NOUVEAU : détecter si on est sur un item movable
-    const auto items = view.items(event->pos());
-
-    for (auto* item : items)
-    {
-        if (item->flags() & QGraphicsItem::ItemIsMovable)
-        {
-            if (overlay_)
-                overlay_->hideOverlay();
-
-            return true; // on reste actif mais on n'affiche pas
-        }
-    }
-
-    // sinon comportement normal
     updateOverlay(view, event->pos());
     return true;
 }
@@ -102,31 +85,27 @@ void PixelInfoBehavior::updateOverlay(ImageView& view, const QPoint& viewPos)
     if (!overlay_)
         return;
 
-    // Si on est sur un item interactif (ex: texte overlay)
-    const auto items = view.items(viewPos);
-
-    for (auto* item : items)
-    {
-        if (item->flags() & QGraphicsItem::ItemIsMovable)
-        {
-            overlay_->hideOverlay();
-            active_ = false;
-            return;
-        }
-    }
-
     const QPoint pixel = view.imageCoordinatesFromView(viewPos);
 
-    if (pixel.x() < 0)
+    if (!view.isPixelVisible(viewPos))
+    {
+        overlay_->hideOverlay();
+        return;
+    }
+
+    QPointF scenePos = view.mapToScene(viewPos);
+
+    QRectF visibleSceneRect = view.mapToScene(view.viewport()->rect()).boundingRect();
+
+    if (!visibleSceneRect.contains(scenePos))
     {
         overlay_->hideOverlay();
         return;
     }
 
     const QRgb color = view.pixelColorAt(pixel);
-    const QPointF anchorScenePos = view.mapToScene(viewPos);
 
-    overlay_->updateInfo(pixel, color, view.isGrayscale(), anchorScenePos, view);
+    overlay_->updateInfo(pixel, color, view.isGrayscale(), scenePos, view);
 }
 
 void PixelInfoBehavior::cancel()

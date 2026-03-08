@@ -71,6 +71,8 @@ public:
     void notifyImageDropped(const QString& path);
     void setDragHighlight(bool enabled);
 
+    bool isPixelVisible(const QPoint& viewPos) const;
+
 public slots:
     void setImage(const QImage& img);
 

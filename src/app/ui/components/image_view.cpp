@@ -451,6 +451,7 @@ void ImageView::updateCursor(const QMouseEvent* e)
 
     const auto items = this->items(pos);
 
+    // 1️⃣ priorité aux items UI déplaçables
     for (auto* item : items)
     {
         if (item->flags() & QGraphicsItem::ItemIsMovable)
@@ -460,6 +461,13 @@ void ImageView::updateCursor(const QMouseEvent* e)
         }
     }
 
+    if (!isPixelVisible(pos))
+    {
+        viewport()->setCursor(Qt::ArrowCursor);
+        return;
+    }
+
+    // 3️⃣ sinon les interactions décident
     viewport()->setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), e));
 }
 
@@ -849,6 +857,19 @@ bool ImageView::supportsDragDrop() const
     auto set = dynamic_cast<const InteractionSet*>(m_interaction_);
 
     return set && set->hasBehavior<DragDropBehavior>();
+}
+
+bool ImageView::isPixelVisible(const QPoint& viewPos) const
+{
+    QPoint pixel = imageCoordinatesFromView(viewPos);
+    if (pixel.x() < 0)
+        return false;
+
+    QPointF scenePos = mapToScene(viewPos);
+
+    QRectF visibleSceneRect = mapToScene(viewport()->rect()).boundingRect();
+
+    return visibleSceneRect.contains(scenePos);
 }
 
 } // namespace ofeli_app
