@@ -276,10 +276,9 @@ AboutWindow::AboutWindow(QWidget* parent)
 
     QFile file(txt_file);
     QTextEdit* license_textedit = new QTextEdit;
+
     if (file.open(QIODevice::ReadOnly))
-    {
         license_textedit->setText(QString::fromUtf8(file.readAll()));
-    }
 
     license_textedit->setReadOnly(true);
 
