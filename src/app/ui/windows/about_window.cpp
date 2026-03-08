@@ -278,11 +278,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     QTextEdit* license_textedit = new QTextEdit;
     if (file.open(QIODevice::ReadOnly))
     {
-        QTextStream ts(&file);
-        // ts.setCodec("ISO 8859-1");
-        //  Qt6
-        ts.setEncoding(QStringConverter::Latin1);
-        license_textedit->setText(ts.readAll());
+        license_textedit->setText(QString::fromUtf8(file.readAll()));
     }
 
     license_textedit->setReadOnly(true);
