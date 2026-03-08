@@ -27,6 +27,11 @@ public:
         return capturing_;
     }
 
+    void cancel() override
+    {
+        capturing_ = false;
+    }
+
     Qt::CursorShape activeCursor() const override
     {
         return Qt::ClosedHandCursor;
