@@ -342,8 +342,6 @@ void ImageView::wheelEvent(QWheelEvent* event)
 
     autoFitEnabled_ = false;
 
-    updateCursor(nullptr);
-
 #ifdef OFELI_DEBUG
     qDebug() << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
              << "zoom =" << currentZoom << " new zoom =" << newZoom << "delta =" << delta.x()
@@ -351,6 +349,8 @@ void ImageView::wheelEvent(QWheelEvent* event)
 #endif
 
     setTextPosition(overlayPosition);
+
+    updateCursor(nullptr);
 }
 
 void ImageView::resizeEvent(QResizeEvent* event)
