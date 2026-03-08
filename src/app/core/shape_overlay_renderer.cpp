@@ -5,7 +5,7 @@
 
 #include <QPainter>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ShapeOverlayRenderer::ShapeOverlayRenderer(QWidget* parent)
@@ -47,4 +47,4 @@ void ShapeOverlayRenderer::paintEvent(QPaintEvent*)
         p.drawEllipse(shape_.boundingBox);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

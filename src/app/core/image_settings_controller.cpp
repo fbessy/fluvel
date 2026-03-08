@@ -5,7 +5,7 @@
 
 #include "application_settings.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ImageSettingsController::ImageSettingsController(QObject* parent)
@@ -131,4 +131,4 @@ void ImageSettingsController::setInitialPhi(const QImage& phi)
     AppSettings::instance().imgConfig.compute.initialPhi = phi;
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

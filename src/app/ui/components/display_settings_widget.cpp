@@ -16,7 +16,7 @@
 
 #include <cassert>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
@@ -276,4 +276,4 @@ void DisplaySettingsWidget::animate(bool open)
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

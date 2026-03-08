@@ -8,7 +8,7 @@
 
 #include <QObject>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 struct UiShapeInfo
@@ -36,7 +36,7 @@ public:
     void reject();
 
 public slots:
-    void onUpdateOverlay(ofeli_app::UiShapeInfo uiShape);
+    void onUpdateOverlay(fluvel_app::UiShapeInfo uiShape);
     void onViewChanged(const QImage& imageSettings);
 
 signals:
@@ -51,4 +51,4 @@ private:
     std::unique_ptr<PhiViewModel> phiViewModel_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

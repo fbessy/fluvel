@@ -5,7 +5,7 @@
 
 #include <QElapsedTimer>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class FrameClock
@@ -18,4 +18,4 @@ private:
     static QElapsedTimer timer;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

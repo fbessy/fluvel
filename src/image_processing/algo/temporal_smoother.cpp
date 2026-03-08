@@ -7,7 +7,7 @@
 #include <chrono>
 #include <cmath>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 using clock_type = std::chrono::steady_clock;
@@ -233,4 +233,4 @@ ImageSpan TemporalSmoother::outputSpan()
             output_.height(), ImageFormat::Rgb24};
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

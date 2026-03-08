@@ -8,7 +8,7 @@
 #include <QSettings>
 #include <QStandardPaths>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 namespace
@@ -38,24 +38,24 @@ QSettings camSessionSettings()
     return QSettings(dir + "/camera_session.ini", QSettings::IniFormat);
 }
 
-QSettings sessionSettings(ofeli_app::Session session)
+QSettings sessionSettings(fluvel_app::Session session)
 {
     switch (session)
     {
-        case ofeli_app::Session::Image:
+        case fluvel_app::Session::Image:
             return imgSessionSettings();
-        case ofeli_app::Session::Camera:
+        case fluvel_app::Session::Camera:
             return camSessionSettings();
     }
     Q_UNREACHABLE();
 }
 
-QString rgbToString(const ofeli_ip::Rgb_uc& c)
+QString rgbToString(const fluvel_ip::Rgb_uc& c)
 {
     return QString("%1,%2,%3").arg(c.red).arg(c.green).arg(c.blue);
 }
 
-ofeli_ip::Rgb_uc rgbFromString(const QString& s, const ofeli_ip::Rgb_uc& defaultColor)
+fluvel_ip::Rgb_uc rgbFromString(const QString& s, const fluvel_ip::Rgb_uc& defaultColor)
 {
     auto clampToByte = [](int v) -> uint8_t
     {
@@ -71,7 +71,7 @@ ofeli_ip::Rgb_uc rgbFromString(const QString& s, const ofeli_ip::Rgb_uc& default
     if (rgb.size() != 3)
         return defaultColor;
 
-    ofeli_ip::Rgb_uc c;
+    fluvel_ip::Rgb_uc c;
     c.red = clampToByte(rgb[0].toInt());
     c.green = clampToByte(rgb[1].toInt());
     c.blue = clampToByte(rgb[2].toInt());
@@ -199,7 +199,7 @@ void ApplicationSettings::save_algo(Session session, const AlgoConfig& algo_conf
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("algo/connectivity", ofeli_ip::to_string(algo_config.connectivity));
+    settings.setValue("algo/connectivity", fluvel_ip::to_string(algo_config.connectivity));
 
     settings.setValue("algo/Na", algo_config.acConfig.Na);
 
@@ -214,7 +214,7 @@ void ApplicationSettings::save_algo(Session session, const AlgoConfig& algo_conf
     settings.setValue("algo/lambda_in", algo_config.regionAcConfig.lambdaIn);
 
     settings.setValue("algo/color_space",
-                      ofeli_ip::to_string(algo_config.regionAcConfig.color_space));
+                      fluvel_ip::to_string(algo_config.regionAcConfig.color_space));
 
     settings.setValue("algo/color_weight_w1", algo_config.regionAcConfig.weights.c1);
 
@@ -317,7 +317,7 @@ void ApplicationSettings::load_img_session_config()
 
     fc.has_aniso_diff =
         settings.value("preprocess/has_aniso_diff", ProcessingConfig::kDefaultProcess).toBool();
-    fc.aniso_option = ofeli_ip::AnisoDiff(
+    fc.aniso_option = fluvel_ip::AnisoDiff(
         settings.value("preprocess/aniso_option", ProcessingConfig::kDefaultAnisoOption).toInt());
     fc.max_itera =
         settings.value("preprocess/max_itera", ProcessingConfig::kDefaultMaxItera).toInt();
@@ -377,51 +377,51 @@ void ApplicationSettings::load_algo(Session session, AlgoConfig& algo_config)
     QSettings settings = sessionSettings(session);
 
     const QString s =
-        settings.value("algo/connectivity", ofeli_ip::to_string(AlgoConfig::kDefaultConnectivity))
+        settings.value("algo/connectivity", fluvel_ip::to_string(AlgoConfig::kDefaultConnectivity))
             .toString();
 
-    algo_config.connectivity = ofeli_ip::connectivity_from_string(s.toStdString());
+    algo_config.connectivity = fluvel_ip::connectivity_from_string(s.toStdString());
 
-    algo_config.acConfig.Na = settings.value("algo/Na", ofeli_ip::AcConfig::kDefaultNa).toInt();
+    algo_config.acConfig.Na = settings.value("algo/Na", fluvel_ip::AcConfig::kDefaultNa).toInt();
     algo_config.acConfig.hasCycle2 =
-        settings.value("algo/has_smoothing_cycle", ofeli_ip::AcConfig::kDefaultIsCycle2).toBool();
-    algo_config.acConfig.Ns = settings.value("algo/Ns", ofeli_ip::AcConfig::kDefaultNs).toInt();
+        settings.value("algo/has_smoothing_cycle", fluvel_ip::AcConfig::kDefaultIsCycle2).toBool();
+    algo_config.acConfig.Ns = settings.value("algo/Ns", fluvel_ip::AcConfig::kDefaultNs).toInt();
     algo_config.acConfig.diskRadius =
-        settings.value("algo/disk_radius", ofeli_ip::AcConfig::kDefaultDiskRadius).toInt();
+        settings.value("algo/disk_radius", fluvel_ip::AcConfig::kDefaultDiskRadius).toInt();
 
     switch (session)
     {
         case Session::Camera:
-            algo_config.acConfig.failureMode = ofeli_ip::FailureHandlingMode::RecoverOnFailure;
+            algo_config.acConfig.failureMode = fluvel_ip::FailureHandlingMode::RecoverOnFailure;
             break;
 
         case Session::Image:
         default:
-            algo_config.acConfig.failureMode = ofeli_ip::FailureHandlingMode::StopOnFailure;
+            algo_config.acConfig.failureMode = fluvel_ip::FailureHandlingMode::StopOnFailure;
             break;
     }
 
     algo_config.regionAcConfig.lambdaOut =
-        settings.value("algo/lambda_out", ofeli_ip::RegionConfig::kDefaultLambdaOut).toInt();
+        settings.value("algo/lambda_out", fluvel_ip::RegionConfig::kDefaultLambdaOut).toInt();
     algo_config.regionAcConfig.lambdaIn =
-        settings.value("algo/lambda_in", ofeli_ip::RegionConfig::kDefaultLambdaIn).toInt();
+        settings.value("algo/lambda_in", fluvel_ip::RegionConfig::kDefaultLambdaIn).toInt();
 
     const QString s_cs =
         settings
             .value("algo/color_space",
-                   ofeli_ip::to_string(ofeli_ip::RegionColorConfig::kDefaultColorSpace))
+                   fluvel_ip::to_string(fluvel_ip::RegionColorConfig::kDefaultColorSpace))
             .toString();
 
-    algo_config.regionAcConfig.color_space = ofeli_ip::color_space_from_string(s_cs.toStdString());
+    algo_config.regionAcConfig.color_space = fluvel_ip::color_space_from_string(s_cs.toStdString());
 
     algo_config.regionAcConfig.weights.c1 =
-        settings.value("algo/color_weight_w1", ofeli_ip::RegionColorConfig::kDefaultWeights.c1)
+        settings.value("algo/color_weight_w1", fluvel_ip::RegionColorConfig::kDefaultWeights.c1)
             .toInt();
     algo_config.regionAcConfig.weights.c2 =
-        settings.value("algo/color_weight_w2", ofeli_ip::RegionColorConfig::kDefaultWeights.c2)
+        settings.value("algo/color_weight_w2", fluvel_ip::RegionColorConfig::kDefaultWeights.c2)
             .toInt();
     algo_config.regionAcConfig.weights.c3 =
-        settings.value("algo/color_weight_w3", ofeli_ip::RegionColorConfig::kDefaultWeights.c3)
+        settings.value("algo/color_weight_w3", fluvel_ip::RegionColorConfig::kDefaultWeights.c3)
             .toInt();
 }
 
@@ -584,4 +584,4 @@ QString toSettingsPrefix(Session scope)
     Q_UNREACHABLE();
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

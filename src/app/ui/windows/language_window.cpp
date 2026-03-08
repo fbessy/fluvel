@@ -10,7 +10,7 @@
 #include <QSettings>
 #include <QVBoxLayout>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 LanguageWindow::LanguageWindow(QWidget* parent)
@@ -100,4 +100,4 @@ void LanguageWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

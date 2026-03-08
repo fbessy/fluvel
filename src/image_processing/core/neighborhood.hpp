@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 struct Vec2i
@@ -23,4 +23,4 @@ inline bool fully_inside_8(int x, int y, int w, int h)
     return x > 0 && x + 1 < w && y > 0 && y + 1 < h;
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

@@ -7,7 +7,7 @@
 #include <QPoint>
 #include <QVector>
 
-[[nodiscard]] inline QVector<QPointF> convertToQVector(const ofeli_ip::ExportedContour& contour)
+[[nodiscard]] inline QVector<QPointF> convertToQVector(const fluvel_ip::ExportedContour& contour)
 {
     QVector<QPointF> q_contour;
     q_contour.reserve(static_cast<qsizetype>(contour.size()));

@@ -10,7 +10,7 @@
 #include <QImage>
 #include <string_view>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 enum SpeedModel : int
@@ -100,8 +100,8 @@ struct DisplayConfig
     static constexpr ImageBase kDefaultImageBase = ImageBase::Preprocessed;
 
     static constexpr bool kDefaultListDisplayed = true;
-    static constexpr ofeli_ip::Rgb_uc kDefaultOut{64u, 0u, 255u};
-    static constexpr ofeli_ip::Rgb_uc kDefaultIn{0u, 230u, 118u};
+    static constexpr fluvel_ip::Rgb_uc kDefaultOut{64u, 0u, 255u};
+    static constexpr fluvel_ip::Rgb_uc kDefaultIn{0u, 230u, 118u};
 
     static constexpr bool kDefaultOptions = false;
     static constexpr bool kDefaultOverlay = true;
@@ -109,10 +109,10 @@ struct DisplayConfig
     ImageBase image = kDefaultImageBase;
 
     bool l_out_displayed = kDefaultListDisplayed;
-    ofeli_ip::Rgb_uc l_out_color{kDefaultOut};
+    fluvel_ip::Rgb_uc l_out_color{kDefaultOut};
 
     bool l_in_displayed = kDefaultListDisplayed;
-    ofeli_ip::Rgb_uc l_in_color{kDefaultIn};
+    fluvel_ip::Rgb_uc l_in_color{kDefaultIn};
 
     bool mirrorMode = kDefaultOptions;
     bool smoothDisplay = kDefaultOptions;
@@ -142,7 +142,7 @@ struct ProcessingConfig
 
     static constexpr bool kDefault01Algo = true;
 
-    static constexpr ofeli_ip::AnisoDiff kDefaultAnisoOption = ofeli_ip::AnisoDiff::FUNCTION1;
+    static constexpr fluvel_ip::AnisoDiff kDefaultAnisoOption = fluvel_ip::AnisoDiff::FUNCTION1;
     static constexpr int kDefaultMaxItera = 10;
     static constexpr float kDefaultLambda = 1.f / 7.f;
     static constexpr float kDefaultKappa = 30.f;
@@ -170,7 +170,7 @@ struct ProcessingConfig
     float sigma = kDefaultGaussianSigma;
 
     bool has_aniso_diff = kDefaultProcess;
-    ofeli_ip::AnisoDiff aniso_option = kDefaultAnisoOption;
+    fluvel_ip::AnisoDiff aniso_option = kDefaultAnisoOption;
     int max_itera = kDefaultMaxItera;
     float lambda = kDefaultLambda;
     float kappa = kDefaultKappa;
@@ -197,11 +197,11 @@ struct ProcessingConfig
 
 struct AlgoConfig
 {
-    static constexpr ofeli_ip::Connectivity kDefaultConnectivity = ofeli_ip::Connectivity::Four;
+    static constexpr fluvel_ip::Connectivity kDefaultConnectivity = fluvel_ip::Connectivity::Four;
 
-    ofeli_ip::Connectivity connectivity;
-    ofeli_ip::AcConfig acConfig;
-    ofeli_ip::RegionColorConfig regionAcConfig;
+    fluvel_ip::Connectivity connectivity;
+    fluvel_ip::AcConfig acConfig;
+    fluvel_ip::RegionColorConfig regionAcConfig;
 };
 
 struct ImageComputeConfig
@@ -238,9 +238,9 @@ struct VideoSessionSettings
     DisplayConfig display;
 };
 
-inline ofeli_ip::Rgb_uc get_color(int index)
+inline fluvel_ip::Rgb_uc get_color(int index)
 {
-    ofeli_ip::Rgb_uc color;
+    fluvel_ip::Rgb_uc color;
 
     switch (index)
     {
@@ -296,45 +296,45 @@ inline ofeli_ip::Rgb_uc get_color(int index)
     return color;
 }
 
-inline int get_index(const ofeli_ip::Rgb_uc& color)
+inline int get_index(const fluvel_ip::Rgb_uc& color)
 {
     int index = ComboBoxColorIndex::SELECTED;
 
-    if (color == ofeli_ip::Rgb_uc{255, 0, 0})
+    if (color == fluvel_ip::Rgb_uc{255, 0, 0})
     {
         index = ComboBoxColorIndex::RED;
     }
 
-    else if (color == ofeli_ip::Rgb_uc{0, 255, 0})
+    else if (color == fluvel_ip::Rgb_uc{0, 255, 0})
     {
         index = ComboBoxColorIndex::GREEN;
     }
 
-    else if (color == ofeli_ip::Rgb_uc{0, 0, 255})
+    else if (color == fluvel_ip::Rgb_uc{0, 0, 255})
     {
         index = ComboBoxColorIndex::BLUE;
     }
 
-    else if (color == ofeli_ip::Rgb_uc{0, 255, 255})
+    else if (color == fluvel_ip::Rgb_uc{0, 255, 255})
     {
         index = ComboBoxColorIndex::CYAN;
     }
 
-    else if (color == ofeli_ip::Rgb_uc{255, 0, 255})
+    else if (color == fluvel_ip::Rgb_uc{255, 0, 255})
     {
         index = ComboBoxColorIndex::MAGENTA;
     }
 
-    else if (color == ofeli_ip::Rgb_uc{255, 255, 0})
+    else if (color == fluvel_ip::Rgb_uc{255, 255, 0})
     {
         index = ComboBoxColorIndex::YELLOW;
     }
 
-    else if (color == ofeli_ip::Rgb_uc{0, 0, 0})
+    else if (color == fluvel_ip::Rgb_uc{0, 0, 0})
     {
         index = ComboBoxColorIndex::BLACK;
     }
-    else if (color == ofeli_ip::Rgb_uc{255, 255, 255})
+    else if (color == fluvel_ip::Rgb_uc{255, 255, 255})
     {
         index = ComboBoxColorIndex::WHITE;
     }
@@ -342,9 +342,9 @@ inline int get_index(const ofeli_ip::Rgb_uc& color)
     return index;
 }
 
-inline QRgb get_QRgb(ofeli_ip::Rgb_uc col)
+inline QRgb get_QRgb(fluvel_ip::Rgb_uc col)
 {
     return qRgb(int(col.red), int(col.green), int(col.blue));
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

@@ -10,7 +10,7 @@
 
 #include <QtWidgets>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 SettingsWindow::SettingsWindow(QWidget* parent)
@@ -713,11 +713,11 @@ void SettingsWindow::accept()
     filt_config.kappa = float(kappa_spin_->value());
     if (aniso1_radio_->isChecked())
     {
-        filt_config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION1;
+        filt_config.aniso_option = fluvel_ip::AnisoDiff::FUNCTION1;
     }
     else if (aniso2_radio_->isChecked())
     {
-        filt_config.aniso_option = ofeli_ip::AnisoDiff::FUNCTION2;
+        filt_config.aniso_option = fluvel_ip::AnisoDiff::FUNCTION2;
     }
 
     filt_config.has_open_filt = open_groupbox_->isChecked();
@@ -781,8 +781,8 @@ void SettingsWindow::updateUIFromConfig()
     iteration_filter_spin_->setValue(config_filter.max_itera);
     lambda_spin_->setValue(double(config_filter.lambda));
     kappa_spin_->setValue(double(config_filter.kappa));
-    aniso1_radio_->setChecked(config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION1);
-    aniso2_radio_->setChecked(config_filter.aniso_option == ofeli_ip::AnisoDiff::FUNCTION2);
+    aniso1_radio_->setChecked(config_filter.aniso_option == fluvel_ip::AnisoDiff::FUNCTION1);
+    aniso2_radio_->setChecked(config_filter.aniso_option == fluvel_ip::AnisoDiff::FUNCTION2);
 
     open_groupbox_->setChecked(config_filter.has_open_filt);
     klength_open_spin_->setValue(config_filter.kernel_open_length);
@@ -829,13 +829,13 @@ void SettingsWindow::default_settings()
     //          Algorithm            //
     ///////////////////////////////////
     /*
-        connectivity_cb->setCurrentIndex( int(ofeli_ip::Connectivity::Four) );
+        connectivity_cb->setCurrentIndex( int(fluvel_ip::Connectivity::Four) );
 
         Na_spin->setValue( 30 );
         lambda_in_spin->setValue( 1 );
         lambda_out_spin->setValue( 1 );
 
-        color_space_cb->setCurrentIndex( int(ofeli_ip::ColorSpaceOption::RGB) );
+        color_space_cb->setCurrentIndex( int(fluvel_ip::ColorSpaceOption::RGB) );
 
         alpha_spin->setValue( 1 );
         beta_spin->setValue( 1 );
@@ -1092,4 +1092,4 @@ void SettingsWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

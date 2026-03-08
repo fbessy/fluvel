@@ -8,7 +8,7 @@
 
 #include <vector>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class HausdorffDistance
@@ -76,4 +76,4 @@ private:
     bool is_sorted_{false};
 };
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 enum AnisoDiff
@@ -176,9 +176,9 @@ inline void Filters::swap(unsigned char* const array, int a, int b)
     array[b] = temp;
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip
 
-//! \class ofeli::Filters
+//! \class fluvel_ip::Filters
 //! This class implements filters and noise functions for RGB images. \n
 //! There are two linear filters : a mean filter and a gaussian filter. \n
 //! Moreover, there are seven operators of mathematical morphology (erosion, dilation, morphological

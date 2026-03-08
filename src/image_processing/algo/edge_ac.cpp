@@ -2,11 +2,11 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "edge_ac.hpp"
-#include "ofeli_math.hpp"
+#include "fluvel_math.hpp"
 
 #include <cstring>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 constexpr auto kGrayscaleDepth = 256u;
@@ -148,4 +148,4 @@ unsigned char EdgeAc::do_otsu_method(ImageSpan image)
     return threshold;
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

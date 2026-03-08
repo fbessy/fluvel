@@ -11,7 +11,7 @@
 
 using clock_type = std::chrono::steady_clock;
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class TemporalSmoother
@@ -50,4 +50,4 @@ private:
     float motion_ratio_filtered_ = 1.f;
 };
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

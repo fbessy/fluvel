@@ -25,7 +25,7 @@
 #include <QtCore/qpermissions.h>
 #endif
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 CameraWindow::CameraWindow(QWidget* parent)
@@ -313,4 +313,4 @@ void CameraWindow::connectFrameToView()
                                &ImageView::setImageAndContour);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

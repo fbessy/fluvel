@@ -1,9 +1,9 @@
 {
-  "id": "org.ofeli.App",
+  "id": "org.fluvel.App",
   "runtime": "org.kde.Platform",
   "runtime-version": "6.9",
   "sdk": "org.kde.Sdk",
-  "command": "Ofeli",
+  "command": "fluvel",
 
   "finish-args": [
   "--share=ipc",
@@ -15,7 +15,7 @@
 
   "modules": [
     {
-      "name": "ofeli",
+      "name": "fluvel",
       "buildsystem": "cmake-ninja",
       "sources": [
         {

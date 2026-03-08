@@ -7,7 +7,7 @@
 
 #include <QWidget>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ShapeOverlayRenderer : public QWidget
@@ -26,4 +26,4 @@ private:
     QRect lastBoundingBox_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

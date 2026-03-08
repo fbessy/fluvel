@@ -16,7 +16,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 CameraSettingsWindow::CameraSettingsWindow(QWidget* parent)
@@ -154,4 +154,4 @@ void CameraSettingsWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

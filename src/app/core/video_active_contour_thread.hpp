@@ -13,15 +13,15 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 struct FrameResult
 {
     QImage input;
     QImage preprocessed;
-    ofeli_ip::ExportedContour l_out;
-    ofeli_ip::ExportedContour l_in;
+    fluvel_ip::ExportedContour l_out;
+    fluvel_ip::ExportedContour l_in;
     qint64 receiveTs;
     qint64 processTs;
 };
@@ -46,7 +46,7 @@ public:
 signals:
     void frameProcessed(qint64 contourSize);
 
-    void frameResultReady(ofeli_app::FrameResult result);
+    void frameResultReady(fluvel_app::FrameResult result);
 
     void frameSizeStr(QString str);
 
@@ -65,11 +65,11 @@ private:
     bool running_{true};
     bool configChanged_{false};
 
-    std::unique_ptr<ofeli_ip::RegionColorAc> region_ac_;
+    std::unique_ptr<fluvel_ip::RegionColorAc> region_ac_;
     int currentWidth_ = 0;
     int currentHeight_ = 0;
 
-    ofeli_ip::TemporalSmoother smoother_;
+    fluvel_ip::TemporalSmoother smoother_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

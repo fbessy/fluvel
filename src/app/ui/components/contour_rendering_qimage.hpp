@@ -9,12 +9,12 @@
 #include <QImage>
 #include <QRgb>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
-void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                      const ofeli_ip::Rgb_uc& color, QImage& img);
+void draw_list_to_img(const std::vector<fluvel_ip::ContourPoint>& list,
+                      const fluvel_ip::Rgb_uc& color, QImage& img);
 
-void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const ofeli_ip::Rgb_uc& color, int upscale_factor, QImage& img_rgb32);
-} // namespace ofeli_app
+void draw_upscale_list(const std::vector<fluvel_ip::ContourPoint>& list,
+                       const fluvel_ip::Rgb_uc& color, int upscale_factor, QImage& img_rgb32);
+} // namespace fluvel_app

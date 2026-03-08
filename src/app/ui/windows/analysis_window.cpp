@@ -9,7 +9,7 @@
 #include <QtWidgets>
 #include <ctime> // for std::clock_t, std::clock() and CLOCKS_PER_SEC
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 AnalysisWindow::AnalysisWindow(QWidget* parent)
@@ -150,7 +150,7 @@ void AnalysisWindow::compute_hd()
     {
         std::clock_t start_time = std::clock();
 
-        hd_ = new ofeli_ip::HausdorffDistance(widget1_->get_shape(), widget2_->get_shape(),
+        hd_ = new fluvel_ip::HausdorffDistance(widget1_->get_shape(), widget2_->get_shape(),
                                               intersection_);
 
         elapsed = float(std::clock() - start_time) / float(CLOCKS_PER_SEC);
@@ -160,7 +160,7 @@ void AnalysisWindow::compute_hd()
     float hausdorffQuantile = hd_->hausdorffQuantile(hundredth_sp_->value());
     float centr_gap = hd_->get_centroids_distance();
 
-    factor_ = 100.f / ofeli_ip::Shape::get_grid_diagonal(
+    factor_ = 100.f / fluvel_ip::Shape::get_grid_diagonal(
                           std::max(widget1_->get_img_width(), widget2_->get_img_width()),
                           std::max(widget1_->get_img_height(), widget2_->get_img_height()));
 
@@ -219,13 +219,13 @@ void AnalysisWindow::calculateShapesIntersection()
     std::size_t size1 = widget1_->get_shape().get_points().size();
     std::size_t size2 = widget2_->get_shape().get_points().size();
 
-    const ofeli_ip::Shape& smaller_shape =
+    const fluvel_ip::Shape& smaller_shape =
         (size1 < size2) ? widget1_->get_shape() : widget2_->get_shape();
 
     const QImage& larger_shape_img =
         (size1 < size2) ? widget2_->get_image() : widget1_->get_image();
 
-    const ofeli_ip::Rgb_uc& chosen_rgb =
+    const fluvel_ip::Rgb_uc& chosen_rgb =
         (size1 < size2) ? widget2_->get_rgb() : widget1_->get_rgb();
 
     QRgb rgb_pix;
@@ -259,4 +259,4 @@ void AnalysisWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

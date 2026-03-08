@@ -13,7 +13,7 @@
 
 #include <QtWidgets>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 int AnalysisWidget::count_this = 0;
@@ -350,4 +350,4 @@ void AnalysisWidget::save_settings() const
     settings.setValue("Analysis/B" + QString::number(id_this_), int(selected_.blue));
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

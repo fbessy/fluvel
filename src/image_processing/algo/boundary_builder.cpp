@@ -3,14 +3,14 @@
 
 #include "boundary_builder.hpp"
 
-#include "ofeli_math.hpp"
+#include "fluvel_math.hpp"
 #include "point_containers.hpp"
 
 #include <cassert>
 #include <cmath>
 #include <iostream>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 BoundaryBuilder::BoundaryBuilder(int phi_width, int phi_height, Contour& Lout_init,
@@ -306,4 +306,4 @@ void BoundaryBuilder::check_duplicates(const Contour& contour)
     }
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

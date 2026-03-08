@@ -8,7 +8,7 @@
 
 #include <vector>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class ContourData
@@ -190,4 +190,4 @@ constexpr bool differentSide(PhiValue a, PhiValue b)
 
 } // namespace phi_value
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

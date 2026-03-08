@@ -13,7 +13,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageView;
@@ -76,4 +76,4 @@ public:
     }
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

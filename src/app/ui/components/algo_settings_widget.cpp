@@ -12,7 +12,7 @@
 #include <cassert>
 #include <utility>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent, Session session)
@@ -23,10 +23,10 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent, Session session)
     connectivity_cb_ = new QComboBox;
 
     connectivity_cb_->addItem("4-connected (Von Neumann)",
-                              QVariant::fromValue(ofeli_ip::Connectivity::Four));
+                              QVariant::fromValue(fluvel_ip::Connectivity::Four));
 
     connectivity_cb_->addItem("8-connected (Moore)",
-                              QVariant::fromValue(ofeli_ip::Connectivity::Eight));
+                              QVariant::fromValue(fluvel_ip::Connectivity::Eight));
 
     QFormLayout* connect_layout = new QFormLayout;
     connect_layout->addRow("Connectivity :", connectivity_cb_);
@@ -78,15 +78,15 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent, Session session)
     color_weights_groupbox_->setFlat(true);
 
     color_space_cb_ = new QComboBox;
-    color_space_cb_->addItem("RGB", QVariant::fromValue(ofeli_ip::ColorSpaceOption::RGB));
+    color_space_cb_->addItem("RGB", QVariant::fromValue(fluvel_ip::ColorSpaceOption::RGB));
 
-    color_space_cb_->addItem("YUV", QVariant::fromValue(ofeli_ip::ColorSpaceOption::YUV));
+    color_space_cb_->addItem("YUV", QVariant::fromValue(fluvel_ip::ColorSpaceOption::YUV));
 
     color_space_cb_->addItem("L*a*b* (CIELAB)",
-                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::Lab));
+                             QVariant::fromValue(fluvel_ip::ColorSpaceOption::Lab));
 
     color_space_cb_->addItem("L*u*v* (CIELUV)",
-                             QVariant::fromValue(ofeli_ip::ColorSpaceOption::Luv));
+                             QVariant::fromValue(fluvel_ip::ColorSpaceOption::Luv));
 
     alpha_spin_ = new QSpinBox;
     alpha_spin_->setSingleStep(1);
@@ -166,7 +166,7 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent, Session session)
 
 void AlgoSettingsWidget::accept()
 {
-    config_.connectivity = connectivity_cb_->currentData().value<ofeli_ip::Connectivity>();
+    config_.connectivity = connectivity_cb_->currentData().value<fluvel_ip::Connectivity>();
 
     config_.acConfig.Na = Na_spin_->value();
     config_.acConfig.Ns = Ns_spin_->value();
@@ -177,7 +177,7 @@ void AlgoSettingsWidget::accept()
     config_.regionAcConfig.lambdaIn = lambda_in_spin_->value();
 
     config_.regionAcConfig.color_space =
-        color_space_cb_->currentData().value<ofeli_ip::ColorSpaceOption>();
+        color_space_cb_->currentData().value<fluvel_ip::ColorSpaceOption>();
 
     config_.regionAcConfig.weights.c1 = alpha_spin_->value();
     config_.regionAcConfig.weights.c2 = beta_spin_->value();
@@ -221,4 +221,4 @@ AlgoConfig& AlgoSettingsWidget::config(Session session)
     std::unreachable();
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

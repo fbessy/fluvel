@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <cstdlib>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 // Definitions
@@ -617,4 +617,4 @@ void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const
     d.contourSize = cd_.l_out().size() + cd_.l_in().size();
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

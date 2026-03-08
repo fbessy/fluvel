@@ -11,7 +11,7 @@ class QMouseEvent;
 class QColor;
 class QPoint;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageView;
@@ -42,4 +42,4 @@ signals:
     void colorPicked(const QColor& color, const QPoint& imgPos);
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

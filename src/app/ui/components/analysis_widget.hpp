@@ -17,7 +17,7 @@ class QLabel;
 class QPushButton;
 QT_END_NAMESPACE
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageView;
@@ -38,7 +38,7 @@ public:
         return img_height_;
     }
 
-    ofeli_ip::Shape& get_shape()
+    fluvel_ip::Shape& get_shape()
     {
         return shape_;
     }
@@ -46,7 +46,7 @@ public:
     {
         return img_;
     }
-    const ofeli_ip::Rgb_uc& get_rgb() const
+    const fluvel_ip::Rgb_uc& get_rgb() const
     {
         return rgb_;
     }
@@ -63,7 +63,7 @@ private:
     QPushButton* open_button_;
 
     QComboBox* color_list_;
-    ofeli_ip::Rgb_uc selected_;
+    fluvel_ip::Rgb_uc selected_;
     QSpinBox* noise_sp_;
 
     QImage img_;
@@ -71,8 +71,8 @@ private:
     int img_width_{0};
     int img_height_{0};
 
-    ofeli_ip::Shape shape_;
-    ofeli_ip::Rgb_uc rgb_;
+    fluvel_ip::Shape shape_;
+    fluvel_ip::Rgb_uc rgb_;
 
     QString last_directory_used_;
     QStringList name_filters_;
@@ -94,4 +94,4 @@ signals:
     void change_list();
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

@@ -11,7 +11,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class DragDropBehavior : public ViewBehavior
@@ -28,4 +28,4 @@ public:
     }
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

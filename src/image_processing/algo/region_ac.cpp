@@ -3,10 +3,10 @@
 
 #include "region_ac.hpp"
 
-#include "ofeli_math.hpp"
+#include "fluvel_math.hpp"
 #include <cmath>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 void RegionAc::initialize_sums()
@@ -82,4 +82,4 @@ void RegionAc::fillDiagnostics(ContourDiagnostics& d) const
     d.meanOut = ChannelVector(meanOut_);
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

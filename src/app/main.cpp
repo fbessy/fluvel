@@ -24,28 +24,28 @@ int main(int argc, char* argv[])
     QApplication::setQuitOnLastWindowClosed(false);
 #endif
 
-    QCoreApplication::setOrganizationName("ofeli");
+    QCoreApplication::setOrganizationName("fluvel");
     QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/fastlevelset/");
-    QCoreApplication::setApplicationName("ofeli");
+    QCoreApplication::setApplicationName("fluvel");
 
-    ofeli_app::FrameClock::init();
+    fluvel_app::FrameClock::init();
 
-    const auto& config = ofeli_app::AppSettings::instance();
-    ofeli_app::Language language = config.app_language;
+    const auto& config = fluvel_app::AppSettings::instance();
+    fluvel_app::Language language = config.app_language;
 
     static QTranslator translator_qt;
-    static QTranslator translator_ofeli;
+    static QTranslator translator_fluvel;
 
     QString locale;
     switch (language)
     {
-        case ofeli_app::Language::System:
+        case fluvel_app::Language::System:
             locale = QLocale::system().name().section('_', 0, 0);
             break;
-        case ofeli_app::Language::French:
+        case fluvel_app::Language::French:
             locale = "fr";
             break;
-        case ofeli_app::Language::English:
+        case fluvel_app::Language::English:
         default:
             locale = "en";
             break;
@@ -58,9 +58,9 @@ int main(int argc, char* argv[])
     }
 
     // Traductions Fluvel
-    if (translator_ofeli.load(QString(":/i18n/Ofeli_%1.qm").arg(locale)))
+    if (translator_fluvel.load(QString(":/i18n/fluvel_%1.qm").arg(locale)))
     {
-        app.installTranslator(&translator_ofeli);
+        app.installTranslator(&translator_fluvel);
     }
 
     QIcon appIcon;
@@ -68,6 +68,7 @@ int main(int argc, char* argv[])
     appIcon.addFile(":/icons/fluvel_22.png", QSize(22, 22));
     appIcon.addFile(":/icons/fluvel_32.png", QSize(32, 32));
     appIcon.addFile(":/icons/fluvel_48.png", QSize(48, 48));
+    appIcon.addFile(":/icons/fluvel_64.png", QSize(64, 64));
     appIcon.addFile(":/icons/fluvel_128.png", QSize(128, 128));
     appIcon.addFile(":/icons/fluvel_256.png", QSize(256, 256));
 
@@ -76,10 +77,10 @@ int main(int argc, char* argv[])
     std::unique_ptr<QMainWindow> root;
 
 #ifdef Q_OS_ANDROID
-    // root = std::make_unique<ofeli_app::CameraWindow>();
+    // root = std::make_unique<fluvel_app::CameraWindow>();
     // root->show();
     QQmlApplicationEngine engine;
-    // engine.loadFromModule("ofeli", "Main");
+    // engine.loadFromModule("fluvel", "Main");
 
     // #include <QDir>
     // #include <QDebug>
@@ -103,7 +104,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 #else
-    root = std::make_unique<ofeli_app::ImageWindow>();
+    root = std::make_unique<fluvel_app::ImageWindow>();
     root->show();
 #endif
 

@@ -13,7 +13,7 @@
 
 #include <vector>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 struct Span
@@ -55,14 +55,14 @@ private:
     QImage displayedPhi_;
     QImage background_;
 
-    std::vector<ofeli_ip::Point2D_i> l_out_;
-    std::vector<ofeli_ip::Point2D_i> l_in_;
+    std::vector<fluvel_ip::Point2D_i> l_out_;
+    std::vector<fluvel_ip::Point2D_i> l_in_;
 
     QSize listsGridSize_;
 
     ShapeInfo overlayShape_;
 
-    ofeli_ip::Connectivity connectivity_;
+    fluvel_ip::Connectivity connectivity_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

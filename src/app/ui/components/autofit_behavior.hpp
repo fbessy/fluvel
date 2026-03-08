@@ -7,7 +7,7 @@
 
 class QMouseEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class AutoFitBehavior : public ViewBehavior
@@ -21,4 +21,4 @@ private:
     Qt::MouseButton button_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

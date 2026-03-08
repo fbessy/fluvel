@@ -13,7 +13,7 @@
 #include <QTimer>
 #include <QVideoSink>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class CameraController : public QObject
@@ -58,4 +58,4 @@ private:
     DisplayConfig displayConfig_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

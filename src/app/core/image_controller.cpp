@@ -8,7 +8,7 @@
 
 #include <QImageReader>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ImageController::ImageController(QObject* parent)
@@ -157,8 +157,8 @@ void ImageController::refreshView()
     emit displayedImageReady(img);
 }
 
-void ImageController::onContourUpdated(const ofeli_ip::ExportedContour& l_out,
-                                       const ofeli_ip::ExportedContour& l_in)
+void ImageController::onContourUpdated(const fluvel_ip::ExportedContour& l_out,
+                                       const fluvel_ip::ExportedContour& l_in)
 {
     auto q_l_out = convertToQVector(l_out);
     auto q_l_in = convertToQVector(l_in);
@@ -186,14 +186,14 @@ void ImageController::converge()
     acWorker_.converge();
 }
 
-void ImageController::onStateChanged(ofeli_app::WorkerState state)
+void ImageController::onStateChanged(fluvel_app::WorkerState state)
 {
     emit stateChanged(state);
 }
 
-void ImageController::onDiagnosticsUpdated(const ofeli_ip::ContourDiagnostics& diag)
+void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& diag)
 {
-    auto formatChannels = [](const ofeli_ip::ChannelVector& v)
+    auto formatChannels = [](const fluvel_ip::ChannelVector& v)
     {
         const auto& values = v.values();
 
@@ -217,10 +217,10 @@ void ImageController::onDiagnosticsUpdated(const ofeli_ip::ContourDiagnostics& d
     QString s;
 
     s += QString("Step: %1\n").arg(diag.stepCount);
-    s += QString("State: %1\n").arg(ofeli_ip::toString(diag.state));
+    s += QString("State: %1\n").arg(fluvel_ip::toString(diag.state));
 
-    if (diag.stoppingStatus != ofeli_ip::StoppingStatus::None)
-        s += QString("Reason: %1\n").arg(ofeli_ip::toString(diag.stoppingStatus));
+    if (diag.stoppingStatus != fluvel_ip::StoppingStatus::None)
+        s += QString("Reason: %1\n").arg(fluvel_ip::toString(diag.stoppingStatus));
     else
         s += QString("\n");
 
@@ -248,4 +248,4 @@ bool isSupportedImage(const QString& path)
     return reader.canRead();
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

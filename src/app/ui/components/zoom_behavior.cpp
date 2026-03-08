@@ -4,7 +4,7 @@
 #include "zoom_behavior.hpp"
 #include "image_view.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ZoomBehavior::ZoomBehavior(double /*zoomFactor*/)
@@ -25,4 +25,4 @@ bool ZoomBehavior::wheel(ImageView& /*view*/, QWheelEvent* event)
     return true;
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

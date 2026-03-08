@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 template <typename T> struct Point2D
@@ -45,4 +45,4 @@ template <typename T> struct Point2D
 using Point2D_i = Point2D<int>;
 using Point2D_f = Point2D<float>;
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

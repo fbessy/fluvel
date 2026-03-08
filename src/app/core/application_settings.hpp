@@ -9,7 +9,7 @@
 #include <QImage>
 #include <QDir>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 //! This structure contains all the configuration of the application.
@@ -51,10 +51,10 @@ public:
     VideoSessionSettings camConfig;
 
 signals:
-    void imgSettingsChanged(const ofeli_app::ImageSessionSettings& conf);
-    void imgDisplaySettingsChanged(const ofeli_app::DisplayConfig& conf);
-    void videoSettingsChanged(const ofeli_app::VideoSessionSettings& conf);
-    void videoDisplaySettingsChanged(const ofeli_app::DisplayConfig& conf);
+    void imgSettingsChanged(const fluvel_app::ImageSessionSettings& conf);
+    void imgDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
+    void videoSettingsChanged(const fluvel_app::VideoSessionSettings& conf);
+    void videoDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
     void resizedPhi(const QImage& phi);
 };
 
@@ -70,4 +70,4 @@ public:
 
 QString toSettingsPrefix(Session scope);
 
-} // namespace ofeli_app
+} // namespace fluvel_app

@@ -19,7 +19,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ImageWindow::ImageWindow(QWidget* parent)
@@ -39,7 +39,6 @@ ImageWindow::ImageWindow(QWidget* parent)
 void ImageWindow::setupUi()
 {
     updateWindowTitle();
-    setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
 
     QSettings settings;
 
@@ -653,7 +652,7 @@ QString ImageWindow::makeUniqueFileName(const QString& filePath)
     return candidate;
 }
 
-void ImageWindow::onStateChanged(ofeli_app::WorkerState state)
+void ImageWindow::onStateChanged(fluvel_app::WorkerState state)
 {
     bool isEnable = (state != WorkerState::Uninitialized && state != WorkerState::Initializing);
 
@@ -724,4 +723,19 @@ QString buildImageFilter()
     return QObject::tr("Image Files (%1)").arg(patterns.join(' '));
 }
 
-} // namespace ofeli_app
+void ImageWindow::showEvent(QShowEvent* event)
+{
+    // Called here (instead of setupUI) to ensure the window is fully
+    // initialized before setting the icon. This avoids a pixelated icon rendering
+    // issue observed with Qt/KDE on Wayland (Plasma) until the window decorations
+    // are refreshed.
+    QTimer::singleShot(0, this,
+                       [this]()
+                       {
+                           setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
+                       });
+
+    QMainWindow::showEvent(event);
+}
+
+} // namespace fluvel_app

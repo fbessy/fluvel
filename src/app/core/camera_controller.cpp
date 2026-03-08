@@ -8,7 +8,7 @@
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 CameraController::CameraController(QObject* parent)
@@ -172,4 +172,4 @@ void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& displa
     displayConfig_ = displayConfig;
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

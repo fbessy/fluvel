@@ -9,7 +9,7 @@
 #include <string_view>
 #include <vector>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 enum class PhiValue : int8_t
@@ -445,4 +445,4 @@ struct InternalKernel
     }
 };
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

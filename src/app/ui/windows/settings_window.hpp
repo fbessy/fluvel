@@ -11,7 +11,7 @@
 
 #include <QtWidgets>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 enum class TabIndex
@@ -50,7 +50,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 signals:
-    void updateOverlay(ofeli_app::UiShapeInfo uiShape);
+    void updateOverlay(fluvel_app::UiShapeInfo uiShape);
 
 private:
     //////////////////////////////////////////
@@ -137,7 +137,7 @@ private:
     int max_itera2_;
     float lambda2_;
     float kappa2_;
-    ofeli_ip::AnisoDiff aniso_option2_;
+    fluvel_ip::AnisoDiff aniso_option2_;
 
     QGroupBox* open_groupbox_;
     KernelSizeSpinBox* klength_open_spin_;
@@ -165,7 +165,7 @@ private:
     bool has_preprocess2_;
     QLabel* time_filt_;
 
-    ofeli_ip::Filters* filters2_{nullptr};
+    fluvel_ip::Filters* filters2_{nullptr};
     // float calculate_filtered_image();
     const unsigned char* img2_filtered_{nullptr};
 
@@ -227,4 +227,4 @@ private slots:
     // void set_color_in();
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

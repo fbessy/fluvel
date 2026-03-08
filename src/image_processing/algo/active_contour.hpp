@@ -12,7 +12,7 @@
 
 #include <cstddef>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 constexpr size_t kInitialSpeedArrayAllocSize = 10000u;
@@ -329,4 +329,4 @@ constexpr SpeedValue get_discrete_speed(int speed)
 
 } // namespace speed_value
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

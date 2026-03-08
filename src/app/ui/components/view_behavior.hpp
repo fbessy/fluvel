@@ -14,7 +14,7 @@
 
 class QMouseEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageView;
@@ -89,4 +89,4 @@ public:
     virtual void cancel() {};
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

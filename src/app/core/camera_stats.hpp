@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 struct CameraStats
@@ -17,4 +17,4 @@ struct CameraStats
     double avgContourSize = 0.0;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

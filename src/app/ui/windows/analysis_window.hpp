@@ -11,7 +11,7 @@
 #include <QLabel>
 #include <QSpinBox>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class AnalysisWindow : public QDialog
@@ -36,7 +36,7 @@ private:
     AnalysisWidget* widget2_;
     QPushButton* compute_button_;
 
-    std::unordered_set<ofeli_ip::Point2D_i> intersection_;
+    std::unordered_set<fluvel_ip::Point2D_i> intersection_;
 
     QDialog* result_popup_;
     QLabel* hausdorff_label_;
@@ -48,7 +48,7 @@ private:
     QLabel* centroids_ratio_label_;
     QLabel* time_label_;
 
-    ofeli_ip::HausdorffDistance* hd_{nullptr};
+    fluvel_ip::HausdorffDistance* hd_{nullptr};
     float factor_{0.f};
 
 private slots:
@@ -57,8 +57,4 @@ private slots:
     void refresh_quantile(int hundredth);
 };
 
-} // namespace ofeli_app
-
-//! \class ofeli::AnalysisWindow
-//! The class AnalysisWindow is a QDialog window that informs the user about Fluvel . An instance of
-//! this class is created by #ofeli::ImageWindow and displayed when the user clicks on menu About.
+} // namespace fluvel_app

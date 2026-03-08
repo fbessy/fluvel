@@ -6,7 +6,7 @@
 #include <QColor>
 #include <QPoint>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageViewListener
@@ -16,4 +16,4 @@ public:
     virtual void onColorPicked(const QColor& color, const QPoint& imagePos) = 0;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

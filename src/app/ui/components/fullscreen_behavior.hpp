@@ -7,7 +7,7 @@
 
 class QMouseEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class FullscreenBehavior : public ViewBehavior
@@ -16,4 +16,4 @@ public:
     bool mouseDoubleClick(ImageView& view, QMouseEvent* event) override;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

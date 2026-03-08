@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "filters.hpp"
-#include "ofeli_math.hpp"
+#include "fluvel_math.hpp"
 
 #include <algorithm>
 #include <cmath> // std::exp
@@ -11,7 +11,7 @@
 #include <iostream> // std::cerr
 #include <random>   // random generator and normal/uniform distributions
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 Filters::Filters(const unsigned char* img_data1, int img_width1, int img_height1,
@@ -3031,4 +3031,4 @@ void Filters::fas(int kernel_length)
     }
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

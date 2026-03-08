@@ -5,7 +5,7 @@
 
 #include <QSpinBox>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class KernelSizeSpinBox : public QSpinBox
@@ -25,4 +25,4 @@ private:
     QValidator::State previous_result_{QValidator::Acceptable};
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

@@ -218,6 +218,7 @@ set(APP_RESOURCES
     ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-22.png
     ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-32.png
     ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-48.png
+    ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-64.png
     ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-128.png
     ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-256.png
 
@@ -344,7 +345,7 @@ endif()
 
 target_link_libraries(${target_name} PRIVATE
     ${APP_QT_LIBS}
-    ofeli::image_processing
+    fluvel::image_processing
 )
 
 execute_process(
@@ -357,7 +358,7 @@ execute_process(
 string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
 
 add_compile_definitions(
-    OFELI_VERSION="${PROJECT_VERSION}"
+    FLUVEL_VERSION="${PROJECT_VERSION}"
     FLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}"
     FLUVEL_BUILD_TIMESTAMP="${FLUVEL_BUILD_TIMESTAMP}"
     FLUVEL_CMAKE_VERSION="${CMAKE_VERSION}"

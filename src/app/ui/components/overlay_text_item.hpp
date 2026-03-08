@@ -7,7 +7,7 @@
 #include <QGraphicsItem>
 #include <QPainter>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class OverlayTextItem : public QGraphicsItem
@@ -31,4 +31,4 @@ private:
     int padding_ = 8;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

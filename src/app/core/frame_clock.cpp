@@ -3,7 +3,7 @@
 
 #include "frame_clock.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 QElapsedTimer FrameClock::timer;
@@ -19,4 +19,4 @@ qint64 FrameClock::FrameClock::nowNs()
     return timer.nsecsElapsed();
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

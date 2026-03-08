@@ -5,7 +5,7 @@
 
 #include <QPainter>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 PhiEditor::PhiEditor(const QImage& committedPhi)
@@ -77,4 +77,4 @@ void PhiEditor::setSize(const QSize& size)
     }
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

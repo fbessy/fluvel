@@ -14,7 +14,7 @@ class QComboBox;
 class QCheckBox;
 class QSpinBox;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class AlgoSettingsWidget;
@@ -51,4 +51,4 @@ private:
     VideoSessionSettings& config_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

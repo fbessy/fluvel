@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 namespace math
@@ -39,4 +39,4 @@ template <typename P> inline float euclidean_distance(const P& a, const P& b)
 
 } // namespace math
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

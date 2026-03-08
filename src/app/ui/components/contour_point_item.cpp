@@ -5,7 +5,7 @@
 
 #include <QPainter>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ContourPointsItem::ContourPointsItem(QGraphicsItem* parent)
@@ -71,4 +71,4 @@ void ContourPointsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->drawPoints(points_.data(), static_cast<int>(points_.size()));
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

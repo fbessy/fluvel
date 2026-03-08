@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <type_traits>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 struct Bgra32
@@ -351,4 +351,4 @@ inline Color_3i rgb_to_yuv(const Rgb_uc& rgb)
 
 } // namespace color
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

@@ -8,7 +8,7 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 void InteractionSet::addBehavior(std::unique_ptr<ViewBehavior> behavior)
@@ -176,4 +176,4 @@ void InteractionSet::cancel()
         const_cast<ViewBehavior*>(b)->cancel();
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

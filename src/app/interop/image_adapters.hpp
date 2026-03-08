@@ -16,20 +16,20 @@
 #endif
 
 #ifdef FLUVEL_USE_QT
-ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img);
+fluvel_ip::ImageSpan image_span_from_qimage(const QImage& img);
 #endif
 
 #ifdef FLUVEL_USE_OPENCV
-ofeli_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat);
+fluvel_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat);
 #endif
 
-#ifdef OFELI_USE_STB
-ofeli_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int width, int height,
+#ifdef FLUVEL_USE_STB
+fluvel_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int width, int height,
                                          int channels);
 #endif
 
 #ifdef FLUVEL_USE_QT
-inline ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img)
+inline fluvel_ip::ImageSpan image_span_from_qimage(const QImage& img)
 {
     assert(!img.isNull());
 
@@ -41,15 +41,15 @@ inline ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img)
     switch (img.format())
     {
         case QImage::Format_Grayscale8:
-            return ofeli_ip::ImageSpan(data, w, h, ofeli_ip::ImageFormat::Gray8, stride);
+            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Gray8, stride);
 
         case QImage::Format_RGB888:
-            return ofeli_ip::ImageSpan(data, w, h, ofeli_ip::ImageFormat::Rgb24, stride);
+            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Rgb24, stride);
 
         case QImage::Format_ARGB32:
         case QImage::Format_RGB32:
             // Qt stocke BGRA en mémoire
-            return ofeli_ip::ImageSpan(data, w, h, ofeli_ip::ImageFormat::Bgr32, stride);
+            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Bgr32, stride);
 
         default:
             assert(false && "Unsupported QImage format");
@@ -59,7 +59,7 @@ inline ofeli_ip::ImageSpan image_span_from_qimage(const QImage& img)
 #endif
 
 #ifdef FLUVEL_USE_OPENCV
-inline ofeli_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
+inline fluvel_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
 {
     assert(!mat.empty());
     assert(mat.depth() == CV_8U);
@@ -72,14 +72,14 @@ inline ofeli_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
     switch (mat.type())
     {
         case CV_8UC1:
-            return ofeli_ip::ImageSpan(data, w, h, ofeli_ip::ImageFormat::Gray8, stride);
+            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Gray8, stride);
 
         case CV_8UC3:
             // OpenCV = BGR en mémoire
-            return ofeli_ip::ImageSpan(data, w, h, ofeli_ip::ImageFormat::Bgr24, stride);
+            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Bgr24, stride);
 
         case CV_8UC4:
-            return ofeli_ip::ImageSpan(data, w, h, ofeli_ip::ImageFormat::Bgr32, stride);
+            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Bgr32, stride);
 
         default:
             assert(false && "Unsupported cv::Mat type");
@@ -88,8 +88,8 @@ inline ofeli_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
 }
 #endif
 
-#ifdef OFELI_USE_STB
-inline ofeli_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int width, int height,
+#ifdef FLUVEL_USE_STB
+inline fluvel_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int width, int height,
                                                 int channels)
 {
     assert(data != nullptr);
@@ -100,17 +100,17 @@ inline ofeli_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int w
     switch (channels)
     {
         case 1:
-            return ofeli_ip::ImageSpan(data, width, height, ofeli_ip::ImageFormat::Gray8,
+            return fluvel_ip::ImageSpan(data, width, height, fluvel_ip::ImageFormat::Gray8,
                                        width); // compact
 
         case 3:
             // stb = RGB
-            return ofeli_ip::ImageSpan(data, width, height, ofeli_ip::ImageFormat::Rgb24,
+            return fluvel_ip::ImageSpan(data, width, height, fluvel_ip::ImageFormat::Rgb24,
                                        width * 3);
 
         case 4:
             // stb = RGBA
-            return ofeli_ip::ImageSpan(data, width, height, ofeli_ip::ImageFormat::Rgba32,
+            return fluvel_ip::ImageSpan(data, width, height, fluvel_ip::ImageFormat::Rgba32,
                                        width * 4);
 
         default:

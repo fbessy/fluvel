@@ -7,7 +7,7 @@
 
 class QComboBox;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class LanguageWindow : public QDialog
@@ -31,9 +31,4 @@ private:
     QComboBox* combo_;
 };
 
-} // namespace ofeli_app
-
-//! \class ofeli::LanguageWindow
-//! The class LanguageWindow is a QDialog window to choose the application langage for the user. An
-//! instance of this class is created by #ofeli::ImageWindow and displayed when the user clicks on
-//! menu Language.
+} // namespace fluvel_app

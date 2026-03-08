@@ -3,7 +3,7 @@
 
 #include "kernel_size_spinbox.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent)
@@ -105,4 +105,4 @@ void KernelSizeSpinBox::focusInEvent(QFocusEvent* event)
     QAbstractSpinBox::focusInEvent(event);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

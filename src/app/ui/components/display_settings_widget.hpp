@@ -12,7 +12,7 @@
 #include <QRadioButton>
 #include <QWidget>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ColorSelectorWidget;
@@ -54,4 +54,4 @@ private:
     Session session_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

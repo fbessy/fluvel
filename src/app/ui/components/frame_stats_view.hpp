@@ -6,7 +6,7 @@
 #include <QMutex>
 #include <QtGlobal>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class FrameStatsView
@@ -60,4 +60,4 @@ private:
     Snapshot lastSnapshot_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

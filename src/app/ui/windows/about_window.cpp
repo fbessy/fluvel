@@ -18,7 +18,7 @@
 #include <QTabWidget>
 #include <QTextEdit>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 namespace
@@ -26,8 +26,8 @@ namespace
 
 static QString packageType()
 {
-#ifdef OFELI_PACKAGE_TYPE
-    return QString(OFELI_PACKAGE_TYPE);
+#ifdef FLUVEL_PACKAGE_TYPE
+    return QString(FLUVEL_PACKAGE_TYPE);
 #else
     if (qEnvironmentVariableIsSet("FLATPAK_ID"))
         return "Flatpak";
@@ -63,7 +63,7 @@ static QString buildFingerprint()
 {
     QString data;
 
-    data += "Version:" OFELI_VERSION "\n";
+    data += "Version:" FLUVEL_VERSION "\n";
     data += "Git:" FLUVEL_GIT_COMMIT "\n";
     data += "BuildType:" FLUVEL_BUILD_TYPE "\n";
     data += "Qt:" + QString(qVersion()) + "\n";
@@ -115,7 +115,7 @@ QString buildTechnicalSection()
     html += "<div style='margin-left:12px;'>";
 
     html += "<div style='margin-bottom:6px;'>"
-            "<b>Version:</b> " OFELI_VERSION "</div>";
+            "<b>Version:</b> " FLUVEL_VERSION "</div>";
 
     html += "<div style='margin-bottom:4px;'><b>Configuration directory</b></div>";
     html += "<div style='font-family:monospace; margin-bottom:8px;'>" + configDir + "</div>";
@@ -217,8 +217,8 @@ AboutWindow::AboutWindow(QWidget* parent)
     ///////////////////////////////////////
 
     QLabel* icon_label = new QLabel;
-    QIcon ofeli_icon(":/icons/app/fluvel.svg");
-    icon_label->setPixmap(ofeli_icon.pixmap(48 * 3, 48 * 3));
+    QIcon fluvel_icon(":/icons/app/fluvel.svg");
+    icon_label->setPixmap(fluvel_icon.pixmap(48 * 3, 48 * 3));
     icon_label->setAlignment(Qt::AlignCenter);
 
     QLabel* name_label = new QLabel;
@@ -235,7 +235,10 @@ AboutWindow::AboutWindow(QWidget* parent)
     QFont font2;
     font2.setPointSize(12);
     version_label->setFont(font2);
-    version_label->setText("Version 2.0.0");
+
+    const QString verStr = QString(tr("Version ")) + QString(FLUVEL_VERSION);
+
+    version_label->setText(verStr);
     version_label->setAlignment(Qt::AlignCenter);
     version_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
                                            Qt::LinksAccessibleByKeyboard);
@@ -490,4 +493,4 @@ void AboutWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

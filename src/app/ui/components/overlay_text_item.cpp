@@ -3,7 +3,7 @@
 
 #include "overlay_text_item.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 OverlayTextItem::OverlayTextItem(QGraphicsItem* parent)
@@ -65,4 +65,4 @@ void OverlayTextItem::setText(const QString& text)
     update();
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

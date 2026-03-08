@@ -6,7 +6,7 @@
 #include "contour_data.hpp"
 #include "point.hpp"
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 enum class BoundaryOrientation
@@ -109,4 +109,4 @@ inline void BoundaryBuilder::add_point_unique(Contour& out, int x, int y)
     out.push_back(p);
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

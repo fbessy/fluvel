@@ -14,7 +14,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class CameraWindow : public QMainWindow
@@ -71,4 +71,4 @@ signals:
     void cameraWindowClosed();
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

@@ -9,7 +9,7 @@
 class QComboBox;
 class QPushButton;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ColorSelectorWidget : public QWidget
@@ -37,4 +37,4 @@ private:
     QPushButton* custom_pb_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

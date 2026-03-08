@@ -8,7 +8,7 @@
 #include <cassert>
 #include <vector>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 template <typename T> class Grid2D
@@ -139,4 +139,4 @@ private:
     std::vector<T> data_;
 };
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

@@ -6,7 +6,7 @@
 #include "active_contour.hpp"
 #include "image_span.hpp"
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class RegionAc : public ActiveContour
@@ -92,4 +92,4 @@ RegionAc::RegionAc(ImageSpan image, T&& initial_contour,
     RegionAc::do_specific_cycle1();
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

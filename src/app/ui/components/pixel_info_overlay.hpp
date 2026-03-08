@@ -12,7 +12,7 @@
 #include <QPointF>
 #include <QString>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class PixelInfoOverlay final : public QGraphicsItem
@@ -45,4 +45,4 @@ private:
     QRectF boundingRect_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

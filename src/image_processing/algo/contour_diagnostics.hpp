@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <vector>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class ChannelVector
@@ -41,10 +41,10 @@ private:
 struct ContourDiagnostics
 {
     int stepCount = 0;
-    ofeli_ip::PhaseState state{ofeli_ip::PhaseState::Cycle1};
+    fluvel_ip::PhaseState state{fluvel_ip::PhaseState::Cycle1};
     ChannelVector meanIn{0, 0, 0};
     ChannelVector meanOut{0, 0, 0};
-    ofeli_ip::StoppingStatus stoppingStatus{ofeli_ip::StoppingStatus::None};
+    fluvel_ip::StoppingStatus stoppingStatus{fluvel_ip::StoppingStatus::None};
     float hausdorffQuantile = 0.f;
     float relativeCentroidDistance = 0.f;
     double elapsedSec = 0.0;
@@ -87,4 +87,4 @@ inline const char* toString(StoppingStatus status)
     return "Unknown";
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

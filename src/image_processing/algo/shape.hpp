@@ -6,7 +6,7 @@
 #include "point.hpp"
 #include <vector>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class Shape
@@ -64,4 +64,4 @@ private:
     Point2D_f centroid_;
 };
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

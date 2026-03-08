@@ -6,7 +6,7 @@
 
 #include <QPainter>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 PhiViewModel::PhiViewModel(PhiEditor* editor, QObject* parent)
@@ -29,7 +29,7 @@ PhiViewModel::PhiViewModel(PhiEditor* editor, QObject* parent)
 
 void PhiViewModel::onConnectivityChanged(int index)
 {
-    connectivity_ = static_cast<ofeli_ip::Connectivity>(index);
+    connectivity_ = static_cast<fluvel_ip::Connectivity>(index);
 
     updateLists();
     updatePhiFromLists();
@@ -114,7 +114,7 @@ bool PhiViewModel::point_is_redundant(int x, int y)
 
     // 4-connectivity
     // connectivity_ == Connectivity::Four
-    if (connectivity_ == ofeli_ip::Connectivity::Four)
+    if (connectivity_ == fluvel_ip::Connectivity::Four)
     {
         return same_value(x - 1, y) && same_value(x + 1, y) && same_value(x, y - 1) &&
                same_value(x, y + 1);
@@ -301,4 +301,4 @@ void PhiViewModel::setOverlay(const ShapeInfo& overlayShape)
     composeView(true);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

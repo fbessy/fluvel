@@ -5,7 +5,7 @@
 
 #include "view_behavior.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ZoomBehavior : public ViewBehavior
@@ -19,4 +19,4 @@ private:
     // double zoomFactor_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

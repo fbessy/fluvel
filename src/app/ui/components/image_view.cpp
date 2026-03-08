@@ -17,7 +17,7 @@
 
 #include <cassert>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ImageView::ImageView(QWidget* parent)
@@ -891,4 +891,4 @@ bool ImageView::isPixelVisible(const QPoint& viewPos) const
     return visibleSceneRect.contains(scenePos);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

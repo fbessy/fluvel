@@ -10,7 +10,7 @@
 
 class QMouseEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class PanBehavior : public ViewBehavior
@@ -67,4 +67,4 @@ private:
     QPoint lastPos_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

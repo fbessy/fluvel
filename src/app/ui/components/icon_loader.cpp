@@ -4,7 +4,7 @@
 #include "icon_loader.hpp"
 #include <QApplication>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 // icon loader namespace for function outside a class
@@ -75,4 +75,4 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback)
 
 } // namespace il
 
-} // namespace ofeli_app
+} // namespace fluvel_app

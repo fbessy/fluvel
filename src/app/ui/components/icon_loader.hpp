@@ -6,7 +6,7 @@
 #include <QIcon>
 #include <QStyle>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 namespace il
@@ -20,4 +20,4 @@ QIcon loadIcon(const QString& themeName, const QString& fallback);
 QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback);
 } // namespace il
 
-} // namespace ofeli_app
+} // namespace fluvel_app

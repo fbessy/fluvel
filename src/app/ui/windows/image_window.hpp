@@ -15,7 +15,7 @@
 
 #include <QMainWindow>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageView;
@@ -35,7 +35,7 @@ public slots:
     void onInputImageReady(const QImage& inputImage);
     void onDisplayedImageReady(const QImage& displayed);
     void onFileOpened(const QString& path);
-    void onStateChanged(ofeli_app::WorkerState state);
+    void onStateChanged(fluvel_app::WorkerState state);
     void onCameraWindowShown();
     void onCameraWindowClosed();
 
@@ -46,6 +46,7 @@ signals:
     void imageDropped(const QString& path);
 
 protected:
+    void showEvent(QShowEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
 
 private:
@@ -127,4 +128,4 @@ private:
 QString buildImageFilter();
 bool isSupportedImage(const QString& path);
 
-} // namespace ofeli_app
+} // namespace fluvel_app

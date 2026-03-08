@@ -9,7 +9,7 @@
 #include <QImage>
 #include <QRect>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 struct ShapeInfo
@@ -51,4 +51,4 @@ private:
     QImage committedPhi_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

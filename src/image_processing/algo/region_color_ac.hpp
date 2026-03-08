@@ -9,7 +9,7 @@
 
 #include <cstdint>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class RegionColorAc : public ActiveContour
@@ -119,9 +119,9 @@ RegionColorAc::RegionColorAc(
     RegionColorAc::do_specific_cycle1();
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip
 
-//! \class ofeli::RegionColorAc
+//! \class fluvel_ip::RegionColorAc
 //! The child class RegionColorAc implements a function to calculate specifically speed \a Fd based
 //! on the Chan-Vese model, a region-based energy functional. The regularization of our active
 //! contour is performed by a gaussian smoothing of #phi so we are interested uniquely by the

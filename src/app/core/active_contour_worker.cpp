@@ -15,7 +15,7 @@
 
 #include <cassert>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 constexpr int kWorkerPeriodMs = 16;
@@ -227,7 +227,7 @@ void ActiveContourWorker::applyProcessing()
 
     const int bytesPerPixel = static_cast<int>(stride / width);
 
-    ofeli_ip::Filters filters(img.constBits(), width, img.height(), bytesPerPixel);
+    fluvel_ip::Filters filters(img.constBits(), width, img.height(), bytesPerPixel);
 
     // start_time = std::clock();
 
@@ -390,7 +390,7 @@ void ActiveContourWorker::initializeActiveContour()
 
     auto initialPhi = image_span_from_qimage(config_.initialPhi);
 
-    ofeli_ip::ContourData initialCD(initialPhi, config_.algo.connectivity);
+    fluvel_ip::ContourData initialCD(initialPhi, config_.algo.connectivity);
 
     bool is_rgb = (processedImage_.format() != QImage::Format_Grayscale8);
 
@@ -398,12 +398,12 @@ void ActiveContourWorker::initializeActiveContour()
 
     if (is_rgb)
     {
-        ac_ = std::make_unique<ofeli_ip::RegionColorAc>(
+        ac_ = std::make_unique<fluvel_ip::RegionColorAc>(
             processedImg, std::move(initialCD), config_.algo.acConfig, config_.algo.regionAcConfig);
     }
     else
     {
-        ac_ = std::make_unique<ofeli_ip::RegionAc>(
+        ac_ = std::make_unique<fluvel_ip::RegionAc>(
             processedImg, std::move(initialCD), config_.algo.acConfig, config_.algo.regionAcConfig);
     }
 
@@ -474,7 +474,7 @@ void ActiveContourWorker::updateDiagnostics()
     if (!ac_)
         return;
 
-    ofeli_ip::ContourDiagnostics diag;
+    fluvel_ip::ContourDiagnostics diag;
 
     if (isMeasuring_)
     {
@@ -537,4 +537,4 @@ void ActiveContourWorker::resetMeasurement()
     measurementStartTime_ = clock_type::time_point{};
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

@@ -10,7 +10,7 @@
 
 class QMouseEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageView;
@@ -59,4 +59,4 @@ private:
     std::unique_ptr<PixelInfoOverlay> overlay_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

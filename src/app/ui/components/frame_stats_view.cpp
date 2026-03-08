@@ -3,7 +3,7 @@
 
 #include "frame_stats_view.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 static constexpr qint64 kWindowNs = 1'000'000'000LL; // 1 seconde
@@ -110,4 +110,4 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
     windowStartNs_ = nowNs;
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

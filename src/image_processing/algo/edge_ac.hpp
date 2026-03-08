@@ -6,7 +6,7 @@
 #include "active_contour.hpp"
 #include "image_span.hpp"
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 class EdgeAc : public ActiveContour
@@ -58,4 +58,4 @@ EdgeAc::EdgeAc(ImageSpan gradient_image, T&& initial_contour,
            gradient_image_.height() == cd_.phi().height());
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

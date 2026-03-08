@@ -2,11 +2,11 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "region_color_ac.hpp"
-#include "ofeli_math.hpp"
+#include "fluvel_math.hpp"
 
 #include <cassert>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 void RegionColorAc::initialize_sums()
@@ -141,4 +141,4 @@ void RegionColorAc::fillDiagnostics(ContourDiagnostics& d) const
                       static_cast<int>(meanOut_.blue));
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

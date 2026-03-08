@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QWidget>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class RightPanelToggleButton : public QPushButton
@@ -25,4 +25,4 @@ private:
     QIcon iconOff_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

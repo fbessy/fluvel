@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QImage>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageController : public QObject
@@ -21,10 +21,10 @@ public:
 public slots:
     void loadImage(const QString& path);
     void onProcessedImageReady(const QImage& processed);
-    void onContourUpdated(const ofeli_ip::ExportedContour& l_out,
-                          const ofeli_ip::ExportedContour& l_in);
-    void onStateChanged(ofeli_app::WorkerState state);
-    void onDiagnosticsUpdated(const ofeli_ip::ContourDiagnostics& diag);
+    void onContourUpdated(const fluvel_ip::ExportedContour& l_out,
+                          const fluvel_ip::ExportedContour& l_in);
+    void onStateChanged(fluvel_app::WorkerState state);
+    void onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& diag);
 
     void restart();
     void togglePause();
@@ -39,7 +39,7 @@ signals:
     void displayedImageReady(const QImage& displayed);
 
     void contourUpdated(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in);
-    void stateChanged(ofeli_app::WorkerState state);
+    void stateChanged(fluvel_app::WorkerState state);
 
     void textDiagnosticsUpdated(QString string);
 
@@ -67,4 +67,4 @@ private:
 
 bool isSupportedImage(const QString& path);
 
-} // namespace ofeli_app
+} // namespace fluvel_app

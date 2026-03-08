@@ -22,9 +22,9 @@
 #include <cstddef>
 #include <numeric>
 
-#include "ofeli_math.hpp"
+#include "fluvel_math.hpp"
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 constexpr size_t kInitialArrayAllocSize = 10000u;
@@ -218,4 +218,4 @@ float HausdorffDistance::get_centroids_distance() const
     return gap_dist;
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

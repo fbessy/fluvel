@@ -9,7 +9,7 @@
 #include <cstddef>
 #include <utility>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 enum class ImageFormat
@@ -165,4 +165,4 @@ private:
     }
 };
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

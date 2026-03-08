@@ -2,7 +2,7 @@
 # current image_processing directory
 set(IP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(TARGET_NAME ofeli_image_processing)
+set(TARGET_NAME fluvel_image_processing)
 
 set(ALGO_DIR     ${IP_DIR}/algo)
 set(CORE_DIR     ${IP_DIR}/core)
@@ -46,13 +46,13 @@ set(ip_src
     ${CORE_DIR}/point.hpp
     ${CORE_DIR}/point_hash.hpp
     ${CORE_DIR}/point_containers.hpp
-    ${CORE_DIR}/ofeli_math.hpp
+    ${CORE_DIR}/fluvel_math.hpp
     ${CORE_DIR}/color.hpp
     ${CORE_DIR}/neighborhood.hpp
 )
 
 add_library(${TARGET_NAME} STATIC ${ip_src})
-add_library(ofeli::image_processing ALIAS ${TARGET_NAME})
+add_library(fluvel::image_processing ALIAS ${TARGET_NAME})
 
 
 target_include_directories(${TARGET_NAME} PUBLIC
@@ -61,9 +61,9 @@ target_include_directories(${TARGET_NAME} PUBLIC
 )
 
 # image_processing/
-#   include/ofeli/image_processing/   <-- API publique
-#   core/                             <-- interne
-#   algo/                             <-- interne
+#   include/fluvel/image_processing/   <-- API publique
+#   core/                              <-- interne
+#   algo/                              <-- interne
 # Et côté CMake :
 
 # cmake

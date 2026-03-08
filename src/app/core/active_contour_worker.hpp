@@ -14,7 +14,7 @@
 
 #include <chrono>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 using clock_type = std::chrono::steady_clock;
@@ -57,10 +57,10 @@ public:
 
 signals:
     void processedImageReady(const QImage& img);
-    void contourUpdated(const ofeli_ip::ExportedContour& l_out,
-                        const ofeli_ip::ExportedContour& l_in);
-    void stateChanged(ofeli_app::WorkerState state);
-    void diagnosticsUpdated(ofeli_ip::ContourDiagnostics diag);
+    void contourUpdated(const fluvel_ip::ExportedContour& l_out,
+                        const fluvel_ip::ExportedContour& l_in);
+    void stateChanged(fluvel_app::WorkerState state);
+    void diagnosticsUpdated(fluvel_ip::ContourDiagnostics diag);
 
 private slots:
     void onTimeout();
@@ -87,7 +87,7 @@ private:
     WorkerState state_{WorkerState::Uninitialized};
     RunMode mode_{RunMode::Interactive};
     QTimer* workerTimer_;
-    std::unique_ptr<ofeli_ip::ActiveContour> ac_;
+    std::unique_ptr<fluvel_ip::ActiveContour> ac_;
 
     QImage image_;
     QImage processedImage_;
@@ -97,9 +97,9 @@ private:
 
     ImageComputeConfig config_;
 
-    ofeli_ip::ContourDiagnostics diag_;
+    fluvel_ip::ContourDiagnostics diag_;
     clock_type::time_point measurementStartTime_;
     bool isMeasuring_ = false;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

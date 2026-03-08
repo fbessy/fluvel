@@ -16,7 +16,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 /**
@@ -77,4 +77,4 @@ private:
     std::vector<std::unique_ptr<ViewBehavior>> behaviors_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

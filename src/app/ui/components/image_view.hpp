@@ -25,7 +25,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ImageViewInteraction;
@@ -85,8 +85,8 @@ public slots:
 
     void showPlaceholder(bool showEffect);
 
-    void applyDisplayConfig(const ofeli_app::DisplayConfig& display);
-    void applyDownscaleConfig(const ofeli_app::DownscaleConfig& downscale);
+    void applyDisplayConfig(const fluvel_app::DisplayConfig& display);
+    void applyDownscaleConfig(const fluvel_app::DownscaleConfig& downscale);
     void updateFlip();
     void updateSmoothDisplay();
     void updateTextOverlayVisibility();
@@ -184,4 +184,4 @@ signals:
     void imageDropped(const QString& path);
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

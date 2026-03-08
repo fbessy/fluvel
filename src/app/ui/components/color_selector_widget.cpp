@@ -10,7 +10,7 @@
 #include <QPushButton>
 #include <QSignalBlocker>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 ColorSelectorWidget::ColorSelectorWidget(QWidget* parent, QColor initialColor)
@@ -114,4 +114,4 @@ void ColorSelectorWidget::setSelectedColor(const QColor& color)
     }
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

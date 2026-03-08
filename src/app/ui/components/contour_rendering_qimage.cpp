@@ -6,11 +6,11 @@
 
 #include <QImage>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
-void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
-                      const ofeli_ip::Rgb_uc& color, QImage& img)
+void draw_list_to_img(const std::vector<fluvel_ip::ContourPoint>& list,
+                      const fluvel_ip::Rgb_uc& color, QImage& img)
 {
     assert(!img.isNull());
     assert(img.format() == QImage::Format_RGB32);
@@ -34,8 +34,8 @@ void draw_list_to_img(const std::vector<ofeli_ip::ContourPoint>& list,
     }
 }
 
-void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
-                       const ofeli_ip::Rgb_uc& color, int upscale_factor, QImage& img)
+void draw_upscale_list(const std::vector<fluvel_ip::ContourPoint>& list,
+                       const fluvel_ip::Rgb_uc& color, int upscale_factor, QImage& img)
 {
     if (upscale_factor != 2 && upscale_factor != 4)
         return;
@@ -108,4 +108,4 @@ void draw_upscale_list(const std::vector<ofeli_ip::ContourPoint>& list,
     }
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

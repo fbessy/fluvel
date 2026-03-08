@@ -2,14 +2,14 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "shape.hpp"
-#include "ofeli_math.hpp"
+#include "fluvel_math.hpp"
 
 #include <algorithm>
 #include <cassert>
 #include <limits>
 #include <random>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 Shape::Shape()
@@ -91,4 +91,4 @@ float Shape::get_grid_diagonal(int grid_width, int grid_height)
     return math::euclidean_distance(top_left, bottom_right);
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

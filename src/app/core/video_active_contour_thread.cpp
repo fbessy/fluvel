@@ -6,7 +6,7 @@
 #include "frame_clock.hpp"
 #include "image_adapters.hpp"
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
@@ -117,9 +117,9 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
 
             const auto& algo_conf = config.algo;
 
-            region_ac_ = std::make_unique<ofeli_ip::RegionColorAc>(
+            region_ac_ = std::make_unique<fluvel_ip::RegionColorAc>(
                 img_algo,
-                ofeli_ip::ContourData(img_algo.width(), img_algo.height(), algo_conf.connectivity),
+                fluvel_ip::ContourData(img_algo.width(), img_algo.height(), algo_conf.connectivity),
                 algo_conf.acConfig, algo_conf.regionAcConfig);
 
             currentWidth_ = newW;
@@ -181,4 +181,4 @@ void VideoActiveContourThread::setAlgoConfig(const VideoComputeConfig& config)
     configChanged_ = true;
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app

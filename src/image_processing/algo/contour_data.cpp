@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <stack>
 
-namespace ofeli_ip
+namespace fluvel_ip
 {
 
 ContourData::ContourData(int phi_width, int phi_height, Connectivity connectivity)
@@ -366,4 +366,4 @@ ExportedContour ContourData::export_contour(const Contour& boundary) const
     return geometric_boundary;
 }
 
-} // namespace ofeli_ip
+} // namespace fluvel_ip

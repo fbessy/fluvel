@@ -11,7 +11,7 @@ class QComboBox;
 class QSpinBox;
 class QGroupBox;
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class AlgoSettingsWidget : public QWidget
@@ -49,4 +49,4 @@ private:
     AlgoConfig& config_;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

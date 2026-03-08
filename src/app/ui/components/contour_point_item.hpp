@@ -7,7 +7,7 @@
 #include <QPoint>
 #include <QVector>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 class ContourPointsItem : public QGraphicsItem
@@ -34,4 +34,4 @@ private:
     QColor color_ = Qt::red;
 };
 
-} // namespace ofeli_app
+} // namespace fluvel_app

@@ -7,7 +7,7 @@
 #include <QGraphicsScene>
 #include <QPainter>
 
-namespace ofeli_app
+namespace fluvel_app
 {
 
 static const QString kMaxText = "(0000, 0000)\n R:888  G:888  B:888";
@@ -141,4 +141,4 @@ void PixelInfoOverlay::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
                       text_);
 }
 
-} // namespace ofeli_app
+} // namespace fluvel_app
