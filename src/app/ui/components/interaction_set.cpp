@@ -170,4 +170,10 @@ bool InteractionSet::drop(ImageView& view, QDropEvent* event)
     return false;
 }
 
+void InteractionSet::cancel()
+{
+    if (auto* b = capturingBehavior())
+        const_cast<ViewBehavior*>(b)->cancel();
+}
+
 } // namespace ofeli_app

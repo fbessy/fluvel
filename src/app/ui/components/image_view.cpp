@@ -401,7 +401,16 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
-    if (!itemMovable && m_interaction_)
+    if (itemMovable)
+    {
+        if (m_interaction_)
+            m_interaction_->cancel(); // 👈 stop pixel info
+
+        QGraphicsView::mouseMoveEvent(event);
+        return;
+    }
+
+    if (m_interaction_)
     {
         m_interaction_->mouseMove(*this, event);
         updateCursor(event);

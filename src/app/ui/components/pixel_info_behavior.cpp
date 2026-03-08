@@ -23,6 +23,14 @@ bool PixelInfoBehavior::mousePress(ImageView& view, QMouseEvent* event)
     if (event->button() != Qt::RightButton)
         return false;
 
+    const auto items = view.items(event->pos());
+
+    for (auto* item : items)
+    {
+        if (item->flags() & QGraphicsItem::ItemIsMovable)
+            return false; // ne pas activer le pixel info sur overlay
+    }
+
     active_ = true;
 
     if (!overlay_)
@@ -31,6 +39,7 @@ bool PixelInfoBehavior::mousePress(ImageView& view, QMouseEvent* event)
     updateOverlay(view, event->pos());
     overlay_->showOverlay();
 
+    event->accept();
     return true;
 }
 
@@ -52,6 +61,21 @@ bool PixelInfoBehavior::mouseMove(ImageView& view, QMouseEvent* event)
         return false;
     }
 
+    // 👇 NOUVEAU : détecter si on est sur un item movable
+    const auto items = view.items(event->pos());
+
+    for (auto* item : items)
+    {
+        if (item->flags() & QGraphicsItem::ItemIsMovable)
+        {
+            if (overlay_)
+                overlay_->hideOverlay();
+
+            return true; // on reste actif mais on n'affiche pas
+        }
+    }
+
+    // sinon comportement normal
     updateOverlay(view, event->pos());
     return true;
 }
@@ -103,6 +127,14 @@ void PixelInfoBehavior::updateOverlay(ImageView& view, const QPoint& viewPos)
     const QPointF anchorScenePos = view.mapToScene(viewPos);
 
     overlay_->updateInfo(pixel, color, view.isGrayscale(), anchorScenePos, view);
+}
+
+void PixelInfoBehavior::cancel()
+{
+    active_ = false;
+
+    if (overlay_)
+        overlay_->hideOverlay();
 }
 
 } // namespace ofeli_app

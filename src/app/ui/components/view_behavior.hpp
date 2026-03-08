@@ -85,6 +85,8 @@ public:
     {
         return 0;
     }
+
+    virtual void cancel() {};
 };
 
 } // namespace ofeli_app

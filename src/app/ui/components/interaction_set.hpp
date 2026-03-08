@@ -71,6 +71,8 @@ protected:
     bool dragLeave(ImageView& view, QDragLeaveEvent* event) override;
     bool drop(ImageView& view, QDropEvent* event) override;
 
+    void cancel() override;
+
 private:
     std::vector<std::unique_ptr<ViewBehavior>> behaviors_;
 };

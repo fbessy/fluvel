@@ -43,6 +43,7 @@ public:
     bool mousePress(ImageView& view, QMouseEvent* event) override;
     bool mouseMove(ImageView& view, QMouseEvent* event) override;
     bool mouseRelease(ImageView& view, QMouseEvent* event) override;
+    void cancel() override;
 
 private:
     void updateOverlay(ImageView& view, const QPoint& viewPos);
