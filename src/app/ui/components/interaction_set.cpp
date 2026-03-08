@@ -13,8 +13,16 @@ namespace ofeli_app
 
 void InteractionSet::addBehavior(std::unique_ptr<ViewBehavior> behavior)
 {
-    if (behavior)
-        behaviors_.push_back(std::move(behavior));
+    if (!behavior)
+        return;
+
+    behaviors_.push_back(std::move(behavior));
+
+    std::sort(behaviors_.begin(), behaviors_.end(),
+              [](const auto& a, const auto& b)
+              {
+                  return a->priority() > b->priority();
+              });
 }
 
 bool InteractionSet::wheel(ImageView& view, QWheelEvent* event)
@@ -30,6 +38,9 @@ bool InteractionSet::wheel(ImageView& view, QWheelEvent* event)
 
 bool InteractionSet::mousePress(ImageView& view, QMouseEvent* event)
 {
+    if (auto* b = capturingBehavior())
+        return const_cast<ViewBehavior*>(b)->mousePress(view, event);
+
     for (auto& b : behaviors_)
     {
         if (b->mousePress(view, event))
@@ -41,6 +52,9 @@ bool InteractionSet::mousePress(ImageView& view, QMouseEvent* event)
 
 bool InteractionSet::mouseMove(ImageView& view, QMouseEvent* event)
 {
+    if (auto* b = capturingBehavior())
+        return const_cast<ViewBehavior*>(b)->mouseMove(view, event);
+
     for (auto& b : behaviors_)
     {
         if (b->mouseMove(view, event))
@@ -52,6 +66,9 @@ bool InteractionSet::mouseMove(ImageView& view, QMouseEvent* event)
 
 bool InteractionSet::mouseRelease(ImageView& view, QMouseEvent* event)
 {
+    if (auto* b = capturingBehavior())
+        return const_cast<ViewBehavior*>(b)->mouseRelease(view, event);
+
     for (auto& b : behaviors_)
     {
         if (b->mouseRelease(view, event))

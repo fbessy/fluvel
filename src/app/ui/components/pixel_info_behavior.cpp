@@ -41,11 +41,18 @@ bool PixelInfoBehavior::mouseMove(ImageView& view, QMouseEvent* event)
     if (!active_)
         return false;
 
+    // Si le bouton droit n'est plus enfoncé → on stoppe tout
     if (!(event->buttons() & Qt::RightButton))
+    {
+        active_ = false;
+
+        if (overlay_)
+            overlay_->hideOverlay();
+
         return false;
+    }
 
     updateOverlay(view, event->pos());
-
     return true;
 }
 
@@ -71,13 +78,28 @@ void PixelInfoBehavior::updateOverlay(ImageView& view, const QPoint& viewPos)
     if (!overlay_)
         return;
 
+    // Si on est sur un item interactif (ex: texte overlay)
+    const auto items = view.items(viewPos);
+
+    for (auto* item : items)
+    {
+        if (item->flags() & QGraphicsItem::ItemIsMovable)
+        {
+            overlay_->hideOverlay();
+            active_ = false;
+            return;
+        }
+    }
+
     const QPoint pixel = view.imageCoordinatesFromView(viewPos);
+
     if (pixel.x() < 0)
+    {
+        overlay_->hideOverlay();
         return;
+    }
 
     const QRgb color = view.pixelColorAt(pixel);
-
-    // position ancre : exactement sous le curseur
     const QPointF anchorScenePos = view.mapToScene(viewPos);
 
     overlay_->updateInfo(pixel, color, view.isGrayscale(), anchorScenePos, view);

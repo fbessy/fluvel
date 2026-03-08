@@ -33,7 +33,7 @@ public:
     }
 
     Qt::CursorShape availableCursor(bool hasImage, bool isPanRelevant, const ImageView& view,
-                                    const QMouseEvent* e) const
+                                    const QMouseEvent* e) const override
     {
         if (!hasImage || !isPanRelevant)
             return Qt::ArrowCursor;

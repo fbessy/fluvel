@@ -388,7 +388,10 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
     if (!itemMovable && m_interaction_)
+    {
         m_interaction_->mousePress(*this, event);
+        updateCursor(event);
+    }
 
     QGraphicsView::mousePressEvent(event);
 }
@@ -399,7 +402,10 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
     if (!itemMovable && m_interaction_)
+    {
         m_interaction_->mouseMove(*this, event);
+        updateCursor(event);
+    }
 
     QGraphicsView::mouseMoveEvent(event);
 }
@@ -410,7 +416,10 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
     if (!itemMovable && m_interaction_)
+    {
         m_interaction_->mouseRelease(*this, event);
+        updateCursor(event);
+    }
 
     QGraphicsView::mouseReleaseEvent(event);
 }
@@ -429,6 +438,19 @@ void ImageView::updateCursor(const QMouseEvent* e)
     if (!m_interaction_)
         return;
 
+    QPoint pos = e ? e->pos() : viewport()->mapFromGlobal(QCursor::pos());
+
+    const auto items = this->items(pos);
+
+    for (auto* item : items)
+    {
+        if (item->flags() & QGraphicsItem::ItemIsMovable)
+        {
+            viewport()->setCursor(Qt::ArrowCursor);
+            return;
+        }
+    }
+
     viewport()->setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), e));
 }
 
@@ -437,12 +459,22 @@ bool ImageView::viewportEvent(QEvent* event)
     if (!m_interaction_)
         return QGraphicsView::viewportEvent(event);
 
-    if (event->type() == QEvent::MouseMove || event->type() == QEvent::HoverMove ||
-        event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseButtonRelease)
+    switch (event->type())
     {
-        auto* me = dynamic_cast<QMouseEvent*>(event);
+        case QEvent::MouseMove:
+        case QEvent::HoverMove:
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+        {
+            auto* me = static_cast<QMouseEvent*>(event);
 
-        updateCursor(me);
+            updateCursor(me);
+
+            break;
+        }
+
+        default:
+            break;
     }
 
     return QGraphicsView::viewportEvent(event);

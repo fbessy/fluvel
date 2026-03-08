@@ -18,6 +18,9 @@ PixelInfoOverlay::PixelInfoOverlay(QGraphicsScene* scene)
 {
     Q_ASSERT(scene);
 
+    setAcceptedMouseButtons(Qt::NoButton);
+    setAcceptHoverEvents(false);
+
     scene->addItem(this);
 
     setZValue(10'000); // toujours au-dessus
