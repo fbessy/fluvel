@@ -45,7 +45,7 @@ The project is organized into:
 - `src/` — Core engine and application code
 - `docs/` — Documentation configuration (Doxygen)
 - `CMakeLists.txt` — Build configuration
-- `ofeli.json` — Flatpak manifest
+- `fluvel.json` — Flatpak manifest
 
 The image processing engine operates on contiguous memory buffers.
 Visualization and UI components are separated from the core algorithmic logic.
