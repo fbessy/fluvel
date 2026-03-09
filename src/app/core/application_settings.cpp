@@ -81,6 +81,12 @@ fluvel_ip::Rgb_uc rgbFromString(const QString& s, const fluvel_ip::Rgb_uc& defau
 
 } // namespace
 
+ApplicationSettings& ApplicationSettings::instance()
+{
+    static ApplicationSettings instance;
+    return instance;
+}
+
 ApplicationSettings::ApplicationSettings()
 {
     QSettings settings = userSettings();

@@ -917,7 +917,7 @@ void SettingsWindow::default_settings()
 /*
 const unsigned char* SettingsWindow::get_filtered_img_data()
 {
-    const auto& config = AppSettings::instance();
+    const auto& config = ApplicationSettings::instance();
 
     if(    config.has_preprocess
         && ( config.has_gaussian_noise || config.has_salt_noise || config.has_speckle_noise ) )

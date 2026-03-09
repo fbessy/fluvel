@@ -35,7 +35,7 @@ LanguageWindow::LanguageWindow(QWidget* parent)
     combo_->addItem(tr("French"), QVariant::fromValue(int(Language::French)));
 
     // sélectionner la langue actuelle indépendamment de l’index
-    auto currentLanguage = AppSettings::instance().appLanguage();
+    auto currentLanguage = ApplicationSettings::instance().appLanguage();
 
     int index = combo_->findData(QVariant::fromValue(int(currentLanguage)));
     if (index >= 0)
@@ -72,7 +72,7 @@ void LanguageWindow::accept()
     // récupérer la valeur logique (pas l’index)
     Language language = Language(combo_->currentData().toInt());
 
-    AppSettings::instance().setAppLanguage(language);
+    ApplicationSettings::instance().setAppLanguage(language);
 
     QSettings settings;
     settings.setValue("ui/language", int(language));
@@ -83,7 +83,7 @@ void LanguageWindow::accept()
 void LanguageWindow::reject()
 {
     // restaurer la langue active
-    auto language = AppSettings::instance().appLanguage();
+    auto language = ApplicationSettings::instance().appLanguage();
 
     int index = combo_->findData(QVariant::fromValue(int(language)));
     if (index >= 0)

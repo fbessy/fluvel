@@ -11,8 +11,8 @@ namespace fluvel_app
 ImageSettingsController::ImageSettingsController(QObject* parent)
     : QObject(parent)
 {
-    phiEditor_ =
-        std::make_unique<PhiEditor>(AppSettings::instance().imageSettings().compute.initialPhi);
+    phiEditor_ = std::make_unique<PhiEditor>(
+        ApplicationSettings::instance().imageSettings().compute.initialPhi);
     phiViewModel_ = std::make_unique<PhiViewModel>(phiEditor_.get());
 
     connect(phiEditor_.get(), &PhiEditor::phiAccepted, this,
@@ -129,7 +129,7 @@ void ImageSettingsController::reject()
 
 void ImageSettingsController::setInitialPhi(const QImage& phi)
 {
-    AppSettings::instance().setInitialPhiImage(phi);
+    ApplicationSettings::instance().setInitialPhiImage(phi);
 }
 
 } // namespace fluvel_app

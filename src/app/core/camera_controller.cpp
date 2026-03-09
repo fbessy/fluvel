@@ -15,14 +15,14 @@ CameraController::CameraController(QObject* parent)
     : QObject(parent)
     , ac_thread_(this)
 {
-    onVideoSettingsChanged(AppSettings::instance().videoSettings());
-    onVideoDisplaySettingsChanged(AppSettings::instance().videoSettings().display);
+    onVideoSettingsChanged(ApplicationSettings::instance().videoSettings());
+    onVideoDisplaySettingsChanged(ApplicationSettings::instance().videoSettings().display);
 
-    connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
+    connect(&ApplicationSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
             &CameraController::onVideoSettingsChanged);
 
-    connect(&AppSettings::instance(), &ApplicationSettings::videoDisplaySettingsChanged, this,
-            &CameraController::onVideoDisplaySettingsChanged);
+    connect(&ApplicationSettings::instance(), &ApplicationSettings::videoDisplaySettingsChanged,
+            this, &CameraController::onVideoDisplaySettingsChanged);
 
     connect(&ac_thread_, &VideoActiveContourThread::frameResultReady, this,
             &CameraController::onFrameResultReady, Qt::QueuedConnection);

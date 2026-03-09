@@ -18,6 +18,8 @@ class ApplicationSettings : public QObject
     Q_OBJECT
 
 public:
+    static ApplicationSettings& instance();
+
     ApplicationSettings();
     ~ApplicationSettings() override = default;
 
@@ -70,16 +72,6 @@ private:
     VideoSessionSettings videoSettings_;
 
     Language appLanguage_;
-};
-
-class AppSettings
-{
-public:
-    static ApplicationSettings& instance()
-    {
-        static ApplicationSettings settings;
-        return settings;
-    }
 };
 
 QString toSettingsPrefix(Session scope);

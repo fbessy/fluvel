@@ -14,13 +14,13 @@ namespace fluvel_app
 ImageController::ImageController(QObject* parent)
     : QObject(parent)
 {
-    onImgSettingsChanged(AppSettings::instance().imageSettings());
-    onImgDisplaySettingsChanged(AppSettings::instance().imageSettings().display);
+    onImgSettingsChanged(ApplicationSettings::instance().imageSettings());
+    onImgDisplaySettingsChanged(ApplicationSettings::instance().imageSettings().display);
 
-    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
+    connect(&ApplicationSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
             &ImageController::onImgSettingsChanged);
 
-    connect(&AppSettings::instance(), &ApplicationSettings::imgDisplaySettingsChanged, this,
+    connect(&ApplicationSettings::instance(), &ApplicationSettings::imgDisplaySettingsChanged, this,
             &ImageController::onImgDisplaySettingsChanged);
 
     connect(&acWorker_, &ActiveContourWorker::processedImageReady, this,
