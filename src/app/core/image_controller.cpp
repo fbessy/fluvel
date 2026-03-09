@@ -14,8 +14,8 @@ namespace fluvel_app
 ImageController::ImageController(QObject* parent)
     : QObject(parent)
 {
-    onImgSettingsChanged(AppSettings::instance().imgConfig());
-    onImgDisplaySettingsChanged(AppSettings::instance().imgConfig().display);
+    onImgSettingsChanged(AppSettings::instance().imageSettings());
+    onImgDisplaySettingsChanged(AppSettings::instance().imageSettings().display);
 
     connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
             &ImageController::onImgSettingsChanged);

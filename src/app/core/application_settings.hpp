@@ -23,11 +23,11 @@ public:
 
     void save();
 
-    void setInitalPhi(const QImage& phi);
-    const ImageSessionSettings& imgConfig() const;
-    const VideoSessionSettings& camConfig() const;
+    void setInitialPhiImage(const QImage& phi);
+    const ImageSessionSettings& imageSettings() const;
+    const VideoSessionSettings& videoSettings() const;
 
-    void resizeInitialPhi(int width, int height);
+    void resizeInitialPhiImage(int width, int height);
 
     Language app_language;
 
@@ -40,33 +40,33 @@ signals:
     void resizedPhi(const QImage& phi);
 
 public slots:
-    void save_img_session_config_with_val(const ImageSessionSettings& config);
-    void save_cam_session_config_with_val(const VideoSessionSettings& config);
-    void set_img_display_config(const DisplayConfig& disp_config);
-    void set_cam_display_config(const DisplayConfig& disp_config);
+    void updateImageSessionSettings(const ImageSessionSettings& config);
+    void updateVideoSessionSettings(const VideoSessionSettings& config);
+    void setImageDisplayConfig(const DisplayConfig& displayConfig);
+    void setVideoDisplayConfig(const DisplayConfig& displayConfig);
 
 private:
-    void load_img_session_config();
-    void load_cam_session_config();
-    void save_img_session_config();
-    void save_cam_session_config();
+    void loadImageSessionSettings();
+    void loadVideoSessionSettings();
+    void saveImageSessionSettings();
+    void saveVideoSessionSettings();
 
-    void load_algo(Session session, AlgoConfig& algo);
-    void load_downscale(Session session, DownscaleConfig& downscale_config);
-    void load_disp(Session session, DisplayConfig& disp_config);
+    void loadAlgo(Session session, AlgoConfig& algoConfig);
+    void loadDownscale(Session session, DownscaleConfig& downscaleConfig);
+    void loadDisplay(Session session, DisplayConfig& displayConfig);
 
-    void save_algo(Session session, const AlgoConfig& algo);
-    void save_downscale(Session session, const DownscaleConfig& downscale_config);
-    void save_disp(Session session, const DisplayConfig& disp_config);
+    void saveAlgo(Session session, const AlgoConfig& algoConfig);
+    void saveDownscale(Session session, const DownscaleConfig& downscaleConfig);
+    void saveDisplay(Session session, const DisplayConfig& displayConfig);
 
     QDir settingsDirectory();
 
-    void load_default_initial_phi();
-    bool load_initial_phi();
-    bool save_initial_phi();
+    void loadDefaultInitialPhi();
+    bool loadInitialPhi();
+    bool saveInitialPhi();
 
-    ImageSessionSettings imgConfig_;
-    VideoSessionSettings camConfig_;
+    ImageSessionSettings imageSettings_;
+    VideoSessionSettings videoSettings_;
 };
 
 class AppSettings

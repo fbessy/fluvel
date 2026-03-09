@@ -15,8 +15,8 @@ CameraController::CameraController(QObject* parent)
     : QObject(parent)
     , ac_thread_(this)
 {
-    onVideoSettingsChanged(AppSettings::instance().camConfig());
-    onVideoDisplaySettingsChanged(AppSettings::instance().camConfig().display);
+    onVideoSettingsChanged(AppSettings::instance().videoSettings());
+    onVideoDisplaySettingsChanged(AppSettings::instance().videoSettings().display);
 
     connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
             &CameraController::onVideoSettingsChanged);

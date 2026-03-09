@@ -132,8 +132,8 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(settingsButton_);
 
     // --- Image view ---
-    imageView_ = new ImageView(AppSettings::instance().imgConfig().display,
-                               AppSettings::instance().imgConfig().compute.downscale, central);
+    imageView_ = new ImageView(AppSettings::instance().imageSettings().display,
+                               AppSettings::instance().imageSettings().compute.downscale, central);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
@@ -144,7 +144,8 @@ void ImageWindow::setupUi()
     imageView_->setInteraction(interaction.release());
 
     // --- Display bar (à droite) ---
-    displayBar_ = new DisplaySettingsWidget(AppSettings::instance().imgConfig().display, central);
+    displayBar_ =
+        new DisplaySettingsWidget(AppSettings::instance().imageSettings().display, central);
 
     // --- Layout horizontal contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
@@ -310,7 +311,7 @@ void ImageWindow::setupActions()
 
     imageController_ = new ImageController(this);
 
-    settings_window_ = new SettingsWindow(this, AppSettings::instance().imgConfig());
+    settings_window_ = new SettingsWindow(this, AppSettings::instance().imageSettings());
     camera_window_ = new CameraWindow;
     evaluation_window_ = new AnalysisWindow(this);
     about_window_ = new AboutWindow(this);
@@ -384,8 +385,8 @@ void ImageWindow::setupConnections()
 
     connect(languageAct_, &QAction::triggered, language_window_, &LanguageWindow::show);
 
-    imageView_->applyDownscaleConfig(AppSettings::instance().imgConfig().compute.downscale);
-    imageView_->applyDisplayConfig(AppSettings::instance().imgConfig().display);
+    imageView_->applyDownscaleConfig(AppSettings::instance().imageSettings().compute.downscale);
+    imageView_->applyDisplayConfig(AppSettings::instance().imageSettings().display);
 
     connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
             [this](const ImageSessionSettings& conf)
@@ -436,13 +437,13 @@ void ImageWindow::setupConnections()
             &ImageWindow::showErrorMessage);
 
     connect(settings_window_, &SettingsWindow::settingsAccepted, &AppSettings::instance(),
-            &ApplicationSettings::save_img_session_config_with_val);
+            &ApplicationSettings::updateImageSessionSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &AppSettings::instance(),
-            &ApplicationSettings::set_img_display_config);
+            &ApplicationSettings::setImageDisplayConfig);
 
-    bool preprocessing = AppSettings::instance().imgConfig().compute.downscale.hasDownscale ||
-                         AppSettings::instance().imgConfig().compute.processing.hasProcessing();
+    bool preprocessing = AppSettings::instance().imageSettings().compute.downscale.hasDownscale ||
+                         AppSettings::instance().imageSettings().compute.processing.hasProcessing();
 
     displayBar_->updatePipelineAvailability(preprocessing);
 

@@ -89,8 +89,8 @@ ApplicationSettings::ApplicationSettings()
 
     app_language = language_from_string(s.toStdString());
 
-    load_img_session_config();
-    load_cam_session_config();
+    loadImageSessionSettings();
+    loadVideoSessionSettings();
 }
 
 void ApplicationSettings::save()
@@ -99,201 +99,206 @@ void ApplicationSettings::save()
 
     settings.setValue("ui/language", to_string(app_language));
 
-    save_img_session_config();
-    save_cam_session_config();
+    saveImageSessionSettings();
+    saveVideoSessionSettings();
 }
 
-void ApplicationSettings::save_img_session_config()
+void ApplicationSettings::saveImageSessionSettings()
 {
     QSettings settings = imgSessionSettings();
 
     // algo
 
-    save_algo(Session::Image, imgConfig_.compute.algo);
+    saveAlgo(Session::Image, imageSettings_.compute.algo);
 
     // phi init used only for image session
-    save_initial_phi();
+    saveInitialPhi();
 
-    save_downscale(Session::Image, imgConfig_.compute.downscale);
+    saveDownscale(Session::Image, imageSettings_.compute.downscale);
 
-    settings.setValue("preprocess/enabled", imgConfig_.compute.processing.enabled);
+    settings.setValue("preprocess/enabled", imageSettings_.compute.processing.enabled);
 
     settings.setValue("preprocess/has_gaussian_noise",
-                      imgConfig_.compute.processing.has_gaussian_noise);
-    settings.setValue("preprocess/std_noise", imgConfig_.compute.processing.std_noise);
-    settings.setValue("preprocess/has_salt_noise", imgConfig_.compute.processing.has_salt_noise);
-    settings.setValue("preprocess/proba_noise", imgConfig_.compute.processing.proba_noise);
+                      imageSettings_.compute.processing.has_gaussian_noise);
+    settings.setValue("preprocess/std_noise", imageSettings_.compute.processing.std_noise);
+    settings.setValue("preprocess/has_salt_noise",
+                      imageSettings_.compute.processing.has_salt_noise);
+    settings.setValue("preprocess/proba_noise", imageSettings_.compute.processing.proba_noise);
     settings.setValue("preprocess/has_speckle_noise",
-                      imgConfig_.compute.processing.has_speckle_noise);
+                      imageSettings_.compute.processing.has_speckle_noise);
     settings.setValue("preprocess/std_speckle_noise",
-                      imgConfig_.compute.processing.std_speckle_noise);
+                      imageSettings_.compute.processing.std_speckle_noise);
 
-    settings.setValue("preprocess/has_median_filt", imgConfig_.compute.processing.has_median_filt);
+    settings.setValue("preprocess/has_median_filt",
+                      imageSettings_.compute.processing.has_median_filt);
     settings.setValue("preprocess/kernel_median_length",
-                      imgConfig_.compute.processing.kernel_median_length);
+                      imageSettings_.compute.processing.kernel_median_length);
 
-    settings.setValue("preprocess/has_O1_algo", imgConfig_.compute.processing.has_O1_algo);
-    settings.setValue("preprocess/has_mean_filt", imgConfig_.compute.processing.has_mean_filt);
+    settings.setValue("preprocess/has_O1_algo", imageSettings_.compute.processing.has_O1_algo);
+    settings.setValue("preprocess/has_mean_filt", imageSettings_.compute.processing.has_mean_filt);
     settings.setValue("preprocess/kernel_mean_length",
-                      imgConfig_.compute.processing.kernel_mean_length);
+                      imageSettings_.compute.processing.kernel_mean_length);
     settings.setValue("preprocess/has_gaussian_filt",
-                      imgConfig_.compute.processing.has_gaussian_filt);
+                      imageSettings_.compute.processing.has_gaussian_filt);
     settings.setValue("preprocess/kernel_gaussian_length",
-                      imgConfig_.compute.processing.kernel_gaussian_length);
-    settings.setValue("preprocess/sigma", imgConfig_.compute.processing.sigma);
+                      imageSettings_.compute.processing.kernel_gaussian_length);
+    settings.setValue("preprocess/sigma", imageSettings_.compute.processing.sigma);
 
-    settings.setValue("preprocess/has_aniso_diff", imgConfig_.compute.processing.has_aniso_diff);
-    settings.setValue("preprocess/aniso_option", imgConfig_.compute.processing.aniso_option);
-    settings.setValue("preprocess/max_itera", imgConfig_.compute.processing.max_itera);
-    settings.setValue("preprocess/lambda", imgConfig_.compute.processing.lambda);
-    settings.setValue("preprocess/kappa", imgConfig_.compute.processing.kappa);
+    settings.setValue("preprocess/has_aniso_diff",
+                      imageSettings_.compute.processing.has_aniso_diff);
+    settings.setValue("preprocess/aniso_option", imageSettings_.compute.processing.aniso_option);
+    settings.setValue("preprocess/max_itera", imageSettings_.compute.processing.max_itera);
+    settings.setValue("preprocess/lambda", imageSettings_.compute.processing.lambda);
+    settings.setValue("preprocess/kappa", imageSettings_.compute.processing.kappa);
 
-    settings.setValue("preprocess/has_open_filt", imgConfig_.compute.processing.has_open_filt);
+    settings.setValue("preprocess/has_open_filt", imageSettings_.compute.processing.has_open_filt);
     settings.setValue("preprocess/kernel_open_length",
-                      imgConfig_.compute.processing.kernel_open_length);
+                      imageSettings_.compute.processing.kernel_open_length);
 
-    settings.setValue("preprocess/has_close_filt", imgConfig_.compute.processing.has_close_filt);
+    settings.setValue("preprocess/has_close_filt",
+                      imageSettings_.compute.processing.has_close_filt);
     settings.setValue("preprocess/kernel_close_length",
-                      imgConfig_.compute.processing.kernel_close_length);
+                      imageSettings_.compute.processing.kernel_close_length);
 
     settings.setValue("preprocess/has_top_hat_filt",
-                      imgConfig_.compute.processing.has_top_hat_filt);
+                      imageSettings_.compute.processing.has_top_hat_filt);
     settings.setValue("preprocess/is_white_top_hat",
-                      imgConfig_.compute.processing.is_white_top_hat);
+                      imageSettings_.compute.processing.is_white_top_hat);
     settings.setValue("preprocess/kernel_tophat_length",
-                      imgConfig_.compute.processing.kernel_tophat_length);
+                      imageSettings_.compute.processing.kernel_tophat_length);
 
-    settings.setValue("preprocess/has_O1_morpho", imgConfig_.compute.processing.has_O1_morpho);
+    settings.setValue("preprocess/has_O1_morpho", imageSettings_.compute.processing.has_O1_morpho);
 
     // display
 
-    save_disp(Session::Image, imgConfig_.display);
+    saveDisplay(Session::Image, imageSettings_.display);
 
-    emit imgSettingsChanged(imgConfig_);
+    emit imgSettingsChanged(imageSettings_);
 }
 
-void ApplicationSettings::save_img_session_config_with_val(const ImageSessionSettings& config)
+void ApplicationSettings::updateImageSessionSettings(const ImageSessionSettings& config)
 {
-    imgConfig_ = config;
+    imageSettings_ = config;
 
-    save_img_session_config();
+    saveImageSessionSettings();
 }
 
-void ApplicationSettings::save_cam_session_config()
+void ApplicationSettings::saveVideoSessionSettings()
 {
     QSettings settings = camSessionSettings();
 
     // algo
 
-    save_algo(Session::Camera, camConfig_.compute.algo);
+    saveAlgo(Session::Camera, videoSettings_.compute.algo);
 
-    settings.setValue("algo/cycles_nbr", camConfig_.compute.cyclesNbr);
+    settings.setValue("algo/cycles_nbr", videoSettings_.compute.cyclesNbr);
 
     // preprocess
 
-    save_downscale(Session::Camera, camConfig_.compute.downscale);
+    saveDownscale(Session::Camera, videoSettings_.compute.downscale);
 
-    settings.setValue("preprocess/has_temporal_filtering", camConfig_.compute.hasTemporalFiltering);
+    settings.setValue("preprocess/has_temporal_filtering",
+                      videoSettings_.compute.hasTemporalFiltering);
 
     // display
 
-    save_disp(Session::Camera, camConfig_.display);
+    saveDisplay(Session::Camera, videoSettings_.display);
 
-    emit videoSettingsChanged(camConfig_);
+    emit videoSettingsChanged(videoSettings_);
 }
 
-void ApplicationSettings::save_cam_session_config_with_val(const VideoSessionSettings& config)
+void ApplicationSettings::updateVideoSessionSettings(const VideoSessionSettings& config)
 {
-    camConfig_ = config;
+    videoSettings_ = config;
 
-    save_cam_session_config();
+    saveVideoSessionSettings();
 }
 
-void ApplicationSettings::save_algo(Session session, const AlgoConfig& algo_config)
+void ApplicationSettings::saveAlgo(Session session, const AlgoConfig& algoConfig)
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("algo/connectivity", fluvel_ip::to_string(algo_config.connectivity));
+    settings.setValue("algo/connectivity", fluvel_ip::to_string(algoConfig.connectivity));
 
-    settings.setValue("algo/Na", algo_config.acConfig.Na);
+    settings.setValue("algo/Na", algoConfig.acConfig.Na);
 
-    settings.setValue("algo/has_smoothing_cycle", algo_config.acConfig.hasCycle2);
+    settings.setValue("algo/has_smoothing_cycle", algoConfig.acConfig.hasCycle2);
 
-    settings.setValue("algo/Ns", algo_config.acConfig.Ns);
+    settings.setValue("algo/Ns", algoConfig.acConfig.Ns);
 
-    settings.setValue("algo/disk_radius", algo_config.acConfig.diskRadius);
+    settings.setValue("algo/disk_radius", algoConfig.acConfig.diskRadius);
 
-    settings.setValue("algo/lambda_out", algo_config.regionAcConfig.lambdaOut);
+    settings.setValue("algo/lambda_out", algoConfig.regionAcConfig.lambdaOut);
 
-    settings.setValue("algo/lambda_in", algo_config.regionAcConfig.lambdaIn);
+    settings.setValue("algo/lambda_in", algoConfig.regionAcConfig.lambdaIn);
 
     settings.setValue("algo/color_space",
-                      fluvel_ip::to_string(algo_config.regionAcConfig.color_space));
+                      fluvel_ip::to_string(algoConfig.regionAcConfig.color_space));
 
-    settings.setValue("algo/color_weight_w1", algo_config.regionAcConfig.weights.c1);
+    settings.setValue("algo/color_weight_w1", algoConfig.regionAcConfig.weights.c1);
 
-    settings.setValue("algo/color_weight_w2", algo_config.regionAcConfig.weights.c2);
+    settings.setValue("algo/color_weight_w2", algoConfig.regionAcConfig.weights.c2);
 
-    settings.setValue("algo/color_weight_w3", algo_config.regionAcConfig.weights.c3);
+    settings.setValue("algo/color_weight_w3", algoConfig.regionAcConfig.weights.c3);
 }
 
-void ApplicationSettings::save_downscale(Session session, const DownscaleConfig& downscale_config)
+void ApplicationSettings::saveDownscale(Session session, const DownscaleConfig& downscaleConfig)
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("preprocess/has_downscale", downscale_config.hasDownscale);
+    settings.setValue("preprocess/has_downscale", downscaleConfig.hasDownscale);
 
-    settings.setValue("preprocess/downscale_factor", downscale_config.downscaleFactor);
+    settings.setValue("preprocess/downscale_factor", downscaleConfig.downscaleFactor);
 }
 
-void ApplicationSettings::set_img_display_config(const DisplayConfig& disp_config)
+void ApplicationSettings::setImageDisplayConfig(const DisplayConfig& displayConfig)
 {
-    imgConfig_.display = disp_config;
-    emit imgDisplaySettingsChanged(imgConfig_.display);
+    imageSettings_.display = displayConfig;
+    emit imgDisplaySettingsChanged(imageSettings_.display);
 }
 
-void ApplicationSettings::set_cam_display_config(const DisplayConfig& disp_config)
+void ApplicationSettings::setVideoDisplayConfig(const DisplayConfig& displayConfig)
 {
-    camConfig_.display = disp_config;
-    emit videoDisplaySettingsChanged(camConfig_.display);
+    videoSettings_.display = displayConfig;
+    emit videoDisplaySettingsChanged(videoSettings_.display);
 }
 
-void ApplicationSettings::save_disp(Session session, const DisplayConfig& disp_config)
+void ApplicationSettings::saveDisplay(Session session, const DisplayConfig& displayConfig)
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("display/contour_out/enabled", disp_config.l_out_displayed);
-    settings.setValue("display/contour_out/rgb", rgbToString(disp_config.l_out_color));
+    settings.setValue("display/contour_out/enabled", displayConfig.l_out_displayed);
+    settings.setValue("display/contour_out/rgb", rgbToString(displayConfig.l_out_color));
 
-    settings.setValue("display/contour_in/enabled", disp_config.l_in_displayed);
-    settings.setValue("display/contour_in/rgb", rgbToString(disp_config.l_in_color));
+    settings.setValue("display/contour_in/enabled", displayConfig.l_in_displayed);
+    settings.setValue("display/contour_in/rgb", rgbToString(displayConfig.l_in_color));
 
-    settings.setValue("display/algorithm_overlay", disp_config.algorithm_overlay);
+    settings.setValue("display/algorithm_overlay", displayConfig.algorithm_overlay);
 
-    settings.setValue("display/base_image", to_string(disp_config.image));
+    settings.setValue("display/base_image", to_string(displayConfig.image));
 
-    settings.setValue("display/mirror_mode", disp_config.mirrorMode);
+    settings.setValue("display/mirror_mode", displayConfig.mirrorMode);
 
-    settings.setValue("display/smooth_display", disp_config.smoothDisplay);
+    settings.setValue("display/smooth_display", displayConfig.smoothDisplay);
 }
 
-void ApplicationSettings::load_img_session_config()
+void ApplicationSettings::loadImageSessionSettings()
 {
     QSettings settings = imgSessionSettings();
 
-    load_algo(Session::Image, imgConfig_.compute.algo);
+    loadAlgo(Session::Image, imageSettings_.compute.algo);
 
-    bool isOk = load_initial_phi();
+    bool isOk = loadInitialPhi();
 
     if (!isOk)
     {
-        load_default_initial_phi();
+        loadDefaultInitialPhi();
     }
 
     // preprocess
-    load_downscale(Session::Image, imgConfig_.compute.downscale);
+    loadDownscale(Session::Image, imageSettings_.compute.downscale);
 
-    auto& fc = imgConfig_.compute.processing;
+    auto& fc = imageSettings_.compute.processing;
 
     fc.enabled = settings.value("preprocess/enabled", false).toBool();
 
@@ -363,32 +368,32 @@ void ApplicationSettings::load_img_session_config()
         settings.value("preprocess/has_O1_morpho", ProcessingConfig::kDefault01Algo).toBool();
 
     // display
-    load_disp(Session::Image, imgConfig_.display);
+    loadDisplay(Session::Image, imageSettings_.display);
 }
 
-void ApplicationSettings::load_cam_session_config()
+void ApplicationSettings::loadVideoSessionSettings()
 {
     QSettings settings = camSessionSettings();
 
-    load_algo(Session::Camera, camConfig_.compute.algo);
+    loadAlgo(Session::Camera, videoSettings_.compute.algo);
 
-    camConfig_.compute.cyclesNbr =
+    videoSettings_.compute.cyclesNbr =
         settings.value("algo/cycles_nbr", VideoComputeConfig::kDefaultCyclesNbr).toInt();
 
     // preprocess
-    load_downscale(Session::Camera, camConfig_.compute.downscale);
+    loadDownscale(Session::Camera, videoSettings_.compute.downscale);
 
-    camConfig_.compute.hasTemporalFiltering =
+    videoSettings_.compute.hasTemporalFiltering =
         settings
             .value("preprocess/has_temporal_filtering",
                    VideoComputeConfig::kDefaultHasTemporalFiltering)
             .toBool();
 
     // display
-    load_disp(Session::Camera, camConfig_.display);
+    loadDisplay(Session::Camera, videoSettings_.display);
 }
 
-void ApplicationSettings::load_algo(Session session, AlgoConfig& algo_config)
+void ApplicationSettings::loadAlgo(Session session, AlgoConfig& algoConfig)
 {
     QSettings settings = sessionSettings(session);
 
@@ -396,30 +401,30 @@ void ApplicationSettings::load_algo(Session session, AlgoConfig& algo_config)
         settings.value("algo/connectivity", fluvel_ip::to_string(AlgoConfig::kDefaultConnectivity))
             .toString();
 
-    algo_config.connectivity = fluvel_ip::connectivity_from_string(s.toStdString());
+    algoConfig.connectivity = fluvel_ip::connectivity_from_string(s.toStdString());
 
-    algo_config.acConfig.Na = settings.value("algo/Na", fluvel_ip::AcConfig::kDefaultNa).toInt();
-    algo_config.acConfig.hasCycle2 =
+    algoConfig.acConfig.Na = settings.value("algo/Na", fluvel_ip::AcConfig::kDefaultNa).toInt();
+    algoConfig.acConfig.hasCycle2 =
         settings.value("algo/has_smoothing_cycle", fluvel_ip::AcConfig::kDefaultIsCycle2).toBool();
-    algo_config.acConfig.Ns = settings.value("algo/Ns", fluvel_ip::AcConfig::kDefaultNs).toInt();
-    algo_config.acConfig.diskRadius =
+    algoConfig.acConfig.Ns = settings.value("algo/Ns", fluvel_ip::AcConfig::kDefaultNs).toInt();
+    algoConfig.acConfig.diskRadius =
         settings.value("algo/disk_radius", fluvel_ip::AcConfig::kDefaultDiskRadius).toInt();
 
     switch (session)
     {
         case Session::Camera:
-            algo_config.acConfig.failureMode = fluvel_ip::FailureHandlingMode::RecoverOnFailure;
+            algoConfig.acConfig.failureMode = fluvel_ip::FailureHandlingMode::RecoverOnFailure;
             break;
 
         case Session::Image:
         default:
-            algo_config.acConfig.failureMode = fluvel_ip::FailureHandlingMode::StopOnFailure;
+            algoConfig.acConfig.failureMode = fluvel_ip::FailureHandlingMode::StopOnFailure;
             break;
     }
 
-    algo_config.regionAcConfig.lambdaOut =
+    algoConfig.regionAcConfig.lambdaOut =
         settings.value("algo/lambda_out", fluvel_ip::RegionConfig::kDefaultLambdaOut).toInt();
-    algo_config.regionAcConfig.lambdaIn =
+    algoConfig.regionAcConfig.lambdaIn =
         settings.value("algo/lambda_in", fluvel_ip::RegionConfig::kDefaultLambdaIn).toInt();
 
     const QString s_cs =
@@ -428,51 +433,51 @@ void ApplicationSettings::load_algo(Session session, AlgoConfig& algo_config)
                    fluvel_ip::to_string(fluvel_ip::RegionColorConfig::kDefaultColorSpace))
             .toString();
 
-    algo_config.regionAcConfig.color_space = fluvel_ip::color_space_from_string(s_cs.toStdString());
+    algoConfig.regionAcConfig.color_space = fluvel_ip::color_space_from_string(s_cs.toStdString());
 
-    algo_config.regionAcConfig.weights.c1 =
+    algoConfig.regionAcConfig.weights.c1 =
         settings.value("algo/color_weight_w1", fluvel_ip::RegionColorConfig::kDefaultWeights.c1)
             .toInt();
-    algo_config.regionAcConfig.weights.c2 =
+    algoConfig.regionAcConfig.weights.c2 =
         settings.value("algo/color_weight_w2", fluvel_ip::RegionColorConfig::kDefaultWeights.c2)
             .toInt();
-    algo_config.regionAcConfig.weights.c3 =
+    algoConfig.regionAcConfig.weights.c3 =
         settings.value("algo/color_weight_w3", fluvel_ip::RegionColorConfig::kDefaultWeights.c3)
             .toInt();
 }
 
-void ApplicationSettings::load_downscale(Session session, DownscaleConfig& downscale_config)
+void ApplicationSettings::loadDownscale(Session session, DownscaleConfig& downscaleConfig)
 {
     QSettings settings = sessionSettings(session);
 
     bool defaultIsDownscale = (session == Session::Camera);
 
-    downscale_config.hasDownscale =
+    downscaleConfig.hasDownscale =
         settings.value("preprocess/has_downscale", defaultIsDownscale).toBool();
 
-    downscale_config.downscaleFactor =
+    downscaleConfig.downscaleFactor =
         settings.value("preprocess/downscale_factor", DownscaleConfig::kDefaultDownscaleFactor)
             .toInt();
 }
-void ApplicationSettings::load_disp(Session session, DisplayConfig& disp_config)
+void ApplicationSettings::loadDisplay(Session session, DisplayConfig& displayConfig)
 {
     QSettings settings = sessionSettings(session);
 
-    disp_config.l_out_displayed =
+    displayConfig.l_out_displayed =
         settings.value("display/contour_out/enabled", DisplayConfig::kDefaultListDisplayed)
             .toBool();
-    disp_config.l_out_color = rgbFromString(
+    displayConfig.l_out_color = rgbFromString(
         settings.value("display/contour_out/rgb", rgbToString(DisplayConfig::kDefaultOut))
             .toString(),
         DisplayConfig::kDefaultOut);
 
-    disp_config.l_in_displayed =
+    displayConfig.l_in_displayed =
         settings.value("display/contour_in/enabled", DisplayConfig::kDefaultListDisplayed).toBool();
-    disp_config.l_in_color = rgbFromString(
+    displayConfig.l_in_color = rgbFromString(
         settings.value("display/contour_in/rgb", rgbToString(DisplayConfig::kDefaultIn)).toString(),
         DisplayConfig::kDefaultIn);
 
-    disp_config.algorithm_overlay =
+    displayConfig.algorithm_overlay =
         settings.value("display/algorithm_overlay", DisplayConfig::kDefaultOverlay).toBool();
 
     const QString s =
@@ -481,12 +486,12 @@ void ApplicationSettings::load_disp(Session session, DisplayConfig& disp_config)
                    QString::fromStdString(to_string(DisplayConfig::kDefaultImageBase)))
             .toString();
 
-    disp_config.image = ib_from_string(s.toStdString());
+    displayConfig.image = ib_from_string(s.toStdString());
 
-    disp_config.mirrorMode =
+    displayConfig.mirrorMode =
         settings.value("display/mirror_mode", DisplayConfig::kDefaultOptions).toBool();
 
-    disp_config.smoothDisplay =
+    displayConfig.smoothDisplay =
         settings.value("display/smooth_display", DisplayConfig::kDefaultOptions).toBool();
 }
 
@@ -497,14 +502,14 @@ QDir ApplicationSettings::settingsDirectory()
     return info.dir();
 }
 
-bool ApplicationSettings::load_initial_phi()
+bool ApplicationSettings::loadInitialPhi()
 {
     bool isOk = false;
 
     QDir dir = settingsDirectory();
     QString phiPath = dir.filePath(kPhiInitFilename);
 
-    QImage& img = imgConfig_.compute.initialPhi;
+    QImage& img = imageSettings_.compute.initialPhi;
 
     if (QFile::exists(phiPath))
     {
@@ -524,15 +529,15 @@ bool ApplicationSettings::load_initial_phi()
     return isOk;
 }
 
-void ApplicationSettings::load_default_initial_phi()
+void ApplicationSettings::loadDefaultInitialPhi()
 {
     const int width = 1280;
     const int height = 720;
 
-    imgConfig_.compute.initialPhi = QImage(width, height, QImage::Format_Grayscale8);
-    imgConfig_.compute.initialPhi.fill(Qt::black);
+    imageSettings_.compute.initialPhi = QImage(width, height, QImage::Format_Grayscale8);
+    imageSettings_.compute.initialPhi.fill(Qt::black);
 
-    QPainter painter(&imgConfig_.compute.initialPhi);
+    QPainter painter(&imageSettings_.compute.initialPhi);
 
     painter.setRenderHint(QPainter::Antialiasing, false);
     painter.setBrush(Qt::white);
@@ -547,11 +552,11 @@ void ApplicationSettings::load_default_initial_phi()
     painter.drawEllipse(boundingBox);
 }
 
-bool ApplicationSettings::save_initial_phi()
+bool ApplicationSettings::saveInitialPhi()
 {
     bool isOk = false;
 
-    QImage img = imgConfig_.compute.initialPhi;
+    QImage img = imageSettings_.compute.initialPhi;
 
     if (!img.isNull() && img.format() == QImage::Format_Grayscale8)
     {
@@ -564,7 +569,7 @@ bool ApplicationSettings::save_initial_phi()
     return isOk;
 }
 
-void ApplicationSettings::resizeInitialPhi(int width, int height)
+void ApplicationSettings::resizeInitialPhiImage(int width, int height)
 {
     if (width == 0)
         return;
@@ -574,7 +579,7 @@ void ApplicationSettings::resizeInitialPhi(int width, int height)
 
     QSize inputSize = QSize(width, height);
 
-    QImage& phi = imgConfig_.compute.initialPhi;
+    QImage& phi = imageSettings_.compute.initialPhi;
 
     if (phi.isNull())
         return;
@@ -587,29 +592,29 @@ void ApplicationSettings::resizeInitialPhi(int width, int height)
     }
 }
 
-void ApplicationSettings::setInitalPhi(const QImage& phi)
+void ApplicationSettings::setInitialPhiImage(const QImage& phi)
 {
     if (phi.isNull())
         return;
 
-    QSize oldSize = imgConfig_.compute.initialPhi.size();
+    QSize oldSize = imageSettings_.compute.initialPhi.size();
 
-    imgConfig_.compute.initialPhi = phi;
+    imageSettings_.compute.initialPhi = phi;
 
-    QSize newSize = imgConfig_.compute.initialPhi.size();
+    QSize newSize = imageSettings_.compute.initialPhi.size();
 
     if (newSize != oldSize)
-        emit resizedPhi(imgConfig_.compute.initialPhi);
+        emit resizedPhi(imageSettings_.compute.initialPhi);
 }
 
-const ImageSessionSettings& ApplicationSettings::imgConfig() const
+const ImageSessionSettings& ApplicationSettings::imageSettings() const
 {
-    return imgConfig_;
+    return imageSettings_;
 }
 
-const VideoSessionSettings& ApplicationSettings::camConfig() const
+const VideoSessionSettings& ApplicationSettings::videoSettings() const
 {
-    return camConfig_;
+    return videoSettings_;
 }
 
 QString toSettingsPrefix(Session scope)
