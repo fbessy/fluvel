@@ -2,7 +2,6 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "display_settings_widget.hpp"
-#include "application_settings.hpp"
 #include "color_adapters.hpp"
 #include "color_selector_widget.hpp"
 #include "common_settings.hpp"
@@ -166,47 +165,6 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                 config_.smoothDisplay = checked;
                 displayConfigChanged(config_);
             });
-
-    refresh_pipeline_displayed_gb_availability();
-
-    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
-            &DisplaySettingsWidget::onImgSettingsChanged);
-
-    connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
-            &DisplaySettingsWidget::onVideoSettingsChanged);
-}
-
-void DisplaySettingsWidget::refresh_pipeline_displayed_gb_availability()
-{
-#if 0
-    bool isEnabled = false;
-
-    if (session_ == Session::Image)
-    {
-        const bool hasDownscale = AppSettings::instance().imgConfig.compute.downscale.hasDownscale;
-        const auto& fc = AppSettings::instance().imgConfig.compute.processing;
-
-        if (hasDownscale || fc.hasProcessing())
-        {
-            isEnabled = true;
-        }
-    }
-    else if (session_ == Session::Camera)
-    {
-        const bool hasDownscale = AppSettings::instance().camConfig.compute.downscale.hasDownscale;
-        const bool has_filter = AppSettings::instance().camConfig.compute.hasTemporalFiltering;
-
-        isEnabled = (hasDownscale || has_filter);
-    }
-
-    pipeline_displayed_gb_->setEnabled(isEnabled);
-
-    if (!isEnabled)
-    {
-        source_rb_->setChecked(true);
-        preprocessed_rb_->setChecked(false);
-    }
-#endif
 }
 
 void DisplaySettingsWidget::updatePipelineAvailability(bool hasPreprocessing)
@@ -218,16 +176,6 @@ void DisplaySettingsWidget::updatePipelineAvailability(bool hasPreprocessing)
         source_rb_->setChecked(true);
         preprocessed_rb_->setChecked(false);
     }
-}
-
-void DisplaySettingsWidget::onImgSettingsChanged()
-{
-    refresh_pipeline_displayed_gb_availability();
-}
-
-void DisplaySettingsWidget::onVideoSettingsChanged()
-{
-    refresh_pipeline_displayed_gb_availability();
 }
 
 void DisplaySettingsWidget::setPanelVisible(bool visible)

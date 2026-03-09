@@ -31,13 +31,7 @@ signals:
 public slots:
     void setPanelVisible(bool open);
 
-private slots:
-    void onImgSettingsChanged();
-    void onVideoSettingsChanged();
-
 private:
-    void refresh_pipeline_displayed_gb_availability();
-
     void animate(bool open);
     bool isAnimating_ = false;
 
