@@ -22,43 +22,51 @@ public:
     ~ApplicationSettings() override = default;
 
     void save();
-    void save_img_session_config();
-    void save_img_session_config_with_val(const ImageSessionSettings& config);
 
-    void save_cam_session_config();
-    void save_cam_session_config_with_val(const VideoSessionSettings& config);
+    void setInitalPhi(const QImage& phi);
+    const ImageSessionSettings& imgConfig() const;
+    const VideoSessionSettings& camConfig() const;
 
-    void save_algo(Session session, const AlgoConfig& algo);
-    void save_downscale(Session session, const DownscaleConfig& downscale_config);
-    void save_disp(Session session, const DisplayConfig& disp_config);
-
-    void load_img_session_config();
-    void load_cam_session_config();
-
-    void load_algo(Session session, AlgoConfig& algo);
-    void load_downscale(Session session, DownscaleConfig& downscale_config);
-    void load_disp(Session session, DisplayConfig& disp_config);
-
-    void set_img_display_config(const DisplayConfig& disp_config);
-    void set_cam_display_config(const DisplayConfig& disp_config);
-
-    QDir settingsDirectory();
-
-    bool save_initial_phi();
-    void load_default_initial_phi();
-    bool load_initial_phi();
-    void resize_initial_phi(int width, int height);
+    void resizeInitialPhi(int width, int height);
 
     Language app_language;
-    ImageSessionSettings imgConfig;
-    VideoSessionSettings camConfig;
 
 signals:
     void imgSettingsChanged(const fluvel_app::ImageSessionSettings& conf);
     void imgDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
     void videoSettingsChanged(const fluvel_app::VideoSessionSettings& conf);
     void videoDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
+
     void resizedPhi(const QImage& phi);
+
+public slots:
+    void save_img_session_config_with_val(const ImageSessionSettings& config);
+    void save_cam_session_config_with_val(const VideoSessionSettings& config);
+    void set_img_display_config(const DisplayConfig& disp_config);
+    void set_cam_display_config(const DisplayConfig& disp_config);
+
+private:
+    void load_img_session_config();
+    void load_cam_session_config();
+    void save_img_session_config();
+    void save_cam_session_config();
+
+    void load_algo(Session session, AlgoConfig& algo);
+    void load_downscale(Session session, DownscaleConfig& downscale_config);
+    void load_disp(Session session, DisplayConfig& disp_config);
+
+    void save_algo(Session session, const AlgoConfig& algo);
+    void save_downscale(Session session, const DownscaleConfig& downscale_config);
+    void save_disp(Session session, const DisplayConfig& disp_config);
+
+    QDir settingsDirectory();
+
+    void load_default_initial_phi();
+    bool load_initial_phi();
+    bool save_initial_phi();
+
+    ImageSessionSettings imgConfig_;
+    VideoSessionSettings camConfig_;
 };
 
 class AppSettings

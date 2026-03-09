@@ -73,7 +73,7 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     settingsButton_->setIcon(settingsIcon_);
 
-    settings_window_ = new CameraSettingsWindow(this, AppSettings::instance().camConfig);
+    settings_window_ = new CameraSettingsWindow(this, AppSettings::instance().camConfig());
 
     QWidget* central = new QWidget(this);
 
@@ -96,8 +96,8 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     controlLayout->addWidget(settingsButton_);
 
-    videoView_ = new ImageView(AppSettings::instance().camConfig.display,
-                               AppSettings::instance().camConfig.compute.downscale, central);
+    videoView_ = new ImageView(AppSettings::instance().camConfig().display,
+                               AppSettings::instance().camConfig().compute.downscale, central);
 
     videoView_->setMaxDisplayFps(60.0);
 
@@ -109,7 +109,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     videoView_->setInteraction(interaction.release());
 
     // --- Display bar ---
-    displayBar_ = new DisplaySettingsWidget(AppSettings::instance().camConfig.display, central);
+    displayBar_ = new DisplaySettingsWidget(AppSettings::instance().camConfig().display, central);
 
     // --- Layout horizontal contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
@@ -145,8 +145,8 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     connect(controller_, &CameraController::textStatsUpdated, videoView_, &ImageView::setText);
 
-    videoView_->applyDownscaleConfig(AppSettings::instance().camConfig.compute.downscale);
-    videoView_->applyDisplayConfig(AppSettings::instance().camConfig.display);
+    videoView_->applyDownscaleConfig(AppSettings::instance().camConfig().compute.downscale);
+    videoView_->applyDisplayConfig(AppSettings::instance().camConfig().display);
 
     connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
             [this](const VideoSessionSettings& conf)
@@ -166,8 +166,8 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &AppSettings::instance(),
             &ApplicationSettings::set_cam_display_config);
 
-    bool preprocessing = AppSettings::instance().camConfig.compute.downscale.hasDownscale ||
-                         AppSettings::instance().camConfig.compute.hasTemporalFiltering;
+    bool preprocessing = AppSettings::instance().camConfig().compute.downscale.hasDownscale ||
+                         AppSettings::instance().camConfig().compute.hasTemporalFiltering;
 
     displayBar_->updatePipelineAvailability(preprocessing);
 
