@@ -29,9 +29,9 @@ class PhiViewModel : public QObject
 public:
     explicit PhiViewModel(PhiEditor* editor, QObject* parent = nullptr);
 
-    const QImage& phiImage() const
+    const QImage& phi() const
     {
-        return displayedPhi_;
+        return phi_;
     }
     void setOverlay(const ShapeInfo& overlayShape);
 
@@ -52,8 +52,9 @@ private:
     bool point_is_redundant(int x, int y);
 
     PhiEditor* editor_; // non owning
-    QImage displayedPhi_;
     QImage background_;
+    QImage phi_;
+    QImage displayedPhi_;
 
     std::vector<fluvel_ip::Point2D_i> l_out_;
     std::vector<fluvel_ip::Point2D_i> l_in_;

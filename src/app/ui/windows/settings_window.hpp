@@ -70,6 +70,8 @@ private:
 
     void setupConnections();
 
+    void notifyConfigEdited();
+
     ImageView* settingsView_;
 
     ImageSettingsController* imageSettingsController_ = nullptr;
@@ -102,7 +104,7 @@ private:
     QDoubleSpinBox* std_noise_spin_;
 
     QGroupBox* salt_noise_groupbox_;
-    QDoubleSpinBox* proba_noise_spin_;
+    QDoubleSpinBox* salt_percent_spin_;
 
     QGroupBox* speckle_noise_groupbox_;
     QDoubleSpinBox* std_speckle_noise_spin_;
@@ -179,6 +181,9 @@ private:
     QWidget* algo_page_;
 
     ImageSessionSettings config_;
+
+    DownscaleConfig editedDownscaleConfig_;
+    ProcessingConfig editedProcessingConfig_;
 
 private slots:
 

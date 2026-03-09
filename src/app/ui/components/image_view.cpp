@@ -45,6 +45,9 @@ ImageView::ImageView(const DisplayConfig& displayConfig, const DownscaleConfig& 
     overlay_->setZValue(100.0);
     overlay_->hide();
     overlay_->setCursor(Qt::ArrowCursor);
+
+    configUsed_ = true;
+    updateSmoothDisplay();
 }
 
 void ImageView::initialize()
@@ -69,7 +72,6 @@ void ImageView::initialize()
 
     pixmapItem_ = new QGraphicsPixmapItem(contentRoot_);
     pixmapItem_->setZValue(0);
-    updateSmoothDisplay();
 
     blur_ = new QGraphicsBlurEffect;
     pixmapItem_->setGraphicsEffect(blur_);
@@ -684,7 +686,7 @@ bool ImageView::isGrayscale() const
 
 void ImageView::upscaleItems()
 {
-    assert(l_out_ && l_in_);
+    assert(configUsed_ && l_out_ && l_in_);
 
     const bool has_ds = downscaleConfig_.hasDownscale;
     const int df = downscaleConfig_.downscaleFactor;
@@ -700,7 +702,7 @@ void ImageView::upscaleItems()
 
 void ImageView::applyDisplayConfig(const DisplayConfig& display)
 {
-    assert(l_out_ && l_in_);
+    assert(configUsed_);
 
     displayConfig_ = display;
 
@@ -709,6 +711,8 @@ void ImageView::applyDisplayConfig(const DisplayConfig& display)
 
 void ImageView::updateDisplayWithConfig()
 {
+    assert(configUsed_);
+
     updateContourColors();
     upscaleItems();
     updateFlip();
@@ -718,7 +722,7 @@ void ImageView::updateDisplayWithConfig()
 
 void ImageView::updateContourColors()
 {
-    assert(l_out_ && l_in_);
+    assert(configUsed_ && l_out_ && l_in_);
 
     QColor col_lout, col_lin;
 
@@ -738,7 +742,7 @@ void ImageView::updateContourColors()
 
 void ImageView::updateFlip()
 {
-    assert(l_out_ && l_in_);
+    assert(configUsed_);
 
     contentRoot_->setTransformOriginPoint(0.0, 0.0);
 
@@ -759,8 +763,7 @@ void ImageView::updateFlip()
 
 void ImageView::updateSmoothDisplay()
 {
-    if (!pixmapItem_)
-        return;
+    assert(configUsed_ && pixmapItem_);
 
     if (displayConfig_.smoothDisplay)
         pixmapItem_->setTransformationMode(Qt::SmoothTransformation);
@@ -778,7 +781,8 @@ void ImageView::updateTextOverlayVisibility()
 
 void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
 {
-    assert(l_out_ && l_in_);
+    if (!configUsed_)
+        return;
 
     downscaleConfig_ = downscale;
 
@@ -835,6 +839,9 @@ QImage ImageView::darkenImage(const QImage& image)
 
 void ImageView::showPlaceholder(bool showEffect)
 {
+    if (!configUsed_)
+        return;
+
     if (!blur_)
         return;
 

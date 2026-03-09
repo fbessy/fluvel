@@ -19,6 +19,8 @@ PhiViewModel::PhiViewModel(PhiEditor* editor, QObject* parent)
 
     background_.fill(Qt::black);
 
+    phi_ = editor_->phi();
+
     updateLists();
     updatePhiFromLists();
 
@@ -66,17 +68,23 @@ void PhiViewModel::updateLists()
     if (!editor_)
         return;
 
-    const auto& phi = editor_->phi();
-    const int w = phi.width();
-    const int h = phi.height();
+    phi_ = editor_->phi();
 
-    listsGridSize_ = phi.size();
+    if (phi_.size() != background_.size())
+    {
+        phi_ = phi_.scaled(background_.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    }
+
+    const int w = phi_.width();
+    const int h = phi_.height();
+
+    listsGridSize_ = phi_.size();
     l_out_.clear();
     l_in_.clear();
 
     for (int y = 0; y < h; ++y)
     {
-        const uchar* line = phi.constScanLine(y);
+        const uchar* line = phi_.constScanLine(y);
 
         for (int x = 0; x < w; ++x)
         {
@@ -99,17 +107,19 @@ void PhiViewModel::updateLists()
 
 bool PhiViewModel::point_is_redundant(int x, int y)
 {
-    const int w = editor_->phi().width();
-    const int h = editor_->phi().height();
+    assert(!phi_.isNull());
 
-    const uchar center = editor_->phi().constScanLine(y)[x];
+    const int w = phi_.width();
+    const int h = phi_.height();
+
+    const uchar center = phi_.constScanLine(y)[x];
 
     auto same_value = [&](int nx, int ny) -> bool
     {
         if (nx < 0 || nx >= w || ny < 0 || ny >= h)
             return true; // hors image = neutre
 
-        return editor_->phi().constScanLine(ny)[nx] == center;
+        return phi_.constScanLine(ny)[nx] == center;
     };
 
     // 4-connectivity
@@ -138,15 +148,21 @@ bool PhiViewModel::point_is_redundant(int x, int y)
 
 void PhiViewModel::updateListsFloodFill()
 {
-    const auto& phi = editor_->phi();
-    const int w = phi.width();
-    const int h = phi.height();
+    phi_ = editor_->phi();
 
-    listsGridSize_ = phi.size();
+    if (phi_.size() != background_.size())
+    {
+        phi_ = phi_.scaled(background_.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    }
+
+    const int w = phi_.width();
+    const int h = phi_.height();
+
+    listsGridSize_ = phi_.size();
     l_out_.clear();
     l_in_.clear();
 
-    Q_ASSERT(phi.format() == QImage::Format_Grayscale8);
+    Q_ASSERT(phi_.format() == QImage::Format_Grayscale8);
 
     // Marqueur de pixels visités
     QImage visited(w, h, QImage::Format_Grayscale8);
@@ -159,7 +175,7 @@ void PhiViewModel::updateListsFloodFill()
 
     auto pixel = [&](int x, int y) -> uchar
     {
-        return phi.constScanLine(y)[x];
+        return phi_.constScanLine(y)[x];
     };
 
     std::vector<Span> stack;
@@ -167,7 +183,7 @@ void PhiViewModel::updateListsFloodFill()
 
     for (int y = 0; y < h; ++y)
     {
-        const uchar* line = phi.constScanLine(y);
+        const uchar* line = phi_.constScanLine(y);
         uchar* visitedLine = visited.scanLine(y);
 
         for (int x = 0; x < w; ++x)
@@ -224,7 +240,7 @@ void PhiViewModel::updateListsFloodFill()
                     if (ny < 0 || ny >= h)
                         continue;
 
-                    const uchar* nline = phi.constScanLine(ny);
+                    const uchar* nline = phi_.constScanLine(ny);
                     uchar* vline = visited.scanLine(ny);
 
                     int xscan = xl;

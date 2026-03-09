@@ -241,7 +241,7 @@ void ActiveContourWorker::applyProcessing()
         }
         if (fc.has_salt_noise)
         {
-            filters.salt_pepper_noise(fc.proba_noise);
+            filters.impulsive_noise(fc.proba_noise);
         }
         if (fc.has_speckle_noise)
         {

@@ -94,7 +94,7 @@ public:
     void gaussian_white_noise(float sigma);
 
     //! Does an impulsional noise with a probabity of noise for each pixel, i.e the density.
-    void salt_pepper_noise(float proba);
+    void impulsive_noise(float proba);
 
     //! Performs a speckle noise, a multiplicative noise into the image.
     void speckle(float sigma);

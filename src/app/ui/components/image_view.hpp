@@ -178,6 +178,8 @@ private:
 
     bool dragHighlight_ = false;
 
+    bool configUsed_ = false;
+
 signals:
     void imageClicked(int x, int y);
     void frameDisplayed(qint64 receiveTs, qint64 displayTs);

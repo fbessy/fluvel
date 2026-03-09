@@ -3,8 +3,9 @@
 
 #pragma once
 
-#include "phi_view_model.hpp"
+#include "application_settings.hpp"
 #include "phi_editor.hpp"
+#include "phi_view_model.hpp"
 
 #include <QObject>
 
@@ -25,12 +26,16 @@ class ImageSettingsController : public QObject
     Q_OBJECT
 
 public:
-    ImageSettingsController(QObject* parent);
+    ImageSettingsController(const DownscaleConfig& downscaleConfig,
+                            const ProcessingConfig& processingConfig, QObject* parent);
 
     void addShape(UiShapeInfo uiShape);
     void subtractShape(UiShapeInfo uiShape);
     void clearPhi();
     void onInputImageReady(const QImage& inputImage);
+
+    void updateEditedConfig(const DownscaleConfig& downscaleConfig,
+                            const ProcessingConfig& processingConfig);
 
     void accept();
     void reject();
@@ -47,8 +52,18 @@ private:
 
     ShapeInfo computeShapeInfo(const UiShapeInfo& uiShape);
 
+    void applyDownscale();
+    void applyProcessing();
+
     std::unique_ptr<PhiEditor> phiEditor_;
     std::unique_ptr<PhiViewModel> phiViewModel_;
+
+    DownscaleConfig editedDownscaleConfig_;
+    ProcessingConfig editedProcessingConfig_;
+
+    QImage input_;
+    QImage downscaled_;
+    QImage processed_;
 };
 
 } // namespace fluvel_app

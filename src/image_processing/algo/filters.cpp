@@ -2466,82 +2466,66 @@ void Filters::median_filtering_o1(int kernel_length)
 
 void Filters::gaussian_white_noise(float sigma)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::normal_distribution<float> nd{0.f, sigma};
+    constexpr float sigma_min = 1e-3f;
 
-    int filtered_int;
+    if (sigma <= sigma_min)
+        return;
 
-    for (int offset = 0; offset < byte_per_pixel_ * img_size_; offset++)
+    sigma = std::min(sigma, 80.f);
+
+    static thread_local std::mt19937 gen(std::random_device{}());
+    std::normal_distribution<float> nd(0.f, sigma);
+
+    for (int offset = 0; offset < byte_per_pixel_ * img_size_; ++offset)
     {
-        filtered_int = int(filtered_[offset]) + int(roundf(nd(gen)));
+        int value = int(std::round(filtered_[offset] + nd(gen)));
+        value = std::clamp(value, 0, 255);
 
-        if (filtered_int < 0)
-        {
-            filtered_int = 0;
-        }
-        else if (filtered_int > 255)
-        {
-            filtered_int = 255;
-        }
-
-        filtered_[offset] = (unsigned char)(filtered_int);
+        filtered_[offset] = static_cast<unsigned char>(value);
     }
 }
 
-void Filters::salt_pepper_noise(float proba)
+void Filters::impulsive_noise(float proba)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::bernoulli_distribution proba_distri{static_cast<double>(proba)};
-    std::bernoulli_distribution coin_flip_distri{0.5};
+    proba = std::clamp(proba, 0.f, 1.f);
 
-    for (int offset = 0; offset < img_size_; offset++)
+    static thread_local std::mt19937 gen(std::random_device{}());
+
+    std::bernoulli_distribution noise_dist(proba);
+    std::uniform_int_distribution<int> value_dist(0, 255);
+
+    for (int offset = 0; offset < img_size_; ++offset)
     {
-        if (proba_distri(gen))
+        if (!noise_dist(gen))
+            continue;
+
+        int base = byte_per_pixel_ * offset;
+
+        for (int c = 0; c < byte_per_pixel_; ++c)
         {
-            for (int color_channel = 0; color_channel < byte_per_pixel_; color_channel++)
-            {
-                if (coin_flip_distri(gen))
-                {
-                    filtered_[byte_per_pixel_ * offset + color_channel] = 0;
-                }
-                else
-                {
-                    filtered_[byte_per_pixel_ * offset + color_channel] = 255;
-                }
-            }
+            filtered_[base + c] = static_cast<uint8_t>(value_dist(gen));
         }
     }
 }
 
 void Filters::speckle(float sigma)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> ud{0.f, 1.f};
+    sigma = std::clamp(sigma, 0.f, 2.f);
 
-    int filtered_int;
+    static thread_local std::mt19937 gen(std::random_device{}());
+    std::uniform_real_distribution<float> ud(0.f, 1.f);
 
-    for (int offset = 0; offset < byte_per_pixel_ * img_size_; offset++)
+    const float k = sigma * std::sqrt(12.f);
+
+    for (int offset = 0; offset < byte_per_pixel_ * img_size_; ++offset)
     {
-        // img = img + X * img
-        // with X a random variable from a uniform distribution centered at 0
-        // and of a standard deviation sigma
-        // sigma * sqrt(12) is the interval of the uniform distribution
-        filtered_int =
-            int(filtered_[offset]) +
-            int(std::roundf(float(filtered_[offset]) * sigma * std::sqrt(12.f) * (ud(gen) - 0.5f)));
+        float noise = k * (ud(gen) - 0.5f);
 
-        if (filtered_int < 0)
-        {
-            filtered_int = 0;
-        }
-        else if (filtered_int > 255)
-        {
-            filtered_int = 255;
-        }
-        filtered_[offset] = (unsigned char)(filtered_int);
+        int value = int(filtered_[offset] + filtered_[offset] * noise);
+
+        value = std::clamp(value, 0, 255);
+
+        filtered_[offset] = static_cast<unsigned char>(value);
     }
 }
 

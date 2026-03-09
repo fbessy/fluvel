@@ -15,6 +15,8 @@ namespace fluvel_app
 SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& config)
     : QDialog(parent)
     , config_(config)
+    , editedDownscaleConfig_(config.compute.downscale)
+    , editedProcessingConfig_(config.compute.processing)
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -85,7 +87,8 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     // Controller
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    imageSettingsController_ = new ImageSettingsController(this);
+    imageSettingsController_ =
+        new ImageSettingsController(config_.compute.downscale, config_.compute.processing, this);
 
     updateUIFromConfig();
     setupConnections();
@@ -302,7 +305,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     std_noise_spin_ = new QDoubleSpinBox;
     std_noise_spin_->setSingleStep(5.0);
     std_noise_spin_->setMinimum(0.0);
-    std_noise_spin_->setMaximum(10000.0);
+    std_noise_spin_->setMaximum(80.0);
     std_noise_spin_->setToolTip(tr("standard deviation"));
 
     QFormLayout* gaussian_noise_layout = new QFormLayout;
@@ -311,23 +314,21 @@ void SettingsWindow::setupUiPreprocessingTab()
     salt_noise_groupbox_ = new QGroupBox(tr("Impulsional noise (salt and pepper)"));
     salt_noise_groupbox_->setCheckable(true);
     salt_noise_groupbox_->setChecked(false);
-    proba_noise_spin_ = new QDoubleSpinBox;
-    proba_noise_spin_->setSingleStep(1.0);
-    proba_noise_spin_->setMinimum(0.0);
-    proba_noise_spin_->setMaximum(100.0);
-    proba_noise_spin_->setSuffix(" %");
-    proba_noise_spin_->setToolTip(tr("impulsional noise probability for each pixel"));
+    salt_percent_spin_ = new QDoubleSpinBox;
+    salt_percent_spin_->setSingleStep(1.0);
+    salt_percent_spin_->setRange(0.0, 100.0);
+    salt_percent_spin_->setSuffix(" %");
+    salt_percent_spin_->setToolTip(tr("impulsional noise probability for each pixel"));
 
     QFormLayout* salt_noise_layout = new QFormLayout;
-    salt_noise_layout->addRow(tr("d ="), proba_noise_spin_);
+    salt_noise_layout->addRow(tr("d ="), salt_percent_spin_);
 
     speckle_noise_groupbox_ = new QGroupBox(tr("Speckle noise"));
     speckle_noise_groupbox_->setCheckable(true);
     speckle_noise_groupbox_->setChecked(false);
     std_speckle_noise_spin_ = new QDoubleSpinBox;
-    std_speckle_noise_spin_->setSingleStep(0.02);
-    std_speckle_noise_spin_->setMinimum(0.0);
-    std_speckle_noise_spin_->setMaximum(1000.0);
+    std_speckle_noise_spin_->setSingleStep(0.01);
+    std_speckle_noise_spin_->setRange(0.0, 2.0);
     std_speckle_noise_spin_->setToolTip(tr("standard deviation"));
 
     QFormLayout* speckle_noise_layout = new QFormLayout;
@@ -582,6 +583,252 @@ void SettingsWindow::setupConnections()
     connect(abscissa_spin_, QOverload<int>::of(&QSpinBox::valueChanged), abscissa_slider_,
             &QSlider::setValue);
 
+    connect(downscale_page_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedDownscaleConfig_.hasDownscale = checked;
+                notifyConfigEdited();
+
+                onUiShapeChanged();
+            });
+
+    connect(downscale_factor_cb_, &QComboBox::currentIndexChanged, this,
+            [this](int index)
+            {
+                if (index < 0)
+                    return;
+
+                editedDownscaleConfig_.downscaleFactor =
+                    downscale_factor_cb_->itemData(index).toInt();
+                notifyConfigEdited();
+
+                onUiShapeChanged();
+            });
+
+    connect(preprocess_page_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.enabled = checked;
+                notifyConfigEdited();
+            });
+
+    connect(gaussian_noise_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_gaussian_noise = checked;
+                notifyConfigEdited();
+            });
+
+    connect(std_noise_spin_, &QDoubleSpinBox::valueChanged, this,
+            [this](double v)
+            {
+                editedProcessingConfig_.std_noise = static_cast<float>(v);
+                notifyConfigEdited();
+            });
+
+    connect(salt_noise_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_salt_noise = checked;
+                notifyConfigEdited();
+            });
+
+    connect(salt_percent_spin_, &QDoubleSpinBox::valueChanged, this,
+            [this](double v)
+            {
+                editedProcessingConfig_.proba_noise = static_cast<float>(v) / 100.f;
+                notifyConfigEdited();
+            });
+
+    connect(speckle_noise_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_speckle_noise = checked;
+                notifyConfigEdited();
+            });
+
+    connect(std_speckle_noise_spin_, &QDoubleSpinBox::valueChanged, this,
+            [this](double v)
+            {
+                editedProcessingConfig_.std_speckle_noise = static_cast<float>(v);
+                notifyConfigEdited();
+            });
+
+    connect(mean_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_mean_filt = checked;
+                notifyConfigEdited();
+            });
+
+    connect(klength_mean_spin_, &QSpinBox::valueChanged, this,
+            [this](int v)
+            {
+                editedProcessingConfig_.kernel_mean_length = v;
+                notifyConfigEdited();
+            });
+
+    connect(gaussian_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_gaussian_filt = checked;
+                notifyConfigEdited();
+            });
+
+    connect(klength_gaussian_spin_, &QSpinBox::valueChanged, this,
+            [this](int v)
+            {
+                editedProcessingConfig_.kernel_gaussian_length = v;
+                notifyConfigEdited();
+            });
+
+    connect(std_filter_spin_, &QDoubleSpinBox::valueChanged, this,
+            [this](double v)
+            {
+                editedProcessingConfig_.sigma = static_cast<float>(v);
+                notifyConfigEdited();
+            });
+
+    connect(median_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_median_filt = checked;
+                notifyConfigEdited();
+            });
+
+    connect(klength_median_spin_, &QSpinBox::valueChanged, this,
+            [this](int v)
+            {
+                editedProcessingConfig_.kernel_median_length = v;
+                notifyConfigEdited();
+            });
+
+    connect(complex_radio1_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.has_O1_algo = true;
+                notifyConfigEdited();
+            });
+
+    connect(complex_radio2_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.has_O1_algo = false;
+                notifyConfigEdited();
+            });
+
+    connect(aniso_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_aniso_diff = checked;
+                notifyConfigEdited();
+            });
+
+    connect(aniso1_radio_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.aniso_option = fluvel_ip::AnisoDiff::FUNCTION1;
+                notifyConfigEdited();
+            });
+
+    connect(aniso2_radio_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.aniso_option = fluvel_ip::AnisoDiff::FUNCTION2;
+                notifyConfigEdited();
+            });
+
+    connect(iteration_filter_spin_, &QSpinBox::valueChanged, this,
+            [this](int v)
+            {
+                editedProcessingConfig_.max_itera = v;
+                notifyConfigEdited();
+            });
+
+    connect(lambda_spin_, &QDoubleSpinBox::valueChanged, this,
+            [this](double v)
+            {
+                editedProcessingConfig_.lambda = static_cast<float>(v);
+                notifyConfigEdited();
+            });
+
+    connect(kappa_spin_, &QDoubleSpinBox::valueChanged, this,
+            [this](double v)
+            {
+                editedProcessingConfig_.kappa = static_cast<float>(v);
+                notifyConfigEdited();
+            });
+
+    connect(open_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_open_filt = checked;
+                notifyConfigEdited();
+            });
+
+    connect(klength_open_spin_, &QSpinBox::valueChanged, this,
+            [this](int v)
+            {
+                editedProcessingConfig_.kernel_open_length = v;
+                notifyConfigEdited();
+            });
+
+    connect(close_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_close_filt = checked;
+                notifyConfigEdited();
+            });
+
+    connect(klength_close_spin_, &QSpinBox::valueChanged, this,
+            [this](int v)
+            {
+                editedProcessingConfig_.kernel_close_length = v;
+                notifyConfigEdited();
+            });
+
+    connect(tophat_groupbox_, &QGroupBox::clicked, this,
+            [this](bool checked)
+            {
+                editedProcessingConfig_.has_top_hat_filt = checked;
+                notifyConfigEdited();
+            });
+
+    connect(whitetophat_radio_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.is_white_top_hat = true;
+                notifyConfigEdited();
+            });
+
+    connect(blacktophat_radio_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.is_white_top_hat = false;
+                notifyConfigEdited();
+            });
+
+    connect(klength_tophat_spin_, &QSpinBox::valueChanged, this,
+            [this](int v)
+            {
+                editedProcessingConfig_.kernel_tophat_length = v;
+                notifyConfigEdited();
+            });
+
+    connect(complex1_morpho_radio_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.has_O1_morpho = true;
+                notifyConfigEdited();
+            });
+
+    connect(complex2_morpho_radio_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.has_O1_morpho = false;
+                notifyConfigEdited();
+            });
+
     // connect(gaussian_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
     // connect(std_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
 
@@ -694,7 +941,7 @@ void SettingsWindow::accept()
     filt_config.has_gaussian_noise = gaussian_noise_groupbox_->isChecked();
     filt_config.std_noise = float(std_noise_spin_->value());
     filt_config.has_salt_noise = salt_noise_groupbox_->isChecked();
-    filt_config.proba_noise = float(proba_noise_spin_->value()) / 100.f;
+    filt_config.proba_noise = float(salt_percent_spin_->value()) / 100.f;
     filt_config.has_speckle_noise = speckle_noise_groupbox_->isChecked();
     filt_config.std_speckle_noise = float(std_speckle_noise_spin_->value());
     filt_config.has_median_filt = median_groupbox_->isChecked();
@@ -755,7 +1002,7 @@ void SettingsWindow::updateUIFromConfig()
     gaussian_noise_groupbox_->setChecked(config_filter.has_gaussian_noise);
     std_noise_spin_->setValue(double(config_filter.std_noise));
     salt_noise_groupbox_->setChecked(config_filter.has_salt_noise);
-    proba_noise_spin_->setValue(double(100.f * config_filter.proba_noise));
+    salt_percent_spin_->setValue(double(100.f * config_filter.proba_noise));
     speckle_noise_groupbox_->setChecked(config_filter.has_speckle_noise);
     std_speckle_noise_spin_->setValue(double(config_filter.std_speckle_noise));
 
@@ -860,7 +1107,7 @@ void SettingsWindow::default_settings()
     std_noise_spin_->setValue(20.0);
 
     salt_noise_groupbox_->setChecked(false);
-    proba_noise_spin_->setValue(0.05);
+    salt_percent_spin_->setValue(0.05);
 
     speckle_noise_groupbox_->setChecked(false);
     std_speckle_noise_spin_->setValue(0.16);
@@ -946,7 +1193,7 @@ float SettingsWindow::calculate_filtered_image()
         }
         if( has_salt_noise2 )
         {
-            filters2->salt_pepper_noise(proba_noise2);
+            filters2->impulsive_noise(proba_noise2);
         }
         if( has_speckle_noise2 )
         {
@@ -1091,6 +1338,13 @@ void SettingsWindow::closeEvent(QCloseEvent* event)
     settings.setValue("ui_geometry/settings_window", saveGeometry());
 
     QDialog::closeEvent(event);
+}
+
+void SettingsWindow::notifyConfigEdited()
+{
+    if (imageSettingsController_)
+        imageSettingsController_->updateEditedConfig(editedDownscaleConfig_,
+                                                     editedProcessingConfig_);
 }
 
 } // namespace fluvel_app

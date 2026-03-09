@@ -8,8 +8,12 @@
 namespace fluvel_app
 {
 
-ImageSettingsController::ImageSettingsController(QObject* parent)
+ImageSettingsController::ImageSettingsController(const DownscaleConfig& downscaleConfig,
+                                                 const ProcessingConfig& processingConfig,
+                                                 QObject* parent)
     : QObject(parent)
+    , editedDownscaleConfig_(downscaleConfig)
+    , editedProcessingConfig_(processingConfig)
 {
     phiEditor_ = std::make_unique<PhiEditor>(
         ApplicationSettings::instance().imageSettings().compute.initialPhi);
@@ -34,6 +38,18 @@ ImageSettingsController::ImageSettingsController(QObject* parent)
     //         });
 }
 
+void ImageSettingsController::updateEditedConfig(const DownscaleConfig& downscaleConfig,
+                                                 const ProcessingConfig& processingConfig)
+{
+    editedDownscaleConfig_ = downscaleConfig;
+    editedProcessingConfig_ = processingConfig;
+
+    applyDownscale();
+    applyProcessing();
+
+    phiViewModel_->setBackground(processed_);
+}
+
 ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape)
 {
     ShapeInfo info;
@@ -41,8 +57,13 @@ ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape)
     // --- Type de shape ---
     info.type = uiShape.shape;
 
-    const int canvasWidth = phiEditor_->phi().width();
-    const int canvasHeight = phiEditor_->phi().height();
+    const int canvasWidth = input_.width();
+    const int canvasHeight = input_.height();
+
+    float downscale = 1.f;
+
+    if (editedDownscaleConfig_.hasDownscale)
+        downscale = static_cast<float>(editedDownscaleConfig_.downscaleFactor);
 
     // Récupération des valeurs des sliders (en pourcentage)
     float centerXPercent =
@@ -50,13 +71,15 @@ ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape)
     float centerYPercent = static_cast<float>(uiShape.y) / 100.0f;
 
     // Calcul de la position du centre en pixels
-    float centerX = (centerXPercent + 0.5f) * static_cast<float>(canvasWidth);
-    float centerY = (centerYPercent + 0.5f) * static_cast<float>(canvasHeight);
+    float centerX = (centerXPercent + 0.5f) * static_cast<float>(canvasWidth) / downscale;
+    float centerY = (centerYPercent + 0.5f) * static_cast<float>(canvasHeight) / downscale;
 
     // Récupération des dimensions de la shape en pixels
-    float width = static_cast<float>(uiShape.width) / 100.0f * static_cast<float>(canvasWidth);
+    float width =
+        static_cast<float>(uiShape.width) / 100.0f * static_cast<float>(canvasWidth) / downscale;
 
-    float height = static_cast<float>(uiShape.height) / 100.0f * static_cast<float>(canvasHeight);
+    float height =
+        static_cast<float>(uiShape.height) / 100.0f * static_cast<float>(canvasHeight) / downscale;
 
     // Calcul de la bounding box à partir du centre et des dimensions
     float topLeftX = centerX - (width / 2.f);
@@ -94,10 +117,15 @@ void ImageSettingsController::clearPhi()
         phiEditor_->clear();
 }
 
-void ImageSettingsController::onInputImageReady(const QImage& inputImage)
+void ImageSettingsController::onInputImageReady(const QImage& input)
 {
-    phiEditor_->setSize(inputImage.size());
-    phiViewModel_->setBackground(inputImage);
+    input_ = input;
+
+    applyDownscale();
+    applyProcessing();
+
+    phiEditor_->setSize(input_.size());
+    phiViewModel_->setBackground(processed_);
 }
 
 void ImageSettingsController::onViewChanged(const QImage& imageSettings)
@@ -130,6 +158,185 @@ void ImageSettingsController::reject()
 void ImageSettingsController::setInitialPhi(const QImage& phi)
 {
     ApplicationSettings::instance().setInitialPhiImage(phi);
+}
+
+void ImageSettingsController::applyDownscale()
+{
+    if (input_.isNull())
+        return;
+
+    if (input_.format() != QImage::Format_Grayscale8 && input_.format() != QImage::Format_RGB32)
+        return;
+
+    if (editedDownscaleConfig_.hasDownscale)
+    {
+        const int df = editedDownscaleConfig_.downscaleFactor;
+
+        assert(df == 2 || df == 4);
+
+        downscaled_ = input_.scaled(input_.width() / df, input_.height() / df,
+                                    Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+    }
+    else
+    {
+        downscaled_ = input_;
+    }
+}
+
+void ImageSettingsController::applyProcessing()
+{
+    if (downscaled_.isNull())
+        return;
+
+    processed_ = downscaled_;
+
+    // float elapsed_time;
+    // std::clock_t start_time, stop_time;
+
+    QImage img;
+
+    int channelsNbr = 3;
+
+    if (downscaled_.format() == QImage::Format_Grayscale8)
+    {
+        img = downscaled_;
+        channelsNbr = 1;
+    }
+    else if (downscaled_.format() == QImage::Format_RGB32)
+    {
+        img = downscaled_.convertToFormat(QImage::Format_RGB888);
+        channelsNbr = 3;
+    }
+
+    if (img.isNull())
+        return;
+
+    const int width = img.width();
+
+    if (img.bytesPerLine() != static_cast<qsizetype>(width * channelsNbr))
+        return;
+
+    const qsizetype stride = img.bytesPerLine();
+
+    const int bytesPerPixel = static_cast<int>(stride / width);
+
+    fluvel_ip::Filters filters(img.constBits(), width, img.height(), bytesPerPixel);
+
+    // start_time = std::clock();
+
+    const auto& fc = editedProcessingConfig_;
+
+    if (fc.hasProcessing())
+    {
+        if (fc.has_gaussian_noise)
+        {
+            filters.gaussian_white_noise(fc.std_noise);
+        }
+        if (fc.has_salt_noise)
+        {
+            filters.impulsive_noise(fc.proba_noise);
+        }
+        if (fc.has_speckle_noise)
+        {
+            filters.speckle(fc.std_speckle_noise);
+        }
+
+        if (fc.has_mean_filt)
+        {
+            filters.mean_filtering(fc.kernel_mean_length);
+        }
+        if (fc.has_gaussian_filt)
+        {
+            filters.gaussian_filtering(fc.kernel_gaussian_length, fc.sigma);
+        }
+
+        if (fc.has_median_filt)
+        {
+            if (fc.has_O1_algo)
+            {
+                filters.median_filtering_o1(fc.kernel_median_length);
+            }
+            else
+            {
+                filters.median_filtering_oNlogN(fc.kernel_median_length);
+            }
+        }
+        if (fc.has_aniso_diff)
+        {
+            filters.anisotropic_diffusion(fc.max_itera, fc.lambda, fc.kappa, fc.aniso_option);
+        }
+
+        if (fc.has_open_filt)
+        {
+            if (fc.has_O1_morpho)
+            {
+                filters.opening_o1(fc.kernel_open_length);
+            }
+            else
+            {
+                filters.opening(fc.kernel_open_length);
+            }
+        }
+
+        if (fc.has_close_filt)
+        {
+            if (fc.has_O1_morpho)
+            {
+                filters.closing_o1(fc.kernel_close_length);
+            }
+            else
+            {
+                filters.closing(fc.kernel_close_length);
+            }
+        }
+
+        if (fc.has_top_hat_filt)
+        {
+            if (fc.is_white_top_hat)
+            {
+                if (fc.has_O1_morpho)
+                {
+                    filters.white_top_hat_o1(fc.kernel_tophat_length);
+                }
+                else
+                {
+                    filters.white_top_hat(fc.kernel_tophat_length);
+                }
+            }
+            else
+            {
+                if (fc.has_O1_morpho)
+                {
+                    filters.black_top_hat_o1(fc.kernel_tophat_length);
+                }
+                else
+                {
+                    filters.black_top_hat(fc.kernel_tophat_length);
+                }
+            }
+        }
+
+        // stop_time = std::clock();
+        // elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
+
+        if (img.format() == QImage::Format_RGB888)
+        {
+            processed_ =
+                QImage(filters.get_filtered(), img.width(), img.height(), QImage::Format_RGB888)
+                    .convertToFormat(QImage::Format_RGB32);
+        }
+        else if (img.format() == QImage::Format_Grayscale8)
+        {
+            processed_ =
+                QImage(filters.get_filtered(), img.width(), img.height(), QImage::Format_Grayscale8)
+                    .copy();
+        }
+    }
+
+    // return elapsed_time;
+
+    if (processed_.isNull())
+        processed_ = downscaled_;
 }
 
 } // namespace fluvel_app
