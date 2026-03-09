@@ -93,10 +93,6 @@ ApplicationSettings::ApplicationSettings()
     load_cam_session_config();
 }
 
-ApplicationSettings::~ApplicationSettings()
-{
-}
-
 void ApplicationSettings::save()
 {
     QSettings settings = userSettings();
@@ -172,6 +168,13 @@ void ApplicationSettings::save_img_session_config()
     emit imgSettingsChanged(imgConfig);
 }
 
+void ApplicationSettings::save_img_session_config_with_val(const ImageSessionSettings& config)
+{
+    imgConfig = config;
+
+    save_img_session_config();
+}
+
 void ApplicationSettings::save_cam_session_config()
 {
     QSettings settings = camSessionSettings();
@@ -193,6 +196,13 @@ void ApplicationSettings::save_cam_session_config()
     save_disp(Session::Camera, camConfig.display);
 
     emit videoSettingsChanged(camConfig);
+}
+
+void ApplicationSettings::save_cam_session_config_with_val(const VideoSessionSettings& config)
+{
+    camConfig = config;
+
+    save_cam_session_config();
 }
 
 void ApplicationSettings::save_algo(Session session, const AlgoConfig& algo_config)

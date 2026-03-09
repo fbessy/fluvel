@@ -2,7 +2,6 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "algo_settings_widget.hpp"
-#include "application_settings.hpp"
 
 #include <QComboBox>
 #include <QFormLayout>
@@ -10,15 +9,13 @@
 #include <QSpinBox>
 
 #include <cassert>
-#include <utility>
 
 namespace fluvel_app
 {
 
-AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent, Session session)
+AlgoSettingsWidget::AlgoSettingsWidget(AlgoConfig& config, QWidget* parent)
     : QWidget(parent)
-    , session_(session)
-    , config_(config(session))
+    , config_(config)
 {
     connectivity_cb_ = new QComboBox;
 
@@ -56,17 +53,8 @@ AlgoSettingsWidget::AlgoSettingsWidget(QWidget* parent, Session session)
 
     QFormLayout* lambda_layout = new QFormLayout;
 
-    auto& config = AppSettings::instance().imgConfig.display;
-
-    QColor RGBout_list(get_QRgb(config.l_out_color));
-    QColor RGBin_list(get_QRgb(config.l_in_color));
-
-    lambda_layout->addRow("<font color=" + RGBout_list.name() + ">" + "λout" +
-                              "<font color=black>" + " =",
-                          lambda_out_spin_);
-    lambda_layout->addRow("<font color=" + RGBin_list.name() + ">" + "λin" + "<font color=black>" +
-                              " =",
-                          lambda_in_spin_);
+    lambda_layout->addRow("λout =", lambda_out_spin_);
+    lambda_layout->addRow("λin =", lambda_in_spin_);
 
     QVBoxLayout* chanvese_layout = new QVBoxLayout;
     chanvese_layout->addLayout(lambda_layout);
@@ -205,20 +193,6 @@ void AlgoSettingsWidget::reject()
     alpha_spin_->setValue(config_.regionAcConfig.weights.c1);
     beta_spin_->setValue(config_.regionAcConfig.weights.c2);
     gamma_spin_->setValue(config_.regionAcConfig.weights.c3);
-}
-
-AlgoConfig& AlgoSettingsWidget::config(Session session)
-{
-    switch (session)
-    {
-        case Session::Image:
-            return AppSettings::instance().imgConfig.compute.algo;
-
-        case Session::Camera:
-            return AppSettings::instance().camConfig.compute.algo;
-    }
-
-    std::unreachable();
 }
 
 } // namespace fluvel_app

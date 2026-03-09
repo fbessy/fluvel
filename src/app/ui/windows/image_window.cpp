@@ -144,7 +144,7 @@ void ImageWindow::setupUi()
     imageView_->setInteraction(interaction.release());
 
     // --- Display bar (à droite) ---
-    displayBar_ = new DisplaySettingsWidget(central, Session::Image);
+    displayBar_ = new DisplaySettingsWidget(AppSettings::instance().imgConfig.display, central);
 
     // --- Layout horizontal contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
@@ -310,7 +310,7 @@ void ImageWindow::setupActions()
 
     imageController_ = new ImageController(this);
 
-    settings_window_ = new SettingsWindow(this);
+    settings_window_ = new SettingsWindow(this, AppSettings::instance().imgConfig);
     camera_window_ = new CameraWindow;
     evaluation_window_ = new AnalysisWindow(this);
     about_window_ = new AboutWindow(this);
@@ -434,6 +434,26 @@ void ImageWindow::setupConnections()
 
     connect(imageController_, &ImageController::errorOccurred, this,
             &ImageWindow::showErrorMessage);
+
+    connect(settings_window_, &SettingsWindow::settingsAccepted, &AppSettings::instance(),
+            &ApplicationSettings::save_img_session_config_with_val);
+
+    connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &AppSettings::instance(),
+            &ApplicationSettings::set_img_display_config);
+
+    bool hasPreprocessing = AppSettings::instance().imgConfig.compute.downscale.hasDownscale ||
+                            AppSettings::instance().imgConfig.compute.processing.hasProcessing();
+
+    displayBar_->updatePipelineAvailability(hasPreprocessing);
+
+    connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
+            [this](const ImageSessionSettings& conf)
+            {
+                bool hasPreprocessing =
+                    conf.compute.downscale.hasDownscale || conf.compute.processing.hasProcessing();
+
+                displayBar_->updatePipelineAvailability(hasPreprocessing);
+            });
 }
 
 QString ImageWindow::strippedName(const QString& fullFilename)

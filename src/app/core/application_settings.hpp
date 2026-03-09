@@ -19,11 +19,14 @@ class ApplicationSettings : public QObject
 
 public:
     ApplicationSettings();
-    ~ApplicationSettings() override;
+    ~ApplicationSettings() override = default;
 
     void save();
     void save_img_session_config();
+    void save_img_session_config_with_val(const ImageSessionSettings& config);
+
     void save_cam_session_config();
+    void save_cam_session_config_with_val(const VideoSessionSettings& config);
 
     void save_algo(Session session, const AlgoConfig& algo);
     void save_downscale(Session session, const DownscaleConfig& downscale_config);

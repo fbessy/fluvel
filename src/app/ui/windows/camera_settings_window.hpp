@@ -24,7 +24,10 @@ class CameraSettingsWindow : public QDialog
     Q_OBJECT
 
 public:
-    CameraSettingsWindow(QWidget* parent);
+    CameraSettingsWindow(QWidget* parent, const VideoSessionSettings& config);
+
+signals:
+    void settingsAccepted(const VideoSessionSettings& config);
 
 protected:
     //! Save the configuration chosen into the ApplicationSettings.
@@ -39,6 +42,8 @@ private:
     void setupUiDownscaleGb();
     void updateUIFromConfig();
 
+    void restoreToDefaults();
+
     QDialogButtonBox* dial_buttons_;
     QTabWidget* tabs_;
     AlgoSettingsWidget* algoWidget_;
@@ -48,7 +53,7 @@ private:
     QComboBox* downscale_factor_cb_;
     QCheckBox* filter_cb_;
 
-    VideoSessionSettings& config_;
+    VideoSessionSettings config_;
 };
 
 } // namespace fluvel_app

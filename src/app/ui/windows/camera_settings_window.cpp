@@ -10,6 +10,7 @@
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QLabel>
+#include <QPushButton>
 #include <QSettings>
 #include <QSpinBox>
 #include <QTabBar>
@@ -19,9 +20,9 @@
 namespace fluvel_app
 {
 
-CameraSettingsWindow::CameraSettingsWindow(QWidget* parent)
+CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSettings& config)
     : QDialog(parent)
-    , config_(AppSettings::instance().camConfig)
+    , config_(config)
 {
     setWindowTitle(tr("Camera session settings"));
 
@@ -39,7 +40,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent)
     dial_buttons_ = new QDialogButtonBox(this);
     dial_buttons_->addButton(QDialogButtonBox::Ok);
     dial_buttons_->addButton(QDialogButtonBox::Cancel);
-    dial_buttons_->addButton(QDialogButtonBox::Reset);
+    dial_buttons_->addButton(QDialogButtonBox::RestoreDefaults);
 
     tabs_ = new QTabWidget(this);
 
@@ -61,7 +62,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent)
     auto* preprocess_gb = new QGroupBox;
     preprocess_gb->setLayout(preprocess_layout);
 
-    algoWidget_ = new AlgoSettingsWidget(this, Session::Camera);
+    algoWidget_ = new AlgoSettingsWidget(config_.compute.algo, this);
 
     phases_sb_ = new QSpinBox;
     phases_sb_->setMinimum(1);
@@ -92,6 +93,9 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent)
     connect(dial_buttons_, &QDialogButtonBox::accepted, this, &CameraSettingsWindow::accept);
 
     connect(dial_buttons_, &QDialogButtonBox::rejected, this, &CameraSettingsWindow::reject);
+
+    connect(dial_buttons_->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
+            &CameraSettingsWindow::restoreToDefaults);
 }
 
 void CameraSettingsWindow::setupUiDownscaleGb()
@@ -118,10 +122,9 @@ void CameraSettingsWindow::accept()
     algoWidget_->accept();
     config_.compute.cyclesNbr = phases_sb_->value();
 
-    // for data persistence
-    AppSettings::instance().save_cam_session_config();
-
     QDialog::accept();
+
+    emit settingsAccepted(config_);
 }
 
 void CameraSettingsWindow::updateUIFromConfig()
@@ -143,6 +146,12 @@ void CameraSettingsWindow::reject()
     updateUIFromConfig();
 
     QDialog::reject();
+}
+
+void CameraSettingsWindow::restoreToDefaults()
+{
+    // config_ = CamSessionConfig::defaults();
+    updateUIFromConfig();
 }
 
 void CameraSettingsWindow::closeEvent(QCloseEvent* event)

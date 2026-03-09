@@ -19,16 +19,11 @@
 namespace fluvel_app
 {
 
-DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
+DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidget* parent)
     : QWidget(parent)
-    , session_(session)
+    , config_(config)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-
-    if (session_ == Session::Image)
-        config_ = AppSettings::instance().imgConfig.display;
-    else if (session_ == Session::Camera)
-        config_ = AppSettings::instance().camConfig.display;
 
     pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
     source_rb_ = new QRadioButton(tr("Source"));
@@ -107,35 +102,35 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
             [this](bool checked)
             {
                 config_.l_out_displayed = checked;
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(lout_selector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
                 config_.l_out_color = toRgb_uc(color);
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(lin_gb, &QGroupBox::toggled, this,
             [this](bool checked)
             {
                 config_.l_in_displayed = checked;
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(lin_selector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
                 config_.l_in_color = toRgb_uc(color);
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(display_overlay_cb_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.algorithm_overlay = checked;
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(source_rb_, &QRadioButton::toggled, this,
@@ -145,7 +140,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
                     return;
 
                 config_.image = ImageBase::Source;
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(preprocessed_rb_, &QRadioButton::toggled, this,
@@ -155,21 +150,21 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
                     return;
 
                 config_.image = ImageBase::Preprocessed;
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(flip_cb_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.mirrorMode = checked;
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     connect(smooth_cb_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.smoothDisplay = checked;
-                setConfig();
+                displayConfigChanged(config_);
             });
 
     refresh_pipeline_displayed_gb_availability();
@@ -181,16 +176,9 @@ DisplaySettingsWidget::DisplaySettingsWidget(QWidget* parent, Session session)
             &DisplaySettingsWidget::onVideoSettingsChanged);
 }
 
-void DisplaySettingsWidget::setConfig()
-{
-    if (session_ == Session::Image)
-        AppSettings::instance().set_img_display_config(config_);
-    else if (session_ == Session::Camera)
-        AppSettings::instance().set_cam_display_config(config_);
-}
-
 void DisplaySettingsWidget::refresh_pipeline_displayed_gb_availability()
 {
+#if 0
     bool isEnabled = false;
 
     if (session_ == Session::Image)
@@ -214,6 +202,18 @@ void DisplaySettingsWidget::refresh_pipeline_displayed_gb_availability()
     pipeline_displayed_gb_->setEnabled(isEnabled);
 
     if (!isEnabled)
+    {
+        source_rb_->setChecked(true);
+        preprocessed_rb_->setChecked(false);
+    }
+#endif
+}
+
+void DisplaySettingsWidget::updatePipelineAvailability(bool hasPreprocessing)
+{
+    pipeline_displayed_gb_->setEnabled(hasPreprocessing);
+
+    if (!hasPreprocessing)
     {
         source_rb_->setChecked(true);
         preprocessed_rb_->setChecked(false);

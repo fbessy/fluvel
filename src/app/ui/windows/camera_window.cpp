@@ -73,7 +73,7 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     settingsButton_->setIcon(settingsIcon_);
 
-    settings_window_ = new CameraSettingsWindow(this);
+    settings_window_ = new CameraSettingsWindow(this, AppSettings::instance().camConfig);
 
     QWidget* central = new QWidget(this);
 
@@ -109,7 +109,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     videoView_->setInteraction(interaction.release());
 
     // --- Display bar ---
-    displayBar_ = new DisplaySettingsWidget(central, Session::Camera);
+    displayBar_ = new DisplaySettingsWidget(AppSettings::instance().camConfig.display, central);
 
     // --- Layout horizontal contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
@@ -159,6 +159,26 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     connect(videoView_, &ImageView::frameDisplayed, controller_,
             &CameraController::onFrameDisplayed);
+
+    connect(settings_window_, &CameraSettingsWindow::settingsAccepted, &AppSettings::instance(),
+            &ApplicationSettings::save_cam_session_config_with_val);
+
+    connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &AppSettings::instance(),
+            &ApplicationSettings::set_cam_display_config);
+
+    bool hasPreprocessing = AppSettings::instance().camConfig.compute.downscale.hasDownscale ||
+                            AppSettings::instance().camConfig.compute.hasTemporalFiltering;
+
+    displayBar_->updatePipelineAvailability(hasPreprocessing);
+
+    connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
+            [this](const VideoSessionSettings& conf)
+            {
+                bool hasPreprocessing =
+                    conf.compute.downscale.hasDownscale || conf.compute.hasTemporalFiltering;
+
+                displayBar_->updatePipelineAvailability(hasPreprocessing);
+            });
 }
 
 void CameraWindow::onFrameSizeStr(const QString& str)

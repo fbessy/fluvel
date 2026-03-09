@@ -27,7 +27,7 @@ class SettingsWindow : public QDialog
     Q_OBJECT
 
 public:
-    SettingsWindow(QWidget* parent);
+    SettingsWindow(QWidget* parent, const ImageSessionSettings& config);
 
 public slots:
     void onAddShape();
@@ -37,7 +37,7 @@ public slots:
     void onInputImageReady(const QImage& inputImage);
 
 signals:
-    void changed(const QMimeData* mimeData = nullptr);
+    void settingsAccepted(const ImageSessionSettings& config);
 
 protected:
     //! Save the configuration chosen into the ApplicationSettings.
@@ -61,6 +61,14 @@ private:
     UiShapeInfo getUiShape() const;
 
     void updateUIFromConfig();
+
+    // --- Setup ---
+    void setupUiDownscaleTab();
+    void setupUiPreprocessingTab();
+    void setupUiInitTab();
+    void setupUiAlgoTab();
+
+    void setupConnections();
 
     ImageView* settingsView_;
 
@@ -91,19 +99,13 @@ private:
     QVBoxLayout* noise_layout();
 
     QGroupBox* gaussian_noise_groupbox_;
-    bool has_gaussian_noise2_;
     QDoubleSpinBox* std_noise_spin_;
-    float std_noise2_;
 
     QGroupBox* salt_noise_groupbox_;
-    bool has_salt_noise2_;
     QDoubleSpinBox* proba_noise_spin_;
-    float proba_noise2_;
 
     QGroupBox* speckle_noise_groupbox_;
-    bool has_speckle_noise2_;
     QDoubleSpinBox* std_speckle_noise_spin_;
-    float std_speckle_noise2_;
 
     QVBoxLayout* filter_layout();
 
@@ -111,21 +113,13 @@ private:
     KernelSizeSpinBox* klength_median_spin_;
     QRadioButton* complex_radio1_;
     QRadioButton* complex_radio2_;
-    bool has_median_filt2_;
-    bool has_O1_algo2_;
-    int kernel_median_length2_;
 
     QGroupBox* mean_groupbox_;
     KernelSizeSpinBox* klength_mean_spin_;
-    bool has_mean_filt2_;
-    int kernel_mean_length2_;
 
     QGroupBox* gaussian_groupbox_;
     KernelSizeSpinBox* klength_gaussian_spin_;
     QDoubleSpinBox* std_filter_spin_;
-    bool has_gaussian_filt2_;
-    int kernel_gaussian_length2_;
-    float sigma2_;
 
     QGroupBox* aniso_groupbox_;
     QRadioButton* aniso1_radio_;
@@ -133,34 +127,21 @@ private:
     QSpinBox* iteration_filter_spin_;
     QDoubleSpinBox* lambda_spin_;
     QDoubleSpinBox* kappa_spin_;
-    bool has_aniso_diff2_;
-    int max_itera2_;
-    float lambda2_;
-    float kappa2_;
-    fluvel_ip::AnisoDiff aniso_option2_;
 
     QGroupBox* open_groupbox_;
     KernelSizeSpinBox* klength_open_spin_;
-    bool has_open_filt2_;
-    int kernel_open_length2_;
 
     QGroupBox* close_groupbox_;
     KernelSizeSpinBox* klength_close_spin_;
-    bool has_close_filt2_;
-    int kernel_close_length2_;
 
     QGroupBox* tophat_groupbox_;
     QRadioButton* whitetophat_radio_;
     QRadioButton* blacktophat_radio_;
     KernelSizeSpinBox* klength_tophat_spin_;
-    bool has_top_hat_filt2_;
-    bool is_white_top_hat2_;
-    int kernel_tophat_length2_;
 
     QGroupBox* algo_groupbox_;
     QRadioButton* complex1_morpho_radio_;
     QRadioButton* complex2_morpho_radio_;
-    bool has_O1_morpho2_;
 
     bool has_preprocess2_;
     QLabel* time_filt_;
@@ -174,10 +155,6 @@ private:
     // widgets et variables liés à l'onglet initialization :
 
     QWidget* init_page_;
-
-    void open_phi();
-    void phiInit2imgPhi();
-    void imgPhi2phiInit();
 
     QRadioButton* rectangle_radio_;
     QRadioButton* ellipse_radio_;
@@ -201,13 +178,7 @@ private:
     AlgoSettingsWidget* algo_widget_;
     QWidget* algo_page_;
 
-    // --- Setup ---
-    void setupUiDownscaleTab();
-    void setupUiPreprocessingTab();
-    void setupUiInitTab();
-    void setupUiAlgoTab();
-
-    void setupConnections();
+    ImageSessionSettings config_;
 
 private slots:
 

@@ -3,7 +3,6 @@
 
 #include "settings_window.hpp"
 
-#include "application_settings.hpp"
 #include "filters.hpp"
 #include "image_window.hpp"
 #include "kernel_size_spinbox.hpp"
@@ -13,8 +12,9 @@
 namespace fluvel_app
 {
 
-SettingsWindow::SettingsWindow(QWidget* parent)
+SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& config)
     : QDialog(parent)
+    , config_(config)
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -93,7 +93,7 @@ SettingsWindow::SettingsWindow(QWidget* parent)
 
 void SettingsWindow::setupUiAlgoTab()
 {
-    algo_widget_ = new AlgoSettingsWidget(this, Session::Image);
+    algo_widget_ = new AlgoSettingsWidget(config_.compute.algo, this);
 
     QVBoxLayout* algo_layout = new QVBoxLayout;
     algo_layout->addWidget(algo_widget_);
@@ -683,12 +683,12 @@ UiShapeInfo SettingsWindow::getUiShape() const
 
 void SettingsWindow::accept()
 {
-    auto& ds_config = AppSettings::instance().imgConfig.compute.downscale;
+    auto& ds_config = config_.compute.downscale;
 
     ds_config.hasDownscale = downscale_page_->isChecked();
     ds_config.downscaleFactor = downscale_factor_cb_->currentData().toInt();
 
-    auto& filt_config = AppSettings::instance().imgConfig.compute.processing;
+    auto& filt_config = config_.compute.processing;
 
     filt_config.has_gaussian_noise = gaussian_noise_groupbox_->isChecked();
     filt_config.std_noise = float(std_noise_spin_->value());
@@ -733,15 +733,14 @@ void SettingsWindow::accept()
 
     algo_widget_->accept();
 
-    // for data persistence
-    AppSettings::instance().save_img_session_config();
-
     QDialog::accept();
+
+    emit settingsAccepted(config_);
 }
 
 void SettingsWindow::updateUIFromConfig()
 {
-    const auto& ds_config = AppSettings::instance().imgConfig.compute.downscale;
+    const auto& ds_config = config_.compute.downscale;
 
     downscale_page_->setChecked(ds_config.hasDownscale);
 
@@ -749,7 +748,7 @@ void SettingsWindow::updateUIFromConfig()
     if (index >= 0)
         downscale_factor_cb_->setCurrentIndex(index);
 
-    const auto& config_filter = AppSettings::instance().imgConfig.compute.processing;
+    const auto& config_filter = config_.compute.processing;
 
     gaussian_noise_groupbox_->setChecked(config_filter.has_gaussian_noise);
     std_noise_spin_->setValue(double(config_filter.std_noise));

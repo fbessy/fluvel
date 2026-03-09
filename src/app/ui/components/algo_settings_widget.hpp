@@ -19,13 +19,12 @@ class AlgoSettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    AlgoSettingsWidget(QWidget* parent, Session session);
+    AlgoSettingsWidget(AlgoConfig& config, QWidget* parent = nullptr);
 
     void accept();
     void reject();
 
 private:
-    static AlgoConfig& config(Session session);
 
     QComboBox* connectivity_cb_;
 
@@ -45,7 +44,6 @@ private:
     QGroupBox* internalspeed_groupbox_;
     QSpinBox* disk_radius_spin_;
 
-    Session session_;
     AlgoConfig& config_;
 };
 

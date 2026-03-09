@@ -22,7 +22,11 @@ class DisplaySettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    DisplaySettingsWidget(QWidget* parent, Session session);
+    DisplaySettingsWidget(const DisplayConfig& config, QWidget* parent = nullptr);
+    void updatePipelineAvailability(bool hasPreprocessing);
+
+signals:
+    void displayConfigChanged(const DisplayConfig& config);
 
 public slots:
     void setPanelVisible(bool open);
@@ -32,7 +36,6 @@ private slots:
     void onVideoSettingsChanged();
 
 private:
-    void setConfig();
     void refresh_pipeline_displayed_gb_availability();
 
     void animate(bool open);
@@ -51,7 +54,6 @@ private:
     QCheckBox* display_overlay_cb_;
 
     DisplayConfig config_;
-    Session session_;
 };
 
 } // namespace fluvel_app
