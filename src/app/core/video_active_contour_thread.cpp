@@ -51,7 +51,7 @@ void VideoActiveContourThread::run()
 
         result.receiveTs = fd.receiveTs;
 
-        qint64 contourSize = static_cast<qint64>(result.l_out.size() + result.l_in.size());
+        quint64 contourSize = static_cast<quint64>(result.l_out.size() + result.l_in.size());
 
         emit frameProcessed(contourSize);
 

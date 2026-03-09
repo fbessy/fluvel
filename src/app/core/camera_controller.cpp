@@ -115,7 +115,7 @@ void CameraController::stop()
     }
 }
 
-void CameraController::onFrameProcessed(qint64 contourSize)
+void CameraController::onFrameProcessed(quint64 contourSize)
 {
     frameStats_.frameProcessed(contourSize);
 }

@@ -166,10 +166,10 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &AppSettings::instance(),
             &ApplicationSettings::set_cam_display_config);
 
-    bool hasPreprocessing = AppSettings::instance().camConfig.compute.downscale.hasDownscale ||
-                            AppSettings::instance().camConfig.compute.hasTemporalFiltering;
+    bool preprocessing = AppSettings::instance().camConfig.compute.downscale.hasDownscale ||
+                         AppSettings::instance().camConfig.compute.hasTemporalFiltering;
 
-    displayBar_->updatePipelineAvailability(hasPreprocessing);
+    displayBar_->updatePipelineAvailability(preprocessing);
 
     connect(&AppSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
             [this](const VideoSessionSettings& conf)

@@ -441,10 +441,10 @@ void ImageWindow::setupConnections()
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &AppSettings::instance(),
             &ApplicationSettings::set_img_display_config);
 
-    bool hasPreprocessing = AppSettings::instance().imgConfig.compute.downscale.hasDownscale ||
-                            AppSettings::instance().imgConfig.compute.processing.hasProcessing();
+    bool preprocessing = AppSettings::instance().imgConfig.compute.downscale.hasDownscale ||
+                         AppSettings::instance().imgConfig.compute.processing.hasProcessing();
 
-    displayBar_->updatePipelineAvailability(hasPreprocessing);
+    displayBar_->updatePipelineAvailability(preprocessing);
 
     connect(&AppSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
             [this](const ImageSessionSettings& conf)

@@ -42,7 +42,7 @@ void FrameStatsView::frameReceived(qint64 recvTsNs)
     updateWindowLocked(recvTsNs);
 }
 
-void FrameStatsView::frameProcessed(qint64 contourSize)
+void FrameStatsView::frameProcessed(quint64 contourSize)
 {
     QMutexLocker lock(&mutex_);
 

@@ -690,6 +690,7 @@ void SettingsWindow::accept()
 
     auto& filt_config = config_.compute.processing;
 
+    filt_config.enabled = preprocess_page_->isChecked();
     filt_config.has_gaussian_noise = gaussian_noise_groupbox_->isChecked();
     filt_config.std_noise = float(std_noise_spin_->value());
     filt_config.has_salt_noise = salt_noise_groupbox_->isChecked();
@@ -750,6 +751,7 @@ void SettingsWindow::updateUIFromConfig()
 
     const auto& config_filter = config_.compute.processing;
 
+    preprocess_page_->setChecked(config_filter.enabled);
     gaussian_noise_groupbox_->setChecked(config_filter.has_gaussian_noise);
     std_noise_spin_->setValue(double(config_filter.std_noise));
     salt_noise_groupbox_->setChecked(config_filter.has_salt_noise);

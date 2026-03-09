@@ -116,6 +116,8 @@ void ApplicationSettings::save_img_session_config()
 
     save_downscale(Session::Image, imgConfig.compute.downscale);
 
+    settings.setValue("preprocess/enabled", imgConfig.compute.processing.enabled);
+
     settings.setValue("preprocess/has_gaussian_noise",
                       imgConfig.compute.processing.has_gaussian_noise);
     settings.setValue("preprocess/std_noise", imgConfig.compute.processing.std_noise);
@@ -290,6 +292,8 @@ void ApplicationSettings::load_img_session_config()
     load_downscale(Session::Image, imgConfig.compute.downscale);
 
     auto& fc = imgConfig.compute.processing;
+
+    fc.enabled = settings.value("preprocess/enabled", false).toBool();
 
     fc.has_gaussian_noise =
         settings.value("preprocess/has_gaussian_noise", ProcessingConfig::kDefaultProcess).toBool();

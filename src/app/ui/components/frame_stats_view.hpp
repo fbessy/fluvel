@@ -27,7 +27,7 @@ public:
 
     // événements
     void frameReceived(qint64 recvTsNs);
-    void frameProcessed(qint64 contourSize);
+    void frameProcessed(quint64 contourSize);
     void frameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
 
     // lecture stable (fenêtre ~1s)

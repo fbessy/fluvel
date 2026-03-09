@@ -43,7 +43,7 @@ private:
     void onVideoSettingsChanged(const VideoSessionSettings& conf);
     void onVideoDisplaySettingsChanged(const DisplayConfig& displayConfig);
 
-    void onFrameProcessed(qint64 contourSize);
+    void onFrameProcessed(quint64 contourSize);
     void updateDiagnostics();
 
     QCamera* camera_ = nullptr;

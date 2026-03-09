@@ -149,6 +149,8 @@ struct ProcessingConfig
 
     static constexpr bool kDefaultWhiteTopHat = true;
 
+    bool enabled = false;
+
     bool has_gaussian_noise = kDefaultProcess;
     float std_noise = kDefaultStdNoise;
 
@@ -189,9 +191,9 @@ struct ProcessingConfig
 
     bool hasProcessing() const
     {
-        return has_gaussian_noise || has_salt_noise || has_speckle_noise || has_median_filt ||
-               has_mean_filt || has_gaussian_filt || has_aniso_diff || has_open_filt ||
-               has_close_filt || has_top_hat_filt;
+        return enabled && (has_gaussian_noise || has_salt_noise || has_speckle_noise ||
+                           has_median_filt || has_mean_filt || has_gaussian_filt ||
+                           has_aniso_diff || has_open_filt || has_close_filt || has_top_hat_filt);
     }
 };
 

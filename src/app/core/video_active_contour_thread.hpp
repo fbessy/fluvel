@@ -44,7 +44,7 @@ public:
     void setAlgoConfig(const VideoComputeConfig& config);
 
 signals:
-    void frameProcessed(qint64 contourSize);
+    void frameProcessed(quint64 contourSize);
 
     void frameResultReady(fluvel_app::FrameResult result);
 
