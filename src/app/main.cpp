@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
     fluvel_app::FrameClock::init();
 
     const auto& config = fluvel_app::AppSettings::instance();
-    fluvel_app::Language language = config.app_language;
+    fluvel_app::Language language = config.appLanguage();
 
     static QTranslator translator_qt;
     static QTranslator translator_fluvel;

@@ -265,7 +265,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     QString locale = QLocale::system().name().section('_', 0, 0);
 
     const auto& config = AppSettings::instance();
-    const auto language = config.app_language;
+    const auto language = config.appLanguage();
 
     QString txt_file;
     if (language == Language::French || (language == Language::System && locale == "fr"))

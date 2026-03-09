@@ -27,9 +27,10 @@ public:
     const ImageSessionSettings& imageSettings() const;
     const VideoSessionSettings& videoSettings() const;
 
-    void resizeInitialPhiImage(int width, int height);
+    Language appLanguage() const;
+    void setAppLanguage(Language language);
 
-    Language app_language;
+    void resizeInitialPhiImage(int width, int height);
 
 signals:
     void imgSettingsChanged(const fluvel_app::ImageSessionSettings& conf);
@@ -67,6 +68,8 @@ private:
 
     ImageSessionSettings imageSettings_;
     VideoSessionSettings videoSettings_;
+
+    Language appLanguage_;
 };
 
 class AppSettings

@@ -87,7 +87,7 @@ ApplicationSettings::ApplicationSettings()
 
     const QString s = settings.value("ui/language", "system").toString();
 
-    app_language = language_from_string(s.toStdString());
+    appLanguage_ = language_from_string(s.toStdString());
 
     loadImageSessionSettings();
     loadVideoSessionSettings();
@@ -97,7 +97,7 @@ void ApplicationSettings::save()
 {
     QSettings settings = userSettings();
 
-    settings.setValue("ui/language", to_string(app_language));
+    settings.setValue("ui/language", to_string(appLanguage_));
 
     saveImageSessionSettings();
     saveVideoSessionSettings();
@@ -615,6 +615,16 @@ const ImageSessionSettings& ApplicationSettings::imageSettings() const
 const VideoSessionSettings& ApplicationSettings::videoSettings() const
 {
     return videoSettings_;
+}
+
+Language ApplicationSettings::appLanguage() const
+{
+    return appLanguage_;
+}
+
+void ApplicationSettings::setAppLanguage(Language language)
+{
+    appLanguage_ = language;
 }
 
 QString toSettingsPrefix(Session scope)
