@@ -24,6 +24,9 @@ public:
     void accept();
     void reject();
 
+signals:
+    void connectivityChanged(fluvel_ip::Connectivity connectivity);
+
 private:
 
     QComboBox* connectivity_cb_;

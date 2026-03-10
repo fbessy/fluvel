@@ -850,12 +850,8 @@ void SettingsWindow::setupConnections()
     connect(imageSettingsController_, &ImageSettingsController::viewChanged, settingsView_,
             &ImageView::setImage);
 
-    // phiViewModel_->onConnectivityChanged( connectivity_cb->currentIndex() );
-
-    /*connect(connectivity_cb,
-            QOverload<int>::of(&QComboBox::currentIndexChanged),
-            phiViewModel_,
-            &PhiViewModel::onConnectivityChanged);*/
+    connect(algo_widget_, &AlgoSettingsWidget::connectivityChanged, imageSettingsController_,
+            &ImageSettingsController::onConnectivityChanged);
 
     connect(rectangle_radio_, &QRadioButton::toggled, this, &SettingsWindow::onUiShapeChanged);
     connect(ellipse_radio_, &QRadioButton::toggled, this, &SettingsWindow::onUiShapeChanged);

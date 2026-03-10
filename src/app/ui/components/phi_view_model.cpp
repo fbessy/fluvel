@@ -29,9 +29,9 @@ PhiViewModel::PhiViewModel(PhiEditor* editor, QObject* parent)
     connect(editor_, &PhiEditor::editedPhiCleared, this, &PhiViewModel::onClearFromEditor);
 }
 
-void PhiViewModel::onConnectivityChanged(int index)
+void PhiViewModel::setConnectivity(fluvel_ip::Connectivity c)
 {
-    connectivity_ = static_cast<fluvel_ip::Connectivity>(index);
+    connectivity_ = c;
 
     updateLists();
     updatePhiFromLists();

@@ -135,6 +135,14 @@ void ImageSettingsController::onViewChanged(const QImage& imageSettings)
         emit viewChanged(imageSettings);
 }
 
+void ImageSettingsController::onConnectivityChanged(fluvel_ip::Connectivity c)
+{
+    if (!phiViewModel_)
+        return;
+
+    phiViewModel_->setConnectivity(c);
+}
+
 void ImageSettingsController::onUpdateOverlay(UiShapeInfo uiShape)
 {
     if (!phiViewModel_)

@@ -150,6 +150,15 @@ AlgoSettingsWidget::AlgoSettingsWidget(AlgoConfig& config, QWidget* parent)
 
     // to initialize ui state in function of the configuration
     reject();
+
+    connect(connectivity_cb_, &QComboBox::currentIndexChanged, this,
+            [this](int index)
+            {
+                auto connectivity =
+                    connectivity_cb_->itemData(index).value<fluvel_ip::Connectivity>();
+
+                emit connectivityChanged(connectivity);
+            });
 }
 
 void AlgoSettingsWidget::accept()

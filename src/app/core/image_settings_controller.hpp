@@ -47,6 +47,7 @@ public:
 public slots:
     void onUpdateOverlay(fluvel_app::UiShapeInfo uiShape);
     void onViewChanged(const QImage& imageSettings);
+    void onConnectivityChanged(fluvel_ip::Connectivity c);
 
 signals:
     void viewChanged(const QImage& imageSettings);

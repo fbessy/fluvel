@@ -34,12 +34,12 @@ public:
         return phi_;
     }
     void setOverlay(const ShapeInfo& overlayShape);
+    void setConnectivity(fluvel_ip::Connectivity c);
 
 public slots:
     void updateFromEditor();
     void onClearFromEditor();
     void setBackground(const QImage& image);
-    void onConnectivityChanged(int index);
 
 signals:
     void viewChanged(const QImage& image);
