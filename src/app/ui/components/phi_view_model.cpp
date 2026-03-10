@@ -9,6 +9,9 @@
 namespace fluvel_app
 {
 
+const QColor kOutColor(64, 0, 255);
+const QColor kInColor(0, 230, 118);
+
 PhiViewModel::PhiViewModel(PhiEditor* editor, fluvel_ip::Connectivity connectivity, QObject* parent)
     : QObject(parent)
     , editor_(editor)
@@ -67,7 +70,7 @@ void PhiViewModel::onClearFromEditor()
     l_in_.clear();
     displayedPhi_ = background_;
 
-    overlayVisible_ = true;
+    overlayVisible_ = false;
     composeView();
 }
 
@@ -281,32 +284,36 @@ void PhiViewModel::updatePhiFromLists()
     if (displayedPhi_.size() != listsGridSize_)
         return;
 
+    QColor outColor = interactiveMode_ ? QColor(32, 0, 128) : kOutColor;
+    QColor inColor = interactiveMode_ ? QColor(0, 115, 59) : kInColor;
+
     for (const auto& p : l_out_)
     {
         QPoint point(p.x, p.y);
-        displayedPhi_.setPixel(point, qRgb(0, 0, 255));
+        displayedPhi_.setPixel(point, outColor.rgb());
     }
 
     for (const auto& p : l_in_)
     {
         QPoint point(p.x, p.y);
-        displayedPhi_.setPixel(point, qRgb(255, 0, 0));
+        displayedPhi_.setPixel(point, inColor.rgb());
     }
 }
 
 void PhiViewModel::composeView()
 {
-    QImage withOverlay = displayedPhi_;
+    QImage outputImg = displayedPhi_;
 
     if (overlayVisible_)
     {
-        QPainter p(&withOverlay);
-        // p.setRenderHint(QPainter::Antialiasing, false);
+        QPainter p(&outputImg);
+        p.setRenderHint(QPainter::Antialiasing, false);
 
-        QColor overlayColor = Qt::green;
-        overlayColor.setAlpha(150);
+        QColor overlayColor = kInColor.lighter(120);
+        overlayColor.setAlpha(160);
 
-        QPen pen(overlayColor, 3);
+        QPen pen(overlayColor, 2);
+        pen.setStyle(Qt::DashLine);
         p.setPen(pen);
         p.setBrush(Qt::NoBrush);
 
@@ -316,7 +323,7 @@ void PhiViewModel::composeView()
             p.drawEllipse(overlayShape_.boundingBox);
     }
 
-    emit viewChanged(withOverlay);
+    emit viewChanged(outputImg);
 }
 
 void PhiViewModel::setOverlay(const ShapeInfo& overlayShape)
@@ -335,6 +342,14 @@ void PhiViewModel::showOverlay()
 void PhiViewModel::hideOverlay()
 {
     overlayVisible_ = false;
+    composeView();
+}
+
+void PhiViewModel::setInteractiveMode(bool enabled)
+{
+    interactiveMode_ = enabled;
+
+    updatePhiFromLists(); // recalcul des couleurs atténuées
     composeView();
 }
 

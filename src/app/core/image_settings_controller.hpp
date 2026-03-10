@@ -47,7 +47,7 @@ public:
     void reject();
 
 public slots:
-    void setInitializationMode(bool enabled);
+    void setInteractiveMode(bool enabled);
     void onUpdateOverlay(fluvel_app::UiShapeInfo uiShape);
     void onViewChanged(const QImage& imageSettings);
     void onConnectivityChanged(fluvel_ip::Connectivity c);

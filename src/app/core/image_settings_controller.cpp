@@ -133,10 +133,7 @@ void ImageSettingsController::onConnectivityChanged(fluvel_ip::Connectivity c)
 
 void ImageSettingsController::onUpdateOverlay(UiShapeInfo uiShape)
 {
-    if (!initializationEnabled_)
-        return;
-
-    if (!phiViewModel_)
+    if (!initializationEnabled_ || !phiViewModel_)
         return;
 
     if (phiViewModel_->phi().isNull())
@@ -342,12 +339,14 @@ void ImageSettingsController::applyProcessing()
         processed_ = downscaled_;
 }
 
-void ImageSettingsController::setInitializationMode(bool enabled)
+void ImageSettingsController::setInteractiveMode(bool enabled)
 {
     if (!phiViewModel_)
         return;
 
     initializationEnabled_ = enabled;
+
+    phiViewModel_->setInteractiveMode(enabled);
 
     if (enabled)
         phiViewModel_->showOverlay();

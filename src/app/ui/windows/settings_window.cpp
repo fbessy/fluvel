@@ -887,7 +887,7 @@ void SettingsWindow::setupConnections()
     connect(tabs_, &QTabWidget::currentChanged, this, &SettingsWindow::onTabChanged);
 
     connect(this, &SettingsWindow::initializationModeChanged, imageSettingsController_,
-            &ImageSettingsController::setInitializationMode);
+            &ImageSettingsController::setInteractiveMode);
 }
 
 void SettingsWindow::onUiShapeChanged()

@@ -40,6 +40,7 @@ public:
 
     void setOverlay(const ShapeInfo& overlayShape);
     void setConnectivity(fluvel_ip::Connectivity c);
+    void setInteractiveMode(bool enabled);
 
 public slots:
     void updateFromEditor();
@@ -70,7 +71,8 @@ private:
 
     fluvel_ip::Connectivity connectivity_;
 
-    bool overlayVisible_ = true;
+    bool interactiveMode_ = false;
+    bool overlayVisible_ = false;
 };
 
 } // namespace fluvel_app
