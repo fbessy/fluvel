@@ -9,8 +9,12 @@
 
 #include <QObject>
 
+#include <chrono>
+
 namespace fluvel_app
 {
+
+using clock_type = std::chrono::steady_clock;
 
 struct UiShapeInfo
 {
@@ -46,6 +50,8 @@ public slots:
 
 signals:
     void viewChanged(const QImage& imageSettings);
+    void processingStarted();
+    void filterPipelineProcessed(double elapsedSec);
 
 private:
     void setInitialPhi(const QImage& phi);

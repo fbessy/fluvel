@@ -829,51 +829,17 @@ void SettingsWindow::setupConnections()
                 notifyConfigEdited();
             });
 
-    // connect(gaussian_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(std_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
+    connect(imageSettingsController_, &ImageSettingsController::processingStarted, this,
+            [this]()
+            {
+                time_filt_->setText("...");
+            });
 
-    // connect(salt_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(proba_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(speckle_noise_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(std_speckle_noise_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(mean_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(klength_mean_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(gaussian_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(klength_gaussian_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    // connect(std_filter_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(median_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(klength_median_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    // connect(complex_radio1,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(complex_radio2,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(aniso_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(aniso1_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(aniso2_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(iteration_filter_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    // connect(lambda_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
-    // connect(kappa_spin,SIGNAL(valueChanged(double)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(open_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(klength_open_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(close_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(klength_close_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(tophat_groupbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(whitetophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(blacktophat_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(klength_tophat_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(complex1_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-    // connect(complex2_morpho_radio,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(preprocess_page,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
-
-    // connect(histo_checkbox,SIGNAL(clicked()),this,SLOT(show_phi_with_filtered_image()));
+    connect(imageSettingsController_, &ImageSettingsController::filterPipelineProcessed, this,
+            [this](double elapsedSec)
+            {
+                time_filt_->setText(tr("%1 s").arg(elapsedSec, 5, 'f', 2));
+            });
 
     connect(add_button_, &QPushButton::clicked, this, &SettingsWindow::onAddShape);
 

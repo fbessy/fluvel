@@ -3,7 +3,7 @@
 
 #include "image_settings_controller.hpp"
 
-#include "application_settings.hpp"
+#include <QCoreApplication>
 
 namespace fluvel_app
 {
@@ -190,9 +190,6 @@ void ImageSettingsController::applyProcessing()
 
     processed_ = downscaled_;
 
-    // float elapsed_time;
-    // std::clock_t start_time, stop_time;
-
     QImage img;
 
     int channelsNbr = 3;
@@ -222,9 +219,12 @@ void ImageSettingsController::applyProcessing()
 
     fluvel_ip::Filters filters(img.constBits(), width, img.height(), bytesPerPixel);
 
-    // start_time = std::clock();
-
     const auto& fc = editedProcessingConfig_;
+
+    emit processingStarted();
+    QCoreApplication::processEvents();
+
+    clock_type::time_point measurementStartTime = clock_type::now();
 
     if (fc.hasProcessing())
     {
@@ -316,8 +316,10 @@ void ImageSettingsController::applyProcessing()
             }
         }
 
-        // stop_time = std::clock();
-        // elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
+        auto endTime = clock_type::now();
+        double elapsedSec = std::chrono::duration<double>(endTime - measurementStartTime).count();
+
+        emit filterPipelineProcessed(elapsedSec);
 
         if (img.format() == QImage::Format_RGB888)
         {
@@ -332,8 +334,6 @@ void ImageSettingsController::applyProcessing()
                     .copy();
         }
     }
-
-    // return elapsed_time;
 
     if (processed_.isNull())
         processed_ = downscaled_;
