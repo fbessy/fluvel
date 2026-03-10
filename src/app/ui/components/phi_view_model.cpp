@@ -37,7 +37,7 @@ void PhiViewModel::setConnectivity(fluvel_ip::Connectivity c)
     updateLists();
     updatePhiFromLists();
 
-    overlayVisible_ = true;
+    overlayVisible_ = false;
     composeView();
 }
 
