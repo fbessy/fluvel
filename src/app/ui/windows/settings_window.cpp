@@ -5,6 +5,7 @@
 
 #include "filters.hpp"
 #include "image_window.hpp"
+#include "interaction_set.hpp"
 #include "kernel_size_spinbox.hpp"
 
 #include <QtWidgets>
@@ -66,6 +67,14 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     settingsView_ = new ImageView(this);
+    auto interaction = std::make_unique<InteractionSet>();
+
+    auto initBehavior = std::make_unique<InitializationBehavior>();
+    initializationBehavior_ = initBehavior.get();
+
+    interaction->addBehavior(std::move(initBehavior));
+
+    settingsView_->setInteraction(interaction.release());
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Layouts
@@ -865,6 +874,15 @@ void SettingsWindow::setupConnections()
 
     connect(this, &SettingsWindow::updateOverlay, imageSettingsController_,
             &ImageSettingsController::onUpdateOverlay);
+
+    connect(initializationBehavior_, &InitializationBehavior::previewShapeRequested, this,
+            &SettingsWindow::onPreviewShapeAt);
+
+    connect(initializationBehavior_, &InitializationBehavior::addShapeRequested, this,
+            &SettingsWindow::onAddShapeAt);
+
+    connect(initializationBehavior_, &InitializationBehavior::removeShapeRequested, this,
+            &SettingsWindow::onSubtractShapeAt);
 }
 
 void SettingsWindow::onUiShapeChanged()
@@ -873,6 +891,13 @@ void SettingsWindow::onUiShapeChanged()
 }
 
 UiShapeInfo SettingsWindow::getUiShape() const
+{
+    QPoint position{abscissa_spin_->value(), ordinate_spin_->value()};
+
+    return getUiShapeAt(position);
+}
+
+UiShapeInfo SettingsWindow::getUiShapeAt(QPoint position) const
 {
     UiShapeInfo uiShape;
 
@@ -885,8 +910,8 @@ UiShapeInfo SettingsWindow::getUiShape() const
 
     uiShape.width = width_shape_spin_->value();
     uiShape.height = height_shape_spin_->value();
-    uiShape.x = abscissa_spin_->value();
-    uiShape.y = ordinate_spin_->value();
+    uiShape.x = position.x();
+    uiShape.y = position.y();
 
     return uiShape;
 }
@@ -1271,10 +1296,28 @@ void SettingsWindow::onAddShape()
         imageSettingsController_->addShape(getUiShape());
 }
 
+void SettingsWindow::onAddShapeAt(QPoint position)
+{
+    if (imageSettingsController_)
+    {
+        QPoint uiPosition = uiPositionFromView(position);
+        imageSettingsController_->addShape(getUiShapeAt(uiPosition));
+    }
+}
+
 void SettingsWindow::onSubtractShape()
 {
     if (imageSettingsController_)
         imageSettingsController_->subtractShape(getUiShape());
+}
+
+void SettingsWindow::onSubtractShapeAt(QPoint position)
+{
+    if (imageSettingsController_)
+    {
+        QPoint uiPosition = uiPositionFromView(position);
+        imageSettingsController_->subtractShape(getUiShapeAt(uiPosition));
+    }
 }
 
 void SettingsWindow::onClearPhi()
@@ -1310,6 +1353,31 @@ void SettingsWindow::notifyConfigEdited()
     if (imageSettingsController_)
         imageSettingsController_->updateEditedConfig(editedDownscaleConfig_,
                                                      editedProcessingConfig_);
+}
+
+void SettingsWindow::onPreviewShapeAt(QPoint position)
+{
+    QPoint uiPosition = uiPositionFromView(position);
+
+    UiShapeInfo shape = getUiShapeAt(uiPosition);
+
+    emit updateOverlay(shape);
+}
+
+QPoint SettingsWindow::uiPositionFromView(const QPoint& viewPosition) const
+{
+    if (settingsView_->image().isNull())
+        return QPoint(-1, -1);
+
+    QSize viewSize = settingsView_->image().size();
+
+    float px = float(viewPosition.x()) / float(viewSize.width()) - 0.5f;
+    float py = float(viewPosition.y()) / float(viewSize.height()) - 0.5f;
+
+    int ux = int(px * 100.f);
+    int uy = int(py * 100.f);
+
+    return QPoint(ux, uy);
 }
 
 } // namespace fluvel_app

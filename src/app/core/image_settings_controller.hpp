@@ -16,13 +16,14 @@ namespace fluvel_app
 
 using clock_type = std::chrono::steady_clock;
 
+// normalized shape in function of the image size
 struct UiShapeInfo
 {
     ShapeType shape;
-    int width;
-    int height;
-    int x;
-    int y;
+    int width;  // percent
+    int height; // percent
+    int x;      // percent centered
+    int y;      // percent centered
 };
 
 class ImageSettingsController : public QObject
@@ -58,7 +59,7 @@ signals:
 private:
     void setInitialPhi(const QImage& phi);
 
-    ShapeInfo computeShapeInfo(const UiShapeInfo& uiShape);
+    ShapeInfo computeShapeInfo(const UiShapeInfo& uiShape, const QSize& targetSize);
 
     void applyDownscale();
     void applyProcessing();

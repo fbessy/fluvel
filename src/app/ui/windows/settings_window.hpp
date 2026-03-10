@@ -7,6 +7,7 @@
 #include "filters.hpp"
 #include "image_settings_controller.hpp"
 #include "image_view.hpp"
+#include "initialization_behavior.hpp"
 #include "kernel_size_spinbox.hpp"
 
 #include <QtWidgets>
@@ -30,8 +31,11 @@ public:
     SettingsWindow(QWidget* parent, const ImageSessionSettings& config);
 
 public slots:
+    void onPreviewShapeAt(QPoint position);
     void onAddShape();
+    void onAddShapeAt(QPoint position);
     void onSubtractShape();
+    void onSubtractShapeAt(QPoint position);
     void onClearPhi();
 
     void onInputImageReady(const QImage& inputImage);
@@ -59,6 +63,8 @@ private:
 
     void onUiShapeChanged();
     UiShapeInfo getUiShape() const;
+    UiShapeInfo getUiShapeAt(QPoint position) const;
+    QPoint uiPositionFromView(const QPoint& viewPosition) const;
 
     void updateUIFromConfig();
 
@@ -72,7 +78,8 @@ private:
 
     void notifyConfigEdited();
 
-    ImageView* settingsView_;
+    ImageView* settingsView_ = nullptr;
+    InitializationBehavior* initializationBehavior_ = nullptr;
 
     ImageSettingsController* imageSettingsController_ = nullptr;
 

@@ -40,40 +40,27 @@ void ImageSettingsController::updateEditedConfig(const DownscaleConfig& downscal
         phiViewModel_->setBackground(processed_);
 }
 
-ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape)
+ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape,
+                                                    const QSize& targetSize)
 {
     ShapeInfo info;
 
-    // --- Type de shape ---
     info.type = uiShape.shape;
 
-    const int canvasWidth = input_.width();
-    const int canvasHeight = input_.height();
+    const float canvasWidth = static_cast<float>(targetSize.width());
+    const float canvasHeight = static_cast<float>(targetSize.height());
 
-    float downscale = 1.f;
+    float centerXPercent = static_cast<float>(uiShape.x) / 100.f;
+    float centerYPercent = static_cast<float>(uiShape.y) / 100.f;
 
-    if (editedDownscaleConfig_.hasDownscale)
-        downscale = static_cast<float>(editedDownscaleConfig_.downscaleFactor);
+    float centerX = (centerXPercent + 0.5f) * canvasWidth;
+    float centerY = (centerYPercent + 0.5f) * canvasHeight;
 
-    // Récupération des valeurs des sliders (en pourcentage)
-    float centerXPercent =
-        static_cast<float>(uiShape.x) / 100.0f; // De -500 à +500, donc normalisé autour de 0
-    float centerYPercent = static_cast<float>(uiShape.y) / 100.0f;
+    float width = static_cast<float>(uiShape.width) / 100.f * canvasWidth;
+    float height = static_cast<float>(uiShape.height) / 100.f * canvasHeight;
 
-    // Calcul de la position du centre en pixels
-    float centerX = (centerXPercent + 0.5f) * static_cast<float>(canvasWidth) / downscale;
-    float centerY = (centerYPercent + 0.5f) * static_cast<float>(canvasHeight) / downscale;
-
-    // Récupération des dimensions de la shape en pixels
-    float width =
-        static_cast<float>(uiShape.width) / 100.0f * static_cast<float>(canvasWidth) / downscale;
-
-    float height =
-        static_cast<float>(uiShape.height) / 100.0f * static_cast<float>(canvasHeight) / downscale;
-
-    // Calcul de la bounding box à partir du centre et des dimensions
-    float topLeftX = centerX - (width / 2.f);
-    float topLeftY = centerY - (height / 2.f);
+    float topLeftX = centerX - width / 2.f;
+    float topLeftY = centerY - height / 2.f;
 
     info.boundingBox = QRect(static_cast<int>(topLeftX), static_cast<int>(topLeftY),
                              static_cast<int>(width), static_cast<int>(height));
@@ -86,7 +73,10 @@ void ImageSettingsController::addShape(UiShapeInfo uiShape)
     if (!phiEditor_)
         return;
 
-    auto shape = computeShapeInfo(uiShape);
+    if (phiEditor_->phi().isNull())
+        return;
+
+    auto shape = computeShapeInfo(uiShape, phiEditor_->phi().size());
 
     phiEditor_->addShape(shape);
 }
@@ -96,7 +86,10 @@ void ImageSettingsController::subtractShape(UiShapeInfo uiShape)
     if (!phiEditor_)
         return;
 
-    auto shape = computeShapeInfo(uiShape);
+    if (phiEditor_->phi().isNull())
+        return;
+
+    auto shape = computeShapeInfo(uiShape, phiEditor_->phi().size());
 
     phiEditor_->subtractShape(shape);
 }
@@ -137,7 +130,10 @@ void ImageSettingsController::onUpdateOverlay(UiShapeInfo uiShape)
     if (!phiViewModel_)
         return;
 
-    auto shape = computeShapeInfo(uiShape);
+    if (phiViewModel_->phi().isNull())
+        return;
+
+    auto shape = computeShapeInfo(uiShape, phiViewModel_->phi().size());
 
     phiViewModel_->setOverlay(shape);
 }
