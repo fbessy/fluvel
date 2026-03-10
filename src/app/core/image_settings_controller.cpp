@@ -25,18 +25,6 @@ ImageSettingsController::ImageSettingsController(const DownscaleConfig& downscal
 
     connect(phiViewModel_.get(), &PhiViewModel::viewChanged, this,
             &ImageSettingsController::onViewChanged);
-
-    // connect(imageController,    &ImageController::imageReadyWithoutResize,
-    //         phiViewModel.get(), &PhiViewModel::setBackgroundWithUpdate);
-
-    // connect(imageController,
-    //         &ImageController::imageReadyWithResize,
-    //         phiEditor.get(),
-    //         [this](const QImage &img)
-    //         {
-    //             phiViewModel->setBackground(img);
-    //             phiEditor->onImageSizeReady(img.width(), img.height());
-    //         });
 }
 
 void ImageSettingsController::updateEditedConfig(const DownscaleConfig& downscaleConfig,
