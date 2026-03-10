@@ -47,7 +47,8 @@ void ImageSettingsController::updateEditedConfig(const DownscaleConfig& downscal
     applyDownscale();
     applyProcessing();
 
-    phiViewModel_->setBackground(processed_);
+    if (!processed_.isNull())
+        phiViewModel_->setBackground(processed_);
 }
 
 ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape)
