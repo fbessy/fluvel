@@ -384,13 +384,13 @@ void SettingsWindow::setupUiPreprocessingTab()
     klength_median_spin_->setMinimum(3);
     klength_median_spin_->setMaximum(499);
     // klength_median_spin->setSuffix("²");
-    complex_radio1_ = new QRadioButton("O(r log r)×O(n)");
-    complex_radio2_ = new QRadioButton("O(1)×O(n)");
+    complex_sort_ = new QRadioButton("O(r log r)×O(n)");
+    complex_perreault_ = new QRadioButton("O(1)×O(n)");
 
     QFormLayout* median_layout = new QFormLayout;
     median_layout->addRow(tr("kernel size ="), klength_median_spin_);
-    median_layout->addRow(tr("quick sort algorithm"), complex_radio1_);
-    median_layout->addRow(tr("Perreault's algorithm"), complex_radio2_);
+    median_layout->addRow(tr("Sort-based median"), complex_sort_);
+    median_layout->addRow(tr("Perreault's algorithm"), complex_perreault_);
 
     aniso_groupbox_ = new QGroupBox(tr("Perona-Malik anisotropic diffusion"));
     aniso_groupbox_->setCheckable(true);
@@ -703,17 +703,17 @@ void SettingsWindow::setupConnections()
                 notifyConfigEdited();
             });
 
-    connect(complex_radio1_, &QRadioButton::clicked, this,
-            [this]()
-            {
-                editedProcessingConfig_.has_O1_algo = true;
-                notifyConfigEdited();
-            });
-
-    connect(complex_radio2_, &QRadioButton::clicked, this,
+    connect(complex_sort_, &QRadioButton::clicked, this,
             [this]()
             {
                 editedProcessingConfig_.has_O1_algo = false;
+                notifyConfigEdited();
+            });
+
+    connect(complex_perreault_, &QRadioButton::clicked, this,
+            [this]()
+            {
+                editedProcessingConfig_.has_O1_algo = true;
                 notifyConfigEdited();
             });
 
@@ -912,7 +912,7 @@ void SettingsWindow::accept()
     filt_config.std_speckle_noise = float(std_speckle_noise_spin_->value());
     filt_config.has_median_filt = median_groupbox_->isChecked();
     filt_config.kernel_median_length = klength_median_spin_->value();
-    filt_config.has_O1_algo = complex_radio2_->isChecked();
+    filt_config.has_O1_algo = complex_perreault_->isChecked();
 
     filt_config.has_mean_filt = mean_groupbox_->isChecked();
     filt_config.kernel_mean_length = klength_mean_spin_->value();
@@ -977,11 +977,13 @@ void SettingsWindow::updateUIFromConfig()
 
     if (config_filter.has_O1_algo)
     {
-        complex_radio2_->setChecked(true);
+        complex_perreault_->setChecked(true);
+        complex_sort_->setChecked(false);
     }
     else
     {
-        complex_radio1_->setChecked(true);
+        complex_sort_->setChecked(true);
+        complex_perreault_->setChecked(false);
     }
 
     mean_groupbox_->setChecked(config_filter.has_mean_filt);
@@ -1082,7 +1084,7 @@ void SettingsWindow::default_settings()
     klength_median_spin_->setValue(5);
 
     // has_O1_algo
-    complex_radio2_->setChecked(true);
+    complex_perreault_->setChecked(true);
 
     mean_groupbox_->setChecked(false);
     klength_mean_spin_->setValue(5);

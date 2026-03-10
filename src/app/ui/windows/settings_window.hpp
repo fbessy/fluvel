@@ -113,8 +113,8 @@ private:
 
     QGroupBox* median_groupbox_;
     KernelSizeSpinBox* klength_median_spin_;
-    QRadioButton* complex_radio1_;
-    QRadioButton* complex_radio2_;
+    QRadioButton* complex_sort_;
+    QRadioButton* complex_perreault_;
 
     QGroupBox* mean_groupbox_;
     KernelSizeSpinBox* klength_mean_spin_;
