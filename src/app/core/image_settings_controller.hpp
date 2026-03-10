@@ -31,7 +31,8 @@ class ImageSettingsController : public QObject
 
 public:
     ImageSettingsController(const DownscaleConfig& downscaleConfig,
-                            const ProcessingConfig& processingConfig, QObject* parent);
+                            const ProcessingConfig& processingConfig,
+                            fluvel_ip::Connectivity connectivity, QObject* parent);
 
     void addShape(UiShapeInfo uiShape);
     void subtractShape(UiShapeInfo uiShape);

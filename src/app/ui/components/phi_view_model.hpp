@@ -27,7 +27,8 @@ class PhiViewModel : public QObject
 {
     Q_OBJECT
 public:
-    explicit PhiViewModel(PhiEditor* editor, QObject* parent = nullptr);
+    explicit PhiViewModel(PhiEditor* editor, fluvel_ip::Connectivity connectivity,
+                          QObject* parent = nullptr);
 
     const QImage& phi() const
     {

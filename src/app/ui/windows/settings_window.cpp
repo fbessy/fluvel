@@ -88,7 +88,8 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     imageSettingsController_ =
-        new ImageSettingsController(config_.compute.downscale, config_.compute.processing, this);
+        new ImageSettingsController(config_.compute.downscale, config_.compute.processing,
+                                    config_.compute.algo.connectivity, this);
 
     updateUIFromConfig();
     setupConnections();

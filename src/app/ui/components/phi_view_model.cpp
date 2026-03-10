@@ -9,9 +9,10 @@
 namespace fluvel_app
 {
 
-PhiViewModel::PhiViewModel(PhiEditor* editor, QObject* parent)
+PhiViewModel::PhiViewModel(PhiEditor* editor, fluvel_ip::Connectivity connectivity, QObject* parent)
     : QObject(parent)
     , editor_(editor)
+    , connectivity_(connectivity)
 {
     Q_ASSERT(editor_);
 
