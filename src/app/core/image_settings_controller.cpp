@@ -70,6 +70,9 @@ ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape,
 
 void ImageSettingsController::addShape(UiShapeInfo uiShape)
 {
+    if (!initializationEnabled_)
+        return;
+
     if (!phiEditor_)
         return;
 
@@ -83,6 +86,9 @@ void ImageSettingsController::addShape(UiShapeInfo uiShape)
 
 void ImageSettingsController::subtractShape(UiShapeInfo uiShape)
 {
+    if (!initializationEnabled_)
+        return;
+
     if (!phiEditor_)
         return;
 
@@ -127,6 +133,9 @@ void ImageSettingsController::onConnectivityChanged(fluvel_ip::Connectivity c)
 
 void ImageSettingsController::onUpdateOverlay(UiShapeInfo uiShape)
 {
+    if (!initializationEnabled_)
+        return;
+
     if (!phiViewModel_)
         return;
 
@@ -331,6 +340,19 @@ void ImageSettingsController::applyProcessing()
 
     if (processed_.isNull())
         processed_ = downscaled_;
+}
+
+void ImageSettingsController::setInitializationMode(bool enabled)
+{
+    if (!phiViewModel_)
+        return;
+
+    initializationEnabled_ = enabled;
+
+    if (enabled)
+        phiViewModel_->showOverlay();
+    else
+        phiViewModel_->hideOverlay();
 }
 
 } // namespace fluvel_app

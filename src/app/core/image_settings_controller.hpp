@@ -47,6 +47,7 @@ public:
     void reject();
 
 public slots:
+    void setInitializationMode(bool enabled);
     void onUpdateOverlay(fluvel_app::UiShapeInfo uiShape);
     void onViewChanged(const QImage& imageSettings);
     void onConnectivityChanged(fluvel_ip::Connectivity c);
@@ -73,6 +74,8 @@ private:
     QImage input_;
     QImage downscaled_;
     QImage processed_;
+
+    bool initializationEnabled_ = false;
 };
 
 } // namespace fluvel_app

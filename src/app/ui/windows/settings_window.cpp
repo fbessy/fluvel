@@ -883,6 +883,11 @@ void SettingsWindow::setupConnections()
 
     connect(initializationBehavior_, &InitializationBehavior::removeShapeRequested, this,
             &SettingsWindow::onSubtractShapeAt);
+
+    connect(tabs_, &QTabWidget::currentChanged, this, &SettingsWindow::onTabChanged);
+
+    connect(this, &SettingsWindow::initializationModeChanged, imageSettingsController_,
+            &ImageSettingsController::setInitializationMode);
 }
 
 void SettingsWindow::onUiShapeChanged()
@@ -1378,6 +1383,12 @@ QPoint SettingsWindow::uiPositionFromView(const QPoint& viewPosition) const
     int uy = int(py * 100.f);
 
     return QPoint(ux, uy);
+}
+
+void SettingsWindow::onTabChanged(int index)
+{
+    constexpr int kInitializationTab = 2;
+    emit initializationModeChanged(index == kInitializationTab);
 }
 
 } // namespace fluvel_app

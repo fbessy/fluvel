@@ -31,6 +31,7 @@ public:
     SettingsWindow(QWidget* parent, const ImageSessionSettings& config);
 
 public slots:
+    void onTabChanged(int index);
     void onPreviewShapeAt(QPoint position);
     void onAddShape();
     void onAddShapeAt(QPoint position);
@@ -42,6 +43,7 @@ public slots:
 
 signals:
     void settingsAccepted(const ImageSessionSettings& config);
+    void initializationModeChanged(bool enabled);
 
 protected:
     //! Save the configuration chosen into the ApplicationSettings.

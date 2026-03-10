@@ -36,7 +36,9 @@ void PhiViewModel::setConnectivity(fluvel_ip::Connectivity c)
 
     updateLists();
     updatePhiFromLists();
-    composeView(true);
+
+    overlayVisible_ = true;
+    composeView();
 }
 
 void PhiViewModel::setBackground(const QImage& image)
@@ -45,14 +47,18 @@ void PhiViewModel::setBackground(const QImage& image)
 
     updateListsFloodFill();
     updatePhiFromLists();
-    composeView(true);
+
+    overlayVisible_ = false;
+    composeView();
 }
 
 void PhiViewModel::updateFromEditor()
 {
     updateListsFloodFill();
     updatePhiFromLists();
-    composeView(false);
+
+    overlayVisible_ = false;
+    composeView();
 }
 
 void PhiViewModel::onClearFromEditor()
@@ -61,7 +67,8 @@ void PhiViewModel::onClearFromEditor()
     l_in_.clear();
     displayedPhi_ = background_;
 
-    composeView(true);
+    overlayVisible_ = true;
+    composeView();
 }
 
 void PhiViewModel::updateLists()
@@ -287,11 +294,11 @@ void PhiViewModel::updatePhiFromLists()
     }
 }
 
-void PhiViewModel::composeView(bool hasOverlay)
+void PhiViewModel::composeView()
 {
     QImage withOverlay = displayedPhi_;
 
-    if (hasOverlay)
+    if (overlayVisible_)
     {
         QPainter p(&withOverlay);
         // p.setRenderHint(QPainter::Antialiasing, false);
@@ -315,7 +322,20 @@ void PhiViewModel::composeView(bool hasOverlay)
 void PhiViewModel::setOverlay(const ShapeInfo& overlayShape)
 {
     overlayShape_ = overlayShape;
-    composeView(true);
+    overlayVisible_ = true;
+    composeView();
+}
+
+void PhiViewModel::showOverlay()
+{
+    overlayVisible_ = true;
+    composeView();
+}
+
+void PhiViewModel::hideOverlay()
+{
+    overlayVisible_ = false;
+    composeView();
 }
 
 } // namespace fluvel_app

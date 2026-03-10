@@ -34,6 +34,10 @@ public:
     {
         return phi_;
     }
+
+    void showOverlay();
+    void hideOverlay();
+
     void setOverlay(const ShapeInfo& overlayShape);
     void setConnectivity(fluvel_ip::Connectivity c);
 
@@ -49,7 +53,7 @@ private:
     void updateLists();
     void updateListsFloodFill();
     void updatePhiFromLists();
-    void composeView(bool hasOverlay);
+    void composeView();
     bool point_is_redundant(int x, int y);
 
     PhiEditor* editor_; // non owning
@@ -65,6 +69,8 @@ private:
     ShapeInfo overlayShape_;
 
     fluvel_ip::Connectivity connectivity_;
+
+    bool overlayVisible_ = true;
 };
 
 } // namespace fluvel_app
