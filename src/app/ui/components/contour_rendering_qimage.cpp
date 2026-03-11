@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "contour_rendering_qimage.hpp"
-#include "contour_data.hpp"
+#include "color.hpp"
 
 #include <QImage>
 
