@@ -69,6 +69,4 @@ private:
     Language appLanguage_;
 };
 
-QString toSettingsPrefix(Session scope);
-
 } // namespace fluvel_app

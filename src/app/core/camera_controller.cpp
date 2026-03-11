@@ -11,33 +11,33 @@ namespace fluvel_app
 
 CameraController::CameraController(const VideoSessionSettings& session, QObject* parent)
     : QObject(parent)
-    , ac_thread_(this)
+    , activeContourThread_(this)
 {
     onVideoSettingsChanged(session);
     onVideoDisplaySettingsChanged(session.display);
 
-    connect(&ac_thread_, &VideoActiveContourThread::frameResultReady, this,
+    connect(&activeContourThread_, &VideoActiveContourThread::frameResultReady, this,
             &CameraController::onFrameResultReady, Qt::QueuedConnection);
 
-    connect(&ac_thread_, &VideoActiveContourThread::frameSizeStr, this,
+    connect(&activeContourThread_, &VideoActiveContourThread::frameSizeStr, this,
             &CameraController::frameSizeStr);
 
-    ac_thread_.start();
+    activeContourThread_.start();
 
     statsTimer_ = new QTimer(this);
     statsTimer_->setInterval(500);
 
     connect(statsTimer_, &QTimer::timeout, this, &CameraController::updateDiagnostics);
 
-    connect(&ac_thread_, &VideoActiveContourThread::frameProcessed, this,
+    connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
             &CameraController::onFrameProcessed);
 }
 
 CameraController::~CameraController()
 {
     stop();
-    ac_thread_.stop();
-    ac_thread_.wait();
+    activeContourThread_.stop();
+    activeContourThread_.wait();
 }
 
 bool CameraController::isActive() const
@@ -67,7 +67,7 @@ void CameraController::start(const QByteArray& deviceId)
                     {
                         const qint64 recvTs = FrameClock::nowNs();
                         frameStats_.frameReceived(recvTs);
-                        ac_thread_.submitFrame(frame);
+                        activeContourThread_.submitFrame(frame);
                     });
 
             camera_->start();
@@ -154,7 +154,7 @@ void CameraController::updateDiagnostics()
 
 void CameraController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
-    ac_thread_.setAlgoConfig(session.compute);
+    activeContourThread_.setAlgoConfig(session.compute);
 }
 
 void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& display)

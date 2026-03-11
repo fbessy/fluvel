@@ -92,15 +92,15 @@ private:
     static constexpr int kWorkerPeriodMs = 16;
     static constexpr qint64 kTimeSliceConvergeMs = 15;
     static constexpr qint64 kTimeSliceInteractiveMs = 10;
-    qint64 timeSliceMs_ = kTimeSliceInteractiveMs;
+    qint64 timeSliceMs_{kTimeSliceInteractiveMs};
 
-    bool initialShown_ = false;
+    bool initialShown_{false};
 
     ImageComputeConfig config_;
 
     fluvel_ip::ContourDiagnostics diag_;
     clock_type::time_point measurementStartTime_;
-    bool isMeasuring_ = false;
+    bool isMeasuring_{false};
 };
 
 } // namespace fluvel_app

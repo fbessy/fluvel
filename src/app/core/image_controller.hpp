@@ -60,7 +60,7 @@ private:
     DisplayConfig displayConfig_;
     ImageComputeConfig computeConfig_;
 
-    ActiveContourWorker acWorker_;
+    ActiveContourWorker activeContourWorker_;
 };
 
 bool isSupportedImage(const QString& path);

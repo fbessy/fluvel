@@ -19,15 +19,16 @@ ImageController::ImageController(const ImageSessionSettings& session, QObject* p
     onImageSettingsChanged(session);
     onImageDisplaySettingsChanged(session.display);
 
-    connect(&acWorker_, &ActiveContourWorker::processedImageReady, this,
+    connect(&activeContourWorker_, &ActiveContourWorker::processedImageReady, this,
             &ImageController::onProcessedImageReady);
 
-    connect(&acWorker_, &ActiveContourWorker::contourUpdated, this,
+    connect(&activeContourWorker_, &ActiveContourWorker::contourUpdated, this,
             &ImageController::onContourUpdated, Qt::QueuedConnection);
 
-    connect(&acWorker_, &ActiveContourWorker::stateChanged, this, &ImageController::onStateChanged);
+    connect(&activeContourWorker_, &ActiveContourWorker::stateChanged, this,
+            &ImageController::onStateChanged);
 
-    connect(&acWorker_, &ActiveContourWorker::diagnosticsUpdated, this,
+    connect(&activeContourWorker_, &ActiveContourWorker::diagnosticsUpdated, this,
             &ImageController::onDiagnosticsUpdated);
 }
 
@@ -121,7 +122,7 @@ void ImageController::reinitializeWorker()
              << "phi:" << image_debug::describeImage(config.initialPhi);
 #endif
 
-    acWorker_.initialize(downscaledImage_, config);
+    activeContourWorker_.initialize(downscaledImage_, config);
 }
 
 void ImageController::onProcessedImageReady(const QImage& processed)
@@ -174,22 +175,22 @@ void ImageController::onContourUpdated(const fluvel_ip::ExportedContour& l_out,
 
 void ImageController::restart()
 {
-    acWorker_.restart();
+    activeContourWorker_.restart();
 }
 
 void ImageController::togglePause()
 {
-    acWorker_.togglePause();
+    activeContourWorker_.togglePause();
 }
 
 void ImageController::step()
 {
-    acWorker_.step();
+    activeContourWorker_.step();
 }
 
 void ImageController::converge()
 {
-    acWorker_.converge();
+    activeContourWorker_.converge();
 }
 
 void ImageController::onStateChanged(fluvel_app::WorkerState state)
