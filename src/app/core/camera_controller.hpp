@@ -48,7 +48,7 @@ private:
     QMediaCaptureSession* captureSession_ = nullptr;
     QVideoSink* videoSink_ = nullptr;
 
-    VideoActiveContourThread ac_thread_;
+    VideoActiveContourThread ac_thread_ = nullptr;
 
     FrameStatsView frameStats_;
     QTimer* statsTimer_ = nullptr;
