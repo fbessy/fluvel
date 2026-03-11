@@ -55,7 +55,6 @@ protected:
     void run() override;
 
 private:
-    VideoComputeConfig config_;
 
     QImage convertFrame(QVideoFrame frame) const;
     QImage applyDownscale(const QImage& input, const DownscaleConfig& config) const;
@@ -65,6 +64,8 @@ private:
                                      const VideoComputeConfig& config, FrameResult& fr);
 
     void exportContours(FrameResult& fr);
+
+    VideoComputeConfig config_;
 
     QMutex frameMutex_;
     QWaitCondition condition_;

@@ -288,21 +288,21 @@ AboutWindow::AboutWindow(QWidget* parent)
     QHBoxLayout* layout_license = new QHBoxLayout;
     layout_license->addWidget(license_textedit);
 
-    license_window_ = new QDialog(this);
-    license_window_->setWindowTitle(tr("License"));
-    license_window_->setLayout(layout_license);
+    licenseWindow_ = new QDialog(this);
+    licenseWindow_->setWindowTitle(tr("License"));
+    licenseWindow_->setLayout(layout_license);
 
     if (settings.contains("ui_geometry/license_window"))
     {
-        license_window_->restoreGeometry(
+        licenseWindow_->restoreGeometry(
             settings.value("ui_geometry/license_window").toByteArray());
     }
     else
     {
-        license_window_->resize(500, 500);
+        licenseWindow_->resize(500, 500);
     }
 
-    connect(license, &QPushButton::clicked, license_window_, &QDialog::show);
+    connect(license, &QPushButton::clicked, licenseWindow_, &QDialog::show);
 
     QVBoxLayout* left_layout = new QVBoxLayout;
     left_layout->addWidget(icon_label);
@@ -488,7 +488,7 @@ void AboutWindow::closeEvent(QCloseEvent* event)
     QSettings settings;
 
     settings.setValue("ui_geometry/about_window", saveGeometry());
-    settings.setValue("ui_geometry/license_window", license_window_->saveGeometry());
+    settings.setValue("ui_geometry/license_window", licenseWindow_->saveGeometry());
 
     QDialog::closeEvent(event);
 }

@@ -22,39 +22,35 @@ public:
     //! A parametric constructor with a pointer on the QWidget parent.
     AnalysisWindow(QWidget* parent);
 
-public slots:
-
     void check_lists();
 
 protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
+    void compute_hd();
+    void refresh_quantile(int hundredth);
+
     void calculateShapesIntersection();
 
-    AnalysisWidget* widget1_;
-    AnalysisWidget* widget2_;
-    QPushButton* compute_button_;
+    AnalysisWidget* widget1_{nullptr};
+    AnalysisWidget* widget2_{nullptr};
+    QPushButton* computeButton_{nullptr};
 
     std::unordered_set<fluvel_ip::Point2D_i> intersection_;
 
-    QDialog* result_popup_;
-    QLabel* hausdorff_label_;
-    QSpinBox* hundredth_sp_;
-    QLabel* quantile_label_;
-    QLabel* hausdorff_ratio_label_;
-    QLabel* quantile_ratio_label_;
-    QLabel* centroids_dist_label_;
-    QLabel* centroids_ratio_label_;
-    QLabel* time_label_;
+    QDialog* resultPopup_{nullptr};
+    QLabel* hausdorffLabel_{nullptr};
+    QSpinBox* hundredthSp_{nullptr};
+    QLabel* quantileLabel_{nullptr};
+    QLabel* hausdorffRatioLabel_{nullptr};
+    QLabel* quantileRatioLabel_{nullptr};
+    QLabel* centroidsDistLabel_{nullptr};
+    QLabel* centroids_ratio_label_{nullptr};
+    QLabel* timeLabel_{nullptr};
 
     fluvel_ip::HausdorffDistance* hd_{nullptr};
     float factor_{0.f};
-
-private slots:
-
-    void compute_hd();
-    void refresh_quantile(int hundredth);
 };
 
 } // namespace fluvel_app
