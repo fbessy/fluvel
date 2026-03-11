@@ -13,12 +13,6 @@
 namespace fluvel_app
 {
 
-enum SpeedModel : int
-{
-    REGION_BASED = 0, // Chan-Vese model
-    EDGE_BASED        // Geodesic model
-};
-
 enum class Language
 {
     System = 0,
