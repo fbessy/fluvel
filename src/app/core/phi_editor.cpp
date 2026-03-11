@@ -8,10 +8,32 @@
 namespace fluvel_app
 {
 
-PhiEditor::PhiEditor(const QImage& committedPhi)
-    : committedPhi_(committedPhi)
+PhiEditor::PhiEditor(const QImage& phi)
+    : committedPhi_(phi)
 {
     editedPhi_ = committedPhi_;
+}
+
+void PhiEditor::loadPhi(const QImage& phi)
+{
+    committedPhi_ = phi;
+    editedPhi_ = phi;
+
+    emit editedPhiChanged();
+}
+
+QImage PhiEditor::commit()
+{
+    committedPhi_ = editedPhi_;
+
+    return committedPhi_;
+}
+
+void PhiEditor::revert()
+{
+    editedPhi_ = committedPhi_;
+
+    emit editedPhiChanged();
 }
 
 void PhiEditor::changeShape(const ShapeInfo& shapeInfo, const QColor& color)
@@ -45,36 +67,19 @@ void PhiEditor::clear()
     emit editedPhiCleared();
 }
 
-void PhiEditor::accept()
-{
-    committedPhi_ = editedPhi_;
-
-    emit phiAccepted(committedPhi_);
-}
-
-void PhiEditor::reject()
-{
-    editedPhi_ = committedPhi_;
-
-    emit editedPhiChanged();
-}
-
 void PhiEditor::setSize(const QSize& size)
 {
     if (editedPhi_.isNull())
         return;
 
-    if (committedPhi_.isNull())
+    if (size == editedPhi_.size())
         return;
 
-    if (size != editedPhi_.size())
-    {
-        editedPhi_ = editedPhi_.scaled(size, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    editedPhi_ = editedPhi_.scaled(size, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 
-        committedPhi_ = committedPhi_.scaled(size, Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    committedPhi_ = committedPhi_.scaled(size, Qt::IgnoreAspectRatio, Qt::FastTransformation);
 
-        emit phiAccepted(committedPhi_);
-    }
+    emit editedPhiChanged();
 }
 
 } // namespace fluvel_app

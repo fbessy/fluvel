@@ -20,9 +20,6 @@ ImageSettingsController::ImageSettingsController(const DownscaleConfig& downscal
         ApplicationSettings::instance().imageSettings().compute.initialPhi);
     phiViewModel_ = std::make_unique<PhiViewModel>(phiEditor_.get(), connectivity);
 
-    connect(phiEditor_.get(), &PhiEditor::phiAccepted, this,
-            &ImageSettingsController::setInitialPhi);
-
     connect(phiViewModel_.get(), &PhiViewModel::viewChanged, this,
             &ImageSettingsController::onViewChanged);
 }
@@ -144,20 +141,20 @@ void ImageSettingsController::onUpdateOverlay(UiShapeInfo uiShape)
     phiViewModel_->setOverlay(shape);
 }
 
-void ImageSettingsController::accept()
+QImage ImageSettingsController::commit()
 {
+    QImage initialPhi;
+
     if (phiEditor_)
-        phiEditor_->accept();
-}
-void ImageSettingsController::reject()
-{
-    if (phiEditor_)
-        phiEditor_->reject();
+        initialPhi = phiEditor_->commit();
+
+    return initialPhi;
 }
 
-void ImageSettingsController::setInitialPhi(const QImage& phi)
+void ImageSettingsController::revert()
 {
-    ApplicationSettings::instance().setInitialPhiImage(phi);
+    if (phiEditor_)
+        phiEditor_->revert();
 }
 
 void ImageSettingsController::applyDownscale()

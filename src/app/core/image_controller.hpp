@@ -57,8 +57,6 @@ private:
     QImage downscaledImage_;
     QImage processedImage_;
 
-    QImage originalInitialPhi_;
-
     DisplayConfig displayConfig_;
     ImageComputeConfig computeConfig_;
 

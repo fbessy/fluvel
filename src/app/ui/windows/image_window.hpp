@@ -32,7 +32,6 @@ public:
     explicit ImageWindow(QWidget* parent = nullptr);
 
 public slots:
-    void onInputImageReady(const QImage& inputImage);
     void onDisplayedImageReady(const QImage& displayed);
     void onFileOpened(const QString& path);
     void onStateChanged(fluvel_app::WorkerState state);

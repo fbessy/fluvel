@@ -10,6 +10,10 @@
 
 #include <QtWidgets>
 
+#ifdef FLUVEL_DEBUG
+#include "image_debug.hpp"
+#endif
+
 namespace fluvel_app
 {
 
@@ -970,13 +974,23 @@ void SettingsWindow::accept()
     filt_config.kernel_tophat_length = klength_tophat_spin_->value();
     filt_config.has_O1_morpho = complex2_morpho_radio_->isChecked();
 
-    imageSettingsController_->accept();
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << ":" << __LINE__ << __func__
+             << "phi:" << image_debug::describeImage(config_.compute.initialPhi);
+#endif
+
+    config_.compute.initialPhi = imageSettingsController_->commit();
+
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << ":" << __LINE__ << __func__
+             << "phi:" << image_debug::describeImage(config_.compute.initialPhi);
+#endif
 
     algo_widget_->accept();
 
-    QDialog::accept();
-
     emit settingsAccepted(config_);
+
+    QDialog::accept();
 }
 
 void SettingsWindow::updateUIFromConfig()
@@ -1054,7 +1068,7 @@ void SettingsWindow::updateUIFromConfig()
         complex1_morpho_radio_->setChecked(true);
     }
 
-    imageSettingsController_->reject();
+    imageSettingsController_->revert();
 
     algo_widget_->reject();
 }

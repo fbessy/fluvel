@@ -43,8 +43,8 @@ public:
     void updateEditedConfig(const DownscaleConfig& downscaleConfig,
                             const ProcessingConfig& processingConfig);
 
-    void accept();
-    void reject();
+    QImage commit();
+    void revert();
 
 public slots:
     void setInteractiveMode(bool enabled);
@@ -58,8 +58,6 @@ signals:
     void filterPipelineProcessed(double elapsedSec);
 
 private:
-    void setInitialPhi(const QImage& phi);
-
     ShapeInfo computeShapeInfo(const UiShapeInfo& uiShape, const QSize& targetSize);
 
     void applyDownscale();

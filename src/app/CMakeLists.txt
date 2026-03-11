@@ -138,6 +138,9 @@ set(app_src
     ${CORE_DIR}/shape_type.hpp
     ${CORE_DIR}/camera_stats.hpp
 
+    ${CORE_DIR}/image_debug.cpp
+    ${CORE_DIR}/image_debug.hpp
+
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
     ${INTEROP_DIR}/contour_adapters.hpp

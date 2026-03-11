@@ -25,22 +25,17 @@ public:
 
     void save();
 
-    void setInitialPhiImage(const QImage& phi);
     const ImageSessionSettings& imageSettings() const;
     const VideoSessionSettings& videoSettings() const;
 
     Language appLanguage() const;
     void setAppLanguage(Language language);
 
-    void resizeInitialPhiImage(int width, int height);
-
 signals:
     void imgSettingsChanged(const fluvel_app::ImageSessionSettings& conf);
     void imgDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
     void videoSettingsChanged(const fluvel_app::VideoSessionSettings& conf);
     void videoDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
-
-    void resizedPhi(const QImage& phi);
 
 public slots:
     void updateImageSessionSettings(const ImageSessionSettings& config);

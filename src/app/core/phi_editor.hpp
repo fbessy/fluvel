@@ -23,14 +23,16 @@ class PhiEditor : public QObject
     Q_OBJECT
 
 public:
-    PhiEditor(const QImage& committedPhi);
+    PhiEditor(const QImage& phi);
+
+    void loadPhi(const QImage& phi);
 
     void addShape(const ShapeInfo& shape);
     void subtractShape(const ShapeInfo& shape);
     void clear();
 
-    void accept();
-    void reject();
+    QImage commit();
+    void revert();
 
     void setSize(const QSize& size);
 
@@ -40,7 +42,6 @@ public:
     }
 
 signals:
-    void phiAccepted(const QImage& committedPhi);
     void editedPhiChanged();
     void editedPhiCleared();
 

@@ -8,6 +8,10 @@
 
 #include <QImageReader>
 
+#ifdef FLUVEL_DEBUG
+#include "image_debug.hpp"
+#endif
+
 namespace fluvel_app
 {
 
@@ -102,19 +106,30 @@ void ImageController::reinitializeWorker()
     if (downscaledImage_.isNull())
         return;
 
-    if (originalInitialPhi_.isNull())
-        return;
-
-    computeConfig_.initialPhi =
-        originalInitialPhi_.scaled(downscaledImage_.width(), downscaledImage_.height(),
-                                   Qt::IgnoreAspectRatio, Qt::FastTransformation);
-
     if (computeConfig_.initialPhi.isNull())
         return;
 
+    ImageComputeConfig config = computeConfig_;
+
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << ":" << __LINE__ << __func__
+             << "phi:" << image_debug::describeImage(config.initialPhi);
+#endif
+
+    if (computeConfig_.initialPhi.size() != downscaledImage_.size())
+    {
+        config.initialPhi = computeConfig_.initialPhi.scaled(
+            downscaledImage_.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
+    }
+
     emit clearOverlaysRequested();
 
-    acWorker_.initialize(downscaledImage_, computeConfig_);
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << ":" << __LINE__ << __func__
+             << "phi:" << image_debug::describeImage(config.initialPhi);
+#endif
+
+    acWorker_.initialize(downscaledImage_, config);
 }
 
 void ImageController::onProcessedImageReady(const QImage& processed)
@@ -127,7 +142,6 @@ void ImageController::onProcessedImageReady(const QImage& processed)
 void ImageController::onImgSettingsChanged(const ImageSessionSettings& config)
 {
     computeConfig_ = config.compute;
-    originalInitialPhi_ = computeConfig_.initialPhi;
 
     reinitializeWorker();
 }

@@ -8,6 +8,10 @@
 #include <QSettings>
 #include <QStandardPaths>
 
+#ifdef FLUVEL_DEBUG
+#include "image_debug.hpp"
+#endif
+
 namespace fluvel_app
 {
 
@@ -184,7 +188,17 @@ void ApplicationSettings::saveImageSessionSettings()
 
 void ApplicationSettings::updateImageSessionSettings(const ImageSessionSettings& config)
 {
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << ":" << __LINE__ << __func__
+             << "phi:" << image_debug::describeImage(config.compute.initialPhi);
+#endif
+
     imageSettings_ = config;
+
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << ":" << __LINE__ << __func__
+             << "phi:" << image_debug::describeImage(imageSettings_.compute.initialPhi);
+#endif
 
     saveImageSessionSettings();
 }
@@ -573,44 +587,6 @@ bool ApplicationSettings::saveInitialPhi()
     }
 
     return isOk;
-}
-
-void ApplicationSettings::resizeInitialPhiImage(int width, int height)
-{
-    if (width == 0)
-        return;
-
-    if (height == 0)
-        return;
-
-    QSize inputSize = QSize(width, height);
-
-    QImage& phi = imageSettings_.compute.initialPhi;
-
-    if (phi.isNull())
-        return;
-
-    if (phi.size() != inputSize)
-    {
-        phi = phi.scaled(width, height, Qt::IgnoreAspectRatio, Qt::FastTransformation);
-
-        emit resizedPhi(phi);
-    }
-}
-
-void ApplicationSettings::setInitialPhiImage(const QImage& phi)
-{
-    if (phi.isNull())
-        return;
-
-    QSize oldSize = imageSettings_.compute.initialPhi.size();
-
-    imageSettings_.compute.initialPhi = phi;
-
-    QSize newSize = imageSettings_.compute.initialPhi.size();
-
-    if (newSize != oldSize)
-        emit resizedPhi(imageSettings_.compute.initialPhi);
 }
 
 const ImageSessionSettings& ApplicationSettings::imageSettings() const

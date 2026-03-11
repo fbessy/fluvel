@@ -405,10 +405,7 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::displayedImageReady, imageView_,
             &ImageView::setImage);
 
-    connect(imageController_, &ImageController::inputImageReady, this,
-            &ImageWindow::onInputImageReady);
-
-    connect(this, &ImageWindow::inputImageReady, settings_window_,
+    connect(imageController_, &ImageController::inputImageReady, settings_window_,
             &SettingsWindow::onInputImageReady);
 
     connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageView::setContour,
@@ -720,11 +717,6 @@ void ImageWindow::onCameraWindowShown()
 void ImageWindow::onCameraWindowClosed()
 {
     cameraSessionAct_->setChecked(false);
-}
-
-void ImageWindow::onInputImageReady(const QImage& inputImage)
-{
-    emit inputImageReady(inputImage);
 }
 
 void ImageWindow::showErrorMessage(const QString& msg)

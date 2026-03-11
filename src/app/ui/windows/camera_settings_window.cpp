@@ -122,9 +122,9 @@ void CameraSettingsWindow::accept()
     algoWidget_->accept();
     config_.compute.cyclesNbr = phases_sb_->value();
 
-    QDialog::accept();
-
     emit settingsAccepted(config_);
+
+    QDialog::accept();
 }
 
 void CameraSettingsWindow::updateUIFromConfig()
