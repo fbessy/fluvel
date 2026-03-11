@@ -164,19 +164,30 @@ void PhiViewModel::updatePhiFromLists()
     if (displayedPhi_.size() != listsGridSize_)
         return;
 
-    QColor outColor = interactiveMode_ ? QColor(32, 0, 128) : kOutColor;
-    QColor inColor = interactiveMode_ ? QColor(0, 115, 59) : kInColor;
+    Q_ASSERT(displayedPhi_.format() == QImage::Format_RGB32);
+
+    const QRgb outColor = (interactiveMode_ ? QColor(32, 0, 128) : kOutColor).rgb();
+    const QRgb inColor = (interactiveMode_ ? QColor(0, 115, 59) : kInColor).rgb();
+
+    const int width = displayedPhi_.width();
+    const int height = displayedPhi_.height();
 
     for (const auto& p : l_out_)
     {
-        QPoint point(p.x, p.y);
-        displayedPhi_.setPixel(point, outColor.rgb());
+        if (p.y < 0 || p.y >= height || p.x < 0 || p.x >= width)
+            continue;
+
+        QRgb* line = reinterpret_cast<QRgb*>(displayedPhi_.scanLine(p.y));
+        line[p.x] = outColor;
     }
 
     for (const auto& p : l_in_)
     {
-        QPoint point(p.x, p.y);
-        displayedPhi_.setPixel(point, inColor.rgb());
+        if (p.y < 0 || p.y >= height || p.x < 0 || p.x >= width)
+            continue;
+
+        QRgb* line = reinterpret_cast<QRgb*>(displayedPhi_.scanLine(p.y));
+        line[p.x] = inColor;
     }
 }
 
