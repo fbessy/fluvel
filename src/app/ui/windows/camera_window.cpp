@@ -169,8 +169,8 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(videoView_, &ImageView::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
 
-    connect(settings_window_, &CameraSettingsWindow::settingsAccepted,
-            &ApplicationSettings::instance(), &ApplicationSettings::updateVideoSessionSettings);
+    connect(settings_window_, &CameraSettingsWindow::videoSessionSettingsAccepted,
+            &ApplicationSettings::instance(), &ApplicationSettings::setVideoSessionSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged,
             &ApplicationSettings::instance(), &ApplicationSettings::setVideoDisplayConfig);

@@ -452,8 +452,8 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::errorOccurred, this,
             &ImageWindow::showErrorMessage);
 
-    connect(settings_window_, &SettingsWindow::settingsAccepted, &ApplicationSettings::instance(),
-            &ApplicationSettings::updateImageSessionSettings);
+    connect(settings_window_, &SettingsWindow::imageSessionSettingsAccepted,
+            &ApplicationSettings::instance(), &ApplicationSettings::setImageSessionSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged,
             &ApplicationSettings::instance(), &ApplicationSettings::setImageDisplayConfig);

@@ -51,10 +51,6 @@ public:
     void converge();    // converge to the final state and
                         // display only the final result
 
-    void finish();
-
-    void setAlgoConfig(const ImageComputeConfig& config);
-
 signals:
     void processedImageReady(const QImage& img);
     void contourUpdated(const fluvel_ip::ExportedContour& l_out,
@@ -62,10 +58,9 @@ signals:
     void stateChanged(fluvel_app::WorkerState state);
     void diagnosticsUpdated(fluvel_ip::ContourDiagnostics diag);
 
-private slots:
+private:
     void onTimeout();
 
-private:
     void emitContour();
     void updateDiagnostics();
 
@@ -78,6 +73,8 @@ private:
     void applyProcessing();
     void initializeActiveContour();
     void finalizeAndPrepareNextRun();
+
+    void finish();
 
     void setMode(RunMode mode);
     void setState(WorkerState state);

@@ -978,7 +978,7 @@ void SettingsWindow::accept()
 
     algo_widget_->accept();
 
-    emit settingsAccepted(config_);
+    emit imageSessionSettingsAccepted(config_);
 
     QDialog::accept();
 }

@@ -505,22 +505,6 @@ void ActiveContourWorker::setState(WorkerState state)
     emit stateChanged(state);
 }
 
-void ActiveContourWorker::setAlgoConfig(const ImageComputeConfig& config)
-{
-    config_ = config;
-
-    applyProcessing();
-    initializeActiveContour();
-
-    if (state_ != WorkerState::Ready)
-        return;
-
-    updateDiagnostics();
-    emitContour();
-
-    initialShown_ = true;
-}
-
 void ActiveContourWorker::resetMeasurement()
 {
     isMeasuring_ = false;

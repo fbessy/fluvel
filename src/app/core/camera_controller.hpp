@@ -28,7 +28,6 @@ public:
     void stop();
     bool isActive() const;
 
-public slots:
     void onVideoSettingsChanged(const VideoSessionSettings& session);
     void onVideoDisplaySettingsChanged(const DisplayConfig& display);
 
@@ -41,8 +40,8 @@ signals:
                                 const QVector<QPointF>& l_in, qint64 receiveTs);
 
 private:
-    void onFrameResultReady(const FrameResult& result);
     void onFrameProcessed(quint64 contourSize);
+    void onFrameResultReady(const FrameResult& result);
     void updateDiagnostics();
 
     QCamera* camera_ = nullptr;

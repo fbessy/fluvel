@@ -192,7 +192,7 @@ void ApplicationSettings::saveImageSessionSettings()
     emit imgSettingsChanged(imageSettings_);
 }
 
-void ApplicationSettings::updateImageSessionSettings(const ImageSessionSettings& config)
+void ApplicationSettings::setImageSessionSettings(const ImageSessionSettings& config)
 {
 #ifdef FLUVEL_DEBUG
     qDebug() << __FILE__ << ":" << __LINE__ << __func__
@@ -233,7 +233,7 @@ void ApplicationSettings::saveVideoSessionSettings()
     emit videoSettingsChanged(videoSettings_);
 }
 
-void ApplicationSettings::updateVideoSessionSettings(const VideoSessionSettings& config)
+void ApplicationSettings::setVideoSessionSettings(const VideoSessionSettings& config)
 {
     videoSettings_ = config;
 

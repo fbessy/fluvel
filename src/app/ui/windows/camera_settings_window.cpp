@@ -122,7 +122,7 @@ void CameraSettingsWindow::accept()
     algoWidget_->accept();
     config_.compute.cyclesNbr = phases_sb_->value();
 
-    emit settingsAccepted(config_);
+    emit videoSessionSettingsAccepted(config_);
 
     QDialog::accept();
 }

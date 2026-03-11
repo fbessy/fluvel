@@ -32,17 +32,16 @@ public:
     Language appLanguage() const;
     void setAppLanguage(Language language);
 
+    void setImageSessionSettings(const ImageSessionSettings& config);
+    void setVideoSessionSettings(const VideoSessionSettings& config);
+    void setImageDisplayConfig(const DisplayConfig& displayConfig);
+    void setVideoDisplayConfig(const DisplayConfig& displayConfig);
+
 signals:
     void imgSettingsChanged(const fluvel_app::ImageSessionSettings& conf);
     void imgDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
     void videoSettingsChanged(const fluvel_app::VideoSessionSettings& conf);
     void videoDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
-
-public slots:
-    void updateImageSessionSettings(const ImageSessionSettings& config);
-    void updateVideoSessionSettings(const VideoSessionSettings& config);
-    void setImageDisplayConfig(const DisplayConfig& displayConfig);
-    void setVideoDisplayConfig(const DisplayConfig& displayConfig);
 
 private:
     void loadImageSessionSettings();
