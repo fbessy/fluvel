@@ -197,9 +197,6 @@ void ActiveContourWorker::applyProcessing()
 
     processedImage_ = image_;
 
-    // float elapsed_time;
-    // std::clock_t start_time, stop_time;
-
     QImage img;
 
     int channelsNbr = 3;
@@ -228,8 +225,6 @@ void ActiveContourWorker::applyProcessing()
     const int bytesPerPixel = static_cast<int>(stride / width);
 
     fluvel_ip::Filters filters(img.constBits(), width, img.height(), bytesPerPixel);
-
-    // start_time = std::clock();
 
     const auto& fc = config_.processing;
 
@@ -323,9 +318,6 @@ void ActiveContourWorker::applyProcessing()
             }
         }
 
-        // stop_time = std::clock();
-        // elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
-
         if (img.format() == QImage::Format_RGB888)
         {
             processedImage_ =
@@ -342,8 +334,6 @@ void ActiveContourWorker::applyProcessing()
 
     if (!processedImage_.isNull())
         emit processedImageReady(processedImage_);
-
-    // return elapsed_time;
 }
 
 void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConfig& config)
