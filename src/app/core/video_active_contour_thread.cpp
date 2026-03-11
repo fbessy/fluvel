@@ -67,6 +67,7 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
 
     FrameResult fr;
     fr.input = frame.toImage();
+    fr.preprocessed = fr.input;
 
     switch (fr.input.format())
     {
@@ -94,10 +95,6 @@ FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
             fr.preprocessed = fr.input.scaled(fr.input.width() / downscale_fctr,
                                               fr.input.height() / downscale_fctr,
                                               Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        }
-        else
-        {
-            fr.preprocessed = fr.input;
         }
 
         auto img_algo = image_span_from_qimage(fr.preprocessed);
