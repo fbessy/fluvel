@@ -322,6 +322,16 @@ void ImageView::wheelEvent(QWheelEvent* event)
         return;
     }
 
+    // interception Ctrl + wheel
+    if ((event->modifiers() & Qt::ControlModifier) && m_interaction_)
+    {
+        if (m_interaction_->wheel(*this, event))
+        {
+            event->accept();
+            return;
+        }
+    }
+
     const QPoint overlayPosition = textPosition();
 
     constexpr double zoomFactor = 1.15;

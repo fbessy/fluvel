@@ -129,11 +129,9 @@ void SettingsWindow::setupUiInitTab()
     shape_groupbox->setFlat(true);
 
     rectangle_radio_ = new QRadioButton(tr("rectangle"));
-    rectangle_radio_->setToolTip(
-        tr("or click on the middle mouse button when the cursor is in the image"));
+    rectangle_radio_->setToolTip(tr("Middle mouse button: toggle rectangle / ellipse"));
     ellipse_radio_ = new QRadioButton(tr("ellipse"));
-    ellipse_radio_->setToolTip(
-        tr("or click on the middle mouse button when the cursor is in the image"));
+    ellipse_radio_->setToolTip(tr("Middle mouse button: toggle rectangle / ellipse"));
 
     rectangle_radio_->setChecked(false);
     ellipse_radio_->setChecked(true);
@@ -146,10 +144,10 @@ void SettingsWindow::setupUiInitTab()
     ////////////////////////////////////////////
 
     QGroupBox* shape_size_groupbox = new QGroupBox(tr("Size"));
-    shape_size_groupbox->setToolTip(tr("or roll the mouse wheel when the cursor is in the image"));
+    shape_size_groupbox->setToolTip(tr("Ctrl + mouse wheel in the image to resize the shape"));
 
     width_shape_spin_ = new QSpinBox;
-    width_shape_spin_->setSingleStep(15);
+    width_shape_spin_->setSingleStep(10);
     width_shape_spin_->setMinimum(0);
     width_shape_spin_->setMaximum(200);
     width_shape_spin_->setSuffix(tr(" % image width"));
@@ -164,12 +162,12 @@ void SettingsWindow::setupUiInitTab()
 
     width_slider_->setMinimum(0);
     width_slider_->setMaximum(200);
-    width_slider_->setTickInterval(25);
-    width_slider_->setSingleStep(15);
+    width_slider_->setTickInterval(20);
+    width_slider_->setSingleStep(10);
     width_slider_->setValue(65);
 
     height_shape_spin_ = new QSpinBox;
-    height_shape_spin_->setSingleStep(15);
+    height_shape_spin_->setSingleStep(10);
     height_shape_spin_->setMinimum(0);
     height_shape_spin_->setMaximum(200);
     height_shape_spin_->setSuffix(tr((" % image height")));
@@ -184,8 +182,8 @@ void SettingsWindow::setupUiInitTab()
 
     height_slider_->setMinimum(0);
     height_slider_->setMaximum(200);
-    height_slider_->setTickInterval(25);
-    height_slider_->setSingleStep(15);
+    height_slider_->setTickInterval(20);
+    height_slider_->setSingleStep(10);
     height_slider_->setValue(65);
 
     QVBoxLayout* shape_size_layout = new QVBoxLayout;
@@ -198,7 +196,7 @@ void SettingsWindow::setupUiInitTab()
     ////////////////////////////////////////////
 
     QGroupBox* position_groupbox = new QGroupBox(tr("Position (x,y)"));
-    position_groupbox->setToolTip(tr("or move the mouse cursor in the image"));
+    position_groupbox->setToolTip(tr("Move the cursor in the image to set the position"));
 
     abscissa_spin_ = new QSpinBox;
     abscissa_spin_->setSingleStep(15);
@@ -253,12 +251,10 @@ void SettingsWindow::setupUiInitTab()
     modify_groupbox->setFlat(true);
 
     add_button_ = new QPushButton(tr("Add"));
-    add_button_->setToolTip(
-        tr("or click on the left mouse button when the cursor is in the image"));
+    add_button_->setToolTip(tr("Left mouse button in the image: add the shape"));
 
     subtract_button_ = new QPushButton(tr("Subtract"));
-    subtract_button_->setToolTip(
-        tr("or click on the right mouse button when the cursor is in the image"));
+    subtract_button_->setToolTip(tr("Right mouse button in the image: remove the shape"));
 
     clear_button_ = new QPushButton(tr("Clear"));
 
@@ -888,6 +884,12 @@ void SettingsWindow::setupConnections()
     connect(initializationBehavior_, &InitializationBehavior::removeShapeRequested, this,
             &SettingsWindow::onSubtractShapeAt);
 
+    connect(initializationBehavior_, &InitializationBehavior::resizeShapeRequested, this,
+            &SettingsWindow::onResizeShape);
+
+    connect(initializationBehavior_, &InitializationBehavior::toggleShapeRequested, this,
+            &SettingsWindow::onToggleShape);
+
     connect(tabs_, &QTabWidget::currentChanged, this, &SettingsWindow::onTabChanged);
 
     connect(this, &SettingsWindow::initializationModeChanged, imageSettingsController_,
@@ -1381,6 +1383,37 @@ void SettingsWindow::onPreviewShapeAt(QPoint position)
     UiShapeInfo shape = getUiShapeAt(uiPosition);
 
     emit updateOverlay(shape);
+}
+
+void SettingsWindow::onResizeShape(int delta)
+{
+    wheelAccumulator_ += delta;
+
+    const int stepUnit = 120;
+
+    while (wheelAccumulator_ >= stepUnit)
+    {
+        width_shape_spin_->stepUp();
+        height_shape_spin_->stepUp();
+        wheelAccumulator_ -= stepUnit;
+    }
+
+    while (wheelAccumulator_ <= -stepUnit)
+    {
+        width_shape_spin_->stepDown();
+        height_shape_spin_->stepDown();
+        wheelAccumulator_ += stepUnit;
+    }
+
+    emit updateOverlay(getUiShape());
+}
+
+void SettingsWindow::onToggleShape()
+{
+    if (rectangle_radio_->isChecked())
+        ellipse_radio_->setChecked(true);
+    else
+        rectangle_radio_->setChecked(true);
 }
 
 QPoint SettingsWindow::uiPositionFromView(const QPoint& viewPosition) const

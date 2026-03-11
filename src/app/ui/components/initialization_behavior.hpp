@@ -24,11 +24,14 @@ public:
 
     bool mouseMove(ImageView& view, QMouseEvent* e) override;
     bool mousePress(ImageView& view, QMouseEvent* e) override;
+    bool wheel(ImageView& view, QWheelEvent* we) override;
 
 signals:
     void previewShapeRequested(QPoint imagePos);
     void addShapeRequested(QPoint imagePos);
     void removeShapeRequested(QPoint imagePos);
+    void resizeShapeRequested(int delta);
+    void toggleShapeRequested();
 };
 
 } // namespace fluvel_app

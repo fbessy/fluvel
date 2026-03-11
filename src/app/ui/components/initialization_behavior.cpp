@@ -35,6 +35,13 @@ bool InitializationBehavior::mousePress(ImageView& view, QMouseEvent* e)
     if (imgPos.x() < 0)
         return false;
 
+    if (e->button() == Qt::MiddleButton)
+    {
+        emit toggleShapeRequested();
+        e->accept();
+        return true;
+    }
+
     if (e->button() == Qt::LeftButton)
     {
         emit addShapeRequested(imgPos);
@@ -50,6 +57,19 @@ bool InitializationBehavior::mousePress(ImageView& view, QMouseEvent* e)
     }
 
     return false;
+}
+
+bool InitializationBehavior::wheel(ImageView& view, QWheelEvent* we)
+{
+    if (!(we->modifiers() & Qt::ControlModifier))
+        return false;
+
+    int delta = we->angleDelta().y();
+
+    emit resizeShapeRequested(delta);
+
+    we->accept();
+    return true;
 }
 
 } // namespace fluvel_app

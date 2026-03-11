@@ -33,6 +33,9 @@ public:
 public slots:
     void onTabChanged(int index);
     void onPreviewShapeAt(QPoint position);
+    void onResizeShape(int delta);
+    void onToggleShape();
+
     void onAddShape();
     void onAddShapeAt(QPoint position);
     void onSubtractShape();
@@ -193,6 +196,8 @@ private:
 
     DownscaleConfig editedDownscaleConfig_;
     ProcessingConfig editedProcessingConfig_;
+
+    int wheelAccumulator_ = 0;
 
 private slots:
 
