@@ -26,7 +26,7 @@ public:
     void updatePipelineAvailability(bool hasPreprocessing);
 
 signals:
-    void displayConfigChanged(const DisplayConfig& config);
+    void displayConfigChanged(const fluvel_app::DisplayConfig& config);
 
 public slots:
     void setPanelVisible(bool open);

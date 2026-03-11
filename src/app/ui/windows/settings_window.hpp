@@ -45,7 +45,7 @@ public slots:
     void onInputImageReady(const QImage& inputImage);
 
 signals:
-    void imageSessionSettingsAccepted(const ImageSessionSettings& config);
+    void imageSessionSettingsAccepted(const fluvel_app::ImageSessionSettings& config);
     void initializationModeChanged(bool enabled);
 
 protected:

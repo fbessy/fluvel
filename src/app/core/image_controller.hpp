@@ -19,8 +19,8 @@ public:
     ImageController(const ImageSessionSettings& session, QObject* parent);
 
 public slots:
-    void onImgSettingsChanged(const ImageSessionSettings& session);
-    void onImgDisplaySettingsChanged(const DisplayConfig& display);
+    void onImgSettingsChanged(const fluvel_app::ImageSessionSettings& session);
+    void onImgDisplaySettingsChanged(const fluvel_app::DisplayConfig& display);
 
     void loadImage(const QString& path);
     void onProcessedImageReady(const QImage& processed);

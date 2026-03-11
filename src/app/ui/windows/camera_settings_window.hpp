@@ -27,7 +27,7 @@ public:
     CameraSettingsWindow(QWidget* parent, const VideoSessionSettings& config);
 
 signals:
-    void videoSessionSettingsAccepted(const VideoSessionSettings& config);
+    void videoSessionSettingsAccepted(const fluvel_app::VideoSessionSettings& config);
 
 protected:
     //! Save the configuration chosen into the ApplicationSettings.
