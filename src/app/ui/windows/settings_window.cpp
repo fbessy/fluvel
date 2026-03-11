@@ -1198,7 +1198,7 @@ void SettingsWindow::onClearPhi()
         imageSettingsController_->clearPhi();
 }
 
-void SettingsWindow::onInputImageReady(const QImage& inputImage)
+void SettingsWindow::handleInputImageReady(const QImage& inputImage)
 {
     if (!inputImage.isNull())
         imageSettingsController_->onInputImageReady(inputImage);

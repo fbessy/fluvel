@@ -423,7 +423,7 @@ void ImageWindow::setupConnections()
             &ImageView::setImage);
 
     connect(imageController_, &ImageController::inputImageReady, settingsWindow_,
-            &SettingsWindow::onInputImageReady);
+            &SettingsWindow::handleInputImageReady);
 
     connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageView::setContour,
             Qt::QueuedConnection);

@@ -42,7 +42,7 @@ public slots:
     void onSubtractShapeAt(QPoint position);
     void onClearPhi();
 
-    void onInputImageReady(const QImage& inputImage);
+    void handleInputImageReady(const QImage& inputImage);
 
 signals:
     void imageSessionSettingsAccepted(const fluvel_app::ImageSessionSettings& config);

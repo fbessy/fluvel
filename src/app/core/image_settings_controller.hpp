@@ -46,11 +46,9 @@ public:
     QImage commit();
     void revert();
 
-public slots:
-    void setInteractiveMode(bool enabled);
     void onUpdateOverlay(fluvel_app::UiShapeInfo uiShape);
-    void onViewChanged(const QImage& imageSettings);
     void onConnectivityChanged(fluvel_ip::Connectivity c);
+    void setInteractiveMode(bool enabled);
 
 signals:
     void viewChanged(const QImage& imageSettings);
@@ -58,6 +56,8 @@ signals:
     void filterPipelineProcessed(double elapsedSec);
 
 private:
+    void onViewChanged(const QImage& imageSettings);
+
     ShapeInfo computeShapeInfo(const UiShapeInfo& uiShape, const QSize& targetSize);
 
     void applyDownscale();
