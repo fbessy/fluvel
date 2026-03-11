@@ -123,7 +123,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 
     const auto newWSize = fr.preprocessed.size();
 
-    if (!region_ac_ || configChanged_ || newWSize != currentSize_)
+    if (!activeContour_ || configChanged_ || newWSize != currentSize_)
     {
         if (config.hasTemporalFiltering)
         {
@@ -131,7 +131,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
             algoImage = smoother_.outputSpan();
         }
 
-        region_ac_ = std::make_unique<fluvel_ip::RegionColorAc>(
+        activeContour_ = std::make_unique<fluvel_ip::RegionColorAc>(
             algoImage,
             fluvel_ip::ContourData(algoImage.width(), algoImage.height(), algoConfig.connectivity),
             algoConfig.acConfig, algoConfig.regionAcConfig);
@@ -157,10 +157,10 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
             algoImage = smoother_.outputSpan();
         }
 
-        region_ac_->resetExecutionState(algoImage);
+        activeContour_->resetExecutionState(algoImage);
     }
 
-    region_ac_->runCycles(config.cyclesNbr);
+    activeContour_->runCycles(config.cyclesNbr);
     fr.processTs = FrameClock::nowNs() - startTs;
 
     exportTemporalFilteredImage(algoImage, config, fr);
@@ -182,10 +182,10 @@ void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::Imag
 
 void VideoActiveContourThread::exportContours(FrameResult& fr)
 {
-    if (region_ac_)
+    if (activeContour_)
     {
-        fr.l_out = region_ac_->export_l_out();
-        fr.l_in = region_ac_->export_l_in();
+        fr.l_out = activeContour_->export_l_out();
+        fr.l_in = activeContour_->export_l_in();
     }
 }
 

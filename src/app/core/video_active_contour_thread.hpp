@@ -73,7 +73,7 @@ private:
     bool running_{true};
     bool configChanged_{false};
 
-    std::unique_ptr<fluvel_ip::RegionColorAc> region_ac_;
+    std::unique_ptr<fluvel_ip::RegionColorAc> activeContour_;
     QSize currentSize_ = {0, 0};
 
     fluvel_ip::TemporalSmoother smoother_;
