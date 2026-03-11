@@ -6,6 +6,10 @@
 
 #include <QPainter>
 
+#ifdef FLUVEL_DEBUG
+#include <QDebug>
+#endif
+
 namespace fluvel_app
 {
 
@@ -57,6 +61,10 @@ void PhiViewModel::setBackground(const QImage& image)
 
 void PhiViewModel::updateFromEditor()
 {
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << " updateFromEditor() " << __LINE__ << __func__;
+#endif
+
     updateLists();
     updatePhiFromLists();
 
@@ -159,6 +167,10 @@ bool PhiViewModel::point_is_redundant(int x, int y)
 
 void PhiViewModel::updatePhiFromLists()
 {
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << " updatePhiFromLists() " << __LINE__ << __func__;
+#endif
+
     displayedPhi_ = background_;
 
     if (displayedPhi_.size() != listsGridSize_)
@@ -193,6 +205,10 @@ void PhiViewModel::updatePhiFromLists()
 
 void PhiViewModel::composeView()
 {
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << " composeView() " << __LINE__ << __func__;
+#endif
+
     QImage outputImg = displayedPhi_;
 
     if (overlayVisible_)

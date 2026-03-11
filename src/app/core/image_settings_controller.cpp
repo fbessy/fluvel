@@ -34,11 +34,7 @@ void ImageSettingsController::updateEditedConfig(const DownscaleConfig& downscal
     editedDownscaleConfig_ = downscaleConfig;
     editedProcessingConfig_ = processingConfig;
 
-    applyDownscale();
-    applyProcessing();
-
-    if (!processed_.isNull())
-        phiViewModel_->setBackground(processed_);
+    refreshPreview();
 }
 
 ShapeInfo ImageSettingsController::computeShapeInfo(const UiShapeInfo& uiShape,
@@ -111,11 +107,15 @@ void ImageSettingsController::onInputImageReady(const QImage& input)
 {
     input_ = input;
 
-    applyDownscale();
-    applyProcessing();
+    if (!viewVisible_)
+    {
+        needsRefresh_ = true;
+        return;
+    }
 
     phiEditor_->setSize(input_.size());
-    phiViewModel_->setBackground(processed_);
+
+    refreshPreview();
 }
 
 void ImageSettingsController::onViewChanged(const QImage& imageSettings)
@@ -357,6 +357,29 @@ void ImageSettingsController::setInteractiveMode(bool enabled)
         phiViewModel_->showOverlay();
     else
         phiViewModel_->hideOverlay();
+}
+
+void ImageSettingsController::refreshPreview()
+{
+    if (input_.isNull())
+        return;
+
+    applyDownscale();
+    applyProcessing();
+
+    if (!processed_.isNull())
+        phiViewModel_->setBackground(processed_);
+}
+
+void ImageSettingsController::setViewVisible(bool v)
+{
+    viewVisible_ = v;
+
+    if (viewVisible_ && needsRefresh_)
+    {
+        needsRefresh_ = false;
+        refreshPreview();
+    }
 }
 
 } // namespace fluvel_app

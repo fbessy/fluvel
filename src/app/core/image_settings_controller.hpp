@@ -33,6 +33,8 @@ class ImageSettingsController : public QObject
 public:
     ImageSettingsController(const ImageSessionSettings& session, QObject* parent);
 
+    void setViewVisible(bool v);
+
     void addShape(UiShapeInfo uiShape);
     void subtractShape(UiShapeInfo uiShape);
     void clearPhi();
@@ -61,6 +63,8 @@ private:
     void applyDownscale();
     void applyProcessing();
 
+    void refreshPreview();
+
     std::unique_ptr<PhiEditor> phiEditor_;
     std::unique_ptr<PhiViewModel> phiViewModel_;
 
@@ -72,6 +76,9 @@ private:
     QImage processed_;
 
     bool initializationEnabled_ = false;
+
+    bool needsRefresh_ = false;
+    bool viewVisible_ = false;
 };
 
 } // namespace fluvel_app

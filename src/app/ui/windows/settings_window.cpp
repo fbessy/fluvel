@@ -1208,6 +1208,9 @@ void SettingsWindow::showEvent(QShowEvent* event)
 {
     QDialog::showEvent(event);
 
+    if (imageSettingsController_)
+        imageSettingsController_->setViewVisible(true);
+
     emit updateOverlay(getUiShape());
 }
 
