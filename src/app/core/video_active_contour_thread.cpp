@@ -61,107 +61,132 @@ void VideoActiveContourThread::run()
     }
 }
 
-FrameResult VideoActiveContourThread::processFrame(QVideoFrame& frame)
+QImage VideoActiveContourThread::convertFrame(QVideoFrame frame) const
 {
-    qint64 startTs = FrameClock::nowNs();
+    QImage img = frame.toImage();
 
-    FrameResult fr;
-    fr.input = frame.toImage();
-    fr.preprocessed = fr.input;
+    if (img.isNull())
+        return img;
 
-    switch (fr.input.format())
+    switch (img.format())
     {
         case QImage::Format_RGB32:
         case QImage::Format_RGB888:
-            break;
+            return img;
 
         default:
-            fr.input = fr.input.convertToFormat(QImage::Format_RGB32);
-            break;
+            return img.convertToFormat(QImage::Format_RGB32);
     }
+}
 
-    if (!fr.input.isNull())
+QImage VideoActiveContourThread::applyDownscale(const QImage& input,
+                                                const DownscaleConfig& config) const
+{
+    if (input.isNull())
+        return input;
+
+    if (!config.hasDownscale)
+        return input;
+
+    const int factor = config.downscaleFactor;
+
+    assert(factor == 2 || factor == 4);
+
+    return input.scaled(input.width() / factor, input.height() / factor, Qt::IgnoreAspectRatio,
+                        Qt::SmoothTransformation);
+}
+
+FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
+{
+    qint64 startTs = FrameClock::nowNs();
+
+    VideoComputeConfig config;
+
     {
-        const auto& config = config_;
-
-        // downscale
-        const bool hasDownscale = config.downscale.hasDownscale;
-        const int downscale_fctr = config.downscale.downscaleFactor;
-
-        if (hasDownscale)
-        {
-            assert(downscale_fctr == 2 || downscale_fctr == 4);
-
-            fr.preprocessed = fr.input.scaled(fr.input.width() / downscale_fctr,
-                                              fr.input.height() / downscale_fctr,
-                                              Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-        }
-
-        auto img_algo = image_span_from_qimage(fr.preprocessed);
-
-        const int newW = img_algo.width();
-        const int newH = img_algo.height();
-
-        const bool sizeChanged = (newW != currentWidth_) || (newH != currentHeight_);
-
-        if (!region_ac_ || configChanged_ || sizeChanged)
-        {
-            if (config.hasTemporalFiltering)
-            {
-                smoother_.reset(img_algo);
-                img_algo = smoother_.outputSpan();
-            }
-
-            const auto& algo_conf = config.algo;
-
-            region_ac_ = std::make_unique<fluvel_ip::RegionColorAc>(
-                img_algo,
-                fluvel_ip::ContourData(img_algo.width(), img_algo.height(), algo_conf.connectivity),
-                algo_conf.acConfig, algo_conf.regionAcConfig);
-
-            currentWidth_ = newW;
-            currentHeight_ = newH;
-            configChanged_ = false;
-
-            QString size_str = QString("%1×%2").arg(QString::number(fr.preprocessed.width()),
-                                                    QString::number(fr.preprocessed.height()));
-
-            if (downscale_fctr >= 2)
-            {
-                size_str += QString(" /%1").arg(downscale_fctr);
-            }
-
-            emit frameSizeStr(size_str);
-        }
-        else
-        {
-            if (config.hasTemporalFiltering)
-            {
-                smoother_.update(img_algo);
-                img_algo = smoother_.outputSpan();
-            }
-
-            region_ac_->resetExecutionState(img_algo);
-        }
-
-        region_ac_->runCycles(config.cyclesNbr);
-        fr.processTs = FrameClock::nowNs() - startTs;
-
-        if (region_ac_)
-        {
-            if (config.hasTemporalFiltering)
-            {
-                fr.preprocessed =
-                    QImage(img_algo.data(), img_algo.width(), img_algo.height(),
-                           static_cast<qsizetype>(3 * img_algo.width()), QImage::Format_RGB888);
-            }
-
-            fr.l_out = region_ac_->export_l_out();
-            fr.l_in = region_ac_->export_l_in();
-        }
+        QMutexLocker locker(&frameMutex_);
+        config = config_;
     }
+
+    FrameResult fr;
+    fr.input = convertFrame(frame);
+
+    if (fr.input.isNull())
+        return fr;
+
+    fr.preprocessed = applyDownscale(fr.input, config.downscale);
+
+    if (fr.preprocessed.isNull())
+        return fr;
+
+    auto algoImage = image_span_from_qimage(fr.preprocessed);
+    const auto& algoConfig = config.algo;
+
+    const auto newWSize = fr.preprocessed.size();
+
+    if (!region_ac_ || configChanged_ || newWSize != currentSize)
+    {
+        if (config.hasTemporalFiltering)
+        {
+            smoother_.reset(algoImage);
+            algoImage = smoother_.outputSpan();
+        }
+
+        region_ac_ = std::make_unique<fluvel_ip::RegionColorAc>(
+            algoImage,
+            fluvel_ip::ContourData(algoImage.width(), algoImage.height(), algoConfig.connectivity),
+            algoConfig.acConfig, algoConfig.regionAcConfig);
+
+        currentSize = newWSize;
+        configChanged_ = false;
+
+        QString size_str = QString("%1×%2").arg(QString::number(fr.preprocessed.width()),
+                                                QString::number(fr.preprocessed.height()));
+
+        // if (downscale_fctr >= 2)
+        //{
+        // size_str += QString(" /%1").arg(downscale_fctr);
+        //}
+
+        emit frameSizeStr(size_str);
+    }
+    else
+    {
+        if (config.hasTemporalFiltering)
+        {
+            smoother_.update(algoImage);
+            algoImage = smoother_.outputSpan();
+        }
+
+        region_ac_->resetExecutionState(algoImage);
+    }
+
+    region_ac_->runCycles(config.cyclesNbr);
+    fr.processTs = FrameClock::nowNs() - startTs;
+
+    exportTemporalFilteredImage(algoImage, config, fr);
+    exportContours(fr);
 
     return fr;
+}
+
+void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageSpan& algoImage,
+                                                           const VideoComputeConfig& config,
+                                                           FrameResult& fr)
+{
+    if (!config.hasTemporalFiltering)
+        return;
+
+    fr.preprocessed = QImage(algoImage.data(), algoImage.width(), algoImage.height(),
+                             static_cast<qsizetype>(3 * algoImage.width()), QImage::Format_RGB888);
+}
+
+void VideoActiveContourThread::exportContours(FrameResult& fr)
+{
+    if (region_ac_)
+    {
+        fr.l_out = region_ac_->export_l_out();
+        fr.l_in = region_ac_->export_l_in();
+    }
 }
 
 void VideoActiveContourThread::stop()

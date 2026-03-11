@@ -5,6 +5,7 @@
 
 #include "ac_types.hpp"
 #include "common_settings.hpp"
+#include "image_span.hpp"
 #include "region_color_ac.hpp"
 #include "temporal_smoother.hpp"
 
@@ -56,7 +57,14 @@ protected:
 private:
     VideoComputeConfig config_;
 
-    FrameResult processFrame(QVideoFrame& frame);
+    QImage convertFrame(QVideoFrame frame) const;
+    QImage applyDownscale(const QImage& input, const DownscaleConfig& config) const;
+    FrameResult processFrame(const QVideoFrame& frame);
+
+    void exportTemporalFilteredImage(const fluvel_ip::ImageSpan& algoImage,
+                                     const VideoComputeConfig& config, FrameResult& fr);
+
+    void exportContours(FrameResult& fr);
 
     QMutex frameMutex_;
     QWaitCondition condition_;
@@ -66,8 +74,7 @@ private:
     bool configChanged_{false};
 
     std::unique_ptr<fluvel_ip::RegionColorAc> region_ac_;
-    int currentWidth_ = 0;
-    int currentHeight_ = 0;
+    QSize currentSize = {0, 0};
 
     fluvel_ip::TemporalSmoother smoother_;
 };
