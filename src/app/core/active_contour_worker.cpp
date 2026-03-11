@@ -21,16 +21,9 @@
 namespace fluvel_app
 {
 
-constexpr int kWorkerPeriodMs = 16;
-constexpr qint64 kTimeSliceInteractiveMs = 10;
-constexpr qint64 kTimeSliceConvergeMs = 15;
-
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr)
-    ,
-
-    workerTimer_(new QTimer(this))
-    , timeSliceMs_(kTimeSliceInteractiveMs)
+    , workerTimer_(new QTimer(this))
 {
     workerTimer_->setInterval(kWorkerPeriodMs);
     connect(workerTimer_, &QTimer::timeout, this, &ActiveContourWorker::onTimeout);

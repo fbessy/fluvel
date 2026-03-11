@@ -92,8 +92,12 @@ private:
     QImage image_;
     QImage processedImage_;
 
-    qint64 timeSliceMs_;
-    bool initialShown_;
+    static constexpr int kWorkerPeriodMs = 16;
+    static constexpr qint64 kTimeSliceConvergeMs = 15;
+    static constexpr qint64 kTimeSliceInteractiveMs = 10;
+    qint64 timeSliceMs_ = kTimeSliceInteractiveMs;
+
+    bool initialShown_ = false;
 
     ImageComputeConfig config_;
 
