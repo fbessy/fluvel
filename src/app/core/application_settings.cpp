@@ -615,16 +615,4 @@ void ApplicationSettings::setAppLanguage(Language language)
     appLanguage_ = language;
 }
 
-QString toSettingsPrefix(Session scope)
-{
-    switch (scope)
-    {
-        case Session::Camera:
-            return "cam";
-        case Session::Image:
-            return "img";
-    }
-    Q_UNREACHABLE();
-}
-
 } // namespace fluvel_app

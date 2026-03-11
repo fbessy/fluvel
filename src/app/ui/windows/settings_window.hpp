@@ -83,6 +83,8 @@ private:
 
     void notifyConfigEdited();
 
+    void restoreDefaults();
+
     ImageView* settingsView_ = nullptr;
     InitializationBehavior* initializationBehavior_ = nullptr;
 
@@ -186,11 +188,7 @@ private:
     DownscaleConfig editedDownscaleConfig_;
     ProcessingConfig editedProcessingConfig_;
 
-    int wheelAccumulator_ = 0;
-
-private slots:
-
-    void default_settings();
+    int wheelAccumulator_ = 0; 
 };
 
 } // namespace fluvel_app

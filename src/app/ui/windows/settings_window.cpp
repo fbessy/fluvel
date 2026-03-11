@@ -559,7 +559,7 @@ void SettingsWindow::setupConnections()
 
     auto* restoreBtn = dial_buttons_->button(QDialogButtonBox::RestoreDefaults);
 
-    connect(restoreBtn, &QPushButton::clicked, this, &SettingsWindow::default_settings);
+    connect(restoreBtn, &QPushButton::clicked, this, &SettingsWindow::restoreDefaults);
 
     connect(width_slider_, &QSlider::valueChanged, width_shape_spin_, &QSpinBox::setValue);
 
@@ -1072,7 +1072,7 @@ void SettingsWindow::reject()
     QDialog::reject();
 }
 
-void SettingsWindow::default_settings()
+void SettingsWindow::restoreDefaults()
 {
     ///////////////////////////////////
     //          Algorithm            //
