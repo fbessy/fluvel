@@ -1299,7 +1299,7 @@ QPoint SettingsWindow::uiPositionFromView(const QPoint& viewPosition) const
 
 void SettingsWindow::onTabChanged(int index)
 {
-    constexpr int kInitializationTab = 2;
+    constexpr int kInitializationTab = int(TabIndex::Initialization);
     emit initializationModeChanged(index == kInitializationTab);
 }
 
