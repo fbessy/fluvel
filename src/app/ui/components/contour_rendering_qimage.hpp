@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include "ac_types.hpp"
 #include "color.hpp"
-#include "contour_data.hpp"
 
 #include <QImage>
 #include <QRgb>
