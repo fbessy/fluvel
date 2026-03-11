@@ -5,6 +5,10 @@
 
 #include <QCoreApplication>
 
+#ifdef FLUVEL_DEBUG
+#include <QDebug>
+#endif
+
 namespace fluvel_app
 {
 
@@ -184,6 +188,10 @@ void ImageSettingsController::applyProcessing()
 {
     if (downscaled_.isNull())
         return;
+
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << " applyProcessing() " << __LINE__ << __func__;
+#endif
 
     processed_ = downscaled_;
 

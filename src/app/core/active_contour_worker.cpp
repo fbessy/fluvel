@@ -9,9 +9,12 @@
 #include "image_adapters.hpp"
 #include "image_span.hpp"
 
-#include <QDebug>
 #include <QElapsedTimer>
 #include <QTimer>
+
+#ifdef FLUVEL_DEBUG
+#include <QDebug>
+#endif
 
 #include <cassert>
 
@@ -191,6 +194,10 @@ void ActiveContourWorker::applyProcessing()
 {
     if (image_.isNull())
         return;
+
+#ifdef FLUVEL_DEBUG
+    qDebug() << __FILE__ << " applyProcessing() " << __LINE__ << __func__;
+#endif
 
     workerTimer_->stop();
     setState(WorkerState::Initializing);
