@@ -16,8 +16,8 @@ namespace fluvel_app
 ImageController::ImageController(const ImageSessionSettings& session, QObject* parent)
     : QObject(parent)
 {
-    onImgSettingsChanged(session);
-    onImgDisplaySettingsChanged(session.display);
+    onImageSettingsChanged(session);
+    onImageDisplaySettingsChanged(session.display);
 
     connect(&acWorker_, &ActiveContourWorker::processedImageReady, this,
             &ImageController::onProcessedImageReady);
@@ -131,14 +131,14 @@ void ImageController::onProcessedImageReady(const QImage& processed)
     refreshView();
 }
 
-void ImageController::onImgSettingsChanged(const ImageSessionSettings& session)
+void ImageController::onImageSettingsChanged(const ImageSessionSettings& session)
 {
     computeConfig_ = session.compute;
 
     reinitializeWorker();
 }
 
-void ImageController::onImgDisplaySettingsChanged(const DisplayConfig& display)
+void ImageController::onImageDisplaySettingsChanged(const DisplayConfig& display)
 {
     bool needs_refresh = (displayConfig_.image != display.image);
 

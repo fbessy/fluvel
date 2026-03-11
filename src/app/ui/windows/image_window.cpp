@@ -330,10 +330,10 @@ void ImageWindow::bindApplicationSettings()
     const auto& appConfig = ApplicationSettings::instance();
 
     connect(&appConfig, &ApplicationSettings::imgSettingsChanged, imageController_,
-            &ImageController::onImgSettingsChanged);
+            &ImageController::onImageSettingsChanged);
 
     connect(&appConfig, &ApplicationSettings::imgDisplaySettingsChanged, imageController_,
-            &ImageController::onImgDisplaySettingsChanged);
+            &ImageController::onImageDisplaySettingsChanged);
 }
 
 void ImageWindow::setupConnections()
