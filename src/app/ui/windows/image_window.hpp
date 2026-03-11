@@ -41,7 +41,6 @@ public slots:
 signals:
 
     void fileSelected(QString fileName);
-    void inputImageReady(const QImage& inputImage);
     void imageDropped(const QString& path);
 
 protected:
