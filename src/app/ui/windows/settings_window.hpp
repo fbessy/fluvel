@@ -101,7 +101,7 @@ private:
     /////////////////////////////////////////
 
     QGroupBox* downscale_page_ = nullptr;
-    QComboBox* downscale_factor_cb_ = nullptr;
+    QComboBox* downscaleFactorCb_ = nullptr;
 
     // widgets et variables liés à l'onglet preprocessing :
 

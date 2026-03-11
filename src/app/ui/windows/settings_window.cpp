@@ -280,15 +280,15 @@ void SettingsWindow::setupUiDownscaleTab()
     downscale_page_ = new QGroupBox(tr("Downscale"));
     downscale_page_->setCheckable(true);
 
-    downscale_factor_cb_ = new QComboBox;
-    downscale_factor_cb_->addItem("2", 2);
-    downscale_factor_cb_->addItem("4", 4);
+    downscaleFactorCb_ = new QComboBox;
+    downscaleFactorCb_->addItem("2", 2);
+    downscaleFactorCb_->addItem("4", 4);
 
     auto* label = new QLabel(tr("Factor:"));
 
     auto* hbox = new QHBoxLayout;
     hbox->addWidget(label);
-    hbox->addWidget(downscale_factor_cb_);
+    hbox->addWidget(downscaleFactorCb_);
     hbox->addStretch();
 
     auto* vbox = new QVBoxLayout;
@@ -590,14 +590,14 @@ void SettingsWindow::setupConnections()
                 onUiShapeChanged();
             });
 
-    connect(downscale_factor_cb_, &QComboBox::currentIndexChanged, this,
+    connect(downscaleFactorCb_, &QComboBox::currentIndexChanged, this,
             [this](int index)
             {
                 if (index < 0)
                     return;
 
                 editedDownscaleConfig_.downscaleFactor =
-                    downscale_factor_cb_->itemData(index).toInt();
+                    downscaleFactorCb_->itemData(index).toInt();
                 notifyConfigEdited();
 
                 onUiShapeChanged();
@@ -920,7 +920,7 @@ void SettingsWindow::accept()
     auto& ds_config = config_.compute.downscale;
 
     ds_config.hasDownscale = downscale_page_->isChecked();
-    ds_config.downscaleFactor = downscale_factor_cb_->currentData().toInt();
+    ds_config.downscaleFactor = downscaleFactorCb_->currentData().toInt();
 
     auto& filt_config = config_.compute.processing;
 
@@ -991,9 +991,9 @@ void SettingsWindow::updateUIFromConfig()
 
     downscale_page_->setChecked(ds_config.hasDownscale);
 
-    int index = downscale_factor_cb_->findData(ds_config.downscaleFactor);
+    int index = downscaleFactorCb_->findData(ds_config.downscaleFactor);
     if (index >= 0)
-        downscale_factor_cb_->setCurrentIndex(index);
+        downscaleFactorCb_->setCurrentIndex(index);
 
     const auto& config_filter = config_.compute.processing;
 

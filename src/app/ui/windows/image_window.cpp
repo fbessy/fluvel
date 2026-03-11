@@ -4,6 +4,7 @@
 #include "image_window.hpp"
 
 #include "active_contour_worker.hpp"
+#include "application_settings.hpp"
 #include "autofit_behavior.hpp"
 #include "drag_drop_behavior.hpp"
 #include "fullscreen_behavior.hpp"

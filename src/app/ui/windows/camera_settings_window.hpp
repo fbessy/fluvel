@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "application_settings.hpp"
+#include "common_settings.hpp"
 
 #include <QDialog>
 
@@ -44,14 +44,14 @@ private:
 
     void restoreToDefaults();
 
-    QDialogButtonBox* dial_buttons_;
-    QTabWidget* tabs_;
-    AlgoSettingsWidget* algoWidget_;
-    QSpinBox* phases_sb_;
+    QDialogButtonBox* camDialButtons_{nullptr};
+    QTabWidget* tabs_{nullptr};
+    AlgoSettingsWidget* algoWidget_{nullptr};
+    QSpinBox* phasesSb_{nullptr};
 
-    QGroupBox* downscale_gb_;
-    QComboBox* downscale_factor_cb_;
-    QCheckBox* filter_cb_;
+    QGroupBox* downscaleGb_{nullptr};
+    QComboBox* downscaleFactorCb_{nullptr};
+    QCheckBox* filterCb_{nullptr};
 
     VideoSessionSettings config_;
 };

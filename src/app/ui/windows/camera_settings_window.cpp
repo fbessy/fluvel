@@ -37,10 +37,10 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
         resize(350, 650);
     }
 
-    dial_buttons_ = new QDialogButtonBox(this);
-    dial_buttons_->addButton(QDialogButtonBox::Ok);
-    dial_buttons_->addButton(QDialogButtonBox::Cancel);
-    dial_buttons_->addButton(QDialogButtonBox::RestoreDefaults);
+    camDialButtons_ = new QDialogButtonBox(this);
+    camDialButtons_->addButton(QDialogButtonBox::Ok);
+    camDialButtons_->addButton(QDialogButtonBox::Cancel);
+    camDialButtons_->addButton(QDialogButtonBox::RestoreDefaults);
 
     tabs_ = new QTabWidget(this);
 
@@ -52,11 +52,11 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
 
     setupUiDownscaleGb();
 
-    filter_cb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
+    filterCb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
 
     auto* preprocess_layout = new QVBoxLayout(this);
-    preprocess_layout->addWidget(downscale_gb_);
-    preprocess_layout->addWidget(filter_cb_);
+    preprocess_layout->addWidget(downscaleGb_);
+    preprocess_layout->addWidget(filterCb_);
     preprocess_layout->addStretch(1);
 
     auto* preprocess_gb = new QGroupBox;
@@ -64,11 +64,11 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
 
     algoWidget_ = new AlgoSettingsWidget(config_.compute.algo, this);
 
-    phases_sb_ = new QSpinBox;
-    phases_sb_->setMinimum(1);
+    phasesSb_ = new QSpinBox;
+    phasesSb_->setMinimum(1);
 
     auto* fl = new QFormLayout;
-    fl->addRow(tr("phases (cycle 1 to 2) per frame"), phases_sb_);
+    fl->addRow(tr("phases (cycle 1 to 2) per frame"), phasesSb_);
 
     auto* algoLayout = new QVBoxLayout;
     algoLayout->addWidget(algoWidget_);
@@ -84,43 +84,43 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
 
     auto* layout = new QVBoxLayout;
     layout->addWidget(tabs_);
-    layout->addWidget(dial_buttons_);
+    layout->addWidget(camDialButtons_);
 
     setLayout(layout);
 
     updateUIFromConfig();
 
-    connect(dial_buttons_, &QDialogButtonBox::accepted, this, &CameraSettingsWindow::accept);
+    connect(camDialButtons_, &QDialogButtonBox::accepted, this, &CameraSettingsWindow::accept);
 
-    connect(dial_buttons_, &QDialogButtonBox::rejected, this, &CameraSettingsWindow::reject);
+    connect(camDialButtons_, &QDialogButtonBox::rejected, this, &CameraSettingsWindow::reject);
 
-    connect(dial_buttons_->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
+    connect(camDialButtons_->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
             &CameraSettingsWindow::restoreToDefaults);
 }
 
 void CameraSettingsWindow::setupUiDownscaleGb()
 {
-    downscale_gb_ = new QGroupBox(tr("Downscale"));
-    downscale_gb_->setCheckable(true);
+    downscaleGb_ = new QGroupBox(tr("Downscale"));
+    downscaleGb_->setCheckable(true);
 
-    downscale_factor_cb_ = new QComboBox;
-    downscale_factor_cb_->addItem("2", 2);
-    downscale_factor_cb_->addItem("4", 4);
+    downscaleFactorCb_ = new QComboBox;
+    downscaleFactorCb_->addItem("2", 2);
+    downscaleFactorCb_->addItem("4", 4);
 
     auto* fl = new QFormLayout;
-    fl->addRow(tr("Factor:"), downscale_factor_cb_);
+    fl->addRow(tr("Factor:"), downscaleFactorCb_);
 
-    downscale_gb_->setLayout(fl);
+    downscaleGb_->setLayout(fl);
 }
 
 void CameraSettingsWindow::accept()
 {
-    config_.compute.downscale.hasDownscale = downscale_gb_->isChecked();
-    config_.compute.downscale.downscaleFactor = downscale_factor_cb_->currentData().toInt();
-    config_.compute.hasTemporalFiltering = filter_cb_->isChecked();
+    config_.compute.downscale.hasDownscale = downscaleGb_->isChecked();
+    config_.compute.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
+    config_.compute.hasTemporalFiltering = filterCb_->isChecked();
 
     algoWidget_->accept();
-    config_.compute.cyclesNbr = phases_sb_->value();
+    config_.compute.cyclesNbr = phasesSb_->value();
 
     emit videoSessionSettingsAccepted(config_);
 
@@ -131,16 +131,16 @@ void CameraSettingsWindow::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
 
-    downscale_gb_->setChecked(config_.compute.downscale.hasDownscale);
+    downscaleGb_->setChecked(config_.compute.downscale.hasDownscale);
 
-    int index = downscale_factor_cb_->findData(config_.compute.downscale.downscaleFactor);
+    int index = downscaleFactorCb_->findData(config_.compute.downscale.downscaleFactor);
     if (index >= 0)
-        downscale_factor_cb_->setCurrentIndex(index);
+        downscaleFactorCb_->setCurrentIndex(index);
 
-    filter_cb_->setChecked(config_.compute.hasTemporalFiltering);
+    filterCb_->setChecked(config_.compute.hasTemporalFiltering);
 
     algoWidget_->reject();
-    phases_sb_->setValue(config_.compute.cyclesNbr);
+    phasesSb_->setValue(config_.compute.cyclesNbr);
 }
 
 void CameraSettingsWindow::reject()

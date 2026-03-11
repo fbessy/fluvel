@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "camera_window.hpp"
+#include "application_settings.hpp"
 #include "autofit_behavior.hpp"
 #include "fullscreen_behavior.hpp"
 #include "icon_loader.hpp"
