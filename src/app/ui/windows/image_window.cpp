@@ -582,7 +582,7 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     settings.setValue("ui_geometry/image_window", saveGeometry());
     settings.setValue("history/last_directory", last_directory_used_);
 
-    config.save();
+    config.saveQuiet();
 
     QMainWindow::closeEvent(event);
 

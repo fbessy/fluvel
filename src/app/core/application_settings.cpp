@@ -113,6 +113,12 @@ void ApplicationSettings::save()
     saveVideoSessionSettings();
 }
 
+void ApplicationSettings::saveQuiet()
+{
+    QSignalBlocker blocker(this);
+    save();
+}
+
 void ApplicationSettings::saveImageSessionSettings()
 {
     QSettings settings = imgSessionSettings();

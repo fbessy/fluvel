@@ -24,6 +24,7 @@ public:
     ~ApplicationSettings() override = default;
 
     void save();
+    void saveQuiet();
 
     const ImageSessionSettings& imageSettings() const;
     const VideoSessionSettings& videoSettings() const;
