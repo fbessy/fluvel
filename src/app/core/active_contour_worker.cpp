@@ -167,24 +167,24 @@ void ActiveContourWorker::converge()
 
 bool ActiveContourWorker::stepOnceAlgo()
 {
-    assert(ac_ != nullptr);
+    assert(activeContour_ != nullptr);
 
-    if (ac_->isStopped())
+    if (activeContour_->isStopped())
     {
         initializeActiveContour();
     }
     else
     {
-        if (ac_->isFirstIteration())
+        if (activeContour_->isFirstIteration())
         {
             isMeasuring_ = true;
             measurementStartTime_ = clock_type::now();
         }
 
-        ac_->step();
+        activeContour_->step();
     }
 
-    return ac_->isStopped();
+    return activeContour_->isStopped();
 }
 
 void ActiveContourWorker::applyProcessing()
@@ -375,7 +375,7 @@ void ActiveContourWorker::initializeActiveContour()
     workerTimer_->stop();
     setState(WorkerState::Initializing);
 
-    ac_.reset();
+    activeContour_.reset();
     resetMeasurement();
 
     assert(processedImage_.size() == config_.initialPhi.size());
@@ -398,12 +398,12 @@ void ActiveContourWorker::initializeActiveContour()
 
     if (is_rgb)
     {
-        ac_ = std::make_unique<fluvel_ip::RegionColorAc>(
+        activeContour_ = std::make_unique<fluvel_ip::RegionColorAc>(
             processedImg, std::move(initialCD), config_.algo.acConfig, config_.algo.regionAcConfig);
     }
     else
     {
-        ac_ = std::make_unique<fluvel_ip::RegionAc>(
+        activeContour_ = std::make_unique<fluvel_ip::RegionAc>(
             processedImg, std::move(initialCD), config_.algo.acConfig, config_.algo.regionAcConfig);
     }
 
@@ -447,7 +447,7 @@ void ActiveContourWorker::resume()
 
 void ActiveContourWorker::onTimeout()
 {
-    assert(ac_ != nullptr);
+    assert(activeContour_ != nullptr);
     assert(state_ == WorkerState::Running);
 
     QElapsedTimer timeSliceBudgetMs;
@@ -471,7 +471,7 @@ void ActiveContourWorker::onTimeout()
 
 void ActiveContourWorker::updateDiagnostics()
 {
-    if (!ac_)
+    if (!activeContour_)
         return;
 
     fluvel_ip::ContourDiagnostics diag;
@@ -486,17 +486,17 @@ void ActiveContourWorker::updateDiagnostics()
         diag.elapsedSec = 0.0;
     }
 
-    ac_->fillDiagnostics(diag);
+    activeContour_->fillDiagnostics(diag);
 
     emit diagnosticsUpdated(diag);
 }
 
 void ActiveContourWorker::emitContour()
 {
-    if (!ac_)
+    if (!activeContour_)
         return;
 
-    emit contourUpdated(ac_->export_l_out(), ac_->export_l_in());
+    emit contourUpdated(activeContour_->export_l_out(), activeContour_->export_l_in());
 }
 
 void ActiveContourWorker::setMode(RunMode mode)

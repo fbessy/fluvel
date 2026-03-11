@@ -87,7 +87,7 @@ private:
     WorkerState state_{WorkerState::Uninitialized};
     RunMode mode_{RunMode::Interactive};
     QTimer* workerTimer_;
-    std::unique_ptr<fluvel_ip::ActiveContour> ac_;
+    std::unique_ptr<fluvel_ip::ActiveContour> activeContour_;
 
     QImage image_;
     QImage processedImage_;
