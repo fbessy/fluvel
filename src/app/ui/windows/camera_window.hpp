@@ -23,16 +23,19 @@ class CameraWindow : public QMainWindow
 public:
     explicit CameraWindow(QWidget* parent = nullptr);
 
+signals:
+    void cameraWindowShown();
+    void cameraWindowClosed();
+
 protected:
     void showEvent(QShowEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
 
-private slots:
+private:
     void updateCameraList();
     void onToggleStreaming();
     void onFrameSizeStr(const QString& str);
 
-private:
     void bindApplicationSettings();
     void connectFrameToView();
     void stopCameraAndUi();
@@ -41,7 +44,7 @@ private:
     void ensureCameraPermission();
 #endif
 
-    CameraController* cameraController_;
+    CameraController* cameraController_{nullptr};
 
     QByteArray currentCameraId_;
 
@@ -58,18 +61,14 @@ private:
     QIcon stopIcon_;
     QIcon settingsIcon_;
 
-    RightPanelToggleButton* rightPanelToggle_;
-    QPushButton* settingsButton_;
+    RightPanelToggleButton* rightPanelToggle_{nullptr};
+    QPushButton* settingsButton_{nullptr};
 
-    DisplaySettingsWidget* displayBar_;
+    DisplaySettingsWidget* displayBar_{nullptr};
 
-    CameraSettingsWindow* cameraSettingsWindow_;
+    CameraSettingsWindow* cameraSettingsWindow_{nullptr};
 
     QMetaObject::Connection frameConnection_;
-
-signals:
-    void cameraWindowShown();
-    void cameraWindowClosed();
 };
 
 } // namespace fluvel_app
