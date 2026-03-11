@@ -11,13 +11,14 @@ namespace fluvel_app
 ImageSettingsController::ImageSettingsController(const ImageSessionSettings& session,
                                                  QObject* parent)
     : QObject(parent)
-    , editedDownscaleConfig_(session.compute.downscale)
-    , editedProcessingConfig_(session.compute.processing)
 {
-    phiEditor_ = std::make_unique<PhiEditor>(session.compute.initialPhi);
+    const auto& sc = session.compute;
+    editedDownscaleConfig_ = sc.downscale;
+    editedProcessingConfig_ = sc.processing;
 
-    phiViewModel_ =
-        std::make_unique<PhiViewModel>(phiEditor_.get(), session.compute.algo.connectivity);
+    phiEditor_ = std::make_unique<PhiEditor>(sc.initialPhi);
+
+    phiViewModel_ = std::make_unique<PhiViewModel>(phiEditor_.get(), sc.algo.connectivity);
 
     connect(phiViewModel_.get(), &PhiViewModel::viewChanged, this,
             &ImageSettingsController::onViewChanged);
