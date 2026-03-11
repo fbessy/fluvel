@@ -306,9 +306,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     /// Preprocessing tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // is_downscale_cb = new QCheckBox("Downscale :");
-    // is_downscale_cb->setChecked(false);
-
     gaussian_noise_groupbox_ = new QGroupBox(tr("Gaussian white noise"));
     gaussian_noise_groupbox_->setCheckable(true);
     gaussian_noise_groupbox_->setChecked(false);
@@ -565,13 +562,6 @@ void SettingsWindow::setupConnections()
     auto* restoreBtn = dial_buttons_->button(QDialogButtonBox::RestoreDefaults);
 
     connect(restoreBtn, &QPushButton::clicked, this, &SettingsWindow::default_settings);
-
-    // connect(klength_gradient_spin,SIGNAL(valueChanged(int)),this,
-    // SLOT(show_phi_with_filtered_image()));
-
-    // connect(alpha_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    // connect(beta_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
-    // connect(gamma_spin,SIGNAL(valueChanged(int)),this,SLOT(show_phi_with_filtered_image()));
 
     connect(width_slider_, &QSlider::valueChanged, width_shape_spin_, &QSpinBox::setValue);
 
@@ -1171,145 +1161,6 @@ void SettingsWindow::default_settings()
     abscissa_spin_->setValue(0);
     ordinate_spin_->setValue(0);
 }
-
-/*
-const unsigned char* SettingsWindow::get_filtered_img_data()
-{
-    const auto& config = ApplicationSettings::instance();
-
-    if(    config.has_preprocess
-        && ( config.has_gaussian_noise || config.has_salt_noise || config.has_speckle_noise ) )
-    {
-        calculate_filtered_image();
-    }
-
-    return img2_filtered;
-}
-
-float SettingsWindow::calculate_filtered_image()
-{
-    // pour refiltrer à partir de l'image de départ
-    filters2->initialyze_filtered();
-
-    float elapsed_time;
-    std::clock_t start_time, stop_time;
-
-    start_time = std::clock();
-
-    if( has_preprocess2 )
-    {
-        if( has_gaussian_noise2 )
-        {
-            filters2->gaussian_white_noise(std_noise2);
-        }
-        if( has_salt_noise2 )
-        {
-            filters2->impulsive_noise(proba_noise2);
-        }
-        if( has_speckle_noise2 )
-        {
-            filters2->speckle(std_speckle_noise2);
-        }
-
-        if( has_mean_filt2 )
-        {
-            filters2->mean_filtering(kernel_mean_length2);
-        }
-        if( has_gaussian_filt2 )
-        {
-            filters2->gaussian_filtering(kernel_gaussian_length2, sigma2);
-        }
-
-        if( has_median_filt2 )
-        {
-            if( has_O1_algo2 )
-            {
-                filters2->median_filtering_o1(kernel_median_length2);
-            }
-            else
-            {
-                filters2->median_filtering_oNlogN(kernel_median_length2);
-            }
-        }
-        if( has_aniso_diff2 )
-        {
-            filters2->anisotropic_diffusion(max_itera2, lambda2, kappa2, aniso_option2);
-        }
-
-        if( has_open_filt2 )
-        {
-            if( has_O1_morpho2 )
-            {
-                filters2->opening_o1(kernel_open_length2);
-            }
-            else
-            {
-                filters2->opening(kernel_open_length2);
-            }
-        }
-
-        if( has_close_filt2 )
-        {
-            if( has_O1_morpho2 )
-            {
-                filters2->closing_o1(kernel_close_length2);
-            }
-            else
-            {
-                filters2->closing(kernel_close_length2);
-            }
-        }
-
-        if( has_top_hat_filt2 )
-        {
-            if( is_white_top_hat2 )
-            {
-                if( has_O1_morpho2 )
-                {
-                    filters2->white_top_hat_o1(kernel_tophat_length2);
-                }
-                else
-                {
-                    filters2->white_top_hat(kernel_tophat_length2);
-                }
-            }
-            else
-            {
-                if( has_O1_morpho2 )
-                {
-                    filters2->black_top_hat_o1(kernel_tophat_length2);
-                }
-                else
-                {
-                    filters2->black_top_hat(kernel_tophat_length2);
-                }
-            }
-        }
-    }
-
-    if( speed == SpeedModel::REGION_BASED )
-    {
-        img2_filtered = filters2->get_filtered();
-    }
-    else if( speed == SpeedModel::EDGE_BASED )
-    {
-        if( is_rgb1 )
-        {
-            filters2->morphological_gradient_yuv(kernel_gradient_length2,alpha2,beta2,gamma2);
-            img2_filtered = filters2->get_gradient();
-        }
-        else
-        {
-            filters2->morphological_gradient(kernel_gradient_length2);
-            img2_filtered = filters2->get_filtered();
-        }
-    }
-
-    stop_time = std::clock();
-    elapsed_time = float(stop_time - start_time) / float(CLOCKS_PER_SEC);
-
-    return elapsed_time;
-}*/
 
 void SettingsWindow::onAddShape()
 {
