@@ -1233,6 +1233,20 @@ void SettingsWindow::onPreviewShapeAt(QPoint position)
 {
     QPoint uiPosition = uiPositionFromView(position);
 
+    {
+        QSignalBlocker b1(abscissa_spin_);
+        QSignalBlocker b2(ordinate_spin_);
+
+        QSignalBlocker b3(abscissa_slider_);
+        QSignalBlocker b4(ordinate_slider_);
+
+        abscissa_spin_->setValue(uiPosition.x());
+        ordinate_spin_->setValue(uiPosition.y());
+
+        abscissa_slider_->setValue(uiPosition.x());
+        ordinate_slider_->setValue(uiPosition.y());
+    }
+
     UiShapeInfo shape = getUiShapeAt(uiPosition);
 
     emit updateOverlay(shape);
@@ -1257,8 +1271,6 @@ void SettingsWindow::onResizeShape(int delta)
         height_shape_spin_->stepDown();
         wheelAccumulator_ += stepUnit;
     }
-
-    emit updateOverlay(getUiShape());
 }
 
 void SettingsWindow::onToggleShape()
