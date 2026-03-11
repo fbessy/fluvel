@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include "ac_types.hpp"
 #include "phi_editor.hpp"
-#include "contour_data.hpp"
 #include "point.hpp"
 
 #include <QImage>
@@ -52,7 +52,6 @@ signals:
 
 private:
     void updateLists();
-    void updateListsFloodFill();
     void updatePhiFromLists();
     void composeView();
     bool point_is_redundant(int x, int y);

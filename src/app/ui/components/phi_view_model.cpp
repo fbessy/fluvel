@@ -48,7 +48,7 @@ void PhiViewModel::setBackground(const QImage& image)
 {
     background_ = image.convertToFormat(QImage::Format_RGB32);
 
-    updateListsFloodFill();
+    updateLists();
     updatePhiFromLists();
 
     overlayVisible_ = false;
@@ -57,7 +57,7 @@ void PhiViewModel::setBackground(const QImage& image)
 
 void PhiViewModel::updateFromEditor()
 {
-    updateListsFloodFill();
+    updateLists();
     updatePhiFromLists();
 
     overlayVisible_ = false;
@@ -155,126 +155,6 @@ bool PhiViewModel::point_is_redundant(int x, int y)
     }
 
     return true;
-}
-
-void PhiViewModel::updateListsFloodFill()
-{
-    phi_ = editor_->phi();
-
-    if (phi_.size() != background_.size())
-    {
-        phi_ = phi_.scaled(background_.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
-    }
-
-    const int w = phi_.width();
-    const int h = phi_.height();
-
-    listsGridSize_ = phi_.size();
-    l_out_.clear();
-    l_in_.clear();
-
-    Q_ASSERT(phi_.format() == QImage::Format_Grayscale8);
-
-    // Marqueur de pixels visités
-    QImage visited(w, h, QImage::Format_Grayscale8);
-    visited.fill(0);
-
-    /*
-    auto inside = [&](int x, int y) {
-        return x >= 0 && x < w && y >= 0 && y < h;
-    };*/
-
-    auto pixel = [&](int x, int y) -> uchar
-    {
-        return phi_.constScanLine(y)[x];
-    };
-
-    std::vector<Span> stack;
-    stack.reserve(1024);
-
-    for (int y = 0; y < h; ++y)
-    {
-        const uchar* line = phi_.constScanLine(y);
-        uchar* visitedLine = visited.scanLine(y);
-
-        for (int x = 0; x < w; ++x)
-        {
-            if (visitedLine[x])
-                continue;
-
-            if (point_is_redundant(x, y))
-                continue;
-
-            uchar value = line[x];
-            if (value != 0 && value != 255)
-                continue;
-
-            // Nouveau seed
-            stack.push_back({y, x, x});
-
-            while (!stack.empty())
-            {
-                Span s = stack.back();
-                stack.pop_back();
-
-                int xl = s.xLeft;
-                int xr = s.xRight;
-
-                // Étendre à gauche
-                while (xl - 1 >= 0 && !visitedLine[xl - 1] && !point_is_redundant(xl - 1, s.y) &&
-                       pixel(xl - 1, s.y) == value)
-                {
-                    --xl;
-                }
-
-                // Étendre à droite
-                while (xr + 1 < w && !visitedLine[xr + 1] && !point_is_redundant(xr + 1, s.y) &&
-                       pixel(xr + 1, s.y) == value)
-                {
-                    ++xr;
-                }
-
-                // Marquer et stocker
-                for (int xi = xl; xi <= xr; ++xi)
-                {
-                    visited.scanLine(s.y)[xi] = 1;
-
-                    if (value == 0)
-                        l_out_.emplace_back(xi, s.y);
-                    else
-                        l_in_.emplace_back(xi, s.y);
-                }
-
-                // Examiner lignes au-dessus et en dessous
-                for (int ny : {s.y - 1, s.y + 1})
-                {
-                    if (ny < 0 || ny >= h)
-                        continue;
-
-                    const uchar* nline = phi_.constScanLine(ny);
-                    uchar* vline = visited.scanLine(ny);
-
-                    int xscan = xl;
-                    while (xscan <= xr)
-                    {
-                        if (!vline[xscan] && !point_is_redundant(xscan, ny) &&
-                            nline[xscan] == value)
-                        {
-                            int xstart = xscan;
-                            while (xscan + 1 <= xr && !vline[xscan + 1] &&
-                                   !point_is_redundant(xscan + 1, ny) && nline[xscan + 1] == value)
-                            {
-                                ++xscan;
-                            }
-
-                            stack.push_back({ny, xstart, xscan});
-                        }
-                        ++xscan;
-                    }
-                }
-            }
-        }
-    }
 }
 
 void PhiViewModel::updatePhiFromLists()

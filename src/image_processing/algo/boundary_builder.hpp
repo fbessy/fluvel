@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "contour_data.hpp"
+#include "ac_types.hpp"
 #include "point.hpp"
 
 namespace fluvel_ip
