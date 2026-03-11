@@ -52,6 +52,7 @@ private:
     // --- Setup ---
     void setupUi();
     void setupActions();
+    void bindApplicationSettings();
     void setupConnections();
 
     void updateWindowTitle();

@@ -19,6 +19,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 
+#include <cassert>
+
 namespace fluvel_app
 {
 
@@ -27,6 +29,7 @@ ImageWindow::ImageWindow(QWidget* parent)
 {
     setupUi();
     setupActions();
+    bindApplicationSettings();
     setupConnections();
 
     updateRecentFileActions();
@@ -310,13 +313,27 @@ void ImageWindow::setupActions()
     menuBar()->addMenu(segmentationMenu_);
     menuBar()->addMenu(helpMenu_);
 
-    imageController_ = new ImageController(this);
+    const auto& sessionConfig = ApplicationSettings::instance().imageSettings();
+    imageController_ = new ImageController(sessionConfig, this);
 
     settings_window_ = new SettingsWindow(this, ApplicationSettings::instance().imageSettings());
     camera_window_ = new CameraWindow;
     evaluation_window_ = new AnalysisWindow(this);
     about_window_ = new AboutWindow(this);
     language_window_ = new LanguageWindow(this);
+}
+
+void ImageWindow::bindApplicationSettings()
+{
+    assert(imageController_);
+
+    const auto& appConfig = ApplicationSettings::instance();
+
+    connect(&appConfig, &ApplicationSettings::imgSettingsChanged, imageController_,
+            &ImageController::onImgSettingsChanged);
+
+    connect(&appConfig, &ApplicationSettings::imgDisplaySettingsChanged, imageController_,
+            &ImageController::onImgDisplaySettingsChanged);
 }
 
 void ImageWindow::setupConnections()

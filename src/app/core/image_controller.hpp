@@ -16,9 +16,12 @@ class ImageController : public QObject
     Q_OBJECT
 
 public:
-    ImageController(QObject* parent);
+    ImageController(const ImageSessionSettings& session, QObject* parent);
 
 public slots:
+    void onImgSettingsChanged(const ImageSessionSettings& session);
+    void onImgDisplaySettingsChanged(const DisplayConfig& display);
+
     void loadImage(const QString& path);
     void onProcessedImageReady(const QImage& processed);
     void onContourUpdated(const fluvel_ip::ExportedContour& l_out,
@@ -46,8 +49,6 @@ signals:
     void clearOverlaysRequested();
 
 private:
-    void onImgSettingsChanged(const ImageSessionSettings& conf);
-    void onImgDisplaySettingsChanged(const DisplayConfig& display);
 
     void downscaleImage();
     void reinitializeWorker();
