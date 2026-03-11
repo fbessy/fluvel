@@ -44,16 +44,16 @@ private:
     void ensureCameraPermission();
 #endif
 
-    CameraController* cameraController_{nullptr};
+    CameraController* cameraController_ = nullptr;
 
     QByteArray currentCameraId_;
 
-    QComboBox* cameraSelector_{nullptr};
-    QPushButton* toggleStreamingButton_{nullptr};
+    QComboBox* cameraSelector_ = nullptr;
+    QPushButton* toggleStreamingButton_ = nullptr;
 
-    ImageView* videoView_{nullptr};
+    ImageView* videoView_ = nullptr;
 
-    QMediaDevices* mediaDevices_{nullptr};
+    QMediaDevices* mediaDevices_ = nullptr;
 
     QString deviceWindowTitle_;
 
@@ -61,12 +61,12 @@ private:
     QIcon stopIcon_;
     QIcon settingsIcon_;
 
-    RightPanelToggleButton* rightPanelToggle_{nullptr};
-    QPushButton* settingsButton_{nullptr};
+    RightPanelToggleButton* rightPanelToggle_ = nullptr;
+    QPushButton* settingsButton_ = nullptr;
 
-    DisplaySettingsWidget* displayBar_{nullptr};
+    DisplaySettingsWidget* displayBar_ = nullptr;
 
-    CameraSettingsWindow* cameraSettingsWindow_{nullptr};
+    CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
 
     QMetaObject::Connection frameConnection_;
 };

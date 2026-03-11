@@ -33,23 +33,23 @@ private:
 
     void calculateShapesIntersection();
 
-    AnalysisWidget* widget1_{nullptr};
-    AnalysisWidget* widget2_{nullptr};
-    QPushButton* computeButton_{nullptr};
+    AnalysisWidget* widget1_ = nullptr;
+    AnalysisWidget* widget2_ = nullptr;
+    QPushButton* computeButton_ = nullptr;
 
     std::unordered_set<fluvel_ip::Point2D_i> intersection_;
 
-    QDialog* resultPopup_{nullptr};
-    QLabel* hausdorffLabel_{nullptr};
-    QSpinBox* hundredthSp_{nullptr};
-    QLabel* quantileLabel_{nullptr};
-    QLabel* hausdorffRatioLabel_{nullptr};
-    QLabel* quantileRatioLabel_{nullptr};
-    QLabel* centroidsDistLabel_{nullptr};
-    QLabel* centroids_ratio_label_{nullptr};
-    QLabel* timeLabel_{nullptr};
+    QDialog* resultPopup_ = nullptr;
+    QLabel* hausdorffLabel_ = nullptr;
+    QSpinBox* hundredthSp_ = nullptr;
+    QLabel* quantileLabel_ = nullptr;
+    QLabel* hausdorffRatioLabel_ = nullptr;
+    QLabel* quantileRatioLabel_ = nullptr;
+    QLabel* centroidsDistLabel_ = nullptr;
+    QLabel* centroids_ratio_label_ = nullptr;
+    QLabel* timeLabel_ = nullptr;
 
-    fluvel_ip::HausdorffDistance* hd_{nullptr};
+    fluvel_ip::HausdorffDistance* hd_ = nullptr;
     float factor_{0.f};
 };
 

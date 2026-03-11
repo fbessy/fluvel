@@ -44,14 +44,14 @@ private:
 
     void restoreToDefaults();
 
-    QDialogButtonBox* camDialButtons_{nullptr};
-    QTabWidget* tabs_{nullptr};
-    AlgoSettingsWidget* algoWidget_{nullptr};
-    QSpinBox* phasesSb_{nullptr};
+    QDialogButtonBox* camDialButtons_ = nullptr;
+    QTabWidget* tabs_ = nullptr;
+    AlgoSettingsWidget* algoWidget_ = nullptr;
+    QSpinBox* phasesSb_ = nullptr;
 
-    QGroupBox* downscaleGb_{nullptr};
-    QComboBox* downscaleFactorCb_{nullptr};
-    QCheckBox* filterCb_{nullptr};
+    QGroupBox* downscaleGb_ = nullptr;
+    QComboBox* downscaleFactorCb_ = nullptr;
+    QCheckBox* filterCb_ = nullptr;
 
     VideoSessionSettings config_;
 };
