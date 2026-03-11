@@ -129,6 +129,8 @@ void CameraSettingsWindow::accept()
 
 void CameraSettingsWindow::updateUIFromConfig()
 {
+    QSignalBlocker blocker(this);
+
     downscale_gb_->setChecked(config_.compute.downscale.hasDownscale);
 
     int index = downscale_factor_cb_->findData(config_.compute.downscale.downscaleFactor);

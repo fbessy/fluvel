@@ -987,6 +987,8 @@ void SettingsWindow::accept()
 
 void SettingsWindow::updateUIFromConfig()
 {
+    QSignalBlocker blocker(this);
+
     const auto& ds_config = config_.compute.downscale;
 
     downscale_page_->setChecked(ds_config.hasDownscale);
