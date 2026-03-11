@@ -123,7 +123,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 
     const auto newWSize = fr.preprocessed.size();
 
-    if (!region_ac_ || configChanged_ || newWSize != currentSize)
+    if (!region_ac_ || configChanged_ || newWSize != currentSize_)
     {
         if (config.hasTemporalFiltering)
         {
@@ -136,7 +136,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
             fluvel_ip::ContourData(algoImage.width(), algoImage.height(), algoConfig.connectivity),
             algoConfig.acConfig, algoConfig.regionAcConfig);
 
-        currentSize = newWSize;
+        currentSize_ = newWSize;
         configChanged_ = false;
 
         QString size_str = QString("%1×%2").arg(QString::number(fr.preprocessed.width()),

@@ -74,7 +74,7 @@ private:
     bool configChanged_{false};
 
     std::unique_ptr<fluvel_ip::RegionColorAc> region_ac_;
-    QSize currentSize = {0, 0};
+    QSize currentSize_ = {0, 0};
 
     fluvel_ip::TemporalSmoother smoother_;
 };
