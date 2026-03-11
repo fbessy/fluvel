@@ -142,11 +142,16 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
             &CameraWindow::updateCameraList);
 
-    controller_ = new CameraController(this);
+    const auto& session = ApplicationSettings::instance().videoSettings();
+    cameraController_ = new CameraController(session, this);
 
-    connect(controller_, &CameraController::frameSizeStr, this, &CameraWindow::onFrameSizeStr);
+    bindApplicationSettings();
 
-    connect(controller_, &CameraController::textStatsUpdated, videoView_, &ImageView::setText);
+    connect(cameraController_, &CameraController::frameSizeStr, this,
+            &CameraWindow::onFrameSizeStr);
+
+    connect(cameraController_, &CameraController::textStatsUpdated, videoView_,
+            &ImageView::setText);
 
     videoView_->applyDownscaleConfig(
         ApplicationSettings::instance().videoSettings().compute.downscale);
@@ -161,7 +166,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(&ApplicationSettings::instance(), &ApplicationSettings::videoDisplaySettingsChanged,
             videoView_, &ImageView::applyDisplayConfig);
 
-    connect(videoView_, &ImageView::frameDisplayed, controller_,
+    connect(videoView_, &ImageView::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
 
     connect(settings_window_, &CameraSettingsWindow::settingsAccepted,
@@ -184,6 +189,19 @@ CameraWindow::CameraWindow(QWidget* parent)
 
                 displayBar_->updatePipelineAvailability(hasPreprocessing);
             });
+}
+
+void CameraWindow::bindApplicationSettings()
+{
+    assert(cameraController_);
+
+    auto& app = ApplicationSettings::instance();
+
+    connect(&app, &ApplicationSettings::videoSettingsChanged, cameraController_,
+            &CameraController::onVideoSettingsChanged);
+
+    connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, cameraController_,
+            &CameraController::onVideoDisplaySettingsChanged);
 }
 
 void CameraWindow::onFrameSizeStr(const QString& str)
@@ -243,10 +261,10 @@ void CameraWindow::updateCameraList()
 
 void CameraWindow::onToggleStreaming()
 {
-    if (!controller_)
+    if (!cameraController_)
         return;
 
-    if (controller_->isActive())
+    if (cameraController_->isActive())
     {
         stopCameraAndUi();
     }
@@ -263,7 +281,7 @@ void CameraWindow::onToggleStreaming()
         settings.setValue("camera/device", currentCameraId_);
 
         videoView_->showPlaceholder(false);
-        controller_->start(selectedId);
+        cameraController_->start(selectedId);
         connectFrameToView();
 
         toggleStreamingButton_->setText(tr("Stop"));
@@ -274,10 +292,10 @@ void CameraWindow::onToggleStreaming()
 
 void CameraWindow::stopCameraAndUi()
 {
-    if (controller_ && controller_->isActive())
+    if (cameraController_ && cameraController_->isActive())
     {
         disconnect(frameConnection_);
-        controller_->stop();
+        cameraController_->stop();
         videoView_->showPlaceholder(true);
 
         toggleStreamingButton_->setText(tr("Start"));
@@ -334,8 +352,8 @@ void CameraWindow::ensureCameraPermission()
 
 void CameraWindow::connectFrameToView()
 {
-    frameConnection_ = connect(controller_, &CameraController::imageAndContourUpdated, videoView_,
-                               &ImageView::setImageAndContour);
+    frameConnection_ = connect(cameraController_, &CameraController::imageAndContourUpdated,
+                               videoView_, &ImageView::setImageAndContour);
 }
 
 } // namespace fluvel_app

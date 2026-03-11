@@ -33,6 +33,7 @@ private slots:
     void onFrameSizeStr(const QString& str);
 
 private:
+    void bindApplicationSettings();
     void connectFrameToView();
     void stopCameraAndUi();
 
@@ -40,7 +41,7 @@ private:
     void ensureCameraPermission();
 #endif
 
-    CameraController* controller_;
+    CameraController* cameraController_;
 
     QByteArray currentCameraId_;
 

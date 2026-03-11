@@ -21,7 +21,7 @@ class CameraController : public QObject
     Q_OBJECT
 
 public:
-    explicit CameraController(QObject* parent = nullptr);
+    explicit CameraController(const VideoSessionSettings& session, QObject* parent = nullptr);
     ~CameraController() override;
 
     void start(const QByteArray& deviceId);
@@ -29,6 +29,8 @@ public:
     bool isActive() const;
 
 public slots:
+    void onVideoSettingsChanged(const VideoSessionSettings& session);
+    void onVideoDisplaySettingsChanged(const DisplayConfig& display);
 
     void onFrameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
 
@@ -40,9 +42,6 @@ signals:
 
 private:
     void onFrameResultReady(const FrameResult& result);
-    void onVideoSettingsChanged(const VideoSessionSettings& conf);
-    void onVideoDisplaySettingsChanged(const DisplayConfig& displayConfig);
-
     void onFrameProcessed(quint64 contourSize);
     void updateDiagnostics();
 

@@ -2,8 +2,6 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "camera_controller.hpp"
-
-#include "application_settings.hpp"
 #include "camera_stats.hpp"
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
@@ -11,18 +9,12 @@
 namespace fluvel_app
 {
 
-CameraController::CameraController(QObject* parent)
+CameraController::CameraController(const VideoSessionSettings& session, QObject* parent)
     : QObject(parent)
     , ac_thread_(this)
 {
-    onVideoSettingsChanged(ApplicationSettings::instance().videoSettings());
-    onVideoDisplaySettingsChanged(ApplicationSettings::instance().videoSettings().display);
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
-            &CameraController::onVideoSettingsChanged);
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::videoDisplaySettingsChanged,
-            this, &CameraController::onVideoDisplaySettingsChanged);
+    onVideoSettingsChanged(session);
+    onVideoDisplaySettingsChanged(session.display);
 
     connect(&ac_thread_, &VideoActiveContourThread::frameResultReady, this,
             &CameraController::onFrameResultReady, Qt::QueuedConnection);
@@ -32,13 +24,11 @@ CameraController::CameraController(QObject* parent)
 
     ac_thread_.start();
 
-    // Stats timer
     statsTimer_ = new QTimer(this);
     statsTimer_->setInterval(500);
 
     connect(statsTimer_, &QTimer::timeout, this, &CameraController::updateDiagnostics);
 
-    // Thread → controller
     connect(&ac_thread_, &VideoActiveContourThread::frameProcessed, this,
             &CameraController::onFrameProcessed);
 }
@@ -162,14 +152,14 @@ void CameraController::updateDiagnostics()
     emit textStatsUpdated(textStats);
 }
 
-void CameraController::onVideoSettingsChanged(const VideoSessionSettings& conf)
+void CameraController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
-    ac_thread_.setAlgoConfig(conf.compute);
+    ac_thread_.setAlgoConfig(session.compute);
 }
 
-void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& displayConfig)
+void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
 {
-    displayConfig_ = displayConfig;
+    displayConfig_ = display;
 }
 
 } // namespace fluvel_app
