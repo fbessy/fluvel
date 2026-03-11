@@ -73,7 +73,7 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     settingsButton_->setIcon(settingsIcon_);
 
-    settings_window_ =
+    cameraSettingsWindow_ =
         new CameraSettingsWindow(this, ApplicationSettings::instance().videoSettings());
 
     QWidget* central = new QWidget(this);
@@ -131,7 +131,8 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, settings_window_, &CameraSettingsWindow::show);
+    connect(settingsButton_, &QPushButton::clicked, cameraSettingsWindow_,
+            &CameraSettingsWindow::show);
 
     connect(toggleStreamingButton_, &QPushButton::clicked, this, &CameraWindow::onToggleStreaming);
 
@@ -169,7 +170,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(videoView_, &ImageView::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
 
-    connect(settings_window_, &CameraSettingsWindow::videoSessionSettingsAccepted,
+    connect(cameraSettingsWindow_, &CameraSettingsWindow::videoSessionSettingsAccepted,
             &ApplicationSettings::instance(), &ApplicationSettings::setVideoSessionSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged,

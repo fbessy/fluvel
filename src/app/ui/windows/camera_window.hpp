@@ -63,7 +63,7 @@ private:
 
     DisplaySettingsWidget* displayBar_;
 
-    CameraSettingsWindow* settings_window_;
+    CameraSettingsWindow* cameraSettingsWindow_;
 
     QMetaObject::Connection frameConnection_;
 

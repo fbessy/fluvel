@@ -316,11 +316,11 @@ void ImageWindow::setupActions()
     const auto& sessionConfig = ApplicationSettings::instance().imageSettings();
     imageController_ = new ImageController(sessionConfig, this);
 
-    settings_window_ = new SettingsWindow(this, ApplicationSettings::instance().imageSettings());
-    camera_window_ = new CameraWindow;
-    evaluation_window_ = new AnalysisWindow(this);
-    about_window_ = new AboutWindow(this);
-    language_window_ = new LanguageWindow(this);
+    settingsWindow_ = new SettingsWindow(this, ApplicationSettings::instance().imageSettings());
+    cameraWindow_ = new CameraWindow;
+    evaluationWindow_ = new AnalysisWindow(this);
+    aboutWindow_ = new AboutWindow(this);
+    languageWindow_ = new LanguageWindow(this);
 }
 
 void ImageWindow::bindApplicationSettings()
@@ -387,21 +387,21 @@ void ImageWindow::setupConnections()
     connect(cameraSessionAct_, &QAction::triggered, this,
             &ImageWindow::onStartCameraActionTriggered);
 
-    connect(camera_window_, &CameraWindow::cameraWindowClosed, this,
+    connect(cameraWindow_, &CameraWindow::cameraWindowClosed, this,
             &ImageWindow::onCameraWindowClosed);
-    connect(camera_window_, &CameraWindow::cameraWindowShown, this,
+    connect(cameraWindow_, &CameraWindow::cameraWindowShown, this,
             &ImageWindow::onCameraWindowShown);
 
     connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
             &ImageWindow::updateCameraAction);
 
-    connect(analysisAct_, &QAction::triggered, evaluation_window_, &AnalysisWindow::show);
+    connect(analysisAct_, &QAction::triggered, evaluationWindow_, &AnalysisWindow::show);
 
-    connect(settingsAct_, &QAction::triggered, settings_window_, &SettingsWindow::show);
+    connect(settingsAct_, &QAction::triggered, settingsWindow_, &SettingsWindow::show);
 
-    connect(aboutAct_, &QAction::triggered, about_window_, &AboutWindow::show);
+    connect(aboutAct_, &QAction::triggered, aboutWindow_, &AboutWindow::show);
 
-    connect(languageAct_, &QAction::triggered, language_window_, &LanguageWindow::show);
+    connect(languageAct_, &QAction::triggered, languageWindow_, &LanguageWindow::show);
 
     imageView_->applyDownscaleConfig(
         ApplicationSettings::instance().imageSettings().compute.downscale);
@@ -422,7 +422,7 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::displayedImageReady, imageView_,
             &ImageView::setImage);
 
-    connect(imageController_, &ImageController::inputImageReady, settings_window_,
+    connect(imageController_, &ImageController::inputImageReady, settingsWindow_,
             &SettingsWindow::onInputImageReady);
 
     connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageView::setContour,
@@ -440,7 +440,7 @@ void ImageWindow::setupConnections()
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, settings_window_, &SettingsWindow::show);
+    connect(settingsButton_, &QPushButton::clicked, settingsWindow_, &SettingsWindow::show);
 
     connect(imageController_, &ImageController::stateChanged, this, &ImageWindow::onStateChanged);
 
@@ -452,7 +452,7 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::errorOccurred, this,
             &ImageWindow::showErrorMessage);
 
-    connect(settings_window_, &SettingsWindow::imageSessionSettingsAccepted,
+    connect(settingsWindow_, &SettingsWindow::imageSessionSettingsAccepted,
             &ApplicationSettings::instance(), &ApplicationSettings::setImageSessionSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged,
@@ -553,10 +553,10 @@ void ImageWindow::onStartCameraActionTriggered()
     if (!cameraSessionAct_)
         return;
 
-    if (!camera_window_)
+    if (!cameraWindow_)
         return;
 
-    cameraSessionAct_->setChecked(camera_window_ && camera_window_->isVisible());
+    cameraSessionAct_->setChecked(cameraWindow_ && cameraWindow_->isVisible());
 
     auto cameras = QMediaDevices::videoInputs();
 
@@ -566,11 +566,11 @@ void ImageWindow::onStartCameraActionTriggered()
     }
     else
     {
-        camera_window_->setWindowState(camera_window_->windowState() & ~Qt::WindowMinimized);
+        cameraWindow_->setWindowState(cameraWindow_->windowState() & ~Qt::WindowMinimized);
 
-        camera_window_->show();
-        camera_window_->raise();
-        camera_window_->activateWindow();
+        cameraWindow_->show();
+        cameraWindow_->raise();
+        cameraWindow_->activateWindow();
     }
 }
 

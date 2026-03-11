@@ -70,11 +70,11 @@ private:
     static QString makeUniqueFileName(const QString& filePath);
 
     // --- UI ---
-    CameraWindow* camera_window_ = nullptr;
-    AnalysisWindow* evaluation_window_ = nullptr;
-    SettingsWindow* settings_window_ = nullptr;
-    AboutWindow* about_window_ = nullptr;
-    LanguageWindow* language_window_ = nullptr;
+    CameraWindow* cameraWindow_ = nullptr;
+    AnalysisWindow* evaluationWindow_ = nullptr;
+    SettingsWindow* settingsWindow_ = nullptr;
+    AboutWindow* aboutWindow_ = nullptr;
+    LanguageWindow* languageWindow_ = nullptr;
 
     QPushButton* restartButton_ = nullptr;
     QPushButton* togglePauseButton_ = nullptr;
