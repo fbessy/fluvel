@@ -5,18 +5,27 @@
 
 #include <QMainWindow>
 
+#include <QByteArray>
+#include <QIcon>
+#include <QMetaObject>
+#include <QString>
+
+class QWidget;
 class QComboBox;
 class QPushButton;
 class QMediaDevices;
 
+class QShowEvent;
+class QCloseEvent;
+
 namespace fluvel_app
 {
 
-class RightPanelToggleButton;
-class ImageView;
-class DisplaySettingsWidget;
-class CameraController;
 class CameraSettingsWindow;
+class RightPanelToggleButton;
+class DisplaySettingsWidget;
+class ImageView;
+class CameraController;
 
 class CameraWindow : public QMainWindow
 {
@@ -45,31 +54,26 @@ private:
     void ensureCameraPermission();
 #endif
 
-    CameraController* cameraController_ = nullptr;
-
-    QByteArray currentCameraId_;
+    CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
 
     QComboBox* cameraSelector_ = nullptr;
     QPushButton* toggleStreamingButton_ = nullptr;
-
-    ImageView* videoView_ = nullptr;
-
-    QMediaDevices* mediaDevices_ = nullptr;
-
-    QString deviceWindowTitle_;
-
+    RightPanelToggleButton* rightPanelToggle_ = nullptr;
+    QPushButton* settingsButton_ = nullptr;
     QIcon startIcon_;
     QIcon stopIcon_;
     QIcon settingsIcon_;
 
-    RightPanelToggleButton* rightPanelToggle_ = nullptr;
-    QPushButton* settingsButton_ = nullptr;
-
     DisplaySettingsWidget* displayBar_ = nullptr;
 
-    CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
+    QMediaDevices* mediaDevices_ = nullptr;
+    QByteArray currentCameraId_;
 
+    ImageView* videoView_ = nullptr;
+    CameraController* cameraController_ = nullptr;
     QMetaObject::Connection frameConnection_;
+
+    QString deviceWindowTitle_;
 };
 
 } // namespace fluvel_app
