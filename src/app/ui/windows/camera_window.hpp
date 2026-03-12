@@ -42,11 +42,22 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
+    void setupWindow();
+    void restoreSettings();
+    void createUi();
+    void setupView();
+    void setupController();
+    void setupLayout();
+    void setupConnections();
+    void applyInitialSettings();
+
     void updateCameraList();
     void onToggleStreaming();
     void onFrameSizeStr(const QString& str);
 
-    void bindApplicationSettings();
+    void bindApplicationSettingsToController();
+    void bindApplicationSettingsToView();
+    void bindUiToApplicationSettings();
     void connectFrameToView();
     void stopCameraAndUi();
 
@@ -55,6 +66,8 @@ private:
 #endif
 
     CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
+
+    QWidget* central_ = new QWidget(this);
 
     QComboBox* cameraSelector_ = nullptr;
     QPushButton* toggleStreamingButton_ = nullptr;

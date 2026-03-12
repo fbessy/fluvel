@@ -34,21 +34,41 @@ CameraWindow::CameraWindow(QWidget* parent)
     : QMainWindow(parent)
 
 {
+    setupWindow();
+    restoreSettings();
+
+    createUi();
+    setupView();
+    setupController();
+    setupLayout();
+
+    applyInitialSettings();
+    setupConnections();
+}
+
+void CameraWindow::setupWindow()
+{
     setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
     setWindowTitle(tr("Fluvel - Camera"));
+}
 
+void CameraWindow::restoreSettings()
+{
     QSettings settings;
 
     if (settings.contains("ui_geometry/camera_window"))
-    {
         restoreGeometry(settings.value("ui_geometry/camera_window").toByteArray());
-    }
     else
-    {
         resize(900, 600);
-    }
 
     currentCameraId_ = settings.value("camera/device").toByteArray();
+}
+
+void CameraWindow::createUi()
+{
+    const auto& config = ApplicationSettings::instance().videoSettings();
+
+    central_ = new QWidget(this);
 
     cameraSelector_ = new QComboBox(this);
     cameraSelector_->setEnabled(false);
@@ -75,17 +95,45 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     settingsButton_->setIcon(settingsIcon_);
 
-    cameraSettingsWindow_ =
-        new CameraSettingsWindow(this, ApplicationSettings::instance().videoSettings());
+    // --- Display bar ---
+    displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
-    QWidget* central = new QWidget(this);
+    cameraSettingsWindow_ = new CameraSettingsWindow(this, config);
+}
 
+void CameraWindow::setupView()
+{
+    const auto& app = ApplicationSettings::instance();
+
+    videoView_ =
+        new ImageView(app.videoSettings().display, app.videoSettings().compute.downscale, central_);
+
+    videoView_->setMaxDisplayFps(60.0);
+
+    auto interaction = std::make_unique<InteractionSet>();
+    interaction->addBehavior(std::make_unique<AutoFitBehavior>());
+    interaction->addBehavior(std::make_unique<FullscreenBehavior>());
+    interaction->addBehavior(std::make_unique<PanBehavior>());
+    interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
+    videoView_->setInteraction(interaction.release());
+}
+
+void CameraWindow::setupController()
+{
+    const auto& config = ApplicationSettings::instance().videoSettings();
+    cameraController_ = new CameraController(config, this);
+
+    mediaDevices_ = new QMediaDevices(this);
+}
+
+void CameraWindow::setupLayout()
+{
     // Layout principal vertical
-    QVBoxLayout* vLayout = new QVBoxLayout(central);
+    QVBoxLayout* vLayout = new QVBoxLayout(central_);
     vLayout->setContentsMargins(0, 0, 0, 0);
     vLayout->setSpacing(0);
 
-    QWidget* controlBar = new QWidget(central);
+    QWidget* controlBar = new QWidget(central_);
     QHBoxLayout* controlLayout = new QHBoxLayout(controlBar);
     controlLayout->setContentsMargins(8, 4, 8, 4);
     controlLayout->setSpacing(6);
@@ -99,23 +147,6 @@ CameraWindow::CameraWindow(QWidget* parent)
 
     controlLayout->addWidget(settingsButton_);
 
-    videoView_ =
-        new ImageView(ApplicationSettings::instance().videoSettings().display,
-                      ApplicationSettings::instance().videoSettings().compute.downscale, central);
-
-    videoView_->setMaxDisplayFps(60.0);
-
-    auto interaction = std::make_unique<InteractionSet>();
-    interaction->addBehavior(std::make_unique<AutoFitBehavior>());
-    interaction->addBehavior(std::make_unique<FullscreenBehavior>());
-    interaction->addBehavior(std::make_unique<PanBehavior>());
-    interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
-    videoView_->setInteraction(interaction.release());
-
-    // --- Display bar ---
-    displayBar_ =
-        new DisplaySettingsWidget(ApplicationSettings::instance().videoSettings().display, central);
-
     // --- Layout horizontal contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
     contentLayout->setContentsMargins(0, 0, 0, 0);
@@ -128,7 +159,14 @@ CameraWindow::CameraWindow(QWidget* parent)
     vLayout->addWidget(controlBar);
     vLayout->addLayout(contentLayout);
 
-    setCentralWidget(central);
+    setCentralWidget(central_);
+}
+
+void CameraWindow::setupConnections()
+{
+    // --- User actions ---
+
+    connect(toggleStreamingButton_, &QPushButton::clicked, this, &CameraWindow::onToggleStreaming);
 
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
@@ -136,19 +174,12 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(settingsButton_, &QPushButton::clicked, cameraSettingsWindow_,
             &CameraSettingsWindow::show);
 
-    connect(toggleStreamingButton_, &QPushButton::clicked, this, &CameraWindow::onToggleStreaming);
-
-    mediaDevices_ = new QMediaDevices(this);
-
-    updateCameraList();
+    // --- Hardware events (camera devices) ---
 
     connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
             &CameraWindow::updateCameraList);
 
-    const auto& session = ApplicationSettings::instance().videoSettings();
-    cameraController_ = new CameraController(session, this);
-
-    bindApplicationSettings();
+    // --- Controller → View or Window updates ---
 
     connect(cameraController_, &CameraController::frameSizeStr, this,
             &CameraWindow::onFrameSizeStr);
@@ -156,35 +187,19 @@ CameraWindow::CameraWindow(QWidget* parent)
     connect(cameraController_, &CameraController::textStatsUpdated, videoView_,
             &ImageView::setText);
 
-    videoView_->applyDownscaleConfig(
-        ApplicationSettings::instance().videoSettings().compute.downscale);
-    videoView_->applyDisplayConfig(ApplicationSettings::instance().videoSettings().display);
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
-            [this](const VideoSessionSettings& conf)
-            {
-                videoView_->applyDownscaleConfig(conf.compute.downscale);
-            });
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::videoDisplaySettingsChanged,
-            videoView_, &ImageView::applyDisplayConfig);
-
     connect(videoView_, &ImageView::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
 
-    connect(cameraSettingsWindow_, &CameraSettingsWindow::videoSessionSettingsAccepted,
-            &ApplicationSettings::instance(), &ApplicationSettings::setVideoSessionSettings);
+    // --- Application settings synchronization ---
 
-    connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged,
-            &ApplicationSettings::instance(), &ApplicationSettings::setVideoDisplayConfig);
+    bindApplicationSettingsToController();
+    bindApplicationSettingsToView();
+    bindUiToApplicationSettings();
 
-    bool preprocessing =
-        ApplicationSettings::instance().videoSettings().compute.downscale.hasDownscale ||
-        ApplicationSettings::instance().videoSettings().compute.hasTemporalFiltering;
+    const auto& app = ApplicationSettings::instance();
 
-    displayBar_->updatePipelineAvailability(preprocessing);
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::videoSettingsChanged, this,
+    // refresh widget in function of settings
+    connect(&app, &ApplicationSettings::videoSettingsChanged, this,
             [this](const VideoSessionSettings& conf)
             {
                 bool hasPreprocessing =
@@ -194,17 +209,62 @@ CameraWindow::CameraWindow(QWidget* parent)
             });
 }
 
-void CameraWindow::bindApplicationSettings()
+void CameraWindow::applyInitialSettings()
+{
+    const auto& app = ApplicationSettings::instance();
+
+    videoView_->applyDownscaleConfig(app.videoSettings().compute.downscale);
+    videoView_->applyDisplayConfig(app.videoSettings().display);
+
+    bool preprocessing = app.videoSettings().compute.downscale.hasDownscale ||
+                         app.videoSettings().compute.hasTemporalFiltering;
+
+    displayBar_->updatePipelineAvailability(preprocessing);
+
+    updateCameraList();
+}
+
+void CameraWindow::bindApplicationSettingsToController()
 {
     assert(cameraController_);
 
-    auto& app = ApplicationSettings::instance();
+    const auto& app = ApplicationSettings::instance();
 
     connect(&app, &ApplicationSettings::videoSettingsChanged, cameraController_,
             &CameraController::onVideoSettingsChanged);
 
     connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, cameraController_,
             &CameraController::onVideoDisplaySettingsChanged);
+}
+
+void CameraWindow::bindApplicationSettingsToView()
+{
+    assert(videoView_);
+
+    const auto& app = ApplicationSettings::instance();
+
+    connect(&app, &ApplicationSettings::videoSettingsChanged, this,
+            [this](const VideoSessionSettings& conf)
+            {
+                videoView_->applyDownscaleConfig(conf.compute.downscale);
+            });
+
+    connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, videoView_,
+            &ImageView::applyDisplayConfig);
+}
+
+void CameraWindow::bindUiToApplicationSettings()
+{
+    assert(displayBar_ && cameraSettingsWindow_);
+
+    const auto& app = ApplicationSettings::instance();
+
+    connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &app,
+            &ApplicationSettings::setVideoDisplayConfig);
+
+    // commit settings
+    connect(cameraSettingsWindow_, &CameraSettingsWindow::videoSessionSettingsAccepted, &app,
+            &ApplicationSettings::setVideoSessionSettings);
 }
 
 void CameraWindow::onFrameSizeStr(const QString& str)
@@ -284,8 +344,8 @@ void CameraWindow::onToggleStreaming()
         settings.setValue("camera/device", currentCameraId_);
 
         videoView_->showPlaceholder(false);
-        cameraController_->start(selectedId);
         connectFrameToView();
+        cameraController_->start(selectedId);
 
         toggleStreamingButton_->setText(tr("Stop"));
         toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
