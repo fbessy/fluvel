@@ -10,19 +10,19 @@
 #include <QImage>
 #include <QPoint>
 
-class QWidget;
-class QShowEvent;
-class QCloseEvent;
-class QTabWidget;
-class QDialogButtonBox;
-class QGroupBox;
 class QComboBox;
+class QDialogButtonBox;
 class QDoubleSpinBox;
-class QRadioButton;
-class QSpinBox;
+class QGroupBox;
 class QLabel;
+class QRadioButton;
 class QSlider;
+class QSpinBox;
+class QTabWidget;
 class QWidget;
+
+class QCloseEvent;
+class QShowEvent;
 
 namespace fluvel_app
 {
@@ -46,23 +46,12 @@ class SettingsWindow : public QDialog
 public:
     SettingsWindow(QWidget* parent, const ImageSessionSettings& config);
 
-public slots:
-    void onTabChanged(int index);
-    void onPreviewShapeAt(QPoint position);
-    void onResizeShape(int delta);
-    void onToggleShape();
-
-    void onAddShape();
-    void onAddShapeAt(QPoint position);
-    void onSubtractShape();
-    void onSubtractShapeAt(QPoint position);
-    void onClearPhi();
-
     void handleInputImageReady(const QImage& inputImage);
 
 signals:
     void imageSessionSettingsAccepted(const fluvel_app::ImageSessionSettings& config);
     void initializationModeChanged(bool enabled);
+    void updateOverlay(fluvel_app::UiShapeInfo uiShape);
 
 protected:
     //! Save the configuration chosen into the ApplicationSettings.
@@ -74,22 +63,27 @@ protected:
     void showEvent(QShowEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
 
-signals:
-    void updateOverlay(fluvel_app::UiShapeInfo uiShape);
-
 private:
-    //////////////////////////////////////////
-    //   pour la fenêtre de configuration   //
-    /////////////////////////////////////////
+    // slots
+    void onTabChanged(int index);
+    void onPreviewShapeAt(QPoint position);
+    void onResizeShape(int delta);
+    void onToggleShape();
 
+    // slots
+    void onAddShape();
+    void onAddShapeAt(QPoint position);
+    void onSubtractShape();
+    void onSubtractShapeAt(QPoint position);
+    void onClearPhi();
     void onUiShapeChanged();
+
+    // other methods
+
     UiShapeInfo getUiShape() const;
     UiShapeInfo getUiShapeAt(QPoint position) const;
     QPoint uiPositionFromView(const QPoint& viewPosition) const;
 
-    void updateUIFromConfig();
-
-    // --- Setup ---
     void setupUiDownscaleTab();
     void setupUiPreprocessingTab();
     void setupUiInitTab();
@@ -97,114 +91,116 @@ private:
 
     void setupConnections();
 
+    void updateUIFromConfig();
     void notifyConfigEdited();
-
     void restoreDefaults();
+
+    ///////////////////////////////////////
+    /////////////  UI Data  ///////////////
+    ///////////////////////////////////////
+
+    QTabWidget* tabs_ = nullptr;
+
+    /////////////////////////////////////////
+
+    QGroupBox* downscalePage_ = nullptr;
+    QComboBox* downscaleFactorCb_ = nullptr;
+
+    /////////////////////////////////////////
+
+    QGroupBox* preprocessPage_ = nullptr;
+    QTabWidget* preprocessTabs_ = nullptr;
+
+    QGroupBox* gaussianNoiseGroupbox_ = nullptr;
+    QDoubleSpinBox* gaussianNoiseStdSpin_ = nullptr;
+
+    QGroupBox* saltNoiseGroupbox_ = nullptr;
+    QDoubleSpinBox* saltNoisePercentSpin_ = nullptr;
+
+    QGroupBox* speckleNoiseGroupbox_ = nullptr;
+    QDoubleSpinBox* speckleNoiseStdSpin_ = nullptr;
+
+    QGroupBox* medianGroupbox_ = nullptr;
+    KernelSizeSpinBox* medianKernelSizeSpin_ = nullptr;
+    QRadioButton* medianDirectRadio_ = nullptr;
+    QRadioButton* medianPerreaultRadio_ = nullptr;
+
+    QGroupBox* meanGroupbox_ = nullptr;
+    KernelSizeSpinBox* meanKernelSizeSpin_ = nullptr;
+
+    QGroupBox* gaussianGroupbox_ = nullptr;
+    KernelSizeSpinBox* gaussianKernelSizeSpin_ = nullptr;
+    QDoubleSpinBox* gaussianSigmaSpin_ = nullptr;
+
+    QGroupBox* anisoGroupbox_ = nullptr;
+    QRadioButton* anisoExpConductionRadio_ = nullptr;
+    QRadioButton* anisoReciprocalConductionRadio_ = nullptr;
+    QSpinBox* iterationFilterSpin_ = nullptr;
+    QDoubleSpinBox* lambdaSpin_ = nullptr;
+    QDoubleSpinBox* kappaSpin_ = nullptr;
+
+    QGroupBox* openGroupbox_ = nullptr;
+    KernelSizeSpinBox* openKernelSizeSpin_ = nullptr;
+
+    QGroupBox* closeGroupbox_ = nullptr;
+    KernelSizeSpinBox* closeKernelSizeSpin_ = nullptr;
+
+    QGroupBox* tophatGroupbox_ = nullptr;
+    QRadioButton* whitetophatRadio_ = nullptr;
+    QRadioButton* blacktophatRadio_ = nullptr;
+    KernelSizeSpinBox* tophatKernelSizeSpin_ = nullptr;
+
+    QGroupBox* algoGroupbox_ = nullptr;
+    QRadioButton* naiveRadio_ = nullptr;
+    QRadioButton* perreaultRadio_ = nullptr;
+
+    QLabel* timeFilt_ = nullptr;
+
+    /////////////////////////////////////////
+
+    QWidget* initPage_ = nullptr;
+
+    QRadioButton* rectangleRadio_ = nullptr;
+    QRadioButton* ellipseRadio_ = nullptr;
+    QSpinBox* widthShapeSpin_ = nullptr;
+    QSlider* widthSlider_ = nullptr;
+    QSpinBox* heightShapeSpin_ = nullptr;
+    QSlider* heightSlider_ = nullptr;
+    QSpinBox* abscissaSpin_ = nullptr;
+    QSlider* abscissaSlider_ = nullptr;
+    QSpinBox* ordinateSpin_ = nullptr;
+    QSlider* ordinateSlider_ = nullptr;
+
+    QPushButton* addButton_ = nullptr;
+    QPushButton* subtractButton_ = nullptr;
+    QPushButton* clearButton_ = nullptr;
+
+    /////////////////////////////////////////
+
+    QWidget* algoPage_ = nullptr;
+    AlgoSettingsWidget* algoWidget_ = nullptr;
+
+    /////////////////////////////////////////
+
+    QDialogButtonBox* dialButtons_ = nullptr;
+
+    ////////////////////////////////////////
+    /////////    View - Controller    /////
+    ///////////////////////////////////////
 
     ImageView* settingsView_ = nullptr;
     InitializationBehavior* initializationBehavior_ = nullptr;
-
     ImageSettingsController* imageSettingsController_ = nullptr;
+    int wheelAccumulator_ = 0;
 
-    // onglets a gauche
-    QTabWidget* tabs_ = nullptr;
+    ////////////////////////////////////////
+    /////////       Model              /////
+    ///////////////////////////////////////
 
-    // Ok Cancel en bas
-    QDialogButtonBox* dial_buttons_ = nullptr;
-
-    /////////////////////////////////////////
-    //             onglets                 //
-    /////////////////////////////////////////
-
-    /////////////////////////////////////////
-
-    QGroupBox* downscale_page_ = nullptr;
-    QComboBox* downscaleFactorCb_ = nullptr;
-
-    // widgets et variables liés à l'onglet preprocessing :
-
-    QTabWidget* preprocess_tabs_ = nullptr;
-    QGroupBox* preprocess_page_ = nullptr;
-
-    // QCheckBox* is_downscale_cb;
-
-    QGroupBox* gaussian_noise_groupbox_ = nullptr;
-    QDoubleSpinBox* std_noise_spin_ = nullptr;
-
-    QGroupBox* salt_noise_groupbox_ = nullptr;
-    QDoubleSpinBox* salt_percent_spin_ = nullptr;
-
-    QGroupBox* speckle_noise_groupbox_ = nullptr;
-    QDoubleSpinBox* std_speckle_noise_spin_ = nullptr;
-
-    QGroupBox* median_groupbox_ = nullptr;
-    KernelSizeSpinBox* klength_median_spin_ = nullptr;
-    QRadioButton* complex_sort_ = nullptr;
-    QRadioButton* complex_perreault_ = nullptr;
-
-    QGroupBox* mean_groupbox_ = nullptr;
-    KernelSizeSpinBox* klength_mean_spin_ = nullptr;
-
-    QGroupBox* gaussian_groupbox_ = nullptr;
-    KernelSizeSpinBox* klength_gaussian_spin_ = nullptr;
-    QDoubleSpinBox* std_filter_spin_ = nullptr;
-
-    QGroupBox* aniso_groupbox_ = nullptr;
-    QRadioButton* aniso1_radio_ = nullptr;
-    QRadioButton* aniso2_radio_ = nullptr;
-    QSpinBox* iteration_filter_spin_ = nullptr;
-    QDoubleSpinBox* lambda_spin_ = nullptr;
-    QDoubleSpinBox* kappa_spin_ = nullptr;
-
-    QGroupBox* open_groupbox_ = nullptr;
-    KernelSizeSpinBox* klength_open_spin_ = nullptr;
-
-    QGroupBox* close_groupbox_ = nullptr;
-    KernelSizeSpinBox* klength_close_spin_ = nullptr;
-
-    QGroupBox* tophat_groupbox_ = nullptr;
-    QRadioButton* whitetophat_radio_ = nullptr;
-    QRadioButton* blacktophat_radio_ = nullptr;
-    KernelSizeSpinBox* klength_tophat_spin_ = nullptr;
-
-    QGroupBox* algo_groupbox_ = nullptr;
-    QRadioButton* complex1_morpho_radio_ = nullptr;
-    QRadioButton* complex2_morpho_radio_ = nullptr;
-
-    QLabel* time_filt_ = nullptr;
-
-    /////////////////////////////////////////
-
-    // widgets et variables liés à l'onglet initialization :
-
-    QWidget* init_page_ = nullptr;
-
-    QRadioButton* rectangle_radio_ = nullptr;
-    QRadioButton* ellipse_radio_ = nullptr;
-    QSpinBox* width_shape_spin_ = nullptr;
-    QSlider* width_slider_ = nullptr;
-    QSpinBox* height_shape_spin_ = nullptr;
-    QSlider* height_slider_ = nullptr;
-    QSpinBox* abscissa_spin_ = nullptr;
-    QSlider* abscissa_slider_ = nullptr;
-    QSpinBox* ordinate_spin_ = nullptr;
-    QSlider* ordinate_slider_ = nullptr;
-
-    QPushButton* add_button_ = nullptr;
-    QPushButton* subtract_button_ = nullptr;
-    QPushButton* clear_button_ = nullptr;
-
-    // widgets et variables liés à l'onglet algorithm :
-
-    AlgoSettingsWidget* algo_widget_ = nullptr;
-    QWidget* algo_page_ = nullptr;
-
-    ImageSessionSettings config_;
+    ImageSessionSettings committedConfig_;
 
     DownscaleConfig editedDownscaleConfig_;
     ProcessingConfig editedProcessingConfig_;
-
-    int wheelAccumulator_ = 0;
 };
 
 } // namespace fluvel_app

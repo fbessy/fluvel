@@ -254,7 +254,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     QPushButton* webpage = new QPushButton(tr("Web page"));
     webpage->setAutoDefault(false);
 
-    connect(webpage, &QPushButton::clicked, this, &AboutWindow::open_webpage);
+    connect(webpage, &QPushButton::clicked, this, &AboutWindow::openWebPage);
 
     QPushButton* license = new QPushButton(tr("License"));
     license->setAutoDefault(false);
@@ -474,7 +474,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     this->setLayout(layout_this);
 }
 
-void AboutWindow::open_webpage()
+void AboutWindow::openWebPage()
 {
     QDesktopServices::openUrl(
         QUrl("https://sourceforge.net/projects/fastlevelset/", QUrl::TolerantMode));
