@@ -59,7 +59,7 @@ bool InitializationBehavior::mousePress(ImageView& view, QMouseEvent* e)
     return false;
 }
 
-bool InitializationBehavior::wheel(ImageView& view, QWheelEvent* we)
+bool InitializationBehavior::wheel(ImageView& /* view */, QWheelEvent* we)
 {
     if (!(we->modifiers() & Qt::ControlModifier))
         return false;
