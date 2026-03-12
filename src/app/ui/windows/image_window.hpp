@@ -7,13 +7,14 @@
 
 #include <QImage>
 #include <QMainWindow>
-#include <QString>
 
 class QWidget;
+class QString;
 class QShowEvent;
 class QCloseEvent;
 class QPushButton;
 class QMediaDevices;
+class QMenu;
 
 namespace fluvel_app
 {
@@ -38,7 +39,7 @@ public:
     explicit ImageWindow(QWidget* parent = nullptr);
 
 signals:
-    void fileSelected(QString fileName);
+    void fileSelected(const QString& fileName);
     void imageDropped(const QString& path);
 
 protected:
@@ -61,7 +62,7 @@ private:
     void updateWindowTitle();
     void setCurrentFile(const QString& fileName);
     void updateRecentFileActions();
-    void deleteList();
+    void clearRecentFiles();
     static QString strippedName(const QString& fullFileName);
 
     void showErrorMessage(const QString& msg);
@@ -74,10 +75,15 @@ private:
 
     // --- UI ---
     CameraWindow* cameraWindow_ = nullptr;
-    AnalysisWindow* evaluationWindow_ = nullptr;
+    AnalysisWindow* analysisWindow_ = nullptr;
     SettingsWindow* settingsWindow_ = nullptr;
     AboutWindow* aboutWindow_ = nullptr;
     LanguageWindow* languageWindow_ = nullptr;
+
+    QMenu* fileMenu_ = nullptr;
+    QMenu* segmentationMenu_ = nullptr;
+    QMenu* sessionMenu_ = nullptr;
+    QMenu* helpMenu_ = nullptr;
 
     QPushButton* restartButton_ = nullptr;
     QPushButton* togglePauseButton_ = nullptr;
@@ -86,15 +92,20 @@ private:
     RightPanelToggleButton* rightPanelToggle_ = nullptr;
     QPushButton* settingsButton_ = nullptr;
 
-    ImageView* imageView_ = nullptr;
+    QIcon startResumeIcon_;
+    QIcon restartIcon_;
+    QIcon pauseIcon_;
+    QIcon settingsIcon_;
 
     DisplaySettingsWidget* displayBar_ = nullptr;
+
+    // --- Actions ---
 
     QAction* openAct_ = nullptr;
     QAction* separatorAct_ = nullptr;
 
     static constexpr qsizetype kMaxRecentFiles = 5;
-    QAction* recentFileActs_[kMaxRecentFiles];
+    std::array<QAction*, kMaxRecentFiles> recentFileActs_;
 
     QAction* deleteAct_ = nullptr;
     QAction* saveAct_ = nullptr;
@@ -109,25 +120,17 @@ private:
     QAction* aboutAct_ = nullptr;
     QAction* languageAct_ = nullptr;
 
-    QMenu* fileMenu_ = nullptr;
-    QMenu* segmentationMenu_ = nullptr;
-    QMenu* sessionMenu_ = nullptr;
-    QMenu* helpMenu_ = nullptr;
-
-    QString last_directory_used_;
-
-    // --- Controllers / Workers ---
+    // --- VIEW - CONTROLLER ---
+    ImageView* imageView_ = nullptr;
     ImageController* imageController_ = nullptr;
 
+    // --- Current image state ---
     QString fileName_;
     QString fullPath_;
     QSize imageSize_;
     int channels_{0};
 
-    QIcon startResumeIcon_;
-    QIcon restartIcon_;
-    QIcon pauseIcon_;
-    QIcon settingsIcon_;
+    QString lastDirectoryUsed_;
 };
 
 QString buildImageFilter();

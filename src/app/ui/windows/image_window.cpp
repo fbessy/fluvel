@@ -58,7 +58,7 @@ ImageWindow::ImageWindow(QWidget* parent)
     updateCameraAction();
 
     QSettings settings;
-    last_directory_used_ = settings.value("history/last_directory", QDir().homePath()).toString();
+    lastDirectoryUsed_ = settings.value("history/last_directory", QDir().homePath()).toString();
 }
 
 void ImageWindow::setupUi()
@@ -340,7 +340,7 @@ void ImageWindow::setupActions()
 
     settingsWindow_ = new SettingsWindow(this, ApplicationSettings::instance().imageSettings());
     cameraWindow_ = new CameraWindow;
-    evaluationWindow_ = new AnalysisWindow(this);
+    analysisWindow_ = new AnalysisWindow(this);
     aboutWindow_ = new AboutWindow(this);
     languageWindow_ = new LanguageWindow(this);
 }
@@ -367,7 +367,7 @@ void ImageWindow::setupConnections()
             [this]()
             {
                 QString fileName = QFileDialog::getOpenFileName(
-                    this, tr("Open Image"), last_directory_used_, buildImageFilter());
+                    this, tr("Open Image"), lastDirectoryUsed_, buildImageFilter());
 
                 if (!fileName.isEmpty())
                     emit fileSelected(fileName);
@@ -394,7 +394,7 @@ void ImageWindow::setupConnections()
 
     connect(this, &ImageWindow::fileSelected, imageController_, &ImageController::loadImage);
 
-    connect(deleteAct_, &QAction::triggered, this, &ImageWindow::deleteList);
+    connect(deleteAct_, &QAction::triggered, this, &ImageWindow::clearRecentFiles);
 
     connect(saveAct_, &QAction::triggered, this, &ImageWindow::saveDisplayed);
 
@@ -417,7 +417,7 @@ void ImageWindow::setupConnections()
     connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
             &ImageWindow::updateCameraAction);
 
-    connect(analysisAct_, &QAction::triggered, evaluationWindow_, &AnalysisWindow::show);
+    connect(analysisAct_, &QAction::triggered, analysisWindow_, &AnalysisWindow::show);
 
     connect(settingsAct_, &QAction::triggered, settingsWindow_, &SettingsWindow::show);
 
@@ -549,7 +549,7 @@ void ImageWindow::updateRecentFileActions()
     }
 }
 
-void ImageWindow::deleteList()
+void ImageWindow::clearRecentFiles()
 {
     QStringList files;
     files.clear();
@@ -602,7 +602,7 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     QSettings settings;
 
     settings.setValue("ui_geometry/image_window", saveGeometry());
-    settings.setValue("history/last_directory", last_directory_used_);
+    settings.setValue("history/last_directory", lastDirectoryUsed_);
 
     config.saveQuiet();
 
@@ -627,7 +627,7 @@ void ImageWindow::onFileOpened(const QString& path)
 {
     setCurrentFile(path); // for recent file
 
-    last_directory_used_ = QFileInfo(path).absolutePath();
+    lastDirectoryUsed_ = QFileInfo(path).absolutePath();
 
     fileName_ = strippedName(path);
     fullPath_ = path;
@@ -663,7 +663,7 @@ void ImageWindow::saveDisplayed()
 
     QString selectedFilter;
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save displayed image"), last_directory_used_ + "/" + baseName,
+        this, tr("Save displayed image"), lastDirectoryUsed_ + "/" + baseName,
         tr("PNG (*.png);;JPG (*.jpg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm)"),
         &selectedFilter);
 
