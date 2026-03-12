@@ -5,22 +5,25 @@
 
 #include "active_contour_worker.hpp"
 
+#include <QIcon>
 #include <QImage>
 #include <QMainWindow>
+#include <QString>
+
+#include <array>
 
 class QWidget;
-class QString;
-class QShowEvent;
-class QCloseEvent;
+
+class QMenu;
+class QAction;
 class QPushButton;
 class QMediaDevices;
-class QMenu;
+
+class QShowEvent;
+class QCloseEvent;
 
 namespace fluvel_app
 {
-
-class ImageView;
-class ImageController;
 
 class CameraWindow;
 class AnalysisWindow;
@@ -30,6 +33,9 @@ class LanguageWindow;
 
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
+
+class ImageView;
+class ImageController;
 
 class ImageWindow : public QMainWindow
 {
