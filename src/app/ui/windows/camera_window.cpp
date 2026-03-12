@@ -179,13 +179,15 @@ void CameraWindow::setupConnections()
     connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
             &CameraWindow::updateCameraList);
 
-    // --- Controller → View or Window updates ---
+    // --- Controller → View / Window updates ---
 
     connect(cameraController_, &CameraController::frameSizeStr, this,
             &CameraWindow::onFrameSizeStr);
 
     connect(cameraController_, &CameraController::textStatsUpdated, videoView_,
             &ImageView::setText);
+
+    // ---  View -> Controller for display stats ---
 
     connect(videoView_, &ImageView::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
