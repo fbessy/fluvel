@@ -4,9 +4,12 @@
 #pragma once
 
 #include "active_contour_worker.hpp"
+#include "common_settings.hpp"
 
-#include <QObject>
 #include <QImage>
+#include <QObject>
+#include <QString>
+#include <QVector>
 
 namespace fluvel_app
 {

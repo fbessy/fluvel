@@ -3,15 +3,18 @@
 
 #pragma once
 
-#include "video_active_contour_thread.hpp"
+#include "common_settings.hpp"
 #include "frame_stats_view.hpp"
+#include "video_active_contour_thread.hpp"
 
-#include <QCamera>
-#include <QMediaCaptureSession>
-#include <QMediaDevices>
+#include <QByteArray>
 #include <QObject>
-#include <QTimer>
-#include <QVideoSink>
+#include <QtTypes>
+
+class QCamera;
+class QMediaCaptureSession;
+class QVideoSink;
+class QTimer;
 
 namespace fluvel_app
 {
@@ -48,7 +51,7 @@ private:
     QMediaCaptureSession* captureSession_ = nullptr;
     QVideoSink* videoSink_ = nullptr;
 
-    VideoActiveContourThread activeContourThread_ = nullptr;
+    VideoActiveContourThread activeContourThread_;
 
     FrameStatsView frameStats_;
     QTimer* statsTimer_ = nullptr;

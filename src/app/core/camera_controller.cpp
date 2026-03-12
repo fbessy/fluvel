@@ -6,6 +6,12 @@
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
 
+#include <QCamera>
+#include <QMediaCaptureSession>
+#include <QMediaDevices>
+#include <QTimer>
+#include <QVideoSink>
+
 namespace fluvel_app
 {
 

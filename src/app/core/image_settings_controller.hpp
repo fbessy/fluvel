@@ -75,10 +75,10 @@ private:
     QImage downscaled_;
     QImage processed_;
 
-    bool initializationEnabled_ = false;
+    bool initializationEnabled_{false};
 
-    bool needsRefresh_ = false;
-    bool viewVisible_ = false;
+    bool needsRefresh_{false};
+    bool viewVisible_{false};
 };
 
 } // namespace fluvel_app

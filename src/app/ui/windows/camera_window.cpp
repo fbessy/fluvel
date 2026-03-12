@@ -14,6 +14,7 @@
 #include "pixel_info_behavior.hpp"
 #include "right_panel_toggle_button.hpp"
 
+#include <QCameraDevice>
 #include <QComboBox>
 #include <QMediaDevices>
 #include <QPushButton>
