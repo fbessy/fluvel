@@ -3,17 +3,33 @@
 
 #pragma once
 
-#include "algo_settings_widget.hpp"
-#include "filters.hpp"
+#include "common_settings.hpp"
 #include "image_settings_controller.hpp"
-#include "image_view.hpp"
-#include "initialization_behavior.hpp"
-#include "kernel_size_spinbox.hpp"
 
-#include <QtWidgets>
+#include <QDialog>
+#include <QImage>
+#include <QPoint>
+
+class QWidget;
+class QShowEvent;
+class QCloseEvent;
+class QTabWidget;
+class QDialogButtonBox;
+class QGroupBox;
+class QComboBox;
+class QDoubleSpinBox;
+class QRadioButton;
+class QSpinBox;
+class QLabel;
+class QSlider;
+class QWidget;
 
 namespace fluvel_app
 {
+class ImageView;
+class InitializationBehavior;
+class KernelSizeSpinBox;
+class AlgoSettingsWidget;
 
 enum class TabIndex
 {
@@ -188,7 +204,7 @@ private:
     DownscaleConfig editedDownscaleConfig_;
     ProcessingConfig editedProcessingConfig_;
 
-    int wheelAccumulator_ = 0; 
+    int wheelAccumulator_ = 0;
 };
 
 } // namespace fluvel_app

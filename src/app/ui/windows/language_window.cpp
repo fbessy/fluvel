@@ -8,6 +8,7 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QSettings>
+#include <QString>
 #include <QVBoxLayout>
 
 namespace fluvel_app

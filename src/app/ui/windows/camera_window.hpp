@@ -3,19 +3,20 @@
 
 #pragma once
 
-#include "camera_controller.hpp"
-#include "camera_settings_window.hpp"
-#include "display_settings_widget.hpp"
-#include "image_view.hpp"
-#include "right_panel_toggle_button.hpp"
-
-#include <QComboBox>
-#include <QLabel>
 #include <QMainWindow>
-#include <QPushButton>
+
+class QComboBox;
+class QPushButton;
+class QMediaDevices;
 
 namespace fluvel_app
 {
+
+class RightPanelToggleButton;
+class ImageView;
+class DisplaySettingsWidget;
+class CameraController;
+class CameraSettingsWindow;
 
 class CameraWindow : public QMainWindow
 {

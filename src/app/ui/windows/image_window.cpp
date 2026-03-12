@@ -3,24 +3,45 @@
 
 #include "image_window.hpp"
 
-#include "active_contour_worker.hpp"
+#include "about_window.hpp"
+#include "analysis_window.hpp"
 #include "application_settings.hpp"
+#include "camera_window.hpp"
+#include "language_window.hpp"
+#include "settings_window.hpp"
+
+#include "display_settings_widget.hpp"
+#include "icon_loader.hpp"
+#include "right_panel_toggle_button.hpp"
+
 #include "autofit_behavior.hpp"
 #include "drag_drop_behavior.hpp"
 #include "fullscreen_behavior.hpp"
-#include "icon_loader.hpp"
-#include "image_controller.hpp"
 #include "image_view.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
 
-#include <QAction>
+#include "image_controller.hpp"
+
+#include <QApplication>
+#include <QCameraDevice>
+#include <QCloseEvent>
+#include <QDir>
 #include <QFileDialog>
+#include <QHBoxLayout>
+#include <QImageReader>
+#include <QMediaDevices>
+#include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-
-#include <cassert>
+#include <QPushButton>
+#include <QSettings>
+#include <QShowEvent>
+#include <QStatusBar>
+#include <QStyle>
+#include <QVBoxLayout>
+#include <QWidget>
 
 namespace fluvel_app
 {
@@ -592,12 +613,12 @@ void ImageWindow::closeEvent(QCloseEvent* event)
 
 void ImageWindow::onDisplayedImageReady(const QImage& displayed)
 {
-    m_imageSize_ = displayed.size();
-    m_channels_ = displayed.depth() / 8;
+    imageSize_ = displayed.size();
+    channels_ = displayed.depth() / 8;
 
-    if (m_channels_ > 3)
-        m_channels_ = 3; // because this application processes only 3 channels
-                         // even there are 4 channels, for example.
+    if (channels_ > 3)
+        channels_ = 3; // because this application processes only 3 channels
+                       // even there are 4 channels, for example.
 
     updateWindowTitle();
 }
@@ -608,8 +629,8 @@ void ImageWindow::onFileOpened(const QString& path)
 
     last_directory_used_ = QFileInfo(path).absolutePath();
 
-    m_fileName_ = strippedName(path);
-    m_fullPath_ = path;
+    fileName_ = strippedName(path);
+    fullPath_ = path;
 
     updateWindowTitle();
 
@@ -620,14 +641,13 @@ void ImageWindow::updateWindowTitle()
 {
     QString title = "Fluvel";
 
-    if (!m_fileName_.isEmpty() && m_imageSize_.isValid() && m_channels_ > 0)
+    if (!fileName_.isEmpty() && imageSize_.isValid() && channels_ > 0)
     {
-        const QString colorText = (m_channels_ == 1) ? "Gray" : "RGB";
+        const QString colorText = (channels_ == 1) ? "Gray" : "RGB";
 
-        const QString sizeStr =
-            QString("%1×%2").arg(m_imageSize_.width()).arg(m_imageSize_.height());
+        const QString sizeStr = QString("%1×%2").arg(imageSize_.width()).arg(imageSize_.height());
 
-        title += QString(" - %1 - %2 - %3").arg(m_fileName_, sizeStr, colorText);
+        title += QString(" - %1 - %2 - %3").arg(fileName_, sizeStr, colorText);
     }
 
     setWindowTitle(title);
@@ -639,7 +659,7 @@ void ImageWindow::saveDisplayed()
     if (displayed.isNull())
         return;
 
-    QString baseName = m_fileName_.isEmpty() ? "displayed" : QFileInfo(m_fileName_).baseName();
+    QString baseName = fileName_.isEmpty() ? "displayed" : QFileInfo(fileName_).baseName();
 
     QString selectedFilter;
     QString fileName = QFileDialog::getSaveFileName(

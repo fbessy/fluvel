@@ -4,17 +4,14 @@
 #include "about_window.hpp"
 #include "application_settings.hpp"
 
-#include <QCoreApplication>
 #include <QCryptographicHash>
 #include <QDesktopServices>
-#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QImageWriter>
 #include <QLabel>
 #include <QPushButton>
 #include <QSettings>
-#include <QSysInfo>
 #include <QTabWidget>
 #include <QTextEdit>
 

@@ -3,12 +3,25 @@
 
 #include "settings_window.hpp"
 
-#include "filters.hpp"
-#include "image_window.hpp"
+#include "algo_settings_widget.hpp"
+#include "image_view.hpp"
+#include "initialization_behavior.hpp"
 #include "interaction_set.hpp"
 #include "kernel_size_spinbox.hpp"
 
-#include <QtWidgets>
+#include <QComboBox>
+#include <QDialogButtonBox>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QSettings>
+#include <QSlider>
+#include <QTabBar>
+#include <QTabWidget>
+#include <QVBoxLayout>
 
 #ifdef FLUVEL_DEBUG
 #include "image_debug.hpp"

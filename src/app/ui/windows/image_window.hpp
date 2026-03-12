@@ -3,26 +3,32 @@
 
 #pragma once
 
-#include "about_window.hpp"
-#include "analysis_window.hpp"
-#include "camera_window.hpp"
-#include "language_window.hpp"
-#include "settings_window.hpp"
-
 #include "active_contour_worker.hpp"
-#include "display_settings_widget.hpp"
-#include "right_panel_toggle_button.hpp"
 
+#include <QImage>
 #include <QMainWindow>
+#include <QString>
+
+class QWidget;
+class QShowEvent;
+class QCloseEvent;
+class QPushButton;
+class QMediaDevices;
 
 namespace fluvel_app
 {
 
 class ImageView;
-class AlgoInfoOverlay;
 class ImageController;
-class ActiveContourWorker;
-struct AlgoStats;
+
+class CameraWindow;
+class AnalysisWindow;
+class SettingsWindow;
+class AboutWindow;
+class LanguageWindow;
+
+class RightPanelToggleButton;
+class DisplaySettingsWidget;
 
 class ImageWindow : public QMainWindow
 {
@@ -31,15 +37,7 @@ class ImageWindow : public QMainWindow
 public:
     explicit ImageWindow(QWidget* parent = nullptr);
 
-public slots:
-    void onDisplayedImageReady(const QImage& displayed);
-    void onFileOpened(const QString& path);
-    void onStateChanged(fluvel_app::WorkerState state);
-    void onCameraWindowShown();
-    void onCameraWindowClosed();
-
 signals:
-
     void fileSelected(QString fileName);
     void imageDropped(const QString& path);
 
@@ -48,6 +46,12 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
+    void onDisplayedImageReady(const QImage& displayed);
+    void onFileOpened(const QString& path);
+    void onStateChanged(fluvel_app::WorkerState state);
+    void onCameraWindowShown();
+    void onCameraWindowClosed();
+
     // --- Setup ---
     void setupUi();
     void setupActions();
@@ -88,8 +92,10 @@ private:
 
     QAction* openAct_ = nullptr;
     QAction* separatorAct_ = nullptr;
+
     static constexpr qsizetype kMaxRecentFiles = 5;
     QAction* recentFileActs_[kMaxRecentFiles];
+
     QAction* deleteAct_ = nullptr;
     QAction* saveAct_ = nullptr;
     QAction* quitAct_ = nullptr;
@@ -113,10 +119,10 @@ private:
     // --- Controllers / Workers ---
     ImageController* imageController_ = nullptr;
 
-    QString m_fileName_;
-    QString m_fullPath_;
-    QSize m_imageSize_;
-    int m_channels_ = 0;
+    QString fileName_;
+    QString fullPath_;
+    QSize imageSize_;
+    int channels_{0};
 
     QIcon startResumeIcon_;
     QIcon restartIcon_;

@@ -5,6 +5,9 @@
 
 #include <QDialog>
 
+class QWidget;
+class QCloseEvent;
+
 namespace fluvel_app
 {
 
@@ -27,7 +30,7 @@ private:
 
     //! A subwindow with the license application, displayed when the user clicks on the license
     //! button.
-    QDialog* licenseWindow_;
+    QDialog* licenseWindow_ = nullptr;
 };
 
 } // namespace fluvel_app

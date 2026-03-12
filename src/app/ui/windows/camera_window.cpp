@@ -4,21 +4,21 @@
 #include "camera_window.hpp"
 #include "application_settings.hpp"
 #include "autofit_behavior.hpp"
+#include "camera_controller.hpp"
+#include "camera_settings_window.hpp"
+#include "display_settings_widget.hpp"
 #include "fullscreen_behavior.hpp"
 #include "icon_loader.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
+#include "right_panel_toggle_button.hpp"
 
+#include <QComboBox>
 #include <QMediaDevices>
+#include <QPushButton>
 #include <QSettings>
-
-#include <QCloseEvent>
-#include <QImage>
-#include <QSettings>
-#include <QStackedLayout>
 #include <QVBoxLayout>
-#include <QVideoFrame>
 
 #ifdef Q_OS_ANDROID
 #include <QCoreApplication>

@@ -4,15 +4,25 @@
 #pragma once
 
 #include "analysis_widget.hpp"
-#include "hausdorff_distance.hpp"
-#include "point.hpp"
+#include "point_containers.hpp"
 
 #include <QDialog>
-#include <QLabel>
-#include <QSpinBox>
+
+class QWidget;
+class QCloseEvent;
+class QPushButton;
+class QLabel;
+class QSpinBox;
+
+namespace fluvel_ip
+{
+class HausdorffDistance;
+}
 
 namespace fluvel_app
 {
+
+class AnalysisWidget;
 
 class AnalysisWindow : public QDialog
 {
@@ -37,7 +47,7 @@ private:
     AnalysisWidget* widget2_ = nullptr;
     QPushButton* computeButton_ = nullptr;
 
-    std::unordered_set<fluvel_ip::Point2D_i> intersection_;
+    fluvel_ip::PointSet intersection_;
 
     QDialog* resultPopup_ = nullptr;
     QLabel* hausdorffLabel_ = nullptr;
@@ -46,7 +56,7 @@ private:
     QLabel* hausdorffRatioLabel_ = nullptr;
     QLabel* quantileRatioLabel_ = nullptr;
     QLabel* centroidsDistLabel_ = nullptr;
-    QLabel* centroids_ratio_label_ = nullptr;
+    QLabel* centroidsRatio_Label_ = nullptr;
     QLabel* timeLabel_ = nullptr;
 
     fluvel_ip::HausdorffDistance* hd_ = nullptr;

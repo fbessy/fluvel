@@ -2,12 +2,20 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "analysis_window.hpp"
+
 #include "analysis_widget.hpp"
 #include "color_adapters.hpp"
 #include "hausdorff_distance.hpp"
 
-#include <QtWidgets>
-#include <ctime> // for std::clock_t, std::clock() and CLOCKS_PER_SEC
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QSettings>
+#include <QSpinBox>
+
+#include <ctime>
 
 namespace fluvel_app
 {
@@ -99,12 +107,12 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     centroidsDistLabel_ = new QLabel(this);
     centroidsDistLabel_->setText(tr("distance between centroids = "));
     centroidsDistLabel_->setAlignment(Qt::AlignCenter);
-    centroids_ratio_label_ = new QLabel(this);
-    centroids_ratio_label_->setText(tr("ratio between centroids = "));
-    centroids_ratio_label_->setAlignment(Qt::AlignCenter);
+    centroidsRatio_Label_ = new QLabel(this);
+    centroidsRatio_Label_->setText(tr("ratio between centroids = "));
+    centroidsRatio_Label_->setAlignment(Qt::AlignCenter);
     QVBoxLayout* centroids_layout = new QVBoxLayout;
     centroids_layout->addWidget(centroidsDistLabel_);
-    centroids_layout->addWidget(centroids_ratio_label_);
+    centroids_layout->addWidget(centroidsRatio_Label_);
     QGroupBox* centroids_group = new QGroupBox(tr("Shapes gap"));
     centroids_group->setLayout(centroids_layout);
 
@@ -179,7 +187,7 @@ void AnalysisWindow::compute_hd()
 
     centroidsDistLabel_->setText(tr("distance between centroids = ") +
                                    QString::number(centr_gap) + (tr(" pixels")));
-    centroids_ratio_label_->setText(tr("ratio between centroids = ") + QString::number(gap_ratio) +
+    centroidsRatio_Label_->setText(tr("ratio between centroids = ") + QString::number(gap_ratio) +
                                     (" %"));
 
     timeLabel_->setText(tr("time = ") + QString::number(elapsed, 'g', 4) + (" s"));

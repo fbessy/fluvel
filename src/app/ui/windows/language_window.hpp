@@ -6,6 +6,8 @@
 #include <QDialog>
 
 class QComboBox;
+class QCloseEvent;
+class QWidget;
 
 namespace fluvel_app
 {
