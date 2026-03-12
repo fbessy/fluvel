@@ -276,7 +276,9 @@ void CameraWindow::onFrameSizeStr(const QString& str)
 
 void CameraWindow::updateCameraList()
 {
-    const auto cameras = QMediaDevices::videoInputs();
+    assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_);
+
+    auto cameras = mediaDevices_->videoInputs();
 
     cameraSelector_->clear();
 

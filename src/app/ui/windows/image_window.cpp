@@ -40,6 +40,7 @@
 #include <QShowEvent>
 #include <QStatusBar>
 #include <QStyle>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -51,11 +52,13 @@ ImageWindow::ImageWindow(QWidget* parent)
 {
     setupUi();
     setupActions();
-    bindApplicationSettings();
-    setupConnections();
+    setupMenus();
+    setupControllers();
+    setupChildWindows();
 
-    updateRecentFileActions();
-    updateCameraAction();
+    applyInitialSettings();
+
+    setupConnections();
 
     QSettings settings;
     lastDirectoryUsed_ = settings.value("history/last_directory", QDir().homePath()).toString();
@@ -157,9 +160,9 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(settingsButton_);
 
     // --- Image view ---
-    imageView_ =
-        new ImageView(ApplicationSettings::instance().imageSettings().display,
-                      ApplicationSettings::instance().imageSettings().compute.downscale, central);
+
+    const auto& config = ApplicationSettings::instance().imageSettings();
+    imageView_ = new ImageView(config.display, config.compute.downscale, central);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
@@ -170,8 +173,7 @@ void ImageWindow::setupUi()
     imageView_->setInteraction(interaction.release());
 
     // --- Display bar (à droite) ---
-    displayBar_ =
-        new DisplaySettingsWidget(ApplicationSettings::instance().imageSettings().display, central);
+    displayBar_ = new DisplaySettingsWidget(config.display, central);
 
     // --- Layout horizontal contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
@@ -236,13 +238,13 @@ void ImageWindow::setupActions()
 
     openAct_->setIcon(openIcon);
 
-    deleteAct_ = new QAction(tr("Clear list"), this);
-    deleteAct_->setStatusTip(tr("Clean the recent files list."));
+    clearAct_ = new QAction(tr("Clear list"), this);
+    clearAct_->setStatusTip(tr("Clean the recent files list."));
 
     QIcon deleteIcon = il::loadIcon(QIcon::ThemeIcon::EditClear, QStyle::SP_LineEditClearButton,
                                     ":/icons/toolbar/edit-clear-history.svg");
 
-    deleteAct_->setIcon(deleteIcon);
+    clearAct_->setIcon(deleteIcon);
 
     saveAct_ = new QAction(tr("&Save..."), this);
     saveAct_->setShortcut(QKeySequence::Save);
@@ -252,8 +254,6 @@ void ImageWindow::setupActions()
                                   ":/icons/toolbar/document-save-as-symbolic.svg");
 
     saveAct_->setIcon(saveIcon);
-
-    mediaDevices_ = new QMediaDevices(this);
 
     QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent, QStyle::SP_DirOpenIcon,
                                     ":/icons/toolbar/document-open-recent-symbolic.svg");
@@ -279,8 +279,6 @@ void ImageWindow::setupActions()
 
     settingsAct_->setIcon(settingsIcon_);
 
-    menuBar()->addSeparator();
-
     aboutAct_ = new QAction(tr("&About"), this);
     aboutAct_->setStatusTip(tr("Information, license and home page."));
 
@@ -296,11 +294,10 @@ void ImageWindow::setupActions()
                                       ":/icons/toolbar/preferences-desktop-locale.svg");
 
     languageAct_->setIcon(languageIcon);
+}
 
-    ////////////////////////////////////////////////////////////////////////////////////////
-    /////////////                          Create Menus                /////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////
-
+void ImageWindow::setupMenus()
+{
     sessionMenu_ = new QMenu(tr("&Session"), this);
     sessionMenu_->addAction(imageSessionAct_);
     sessionMenu_->addAction(cameraSessionAct_);
@@ -316,7 +313,7 @@ void ImageWindow::setupActions()
         fileMenu_->addAction(recentFileActs_[i]);
     }
 
-    fileMenu_->addAction(deleteAct_);
+    fileMenu_->addAction(clearAct_);
 
     fileMenu_->addSeparator();
 
@@ -334,34 +331,168 @@ void ImageWindow::setupActions()
     menuBar()->addMenu(fileMenu_);
     menuBar()->addMenu(segmentationMenu_);
     menuBar()->addMenu(helpMenu_);
+}
 
-    const auto& sessionConfig = ApplicationSettings::instance().imageSettings();
-    imageController_ = new ImageController(sessionConfig, this);
+void ImageWindow::setupControllers()
+{
+    const auto& config = ApplicationSettings::instance().imageSettings();
+    imageController_ = new ImageController(config, this);
 
-    settingsWindow_ = new SettingsWindow(this, ApplicationSettings::instance().imageSettings());
-    cameraWindow_ = new CameraWindow;
+    mediaDevices_ = new QMediaDevices(this);
+}
+
+void ImageWindow::setupChildWindows()
+{
+    const auto& config = ApplicationSettings::instance().imageSettings();
+
+    settingsWindow_ = new SettingsWindow(this, config);
+    cameraWindow_ = new CameraWindow(this);
     analysisWindow_ = new AnalysisWindow(this);
     aboutWindow_ = new AboutWindow(this);
     languageWindow_ = new LanguageWindow(this);
 }
 
-void ImageWindow::bindApplicationSettings()
+void ImageWindow::applyInitialSettings()
 {
-    assert(imageController_);
+    assert(imageView_ && displayBar_);
 
-    const auto& appConfig = ApplicationSettings::instance();
+    const auto& config = ApplicationSettings::instance().imageSettings();
 
-    connect(&appConfig, &ApplicationSettings::imgSettingsChanged, imageController_,
-            &ImageController::onImageSettingsChanged);
+    imageView_->applyDownscaleConfig(config.compute.downscale);
+    imageView_->applyDisplayConfig(config.display);
 
-    connect(&appConfig, &ApplicationSettings::imgDisplaySettingsChanged, imageController_,
-            &ImageController::onImageDisplaySettingsChanged);
+    bool preprocessing =
+        config.compute.downscale.hasDownscale || config.compute.processing.hasProcessing();
+
+    displayBar_->updatePipelineAvailability(preprocessing);
+
+    updateRecentFileActions();
+    updateCameraAction();
 }
 
 void ImageWindow::setupConnections()
 {
+    setupUserActionsConnections();
+
+    // to refresh camera session state in the menu
+    connect(cameraWindow_, &CameraWindow::cameraWindowShown, this,
+            &ImageWindow::onCameraWindowShown);
+    connect(cameraWindow_, &CameraWindow::cameraWindowClosed, this,
+            &ImageWindow::onCameraWindowClosed);
+
+    setupFileEventConnections();
+
+    // --- Hardware events (camera devices) ---
+    connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
+            &ImageWindow::updateCameraAction);
+
+    // --- Controller → View / Window updates ---
+
+    // to refresh the view with a new image
+    connect(imageController_, &ImageController::displayedImageReady, imageView_,
+            &ImageView::setImage);
+
+    // to refresh the view with a new contour
+    connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageView::setContour,
+            Qt::QueuedConnection);
+
+    // to refresh the view with a new text info algo overlay (mean out, iterations, ect)
+    connect(imageController_, &ImageController::textDiagnosticsUpdated, imageView_,
+            &ImageView::setText);
+
+    // to refresh the view and clear the former contour
+    // (it's performed the first time or when a new image is loaded)
+    connect(imageController_, &ImageController::clearOverlaysRequested, imageView_,
+            &ImageView::clearOverlays);
+
+    // to refresh the image window title
     connect(imageController_, &ImageController::displayedImageReady, this,
             &ImageWindow::onDisplayedImageReady);
+
+    // ---  View -> Controller for display stats ---
+
+    // --- Application settings synchronization ---
+
+    bindApplicationSettingsToController();
+    bindApplicationSettingsToView();
+    bindUiToApplicationSettings();
+
+    // to forward a new image for the image settings window view (preview)
+    connect(imageController_, &ImageController::inputImageReady, settingsWindow_,
+            &SettingsWindow::handleInputImageReady);
+
+    // to retrieve worker events and refresh the buttons states (start/restart, pause/resume)
+    connect(imageController_, &ImageController::stateChanged, this, &ImageWindow::onStateChanged);
+
+    // to show an error message when a file format error occured.
+    connect(imageController_, &ImageController::errorOccurred, this,
+            &ImageWindow::showErrorMessage);
+
+    // refresh widget in function of settings
+    connect(&ApplicationSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
+            [this](const ImageSessionSettings& conf)
+            {
+                bool hasPreprocessing =
+                    conf.compute.downscale.hasDownscale || conf.compute.processing.hasProcessing();
+
+                displayBar_->updatePipelineAvailability(hasPreprocessing);
+            });
+}
+
+void ImageWindow::bindApplicationSettingsToController()
+{
+    assert(imageController_);
+
+    const auto& config = ApplicationSettings::instance();
+
+    connect(&config, &ApplicationSettings::imgSettingsChanged, imageController_,
+            &ImageController::onImageSettingsChanged);
+
+    connect(&config, &ApplicationSettings::imgDisplaySettingsChanged, imageController_,
+            &ImageController::onImageDisplaySettingsChanged);
+}
+
+void ImageWindow::bindApplicationSettingsToView()
+{
+    const auto& config = ApplicationSettings::instance();
+
+    connect(&config, &ApplicationSettings::imgSettingsChanged, this,
+            [this](const ImageSessionSettings& conf)
+            {
+                imageView_->applyDownscaleConfig(conf.compute.downscale);
+            });
+
+    connect(&config, &ApplicationSettings::imgDisplaySettingsChanged, imageView_,
+            &ImageView::applyDisplayConfig);
+}
+
+void ImageWindow::bindUiToApplicationSettings()
+{
+    const auto& config = ApplicationSettings::instance();
+
+    connect(settingsWindow_, &SettingsWindow::imageSessionSettingsAccepted, &config,
+            &ApplicationSettings::setImageSessionSettings);
+
+    connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &config,
+            &ApplicationSettings::setImageDisplayConfig);
+}
+
+void ImageWindow::setupUserActionsConnections()
+{
+    // ---   1st menu   ---
+
+    connect(imageSessionAct_, &QAction::triggered, this,
+            [this]()
+            {
+                imageSessionAct_->setChecked(true);
+            });
+
+    connect(cameraSessionAct_, &QAction::triggered, this,
+            &ImageWindow::onStartCameraActionTriggered);
+
+    connect(quitAct_, &QAction::triggered, this, &ImageWindow::close);
+
+    // ---   2nd menu   ---
 
     connect(openAct_, &QAction::triggered, this,
             [this]()
@@ -376,79 +507,31 @@ void ImageWindow::setupConnections()
     for (int i = 0; i < kMaxRecentFiles; ++i)
     {
         connect(recentFileActs_[i], &QAction::triggered, this,
-                [this]()
+                [this, act = recentFileActs_[i]]()
                 {
-                    QAction* action = qobject_cast<QAction*>(sender());
-                    QString fileName;
-                    if (action != nullptr)
-                    {
-                        fileName = action->data().toString();
-                    }
-
+                    QString fileName = act->data().toString();
                     if (!fileName.isEmpty())
                         emit fileSelected(fileName);
                 });
     }
 
-    connect(imageController_, &ImageController::imageOpened, this, &ImageWindow::onFileOpened);
-
-    connect(this, &ImageWindow::fileSelected, imageController_, &ImageController::loadImage);
-
-    connect(deleteAct_, &QAction::triggered, this, &ImageWindow::clearRecentFiles);
+    connect(clearAct_, &QAction::triggered, this, &ImageWindow::clearRecentFiles);
 
     connect(saveAct_, &QAction::triggered, this, &ImageWindow::saveDisplayed);
 
-    connect(quitAct_, &QAction::triggered, this, &ImageWindow::close);
-
-    connect(imageSessionAct_, &QAction::triggered, this,
-            [this]()
-            {
-                imageSessionAct_->setChecked(true);
-            });
-
-    connect(cameraSessionAct_, &QAction::triggered, this,
-            &ImageWindow::onStartCameraActionTriggered);
-
-    connect(cameraWindow_, &CameraWindow::cameraWindowClosed, this,
-            &ImageWindow::onCameraWindowClosed);
-    connect(cameraWindow_, &CameraWindow::cameraWindowShown, this,
-            &ImageWindow::onCameraWindowShown);
-
-    connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
-            &ImageWindow::updateCameraAction);
+    // ---   3rd menu   ---
 
     connect(analysisAct_, &QAction::triggered, analysisWindow_, &AnalysisWindow::show);
 
     connect(settingsAct_, &QAction::triggered, settingsWindow_, &SettingsWindow::show);
 
+    // ---   4th menu   ---
+
     connect(aboutAct_, &QAction::triggered, aboutWindow_, &AboutWindow::show);
 
     connect(languageAct_, &QAction::triggered, languageWindow_, &LanguageWindow::show);
 
-    imageView_->applyDownscaleConfig(
-        ApplicationSettings::instance().imageSettings().compute.downscale);
-    imageView_->applyDisplayConfig(ApplicationSettings::instance().imageSettings().display);
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
-            [this](const ImageSessionSettings& conf)
-            {
-                imageView_->applyDownscaleConfig(conf.compute.downscale);
-            });
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::imgDisplaySettingsChanged,
-            imageView_, &ImageView::applyDisplayConfig);
-
-    connect(imageController_, &ImageController::clearOverlaysRequested, imageView_,
-            &ImageView::clearOverlays);
-
-    connect(imageController_, &ImageController::displayedImageReady, imageView_,
-            &ImageView::setImage);
-
-    connect(imageController_, &ImageController::inputImageReady, settingsWindow_,
-            &SettingsWindow::handleInputImageReady);
-
-    connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageView::setContour,
-            Qt::QueuedConnection);
+    // ---   6 buttons   ---
 
     connect(restartButton_, &QPushButton::clicked, imageController_, &ImageController::restart);
 
@@ -464,36 +547,15 @@ void ImageWindow::setupConnections()
 
     connect(settingsButton_, &QPushButton::clicked, settingsWindow_, &SettingsWindow::show);
 
-    connect(imageController_, &ImageController::stateChanged, this, &ImageWindow::onStateChanged);
-
-    connect(imageController_, &ImageController::textDiagnosticsUpdated, imageView_,
-            &ImageView::setText);
-
+    // when the user drag and drop an image in the view of the image window.
     connect(imageView_, &ImageView::imageDropped, imageController_, &ImageController::loadImage);
+}
 
-    connect(imageController_, &ImageController::errorOccurred, this,
-            &ImageWindow::showErrorMessage);
+void ImageWindow::setupFileEventConnections()
+{
+    connect(this, &ImageWindow::fileSelected, imageController_, &ImageController::loadImage);
 
-    connect(settingsWindow_, &SettingsWindow::imageSessionSettingsAccepted,
-            &ApplicationSettings::instance(), &ApplicationSettings::setImageSessionSettings);
-
-    connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged,
-            &ApplicationSettings::instance(), &ApplicationSettings::setImageDisplayConfig);
-
-    bool preprocessing =
-        ApplicationSettings::instance().imageSettings().compute.downscale.hasDownscale ||
-        ApplicationSettings::instance().imageSettings().compute.processing.hasProcessing();
-
-    displayBar_->updatePipelineAvailability(preprocessing);
-
-    connect(&ApplicationSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
-            [this](const ImageSessionSettings& conf)
-            {
-                bool hasPreprocessing =
-                    conf.compute.downscale.hasDownscale || conf.compute.processing.hasProcessing();
-
-                displayBar_->updatePipelineAvailability(hasPreprocessing);
-            });
+    connect(imageController_, &ImageController::imageOpened, this, &ImageWindow::onFileOpened);
 }
 
 QString ImageWindow::strippedName(const QString& fullFilename)
@@ -541,33 +603,29 @@ void ImageWindow::updateRecentFileActions()
 
     if (files.isEmpty())
     {
-        deleteAct_->setVisible(false);
+        clearAct_->setVisible(false);
     }
     else
     {
-        deleteAct_->setVisible(true);
+        clearAct_->setVisible(true);
     }
 }
 
 void ImageWindow::clearRecentFiles()
 {
-    QStringList files;
-    files.clear();
-
     QSettings settings;
-    settings.setValue("history/recent_files", files);
+    settings.setValue("history/recent_files", QStringList());
 
     updateRecentFileActions();
 }
 
 void ImageWindow::updateCameraAction()
 {
-    auto cameras = QMediaDevices::videoInputs();
+    assert(mediaDevices_ && cameraSessionAct_);
 
-    if (cameras.isEmpty())
-        cameraSessionAct_->setEnabled(false);
-    else
-        cameraSessionAct_->setEnabled(true);
+    auto cameras = mediaDevices_->videoInputs();
+
+    cameraSessionAct_->setEnabled(!cameras.isEmpty());
 }
 
 void ImageWindow::onStartCameraActionTriggered()
@@ -578,9 +636,10 @@ void ImageWindow::onStartCameraActionTriggered()
     if (!cameraWindow_)
         return;
 
-    cameraSessionAct_->setChecked(cameraWindow_ && cameraWindow_->isVisible());
+    if (!mediaDevices_)
+        return;
 
-    auto cameras = QMediaDevices::videoInputs();
+    auto cameras = mediaDevices_->videoInputs();
 
     if (cameras.isEmpty())
     {
@@ -588,6 +647,8 @@ void ImageWindow::onStartCameraActionTriggered()
     }
     else
     {
+        cameraSessionAct_->setChecked(true);
+
         cameraWindow_->setWindowState(cameraWindow_->windowState() & ~Qt::WindowMinimized);
 
         cameraWindow_->show();

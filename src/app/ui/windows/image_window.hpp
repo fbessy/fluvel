@@ -62,8 +62,19 @@ private:
     // --- Setup ---
     void setupUi();
     void setupActions();
-    void bindApplicationSettings();
+    void setupMenus();
+    void setupControllers();
+    void setupChildWindows();
+
+    void applyInitialSettings();
+
     void setupConnections();
+    void setupUserActionsConnections();
+    void setupFileEventConnections();
+
+    void bindApplicationSettingsToController();
+    void bindApplicationSettingsToView();
+    void bindUiToApplicationSettings();
 
     void updateWindowTitle();
     void setCurrentFile(const QString& fileName);
@@ -113,7 +124,7 @@ private:
     static constexpr qsizetype kMaxRecentFiles = 5;
     std::array<QAction*, kMaxRecentFiles> recentFileActs_;
 
-    QAction* deleteAct_ = nullptr;
+    QAction* clearAct_ = nullptr;
     QAction* saveAct_ = nullptr;
     QAction* quitAct_ = nullptr;
 

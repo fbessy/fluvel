@@ -31,7 +31,7 @@ class CameraWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit CameraWindow(QWidget* parent = nullptr);
+    explicit CameraWindow(QWidget* parent);
 
 signals:
     void cameraWindowShown();
