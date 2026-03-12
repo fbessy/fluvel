@@ -9,6 +9,7 @@
 #include <QPainter>
 #include <QPushButton>
 #include <QSignalBlocker>
+#include <QString>
 
 namespace fluvel_app
 {
