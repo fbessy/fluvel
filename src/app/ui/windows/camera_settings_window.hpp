@@ -62,7 +62,7 @@ private:
 
     QDialogButtonBox* dialogButtons_ = nullptr;
 
-    // --- UI ---
+    // --- Model ---
     VideoSessionSettings config_;
 };
 
