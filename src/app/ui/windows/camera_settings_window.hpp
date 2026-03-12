@@ -7,6 +7,9 @@
 
 #include <QDialog>
 
+class QWidget;
+class QCloseEvent;
+
 class QDialogButtonBox;
 class QTabWidget;
 class QGroupBox;
@@ -39,20 +42,27 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    void setupUiDownscaleGb();
-    void updateUIFromConfig();
+    // --- Setup ---
 
+    void setupDownscaleGroup();
+    void updateUIFromConfig();
     void restoreToDefaults();
 
-    QDialogButtonBox* camDialButtons_ = nullptr;
+    // --- UI ---
+
     QTabWidget* tabs_ = nullptr;
-    AlgoSettingsWidget* algoWidget_ = nullptr;
-    QSpinBox* phasesSb_ = nullptr;
 
     QGroupBox* downscaleGb_ = nullptr;
     QComboBox* downscaleFactorCb_ = nullptr;
+
     QCheckBox* filterCb_ = nullptr;
 
+    AlgoSettingsWidget* algoWidget_ = nullptr;
+    QSpinBox* phasesSb_ = nullptr;
+
+    QDialogButtonBox* dialogButtons_ = nullptr;
+
+    // --- UI ---
     VideoSessionSettings config_;
 };
 

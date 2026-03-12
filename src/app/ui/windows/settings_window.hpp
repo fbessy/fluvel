@@ -182,7 +182,7 @@ private:
 
     /////////////////////////////////////////
 
-    QDialogButtonBox* dialButtons_ = nullptr;
+    QDialogButtonBox* dialogButtons_ = nullptr;
 
     ////////////////////////////////////////
     /////////    View - Controller    /////

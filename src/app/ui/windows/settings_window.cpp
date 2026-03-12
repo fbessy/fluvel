@@ -53,10 +53,10 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     // Dialog buttons
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    dialButtons_ = new QDialogButtonBox(this);
-    dialButtons_->addButton(QDialogButtonBox::Ok);
-    dialButtons_->addButton(QDialogButtonBox::Cancel);
-    dialButtons_->addButton(QDialogButtonBox::RestoreDefaults);
+    dialogButtons_ = new QDialogButtonBox(this);
+    dialogButtons_->addButton(QDialogButtonBox::Ok);
+    dialogButtons_->addButton(QDialogButtonBox::Cancel);
+    dialogButtons_->addButton(QDialogButtonBox::RestoreDefaults);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Tabs
@@ -105,7 +105,7 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     // Vertical root layout: content + buttons
     QVBoxLayout* root_layout = new QVBoxLayout;
     root_layout->addLayout(content_layout);
-    root_layout->addWidget(dialButtons_);
+    root_layout->addWidget(dialogButtons_);
 
     setLayout(root_layout);
 
@@ -566,11 +566,11 @@ void SettingsWindow::setupConnections()
 {
     // connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
 
-    connect(dialButtons_, &QDialogButtonBox::accepted, this, &SettingsWindow::accept);
+    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &SettingsWindow::accept);
 
-    connect(dialButtons_, &QDialogButtonBox::rejected, this, &SettingsWindow::reject);
+    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &SettingsWindow::reject);
 
-    auto* restoreBtn = dialButtons_->button(QDialogButtonBox::RestoreDefaults);
+    auto* restoreBtn = dialogButtons_->button(QDialogButtonBox::RestoreDefaults);
 
     connect(restoreBtn, &QPushButton::clicked, this, &SettingsWindow::restoreDefaults);
 

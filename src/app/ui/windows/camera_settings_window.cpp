@@ -36,10 +36,10 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
         resize(350, 650);
     }
 
-    camDialButtons_ = new QDialogButtonBox(this);
-    camDialButtons_->addButton(QDialogButtonBox::Ok);
-    camDialButtons_->addButton(QDialogButtonBox::Cancel);
-    camDialButtons_->addButton(QDialogButtonBox::RestoreDefaults);
+    dialogButtons_ = new QDialogButtonBox(this);
+    dialogButtons_->addButton(QDialogButtonBox::Ok);
+    dialogButtons_->addButton(QDialogButtonBox::Cancel);
+    dialogButtons_->addButton(QDialogButtonBox::RestoreDefaults);
 
     tabs_ = new QTabWidget(this);
 
@@ -49,7 +49,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
     tabBar->setUsesScrollButtons(false);
     tabBar->setElideMode(Qt::ElideNone);
 
-    setupUiDownscaleGb();
+    setupDownscaleGroup();
 
     filterCb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
 
@@ -83,21 +83,21 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
 
     auto* layout = new QVBoxLayout;
     layout->addWidget(tabs_);
-    layout->addWidget(camDialButtons_);
+    layout->addWidget(dialogButtons_);
 
     setLayout(layout);
 
     updateUIFromConfig();
 
-    connect(camDialButtons_, &QDialogButtonBox::accepted, this, &CameraSettingsWindow::accept);
+    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &CameraSettingsWindow::accept);
 
-    connect(camDialButtons_, &QDialogButtonBox::rejected, this, &CameraSettingsWindow::reject);
+    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &CameraSettingsWindow::reject);
 
-    connect(camDialButtons_->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
+    connect(dialogButtons_->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
             &CameraSettingsWindow::restoreToDefaults);
 }
 
-void CameraSettingsWindow::setupUiDownscaleGb()
+void CameraSettingsWindow::setupDownscaleGroup()
 {
     downscaleGb_ = new QGroupBox(tr("Downscale"));
     downscaleGb_->setCheckable(true);
