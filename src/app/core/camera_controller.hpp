@@ -38,7 +38,7 @@ public:
 
 signals:
     void cameraStarted(const QByteArray& deviceId);
-    void cameraStopped(const QByteArray& deviceId);
+    void cameraStopped();
     void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
 
     void frameSizeStr(const QString& str);

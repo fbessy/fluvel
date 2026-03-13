@@ -182,7 +182,7 @@ void CameraController::onCameraActiveChanged(bool active)
         return;
 
     if (!active)
-        emit cameraStopped(camera_->cameraDevice().id());
+        emit cameraStopped();
 }
 
 void CameraController::onVideoInputsChanged()

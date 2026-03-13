@@ -491,7 +491,7 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
     settings.setValue("camera/device", cameraSelector_->currentData().toByteArray());
 }
 
-void CameraWindow::onCameraStopped(const QByteArray&)
+void CameraWindow::onCameraStopped()
 {
     activeCameraId_.clear();
 

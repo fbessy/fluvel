@@ -56,7 +56,7 @@ private:
     void setupConnections();
 
     void onCameraStarted(const QByteArray& deviceId);
-    void onCameraStopped(const QByteArray& deviceId);
+    void onCameraStopped();
     void onCameraError(const QByteArray& deviceId, QCamera::Error error,
                        const QString& errorString);
 
