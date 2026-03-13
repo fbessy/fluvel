@@ -48,7 +48,7 @@ CameraController::~CameraController()
 
 bool CameraController::isActive() const
 {
-    return camera_ && camera_->isActive();
+    return streamStarted_;
 }
 
 void CameraController::start(const QByteArray& deviceId)
@@ -170,14 +170,10 @@ void CameraController::onCameraActiveChanged(bool active)
     if (!camera_)
         return;
 
-    if (active)
+    if (!active)
     {
-        frameStats_.reset();
-        statsTimer_->start();
-        emit cameraStarted(camera_->cameraDevice().id());
-    }
-    else
-    {
+        streamStarted_ = false;
+
         statsTimer_->stop();
         emit cameraStopped(camera_->cameraDevice().id());
     }
@@ -193,6 +189,19 @@ void CameraController::onCameraError(QCamera::Error error, const QString& errorS
 
 void CameraController::onVideoFrame(const QVideoFrame& frame)
 {
+    if (!frame.isValid())
+        return;
+
+    if (!streamStarted_)
+    {
+        streamStarted_ = true;
+
+        frameStats_.reset();
+        statsTimer_->start();
+
+        emit cameraStarted(camera_->cameraDevice().id());
+    }
+
     const qint64 recvTs = FrameClock::nowNs();
     frameStats_.frameReceived(recvTs);
     activeContourThread_.submitFrame(frame);

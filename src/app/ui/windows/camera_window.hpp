@@ -48,6 +48,7 @@ private:
     void createUi();
     static QIcon createActiveCameraIcon();
     static QIcon createEmptyCameraIcon();
+    static QIcon createErrorCameraIcon();
     void setupView();
     void setupController();
     void setupLayout();
@@ -100,6 +101,7 @@ private:
 
     QIcon activeCameraIcon_;
     QIcon emptyCameraIcon_;
+    QIcon errorCameraIcon_;
 };
 
 } // namespace fluvel_app

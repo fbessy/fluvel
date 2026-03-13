@@ -92,6 +92,11 @@ public slots:
     void updateTextOverlayVisibility();
     void clearOverlays();
 
+signals:
+    void imageClicked(int x, int y);
+    void frameDisplayed(qint64 receiveTs, qint64 displayTs);
+    void imageDropped(const QString& path);
+
 protected:
     void wheelEvent(QWheelEvent* event) override;
 
@@ -180,10 +185,7 @@ private:
 
     bool configUsed_ = false;
 
-signals:
-    void imageClicked(int x, int y);
-    void frameDisplayed(qint64 receiveTs, qint64 displayTs);
-    void imageDropped(const QString& path);
+    bool placeholderVisible_ = false;
 };
 
 } // namespace fluvel_app

@@ -80,6 +80,7 @@ void CameraWindow::createUi()
 
     activeCameraIcon_ = createActiveCameraIcon();
     emptyCameraIcon_ = createEmptyCameraIcon();
+    errorCameraIcon_ = createErrorCameraIcon();
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
                               ":/icons/toolbar/media-playback-start-symbolic.svg");
@@ -132,6 +133,25 @@ QIcon CameraWindow::createEmptyCameraIcon()
 {
     QPixmap pix(13, 13);
     pix.fill(Qt::transparent);
+    return QIcon(pix);
+}
+
+QIcon CameraWindow::createErrorCameraIcon()
+{
+    const int pixSize = 13;
+    const int ellipseSize = 11;
+
+    QPixmap pix(pixSize, pixSize);
+    pix.fill(Qt::transparent);
+
+    QPainter p(&pix);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    p.setBrush(QColor(255, 165, 0)); // orange
+    p.setPen(QPen(QColor(40, 40, 40), 1));
+
+    p.drawEllipse(1, 1, ellipseSize, ellipseSize);
+
     return QIcon(pix);
 }
 
@@ -440,8 +460,6 @@ void CameraWindow::startCamera()
     if (selectedId.isEmpty())
         return;
 
-    videoView_->showPlaceholder(false);
-
     cameraController_->start(selectedId);
 }
 
@@ -455,6 +473,7 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
 {
     currentCameraId_ = deviceId;
 
+    videoView_->showPlaceholder(false);
     connectFrameToView();
 
     int index = cameraSelector_->findData(deviceId);
@@ -471,10 +490,9 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
 
 void CameraWindow::onCameraStopped(const QByteArray&)
 {
-    disconnect(frameToViewConnection_);
-
     currentCameraId_.clear();
 
+    disconnect(frameToViewConnection_);
     videoView_->showPlaceholder(true);
 
     for (int i = 0; i < cameraSelector_->count(); ++i)
@@ -487,11 +505,17 @@ void CameraWindow::onCameraStopped(const QByteArray&)
     setWindowTitle(tr("Fluvel - Camera"));
 }
 
-void CameraWindow::onCameraError(const QByteArray&, QCamera::Error, const QString& errorString)
+void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
+                                 const QString& errorString)
 {
+    disconnect(frameToViewConnection_);
     videoView_->showPlaceholder(true);
 
     QMessageBox::warning(this, tr("Camera error"), errorString);
+
+    int index = cameraSelector_->findData(deviceId);
+    if (index >= 0)
+        cameraSelector_->setItemIcon(index, errorCameraIcon_);
 }
 
 } // namespace fluvel_app

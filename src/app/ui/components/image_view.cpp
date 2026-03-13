@@ -851,6 +851,9 @@ void ImageView::showPlaceholder(bool showEffect)
 {
     assert(blur_);
 
+    if (placeholderVisible_ == showEffect)
+        return;
+
     if (showEffect)
     {
         if (!lastDisplayedImage_.isNull())
@@ -869,6 +872,8 @@ void ImageView::showPlaceholder(bool showEffect)
         updateContourColors();
         blur_->setBlurRadius(0);
     }
+
+    placeholderVisible_ = showEffect;
 }
 
 void ImageView::notifyImageDropped(const QString& path)

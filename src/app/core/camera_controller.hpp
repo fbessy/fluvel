@@ -65,6 +65,8 @@ private:
     QTimer* statsTimer_ = nullptr;
 
     DisplayConfig displayConfig_;
+
+    bool streamStarted_{false};
 };
 
 } // namespace fluvel_app
