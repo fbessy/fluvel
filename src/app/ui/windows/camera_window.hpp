@@ -46,6 +46,8 @@ private:
     void setupWindow();
     void restoreSettings();
     void createUi();
+    static QIcon createActiveCameraIcon();
+    static QIcon createEmptyCameraIcon();
     void setupView();
     void setupController();
     void setupLayout();
@@ -95,6 +97,9 @@ private:
     QMetaObject::Connection frameToViewConnection_;
 
     QString deviceWindowTitle_;
+
+    QIcon activeCameraIcon_;
+    QIcon emptyCameraIcon_;
 };
 
 } // namespace fluvel_app

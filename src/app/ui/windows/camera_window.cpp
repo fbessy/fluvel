@@ -72,7 +72,14 @@ void CameraWindow::createUi()
     central_ = new QWidget(this);
 
     cameraSelector_ = new QComboBox(this);
+
+    // Adjust width to contents (needed when items have icons)
+    cameraSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cameraSelector_->setIconSize(QSize(13, 13));
     cameraSelector_->setEnabled(false);
+
+    activeCameraIcon_ = createActiveCameraIcon();
+    emptyCameraIcon_ = createEmptyCameraIcon();
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
                               ":/icons/toolbar/media-playback-start-symbolic.svg");
@@ -100,6 +107,32 @@ void CameraWindow::createUi()
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
     cameraSettingsWindow_ = new CameraSettingsWindow(this, config);
+}
+
+QIcon CameraWindow::createActiveCameraIcon()
+{
+    const int pixSize = 13;
+    const int ellipseSize = 11;
+
+    QPixmap pix(pixSize, pixSize);
+    pix.fill(Qt::transparent);
+
+    QPainter p(&pix);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    p.setBrush(QColor(0, 200, 0));
+    p.setPen(QPen(QColor(40, 40, 40), 1));
+
+    p.drawEllipse(1, 1, ellipseSize, ellipseSize);
+
+    return QIcon(pix);
+}
+
+QIcon CameraWindow::createEmptyCameraIcon()
+{
+    QPixmap pix(13, 13);
+    pix.fill(Qt::transparent);
+    return QIcon(pix);
 }
 
 void CameraWindow::setupView()
@@ -285,15 +318,23 @@ void CameraWindow::onFrameSizeStr(const QString& str)
 
 void CameraWindow::updateCameraList()
 {
-    assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_);
+    assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_ && cameraController_);
 
     const auto cameras = mediaDevices_->videoInputs();
-
     cameraSelector_->clear();
+    QIcon icon;
+    int index = 0;
 
     for (const auto& cam : cameras)
     {
-        cameraSelector_->addItem(cam.description(), cam.id());
+        if (cam.id() == currentCameraId_ && cameraController_->isActive())
+            icon = activeCameraIcon_;
+        else
+            icon = emptyCameraIcon_;
+
+        cameraSelector_->addItem(icon, cam.description(), cam.id());
+
+        ++index;
     }
 
     const bool hasCamera = !cameras.isEmpty();
@@ -393,20 +434,6 @@ void CameraWindow::connectFrameToView()
                                      videoView_, &ImageView::setImageAndContour);
 }
 
-void CameraWindow::onCameraStarted(const QByteArray& deviceId)
-{
-    connectFrameToView();
-
-    currentCameraId_ = deviceId;
-
-    toggleStreamingButton_->setText(tr("Stop"));
-    toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
-    toggleStreamingButton_->setIcon(stopIcon_);
-
-    QSettings settings;
-    settings.setValue("camera/device", currentCameraId_);
-}
-
 void CameraWindow::startCamera()
 {
     const QByteArray selectedId = cameraSelector_->currentData().toByteArray();
@@ -424,6 +451,24 @@ void CameraWindow::stopCamera()
         cameraController_->stop();
 }
 
+void CameraWindow::onCameraStarted(const QByteArray& deviceId)
+{
+    currentCameraId_ = deviceId;
+
+    connectFrameToView();
+
+    int index = cameraSelector_->findData(deviceId);
+    if (index >= 0)
+        cameraSelector_->setItemIcon(index, activeCameraIcon_);
+
+    toggleStreamingButton_->setText(tr("Stop"));
+    toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
+    toggleStreamingButton_->setIcon(stopIcon_);
+
+    QSettings settings;
+    settings.setValue("camera/device", currentCameraId_);
+}
+
 void CameraWindow::onCameraStopped(const QByteArray&)
 {
     disconnect(frameToViewConnection_);
@@ -431,6 +476,9 @@ void CameraWindow::onCameraStopped(const QByteArray&)
     currentCameraId_.clear();
 
     videoView_->showPlaceholder(true);
+
+    for (int i = 0; i < cameraSelector_->count(); ++i)
+        cameraSelector_->setItemIcon(i, emptyCameraIcon_);
 
     toggleStreamingButton_->setText(tr("Start"));
     toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
