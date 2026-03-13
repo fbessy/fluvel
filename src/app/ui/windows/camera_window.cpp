@@ -61,8 +61,6 @@ void CameraWindow::restoreSettings()
         restoreGeometry(settings.value("ui_geometry/camera_window").toByteArray());
     else
         resize(900, 600);
-
-    currentCameraId_ = settings.value("camera/device").toByteArray();
 }
 
 void CameraWindow::createUi()
@@ -343,10 +341,26 @@ void CameraWindow::updateCameraList()
     QSignalBlocker blocker(cameraSelector_);
 
     const auto cameras = mediaDevices_->videoInputs();
+
+    QByteArray newlyAddedCamera;
+    QList<QByteArray> currentIds;
+
     cameraSelector_->clear();
 
     for (const auto& cam : cameras)
-        cameraSelector_->addItem(emptyCameraIcon_, cam.description(), cam.id());
+    {
+        currentIds.append(cam.id());
+
+        if (!knownCameraIds_.contains(cam.id()))
+            newlyAddedCamera = cam.id();
+
+        const QIcon icon = (cam.id() == activeCameraId_) ? activeCameraIcon_ : emptyCameraIcon_;
+
+        cameraSelector_->addItem(icon, cam.description(), cam.id());
+    }
+
+    // mémoriser la nouvelle liste
+    knownCameraIds_ = currentIds;
 
     const bool hasCamera = !cameras.isEmpty();
     cameraSelector_->setEnabled(hasCamera);
@@ -358,19 +372,29 @@ void CameraWindow::updateCameraList()
         return;
     }
 
-    if (!currentCameraId_.isEmpty())
-    {
-        int index = cameraSelector_->findData(currentCameraId_);
+    int index = -1;
 
-        if (index >= 0)
-            cameraSelector_->setCurrentIndex(index);
-        else
-            cameraSelector_->setCurrentIndex(0);
-    }
-    else
+    // 1️⃣ caméra active
+    if (!activeCameraId_.isEmpty())
+        index = cameraSelector_->findData(activeCameraId_);
+
+    // 2️⃣ caméra nouvellement branchée
+    if (index < 0 && !newlyAddedCamera.isEmpty())
+        index = cameraSelector_->findData(newlyAddedCamera);
+
+    // 3️⃣ caméra sauvegardée
+    if (index < 0)
     {
-        cameraSelector_->setCurrentIndex(0);
+        QSettings settings;
+        QByteArray savedId = settings.value("camera/device").toByteArray();
+        index = cameraSelector_->findData(savedId);
     }
+
+    // 4️⃣ fallback
+    if (index < 0)
+        index = 0;
+
+    cameraSelector_->setCurrentIndex(index);
 }
 
 void CameraWindow::onToggleStreaming()
@@ -450,7 +474,7 @@ void CameraWindow::stopCamera()
 
 void CameraWindow::onCameraStarted(const QByteArray& deviceId)
 {
-    currentCameraId_ = deviceId;
+    activeCameraId_ = deviceId;
 
     videoView_->showPlaceholder(false);
     connectFrameToView();
@@ -464,12 +488,12 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
     toggleStreamingButton_->setIcon(stopIcon_);
 
     QSettings settings;
-    settings.setValue("camera/device", currentCameraId_);
+    settings.setValue("camera/device", cameraSelector_->currentData().toByteArray());
 }
 
 void CameraWindow::onCameraStopped(const QByteArray&)
 {
-    currentCameraId_.clear();
+    activeCameraId_.clear();
 
     disconnect(frameToViewConnection_);
     videoView_->showPlaceholder(true);

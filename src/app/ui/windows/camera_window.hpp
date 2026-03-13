@@ -91,7 +91,8 @@ private:
     DisplaySettingsWidget* displayBar_ = nullptr;
 
     QMediaDevices* mediaDevices_ = nullptr;
-    QByteArray currentCameraId_;
+    QByteArray activeCameraId_;
+    QList<QByteArray> knownCameraIds_;
 
     ImageView* videoView_ = nullptr;
     CameraController* cameraController_ = nullptr;
