@@ -385,8 +385,7 @@ void CameraWindow::updateCameraList()
     // 3️⃣ caméra sauvegardée
     if (index < 0)
     {
-        QSettings settings;
-        QByteArray savedId = settings.value("camera/device").toByteArray();
+        QByteArray savedId = loadSelectedCameraId();
         index = cameraSelector_->findData(savedId);
     }
 
@@ -416,6 +415,8 @@ void CameraWindow::showEvent(QShowEvent* event)
 void CameraWindow::closeEvent(QCloseEvent* event)
 {
     stopCamera();
+
+    saveSelectedCameraId();
 
     QSettings settings;
 
@@ -487,8 +488,7 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
     toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
     toggleStreamingButton_->setIcon(stopIcon_);
 
-    QSettings settings;
-    settings.setValue("camera/device", cameraSelector_->currentData().toByteArray());
+    saveSelectedCameraId();
 }
 
 void CameraWindow::onCameraStopped()
@@ -519,6 +519,20 @@ void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
     int index = cameraSelector_->findData(deviceId);
     if (index >= 0)
         cameraSelector_->setItemIcon(index, errorCameraIcon_);
+}
+
+static constexpr auto kCameraDeviceKey = "camera/device";
+
+QByteArray CameraWindow::loadSelectedCameraId()
+{
+    QSettings settings;
+    return settings.value(kCameraDeviceKey).toByteArray();
+}
+
+void CameraWindow::saveSelectedCameraId()
+{
+    QSettings settings;
+    settings.setValue(kCameraDeviceKey, cameraSelector_->currentData().toByteArray());
 }
 
 } // namespace fluvel_app

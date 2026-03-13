@@ -76,6 +76,9 @@ private:
     void startCamera();
     void stopCamera();
 
+    static QByteArray loadSelectedCameraId();
+    void saveSelectedCameraId();
+
     CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
 
     QWidget* central_ = new QWidget(this);
