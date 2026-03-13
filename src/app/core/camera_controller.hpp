@@ -8,10 +8,10 @@
 #include "video_active_contour_thread.hpp"
 
 #include <QByteArray>
+#include <QCamera>
 #include <QObject>
 #include <QtTypes>
 
-class QCamera;
 class QMediaCaptureSession;
 class QVideoSink;
 class QTimer;
@@ -37,12 +37,20 @@ public:
     void onFrameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
 
 signals:
+    void cameraStarted(const QByteArray& deviceId);
+    void cameraStopped(const QByteArray& deviceId);
+    void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
+
     void frameSizeStr(const QString& str);
     void textStatsUpdated(const QString& textStats);
     void imageAndContourUpdated(const QImage& img, const QVector<QPointF>& l_out,
                                 const QVector<QPointF>& l_in, qint64 receiveTs);
 
 private:
+    void onCameraActiveChanged(bool active);
+    void onCameraError(QCamera::Error error, const QString& errorString);
+    void onVideoFrame(const QVideoFrame& frame);
+
     void onFrameProcessed(quint64 contourSize);
     void onFrameResultReady(const FrameResult& result);
     void updateDiagnostics();

@@ -56,11 +56,14 @@ void CameraController::start(const QByteArray& deviceId)
     stop();
 
     const auto cameras = QMediaDevices::videoInputs();
+    bool isFound = false;
 
     for (const auto& cam : cameras)
     {
         if (cam.id() == deviceId)
         {
+            isFound = true;
+
             camera_ = new QCamera(cam, this);
             videoSink_ = new QVideoSink(this);
             captureSession_ = new QMediaCaptureSession(this);
@@ -68,47 +71,41 @@ void CameraController::start(const QByteArray& deviceId)
             captureSession_->setCamera(camera_);
             captureSession_->setVideoSink(videoSink_);
 
+            connect(camera_, &QCamera::activeChanged, this,
+                    &CameraController::onCameraActiveChanged);
+
+            connect(camera_, &QCamera::errorOccurred, this, &CameraController::onCameraError);
+
             connect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                    [this](const QVideoFrame& frame)
-                    {
-                        const qint64 recvTs = FrameClock::nowNs();
-                        frameStats_.frameReceived(recvTs);
-                        activeContourThread_.submitFrame(frame);
-                    });
+                    &CameraController::onVideoFrame);
 
             camera_->start();
-
-            frameStats_.reset();
-            statsTimer_->start();
-
-            return;
         }
     }
+
+    if (!isFound)
+        emit cameraError(deviceId, QCamera::CameraError, tr("Camera not found"));
 }
 
 void CameraController::stop()
 {
-    if (statsTimer_)
-        statsTimer_->stop();
+    statsTimer_->stop();
 
     if (camera_)
-    {
         camera_->stop();
-        camera_->deleteLater();
-        camera_ = nullptr;
-    }
-
-    if (videoSink_)
-    {
-        videoSink_->deleteLater();
-        videoSink_ = nullptr;
-    }
 
     if (captureSession_)
-    {
         captureSession_->deleteLater();
-        captureSession_ = nullptr;
-    }
+
+    if (videoSink_)
+        videoSink_->deleteLater();
+
+    if (camera_)
+        camera_->deleteLater();
+
+    camera_ = nullptr;
+    videoSink_ = nullptr;
+    captureSession_ = nullptr;
 }
 
 void CameraController::onFrameProcessed(quint64 contourSize)
@@ -166,6 +163,39 @@ void CameraController::onVideoSettingsChanged(const VideoSessionSettings& sessio
 void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
 {
     displayConfig_ = display;
+}
+
+void CameraController::onCameraActiveChanged(bool active)
+{
+    if (!camera_)
+        return;
+
+    if (active)
+    {
+        frameStats_.reset();
+        statsTimer_->start();
+        emit cameraStarted(camera_->cameraDevice().id());
+    }
+    else
+    {
+        statsTimer_->stop();
+        emit cameraStopped(camera_->cameraDevice().id());
+    }
+}
+
+void CameraController::onCameraError(QCamera::Error error, const QString& errorString)
+{
+    if (!camera_)
+        return;
+
+    emit cameraError(camera_->cameraDevice().id(), error, errorString);
+}
+
+void CameraController::onVideoFrame(const QVideoFrame& frame)
+{
+    const qint64 recvTs = FrameClock::nowNs();
+    frameStats_.frameReceived(recvTs);
+    activeContourThread_.submitFrame(frame);
 }
 
 } // namespace fluvel_app

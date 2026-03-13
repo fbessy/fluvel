@@ -849,32 +849,26 @@ QImage ImageView::darkenImage(const QImage& image)
 
 void ImageView::showPlaceholder(bool showEffect)
 {
-    if (!configUsed_)
-        return;
-
-    if (!blur_)
-        return;
+    assert(blur_);
 
     if (showEffect)
     {
-        setImage(darkenImage(lastDisplayedImage_));
-
-        pixmapItem_->update();
-        contentRoot_->update();
-        scene_->update();
+        if (!lastDisplayedImage_.isNull())
+            setImage(darkenImage(lastDisplayedImage_));
 
         if (l_out_)
             l_out_->setColor(desaturateAndDarken(toQColor(displayConfig_.l_out_color), 0.4, 0.6));
 
         if (l_in_)
             l_in_->setColor(desaturateAndDarken(toQColor(displayConfig_.l_in_color), 0.4, 0.6));
+
+        blur_->setBlurRadius(6);
     }
     else
     {
         updateContourColors();
+        blur_->setBlurRadius(0);
     }
-
-    blur_->setBlurRadius(showEffect ? 6 : 0);
 }
 
 void ImageView::notifyImageDropped(const QString& path)

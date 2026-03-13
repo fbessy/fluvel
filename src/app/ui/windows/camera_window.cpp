@@ -17,6 +17,7 @@
 #include <QCameraDevice>
 #include <QComboBox>
 #include <QMediaDevices>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
 #include <QVBoxLayout>
@@ -179,6 +180,14 @@ void CameraWindow::setupConnections()
     connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
             &CameraWindow::updateCameraList);
 
+    connect(cameraController_, &CameraController::cameraStarted, this,
+            &CameraWindow::onCameraStarted);
+
+    connect(cameraController_, &CameraController::cameraStopped, this,
+            &CameraWindow::onCameraStopped);
+
+    connect(cameraController_, &CameraController::cameraError, this, &CameraWindow::onCameraError);
+
     // --- Controller → View / Window updates ---
 
     connect(cameraController_, &CameraController::frameSizeStr, this,
@@ -187,7 +196,7 @@ void CameraWindow::setupConnections()
     connect(cameraController_, &CameraController::textStatsUpdated, videoView_,
             &ImageView::setText);
 
-    // ---  View -> Controller for display stats ---
+    // ---  View → Controller for display stats ---
 
     connect(videoView_, &ImageView::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
@@ -278,7 +287,7 @@ void CameraWindow::updateCameraList()
 {
     assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_);
 
-    auto cameras = mediaDevices_->videoInputs();
+    const auto cameras = mediaDevices_->videoInputs();
 
     cameraSelector_->clear();
 
@@ -294,8 +303,7 @@ void CameraWindow::updateCameraList()
     if (!hasCamera)
     {
         // plus aucune caméra disponible
-        stopCameraAndUi();
-        currentCameraId_.clear();
+        stopCamera();
         return;
     }
 
@@ -312,8 +320,7 @@ void CameraWindow::updateCameraList()
         else
         {
             // caméra débranchée à chaud
-            stopCameraAndUi();
-            currentCameraId_.clear();
+            stopCamera();
 
             // fallback propre : sélectionner la première dispo
             cameraSelector_->setCurrentIndex(0);
@@ -328,49 +335,12 @@ void CameraWindow::updateCameraList()
 
 void CameraWindow::onToggleStreaming()
 {
-    if (!cameraController_)
-        return;
+    assert(cameraController_);
 
     if (cameraController_->isActive())
-    {
-        stopCameraAndUi();
-    }
+        stopCamera();
     else
-    {
-        const QByteArray selectedId = cameraSelector_->currentData().toByteArray();
-
-        if (selectedId.isEmpty())
-            return;
-
-        currentCameraId_ = selectedId;
-
-        QSettings settings;
-        settings.setValue("camera/device", currentCameraId_);
-
-        videoView_->showPlaceholder(false);
-        connectFrameToView();
-        cameraController_->start(selectedId);
-
-        toggleStreamingButton_->setText(tr("Stop"));
-        toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
-        toggleStreamingButton_->setIcon(stopIcon_);
-    }
-}
-
-void CameraWindow::stopCameraAndUi()
-{
-    if (cameraController_ && cameraController_->isActive())
-    {
-        disconnect(frameConnection_);
-        cameraController_->stop();
-        videoView_->showPlaceholder(true);
-
-        toggleStreamingButton_->setText(tr("Start"));
-        toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
-        toggleStreamingButton_->setIcon(startIcon_);
-
-        setWindowTitle(tr("Fluvel - Camera"));
-    }
+        startCamera();
 }
 
 void CameraWindow::showEvent(QShowEvent* event)
@@ -381,7 +351,7 @@ void CameraWindow::showEvent(QShowEvent* event)
 
 void CameraWindow::closeEvent(QCloseEvent* event)
 {
-    stopCameraAndUi();
+    stopCamera();
 
     QSettings settings;
 
@@ -419,8 +389,61 @@ void CameraWindow::ensureCameraPermission()
 
 void CameraWindow::connectFrameToView()
 {
-    frameConnection_ = connect(cameraController_, &CameraController::imageAndContourUpdated,
-                               videoView_, &ImageView::setImageAndContour);
+    frameToViewConnection_ = connect(cameraController_, &CameraController::imageAndContourUpdated,
+                                     videoView_, &ImageView::setImageAndContour);
+}
+
+void CameraWindow::onCameraStarted(const QByteArray& deviceId)
+{
+    connectFrameToView();
+
+    currentCameraId_ = deviceId;
+
+    toggleStreamingButton_->setText(tr("Stop"));
+    toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
+    toggleStreamingButton_->setIcon(stopIcon_);
+
+    QSettings settings;
+    settings.setValue("camera/device", currentCameraId_);
+}
+
+void CameraWindow::startCamera()
+{
+    const QByteArray selectedId = cameraSelector_->currentData().toByteArray();
+    if (selectedId.isEmpty())
+        return;
+
+    videoView_->showPlaceholder(false);
+
+    cameraController_->start(selectedId);
+}
+
+void CameraWindow::stopCamera()
+{
+    if (cameraController_->isActive())
+        cameraController_->stop();
+}
+
+void CameraWindow::onCameraStopped(const QByteArray&)
+{
+    disconnect(frameToViewConnection_);
+
+    currentCameraId_.clear();
+
+    videoView_->showPlaceholder(true);
+
+    toggleStreamingButton_->setText(tr("Start"));
+    toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
+    toggleStreamingButton_->setIcon(startIcon_);
+
+    setWindowTitle(tr("Fluvel - Camera"));
+}
+
+void CameraWindow::onCameraError(const QByteArray&, QCamera::Error, const QString& errorString)
+{
+    videoView_->showPlaceholder(true);
+
+    QMessageBox::warning(this, tr("Camera error"), errorString);
 }
 
 } // namespace fluvel_app

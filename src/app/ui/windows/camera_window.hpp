@@ -6,6 +6,7 @@
 #include <QMainWindow>
 
 #include <QByteArray>
+#include <QCamera>
 #include <QIcon>
 #include <QMetaObject>
 #include <QString>
@@ -48,8 +49,13 @@ private:
     void setupView();
     void setupController();
     void setupLayout();
-    void setupConnections();
     void applyInitialSettings();
+    void setupConnections();
+
+    void onCameraStarted(const QByteArray& deviceId);
+    void onCameraStopped(const QByteArray& deviceId);
+    void onCameraError(const QByteArray& deviceId, QCamera::Error error,
+                       const QString& errorString);
 
     void updateCameraList();
     void onToggleStreaming();
@@ -59,11 +65,13 @@ private:
     void bindApplicationSettingsToView();
     void bindUiToApplicationSettings();
     void connectFrameToView();
-    void stopCameraAndUi();
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
 #endif
+
+    void startCamera();
+    void stopCamera();
 
     CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
 
@@ -84,7 +92,7 @@ private:
 
     ImageView* videoView_ = nullptr;
     CameraController* cameraController_ = nullptr;
-    QMetaObject::Connection frameConnection_;
+    QMetaObject::Connection frameToViewConnection_;
 
     QString deviceWindowTitle_;
 };
