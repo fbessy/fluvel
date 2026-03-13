@@ -380,13 +380,15 @@ void CameraWindow::updateCameraList()
     {
         index = cameraSelector_->findData(activeCameraId_);
     }
+
     // new plugged camera
-    else if (!newlyAddedCamera.isEmpty())
+    if (index < 0 && !newlyAddedCamera.isEmpty())
     {
         index = cameraSelector_->findData(newlyAddedCamera);
     }
+
     // saved selected camera
-    else
+    if (index < 0)
     {
         QByteArray savedId = loadSelectedCameraId();
         index = cameraSelector_->findData(savedId);
