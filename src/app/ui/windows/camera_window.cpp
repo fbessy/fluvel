@@ -344,6 +344,7 @@ void CameraWindow::updateCameraList()
 
     QByteArray newlyAddedCamera;
     QList<QByteArray> currentIds;
+    currentIds.reserve(cameras.size());
 
     cameraSelector_->clear();
 
@@ -374,22 +375,24 @@ void CameraWindow::updateCameraList()
 
     int index = -1;
 
-    // 1️⃣ caméra active
+    // active camera priority
     if (!activeCameraId_.isEmpty())
+    {
         index = cameraSelector_->findData(activeCameraId_);
-
-    // 2️⃣ caméra nouvellement branchée
-    if (index < 0 && !newlyAddedCamera.isEmpty())
+    }
+    // new plugged camera
+    else if (!newlyAddedCamera.isEmpty())
+    {
         index = cameraSelector_->findData(newlyAddedCamera);
-
-    // 3️⃣ caméra sauvegardée
-    if (index < 0)
+    }
+    // saved selected camera
+    else
     {
         QByteArray savedId = loadSelectedCameraId();
         index = cameraSelector_->findData(savedId);
     }
 
-    // 4️⃣ fallback
+    // fallback
     if (index < 0)
         index = 0;
 
