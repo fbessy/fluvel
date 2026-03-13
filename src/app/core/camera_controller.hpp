@@ -47,6 +47,7 @@ signals:
                                 const QVector<QPointF>& l_in, qint64 receiveTs);
 
 private:
+    void onVideoInputsChanged();
     void onCameraActiveChanged(bool active);
     void onCameraError(QCamera::Error error, const QString& errorString);
     void onVideoFrame(const QVideoFrame& frame);
@@ -67,6 +68,7 @@ private:
     DisplayConfig displayConfig_;
 
     bool streamStarted_{false};
+    QByteArray activeDeviceId_;
 };
 
 } // namespace fluvel_app

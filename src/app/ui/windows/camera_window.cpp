@@ -338,24 +338,15 @@ void CameraWindow::onFrameSizeStr(const QString& str)
 
 void CameraWindow::updateCameraList()
 {
-    assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_ && cameraController_);
+    assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_);
+
+    QSignalBlocker blocker(cameraSelector_);
 
     const auto cameras = mediaDevices_->videoInputs();
     cameraSelector_->clear();
-    QIcon icon;
-    int index = 0;
 
     for (const auto& cam : cameras)
-    {
-        if (cam.id() == currentCameraId_ && cameraController_->isActive())
-            icon = activeCameraIcon_;
-        else
-            icon = emptyCameraIcon_;
-
-        cameraSelector_->addItem(icon, cam.description(), cam.id());
-
-        ++index;
-    }
+        cameraSelector_->addItem(emptyCameraIcon_, cam.description(), cam.id());
 
     const bool hasCamera = !cameras.isEmpty();
     cameraSelector_->setEnabled(hasCamera);
@@ -363,33 +354,21 @@ void CameraWindow::updateCameraList()
 
     if (!hasCamera)
     {
-        // plus aucune caméra disponible
-        stopCamera();
+        cameraSelector_->setCurrentIndex(-1);
         return;
     }
 
-    // 🔎 Vérifier si la caméra active existe encore
     if (!currentCameraId_.isEmpty())
     {
         int index = cameraSelector_->findData(currentCameraId_);
 
         if (index >= 0)
-        {
-            // caméra toujours présente → restaurer sélection
             cameraSelector_->setCurrentIndex(index);
-        }
         else
-        {
-            // caméra débranchée à chaud
-            stopCamera();
-
-            // fallback propre : sélectionner la première dispo
             cameraSelector_->setCurrentIndex(0);
-        }
     }
     else
     {
-        // aucun historique → sélectionner première caméra
         cameraSelector_->setCurrentIndex(0);
     }
 }

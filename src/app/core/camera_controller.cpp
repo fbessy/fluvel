@@ -19,6 +19,11 @@ CameraController::CameraController(const VideoSessionSettings& session, QObject*
     : QObject(parent)
     , activeContourThread_(this)
 {
+    auto mediaDevices = new QMediaDevices(this);
+
+    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this,
+            &CameraController::onVideoInputsChanged);
+
     onVideoSettingsChanged(session);
     onVideoDisplaySettingsChanged(session.display);
 
@@ -65,6 +70,8 @@ void CameraController::start(const QByteArray& deviceId)
             isFound = true;
 
             camera_ = new QCamera(cam, this);
+            activeDeviceId_ = cam.id();
+
             videoSink_ = new QVideoSink(this);
             captureSession_ = new QMediaCaptureSession(this);
 
@@ -80,6 +87,8 @@ void CameraController::start(const QByteArray& deviceId)
                     &CameraController::onVideoFrame);
 
             camera_->start();
+
+            break;
         }
     }
 
@@ -89,6 +98,8 @@ void CameraController::start(const QByteArray& deviceId)
 
 void CameraController::stop()
 {
+    streamStarted_ = false;
+    activeDeviceId_.clear();
     statsTimer_->stop();
 
     if (camera_)
@@ -171,11 +182,25 @@ void CameraController::onCameraActiveChanged(bool active)
         return;
 
     if (!active)
-    {
-        streamStarted_ = false;
-
-        statsTimer_->stop();
         emit cameraStopped(camera_->cameraDevice().id());
+}
+
+void CameraController::onVideoInputsChanged()
+{
+    if (activeDeviceId_.isEmpty())
+        return;
+
+    auto inputs = QMediaDevices::videoInputs();
+
+    bool cameraStillExists = std::any_of(inputs.begin(), inputs.end(),
+                                         [&](const QCameraDevice& dev)
+                                         {
+                                             return dev.id() == activeDeviceId_;
+                                         });
+
+    if (!cameraStillExists)
+    {
+        stop();
     }
 }
 
@@ -195,11 +220,10 @@ void CameraController::onVideoFrame(const QVideoFrame& frame)
     if (!streamStarted_)
     {
         streamStarted_ = true;
-
         frameStats_.reset();
         statsTimer_->start();
 
-        emit cameraStarted(camera_->cameraDevice().id());
+        emit cameraStarted(activeDeviceId_);
     }
 
     const qint64 recvTs = FrameClock::nowNs();
