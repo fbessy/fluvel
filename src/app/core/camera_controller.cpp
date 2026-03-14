@@ -86,6 +86,9 @@ void CameraController::start(const QByteArray& deviceId)
             connect(videoSink_, &QVideoSink::videoFrameChanged, this,
                     &CameraController::onVideoFrame);
 
+#ifdef FLUVEL_SIMULATE_STREAM_LOSS
+            testFrameCounter_ = 0;
+#endif
             camera_->start();
 
             break;
@@ -225,6 +228,11 @@ void CameraController::onVideoFrame(const QVideoFrame& frame)
 {
     if (!frame.isValid())
         return;
+
+#ifdef FLUVEL_SIMULATE_STREAM_LOSS
+    if (++testFrameCounter_ > 90) // after ~3 seconds if 30 fps
+        return;
+#endif
 
     const qint64 receivedTs = FrameClock::nowNs();
     lastValidFrameTsNs_ = receivedTs;

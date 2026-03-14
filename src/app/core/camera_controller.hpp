@@ -12,6 +12,8 @@
 #include <QObject>
 #include <QtTypes>
 
+// #define FLUVEL_SIMULATE_STREAM_LOSS
+
 class QMediaCaptureSession;
 class QVideoSink;
 class QTimer;
@@ -76,6 +78,10 @@ private:
 
     //! Timeout used to detect loss of video stream.
     static constexpr qint64 kStreamLossTimeoutNs = 2'000'000'000;
+
+#ifdef FLUVEL_SIMULATE_STREAM_LOSS
+    int testFrameCounter_ = 0;
+#endif
 };
 
 } // namespace fluvel_app
