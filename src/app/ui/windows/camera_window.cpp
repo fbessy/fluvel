@@ -74,7 +74,6 @@ void CameraWindow::createUi()
     // Adjust width to contents (needed when items have icons)
     cameraSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cameraSelector_->setIconSize(QSize(13, 13));
-    cameraSelector_->setEnabled(false);
 
     activeCameraIcon_ = createActiveCameraIcon();
     emptyCameraIcon_ = createEmptyCameraIcon();
@@ -86,10 +85,7 @@ void CameraWindow::createUi()
     stopIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop, QStyle::SP_MediaStop,
                              ":/icons/toolbar/media-playback-stop-symbolic.svg");
 
-    toggleStreamingButton_ = new QPushButton(tr("Start"));
-    toggleStreamingButton_->setEnabled(false);
-    toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
-    toggleStreamingButton_->setIcon(startIcon_);
+    toggleStreamingButton_ = new QPushButton(tr("---"));
 
     rightPanelToggle_ = new RightPanelToggleButton;
 
@@ -269,6 +265,10 @@ void CameraWindow::setupConnections()
 
                 displayBar_->updatePipelineAvailability(hasPreprocessing);
             });
+
+    // refresh button in function of user action
+    connect(cameraSelector_, &QComboBox::currentIndexChanged, this,
+            &CameraWindow::updateStreamingButton);
 }
 
 void CameraWindow::applyInitialSettings()
@@ -284,6 +284,7 @@ void CameraWindow::applyInitialSettings()
     displayBar_->updatePipelineAvailability(preprocessing);
 
     updateCameraList();
+    updateStreamingButton();
 }
 
 void CameraWindow::bindApplicationSettingsToController()
@@ -342,17 +343,16 @@ void CameraWindow::updateCameraList()
 
     const auto cameras = mediaDevices_->videoInputs();
 
-    QByteArray newlyAddedCamera;
-    QList<QByteArray> currentIds;
-    currentIds.reserve(cameras.size());
+    QByteArray newlyAddedCamera{};
+    QSet<QByteArray> currentIds;
 
     cameraSelector_->clear();
 
     for (const auto& cam : cameras)
     {
-        currentIds.append(cam.id());
+        currentIds.insert(cam.id());
 
-        if (!knownCameraIds_.contains(cam.id()))
+        if (!knownCameraIds_.isEmpty() && !knownCameraIds_.contains(cam.id()))
             newlyAddedCamera = cam.id();
 
         const QIcon icon = (cam.id() == activeCameraId_) ? activeCameraIcon_ : emptyCameraIcon_;
@@ -360,55 +360,72 @@ void CameraWindow::updateCameraList()
         cameraSelector_->addItem(icon, cam.description(), cam.id());
     }
 
-    // mémoriser la nouvelle liste
     knownCameraIds_ = currentIds;
 
     const bool hasCamera = !cameras.isEmpty();
-    cameraSelector_->setEnabled(hasCamera);
-    toggleStreamingButton_->setEnabled(hasCamera);
 
-    if (!hasCamera)
-    {
-        cameraSelector_->setCurrentIndex(-1);
-        return;
-    }
+    setCameraControlsEnabled(hasCamera);
+
+    int currentIndex = -1;
+
+    if (hasCamera)
+        currentIndex = computeBestCameraIndex(newlyAddedCamera);
+
+    cameraSelector_->setCurrentIndex(currentIndex);
+}
+
+int CameraWindow::computeBestCameraIndex(const QByteArray& newlyAddedCamera)
+{
+    assert(cameraSelector_);
 
     int index = -1;
 
-    // active camera priority
     if (!activeCameraId_.isEmpty())
-    {
         index = cameraSelector_->findData(activeCameraId_);
-    }
 
-    // new plugged camera
     if (index < 0 && !newlyAddedCamera.isEmpty())
-    {
         index = cameraSelector_->findData(newlyAddedCamera);
-    }
 
-    // saved selected camera
     if (index < 0)
-    {
-        QByteArray savedId = loadSelectedCameraId();
-        index = cameraSelector_->findData(savedId);
-    }
+        index = cameraSelector_->findData(loadSelectedCameraId());
 
-    // fallback
     if (index < 0)
         index = 0;
 
-    cameraSelector_->setCurrentIndex(index);
+    return index;
+}
+
+void CameraWindow::setCameraControlsEnabled(bool enabled)
+{
+    assert(cameraSelector_ && toggleStreamingButton_);
+
+    cameraSelector_->setEnabled(enabled);
+    toggleStreamingButton_->setEnabled(enabled);
 }
 
 void CameraWindow::onToggleStreaming()
 {
-    assert(cameraController_);
+    assert(cameraSelector_ && cameraController_);
 
-    if (cameraController_->isActive())
-        stopCamera();
-    else
+    if (cameraSelector_->currentIndex() < 0)
+        return;
+
+    QByteArray selected = cameraSelector_->currentData().toByteArray();
+
+    if (!cameraController_->isActive())
+    {
         startCamera();
+    }
+    else if (selected == activeCameraId_)
+    {
+        stopCamera();
+    }
+    else
+    {
+        switchingInProgress_ = true;
+        stopCamera();
+        startCamera();
+    }
 }
 
 void CameraWindow::showEvent(QShowEvent* event)
@@ -482,33 +499,37 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
 {
     activeCameraId_ = deviceId;
 
-    videoView_->showPlaceholder(false);
-    connectFrameToView();
+    if (!switchingInProgress_)
+    {
+        videoView_->showPlaceholder(false);
+        connectFrameToView();
+    }
 
     int index = cameraSelector_->findData(deviceId);
     if (index >= 0)
         cameraSelector_->setItemIcon(index, activeCameraIcon_);
 
-    toggleStreamingButton_->setText(tr("Stop"));
-    toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
-    toggleStreamingButton_->setIcon(stopIcon_);
+    updateStreamingButton();
 
     saveSelectedCameraId();
+
+    switchingInProgress_ = false;
 }
 
 void CameraWindow::onCameraStopped()
 {
     activeCameraId_.clear();
 
-    disconnect(frameToViewConnection_);
-    videoView_->showPlaceholder(true);
+    if (!switchingInProgress_)
+    {
+        disconnect(frameToViewConnection_);
+        videoView_->showPlaceholder(true);
+
+        updateStreamingButton();
+    }
 
     for (int i = 0; i < cameraSelector_->count(); ++i)
         cameraSelector_->setItemIcon(i, emptyCameraIcon_);
-
-    toggleStreamingButton_->setText(tr("Start"));
-    toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
-    toggleStreamingButton_->setIcon(startIcon_);
 
     setWindowTitle(tr("Fluvel - Camera"));
 }
@@ -538,6 +559,32 @@ void CameraWindow::saveSelectedCameraId()
 {
     QSettings settings;
     settings.setValue(kCameraDeviceKey, cameraSelector_->currentData().toByteArray());
+}
+
+void CameraWindow::updateStreamingButton()
+{
+    if (!cameraController_->isActive())
+    {
+        toggleStreamingButton_->setText(tr("Start"));
+        toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
+        toggleStreamingButton_->setIcon(startIcon_);
+        return;
+    }
+
+    QByteArray selected = cameraSelector_->currentData().toByteArray();
+
+    if (selected == activeCameraId_)
+    {
+        toggleStreamingButton_->setText(tr("Stop"));
+        toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
+        toggleStreamingButton_->setIcon(stopIcon_);
+    }
+    else
+    {
+        toggleStreamingButton_->setText(tr("Switch"));
+        toggleStreamingButton_->setToolTip(tr("Switch to selected camera."));
+        toggleStreamingButton_->setIcon(startIcon_);
+    }
 }
 
 } // namespace fluvel_app

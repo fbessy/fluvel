@@ -9,6 +9,7 @@
 #include <QCamera>
 #include <QIcon>
 #include <QMetaObject>
+#include <QSet>
 #include <QString>
 
 class QWidget;
@@ -61,7 +62,10 @@ private:
                        const QString& errorString);
 
     void updateCameraList();
+    int computeBestCameraIndex(const QByteArray& newlyAddedCamera);
+    void setCameraControlsEnabled(bool enabled);
     void onToggleStreaming();
+    void updateStreamingButton();
     void onFrameSizeStr(const QString& str);
 
     void bindApplicationSettingsToController();
@@ -95,7 +99,7 @@ private:
 
     QMediaDevices* mediaDevices_ = nullptr;
     QByteArray activeCameraId_;
-    QList<QByteArray> knownCameraIds_;
+    QSet<QByteArray> knownCameraIds_;
 
     ImageView* videoView_ = nullptr;
     CameraController* cameraController_ = nullptr;
@@ -106,6 +110,8 @@ private:
     QIcon activeCameraIcon_;
     QIcon emptyCameraIcon_;
     QIcon errorCameraIcon_;
+
+    bool switchingInProgress_ = false;
 };
 
 } // namespace fluvel_app
