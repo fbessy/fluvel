@@ -258,12 +258,12 @@ void ImageWindow::setupActions()
     QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent, QStyle::SP_DirOpenIcon,
                                     ":/icons/toolbar/document-open-recent-symbolic.svg");
 
-    for (int i = 0; i < kMaxRecentFiles; ++i)
+    for (auto& act : recentFileActs_)
     {
-        recentFileActs_[i] = new QAction(this);
-        recentFileActs_[i]->setVisible(false);
+        act = new QAction(this);
+        act->setVisible(false);
 
-        recentFileActs_[i]->setIcon(recentIcon);
+        act->setIcon(recentIcon);
     }
 
     analysisAct_ = new QAction(tr("&Analysis"), this);
@@ -308,9 +308,9 @@ void ImageWindow::setupMenus()
     fileMenu_->addAction(openAct_);
 
     separatorAct_ = fileMenu_->addSeparator();
-    for (int i = 0; i < kMaxRecentFiles; ++i)
+    for (auto& act : recentFileActs_)
     {
-        fileMenu_->addAction(recentFileActs_[i]);
+        fileMenu_->addAction(act);
     }
 
     fileMenu_->addAction(clearAct_);
@@ -504,12 +504,12 @@ void ImageWindow::setupUserActionsConnections()
                     emit fileSelected(fileName);
             });
 
-    for (int i = 0; i < kMaxRecentFiles; ++i)
+    for (auto* act : recentFileActs_)
     {
-        connect(recentFileActs_[i], &QAction::triggered, this,
-                [this, act = recentFileActs_[i]]()
+        connect(act, &QAction::triggered, this,
+                [this, act]()
                 {
-                    QString fileName = act->data().toString();
+                    const QString fileName = act->data().toString();
                     if (!fileName.isEmpty())
                         emit fileSelected(fileName);
                 });
@@ -581,22 +581,26 @@ void ImageWindow::setCurrentFile(const QString& fileName)
 void ImageWindow::updateRecentFileActions()
 {
     QSettings settings;
-    QStringList files = settings.value("history/recent_files").toStringList();
+    const auto files = settings.value("history/recent_files").toStringList();
 
-    qsizetype numRecentFiles = qMin(files.size(), kMaxRecentFiles);
+    const std::size_t numRecentFiles =
+        std::min<std::size_t>(static_cast<std::size_t>(files.size()), kMaxRecentFiles);
 
-    for (qsizetype i = 0; i < numRecentFiles; ++i)
+    for (std::size_t i = 0; i < numRecentFiles; ++i)
     {
-        QString text = tr("&%1").arg(strippedName(files[i]));
+        const QString& file = files[static_cast<qsizetype>(i)];
+
+        QString text = tr("&%1").arg(strippedName(file));
+
         recentFileActs_[i]->setText(text);
-        recentFileActs_[i]->setData(files[i]);
+        recentFileActs_[i]->setData(file);
         recentFileActs_[i]->setVisible(true);
-        recentFileActs_[i]->setStatusTip(files[i]);
+        recentFileActs_[i]->setStatusTip(file);
     }
 
-    for (qsizetype j = numRecentFiles; j < kMaxRecentFiles; ++j)
+    for (auto& act : recentFileActs_)
     {
-        recentFileActs_[j]->setVisible(false);
+        act->setVisible(false);
     }
 
     separatorAct_->setVisible(numRecentFiles > 0);
