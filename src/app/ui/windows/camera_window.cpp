@@ -497,6 +497,7 @@ void CameraWindow::ensureCameraPermission()
 
 void CameraWindow::connectFrameToView()
 {
+    disconnect(frameToViewConnection_);
     frameToViewConnection_ = connect(cameraController_, &CameraController::imageAndContourUpdated,
                                      videoView_, &ImageView::setImageAndContour);
 }
