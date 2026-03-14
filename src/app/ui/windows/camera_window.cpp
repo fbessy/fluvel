@@ -85,7 +85,7 @@ void CameraWindow::createUi()
     stopIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop, QStyle::SP_MediaStop,
                              ":/icons/toolbar/media-playback-stop-symbolic.svg");
 
-    toggleStreamingButton_ = new QPushButton(tr("---"));
+    toggleStreamingButton_ = new QPushButton;
 
     rightPanelToggle_ = new RightPanelToggleButton;
 
@@ -235,6 +235,9 @@ void CameraWindow::setupConnections()
 
     connect(cameraController_, &CameraController::cameraError, this, &CameraWindow::onCameraError);
 
+    connect(cameraController_, &CameraController::streamingLost, this,
+            &CameraWindow::onStreamingLost);
+
     // --- Controller → View / Window updates ---
 
     connect(cameraController_, &CameraController::frameSizeStr, this,
@@ -283,8 +286,7 @@ void CameraWindow::applyInitialSettings()
 
     displayBar_->updatePipelineAvailability(preprocessing);
 
-    updateCameraList();
-    updateStreamingButton();
+    refreshUi();
 }
 
 void CameraWindow::bindApplicationSettingsToController()
@@ -346,18 +348,28 @@ void CameraWindow::updateCameraList()
     QByteArray newlyAddedCamera{};
     QSet<QByteArray> currentIds;
 
+    const QByteArray previousSelection = cameraSelector_->currentData().toByteArray();
     cameraSelector_->clear();
 
     for (const auto& cam : cameras)
     {
-        currentIds.insert(cam.id());
+        const auto camId = cam.id();
 
-        if (!knownCameraIds_.isEmpty() && !knownCameraIds_.contains(cam.id()))
-            newlyAddedCamera = cam.id();
+        currentIds.insert(camId);
 
-        const QIcon icon = (cam.id() == activeCameraId_) ? activeCameraIcon_ : emptyCameraIcon_;
+        if (!knownCameraIds_.isEmpty() && !knownCameraIds_.contains(camId))
+            newlyAddedCamera = camId;
 
-        cameraSelector_->addItem(icon, cam.description(), cam.id());
+        QIcon icon = emptyCameraIcon_;
+
+        const auto state = cameraStates_.value(camId, CameraState::Normal);
+
+        if (state == CameraState::Active)
+            icon = activeCameraIcon_;
+        else if (state == CameraState::Error)
+            icon = errorCameraIcon_;
+
+        cameraSelector_->addItem(icon, cam.description(), camId);
     }
 
     knownCameraIds_ = currentIds;
@@ -369,26 +381,35 @@ void CameraWindow::updateCameraList()
     int currentIndex = -1;
 
     if (hasCamera)
-        currentIndex = computeBestCameraIndex(newlyAddedCamera);
+        currentIndex = computeBestCameraIndex(previousSelection, newlyAddedCamera);
 
     cameraSelector_->setCurrentIndex(currentIndex);
 }
 
-int CameraWindow::computeBestCameraIndex(const QByteArray& newlyAddedCamera)
+int CameraWindow::computeBestCameraIndex(const QByteArray& previousSelection,
+                                         const QByteArray& newlyPlugged)
 {
     assert(cameraSelector_);
 
     int index = -1;
 
-    if (!activeCameraId_.isEmpty())
+    // 1 newly plugged camera
+    if (index < 0 && !newlyPlugged.isEmpty())
+        index = cameraSelector_->findData(newlyPlugged);
+
+    // 2 user's previous selection
+    if (index < 0 && !previousSelection.isEmpty())
+        index = cameraSelector_->findData(previousSelection);
+
+    // 3 active camera
+    if (index < 0 && !activeCameraId_.isEmpty())
         index = cameraSelector_->findData(activeCameraId_);
 
-    if (index < 0 && !newlyAddedCamera.isEmpty())
-        index = cameraSelector_->findData(newlyAddedCamera);
-
+    // 4 saved camera
     if (index < 0)
         index = cameraSelector_->findData(loadSelectedCameraId());
 
+    // 5 fallback
     if (index < 0)
         index = 0;
 
@@ -498,6 +519,7 @@ void CameraWindow::stopCamera()
 void CameraWindow::onCameraStarted(const QByteArray& deviceId)
 {
     activeCameraId_ = deviceId;
+    cameraStates_[deviceId] = CameraState::Active;
 
     if (!switchingInProgress_)
     {
@@ -505,12 +527,7 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
         connectFrameToView();
     }
 
-    int index = cameraSelector_->findData(deviceId);
-    if (index >= 0)
-        cameraSelector_->setItemIcon(index, activeCameraIcon_);
-
-    updateStreamingButton();
-
+    refreshUi();
     saveSelectedCameraId();
 
     switchingInProgress_ = false;
@@ -518,6 +535,12 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
 
 void CameraWindow::onCameraStopped()
 {
+    if (!activeCameraId_.isEmpty())
+    {
+        if (cameraStates_[activeCameraId_] == CameraState::Active)
+            cameraStates_[activeCameraId_] = CameraState::Normal;
+    }
+
     activeCameraId_.clear();
 
     if (!switchingInProgress_)
@@ -525,11 +548,8 @@ void CameraWindow::onCameraStopped()
         disconnect(frameToViewConnection_);
         videoView_->showPlaceholder(true);
 
-        updateStreamingButton();
+        refreshUi();
     }
-
-    for (int i = 0; i < cameraSelector_->count(); ++i)
-        cameraSelector_->setItemIcon(i, emptyCameraIcon_);
 
     setWindowTitle(tr("Fluvel - Camera"));
 }
@@ -542,9 +562,33 @@ void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
 
     QMessageBox::warning(this, tr("Camera error"), errorString);
 
-    int index = cameraSelector_->findData(deviceId);
-    if (index >= 0)
-        cameraSelector_->setItemIcon(index, errorCameraIcon_);
+    cameraStates_[deviceId] = CameraState::Error;
+
+    // un switch raté devient un stop
+    if (switchingInProgress_)
+    {
+        switchingInProgress_ = false;
+        activeCameraId_.clear();
+    }
+
+    refreshUi();
+}
+
+void CameraWindow::onStreamingLost(const QByteArray& deviceId, qint64 timeoutNs)
+{
+    disconnect(frameToViewConnection_);
+    videoView_->showPlaceholder(true);
+
+    const double timeoutSec = static_cast<double>(timeoutNs) / 1e9;
+
+    QMessageBox::warning(
+        this, tr("Camera stream lost"),
+        tr("No valid frame received for %1 seconds.\nThe camera stream may have stalled.")
+            .arg(timeoutSec, 0, 'f', 1));
+
+    cameraStates_[deviceId] = CameraState::Error;
+
+    refreshUi();
 }
 
 static constexpr auto kCameraDeviceKey = "camera/device";
@@ -585,6 +629,12 @@ void CameraWindow::updateStreamingButton()
         toggleStreamingButton_->setToolTip(tr("Switch to selected camera."));
         toggleStreamingButton_->setIcon(startIcon_);
     }
+}
+
+void CameraWindow::refreshUi()
+{
+    updateCameraList();
+    updateStreamingButton();
 }
 
 } // namespace fluvel_app

@@ -40,6 +40,7 @@ signals:
     void cameraStarted(const QByteArray& deviceId);
     void cameraStopped();
     void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
+    void streamingLost(const QByteArray& deviceId, qint64 timeoutNs);
 
     void frameSizeStr(const QString& str);
     void textStatsUpdated(const QString& textStats);
@@ -69,6 +70,12 @@ private:
 
     bool streamStarted_{false};
     QByteArray activeDeviceId_;
+
+    //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.
+    qint64 lastValidFrameTsNs_;
+
+    //! Timeout used to detect loss of video stream.
+    static constexpr qint64 kStreamLossTimeoutNs = 2'000'000'000;
 };
 
 } // namespace fluvel_app

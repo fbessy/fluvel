@@ -29,6 +29,13 @@ class DisplaySettingsWidget;
 class ImageView;
 class CameraController;
 
+enum class CameraState
+{
+    Normal,
+    Active,
+    Error
+};
+
 class CameraWindow : public QMainWindow
 {
     Q_OBJECT
@@ -55,23 +62,26 @@ private:
     void setupLayout();
     void applyInitialSettings();
     void setupConnections();
+    void bindApplicationSettingsToController();
+    void bindApplicationSettingsToView();
+    void bindUiToApplicationSettings();
+    void connectFrameToView();
+
+    void updateCameraList();
+    int computeBestCameraIndex(const QByteArray& previousSelection, const QByteArray& newlyPlugged);
+    void setCameraControlsEnabled(bool enabled);
+    void updateStreamingButton();
+    void refreshUi();
+
+    void onToggleStreaming();
 
     void onCameraStarted(const QByteArray& deviceId);
     void onCameraStopped();
     void onCameraError(const QByteArray& deviceId, QCamera::Error error,
                        const QString& errorString);
+    void onStreamingLost(const QByteArray& deviceId, qint64 timeoutNs);
 
-    void updateCameraList();
-    int computeBestCameraIndex(const QByteArray& newlyAddedCamera);
-    void setCameraControlsEnabled(bool enabled);
-    void onToggleStreaming();
-    void updateStreamingButton();
     void onFrameSizeStr(const QString& str);
-
-    void bindApplicationSettingsToController();
-    void bindApplicationSettingsToView();
-    void bindUiToApplicationSettings();
-    void connectFrameToView();
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
@@ -112,6 +122,8 @@ private:
     QIcon errorCameraIcon_;
 
     bool switchingInProgress_ = false;
+
+    QHash<QByteArray, CameraState> cameraStates_;
 };
 
 } // namespace fluvel_app

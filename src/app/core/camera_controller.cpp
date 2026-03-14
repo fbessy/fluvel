@@ -147,6 +147,15 @@ void CameraController::onFrameResultReady(const FrameResult& result)
 
 void CameraController::updateDiagnostics()
 {
+    const qint64 now = FrameClock::nowNs();
+
+    if (streamStarted_ && now - lastValidFrameTsNs_ > kStreamLossTimeoutNs)
+    {
+        emit streamingLost(activeDeviceId_, kStreamLossTimeoutNs);
+        stop();
+        return;
+    }
+
     auto snap = frameStats_.snapshot();
 
     CameraStats stats{snap.inputFps,     snap.processingFps, snap.displayFps,    snap.dropRate,
@@ -217,6 +226,9 @@ void CameraController::onVideoFrame(const QVideoFrame& frame)
     if (!frame.isValid())
         return;
 
+    const qint64 receivedTs = FrameClock::nowNs();
+    lastValidFrameTsNs_ = receivedTs;
+
     if (!streamStarted_)
     {
         streamStarted_ = true;
@@ -226,8 +238,7 @@ void CameraController::onVideoFrame(const QVideoFrame& frame)
         emit cameraStarted(activeDeviceId_);
     }
 
-    const qint64 recvTs = FrameClock::nowNs();
-    frameStats_.frameReceived(recvTs);
+    frameStats_.frameReceived(receivedTs);
     activeContourThread_.submitFrame(frame);
 }
 
