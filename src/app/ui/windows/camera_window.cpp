@@ -16,7 +16,6 @@
 
 #include <QCameraDevice>
 #include <QComboBox>
-#include <QMediaDevices>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
@@ -170,8 +169,6 @@ void CameraWindow::setupController()
 {
     const auto& config = ApplicationSettings::instance().videoSettings();
     cameraController_ = new CameraController(config, this);
-
-    mediaDevices_ = new QMediaDevices(this);
 }
 
 void CameraWindow::setupLayout()
@@ -342,7 +339,7 @@ void CameraWindow::onFrameSizeStr(const QString& str)
 
 void CameraWindow::updateCameraList(const QList<QCameraDevice>& inputs)
 {
-    assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_);
+    assert(cameraSelector_ && toggleStreamingButton_);
 
     QSignalBlocker blocker(cameraSelector_);
 
@@ -387,6 +384,8 @@ void CameraWindow::updateCameraList(const QList<QCameraDevice>& inputs)
         currentIndex = computeBestCameraIndex(previousSelection, newlyAddedCamera);
 
     cameraSelector_->setCurrentIndex(currentIndex);
+
+    emit cameraAvailabilityChanged(isCameraAvailable());
 }
 
 int CameraWindow::computeBestCameraIndex(const QByteArray& previousSelection,
@@ -650,6 +649,13 @@ void CameraWindow::refreshUi()
 
     updateCameraList(cameraController_->videoInputs());
     updateStreamingButton();
+}
+
+bool CameraWindow::isCameraAvailable() const
+{
+    assert(cameraSelector_);
+
+    return cameraSelector_->count() > 0;
 }
 
 } // namespace fluvel_app

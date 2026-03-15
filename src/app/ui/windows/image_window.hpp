@@ -17,7 +17,6 @@ class QWidget;
 class QMenu;
 class QAction;
 class QPushButton;
-class QMediaDevices;
 
 class QShowEvent;
 class QCloseEvent;
@@ -84,7 +83,7 @@ private:
 
     void showErrorMessage(const QString& msg);
 
-    void updateCameraAction();
+    void updateCameraAction(bool available);
     void onStartCameraActionTriggered();
 
     void saveDisplayed();
@@ -130,7 +129,6 @@ private:
 
     QAction* imageSessionAct_ = nullptr;
     QAction* cameraSessionAct_ = nullptr;
-    QMediaDevices* mediaDevices_ = nullptr;
     QAction* analysisAct_ = nullptr;
     QAction* settingsAct_ = nullptr;
 

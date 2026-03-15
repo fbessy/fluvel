@@ -15,7 +15,6 @@
 class QWidget;
 class QComboBox;
 class QPushButton;
-class QMediaDevices;
 
 class QShowEvent;
 class QCloseEvent;
@@ -41,8 +40,10 @@ class CameraWindow : public QMainWindow
     Q_OBJECT
 public:
     explicit CameraWindow(QWidget* parent);
+    bool isCameraAvailable() const;
 
 signals:
+    bool cameraAvailabilityChanged(bool available);
     void cameraWindowShown();
     void cameraWindowClosed();
 
@@ -108,7 +109,6 @@ private:
 
     DisplaySettingsWidget* displayBar_ = nullptr;
 
-    QMediaDevices* mediaDevices_ = nullptr;
     QByteArray streamingCameraId_;
     QSet<QByteArray> knownCameraIds_;
 

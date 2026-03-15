@@ -31,7 +31,6 @@
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QImageReader>
-#include <QMediaDevices>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -337,8 +336,6 @@ void ImageWindow::setupControllers()
 {
     const auto& config = ApplicationSettings::instance().imageSettings();
     imageController_ = new ImageController(config, this);
-
-    mediaDevices_ = new QMediaDevices(this);
 }
 
 void ImageWindow::setupChildWindows()
@@ -367,7 +364,7 @@ void ImageWindow::applyInitialSettings()
     displayBar_->updatePipelineAvailability(preprocessing);
 
     updateRecentFileActions();
-    updateCameraAction();
+    updateCameraAction(cameraWindow_->isCameraAvailable());
 }
 
 void ImageWindow::setupConnections()
@@ -382,8 +379,8 @@ void ImageWindow::setupConnections()
 
     setupFileEventConnections();
 
-    // --- Hardware events (camera devices) ---
-    connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
+    // --- Hardware events (camera devices via camera window via camera controller...) ---
+    connect(cameraWindow_, &CameraWindow::cameraAvailabilityChanged, this,
             &ImageWindow::updateCameraAction);
 
     // --- Controller → View / Window updates ---
@@ -623,13 +620,11 @@ void ImageWindow::clearRecentFiles()
     updateRecentFileActions();
 }
 
-void ImageWindow::updateCameraAction()
+void ImageWindow::updateCameraAction(bool available)
 {
-    assert(mediaDevices_ && cameraSessionAct_);
+    assert(cameraSessionAct_);
 
-    auto cameras = mediaDevices_->videoInputs();
-
-    cameraSessionAct_->setEnabled(!cameras.isEmpty());
+    cameraSessionAct_->setEnabled(available);
 }
 
 void ImageWindow::onStartCameraActionTriggered()
@@ -640,12 +635,7 @@ void ImageWindow::onStartCameraActionTriggered()
     if (!cameraWindow_)
         return;
 
-    if (!mediaDevices_)
-        return;
-
-    auto cameras = mediaDevices_->videoInputs();
-
-    if (cameras.isEmpty())
+    if (!cameraWindow_->isCameraAvailable())
     {
         QMessageBox::information(this, tr("Information"), tr("No camera available."));
     }
