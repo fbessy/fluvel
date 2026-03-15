@@ -235,16 +235,23 @@ void CameraController::updateDiagnostics()
 
 void CameraController::onVideoInputsChanged()
 {
-    if (deviceId_.isEmpty())
+    const auto inputs = QMediaDevices::videoInputs();
+
+    handleActiveDeviceUnplug(inputs);
+
+    emit videoInputsChanged(inputs);
+}
+
+void CameraController::handleActiveDeviceUnplug(const QList<QCameraDevice>& inputs)
+{
+    if (state_ == StreamingState::Stopped)
         return;
 
-    auto inputs = QMediaDevices::videoInputs();
-
-    bool cameraStillExists = std::any_of(inputs.begin(), inputs.end(),
-                                         [&](const QCameraDevice& dev)
-                                         {
-                                             return dev.id() == deviceId_;
-                                         });
+    const bool cameraStillExists = std::any_of(inputs.begin(), inputs.end(),
+                                               [&](const QCameraDevice& dev)
+                                               {
+                                                   return dev.id() == deviceId_;
+                                               });
 
     if (!cameraStillExists)
         stop();
@@ -271,6 +278,11 @@ void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& displa
 bool CameraController::isStreaming() const
 {
     return state_ == StreamingState::Streaming;
+}
+
+QList<QCameraDevice> CameraController::videoInputs() const
+{
+    return QMediaDevices::videoInputs();
 }
 
 } // namespace fluvel_app

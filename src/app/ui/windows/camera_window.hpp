@@ -67,7 +67,7 @@ private:
     void bindUiToApplicationSettings();
     void connectFrameToView();
 
-    void updateCameraList();
+    void updateCameraList(const QList<QCameraDevice>& inputs);
     int computeBestCameraIndex(const QByteArray& previousSelection, const QByteArray& newlyPlugged);
     void setCameraControlsEnabled(bool enabled);
     void updateStreamingButton();

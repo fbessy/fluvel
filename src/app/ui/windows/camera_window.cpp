@@ -224,7 +224,7 @@ void CameraWindow::setupConnections()
 
     // --- Hardware events (camera devices) ---
 
-    connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
+    connect(cameraController_, &CameraController::videoInputsChanged, this,
             &CameraWindow::updateCameraList);
 
     connect(cameraController_, &CameraController::streamingStarted, this,
@@ -340,13 +340,13 @@ void CameraWindow::onFrameSizeStr(const QString& str)
     setWindowTitle(deviceWindowTitle_ + str);
 }
 
-void CameraWindow::updateCameraList()
+void CameraWindow::updateCameraList(const QList<QCameraDevice>& inputs)
 {
     assert(mediaDevices_ && cameraSelector_ && toggleStreamingButton_);
 
     QSignalBlocker blocker(cameraSelector_);
 
-    const auto cameras = mediaDevices_->videoInputs();
+    const auto cameras = inputs;
 
     QByteArray newlyAddedCamera{};
     QSet<QByteArray> currentIds;
@@ -646,7 +646,9 @@ void CameraWindow::updateStreamingButton()
 
 void CameraWindow::refreshUi()
 {
-    updateCameraList();
+    assert(cameraController_);
+
+    updateCameraList(cameraController_->videoInputs());
     updateStreamingButton();
 }
 
