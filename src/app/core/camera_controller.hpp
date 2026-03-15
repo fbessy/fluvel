@@ -12,6 +12,7 @@
 #include <QObject>
 #include <QtTypes>
 
+// #define FLUVEL_SIMULATE_STARTUP_TIMEOUT
 // #define FLUVEL_SIMULATE_STREAM_LOSS
 
 class QMediaCaptureSession;
@@ -20,6 +21,13 @@ class QTimer;
 
 namespace fluvel_app
 {
+
+enum class StreamingState
+{
+    Stopped,
+    Starting,
+    Streaming
+};
 
 class CameraController : public QObject
 {
@@ -31,7 +39,7 @@ public:
 
     void start(const QByteArray& deviceId);
     void stop();
-    bool isActive() const;
+    bool isStreaming() const;
 
     void onVideoSettingsChanged(const VideoSessionSettings& session);
     void onVideoDisplaySettingsChanged(const DisplayConfig& display);
@@ -39,10 +47,11 @@ public:
     void onFrameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
 
 signals:
-    void cameraStarted(const QByteArray& deviceId);
-    void cameraStopped();
+    void streamingStarted(const QByteArray& deviceId);
+    void streamingStopped();
     void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
-    void streamingLost(const QByteArray& deviceId, qint64 timeoutNs);
+    void startupTimeout(const QByteArray& deviceId, double timeoutSec);
+    void streamingLost(const QByteArray& deviceId, double frameAgeSec);
 
     void frameSizeStr(const QString& str);
     void textStatsUpdated(const QString& textStats);
@@ -51,12 +60,13 @@ signals:
 
 private:
     void onVideoInputsChanged();
-    void onCameraActiveChanged(bool active);
     void onCameraError(QCamera::Error error, const QString& errorString);
     void onVideoFrame(const QVideoFrame& frame);
 
     void onFrameProcessed(quint64 contourSize);
     void onFrameResultReady(const FrameResult& result);
+    void onStartupTimeout();
+    void checkWatchdog();
     void updateDiagnostics();
 
     QCamera* camera_ = nullptr;
@@ -66,21 +76,29 @@ private:
     VideoActiveContourThread activeContourThread_;
 
     FrameStatsView frameStats_;
-    QTimer* statsTimer_ = nullptr;
+
+    // --- Timing configuration ---
+
+    static constexpr int kStartupTimeoutMs = 7'000;               // 7 sec
+    static constexpr qint64 kStreamLossTimeoutNs = 2'000'000'000; // 2 sec
+    static constexpr int kWatchdogPeriodMs = 200;                 // 0.2 sec
+    static constexpr int kDiagnosticsPeriodMs = 500;              // 0.5 sec
+
+    QTimer* startupTimer_ = nullptr;
+    QTimer* watchdogTimer_ = nullptr;
+    QTimer* diagnosticsTimer_ = nullptr;
 
     DisplayConfig displayConfig_;
-
-    bool streamStarted_{false};
-    QByteArray activeDeviceId_;
+    StreamingState state_ = StreamingState::Stopped;
+    QByteArray deviceId_;
 
     //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.
-    qint64 lastValidFrameTsNs_;
+    qint64 lastValidFrameTsNs_{0};
 
     //! Timeout used to detect loss of video stream.
-    static constexpr qint64 kStreamLossTimeoutNs = 2'000'000'000;
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
-    int testFrameCounter_ = 0;
+    int testFrameCounter_{0};
 #endif
 };
 

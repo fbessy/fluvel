@@ -227,16 +227,19 @@ void CameraWindow::setupConnections()
     connect(mediaDevices_, &QMediaDevices::videoInputsChanged, this,
             &CameraWindow::updateCameraList);
 
-    connect(cameraController_, &CameraController::cameraStarted, this,
-            &CameraWindow::onCameraStarted);
+    connect(cameraController_, &CameraController::streamingStarted, this,
+            &CameraWindow::onStreamingStarted);
 
-    connect(cameraController_, &CameraController::cameraStopped, this,
-            &CameraWindow::onCameraStopped);
+    connect(cameraController_, &CameraController::streamingStopped, this,
+            &CameraWindow::onStreamingStopped);
 
     connect(cameraController_, &CameraController::cameraError, this, &CameraWindow::onCameraError);
 
     connect(cameraController_, &CameraController::streamingLost, this,
             &CameraWindow::onStreamingLost);
+
+    connect(cameraController_, &CameraController::startupTimeout, this,
+            &CameraWindow::onStartupTimeout);
 
     // --- Controller → View / Window updates ---
 
@@ -362,11 +365,11 @@ void CameraWindow::updateCameraList()
 
         QIcon icon = emptyCameraIcon_;
 
-        const auto state = cameraStates_.value(camId, CameraState::Normal);
+        const auto state = cameraStatus_.value(camId, CameraStatus::Normal);
 
-        if (state == CameraState::Active)
+        if (state == CameraStatus::Active)
             icon = activeCameraIcon_;
-        else if (state == CameraState::Error)
+        else if (state == CameraStatus::Error)
             icon = errorCameraIcon_;
 
         cameraSelector_->addItem(icon, cam.description(), camId);
@@ -402,8 +405,8 @@ int CameraWindow::computeBestCameraIndex(const QByteArray& previousSelection,
         index = cameraSelector_->findData(previousSelection);
 
     // 3 active camera
-    if (index < 0 && !activeCameraId_.isEmpty())
-        index = cameraSelector_->findData(activeCameraId_);
+    if (index < 0 && !streamingCameraId_.isEmpty())
+        index = cameraSelector_->findData(streamingCameraId_);
 
     // 4 saved camera
     if (index < 0)
@@ -433,11 +436,11 @@ void CameraWindow::onToggleStreaming()
 
     QByteArray selected = cameraSelector_->currentData().toByteArray();
 
-    if (!cameraController_->isActive())
+    if (!cameraController_->isStreaming())
     {
         startCamera();
     }
-    else if (selected == activeCameraId_)
+    else if (selected == streamingCameraId_)
     {
         stopCamera();
     }
@@ -513,14 +516,13 @@ void CameraWindow::startCamera()
 
 void CameraWindow::stopCamera()
 {
-    if (cameraController_->isActive())
-        cameraController_->stop();
+    cameraController_->stop();
 }
 
-void CameraWindow::onCameraStarted(const QByteArray& deviceId)
+void CameraWindow::onStreamingStarted(const QByteArray& deviceId)
 {
-    activeCameraId_ = deviceId;
-    cameraStates_[deviceId] = CameraState::Active;
+    streamingCameraId_ = deviceId;
+    cameraStatus_[deviceId] = CameraStatus::Active;
 
     if (!switchingInProgress_)
     {
@@ -534,15 +536,15 @@ void CameraWindow::onCameraStarted(const QByteArray& deviceId)
     switchingInProgress_ = false;
 }
 
-void CameraWindow::onCameraStopped()
+void CameraWindow::onStreamingStopped()
 {
-    if (!activeCameraId_.isEmpty())
+    if (!streamingCameraId_.isEmpty())
     {
-        if (cameraStates_[activeCameraId_] == CameraState::Active)
-            cameraStates_[activeCameraId_] = CameraState::Normal;
+        if (cameraStatus_[streamingCameraId_] == CameraStatus::Active)
+            cameraStatus_[streamingCameraId_] = CameraStatus::Normal;
     }
 
-    activeCameraId_.clear();
+    streamingCameraId_.clear();
 
     if (!switchingInProgress_)
     {
@@ -563,31 +565,41 @@ void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
 
     QMessageBox::warning(this, tr("Camera error"), errorString);
 
-    cameraStates_[deviceId] = CameraState::Error;
+    cameraStatus_[deviceId] = CameraStatus::Error;
 
     // un switch raté devient un stop
     if (switchingInProgress_)
     {
         switchingInProgress_ = false;
-        activeCameraId_.clear();
+        streamingCameraId_.clear();
     }
 
     refreshUi();
 }
 
-void CameraWindow::onStreamingLost(const QByteArray& deviceId, qint64 timeoutNs)
+void CameraWindow::onStartupTimeout(const QByteArray& deviceId, double timeoutSec)
+{
+    QMessageBox::warning(this, tr("Camera startup failed"),
+                         tr("The camera did not produce a valid frame within %1 seconds.\n"
+                            "The device may be busy or not responding.")
+                             .arg(timeoutSec, 0, 'f', 1));
+
+    cameraStatus_[deviceId] = CameraStatus::Error;
+
+    refreshUi();
+}
+
+void CameraWindow::onStreamingLost(const QByteArray& deviceId, double frameAgeSec)
 {
     disconnect(frameToViewConnection_);
     videoView_->showPlaceholder(true);
 
-    const double timeoutSec = static_cast<double>(timeoutNs) / 1e9;
-
     QMessageBox::warning(
         this, tr("Camera stream lost"),
         tr("No valid frame received for %1 seconds.\nThe camera stream may have stalled.")
-            .arg(timeoutSec, 0, 'f', 1));
+            .arg(frameAgeSec, 0, 'f', 1));
 
-    cameraStates_[deviceId] = CameraState::Error;
+    cameraStatus_[deviceId] = CameraStatus::Error;
 
     refreshUi();
 }
@@ -608,7 +620,7 @@ void CameraWindow::saveSelectedCameraId()
 
 void CameraWindow::updateStreamingButton()
 {
-    if (!cameraController_->isActive())
+    if (!cameraController_->isStreaming())
     {
         toggleStreamingButton_->setText(tr("Start"));
         toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
@@ -618,7 +630,7 @@ void CameraWindow::updateStreamingButton()
 
     QByteArray selected = cameraSelector_->currentData().toByteArray();
 
-    if (selected == activeCameraId_)
+    if (selected == streamingCameraId_)
     {
         toggleStreamingButton_->setText(tr("Stop"));
         toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));

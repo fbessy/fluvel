@@ -29,7 +29,7 @@ class DisplaySettingsWidget;
 class ImageView;
 class CameraController;
 
-enum class CameraState
+enum class CameraStatus
 {
     Normal,
     Active,
@@ -75,11 +75,12 @@ private:
 
     void onToggleStreaming();
 
-    void onCameraStarted(const QByteArray& deviceId);
-    void onCameraStopped();
+    void onStreamingStarted(const QByteArray& deviceId);
+    void onStreamingStopped();
     void onCameraError(const QByteArray& deviceId, QCamera::Error error,
                        const QString& errorString);
-    void onStreamingLost(const QByteArray& deviceId, qint64 timeoutNs);
+    void onStartupTimeout(const QByteArray& deviceId, double timeoutSec);
+    void onStreamingLost(const QByteArray& deviceId, double frameAgeSec);
 
     void onFrameSizeStr(const QString& str);
 
@@ -108,7 +109,7 @@ private:
     DisplaySettingsWidget* displayBar_ = nullptr;
 
     QMediaDevices* mediaDevices_ = nullptr;
-    QByteArray activeCameraId_;
+    QByteArray streamingCameraId_;
     QSet<QByteArray> knownCameraIds_;
 
     ImageView* videoView_ = nullptr;
@@ -123,7 +124,7 @@ private:
 
     bool switchingInProgress_ = false;
 
-    QHash<QByteArray, CameraState> cameraStates_;
+    QHash<QByteArray, CameraStatus> cameraStatus_;
 };
 
 } // namespace fluvel_app
