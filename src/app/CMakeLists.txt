@@ -68,9 +68,6 @@ set(app_src
     ${UI_COMP_DIR}/pan_behavior.cpp
     ${UI_COMP_DIR}/pan_behavior.hpp
 
-    ${UI_COMP_DIR}/zoom_behavior.cpp
-    ${UI_COMP_DIR}/zoom_behavior.hpp
-
     ${UI_COMP_DIR}/color_picker_behavior.cpp
     ${UI_COMP_DIR}/color_picker_behavior.hpp
 
