@@ -7,6 +7,7 @@
 #include "frame_clock.hpp"
 
 #include <QCamera>
+#include <QDebug>
 #include <QMediaCaptureSession>
 #include <QMediaDevices>
 #include <QTimer>
@@ -73,6 +74,14 @@ void CameraController::start(const QByteArray& deviceId)
 
     for (const auto& cam : cameras)
     {
+#ifdef FLUVEL_DEBUG
+        for (const QCameraFormat& f : cam.videoFormats())
+        {
+            qDebug() << "format:" << QVideoFrameFormat::pixelFormatToString(f.pixelFormat())
+                     << "resolution:" << f.resolution() << "fps:" << f.maxFrameRate();
+        }
+#endif
+
         if (cam.id() == deviceId)
         {
             isFound = true;
@@ -82,6 +91,19 @@ void CameraController::start(const QByteArray& deviceId)
 
             videoSink_ = new QVideoSink(this);
             captureSession_ = new QMediaCaptureSession(this);
+
+            QCameraFormat fmt = chooseBestFormat(cam);
+
+            if (!fmt.isNull())
+            {
+                // #ifdef FLUVEL_DEBUG
+                qDebug() << "Selected format:"
+                         << QVideoFrameFormat::pixelFormatToString(fmt.pixelFormat())
+                         << fmt.resolution() << fmt.maxFrameRate();
+                // #endif
+
+                camera_->setCameraFormat(fmt);
+            }
 
             captureSession_->setCamera(camera_);
             captureSession_->setVideoSink(videoSink_);
@@ -104,6 +126,48 @@ void CameraController::start(const QByteArray& deviceId)
 
     if (!isFound)
         emit cameraError(deviceId, QCamera::CameraError, tr("Camera not found"));
+}
+
+QCameraFormat CameraController::chooseBestFormat(const QCameraDevice& dev)
+{
+    QCameraFormat bestYuv;
+    QCameraFormat bestJpeg;
+
+    for (const QCameraFormat& f : dev.videoFormats())
+    {
+        const int fps = static_cast<int>(f.maxFrameRate());
+        const QSize res = f.resolution();
+        const auto fmt = f.pixelFormat();
+
+        // priorité : YUYV avec bon fps
+        if (fmt == QVideoFrameFormat::Format_YUYV && fps >= 25)
+        {
+            if (bestYuv.isNull() || res.width() * res.height() > bestYuv.resolution().width() *
+                                                                     bestYuv.resolution().height())
+            {
+                bestYuv = f;
+            }
+        }
+
+        // fallback MJPEG
+        if (fmt == QVideoFrameFormat::Format_Jpeg && fps >= 25)
+        {
+            if (bestJpeg.isNull() ||
+                res.width() * res.height() >
+                    bestJpeg.resolution().width() * bestJpeg.resolution().height())
+            {
+                bestJpeg = f;
+            }
+        }
+    }
+
+    if (!bestYuv.isNull())
+        return bestYuv;
+
+    if (!bestJpeg.isNull())
+        return bestJpeg;
+
+    return dev.videoFormats().isEmpty() ? QCameraFormat() : dev.videoFormats().first();
 }
 
 void CameraController::stop()

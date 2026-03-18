@@ -62,6 +62,8 @@ signals:
                                 const QVector<QPointF>& l_in, qint64 receiveTs);
 
 private:
+    QCameraFormat chooseBestFormat(const QCameraDevice& dev);
+
     void onVideoInputsChanged();
     void handleActiveDeviceUnplug(const QList<QCameraDevice>& inputs);
 
