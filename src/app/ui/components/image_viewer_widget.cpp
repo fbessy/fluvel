@@ -9,6 +9,8 @@
 #include "image_viewer_interaction.hpp"
 #include "interaction_set.hpp"
 #include "overlay_text_item.hpp"
+#include "qcolor_utils.hpp"
+#include "qimage_utils.hpp"
 
 #include <QMouseEvent>
 #include <QPainter>
@@ -805,48 +807,6 @@ void ImageViewerWidget::setText(const QString& text)
         overlay_->setText(text);
 }
 
-QColor ImageViewerWidget::desaturateAndDarken(const QColor& original, qreal saturationFactor,
-                                      qreal valueFactor)
-{
-    // Clamp des facteurs pour éviter les aberrations
-    saturationFactor = std::clamp(saturationFactor, 0.0, 1.0);
-    valueFactor = std::clamp(valueFactor, 0.0, 1.0);
-
-    QColor hsv = original.toHsv();
-
-    int h = hsv.hue();        // peut être -1 si gris
-    int s = hsv.saturation(); // 0 → gris pur
-    int v = hsv.value();
-    int a = hsv.alpha();
-
-    // Si gris pur → on ne touche qu'à la luminosité
-    if (s == 0)
-    {
-        v = static_cast<int>(v * valueFactor);
-        return QColor::fromHsv(0, 0, v, a);
-    }
-
-    // Couleur normale
-    s = static_cast<int>(s * saturationFactor);
-    v = static_cast<int>(v * valueFactor);
-
-    return QColor::fromHsv(h, s, v, a);
-}
-
-QImage ImageViewerWidget::darkenImage(const QImage& image)
-{
-    QImage dark = image.convertToFormat(QImage::Format_ARGB32);
-
-    QPainter p(&dark);
-    p.setCompositionMode(QPainter::CompositionMode_Multiply);
-
-    // gris sombre plutôt que noir pur
-    p.fillRect(dark.rect(), QColor(100, 100, 100));
-    p.end();
-
-    return dark;
-}
-
 void ImageViewerWidget::showPlaceholder(bool showEffect)
 {
     assert(blur_);
@@ -857,13 +817,15 @@ void ImageViewerWidget::showPlaceholder(bool showEffect)
     if (showEffect)
     {
         if (!lastDisplayedImage_.isNull())
-            setImage(darkenImage(lastDisplayedImage_));
+            setImage(qimage_utils::darkenImage(lastDisplayedImage_));
 
         if (l_out_)
-            l_out_->setColor(desaturateAndDarken(toQColor(displayConfig_.l_out_color), 0.4, 0.6));
+            l_out_->setColor(
+                qcolor_utils::desaturateAndDarken(toQColor(displayConfig_.l_out_color), 0.4, 0.6));
 
         if (l_in_)
-            l_in_->setColor(desaturateAndDarken(toQColor(displayConfig_.l_in_color), 0.4, 0.6));
+            l_in_->setColor(
+                qcolor_utils::desaturateAndDarken(toQColor(displayConfig_.l_in_color), 0.4, 0.6));
 
         blur_->setBlurRadius(6);
     }

@@ -22,6 +22,7 @@
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
 
+#include "file_utils.hpp"
 #include "image_controller.hpp"
 
 #include <QApplication>
@@ -495,7 +496,7 @@ void ImageWindow::setupUserActionsConnections()
             [this]()
             {
                 QString fileName = QFileDialog::getOpenFileName(
-                    this, tr("Open Image"), lastDirectoryUsed_, buildImageFilter());
+                    this, tr("Open Image"), lastDirectoryUsed_, file_utils::buildImageFilter());
 
                 if (!fileName.isEmpty())
                     emit fileSelected(fileName);
@@ -555,11 +556,6 @@ void ImageWindow::setupFileEventConnections()
     connect(imageController_, &ImageController::imageOpened, this, &ImageWindow::onFileOpened);
 }
 
-QString ImageWindow::strippedName(const QString& fullFilename)
-{
-    return QFileInfo(fullFilename).fileName();
-}
-
 void ImageWindow::setCurrentFile(const QString& fileName)
 {
     QSettings settings;
@@ -587,7 +583,7 @@ void ImageWindow::updateRecentFileActions()
     {
         const QString& file = files[static_cast<qsizetype>(i)];
 
-        QString text = tr("&%1").arg(strippedName(file));
+        QString text = tr("&%1").arg(file_utils::strippedName(file));
 
         recentFileActs_[i]->setText(text);
         recentFileActs_[i]->setData(file);
@@ -684,7 +680,7 @@ void ImageWindow::onFileOpened(const QString& path)
 
     lastDirectoryUsed_ = QFileInfo(path).absolutePath();
 
-    fileName_ = strippedName(path);
+    fileName_ = file_utils::strippedName(path);
     fullPath_ = path;
 
     updateWindowTitle();
@@ -744,26 +740,8 @@ void ImageWindow::saveDisplayed()
     if (fi.suffix().isEmpty())
         fileName += "." + extension;
 
-    fileName = makeUniqueFileName(fileName);
+    fileName = file_utils::makeUniqueFileName(fileName);
     displayed.save(fileName);
-}
-
-QString ImageWindow::makeUniqueFileName(const QString& filePath)
-{
-    QFileInfo fi(filePath);
-    QString base = fi.completeBaseName();
-    QString ext = fi.suffix();
-    QDir dir = fi.dir();
-
-    QString candidate = filePath;
-    int index = 1;
-
-    while (QFile::exists(candidate))
-    {
-        candidate = dir.filePath(QString("%1 (%2).%3").arg(base).arg(index++).arg(ext));
-    }
-
-    return candidate;
 }
 
 void ImageWindow::onStateChanged(fluvel_app::WorkerState state)
@@ -815,21 +793,6 @@ void ImageWindow::onCameraWindowClosed()
 void ImageWindow::showErrorMessage(const QString& msg)
 {
     QMessageBox::warning(this, tr("Error"), msg);
-}
-
-QString buildImageFilter()
-{
-    QStringList patterns;
-
-    const auto formats = QImageReader::supportedImageFormats();
-    for (const QByteArray& format : formats)
-    {
-        patterns << "*." + QString::fromLatin1(format);
-    }
-
-    patterns.sort();
-
-    return QObject::tr("Image Files (%1)").arg(patterns.join(' '));
 }
 
 void ImageWindow::showEvent(QShowEvent* event)

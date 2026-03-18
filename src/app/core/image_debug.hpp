@@ -3,17 +3,13 @@
 
 #pragma once
 
-#include <QByteArray>
 #include <QImage>
+#include <QString>
 
-#include <ostream>
+#include <iostream>
 
 namespace fluvel_app::image_debug
 {
-
-QByteArray imageHash(const QImage& img);
-
-std::string hexHash(const QImage& img);
 
 std::ostream& operator<<(std::ostream& os, const QImage& img);
 

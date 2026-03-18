@@ -141,6 +141,15 @@ set(app_src
     ${CORE_DIR}/image_debug.cpp
     ${CORE_DIR}/image_debug.hpp
 
+    ${CORE_DIR}/qimage_utils.cpp
+    ${CORE_DIR}/qimage_utils.hpp
+
+    ${CORE_DIR}/file_utils.cpp
+    ${CORE_DIR}/file_utils.hpp
+
+    ${CORE_DIR}/qcolor_utils.cpp
+    ${CORE_DIR}/qcolor_utils.hpp
+
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
     ${INTEROP_DIR}/contour_adapters.hpp

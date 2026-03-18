@@ -66,6 +66,4 @@ private:
     ActiveContourWorker activeContourWorker_;
 };
 
-bool isSupportedImage(const QString& path);
-
 } // namespace fluvel_app

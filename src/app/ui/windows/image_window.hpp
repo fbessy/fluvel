@@ -79,7 +79,6 @@ private:
     void setCurrentFile(const QString& fileName);
     void updateRecentFileActions();
     void clearRecentFiles();
-    static QString strippedName(const QString& fullFileName);
 
     void showErrorMessage(const QString& msg);
 
@@ -87,7 +86,6 @@ private:
     void onStartCameraActionTriggered();
 
     void saveDisplayed();
-    static QString makeUniqueFileName(const QString& filePath);
 
     // --- UI ---
     CameraWindow* cameraWindow_ = nullptr;
@@ -147,8 +145,5 @@ private:
 
     QString lastDirectoryUsed_;
 };
-
-QString buildImageFilter();
-bool isSupportedImage(const QString& path);
 
 } // namespace fluvel_app

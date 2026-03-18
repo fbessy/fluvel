@@ -3,6 +3,7 @@
 
 #include "image_controller.hpp"
 #include "contour_adapters.hpp"
+#include "file_utils.hpp"
 
 #include <QImageReader>
 
@@ -37,7 +38,7 @@ void ImageController::loadImage(const QString& path)
     if (path.isEmpty())
         return;
 
-    if (!isSupportedImage(path))
+    if (!file_utils::isSupportedImage(path))
     {
         emit errorOccurred(tr("Unsupported image format."));
         return;
@@ -247,12 +248,6 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
     s += QString("Contour: %1 pts").arg(diag.contourSize);
 
     emit textDiagnosticsUpdated(s);
-}
-
-bool isSupportedImage(const QString& path)
-{
-    QImageReader reader(path);
-    return reader.canRead();
 }
 
 } // namespace fluvel_app
