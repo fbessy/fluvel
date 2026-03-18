@@ -4,7 +4,7 @@
 #pragma once
 
 #include "pixel_info_overlay.hpp"
-#include "view_behavior.hpp"
+#include "image_viewer_behavior.hpp"
 #include <QPoint>
 #include <memory>
 
@@ -24,7 +24,7 @@ class ImageViewerWidget;
  * - No event consumption
  * - Optional by construction (not added = disabled)
  */
-class PixelInfoBehavior final : public ViewBehavior
+class PixelInfoBehavior final : public ImageViewerBehavior
 {
 public:
     PixelInfoBehavior() = default;

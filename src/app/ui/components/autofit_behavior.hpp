@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "view_behavior.hpp"
+#include "image_viewer_behavior.hpp"
 
 class QMouseEvent;
 
 namespace fluvel_app
 {
 
-class AutoFitBehavior : public ViewBehavior
+class AutoFitBehavior : public ImageViewerBehavior
 {
 public:
     explicit AutoFitBehavior(Qt::MouseButton button = Qt::MiddleButton);

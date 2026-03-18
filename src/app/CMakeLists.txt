@@ -57,7 +57,7 @@ set(app_src
     ${UI_COMP_DIR}/interaction_set.cpp
     ${UI_COMP_DIR}/interaction_set.hpp
 
-    ${UI_COMP_DIR}/view_behavior.hpp
+    ${UI_COMP_DIR}/image_viewer_behavior.hpp
 
     ${UI_COMP_DIR}/fullscreen_behavior.cpp
     ${UI_COMP_DIR}/fullscreen_behavior.hpp

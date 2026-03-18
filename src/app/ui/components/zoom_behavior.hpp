@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include "view_behavior.hpp"
+#include "image_viewer_behavior.hpp"
 
 namespace fluvel_app
 {
 
-class ZoomBehavior : public ViewBehavior
+class ZoomBehavior : public ImageViewerBehavior
 {
 public:
     explicit ZoomBehavior(double zoomFactor = 1.15);

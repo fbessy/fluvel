@@ -11,7 +11,7 @@
 namespace fluvel_app
 {
 
-void InteractionSet::addBehavior(std::unique_ptr<ViewBehavior> behavior)
+void InteractionSet::addBehavior(std::unique_ptr<ImageViewerBehavior> behavior)
 {
     if (!behavior)
         return;
@@ -39,7 +39,7 @@ bool InteractionSet::wheel(ImageViewerWidget& view, QWheelEvent* event)
 bool InteractionSet::mousePress(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (auto* b = capturingBehavior())
-        return const_cast<ViewBehavior*>(b)->mousePress(view, event);
+        return const_cast<ImageViewerBehavior*>(b)->mousePress(view, event);
 
     for (auto& b : behaviors_)
     {
@@ -53,7 +53,7 @@ bool InteractionSet::mousePress(ImageViewerWidget& view, QMouseEvent* event)
 bool InteractionSet::mouseMove(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (auto* b = capturingBehavior())
-        return const_cast<ViewBehavior*>(b)->mouseMove(view, event);
+        return const_cast<ImageViewerBehavior*>(b)->mouseMove(view, event);
 
     for (auto& b : behaviors_)
     {
@@ -67,7 +67,7 @@ bool InteractionSet::mouseMove(ImageViewerWidget& view, QMouseEvent* event)
 bool InteractionSet::mouseRelease(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (auto* b = capturingBehavior())
-        return const_cast<ViewBehavior*>(b)->mouseRelease(view, event);
+        return const_cast<ImageViewerBehavior*>(b)->mouseRelease(view, event);
 
     for (auto& b : behaviors_)
     {
@@ -89,7 +89,7 @@ bool InteractionSet::mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* even
     return false;
 }
 
-const ViewBehavior* InteractionSet::capturingBehavior() const
+const ImageViewerBehavior* InteractionSet::capturingBehavior() const
 {
     for (const auto& b : behaviors_)
     {
@@ -173,7 +173,7 @@ bool InteractionSet::drop(ImageViewerWidget& view, QDropEvent* event)
 void InteractionSet::cancel()
 {
     if (auto* b = capturingBehavior())
-        const_cast<ViewBehavior*>(b)->cancel();
+        const_cast<ImageViewerBehavior*>(b)->cancel();
 }
 
 } // namespace fluvel_app

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "image_viewer_widget.hpp"
-#include "view_behavior.hpp"
+#include "image_viewer_behavior.hpp"
 
 class QDragEnterEvent;
 class QDragMoveEvent;
@@ -14,7 +14,7 @@ class QDropEvent;
 namespace fluvel_app
 {
 
-class DragDropBehavior : public ViewBehavior
+class DragDropBehavior : public ImageViewerBehavior
 {
 public:
     bool dragEnter(ImageViewerWidget&, QDragEnterEvent*) override;

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-// view_behavior.hpp
 #pragma once
 
 #include <QWheelEvent>
@@ -19,10 +18,10 @@ namespace fluvel_app
 
 class ImageViewerWidget;
 
-class ViewBehavior
+class ImageViewerBehavior
 {
 public:
-    virtual ~ViewBehavior() = default;
+    virtual ~ImageViewerBehavior() = default;
 
     virtual bool wheel(ImageViewerWidget&, QWheelEvent*)
     {

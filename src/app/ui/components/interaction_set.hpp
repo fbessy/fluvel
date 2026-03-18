@@ -4,7 +4,7 @@
 #pragma once
 
 #include "image_viewer_interaction.hpp"
-#include "view_behavior.hpp"
+#include "image_viewer_behavior.hpp"
 
 #include <QtCore/Qt>
 
@@ -20,7 +20,7 @@ namespace fluvel_app
 {
 
 /**
- * @brief Aggregates multiple ViewBehavior objects.
+ * @brief Aggregates multiple ImageViewerBehavior objects.
  *
  * InteractionSet is the concrete ImageViewerInteraction used by ImageViewerWidget.
  * It forwards each event to all registered behaviors.
@@ -39,9 +39,9 @@ public:
     InteractionSet(InteractionSet&&) = default;
     InteractionSet& operator=(InteractionSet&&) = default;
 
-    void addBehavior(std::unique_ptr<ViewBehavior> behavior);
+    void addBehavior(std::unique_ptr<ImageViewerBehavior> behavior);
 
-    const ViewBehavior* capturingBehavior() const;
+    const ImageViewerBehavior* capturingBehavior() const;
 
     Qt::CursorShape cursor(const ImageViewerWidget& view, bool hasImage, bool isPanRelevant,
                            const QMouseEvent* e) const;
@@ -74,7 +74,7 @@ protected:
     void cancel() override;
 
 private:
-    std::vector<std::unique_ptr<ViewBehavior>> behaviors_;
+    std::vector<std::unique_ptr<ImageViewerBehavior>> behaviors_;
 };
 
 } // namespace fluvel_app

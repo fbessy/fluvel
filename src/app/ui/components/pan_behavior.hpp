@@ -4,7 +4,7 @@
 #pragma once
 
 #include "image_viewer_widget.hpp"
-#include "view_behavior.hpp"
+#include "image_viewer_behavior.hpp"
 
 #include <QPoint>
 
@@ -13,7 +13,7 @@ class QMouseEvent;
 namespace fluvel_app
 {
 
-class PanBehavior : public ViewBehavior
+class PanBehavior : public ImageViewerBehavior
 {
 public:
     explicit PanBehavior(Qt::MouseButton button = Qt::LeftButton);

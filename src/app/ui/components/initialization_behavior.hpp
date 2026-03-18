@@ -4,7 +4,7 @@
 #pragma once
 
 #include "image_viewer_widget.hpp"
-#include "view_behavior.hpp"
+#include "image_viewer_behavior.hpp"
 
 #include <QObject>
 #include <QPoint>
@@ -15,7 +15,7 @@ class ImageViewerWidget;
 namespace fluvel_app
 {
 
-class InitializationBehavior : public QObject, public ViewBehavior
+class InitializationBehavior : public QObject, public ImageViewerBehavior
 {
     Q_OBJECT
 

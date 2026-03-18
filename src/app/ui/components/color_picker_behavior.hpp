@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include "image_viewer_behavior.hpp"
 #include "image_viewer_widget.hpp"
-#include "view_behavior.hpp"
 #include <QColor>
 
 class QMouseEvent;
@@ -16,7 +16,7 @@ namespace fluvel_app
 
 class ImageViewerWidget;
 
-class ColorPickerBehavior : public ViewBehavior
+class ColorPickerBehavior : public ImageViewerBehavior
 {
 public:
     explicit ColorPickerBehavior(Qt::MouseButton button = Qt::RightButton);
