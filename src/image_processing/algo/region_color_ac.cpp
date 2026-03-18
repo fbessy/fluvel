@@ -118,7 +118,7 @@ void RegionColorAc::doSpecificWhenSwitch(const ContourPoint& point, BoundarySwit
     }
 }
 
-void RegionColorAc::resetExecutionState(ImageSpan image)
+void RegionColorAc::resetExecutionState(ImageView image)
 {
     restart();
 

@@ -5,7 +5,7 @@
 
 #include "ac_types.hpp"
 #include "common_settings.hpp"
-#include "image_span.hpp"
+#include "image_view.hpp"
 #include "region_color_ac.hpp"
 #include "temporal_smoother.hpp"
 
@@ -60,7 +60,7 @@ private:
     QImage applyDownscale(const QImage& input, const DownscaleConfig& config) const;
     FrameResult processFrame(const QVideoFrame& frame);
 
-    void exportTemporalFilteredImage(const fluvel_ip::ImageSpan& algoImage,
+    void exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
                                      const VideoComputeConfig& config, FrameResult& fr);
 
     void exportContours(FrameResult& fr);

@@ -85,7 +85,7 @@ int EdgeAc::get_global_speed_sign() const
     return sign;
 }
 
-unsigned char EdgeAc::do_otsu_method(ImageSpan image)
+unsigned char EdgeAc::do_otsu_method(ImageView image)
 {
     unsigned char threshold = 0;
 

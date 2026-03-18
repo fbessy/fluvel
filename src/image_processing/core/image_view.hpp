@@ -21,12 +21,12 @@ enum class ImageFormat
     Rgba32
 };
 
-class ImageSpan final
+class ImageView final
 {
 public:
-    ImageSpan() = default;
+    ImageView() = default;
 
-    ImageSpan(const unsigned char* data, int widthPixels, int heightPixels,
+    ImageView(const unsigned char* data, int widthPixels, int heightPixels,
               ImageFormat format = ImageFormat::Gray8, int strideBytes = 0)
         : data_(data)
         , widthPixels_(widthPixels)

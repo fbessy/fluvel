@@ -42,7 +42,7 @@ set(ip_src
     ${ALGO_DIR}/contour_diagnostics.hpp
 
     ${CORE_DIR}/grid2d.hpp
-    ${CORE_DIR}/image_span.hpp
+    ${CORE_DIR}/image_view.hpp
     ${CORE_DIR}/point.hpp
     ${CORE_DIR}/point_hash.hpp
     ${CORE_DIR}/point_containers.hpp

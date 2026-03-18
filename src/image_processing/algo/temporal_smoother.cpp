@@ -15,7 +15,7 @@ using clock_type = std::chrono::steady_clock;
 // ------------------------------------------------------------
 // RESET
 // ------------------------------------------------------------
-void TemporalSmoother::reset(ImageSpan first_src)
+void TemporalSmoother::reset(ImageView first_src)
 {
     initialized_ = false;
     noise_initialized_ = false;
@@ -45,7 +45,7 @@ void TemporalSmoother::reset(ImageSpan first_src)
 // ------------------------------------------------------------
 // UPDATE
 // ------------------------------------------------------------
-void TemporalSmoother::update(ImageSpan src)
+void TemporalSmoother::update(ImageView src)
 {
     if (!initialized_)
         return;
@@ -221,7 +221,7 @@ void TemporalSmoother::updateOutput()
     }
 }
 
-ImageSpan TemporalSmoother::outputSpan()
+ImageView TemporalSmoother::outputSpan()
 {
     updateOutput();
 

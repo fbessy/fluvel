@@ -4,7 +4,7 @@
 #pragma once
 
 #include "ac_types.hpp"
-#include "image_span.hpp"
+#include "image_view.hpp"
 
 #include <vector>
 
@@ -19,7 +19,7 @@ public:
 
     //! Constructor to initialize the contour from a grayscale image of the levet-set function
     //! #phi.
-    ContourData(ImageSpan grayscale_phi, Connectivity connectivity = Connectivity::Four);
+    ContourData(ImageView grayscale_phi, Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of
     //! #l_out and #l_in.

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "image_span.hpp"
+#include "image_view.hpp"
 
 #include <utility>
 
@@ -16,20 +16,20 @@
 #endif
 
 #ifdef FLUVEL_USE_QT
-fluvel_ip::ImageSpan image_span_from_qimage(const QImage& img);
+fluvel_ip::ImageView image_view_from_qimage(const QImage& img);
 #endif
 
 #ifdef FLUVEL_USE_OPENCV
-fluvel_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat);
+fluvel_ip::ImageView image_view_from_cvmat(const cv::Mat& mat);
 #endif
 
 #ifdef FLUVEL_USE_STB
-fluvel_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int width, int height,
-                                         int channels);
+fluvel_ip::ImageView image_view_from_stbi(const unsigned char* data, int width, int height,
+                                          int channels);
 #endif
 
 #ifdef FLUVEL_USE_QT
-inline fluvel_ip::ImageSpan image_span_from_qimage(const QImage& img)
+inline fluvel_ip::ImageView image_view_from_qimage(const QImage& img)
 {
     assert(!img.isNull());
 
@@ -41,15 +41,15 @@ inline fluvel_ip::ImageSpan image_span_from_qimage(const QImage& img)
     switch (img.format())
     {
         case QImage::Format_Grayscale8:
-            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Gray8, stride);
+            return fluvel_ip::ImageView(data, w, h, fluvel_ip::ImageFormat::Gray8, stride);
 
         case QImage::Format_RGB888:
-            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Rgb24, stride);
+            return fluvel_ip::ImageView(data, w, h, fluvel_ip::ImageFormat::Rgb24, stride);
 
         case QImage::Format_ARGB32:
         case QImage::Format_RGB32:
             // Qt stocke BGRA en mémoire
-            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Bgr32, stride);
+            return fluvel_ip::ImageView(data, w, h, fluvel_ip::ImageFormat::Bgr32, stride);
 
         default:
             assert(false && "Unsupported QImage format");
@@ -59,7 +59,7 @@ inline fluvel_ip::ImageSpan image_span_from_qimage(const QImage& img)
 #endif
 
 #ifdef FLUVEL_USE_OPENCV
-inline fluvel_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
+inline fluvel_ip::ImageView image_view_from_cvmat(const cv::Mat& mat)
 {
     assert(!mat.empty());
     assert(mat.depth() == CV_8U);
@@ -72,14 +72,14 @@ inline fluvel_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
     switch (mat.type())
     {
         case CV_8UC1:
-            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Gray8, stride);
+            return fluvel_ip::ImageView(data, w, h, fluvel_ip::ImageFormat::Gray8, stride);
 
         case CV_8UC3:
             // OpenCV = BGR en mémoire
-            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Bgr24, stride);
+            return fluvel_ip::ImageView(data, w, h, fluvel_ip::ImageFormat::Bgr24, stride);
 
         case CV_8UC4:
-            return fluvel_ip::ImageSpan(data, w, h, fluvel_ip::ImageFormat::Bgr32, stride);
+            return fluvel_ip::ImageView(data, w, h, fluvel_ip::ImageFormat::Bgr32, stride);
 
         default:
             assert(false && "Unsupported cv::Mat type");
@@ -89,8 +89,8 @@ inline fluvel_ip::ImageSpan image_span_from_cvmat(const cv::Mat& mat)
 #endif
 
 #ifdef FLUVEL_USE_STB
-inline fluvel_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int width, int height,
-                                                int channels)
+inline fluvel_ip::ImageView image_view_from_stbi(const unsigned char* data, int width, int height,
+                                                 int channels)
 {
     assert(data != nullptr);
     assert(width > 0);
@@ -100,18 +100,18 @@ inline fluvel_ip::ImageSpan image_span_from_stbi(const unsigned char* data, int 
     switch (channels)
     {
         case 1:
-            return fluvel_ip::ImageSpan(data, width, height, fluvel_ip::ImageFormat::Gray8,
-                                       width); // compact
+            return fluvel_ip::ImageView(data, width, height, fluvel_ip::ImageFormat::Gray8,
+                                        width); // compact
 
         case 3:
             // stb = RGB
-            return fluvel_ip::ImageSpan(data, width, height, fluvel_ip::ImageFormat::Rgb24,
-                                       width * 3);
+            return fluvel_ip::ImageView(data, width, height, fluvel_ip::ImageFormat::Rgb24,
+                                        width * 3);
 
         case 4:
             // stb = RGBA
-            return fluvel_ip::ImageSpan(data, width, height, fluvel_ip::ImageFormat::Rgba32,
-                                       width * 4);
+            return fluvel_ip::ImageView(data, width, height, fluvel_ip::ImageFormat::Rgba32,
+                                        width * 4);
 
         default:
             assert(false && "Unsupported stb_image channel count");

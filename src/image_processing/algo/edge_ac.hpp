@@ -4,7 +4,7 @@
 #pragma once
 
 #include "active_contour.hpp"
-#include "image_span.hpp"
+#include "image_view.hpp"
 
 namespace fluvel_ip
 {
@@ -14,7 +14,7 @@ class EdgeAc : public ActiveContour
 public:
     //! Constructor to initialize with an initial contour.
     template <typename T>
-    EdgeAc(ImageSpan gradient_image, T&& initial_contour,
+    EdgeAc(ImageView gradient_image, T&& initial_contour,
            const AcConfig& config = AcConfig()); /* optional parameter */
 
     ~EdgeAc() override = default;
@@ -34,10 +34,10 @@ private:
     int get_global_speed_sign() const;
 
     //! Otsu's method to calculate an optimal global threshold.
-    static unsigned char do_otsu_method(ImageSpan image);
+    static unsigned char do_otsu_method(ImageView image);
 
     //! Image wrapper.
-    ImageSpan gradient_image_;
+    ImageView gradient_image_;
 
     //! Global speed sign (1 or -1).
     const int global_speed_sign_;
@@ -47,7 +47,7 @@ private:
 };
 
 template <typename T>
-EdgeAc::EdgeAc(ImageSpan gradient_image, T&& initial_contour,
+EdgeAc::EdgeAc(ImageView gradient_image, T&& initial_contour,
                const AcConfig& config) /* optional parameter with AcConfig() */
     : ActiveContour(std::forward<T>(initial_contour), config)
     , gradient_image_(gradient_image)

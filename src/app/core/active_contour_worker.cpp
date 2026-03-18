@@ -7,7 +7,7 @@
 #include "region_color_ac.hpp"
 
 #include "image_adapters.hpp"
-#include "image_span.hpp"
+#include "image_view.hpp"
 
 #include <QElapsedTimer>
 #include <QTimer>
@@ -378,13 +378,13 @@ void ActiveContourWorker::initializeActiveContour()
 
     assert(!config_.initialPhi.isNull());
 
-    auto initialPhi = image_span_from_qimage(config_.initialPhi);
+    auto initialPhi = image_view_from_qimage(config_.initialPhi);
 
     fluvel_ip::ContourData initialCD(initialPhi, config_.algo.connectivity);
 
     bool is_rgb = (processedImage_.format() != QImage::Format_Grayscale8);
 
-    const auto processedImg = image_span_from_qimage(processedImage_);
+    const auto processedImg = image_view_from_qimage(processedImage_);
 
     if (is_rgb)
     {

@@ -25,7 +25,7 @@ ContourData::ContourData(int phi_width, int phi_height, Connectivity connectivit
     assert(is_valid());
 }
 
-ContourData::ContourData(ImageSpan grayscale_phi, Connectivity connectivity)
+ContourData::ContourData(ImageView grayscale_phi, Connectivity connectivity)
     : phi_(grayscale_phi.width(), grayscale_phi.height())
     , connectivity_(connectivity)
 {

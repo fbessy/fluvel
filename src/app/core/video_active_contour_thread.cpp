@@ -118,7 +118,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     if (fr.preprocessed.isNull())
         return fr;
 
-    auto algoImage = image_span_from_qimage(fr.preprocessed);
+    auto algoImage = image_view_from_qimage(fr.preprocessed);
     const auto& algoConfig = config.algo;
 
     const auto newWSize = fr.preprocessed.size();
@@ -169,7 +169,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     return fr;
 }
 
-void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageSpan& algoImage,
+void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
                                                            const VideoComputeConfig& config,
                                                            FrameResult& fr)
 {

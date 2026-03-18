@@ -5,7 +5,7 @@
 
 #include "color.hpp"
 #include "grid2d.hpp"
-#include "image_span.hpp"
+#include "image_view.hpp"
 
 #include <chrono>
 
@@ -17,15 +17,15 @@ namespace fluvel_ip
 class TemporalSmoother
 {
 public:
-    void reset(ImageSpan first_src);
-    void update(ImageSpan src);
+    void reset(ImageView first_src);
+    void update(ImageView src);
 
     const Grid2D<Rgb_f>& accum() const
     {
         return accum_;
     }
 
-    ImageSpan outputSpan();
+    ImageView outputSpan();
 
 private:
     void updateNoiseEstimate(float motion, float dt_seconds);

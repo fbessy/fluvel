@@ -4,7 +4,7 @@
 #pragma once
 
 #include "active_contour.hpp"
-#include "image_span.hpp"
+#include "image_view.hpp"
 
 namespace fluvel_ip
 {
@@ -14,7 +14,7 @@ class RegionAc : public ActiveContour
 public:
     //! Constructor to initialize with an initial contour.
     template <typename T>
-    RegionAc(ImageSpan image, T&& initial_contour,
+    RegionAc(ImageView image, T&& initial_contour,
              const AcConfig& general_config = AcConfig(),         /* optional parameter */
              const RegionConfig& regionConfig = RegionConfig()); /* optional parameter */
 
@@ -51,7 +51,7 @@ private:
     void doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice) override;
 
     //! Image wrapper.
-    ImageSpan image_;
+    ImageView image_;
 
     //! Specific configuration for region based active contour.
     const RegionConfig regionConfig_;
@@ -78,7 +78,7 @@ private:
 };
 
 template <typename T>
-RegionAc::RegionAc(ImageSpan image, T&& initial_contour,
+RegionAc::RegionAc(ImageView image, T&& initial_contour,
                    const AcConfig& general_config,    /* optional parameter with AcConfig() */
                    const RegionConfig& regionConfig) /* optional parameter with RegionConfig() */
     : ActiveContour(std::forward<T>(initial_contour), general_config)

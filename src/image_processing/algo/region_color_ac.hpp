@@ -5,7 +5,7 @@
 
 #include "active_contour.hpp"
 #include "color.hpp"
-#include "image_span.hpp"
+#include "image_view.hpp"
 
 #include <cstdint>
 
@@ -18,14 +18,14 @@ public:
     ///! Constructor to initialize with an initial contour.
     template <typename T>
     RegionColorAc(
-        ImageSpan image, T&& initial_contour,
+        ImageView image, T&& initial_contour,
         const AcConfig& general_config = AcConfig(),                   /* optional parameter */
         const RegionColorConfig& regionConfig = RegionColorConfig()); /* optional parameter */
 
     ~RegionColorAc() override = default;
 
     //! Reset the execution state with a new image buffer. Used for video tracking.
-    void resetExecutionState(ImageSpan image);
+    void resetExecutionState(ImageView image);
 
     //! Getter function for #average_rgb_out
     const Rgb_uc& get_Cout() const
@@ -63,7 +63,7 @@ private:
     inline Color_3i rgb_to_color(const Rgb_uc& rgb) const;
 
     //! Image wrapper.
-    ImageSpan image_;
+    ImageView image_;
 
     //! Specific configuration for YUV region based active contour.
     const RegionColorConfig regionConfig_;
@@ -105,7 +105,7 @@ private:
 
 template <typename T>
 RegionColorAc::RegionColorAc(
-    ImageSpan image, T&& initial_contour,
+    ImageView image, T&& initial_contour,
     const AcConfig& general_config,         /* optional parameter with AcConfig() */
     const RegionColorConfig& regionConfig) /* optional parameter with RegionColorConfig() */
     : ActiveContour(std::forward<T>(initial_contour), general_config)
