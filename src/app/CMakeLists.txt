@@ -95,9 +95,6 @@ set(app_src
     ${UI_COMP_DIR}/phi_view_model.cpp
     ${UI_COMP_DIR}/phi_view_model.hpp
 
-    ${UI_COMP_DIR}/contour_rendering_qimage.cpp
-    ${UI_COMP_DIR}/contour_rendering_qimage.hpp
-
     ${UI_COMP_DIR}/overlay_text_item.cpp
     ${UI_COMP_DIR}/overlay_text_item.hpp
 
@@ -131,9 +128,6 @@ set(app_src
 
     ${CORE_DIR}/phi_editor.cpp
     ${CORE_DIR}/phi_editor.hpp
-
-    ${CORE_DIR}/shape_overlay_renderer.cpp
-    ${CORE_DIR}/shape_overlay_renderer.hpp
 
     ${CORE_DIR}/shape_type.hpp
     ${CORE_DIR}/camera_stats.hpp
