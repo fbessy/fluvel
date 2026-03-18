@@ -141,6 +141,9 @@ set(app_src
     ${CORE_DIR}/image_debug.cpp
     ${CORE_DIR}/image_debug.hpp
 
+    ${INTEROP_DIR}/frame_adapters.cpp
+    ${INTEROP_DIR}/frame_adapters.hpp
+
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
     ${INTEROP_DIR}/contour_adapters.hpp

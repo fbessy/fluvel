@@ -18,7 +18,11 @@ enum class ImageFormat
     Rgb24,
     Bgr24,
     Bgr32,
-    Rgba32
+    Rgba32,
+    Yuyv422,
+    Nv12,
+    Nv21,
+    I420
 };
 
 class ImageSpan final
@@ -39,7 +43,6 @@ public:
         assert(widthPixels > 0);
         assert(heightPixels > 0);
         assert(strideBytes >= 0);
-
         assert(strideBytes_ >= widthPixels_ * channelsPerPixel_);
     }
 
@@ -78,8 +81,10 @@ public:
         return data_ + static_cast<ptrdiff_t>(y * strideBytes_);
     }
 
+    // ⚠️ Ne PAS utiliser pour YUYV
     unsigned char at(int x, int y, int c = 0) const noexcept
     {
+        assert(format_ != ImageFormat::Yuyv422);
         assert(x >= 0 && x < widthPixels_);
         assert(y >= 0 && y < heightPixels_);
         assert(c >= 0 && c < channelsPerPixel_);
@@ -87,7 +92,47 @@ public:
         return row(y)[x * channelsPerPixel_ + c];
     }
 
+    // ---------------- RGB (affichage uniquement)
     inline Rgb_uc atPixelRgb(int x, int y) const noexcept
+    {
+        const unsigned char* p = row(y);
+
+        switch (format_)
+        {
+            case ImageFormat::Rgb24:
+            {
+                const unsigned char* px = p + x * 3;
+                return {px[0], px[1], px[2]};
+            }
+            case ImageFormat::Bgr24:
+            {
+                const unsigned char* px = p + x * 3;
+                return {px[2], px[1], px[0]};
+            }
+            case ImageFormat::Bgr32:
+            {
+                const unsigned char* px = p + x * 4;
+                return {px[2], px[1], px[0]};
+            }
+            case ImageFormat::Rgba32:
+            {
+                const unsigned char* px = p + x * 4;
+                return {px[0], px[1], px[2]};
+            }
+
+            case ImageFormat::Gray8:
+            case ImageFormat::Yuyv422:
+            case ImageFormat::Nv12:
+            case ImageFormat::Nv21:
+            case ImageFormat::I420:
+                std::unreachable();
+        }
+
+        std::unreachable();
+    }
+
+    // ---------------- API algo (source de vérité)
+    inline Components_3i atPixel(int x, int y) const noexcept
     {
         const unsigned char* p = row(y);
 
@@ -95,41 +140,147 @@ public:
         {
             case ImageFormat::Gray8:
             {
-                const unsigned char v = p[x];
+                int v = p[x];
                 return {v, v, v};
             }
+
             case ImageFormat::Rgb24:
             {
-                p += static_cast<ptrdiff_t>(x * 3);
-                return {p[0], p[1], p[2]};
+                const unsigned char* px = p + x * 3;
+                return {px[0], px[1], px[2]};
             }
+
             case ImageFormat::Bgr24:
             {
-                p += static_cast<ptrdiff_t>(x * 3);
-                return {p[2], p[1], p[0]};
+                const unsigned char* px = p + x * 3;
+                return {px[2], px[1], px[0]};
             }
+
             case ImageFormat::Bgr32:
             {
-                p += static_cast<ptrdiff_t>(x * 4);
-                return {p[2], p[1], p[0]};
+                const unsigned char* px = p + x * 4;
+                return {px[2], px[1], px[0]};
             }
+
             case ImageFormat::Rgba32:
             {
-                p += static_cast<ptrdiff_t>(x * 4);
-                return {p[0], p[1], p[2]}; // ignore alpha
+                const unsigned char* px = p + x * 4;
+                return {px[0], px[1], px[2]};
+            }
+
+            case ImageFormat::Yuyv422:
+            {
+                // alignement sur paire YUYV
+                const int x_pair = x & ~1;
+                const unsigned char* px = p + x_pair * 2;
+
+                const int Y = (x & 1) ? px[2] : px[0];
+                const int U = px[1];
+                const int V = px[3];
+
+                return {Y, U - 128, V - 128};
+            }
+
+            case ImageFormat::Nv12:
+            case ImageFormat::Nv21:
+            {
+                const int W = widthPixels_;
+                const int H = heightPixels_;
+
+                const unsigned char* Y_plane = data_;
+                const unsigned char* UV_plane = data_ + W * H;
+
+                int Y = Y_plane[y * W + x];
+
+                int uv_x = x & ~1;
+                int uv_y = y >> 1;
+
+                const unsigned char* uv = UV_plane + uv_y * W + uv_x;
+
+                const bool isNV21 = (format_ == ImageFormat::Nv21);
+
+                int U = uv[isNV21 ? 1 : 0];
+                int V = uv[isNV21 ? 0 : 1];
+
+                return {Y, U - 128, V - 128};
+            }
+
+            case ImageFormat::I420:
+            {
+                const int W = widthPixels_;
+                const int H = heightPixels_;
+
+                const int wHalf = W >> 1;
+                const int hHalf = H >> 1;
+
+                const unsigned char* Y_plane = data_;
+                const unsigned char* U_plane = Y_plane + W * H;
+                const unsigned char* V_plane = U_plane + wHalf * hHalf;
+
+                int Y = Y_plane[y * W + x];
+
+                int uv_x = x >> 1;
+                int uv_y = y >> 1;
+
+                int idx = uv_y * wHalf + uv_x;
+
+                int U = U_plane[idx];
+                int V = V_plane[idx];
+
+                return {Y, U - 128, V - 128};
             }
         }
 
-        // Violation de contrat : format_ invalide
         std::unreachable();
     }
 
+    // ---------------- Luminance rapide
     unsigned char gray(int x, int y) const noexcept
     {
-        assert(format_ == ImageFormat::Gray8);
-        assert(channelsPerPixel_ == 1);
+        const unsigned char* p = row(y);
 
-        return at(x, y, 0);
+        switch (format_)
+        {
+            case ImageFormat::Gray8:
+                return p[x];
+
+            case ImageFormat::Yuyv422:
+                return p[x * 2];
+
+            case ImageFormat::Nv12:
+            case ImageFormat::Nv21:
+            case ImageFormat::I420:
+            {
+                const int W = widthPixels_;
+                return data_[y * W + x]; // Y plane
+            }
+
+            case ImageFormat::Rgb24:
+            {
+                const unsigned char* px = p + x * 3;
+                return (77 * px[0] + 150 * px[1] + 29 * px[2]) >> 8;
+            }
+
+            case ImageFormat::Bgr24:
+            {
+                const unsigned char* px = p + x * 3;
+                return (77 * px[2] + 150 * px[1] + 29 * px[0]) >> 8;
+            }
+
+            case ImageFormat::Bgr32:
+            {
+                const unsigned char* px = p + x * 4;
+                return (77 * px[2] + 150 * px[1] + 29 * px[0]) >> 8;
+            }
+
+            case ImageFormat::Rgba32:
+            {
+                const unsigned char* px = p + x * 4;
+                return (77 * px[0] + 150 * px[1] + 29 * px[2]) >> 8;
+            }
+        }
+
+        std::unreachable();
     }
 
 private:
@@ -138,7 +289,7 @@ private:
     int heightPixels_;
     ImageFormat format_;
     int channelsPerPixel_;
-    int strideBytes_; // bytes per row
+    int strideBytes_;
 
     static int compute_stride(int width, int channels, int strideBytes)
     {
@@ -159,6 +310,14 @@ private:
                 return 4;
             case ImageFormat::Rgba32:
                 return 4;
+            case ImageFormat::Yuyv422:
+                return 2;
+            case ImageFormat::Nv12:
+                return 1; // Y plane
+            case ImageFormat::Nv21:
+                return 1; // Y plane
+            case ImageFormat::I420:
+                return 1;
         }
 
         std::unreachable();
