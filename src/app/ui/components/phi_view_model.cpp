@@ -109,7 +109,7 @@ void PhiViewModel::updateLists()
         {
             uchar I = line[x];
 
-            if (!point_is_redundant(x, y))
+            if (!pointIsRedundant(x, y))
             {
                 if (I == 0)
                 {
@@ -124,7 +124,7 @@ void PhiViewModel::updateLists()
     }
 }
 
-bool PhiViewModel::point_is_redundant(int x, int y)
+bool PhiViewModel::pointIsRedundant(int x, int y)
 {
     assert(!phi_.isNull());
 

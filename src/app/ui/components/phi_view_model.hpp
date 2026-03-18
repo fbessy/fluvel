@@ -54,7 +54,7 @@ private:
     void updateLists();
     void updatePhiFromLists();
     void composeView();
-    bool point_is_redundant(int x, int y);
+    bool pointIsRedundant(int x, int y);
 
     PhiEditor* editor_; // non owning
     QImage background_;
