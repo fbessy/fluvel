@@ -38,7 +38,7 @@ signals:
     void inputImageReady(const QImage& inputImage);
     void displayedImageReady(const QImage& displayed);
 
-    void contourUpdated(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in);
+    void contourUpdated(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
     void stateChanged(fluvel_app::WorkerState state);
 
     void textDiagnosticsUpdated(QString string);
@@ -47,8 +47,8 @@ signals:
 
 private:
     void onProcessedImageReady(const QImage& processed);
-    void onContourUpdated(const fluvel_ip::ExportedContour& l_out,
-                          const fluvel_ip::ExportedContour& l_in);
+    void onContourUpdated(const fluvel_ip::ExportedContour& outerContour,
+                          const fluvel_ip::ExportedContour& innerContour);
     void onStateChanged(fluvel_app::WorkerState state);
     void onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& diag);
 

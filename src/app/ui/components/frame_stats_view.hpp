@@ -26,9 +26,9 @@ public:
     FrameStatsView();
 
     // événements
-    void frameReceived(qint64 recvTsNs);
+    void frameReceived(qint64 receiveTsNs);
     void frameProcessed(quint64 contourSize);
-    void frameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
+    void frameDisplayed(qint64 receiveTsNs, qint64 displayTsNs);
 
     // lecture stable (fenêtre ~1s)
     Snapshot snapshot();

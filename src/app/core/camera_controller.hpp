@@ -46,7 +46,7 @@ public:
     void onVideoSettingsChanged(const VideoSessionSettings& session);
     void onVideoDisplaySettingsChanged(const DisplayConfig& display);
 
-    void onFrameDisplayed(qint64 recvTsNs, qint64 displayTsNs);
+    void onFrameDisplayed(qint64 receiveTsNs, qint64 displayTsNs);
 
 signals:
     void videoInputsChanged(const QList<QCameraDevice>& inputs);
@@ -58,8 +58,8 @@ signals:
 
     void frameSizeStr(const QString& str);
     void textStatsUpdated(const QString& textStats);
-    void imageAndContourUpdated(const QImage& img, const QVector<QPointF>& l_out,
-                                const QVector<QPointF>& l_in, qint64 receiveTs);
+    void imageAndContourUpdated(const QImage& img, const QVector<QPointF>& outerContour,
+                                const QVector<QPointF>& innerContour, qint64 receiveTimestampNs);
 
 private:
     QCameraFormat chooseBestFormat(const QCameraDevice& dev);
@@ -71,7 +71,7 @@ private:
     void onVideoFrame(const QVideoFrame& frame);
 
     void onFrameProcessed(quint64 contourSize);
-    void onFrameResultReady(const FrameResult& result);
+    void onFrameResultReady(const DisplayFrame& result);
     void onStartupTimeout();
     void checkWatchdog();
     void updateDiagnostics();

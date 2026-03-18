@@ -17,9 +17,9 @@ VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
 
 void VideoActiveContourThread::submitFrame(const QVideoFrame& frame)
 {
-    FrameData fd;
+    CapturedFrame fd;
     fd.frame = frame;
-    fd.receiveTs = FrameClock::nowNs();
+    fd.receiveTimestampNs = FrameClock::nowNs();
 
     {
         QMutexLocker locker(&frameMutex_);
@@ -43,15 +43,15 @@ void VideoActiveContourThread::run()
         if (!running_)
             break;
 
-        FrameData fd = lastFrameData_;
+        CapturedFrame fd = lastFrameData_;
         frameAvailable_ = false;
         locker.unlock();
 
-        FrameResult result = processFrame(fd.frame);
+        DisplayFrame result = processFrame(fd.frame);
 
-        result.receiveTs = fd.receiveTs;
+        result.receiveTimestampNs = fd.receiveTimestampNs;
 
-        quint64 contourSize = static_cast<quint64>(result.l_out.size() + result.l_in.size());
+        quint64 contourSize = static_cast<quint64>(result.outerContour.size() + result.innerContour.size());
 
         emit frameProcessed(contourSize);
 
@@ -96,7 +96,7 @@ QImage VideoActiveContourThread::applyDownscale(const QImage& input,
                         Qt::SmoothTransformation);
 }
 
-FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
+DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 {
     qint64 startTs = FrameClock::nowNs();
 
@@ -107,7 +107,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         config = config_;
     }
 
-    FrameResult fr;
+    DisplayFrame fr;
     fr.input = convertFrame(frame);
 
     if (fr.input.isNull())
@@ -161,7 +161,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     }
 
     activeContour_->runCycles(config.cyclesNbr);
-    fr.processTs = FrameClock::nowNs() - startTs;
+    fr.processTimestampNs = FrameClock::nowNs() - startTs;
 
     exportTemporalFilteredImage(algoImage, config, fr);
     exportContours(fr);
@@ -171,7 +171,7 @@ FrameResult VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 
 void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
                                                            const VideoComputeConfig& config,
-                                                           FrameResult& fr)
+                                                           DisplayFrame& fr)
 {
     if (!config.hasTemporalFiltering)
         return;
@@ -180,12 +180,12 @@ void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::Imag
                              static_cast<qsizetype>(3 * algoImage.width()), QImage::Format_RGB888);
 }
 
-void VideoActiveContourThread::exportContours(FrameResult& fr)
+void VideoActiveContourThread::exportContours(DisplayFrame& fr)
 {
     if (activeContour_)
     {
-        fr.l_out = activeContour_->export_l_out();
-        fr.l_in = activeContour_->export_l_in();
+        fr.outerContour = activeContour_->export_l_out();
+        fr.innerContour = activeContour_->export_l_in();
     }
 }
 

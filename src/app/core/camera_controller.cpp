@@ -238,15 +238,15 @@ void CameraController::onFrameProcessed(quint64 contourSize)
     frameStats_.frameProcessed(contourSize);
 }
 
-void CameraController::onFrameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
+void CameraController::onFrameDisplayed(qint64 receiveTsNs, qint64 displayTsNs)
 {
-    frameStats_.frameDisplayed(recvTsNs, displayTsNs);
+    frameStats_.frameDisplayed(receiveTsNs, displayTsNs);
 }
 
-void CameraController::onFrameResultReady(const FrameResult& result)
+void CameraController::onFrameResultReady(const DisplayFrame& result)
 {
-    auto q_l_out = convertToQVector(result.l_out);
-    auto q_l_in = convertToQVector(result.l_in);
+    auto q_l_out = convertToQVector(result.outerContour);
+    auto q_l_in = convertToQVector(result.innerContour);
 
     QImage img;
 
@@ -256,7 +256,7 @@ void CameraController::onFrameResultReady(const FrameResult& result)
         img = result.preprocessed;
 
     if (!img.isNull())
-        emit imageAndContourUpdated(img, q_l_out, q_l_in, result.receiveTs);
+        emit imageAndContourUpdated(img, q_l_out, q_l_in, result.receiveTimestampNs);
 }
 
 void CameraController::onStartupTimeout()

@@ -17,20 +17,20 @@
 namespace fluvel_app
 {
 
-struct FrameResult
+struct DisplayFrame
 {
     QImage input;
     QImage preprocessed;
-    fluvel_ip::ExportedContour l_out;
-    fluvel_ip::ExportedContour l_in;
-    qint64 receiveTs;
-    qint64 processTs;
+    fluvel_ip::ExportedContour outerContour;
+    fluvel_ip::ExportedContour innerContour;
+    qint64 receiveTimestampNs;
+    qint64 processTimestampNs;
 };
 
-struct FrameData
+struct CapturedFrame
 {
     QVideoFrame frame;
-    qint64 receiveTs;
+    qint64 receiveTimestampNs;
 };
 
 class VideoActiveContourThread : public QThread
@@ -47,7 +47,7 @@ public:
 signals:
     void frameProcessed(quint64 contourSize);
 
-    void frameResultReady(fluvel_app::FrameResult result);
+    void frameResultReady(fluvel_app::DisplayFrame result);
 
     void frameSizeStr(QString str);
 
@@ -58,18 +58,18 @@ private:
 
     QImage convertFrame(QVideoFrame frame) const;
     QImage applyDownscale(const QImage& input, const DownscaleConfig& config) const;
-    FrameResult processFrame(const QVideoFrame& frame);
+    DisplayFrame processFrame(const QVideoFrame& frame);
 
     void exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
-                                     const VideoComputeConfig& config, FrameResult& fr);
+                                     const VideoComputeConfig& config, DisplayFrame& fr);
 
-    void exportContours(FrameResult& fr);
+    void exportContours(DisplayFrame& fr);
 
     VideoComputeConfig config_;
 
     QMutex frameMutex_;
     QWaitCondition condition_;
-    FrameData lastFrameData_;
+    CapturedFrame lastFrameData_;
     bool frameAvailable_{false};
     bool running_{true};
     bool configChanged_{false};

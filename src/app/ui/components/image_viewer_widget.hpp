@@ -76,10 +76,10 @@ public:
 public slots:
     void setImage(const QImage& img);
 
-    void setContour(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in);
+    void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
 
-    void setImageAndContour(const QImage& image, const QVector<QPointF>& l_out,
-                            const QVector<QPointF>& l_in, qint64 receiveTs);
+    void setImageAndContour(const QImage& image, const QVector<QPointF>& outerContour,
+                            const QVector<QPointF>& innerContour, qint64 receiveTimestampNs);
 
     void setText(const QString& text);
 
@@ -94,7 +94,7 @@ public slots:
 
 signals:
     void imageClicked(int x, int y);
-    void frameDisplayed(qint64 receiveTs, qint64 displayTs);
+    void frameDisplayed(qint64 receiveTimestampNs, qint64 displayTs);
     void imageDropped(const QString& path);
 
 protected:
@@ -162,7 +162,8 @@ private:
 
     QImage lastDisplayedImage_;
 
-    qint64 lastReceiveTs_;
+    //! Last receive timestamp in nanoseconds.
+    qint64 lastReceiveTsNs_;
 
     ImageViewerInteraction* m_interaction_ = nullptr;
     ImageViewerListener* listener_ = nullptr;

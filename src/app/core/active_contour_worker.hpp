@@ -53,8 +53,8 @@ public:
 
 signals:
     void processedImageReady(const QImage& img);
-    void contourUpdated(const fluvel_ip::ExportedContour& l_out,
-                        const fluvel_ip::ExportedContour& l_in);
+    void contourUpdated(const fluvel_ip::ExportedContour& outerContour,
+                        const fluvel_ip::ExportedContour& innerContour);
     void stateChanged(fluvel_app::WorkerState state);
     void diagnosticsUpdated(fluvel_ip::ContourDiagnostics diag);
 

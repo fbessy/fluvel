@@ -116,7 +116,7 @@ void ImageViewerWidget::setImage(const QImage& img)
 
         qint64 displayTs = FrameClock::nowNs();
 
-        emit frameDisplayed(lastReceiveTs_, displayTs);
+        emit frameDisplayed(lastReceiveTsNs_, displayTs);
 
         return;
     }
@@ -131,7 +131,7 @@ void ImageViewerWidget::setImage(const QImage& img)
 
         qint64 displayTs = FrameClock::nowNs();
 
-        emit frameDisplayed(lastReceiveTs_, displayTs);
+        emit frameDisplayed(lastReceiveTsNs_, displayTs);
     }
     else
     {
@@ -150,23 +150,26 @@ void ImageViewerWidget::setImage(const QImage& img)
     }
 }
 
-void ImageViewerWidget::setContour(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in)
+void ImageViewerWidget::setContour(const QVector<QPointF>& outerContour,
+                                   const QVector<QPointF>& innerContour)
 {
     assert(l_out_ && l_in_);
 
-    l_out_->setPoints(l_out);
-    l_in_->setPoints(l_in);
+    l_out_->setPoints(outerContour);
+    l_in_->setPoints(innerContour);
 }
 
-void ImageViewerWidget::setImageAndContour(const QImage& image, const QVector<QPointF>& l_out,
-                                   const QVector<QPointF>& l_in, qint64 receiveTs)
+void ImageViewerWidget::setImageAndContour(const QImage& image,
+                                           const QVector<QPointF>& outerContour,
+                                           const QVector<QPointF>& innerContour,
+                                           qint64 receiveTimestampNs)
 {
     assert(l_out_ && l_in_);
 
     setImage(image);
-    setContour(l_out, l_in);
+    setContour(outerContour, innerContour);
 
-    lastReceiveTs_ = receiveTs;
+    lastReceiveTsNs_ = receiveTimestampNs;
 }
 
 void ImageViewerWidget::clearOverlays()
@@ -191,7 +194,7 @@ void ImageViewerWidget::flushPendingFrame()
 
     qint64 displayTs = FrameClock::nowNs();
 
-    emit frameDisplayed(lastReceiveTs_, displayTs);
+    emit frameDisplayed(lastReceiveTsNs_, displayTs);
 }
 
 void ImageViewerWidget::updatePixmap(const QImage& img)

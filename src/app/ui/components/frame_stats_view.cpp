@@ -31,15 +31,15 @@ void FrameStatsView::reset()
     lastSnapshot_ = {};
 }
 
-void FrameStatsView::frameReceived(qint64 recvTsNs)
+void FrameStatsView::frameReceived(qint64 receiveTsNs)
 {
     QMutexLocker lock(&mutex_);
 
     if (windowStartNs_ == 0)
-        windowStartNs_ = recvTsNs;
+        windowStartNs_ = receiveTsNs;
 
     ++inputFrames_;
-    updateWindowLocked(recvTsNs);
+    updateWindowLocked(receiveTsNs);
 }
 
 void FrameStatsView::frameProcessed(quint64 contourSize)
@@ -50,14 +50,14 @@ void FrameStatsView::frameProcessed(quint64 contourSize)
     ++processedFrames_;
 }
 
-void FrameStatsView::frameDisplayed(qint64 recvTsNs, qint64 displayTsNs)
+void FrameStatsView::frameDisplayed(qint64 receiveTsNs, qint64 displayTsNs)
 {
     QMutexLocker lock(&mutex_);
 
     ++displayedFrames_;
 
     // latence affichage - réception
-    double latencyMs = double(displayTsNs - recvTsNs) * 1e-6;
+    double latencyMs = double(displayTsNs - receiveTsNs) * 1e-6;
 
     latencySumMs_ += latencyMs;
     latencyMaxMs_ = std::max(latencyMaxMs_, latencyMs);
