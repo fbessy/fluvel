@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "contour_data.hpp"
+#include "ac_types.hpp"
 #include <QPoint>
 #include <QVector>
 
