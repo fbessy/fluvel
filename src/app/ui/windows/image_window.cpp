@@ -579,6 +579,13 @@ void ImageWindow::updateRecentFileActions()
     const std::size_t numRecentFiles =
         std::min<std::size_t>(static_cast<std::size_t>(files.size()), kMaxRecentFiles);
 
+    // 🔥 D'abord tout cacher
+    for (auto& act : recentFileActs_)
+    {
+        act->setVisible(false);
+    }
+
+    // Ensuite afficher ce qu'il faut
     for (std::size_t i = 0; i < numRecentFiles; ++i)
     {
         const QString& file = files[static_cast<qsizetype>(i)];
@@ -591,21 +598,8 @@ void ImageWindow::updateRecentFileActions()
         recentFileActs_[i]->setStatusTip(file);
     }
 
-    for (auto& act : recentFileActs_)
-    {
-        act->setVisible(false);
-    }
-
     separatorAct_->setVisible(numRecentFiles > 0);
-
-    if (files.isEmpty())
-    {
-        clearAct_->setVisible(false);
-    }
-    else
-    {
-        clearAct_->setVisible(true);
-    }
+    clearAct_->setVisible(!files.isEmpty());
 }
 
 void ImageWindow::clearRecentFiles()
@@ -676,6 +670,9 @@ void ImageWindow::onDisplayedImageReady(const QImage& displayed)
 
 void ImageWindow::onFileOpened(const QString& path)
 {
+    if (path.isEmpty())
+        return;
+
     setCurrentFile(path); // for recent file
 
     lastDirectoryUsed_ = QFileInfo(path).absolutePath();
