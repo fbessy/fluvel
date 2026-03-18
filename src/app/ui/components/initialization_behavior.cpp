@@ -3,7 +3,7 @@
 
 #include "initialization_behavior.hpp"
 
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 #include <QMouseEvent>
 
@@ -15,7 +15,7 @@ InitializationBehavior::InitializationBehavior(QObject* parent)
 {
 }
 
-bool InitializationBehavior::mouseMove(ImageView& view, QMouseEvent* e)
+bool InitializationBehavior::mouseMove(ImageViewerWidget& view, QMouseEvent* e)
 {
     const QPoint imgPos = view.imageCoordinatesFromView(e->pos());
 
@@ -28,7 +28,7 @@ bool InitializationBehavior::mouseMove(ImageView& view, QMouseEvent* e)
     return true;
 }
 
-bool InitializationBehavior::mousePress(ImageView& view, QMouseEvent* e)
+bool InitializationBehavior::mousePress(ImageViewerWidget& view, QMouseEvent* e)
 {
     const QPoint imgPos = view.imageCoordinatesFromView(e->pos());
 
@@ -59,7 +59,7 @@ bool InitializationBehavior::mousePress(ImageView& view, QMouseEvent* e)
     return false;
 }
 
-bool InitializationBehavior::wheel(ImageView& /* view */, QWheelEvent* we)
+bool InitializationBehavior::wheel(ImageViewerWidget& /* view */, QWheelEvent* we)
 {
     if (!(we->modifiers() & Qt::ControlModifier))
         return false;

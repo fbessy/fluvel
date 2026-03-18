@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "pan_behavior.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 #include <QMouseEvent>
 
@@ -14,7 +14,7 @@ PanBehavior::PanBehavior(Qt::MouseButton button)
 {
 }
 
-bool PanBehavior::mousePress(ImageView& view, QMouseEvent* e)
+bool PanBehavior::mousePress(ImageViewerWidget& view, QMouseEvent* e)
 {
     if (e->button() == button_ && view.isPanRelevant())
     {
@@ -26,7 +26,7 @@ bool PanBehavior::mousePress(ImageView& view, QMouseEvent* e)
     return false;
 }
 
-bool PanBehavior::mouseMove(ImageView& view, QMouseEvent* e)
+bool PanBehavior::mouseMove(ImageViewerWidget& view, QMouseEvent* e)
 {
     if (!capturing_ || !view.isPanRelevant())
         return false;
@@ -43,7 +43,7 @@ bool PanBehavior::mouseMove(ImageView& view, QMouseEvent* e)
     return true;
 }
 
-bool PanBehavior::mouseRelease(ImageView&, QMouseEvent* e)
+bool PanBehavior::mouseRelease(ImageViewerWidget&, QMouseEvent* e)
 {
     if (e->button() == button_ && capturing_)
     {

@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "autofit_behavior.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 #include <QMouseEvent>
 
@@ -14,7 +14,7 @@ AutoFitBehavior::AutoFitBehavior(Qt::MouseButton button)
 {
 }
 
-bool AutoFitBehavior::mouseRelease(ImageView& view, QMouseEvent* event)
+bool AutoFitBehavior::mouseRelease(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (event->button() == button_)
     {

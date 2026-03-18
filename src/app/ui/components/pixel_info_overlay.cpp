@@ -47,7 +47,7 @@ void PixelInfoOverlay::calc_bounding(const QString& maxStr)
 }
 
 void PixelInfoOverlay::updateInfo(const QPoint& pixel, const QRgb& color, bool isGrayImg,
-                                  const QPointF& anchorScenePos, ImageView& view)
+                                  const QPointF& anchorScenePos, ImageViewerWidget& view)
 {
     if (isGrayImg)
     {
@@ -70,7 +70,7 @@ void PixelInfoOverlay::updateInfo(const QPoint& pixel, const QRgb& color, bool i
     updatePlacement(anchorScenePos, view);
 }
 
-void PixelInfoOverlay::updatePlacement(const QPointF& anchorScenePos, ImageView& view)
+void PixelInfoOverlay::updatePlacement(const QPointF& anchorScenePos, ImageViewerWidget& view)
 {
     constexpr int margin = 8;
 

@@ -16,57 +16,57 @@ class QDropEvent;
 namespace fluvel_app
 {
 
-class ImageView;
+class ImageViewerWidget;
 
-class ImageViewInteraction
+class ImageViewerInteraction
 {
 public:
-    virtual ~ImageViewInteraction() = default;
+    virtual ~ImageViewerInteraction() = default;
 
-    virtual bool wheel(ImageView&, QWheelEvent*)
+    virtual bool wheel(ImageViewerWidget&, QWheelEvent*)
     {
         return false;
     }
-    virtual bool mousePress(ImageView&, QMouseEvent*)
+    virtual bool mousePress(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
-    virtual bool mouseMove(ImageView&, QMouseEvent*)
+    virtual bool mouseMove(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
-    virtual bool mouseRelease(ImageView&, QMouseEvent*)
+    virtual bool mouseRelease(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
-    virtual bool mouseDoubleClick(ImageView&, QMouseEvent*)
+    virtual bool mouseDoubleClick(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
 
-    virtual Qt::CursorShape cursorForEvent(const ImageView& /*view*/, bool /*hasImage*/,
+    virtual Qt::CursorShape cursorForEvent(const ImageViewerWidget& /*view*/, bool /*hasImage*/,
                                            bool /*isPanRelevant*/,
                                            const QMouseEvent* /*event*/) const
     {
         return Qt::ArrowCursor;
     }
 
-    virtual bool dragEnter(ImageView&, QDragEnterEvent*)
+    virtual bool dragEnter(ImageViewerWidget&, QDragEnterEvent*)
     {
         return false;
     }
 
-    virtual bool dragMove(ImageView&, QDragMoveEvent*)
+    virtual bool dragMove(ImageViewerWidget&, QDragMoveEvent*)
     {
         return false;
     }
 
-    virtual bool dragLeave(ImageView&, QDragLeaveEvent*)
+    virtual bool dragLeave(ImageViewerWidget&, QDragLeaveEvent*)
     {
         return false;
     }
 
-    virtual bool drop(ImageView&, QDropEvent*)
+    virtual bool drop(ImageViewerWidget&, QDropEvent*)
     {
         return false;
     }

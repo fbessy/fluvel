@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "view_behavior.hpp"
 
 #include <QObject>
 #include <QPoint>
 
 class QMouseEvent;
-class ImageView;
+class ImageViewerWidget;
 
 namespace fluvel_app
 {
@@ -22,9 +22,9 @@ class InitializationBehavior : public QObject, public ViewBehavior
 public:
     explicit InitializationBehavior(QObject* parent = nullptr);
 
-    bool mouseMove(ImageView& view, QMouseEvent* e) override;
-    bool mousePress(ImageView& view, QMouseEvent* e) override;
-    bool wheel(ImageView& view, QWheelEvent* we) override;
+    bool mouseMove(ImageViewerWidget& view, QMouseEvent* e) override;
+    bool mousePress(ImageViewerWidget& view, QMouseEvent* e) override;
+    bool wheel(ImageViewerWidget& view, QWheelEvent* we) override;
 
 signals:
     void previewShapeRequested(QPoint imagePos);

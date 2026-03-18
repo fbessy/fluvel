@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "color_adapters.hpp"
 #include "common_settings.hpp"
 #include "drag_drop_behavior.hpp"
 #include "frame_clock.hpp"
-#include "image_view_interaction.hpp"
+#include "image_viewer_interaction.hpp"
 #include "interaction_set.hpp"
 #include "overlay_text_item.hpp"
 
@@ -20,13 +20,13 @@
 namespace fluvel_app
 {
 
-ImageView::ImageView(QWidget* parent)
+ImageViewerWidget::ImageViewerWidget(QWidget* parent)
     : QGraphicsView(parent)
 {
     initialize();
 }
 
-ImageView::ImageView(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
+ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
                      QWidget* parent)
     : QGraphicsView(parent)
     , displayConfig_(displayConfig)
@@ -50,7 +50,7 @@ ImageView::ImageView(const DisplayConfig& displayConfig, const DownscaleConfig& 
     updateSmoothDisplay();
 }
 
-void ImageView::initialize()
+void ImageViewerWidget::initialize()
 {
     setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
@@ -82,13 +82,13 @@ void ImageView::initialize()
     throttleTimer_ = new QTimer(this);
     throttleTimer_->setSingleShot(true);
 
-    connect(throttleTimer_, &QTimer::timeout, this, &ImageView::flushPendingFrame);
+    connect(throttleTimer_, &QTimer::timeout, this, &ImageViewerWidget::flushPendingFrame);
 }
 
 // ------------------------------------------------------------
 // Public API
 // ------------------------------------------------------------
-void ImageView::setMaxDisplayFps(double fps)
+void ImageViewerWidget::setMaxDisplayFps(double fps)
 {
     if (fps <= 0.0)
     {
@@ -99,7 +99,7 @@ void ImageView::setMaxDisplayFps(double fps)
     minDisplayIntervalMs_ = static_cast<int>(1000.0 / fps);
 }
 
-void ImageView::setImage(const QImage& img)
+void ImageViewerWidget::setImage(const QImage& img)
 {
     // Toujours garder la dernière image
     pendingFrame_ = img;
@@ -148,7 +148,7 @@ void ImageView::setImage(const QImage& img)
     }
 }
 
-void ImageView::setContour(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in)
+void ImageViewerWidget::setContour(const QVector<QPointF>& l_out, const QVector<QPointF>& l_in)
 {
     assert(l_out_ && l_in_);
 
@@ -156,7 +156,7 @@ void ImageView::setContour(const QVector<QPointF>& l_out, const QVector<QPointF>
     l_in_->setPoints(l_in);
 }
 
-void ImageView::setImageAndContour(const QImage& image, const QVector<QPointF>& l_out,
+void ImageViewerWidget::setImageAndContour(const QImage& image, const QVector<QPointF>& l_out,
                                    const QVector<QPointF>& l_in, qint64 receiveTs)
 {
     assert(l_out_ && l_in_);
@@ -167,7 +167,7 @@ void ImageView::setImageAndContour(const QImage& image, const QVector<QPointF>& 
     lastReceiveTs_ = receiveTs;
 }
 
-void ImageView::clearOverlays()
+void ImageViewerWidget::clearOverlays()
 {
     assert(l_out_ && l_in_);
 
@@ -178,7 +178,7 @@ void ImageView::clearOverlays()
 // ------------------------------------------------------------
 // Internal rendering
 // ------------------------------------------------------------
-void ImageView::flushPendingFrame()
+void ImageViewerWidget::flushPendingFrame()
 {
     if (!hasPendingFrame_)
         return;
@@ -192,7 +192,7 @@ void ImageView::flushPendingFrame()
     emit frameDisplayed(lastReceiveTs_, displayTs);
 }
 
-void ImageView::updatePixmap(const QImage& img)
+void ImageViewerWidget::updatePixmap(const QImage& img)
 {
     if (img.isNull() || !pixmapItem_)
         return;
@@ -216,12 +216,12 @@ void ImageView::updatePixmap(const QImage& img)
     }
 }
 
-double ImageView::currentZoom() const
+double ImageViewerWidget::currentZoom() const
 {
     return getCurrentZoom();
 }
 
-void ImageView::scaleView(double sx, double sy)
+void ImageViewerWidget::scaleView(double sx, double sy)
 {
     const QPoint overlayPosition = textPosition();
 
@@ -230,7 +230,7 @@ void ImageView::scaleView(double sx, double sy)
     setTextPosition(overlayPosition);
 }
 
-void ImageView::translateView(double dx, double dy)
+void ImageViewerWidget::translateView(double dx, double dy)
 {
     const QPoint overlayPosition = textPosition();
 
@@ -239,12 +239,12 @@ void ImageView::translateView(double dx, double dy)
     setTextPosition(overlayPosition);
 }
 
-double ImageView::getCurrentZoom() const
+double ImageViewerWidget::getCurrentZoom() const
 {
     return transform().m11(); // scale X
 }
 
-void ImageView::toggleFullscreen()
+void ImageViewerWidget::toggleFullscreen()
 {
     const QPoint overlayPosition = textPosition();
 
@@ -268,7 +268,7 @@ void ImageView::toggleFullscreen()
     setTextPosition(overlayPosition);
 }
 
-void ImageView::applyAutoFit()
+void ImageViewerWidget::applyAutoFit()
 {
     const QPoint overlayPosition = textPosition();
 
@@ -282,12 +282,12 @@ void ImageView::applyAutoFit()
     setTextPosition(overlayPosition);
 }
 
-void ImageView::userInteracted()
+void ImageViewerWidget::userInteracted()
 {
     autoFitEnabled_ = false;
 }
 
-QPoint ImageView::textPosition() const
+QPoint ImageViewerWidget::textPosition() const
 {
     QPoint overlayPosition = {0, 0};
 
@@ -305,7 +305,7 @@ QPoint ImageView::textPosition() const
     return overlayPosition;
 }
 
-void ImageView::setTextPosition(QPoint position)
+void ImageViewerWidget::setTextPosition(QPoint position)
 {
     if (overlay_)
         overlay_->setPos(mapToScene(position));
@@ -314,7 +314,7 @@ void ImageView::setTextPosition(QPoint position)
 // ------------------------------------------------------------
 // Interaction
 // ------------------------------------------------------------
-void ImageView::wheelEvent(QWheelEvent* event)
+void ImageViewerWidget::wheelEvent(QWheelEvent* event)
 {
     if (!hasImage())
     {
@@ -379,7 +379,7 @@ void ImageView::wheelEvent(QWheelEvent* event)
     }
 }
 
-void ImageView::resizeEvent(QResizeEvent* event)
+void ImageViewerWidget::resizeEvent(QResizeEvent* event)
 {
     const QPoint overlayPosition = textPosition();
 
@@ -391,12 +391,12 @@ void ImageView::resizeEvent(QResizeEvent* event)
     setTextPosition(overlayPosition);
 }
 
-void ImageView::setInteraction(ImageViewInteraction* interaction)
+void ImageViewerWidget::setInteraction(ImageViewerInteraction* interaction)
 {
     m_interaction_ = interaction;
 }
 
-/*void ImageView::wheelEvent(QWheelEvent* event)
+/*void ImageViewerWidget::wheelEvent(QWheelEvent* event)
 {
     if (m_interaction)
     {
@@ -408,7 +408,7 @@ void ImageView::setInteraction(ImageViewInteraction* interaction)
     QGraphicsView::wheelEvent(event);
 }*/
 
-void ImageView::mousePressEvent(QMouseEvent* event)
+void ImageViewerWidget::mousePressEvent(QMouseEvent* event)
 {
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
@@ -422,7 +422,7 @@ void ImageView::mousePressEvent(QMouseEvent* event)
     QGraphicsView::mousePressEvent(event);
 }
 
-void ImageView::mouseMoveEvent(QMouseEvent* event)
+void ImageViewerWidget::mouseMoveEvent(QMouseEvent* event)
 {
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
@@ -445,7 +445,7 @@ void ImageView::mouseMoveEvent(QMouseEvent* event)
     QGraphicsView::mouseMoveEvent(event);
 }
 
-void ImageView::mouseReleaseEvent(QMouseEvent* event)
+void ImageViewerWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
@@ -459,7 +459,7 @@ void ImageView::mouseReleaseEvent(QMouseEvent* event)
     QGraphicsView::mouseReleaseEvent(event);
 }
 
-void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
+void ImageViewerWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
     if (m_interaction_)
         m_interaction_->mouseDoubleClick(*this, event);
@@ -468,7 +468,7 @@ void ImageView::mouseDoubleClickEvent(QMouseEvent* event)
         QGraphicsView::mouseDoubleClickEvent(event);
 }
 
-void ImageView::updateCursor(const QMouseEvent* e)
+void ImageViewerWidget::updateCursor(const QMouseEvent* e)
 {
     if (!m_interaction_)
         return;
@@ -497,7 +497,7 @@ void ImageView::updateCursor(const QMouseEvent* e)
     viewport()->setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), e));
 }
 
-bool ImageView::viewportEvent(QEvent* event)
+bool ImageViewerWidget::viewportEvent(QEvent* event)
 {
     if (!m_interaction_)
         return QGraphicsView::viewportEvent(event);
@@ -523,7 +523,7 @@ bool ImageView::viewportEvent(QEvent* event)
     return QGraphicsView::viewportEvent(event);
 }
 
-void ImageView::dragEnterEvent(QDragEnterEvent* event)
+void ImageViewerWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     bool handled = false;
 
@@ -534,7 +534,7 @@ void ImageView::dragEnterEvent(QDragEnterEvent* event)
         event->ignore();
 }
 
-void ImageView::dragMoveEvent(QDragMoveEvent* event)
+void ImageViewerWidget::dragMoveEvent(QDragMoveEvent* event)
 {
     bool handled = false;
 
@@ -545,13 +545,13 @@ void ImageView::dragMoveEvent(QDragMoveEvent* event)
         event->ignore();
 }
 
-void ImageView::dragLeaveEvent(QDragLeaveEvent* event)
+void ImageViewerWidget::dragLeaveEvent(QDragLeaveEvent* event)
 {
     if (m_interaction_)
         m_interaction_->dragLeave(*this, event);
 }
 
-void ImageView::dropEvent(QDropEvent* event)
+void ImageViewerWidget::dropEvent(QDropEvent* event)
 {
     bool handled = false;
 
@@ -562,7 +562,7 @@ void ImageView::dropEvent(QDropEvent* event)
         event->ignore();
 }
 
-void ImageView::drawForeground(QPainter* painter, const QRectF& rect)
+void ImageViewerWidget::drawForeground(QPainter* painter, const QRectF& rect)
 {
     if (!supportsDragDrop())
         return;
@@ -588,7 +588,7 @@ void ImageView::drawForeground(QPainter* painter, const QRectF& rect)
     painter->restore();
 }
 
-QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
+QPoint ImageViewerWidget::imageCoordinatesFromView(const QPoint& viewPos) const
 {
     if (!pixmapItem_ || lastDisplayedImage_.isNull())
         return QPoint(-1, -1);
@@ -607,7 +607,7 @@ QPoint ImageView::imageCoordinatesFromView(const QPoint& viewPos) const
     return p;
 }
 
-void ImageView::enterEvent(QEnterEvent*)
+void ImageViewerWidget::enterEvent(QEnterEvent*)
 {
     if (!m_interaction_)
         return;
@@ -624,7 +624,7 @@ void ImageView::enterEvent(QEnterEvent*)
     updateCursor(&fake);
 }
 
-QRgb ImageView::pixelColorAt(const QPoint& imagePos) const
+QRgb ImageViewerWidget::pixelColorAt(const QPoint& imagePos) const
 {
     if (!lastDisplayedImage_.valid(imagePos))
         return QRgb();
@@ -632,23 +632,23 @@ QRgb ImageView::pixelColorAt(const QPoint& imagePos) const
     return lastDisplayedImage_.pixel(imagePos);
 }
 
-void ImageView::setListener(ImageViewListener* listener)
+void ImageViewerWidget::setListener(ImageViewerListener* listener)
 {
     listener_ = listener;
 }
 
-void ImageView::onColorPicked(const QColor& color, const QPoint& imagePos)
+void ImageViewerWidget::onColorPicked(const QColor& color, const QPoint& imagePos)
 {
     if (listener_)
         listener_->onColorPicked(color, imagePos);
 }
 
-const QImage& ImageView::image() const
+const QImage& ImageViewerWidget::image() const
 {
     return lastDisplayedImage_;
 }
 
-QImage ImageView::renderToImage() const
+QImage ImageViewerWidget::renderToImage() const
 {
     if (!scene_ || scene_->sceneRect().isEmpty())
         return QImage();
@@ -667,12 +667,12 @@ QImage ImageView::renderToImage() const
     return img;
 }
 
-bool ImageView::hasImage() const
+bool ImageViewerWidget::hasImage() const
 {
     return pixmapItem_ != nullptr && !lastDisplayedImage_.isNull();
 }
 
-bool ImageView::isPanRelevant() const
+bool ImageViewerWidget::isPanRelevant() const
 {
     if (!hasImage())
         return false;
@@ -683,18 +683,18 @@ bool ImageView::isPanRelevant() const
     return sceneRect.width() > viewRect.width() || sceneRect.height() > viewRect.height();
 }
 
-QGraphicsScene* ImageView::graphicsScene() const
+QGraphicsScene* ImageViewerWidget::graphicsScene() const
 {
     return scene_;
 }
 
-bool ImageView::isGrayscale() const
+bool ImageViewerWidget::isGrayscale() const
 {
     return lastDisplayedImage_.format() == QImage::Format_Grayscale8 ||
            lastDisplayedImage_.format() == QImage::Format_Grayscale16;
 }
 
-void ImageView::upscaleItems()
+void ImageViewerWidget::upscaleItems()
 {
     assert(configUsed_ && l_out_ && l_in_);
 
@@ -710,7 +710,7 @@ void ImageView::upscaleItems()
     l_in_->setScale(factor);
 }
 
-void ImageView::applyDisplayConfig(const DisplayConfig& display)
+void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
 {
     assert(configUsed_);
 
@@ -719,7 +719,7 @@ void ImageView::applyDisplayConfig(const DisplayConfig& display)
     updateDisplayWithConfig();
 }
 
-void ImageView::updateDisplayWithConfig()
+void ImageViewerWidget::updateDisplayWithConfig()
 {
     assert(configUsed_);
 
@@ -730,7 +730,7 @@ void ImageView::updateDisplayWithConfig()
     updateTextOverlayVisibility();
 }
 
-void ImageView::updateContourColors()
+void ImageViewerWidget::updateContourColors()
 {
     assert(configUsed_ && l_out_ && l_in_);
 
@@ -750,7 +750,7 @@ void ImageView::updateContourColors()
     l_in_->setColor(col_lin);
 }
 
-void ImageView::updateFlip()
+void ImageViewerWidget::updateFlip()
 {
     assert(configUsed_);
 
@@ -771,7 +771,7 @@ void ImageView::updateFlip()
     }
 }
 
-void ImageView::updateSmoothDisplay()
+void ImageViewerWidget::updateSmoothDisplay()
 {
     assert(configUsed_ && pixmapItem_);
 
@@ -781,7 +781,7 @@ void ImageView::updateSmoothDisplay()
         pixmapItem_->setTransformationMode(Qt::FastTransformation);
 }
 
-void ImageView::updateTextOverlayVisibility()
+void ImageViewerWidget::updateTextOverlayVisibility()
 {
     if (!overlay_)
         return;
@@ -789,7 +789,7 @@ void ImageView::updateTextOverlayVisibility()
     overlay_->setVisible(displayConfig_.algorithm_overlay);
 }
 
-void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
+void ImageViewerWidget::applyDownscaleConfig(const DownscaleConfig& downscale)
 {
     if (!configUsed_)
         return;
@@ -799,13 +799,13 @@ void ImageView::applyDownscaleConfig(const DownscaleConfig& downscale)
     upscaleItems();
 }
 
-void ImageView::setText(const QString& text)
+void ImageViewerWidget::setText(const QString& text)
 {
     if (overlay_)
         overlay_->setText(text);
 }
 
-QColor ImageView::desaturateAndDarken(const QColor& original, qreal saturationFactor,
+QColor ImageViewerWidget::desaturateAndDarken(const QColor& original, qreal saturationFactor,
                                       qreal valueFactor)
 {
     // Clamp des facteurs pour éviter les aberrations
@@ -833,7 +833,7 @@ QColor ImageView::desaturateAndDarken(const QColor& original, qreal saturationFa
     return QColor::fromHsv(h, s, v, a);
 }
 
-QImage ImageView::darkenImage(const QImage& image)
+QImage ImageViewerWidget::darkenImage(const QImage& image)
 {
     QImage dark = image.convertToFormat(QImage::Format_ARGB32);
 
@@ -847,7 +847,7 @@ QImage ImageView::darkenImage(const QImage& image)
     return dark;
 }
 
-void ImageView::showPlaceholder(bool showEffect)
+void ImageViewerWidget::showPlaceholder(bool showEffect)
 {
     assert(blur_);
 
@@ -876,25 +876,25 @@ void ImageView::showPlaceholder(bool showEffect)
     placeholderVisible_ = showEffect;
 }
 
-void ImageView::notifyImageDropped(const QString& path)
+void ImageViewerWidget::notifyImageDropped(const QString& path)
 {
     emit imageDropped(path);
 }
 
-void ImageView::setDragHighlight(bool enabled)
+void ImageViewerWidget::setDragHighlight(bool enabled)
 {
     dragHighlight_ = enabled;
     viewport()->update();
 }
 
-bool ImageView::supportsDragDrop() const
+bool ImageViewerWidget::supportsDragDrop() const
 {
     auto set = dynamic_cast<const InteractionSet*>(m_interaction_);
 
     return set && set->hasBehavior<DragDropBehavior>();
 }
 
-bool ImageView::isPixelVisible(const QPoint& viewPos) const
+bool ImageViewerWidget::isPixelVisible(const QPoint& viewPos) const
 {
     QPoint pixel = imageCoordinatesFromView(viewPos);
     if (pixel.x() < 0)

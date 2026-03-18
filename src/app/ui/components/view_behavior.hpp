@@ -17,50 +17,50 @@ class QMouseEvent;
 namespace fluvel_app
 {
 
-class ImageView;
+class ImageViewerWidget;
 
 class ViewBehavior
 {
 public:
     virtual ~ViewBehavior() = default;
 
-    virtual bool wheel(ImageView&, QWheelEvent*)
+    virtual bool wheel(ImageViewerWidget&, QWheelEvent*)
     {
         return false;
     }
-    virtual bool mousePress(ImageView&, QMouseEvent*)
+    virtual bool mousePress(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
-    virtual bool mouseMove(ImageView&, QMouseEvent*)
+    virtual bool mouseMove(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
-    virtual bool mouseRelease(ImageView&, QMouseEvent*)
+    virtual bool mouseRelease(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
-    virtual bool mouseDoubleClick(ImageView&, QMouseEvent*)
-    {
-        return false;
-    }
-
-    virtual bool dragEnter(ImageView&, QDragEnterEvent*)
+    virtual bool mouseDoubleClick(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
     }
 
-    virtual bool dragMove(ImageView&, QDragMoveEvent*)
+    virtual bool dragEnter(ImageViewerWidget&, QDragEnterEvent*)
     {
         return false;
     }
 
-    virtual bool dragLeave(ImageView&, QDragLeaveEvent*)
+    virtual bool dragMove(ImageViewerWidget&, QDragMoveEvent*)
     {
         return false;
     }
 
-    virtual bool drop(ImageView&, QDropEvent*)
+    virtual bool dragLeave(ImageViewerWidget&, QDragLeaveEvent*)
+    {
+        return false;
+    }
+
+    virtual bool drop(ImageViewerWidget&, QDropEvent*)
     {
         return false;
     }
@@ -76,7 +76,7 @@ public:
     }
 
     virtual Qt::CursorShape availableCursor(bool /*hasImage*/, bool /*isPanRelevant*/,
-                                            const ImageView&, const QMouseEvent*) const
+                                            const ImageViewerWidget&, const QMouseEvent*) const
     {
         return Qt::ArrowCursor;
     }

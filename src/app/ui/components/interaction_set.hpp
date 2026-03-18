@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "image_view_interaction.hpp"
+#include "image_viewer_interaction.hpp"
 #include "view_behavior.hpp"
 
 #include <QtCore/Qt>
@@ -22,10 +22,10 @@ namespace fluvel_app
 /**
  * @brief Aggregates multiple ViewBehavior objects.
  *
- * InteractionSet is the concrete ImageViewInteraction used by ImageView.
+ * InteractionSet is the concrete ImageViewerInteraction used by ImageViewerWidget.
  * It forwards each event to all registered behaviors.
  */
-class InteractionSet : public ImageViewInteraction
+class InteractionSet : public ImageViewerInteraction
 {
 public:
     InteractionSet() = default;
@@ -43,7 +43,7 @@ public:
 
     const ViewBehavior* capturingBehavior() const;
 
-    Qt::CursorShape cursor(const ImageView& view, bool hasImage, bool isPanRelevant,
+    Qt::CursorShape cursor(const ImageViewerWidget& view, bool hasImage, bool isPanRelevant,
                            const QMouseEvent* e) const;
 
     template <typename T> bool hasBehavior() const
@@ -57,19 +57,19 @@ public:
     }
 
 protected:
-    bool wheel(ImageView& view, QWheelEvent* event) override;
-    bool mousePress(ImageView& view, QMouseEvent* event) override;
-    bool mouseMove(ImageView& view, QMouseEvent* event) override;
-    bool mouseRelease(ImageView& view, QMouseEvent* event) override;
-    bool mouseDoubleClick(ImageView& view, QMouseEvent* event) override;
+    bool wheel(ImageViewerWidget& view, QWheelEvent* event) override;
+    bool mousePress(ImageViewerWidget& view, QMouseEvent* event) override;
+    bool mouseMove(ImageViewerWidget& view, QMouseEvent* event) override;
+    bool mouseRelease(ImageViewerWidget& view, QMouseEvent* event) override;
+    bool mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* event) override;
 
-    Qt::CursorShape cursorForEvent(const ImageView& view, bool hasImage, bool isPanRelevant,
+    Qt::CursorShape cursorForEvent(const ImageViewerWidget& view, bool hasImage, bool isPanRelevant,
                                    const QMouseEvent* event) const override;
 
-    bool dragEnter(ImageView& view, QDragEnterEvent* event) override;
-    bool dragMove(ImageView& view, QDragMoveEvent* event) override;
-    bool dragLeave(ImageView& view, QDragLeaveEvent* event) override;
-    bool drop(ImageView& view, QDropEvent* event) override;
+    bool dragEnter(ImageViewerWidget& view, QDragEnterEvent* event) override;
+    bool dragMove(ImageViewerWidget& view, QDragMoveEvent* event) override;
+    bool dragLeave(ImageViewerWidget& view, QDragLeaveEvent* event) override;
+    bool drop(ImageViewerWidget& view, QDropEvent* event) override;
 
     void cancel() override;
 

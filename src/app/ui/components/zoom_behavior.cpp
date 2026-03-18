@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "zoom_behavior.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 namespace fluvel_app
 {
@@ -11,7 +11,7 @@ ZoomBehavior::ZoomBehavior(double /*zoomFactor*/)
 {
 }
 
-bool ZoomBehavior::wheel(ImageView& /*view*/, QWheelEvent* event)
+bool ZoomBehavior::wheel(ImageViewerWidget& /*view*/, QWheelEvent* event)
 {
     /*
     const int delta = event->angleDelta().y();

@@ -26,7 +26,7 @@ class QShowEvent;
 
 namespace fluvel_app
 {
-class ImageView;
+class ImageViewerWidget;
 class InitializationBehavior;
 class KernelSizeSpinBox;
 class AlgoSettingsWidget;
@@ -188,7 +188,7 @@ private:
     /////////    View - Controller    /////
     ///////////////////////////////////////
 
-    ImageView* settingsView_ = nullptr;
+    ImageViewerWidget* settingsView_ = nullptr;
     InitializationBehavior* initializationBehavior_ = nullptr;
     ImageSettingsController* imageSettingsController_ = nullptr;
     int wheelAccumulator_ = 0;

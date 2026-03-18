@@ -12,7 +12,7 @@
 namespace fluvel_app
 {
 
-bool DragDropBehavior::dragEnter(ImageView& view, QDragEnterEvent* e)
+bool DragDropBehavior::dragEnter(ImageViewerWidget& view, QDragEnterEvent* e)
 {
     if (!e->mimeData()->hasUrls())
         return false;
@@ -23,19 +23,19 @@ bool DragDropBehavior::dragEnter(ImageView& view, QDragEnterEvent* e)
     return true;
 }
 
-bool DragDropBehavior::dragMove(ImageView&, QDragMoveEvent* e)
+bool DragDropBehavior::dragMove(ImageViewerWidget&, QDragMoveEvent* e)
 {
     e->acceptProposedAction();
     return true;
 }
 
-bool DragDropBehavior::dragLeave(ImageView& view, QDragLeaveEvent*)
+bool DragDropBehavior::dragLeave(ImageViewerWidget& view, QDragLeaveEvent*)
 {
     view.setDragHighlight(false);
     return true;
 }
 
-bool DragDropBehavior::drop(ImageView& view, QDropEvent* e)
+bool DragDropBehavior::drop(ImageViewerWidget& view, QDropEvent* e)
 {
     view.setDragHighlight(false);
 

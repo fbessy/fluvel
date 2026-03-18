@@ -25,7 +25,7 @@ void InteractionSet::addBehavior(std::unique_ptr<ViewBehavior> behavior)
               });
 }
 
-bool InteractionSet::wheel(ImageView& view, QWheelEvent* event)
+bool InteractionSet::wheel(ImageViewerWidget& view, QWheelEvent* event)
 {
     for (auto& b : behaviors_)
     {
@@ -36,7 +36,7 @@ bool InteractionSet::wheel(ImageView& view, QWheelEvent* event)
     return false;
 }
 
-bool InteractionSet::mousePress(ImageView& view, QMouseEvent* event)
+bool InteractionSet::mousePress(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (auto* b = capturingBehavior())
         return const_cast<ViewBehavior*>(b)->mousePress(view, event);
@@ -50,7 +50,7 @@ bool InteractionSet::mousePress(ImageView& view, QMouseEvent* event)
     return false;
 }
 
-bool InteractionSet::mouseMove(ImageView& view, QMouseEvent* event)
+bool InteractionSet::mouseMove(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (auto* b = capturingBehavior())
         return const_cast<ViewBehavior*>(b)->mouseMove(view, event);
@@ -64,7 +64,7 @@ bool InteractionSet::mouseMove(ImageView& view, QMouseEvent* event)
     return false;
 }
 
-bool InteractionSet::mouseRelease(ImageView& view, QMouseEvent* event)
+bool InteractionSet::mouseRelease(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (auto* b = capturingBehavior())
         return const_cast<ViewBehavior*>(b)->mouseRelease(view, event);
@@ -78,7 +78,7 @@ bool InteractionSet::mouseRelease(ImageView& view, QMouseEvent* event)
     return false;
 }
 
-bool InteractionSet::mouseDoubleClick(ImageView& view, QMouseEvent* event)
+bool InteractionSet::mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* event)
 {
     for (auto& b : behaviors_)
     {
@@ -99,7 +99,7 @@ const ViewBehavior* InteractionSet::capturingBehavior() const
     return nullptr;
 }
 
-Qt::CursorShape InteractionSet::cursor(const ImageView& view, bool hasImage, bool isPanRelevant,
+Qt::CursorShape InteractionSet::cursor(const ImageViewerWidget& view, bool hasImage, bool isPanRelevant,
                                        const QMouseEvent* e) const
 {
     // 1️⃣ Action en cours → priorité absolue
@@ -124,13 +124,13 @@ Qt::CursorShape InteractionSet::cursor(const ImageView& view, bool hasImage, boo
     return result;
 }
 
-Qt::CursorShape InteractionSet::cursorForEvent(const ImageView& view, bool hasImage,
+Qt::CursorShape InteractionSet::cursorForEvent(const ImageViewerWidget& view, bool hasImage,
                                                bool isPanRelevant, const QMouseEvent* event) const
 {
     return cursor(view, hasImage, isPanRelevant, event);
 }
 
-bool InteractionSet::dragEnter(ImageView& view, QDragEnterEvent* event)
+bool InteractionSet::dragEnter(ImageViewerWidget& view, QDragEnterEvent* event)
 {
     for (auto& behavior : behaviors_)
     {
@@ -140,7 +140,7 @@ bool InteractionSet::dragEnter(ImageView& view, QDragEnterEvent* event)
     return false;
 }
 
-bool InteractionSet::dragMove(ImageView& view, QDragMoveEvent* event)
+bool InteractionSet::dragMove(ImageViewerWidget& view, QDragMoveEvent* event)
 {
     for (auto& behavior : behaviors_)
     {
@@ -150,7 +150,7 @@ bool InteractionSet::dragMove(ImageView& view, QDragMoveEvent* event)
     return false;
 }
 
-bool InteractionSet::dragLeave(ImageView& view, QDragLeaveEvent* event)
+bool InteractionSet::dragLeave(ImageViewerWidget& view, QDragLeaveEvent* event)
 {
     for (auto& behavior : behaviors_)
     {
@@ -160,7 +160,7 @@ bool InteractionSet::dragLeave(ImageView& view, QDragLeaveEvent* event)
     return false;
 }
 
-bool InteractionSet::drop(ImageView& view, QDropEvent* event)
+bool InteractionSet::drop(ImageViewerWidget& view, QDropEvent* event)
 {
     for (auto& behavior : behaviors_)
     {

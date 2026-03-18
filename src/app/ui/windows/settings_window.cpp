@@ -4,7 +4,7 @@
 #include "settings_window.hpp"
 
 #include "algo_settings_widget.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "initialization_behavior.hpp"
 #include "interaction_set.hpp"
 #include "kernel_size_spinbox.hpp"
@@ -83,7 +83,7 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     // Image preview
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    settingsView_ = new ImageView(this);
+    settingsView_ = new ImageViewerWidget(this);
     auto interaction = std::make_unique<InteractionSet>();
 
     auto initBehavior = std::make_unique<InitializationBehavior>();
@@ -859,7 +859,7 @@ void SettingsWindow::setupConnections()
     connect(clearButton_, &QPushButton::clicked, this, &SettingsWindow::onClearPhi);
 
     connect(imageSettingsController_, &ImageSettingsController::viewChanged, settingsView_,
-            &ImageView::setImage);
+            &ImageViewerWidget::setImage);
 
     connect(algoWidget_, &AlgoSettingsWidget::connectivityChanged, imageSettingsController_,
             &ImageSettingsController::onConnectivityChanged);

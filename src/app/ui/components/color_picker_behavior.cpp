@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "color_picker_behavior.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 namespace fluvel_app
 {
@@ -12,7 +12,7 @@ ColorPickerBehavior::ColorPickerBehavior(Qt::MouseButton button)
 {
 }
 
-bool ColorPickerBehavior::mousePress(ImageView& view, QMouseEvent* e)
+bool ColorPickerBehavior::mousePress(ImageViewerWidget& view, QMouseEvent* e)
 {
     if (e->button() != button_)
         return false;

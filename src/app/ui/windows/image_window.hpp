@@ -33,7 +33,7 @@ class LanguageWindow;
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
 
-class ImageView;
+class ImageViewerWidget;
 class ImageController;
 
 class ImageWindow : public QMainWindow
@@ -136,7 +136,7 @@ private:
     QAction* languageAct_ = nullptr;
 
     // --- VIEW - CONTROLLER ---
-    ImageView* imageView_ = nullptr;
+    ImageViewerWidget* imageView_ = nullptr;
     ImageController* imageController_ = nullptr;
 
     // --- Current image state ---

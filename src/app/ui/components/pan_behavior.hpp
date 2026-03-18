@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "view_behavior.hpp"
 
 #include <QPoint>
@@ -18,9 +18,9 @@ class PanBehavior : public ViewBehavior
 public:
     explicit PanBehavior(Qt::MouseButton button = Qt::LeftButton);
 
-    bool mousePress(ImageView& view, QMouseEvent* event) override;
-    bool mouseMove(ImageView& view, QMouseEvent* event) override;
-    bool mouseRelease(ImageView& view, QMouseEvent* event) override;
+    bool mousePress(ImageViewerWidget& view, QMouseEvent* event) override;
+    bool mouseMove(ImageViewerWidget& view, QMouseEvent* event) override;
+    bool mouseRelease(ImageViewerWidget& view, QMouseEvent* event) override;
 
     bool isCapturing() const override
     {
@@ -37,7 +37,7 @@ public:
         return Qt::ClosedHandCursor;
     }
 
-    Qt::CursorShape availableCursor(bool hasImage, bool isPanRelevant, const ImageView& view,
+    Qt::CursorShape availableCursor(bool hasImage, bool isPanRelevant, const ImageViewerWidget& view,
                                     const QMouseEvent* e) const override
     {
         if (!hasImage || !isPanRelevant)

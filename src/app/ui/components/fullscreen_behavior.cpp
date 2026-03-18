@@ -2,14 +2,14 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "fullscreen_behavior.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 #include <QMouseEvent>
 
 namespace fluvel_app
 {
 
-bool FullscreenBehavior::mouseDoubleClick(ImageView& view, QMouseEvent* event)
+bool FullscreenBehavior::mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* event)
 {
     Q_UNUSED(event);
 

@@ -7,7 +7,7 @@
 #include "color_adapters.hpp"
 #include "color_picker_behavior.hpp"
 #include "drag_drop_behavior.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 
@@ -48,7 +48,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     ///////////////////////////////////////
 
-    imageView_ = new ImageView(this);
+    imageView_ = new ImageViewerWidget(this);
     auto interaction = std::make_unique<InteractionSet>();
     // interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     // interaction->addBehavior(std::make_unique<FullscreenBehavior>());

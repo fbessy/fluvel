@@ -153,7 +153,7 @@ void CameraWindow::setupView()
     const auto& app = ApplicationSettings::instance();
 
     videoView_ =
-        new ImageView(app.videoSettings().display, app.videoSettings().compute.downscale, central_);
+        new ImageViewerWidget(app.videoSettings().display, app.videoSettings().compute.downscale, central_);
 
     videoView_->setMaxDisplayFps(60.0);
 
@@ -244,11 +244,11 @@ void CameraWindow::setupConnections()
             &CameraWindow::onFrameSizeStr);
 
     connect(cameraController_, &CameraController::textStatsUpdated, videoView_,
-            &ImageView::setText);
+            &ImageViewerWidget::setText);
 
     // ---  View → Controller for display stats ---
 
-    connect(videoView_, &ImageView::frameDisplayed, cameraController_,
+    connect(videoView_, &ImageViewerWidget::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
 
     // --- Application settings synchronization ---
@@ -315,7 +315,7 @@ void CameraWindow::bindApplicationSettingsToView()
             });
 
     connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, videoView_,
-            &ImageView::applyDisplayConfig);
+            &ImageViewerWidget::applyDisplayConfig);
 }
 
 void CameraWindow::bindUiToApplicationSettings()
@@ -501,7 +501,7 @@ void CameraWindow::connectFrameToView()
 {
     disconnect(frameToViewConnection_);
     frameToViewConnection_ = connect(cameraController_, &CameraController::imageAndContourUpdated,
-                                     videoView_, &ImageView::setImageAndContour);
+                                     videoView_, &ImageViewerWidget::setImageAndContour);
 }
 
 void CameraWindow::startCamera()

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "view_behavior.hpp"
 
 class QDragEnterEvent;
@@ -17,10 +17,10 @@ namespace fluvel_app
 class DragDropBehavior : public ViewBehavior
 {
 public:
-    bool dragEnter(ImageView&, QDragEnterEvent*) override;
-    bool dragMove(ImageView&, QDragMoveEvent*) override;
-    bool dragLeave(ImageView&, QDragLeaveEvent*) override;
-    bool drop(ImageView&, QDropEvent*) override;
+    bool dragEnter(ImageViewerWidget&, QDragEnterEvent*) override;
+    bool dragMove(ImageViewerWidget&, QDragMoveEvent*) override;
+    bool dragLeave(ImageViewerWidget&, QDragLeaveEvent*) override;
+    bool drop(ImageViewerWidget&, QDropEvent*) override;
 
     int priority() const override
     {

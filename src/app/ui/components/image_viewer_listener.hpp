@@ -9,10 +9,10 @@
 namespace fluvel_app
 {
 
-class ImageViewListener
+class ImageViewerListener
 {
 public:
-    virtual ~ImageViewListener() = default;
+    virtual ~ImageViewerListener() = default;
     virtual void onColorPicked(const QColor& color, const QPoint& imagePos) = 0;
 };
 

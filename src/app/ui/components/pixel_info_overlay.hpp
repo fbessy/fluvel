@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 #include <QtGui/qrgb.h>
 #include <QFont>
@@ -23,9 +23,9 @@ public:
 
     // Mise à jour du contenu et de la position
     void updateInfo(const QPoint& pixel, const QRgb& color, bool isGrayImg,
-                    const QPointF& anchorScenePos, ImageView& view);
+                    const QPointF& anchorScenePos, ImageViewerWidget& view);
 
-    void updatePlacement(const QPointF& anchorScenePos, ImageView& view);
+    void updatePlacement(const QPointF& anchorScenePos, ImageViewerWidget& view);
 
     void showOverlay();
     void hideOverlay();

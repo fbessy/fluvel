@@ -5,7 +5,7 @@
 
 #include "common_settings.hpp"
 #include "contour_point_item.hpp"
-#include "image_view_listener.hpp"
+#include "image_viewer_listener.hpp"
 #include "overlay_text_item.hpp"
 
 #include <QElapsedTimer>
@@ -28,16 +28,16 @@ class QDropEvent;
 namespace fluvel_app
 {
 
-class ImageViewInteraction;
+class ImageViewerInteraction;
 
-class ImageView : public QGraphicsView
+class ImageViewerWidget : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    explicit ImageView(QWidget* parent = nullptr);
+    explicit ImageViewerWidget(QWidget* parent = nullptr);
 
-    explicit ImageView(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
+    explicit ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
                        QWidget* parent = nullptr);
 
     // Throttling : fps max (0 = désactivé)
@@ -46,7 +46,7 @@ public:
     const QImage& image() const;
     QImage renderToImage() const;
 
-    void setInteraction(ImageViewInteraction* interaction);
+    void setInteraction(ImageViewerInteraction* interaction);
 
     double currentZoom() const;
     void scaleView(double sx, double sy);
@@ -59,7 +59,7 @@ public:
     QPoint imageCoordinatesFromView(const QPoint& viewPos) const;
     QRgb pixelColorAt(const QPoint& imagePos) const;
 
-    void setListener(ImageViewListener* listener);
+    void setListener(ImageViewerListener* listener);
     void onColorPicked(const QColor& color, const QPoint& imagePos);
 
     bool hasImage() const;
@@ -167,8 +167,8 @@ private:
 
     qint64 lastReceiveTs_;
 
-    ImageViewInteraction* m_interaction_ = nullptr;
-    ImageViewListener* listener_ = nullptr;
+    ImageViewerInteraction* m_interaction_ = nullptr;
+    ImageViewerListener* listener_ = nullptr;
 
     DisplayConfig displayConfig_;
     DownscaleConfig downscaleConfig_;

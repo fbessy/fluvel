@@ -50,10 +50,10 @@ set(app_src
     ${UI_COMP_DIR}/icon_loader.cpp
     ${UI_COMP_DIR}/icon_loader.hpp
 
-    ${UI_COMP_DIR}/image_view.cpp
-    ${UI_COMP_DIR}/image_view.hpp
+    ${UI_COMP_DIR}/image_viewer_widget.cpp
+    ${UI_COMP_DIR}/image_viewer_widget.hpp
 
-    ${UI_COMP_DIR}/image_view_interaction.hpp
+    ${UI_COMP_DIR}/image_viewer_interaction.hpp
     ${UI_COMP_DIR}/interaction_set.cpp
     ${UI_COMP_DIR}/interaction_set.hpp
 
@@ -104,7 +104,7 @@ set(app_src
     ${UI_COMP_DIR}/right_panel_toggle_button.cpp
     ${UI_COMP_DIR}/right_panel_toggle_button.hpp
 
-    ${UI_COMP_DIR}/image_view_listener.hpp
+    ${UI_COMP_DIR}/image_viewer_listener.hpp
 
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp

@@ -17,7 +17,7 @@
 #include "autofit_behavior.hpp"
 #include "drag_drop_behavior.hpp"
 #include "fullscreen_behavior.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
@@ -161,7 +161,7 @@ void ImageWindow::setupUi()
     // --- Image view ---
 
     const auto& config = ApplicationSettings::instance().imageSettings();
-    imageView_ = new ImageView(config.display, config.compute.downscale, central);
+    imageView_ = new ImageViewerWidget(config.display, config.compute.downscale, central);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
@@ -387,20 +387,20 @@ void ImageWindow::setupConnections()
 
     // to refresh the view with a new image
     connect(imageController_, &ImageController::displayedImageReady, imageView_,
-            &ImageView::setImage);
+            &ImageViewerWidget::setImage);
 
     // to refresh the view with a new contour
-    connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageView::setContour,
+    connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageViewerWidget::setContour,
             Qt::QueuedConnection);
 
     // to refresh the view with a new text info algo overlay (mean out, iterations, ect)
     connect(imageController_, &ImageController::textDiagnosticsUpdated, imageView_,
-            &ImageView::setText);
+            &ImageViewerWidget::setText);
 
     // to refresh the view and clear the former contour
     // (it's performed the first time or when a new image is loaded)
     connect(imageController_, &ImageController::clearOverlaysRequested, imageView_,
-            &ImageView::clearOverlays);
+            &ImageViewerWidget::clearOverlays);
 
     // to refresh the image window title
     connect(imageController_, &ImageController::displayedImageReady, this,
@@ -460,7 +460,7 @@ void ImageWindow::bindApplicationSettingsToView()
             });
 
     connect(&config, &ApplicationSettings::imgDisplaySettingsChanged, imageView_,
-            &ImageView::applyDisplayConfig);
+            &ImageViewerWidget::applyDisplayConfig);
 }
 
 void ImageWindow::bindUiToApplicationSettings()
@@ -545,7 +545,7 @@ void ImageWindow::setupUserActionsConnections()
     connect(settingsButton_, &QPushButton::clicked, settingsWindow_, &SettingsWindow::show);
 
     // when the user drag and drop an image in the view of the image window.
-    connect(imageView_, &ImageView::imageDropped, imageController_, &ImageController::loadImage);
+    connect(imageView_, &ImageViewerWidget::imageDropped, imageController_, &ImageController::loadImage);
 }
 
 void ImageWindow::setupFileEventConnections()

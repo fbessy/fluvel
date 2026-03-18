@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 #include "view_behavior.hpp"
 #include <QColor>
 
@@ -14,14 +14,14 @@ class QPoint;
 namespace fluvel_app
 {
 
-class ImageView;
+class ImageViewerWidget;
 
 class ColorPickerBehavior : public ViewBehavior
 {
 public:
     explicit ColorPickerBehavior(Qt::MouseButton button = Qt::RightButton);
 
-    Qt::CursorShape availableCursor(bool hasImage, bool /*isZoomed*/, const ImageView&,
+    Qt::CursorShape availableCursor(bool hasImage, bool /*isZoomed*/, const ImageViewerWidget&,
                                     const QMouseEvent*) const override
     {
         return hasImage ? Qt::CrossCursor : Qt::ArrowCursor;
@@ -33,7 +33,7 @@ public:
     }
 
 protected:
-    bool mousePress(ImageView& view, QMouseEvent* e) override;
+    bool mousePress(ImageViewerWidget& view, QMouseEvent* e) override;
 
 private:
     Qt::MouseButton button_;

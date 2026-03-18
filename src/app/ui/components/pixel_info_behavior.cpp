@@ -4,7 +4,7 @@
 #include "pixel_info_behavior.hpp"
 
 #include "pixel_info_overlay.hpp"
-#include "image_view.hpp"
+#include "image_viewer_widget.hpp"
 
 #include <QtGui/qrgb.h>
 #include <QGraphicsScene>
@@ -15,7 +15,7 @@ namespace fluvel_app
 
 // ---------------------------------------------------------------------
 
-bool PixelInfoBehavior::mousePress(ImageView& view, QMouseEvent* event)
+bool PixelInfoBehavior::mousePress(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (event->button() != Qt::RightButton)
         return false;
@@ -43,7 +43,7 @@ bool PixelInfoBehavior::mousePress(ImageView& view, QMouseEvent* event)
 
 // ---------------------------------------------------------------------
 
-bool PixelInfoBehavior::mouseMove(ImageView& view, QMouseEvent* event)
+bool PixelInfoBehavior::mouseMove(ImageViewerWidget& view, QMouseEvent* event)
 {
     if (!active_)
         return false;
@@ -65,7 +65,7 @@ bool PixelInfoBehavior::mouseMove(ImageView& view, QMouseEvent* event)
 
 // ---------------------------------------------------------------------
 
-bool PixelInfoBehavior::mouseRelease(ImageView&, QMouseEvent* event)
+bool PixelInfoBehavior::mouseRelease(ImageViewerWidget&, QMouseEvent* event)
 {
     if (event->button() != Qt::RightButton)
         return false;
@@ -80,7 +80,7 @@ bool PixelInfoBehavior::mouseRelease(ImageView&, QMouseEvent* event)
 
 // ---------------------------------------------------------------------
 
-void PixelInfoBehavior::updateOverlay(ImageView& view, const QPoint& viewPos)
+void PixelInfoBehavior::updateOverlay(ImageViewerWidget& view, const QPoint& viewPos)
 {
     if (!overlay_)
         return;

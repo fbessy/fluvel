@@ -4,7 +4,7 @@
 #pragma once
 
 #include "color.hpp"
-#include "image_view_listener.hpp"
+#include "image_viewer_listener.hpp"
 #include "shape.hpp"
 
 #include <QWidget>
@@ -20,9 +20,9 @@ QT_END_NAMESPACE
 namespace fluvel_app
 {
 
-class ImageView;
+class ImageViewerWidget;
 
-class AnalysisWidget : public QWidget, public ImageViewListener
+class AnalysisWidget : public QWidget, public ImageViewerListener
 {
     Q_OBJECT
 
@@ -59,7 +59,7 @@ private:
     QLabel* text_list_length_;
     QString absolute_name_;
     QLabel* name_label_;
-    ImageView* imageView_;
+    ImageViewerWidget* imageView_;
     QPushButton* open_button_;
 
     QComboBox* color_list_;

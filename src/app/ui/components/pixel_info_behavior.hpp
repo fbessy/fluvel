@@ -13,7 +13,7 @@ class QMouseEvent;
 namespace fluvel_app
 {
 
-class ImageView;
+class ImageViewerWidget;
 
 /**
  * @brief Passive behavior that displays pixel information
@@ -45,13 +45,13 @@ public:
         return active_;
     }
 
-    bool mousePress(ImageView& view, QMouseEvent* event) override;
-    bool mouseMove(ImageView& view, QMouseEvent* event) override;
-    bool mouseRelease(ImageView& view, QMouseEvent* event) override;
+    bool mousePress(ImageViewerWidget& view, QMouseEvent* event) override;
+    bool mouseMove(ImageViewerWidget& view, QMouseEvent* event) override;
+    bool mouseRelease(ImageViewerWidget& view, QMouseEvent* event) override;
     void cancel() override;
 
 private:
-    void updateOverlay(ImageView& view, const QPoint& viewPos);
+    void updateOverlay(ImageViewerWidget& view, const QPoint& viewPos);
 
 private:
     bool active_ = false;

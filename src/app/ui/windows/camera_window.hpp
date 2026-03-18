@@ -25,7 +25,7 @@ namespace fluvel_app
 class CameraSettingsWindow;
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
-class ImageView;
+class ImageViewerWidget;
 class CameraController;
 
 enum class CameraStatus
@@ -112,7 +112,7 @@ private:
     QByteArray streamingCameraId_;
     QSet<QByteArray> knownCameraIds_;
 
-    ImageView* videoView_ = nullptr;
+    ImageViewerWidget* videoView_ = nullptr;
     CameraController* cameraController_ = nullptr;
     QMetaObject::Connection frameToViewConnection_;
 
