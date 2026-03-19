@@ -71,7 +71,7 @@ private:
     void onVideoFrame(const QVideoFrame& frame);
 
     void onFrameProcessed(quint64 contourSize);
-    void onFrameResultReady(const DisplayFrame& result);
+    void onDisplayFrameReady(const DisplayFrame& result);
     void onStartupTimeout();
     void checkWatchdog();
     void updateDiagnostics();

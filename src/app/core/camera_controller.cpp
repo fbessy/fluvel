@@ -28,8 +28,8 @@ CameraController::CameraController(const VideoSessionSettings& session, QObject*
     onVideoSettingsChanged(session);
     onVideoDisplaySettingsChanged(session.display);
 
-    connect(&activeContourThread_, &VideoActiveContourThread::frameResultReady, this,
-            &CameraController::onFrameResultReady, Qt::QueuedConnection);
+    connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
+            &CameraController::onDisplayFrameReady, Qt::QueuedConnection);
 
     connect(&activeContourThread_, &VideoActiveContourThread::frameSizeStr, this,
             &CameraController::frameSizeStr);
@@ -229,7 +229,7 @@ void CameraController::onVideoFrame(const QVideoFrame& frame)
         emit streamingStarted(deviceId_);
     }
 
-    frameStats_.frameReceived(now);
+    frameStats_.frameCaptured(now);
     activeContourThread_.submitFrame(frame);
 }
 
@@ -243,7 +243,7 @@ void CameraController::onFrameDisplayed(qint64 receiveTsNs, qint64 displayTsNs)
     frameStats_.frameDisplayed(receiveTsNs, displayTsNs);
 }
 
-void CameraController::onFrameResultReady(const DisplayFrame& result)
+void CameraController::onDisplayFrameReady(const DisplayFrame& result)
 {
     auto q_l_out = convertToQVector(result.outerContour);
     auto q_l_in = convertToQVector(result.innerContour);
@@ -280,15 +280,15 @@ void CameraController::updateDiagnostics()
 {
     auto snap = frameStats_.snapshot();
 
-    CameraStats stats{snap.inputFps,     snap.processingFps, snap.displayFps,    snap.dropRate,
-                      snap.avgLatencyMs, snap.maxLatencyMs,  snap.avgContourSize};
+    CameraStats stats{snap.capturedFps,  snap.processedFps, snap.displayedFps,  snap.dropRate,
+                      snap.avgLatencyMs, snap.maxLatencyMs, snap.avgContourSize};
 
     QString textStats = QString(tr("In | Proc | Disp: %1 | %2 | %3 fps\n"
                                    "Lat: %4 ms (max %5) | Drop: %6 %\n"
                                    "Contour: %7 pts"))
-                            .arg(stats.inputFps, 0, 'f', 1)
-                            .arg(stats.processingFps, 0, 'f', 1)
-                            .arg(stats.displayFps, 0, 'f', 1)
+                            .arg(stats.capturedFps, 0, 'f', 1)
+                            .arg(stats.processedFps, 0, 'f', 1)
+                            .arg(stats.displayedFps, 0, 'f', 1)
                             .arg(stats.avgLatencyMs, 0, 'f', 1)
                             .arg(stats.maxLatencyMs, 0, 'f', 1)
                             .arg(100.f * stats.dropRate, 0, 'f', 1)

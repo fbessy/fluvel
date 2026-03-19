@@ -14,9 +14,9 @@ class FrameStatsView
 public:
     struct Snapshot
     {
-        double inputFps = 0.0;
-        double processingFps = 0.0;
-        double displayFps = 0.0;
+        double capturedFps = 0.0;
+        double processedFps = 0.0;
+        double displayedFps = 0.0;
         double dropRate = 0.0;
         double avgLatencyMs = 0.0;
         double maxLatencyMs = 0.0;
@@ -26,7 +26,7 @@ public:
     FrameStatsView();
 
     // événements
-    void frameReceived(qint64 receiveTsNs);
+    void frameCaptured(qint64 receiveTsNs);
     void frameProcessed(quint64 contourSize);
     void frameDisplayed(qint64 receiveTsNs, qint64 displayTsNs);
 
@@ -42,7 +42,7 @@ private:
     QMutex mutex_;
 
     // compteurs fenêtre courante
-    quint64 inputFrames_;
+    quint64 capturedFrames_;
     quint64 processedFrames_;
     quint64 displayedFrames_;
     quint64 droppedFrames_;

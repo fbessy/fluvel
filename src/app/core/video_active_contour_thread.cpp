@@ -23,7 +23,7 @@ void VideoActiveContourThread::submitFrame(const QVideoFrame& frame)
 
     {
         QMutexLocker locker(&frameMutex_);
-        lastFrameData_ = fd;
+        lastCapturedFrame_ = fd;
         frameAvailable_ = true;
     }
 
@@ -43,19 +43,19 @@ void VideoActiveContourThread::run()
         if (!running_)
             break;
 
-        CapturedFrame fd = lastFrameData_;
+        CapturedFrame cf = lastCapturedFrame_;
         frameAvailable_ = false;
         locker.unlock();
 
-        DisplayFrame result = processFrame(fd.frame);
+        DisplayFrame df = processFrame(cf.frame);
 
-        result.receiveTimestampNs = fd.receiveTimestampNs;
+        df.receiveTimestampNs = cf.receiveTimestampNs;
 
-        quint64 contourSize = static_cast<quint64>(result.outerContour.size() + result.innerContour.size());
+        quint64 contourSize = static_cast<quint64>(df.outerContour.size() + df.innerContour.size());
 
         emit frameProcessed(contourSize);
 
-        emit frameResultReady(result);
+        emit displayFrameReady(df);
 
         locker.relock();
     }
@@ -107,21 +107,21 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         config = config_;
     }
 
-    DisplayFrame fr;
-    fr.input = convertFrame(frame);
+    DisplayFrame df;
+    df.input = convertFrame(frame);
 
-    if (fr.input.isNull())
-        return fr;
+    if (df.input.isNull())
+        return df;
 
-    fr.preprocessed = applyDownscale(fr.input, config.downscale);
+    df.preprocessed = applyDownscale(df.input, config.downscale);
 
-    if (fr.preprocessed.isNull())
-        return fr;
+    if (df.preprocessed.isNull())
+        return df;
 
-    auto algoImage = image_view_from_qimage(fr.preprocessed);
+    auto algoImage = image_view_from_qimage(df.preprocessed);
     const auto& algoConfig = config.algo;
 
-    const auto newWSize = fr.preprocessed.size();
+    const auto newWSize = df.preprocessed.size();
 
     if (!activeContour_ || configChanged_ || newWSize != currentSize_)
     {
@@ -139,8 +139,8 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         currentSize_ = newWSize;
         configChanged_ = false;
 
-        QString size_str = QString("%1×%2").arg(QString::number(fr.preprocessed.width()),
-                                                QString::number(fr.preprocessed.height()));
+        QString size_str = QString("%1×%2").arg(QString::number(df.preprocessed.width()),
+                                                QString::number(df.preprocessed.height()));
 
         // if (downscale_fctr >= 2)
         //{
@@ -161,31 +161,32 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     }
 
     activeContour_->runCycles(config.cyclesNbr);
-    fr.processTimestampNs = FrameClock::nowNs() - startTs;
+    df.processTimestampNs = FrameClock::nowNs() - startTs;
 
-    exportTemporalFilteredImage(algoImage, config, fr);
-    exportContours(fr);
+    exportTemporalFilteredImage(algoImage, config, df);
+    exportContours(df);
 
-    return fr;
+    return df;
 }
 
 void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
                                                            const VideoComputeConfig& config,
-                                                           DisplayFrame& fr)
+                                                           DisplayFrame& displayFrame)
 {
     if (!config.hasTemporalFiltering)
         return;
 
-    fr.preprocessed = QImage(algoImage.data(), algoImage.width(), algoImage.height(),
-                             static_cast<qsizetype>(3 * algoImage.width()), QImage::Format_RGB888);
+    displayFrame.preprocessed =
+        QImage(algoImage.data(), algoImage.width(), algoImage.height(),
+               static_cast<qsizetype>(3 * algoImage.width()), QImage::Format_RGB888);
 }
 
-void VideoActiveContourThread::exportContours(DisplayFrame& fr)
+void VideoActiveContourThread::exportContours(DisplayFrame& displayFrame)
 {
     if (activeContour_)
     {
-        fr.outerContour = activeContour_->export_l_out();
-        fr.innerContour = activeContour_->export_l_in();
+        displayFrame.outerContour = activeContour_->export_l_out();
+        displayFrame.innerContour = activeContour_->export_l_in();
     }
 }
 

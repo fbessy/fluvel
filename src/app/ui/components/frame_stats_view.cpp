@@ -17,7 +17,7 @@ void FrameStatsView::reset()
 {
     QMutexLocker lock(&mutex_);
 
-    inputFrames_ = 0;
+    capturedFrames_ = 0;
     processedFrames_ = 0;
     displayedFrames_ = 0;
     droppedFrames_ = 0;
@@ -31,14 +31,14 @@ void FrameStatsView::reset()
     lastSnapshot_ = {};
 }
 
-void FrameStatsView::frameReceived(qint64 receiveTsNs)
+void FrameStatsView::frameCaptured(qint64 receiveTsNs)
 {
     QMutexLocker lock(&mutex_);
 
     if (windowStartNs_ == 0)
         windowStartNs_ = receiveTsNs;
 
-    ++inputFrames_;
+    ++capturedFrames_;
     updateWindowLocked(receiveTsNs);
 }
 
@@ -81,13 +81,14 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
 
     Snapshot snap;
 
-    snap.inputFps = double(inputFrames_) / seconds;
-    snap.processingFps = double(processedFrames_) / seconds;
-    snap.displayFps = double(displayedFrames_) / seconds;
+    snap.capturedFps = double(capturedFrames_) / seconds;
+    snap.processedFps = double(processedFrames_) / seconds;
+    snap.displayedFps = double(displayedFrames_) / seconds;
 
-    droppedFrames_ = (inputFrames_ > displayedFrames_) ? (inputFrames_ - displayedFrames_) : 0;
+    droppedFrames_ =
+        (capturedFrames_ > displayedFrames_) ? (capturedFrames_ - displayedFrames_) : 0;
 
-    snap.dropRate = inputFrames_ > 0 ? double(droppedFrames_) / double(inputFrames_) : 0.0;
+    snap.dropRate = capturedFrames_ > 0 ? double(droppedFrames_) / double(capturedFrames_) : 0.0;
 
     snap.avgLatencyMs = displayedFrames_ > 0 ? latencySumMs_ / double(displayedFrames_) : 0.0;
 
@@ -98,7 +99,7 @@ void FrameStatsView::updateWindowLocked(qint64 nowNs)
     lastSnapshot_ = snap;
 
     // reset fenêtre
-    inputFrames_ = 0;
+    capturedFrames_ = 0;
     processedFrames_ = 0;
     displayedFrames_ = 0;
     droppedFrames_ = 0;

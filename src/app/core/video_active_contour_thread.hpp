@@ -47,7 +47,7 @@ public:
 signals:
     void frameProcessed(quint64 contourSize);
 
-    void frameResultReady(fluvel_app::DisplayFrame result);
+    void displayFrameReady(fluvel_app::DisplayFrame displayFrame);
 
     void frameSizeStr(QString str);
 
@@ -61,15 +61,15 @@ private:
     DisplayFrame processFrame(const QVideoFrame& frame);
 
     void exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
-                                     const VideoComputeConfig& config, DisplayFrame& fr);
+                                     const VideoComputeConfig& config, DisplayFrame& displayFrame);
 
-    void exportContours(DisplayFrame& fr);
+    void exportContours(DisplayFrame& displayFrame);
 
     VideoComputeConfig config_;
 
     QMutex frameMutex_;
     QWaitCondition condition_;
-    CapturedFrame lastFrameData_;
+    CapturedFrame lastCapturedFrame_;
     bool frameAvailable_{false};
     bool running_{true};
     bool configChanged_{false};
