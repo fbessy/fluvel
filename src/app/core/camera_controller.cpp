@@ -230,7 +230,12 @@ void CameraController::onCapturedFrame(const QVideoFrame& frame)
     }
 
     frameStats_.frameCaptured(now);
-    activeContourThread_.submitFrame(frame);
+
+    CapturedFrame cf;
+    cf.frame = frame;
+    cf.receiveTimestampNs = now;
+
+    activeContourThread_.submitFrame(cf);
 }
 
 void CameraController::onFrameProcessed(quint64 contourSize)

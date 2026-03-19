@@ -15,15 +15,11 @@ VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
 {
 }
 
-void VideoActiveContourThread::submitFrame(const QVideoFrame& frame)
+void VideoActiveContourThread::submitFrame(const CapturedFrame& capturedFrame)
 {
-    CapturedFrame fd;
-    fd.frame = frame;
-    fd.receiveTimestampNs = FrameClock::nowNs();
-
     {
         QMutexLocker locker(&frameMutex_);
-        lastCapturedFrame_ = fd;
+        lastCapturedFrame_ = capturedFrame;
         frameAvailable_ = true;
     }
 

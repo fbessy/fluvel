@@ -4,6 +4,7 @@
 #pragma once
 
 #include "ac_types.hpp"
+#include "captured_frame.hpp"
 #include "common_settings.hpp"
 #include "image_view.hpp"
 #include "region_color_ac.hpp"
@@ -27,19 +28,13 @@ struct DisplayFrame
     qint64 processTimestampNs;
 };
 
-struct CapturedFrame
-{
-    QVideoFrame frame;
-    qint64 receiveTimestampNs;
-};
-
 class VideoActiveContourThread : public QThread
 {
     Q_OBJECT
 public:
     VideoActiveContourThread(QObject* parent);
 
-    void submitFrame(const QVideoFrame& frame);
+    void submitFrame(const CapturedFrame& capturedFrame);
     void stop();
 
     void setAlgoConfig(const VideoComputeConfig& config);

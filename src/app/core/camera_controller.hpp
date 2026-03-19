@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "captured_frame.hpp"
 #include "common_settings.hpp"
 #include "frame_stats_view.hpp"
 #include "video_active_contour_thread.hpp"
