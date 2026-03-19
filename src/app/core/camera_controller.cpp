@@ -111,7 +111,7 @@ void CameraController::start(const QByteArray& deviceId)
             connect(camera_, &QCamera::errorOccurred, this, &CameraController::onCameraError);
 
             connect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                    &CameraController::onVideoFrame);
+                    &CameraController::onCapturedFrame);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
             testFrameCounter_ = 0;
@@ -199,7 +199,7 @@ void CameraController::stop()
     emit streamingStopped();
 }
 
-void CameraController::onVideoFrame(const QVideoFrame& frame)
+void CameraController::onCapturedFrame(const QVideoFrame& frame)
 {
 #ifdef FLUVEL_SIMULATE_STARTUP_TIMEOUT
     return;

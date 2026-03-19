@@ -68,7 +68,7 @@ private:
     void handleActiveDeviceUnplug(const QList<QCameraDevice>& inputs);
 
     void onCameraError(QCamera::Error error, const QString& errorString);
-    void onVideoFrame(const QVideoFrame& frame);
+    void onCapturedFrame(const QVideoFrame& frame);
 
     void onFrameProcessed(quint64 contourSize);
     void onDisplayFrameReady(const DisplayFrame& result);
