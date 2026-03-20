@@ -162,7 +162,8 @@ void ImageWindow::setupUi()
     // --- Image view ---
 
     const auto& config = ApplicationSettings::instance().imageSettings();
-    imageView_ = new ImageViewerWidget(config.display, config.compute.downscale, central);
+    imageViewer_ = new ImageViewerWidget(config.display, config.compute.downscale, central);
+    imageViewer_->setMaxDisplayFps(60.0);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
@@ -170,7 +171,7 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
     interaction->addBehavior(std::make_unique<DragDropBehavior>());
-    imageView_->setInteraction(interaction.release());
+    imageViewer_->setInteraction(interaction.release());
 
     // --- Display bar (à droite) ---
     displayBar_ = new DisplaySettingsWidget(config.display, central);
@@ -180,7 +181,7 @@ void ImageWindow::setupUi()
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    contentLayout->addWidget(imageView_, 1);  // prend tout l'espace
+    contentLayout->addWidget(imageViewer_, 1); // prend tout l'espace
     contentLayout->addWidget(displayBar_, 0); // largeur naturelle
 
     // Assemblage global
@@ -352,12 +353,12 @@ void ImageWindow::setupChildWindows()
 
 void ImageWindow::applyInitialSettings()
 {
-    assert(imageView_ && displayBar_);
+    assert(imageViewer_ && displayBar_);
 
     const auto& config = ApplicationSettings::instance().imageSettings();
 
-    imageView_->applyDownscaleConfig(config.compute.downscale);
-    imageView_->applyDisplayConfig(config.display);
+    imageViewer_->applyDownscaleConfig(config.compute.downscale);
+    imageViewer_->applyDisplayConfig(config.display);
 
     bool preprocessing =
         config.compute.downscale.hasDownscale || config.compute.processing.hasProcessing();
@@ -387,20 +388,20 @@ void ImageWindow::setupConnections()
     // --- Controller → View / Window updates ---
 
     // to refresh the view with a new image
-    connect(imageController_, &ImageController::displayedImageReady, imageView_,
+    connect(imageController_, &ImageController::displayedImageReady, imageViewer_,
             &ImageViewerWidget::setImage);
 
     // to refresh the view with a new contour
-    connect(imageController_, &ImageController::contourUpdated, imageView_, &ImageViewerWidget::setContour,
-            Qt::QueuedConnection);
+    connect(imageController_, &ImageController::contourUpdated, imageViewer_,
+            &ImageViewerWidget::setContour, Qt::QueuedConnection);
 
     // to refresh the view with a new text info algo overlay (mean out, iterations, ect)
-    connect(imageController_, &ImageController::textDiagnosticsUpdated, imageView_,
+    connect(imageController_, &ImageController::textDiagnosticsUpdated, imageViewer_,
             &ImageViewerWidget::setText);
 
     // to refresh the view and clear the former contour
     // (it's performed the first time or when a new image is loaded)
-    connect(imageController_, &ImageController::clearOverlaysRequested, imageView_,
+    connect(imageController_, &ImageController::clearOverlaysRequested, imageViewer_,
             &ImageViewerWidget::clearOverlays);
 
     // to refresh the image window title
@@ -457,10 +458,10 @@ void ImageWindow::bindApplicationSettingsToView()
     connect(&config, &ApplicationSettings::imgSettingsChanged, this,
             [this](const ImageSessionSettings& conf)
             {
-                imageView_->applyDownscaleConfig(conf.compute.downscale);
+                imageViewer_->applyDownscaleConfig(conf.compute.downscale);
             });
 
-    connect(&config, &ApplicationSettings::imgDisplaySettingsChanged, imageView_,
+    connect(&config, &ApplicationSettings::imgDisplaySettingsChanged, imageViewer_,
             &ImageViewerWidget::applyDisplayConfig);
 }
 
@@ -546,7 +547,8 @@ void ImageWindow::setupUserActionsConnections()
     connect(settingsButton_, &QPushButton::clicked, settingsWindow_, &SettingsWindow::show);
 
     // when the user drag and drop an image in the view of the image window.
-    connect(imageView_, &ImageViewerWidget::imageDropped, imageController_, &ImageController::loadImage);
+    connect(imageViewer_, &ImageViewerWidget::imageDropped, imageController_,
+            &ImageController::loadImage);
 }
 
 void ImageWindow::setupFileEventConnections()
@@ -703,7 +705,7 @@ void ImageWindow::updateWindowTitle()
 
 void ImageWindow::saveDisplayed()
 {
-    QImage displayed = imageView_->renderToImage();
+    QImage displayed = imageViewer_->renderToImage();
     if (displayed.isNull())
         return;
 

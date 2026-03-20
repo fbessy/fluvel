@@ -115,7 +115,7 @@ set(app_src
     ${CORE_DIR}/video_active_contour_thread.cpp
     ${CORE_DIR}/video_active_contour_thread.hpp
 
-    ${CORE_DIR}/captured_frame.hpp
+    ${CORE_DIR}/frame_data.hpp
 
     ${CORE_DIR}/frame_clock.cpp
     ${CORE_DIR}/frame_clock.hpp

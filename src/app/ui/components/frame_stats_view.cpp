@@ -3,10 +3,13 @@
 
 #include "frame_stats_view.hpp"
 
+#include <QElapsedTimer>
+#include <QMutexLocker>
+
 namespace fluvel_app
 {
 
-static constexpr qint64 kWindowNs = 1'000'000'000LL; // 1 seconde
+static constexpr qint64 kWindowMs = 1000; // 1 seconde
 
 FrameStatsView::FrameStatsView()
 {
@@ -24,22 +27,21 @@ void FrameStatsView::reset()
 
     contourSizeSum_ = 0;
 
-    latencySumMs_ = 0.0;
-    latencyMaxMs_ = 0.0;
+    latencySumDisplayMs_ = 0.0;
+    latencyMaxDisplayMs_ = 0.0;
+    latencySumProcMs_ = 0.0;
 
-    windowStartNs_ = 0;
+    windowTimer_.restart(); // 🔥 remplace windowStartNs_
+
     lastSnapshot_ = {};
 }
 
-void FrameStatsView::frameCaptured(qint64 receiveTsNs)
+void FrameStatsView::frameCaptured()
 {
     QMutexLocker lock(&mutex_);
 
-    if (windowStartNs_ == 0)
-        windowStartNs_ = receiveTsNs;
-
     ++capturedFrames_;
-    updateWindowLocked(receiveTsNs);
+    updateWindowLocked();
 }
 
 void FrameStatsView::frameProcessed(quint64 contourSize)
@@ -50,19 +52,23 @@ void FrameStatsView::frameProcessed(quint64 contourSize)
     ++processedFrames_;
 }
 
-void FrameStatsView::frameDisplayed(qint64 receiveTsNs, qint64 displayTsNs)
+void FrameStatsView::frameDisplayed(const FrameTimestamps& ts)
 {
     QMutexLocker lock(&mutex_);
 
     ++displayedFrames_;
 
-    // latence affichage - réception
-    double latencyMs = double(displayTsNs - receiveTsNs) * 1e-6;
+    // Latences fiables (basées sur la frame)
+    double latencyDisplayMs = double(ts.displayTimestampNs - ts.receiveTimestampNs) * 1e-6;
 
-    latencySumMs_ += latencyMs;
-    latencyMaxMs_ = std::max(latencyMaxMs_, latencyMs);
+    double latencyProcMs = double(ts.processTimestampNs - ts.receiveTimestampNs) * 1e-6;
 
-    updateWindowLocked(displayTsNs);
+    latencySumDisplayMs_ += latencyDisplayMs;
+    latencyMaxDisplayMs_ = std::max(latencyMaxDisplayMs_, latencyDisplayMs);
+
+    latencySumProcMs_ += latencyProcMs;
+
+    updateWindowLocked();
 }
 
 FrameStatsView::Snapshot FrameStatsView::snapshot()
@@ -71,44 +77,57 @@ FrameStatsView::Snapshot FrameStatsView::snapshot()
     return lastSnapshot_;
 }
 
-void FrameStatsView::updateWindowLocked(qint64 nowNs)
+void FrameStatsView::updateWindowLocked()
 {
-    qint64 elapsed = nowNs - windowStartNs_;
-    if (elapsed < kWindowNs)
+    qint64 elapsedMs = windowTimer_.elapsed();
+
+    if (elapsedMs < kWindowMs)
         return;
 
-    double seconds = double(elapsed) * 1e-9;
+    double seconds = double(elapsedMs) * 1e-3;
 
     Snapshot snap;
 
+    // FPS
     snap.capturedFps = double(capturedFrames_) / seconds;
     snap.processedFps = double(processedFrames_) / seconds;
     snap.displayedFps = double(displayedFrames_) / seconds;
 
+    // Drop
     droppedFrames_ =
         (capturedFrames_ > displayedFrames_) ? (capturedFrames_ - displayedFrames_) : 0;
 
     snap.dropRate = capturedFrames_ > 0 ? double(droppedFrames_) / double(capturedFrames_) : 0.0;
 
-    snap.avgLatencyMs = displayedFrames_ > 0 ? latencySumMs_ / double(displayedFrames_) : 0.0;
+    // Latence display
+    snap.avgLatencyDisplayMs =
+        displayedFrames_ > 0 ? latencySumDisplayMs_ / double(displayedFrames_) : 0.0;
 
-    snap.maxLatencyMs = latencyMaxMs_;
+    snap.maxLatencyDisplayMs = latencyMaxDisplayMs_;
 
-    snap.avgContourSize = double(contourSizeSum_) / double(processedFrames_);
+    // Latence proc
+    snap.avgLatencyProcMs =
+        displayedFrames_ > 0 ? latencySumProcMs_ / double(displayedFrames_) : 0.0;
+
+    // Contour
+    snap.avgContourSize =
+        processedFrames_ > 0 ? double(contourSizeSum_) / double(processedFrames_) : 0.0;
 
     lastSnapshot_ = snap;
 
-    // reset fenêtre
+    // Reset fenêtre
     capturedFrames_ = 0;
     processedFrames_ = 0;
     displayedFrames_ = 0;
     droppedFrames_ = 0;
+
     contourSizeSum_ = 0;
 
-    latencySumMs_ = 0.0;
-    latencyMaxMs_ = 0.0;
+    latencySumDisplayMs_ = 0.0;
+    latencyMaxDisplayMs_ = 0.0;
+    latencySumProcMs_ = 0.0;
 
-    windowStartNs_ = nowNs;
+    windowTimer_.restart();
 }
 
 } // namespace fluvel_app

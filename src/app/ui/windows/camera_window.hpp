@@ -112,7 +112,7 @@ private:
     QByteArray streamingCameraId_;
     QSet<QByteArray> knownCameraIds_;
 
-    ImageViewerWidget* videoView_ = nullptr;
+    ImageViewerWidget* imageViewer_ = nullptr;
     CameraController* cameraController_ = nullptr;
     QMetaObject::Connection frameToViewConnection_;
 

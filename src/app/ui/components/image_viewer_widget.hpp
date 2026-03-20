@@ -5,6 +5,7 @@
 
 #include "common_settings.hpp"
 #include "contour_point_item.hpp"
+#include "frame_data.hpp"
 #include "image_viewer_listener.hpp"
 #include "overlay_text_item.hpp"
 
@@ -43,6 +44,8 @@ public:
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);
 
+    void displayFrameNow(const UiFrame& f);
+
     const QImage& image() const;
     QImage renderToImage() const;
 
@@ -74,12 +77,10 @@ public:
     bool isPixelVisible(const QPoint& viewPos) const;
 
 public slots:
+
     void setImage(const QImage& img);
-
     void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
-
-    void setImageAndContour(const QImage& image, const QVector<QPointF>& outerContour,
-                            const QVector<QPointF>& innerContour, qint64 receiveTimestampNs);
+    void setImageAndContour(const UiFrame& uiFrame);
 
     void setText(const QString& text);
 
@@ -94,7 +95,7 @@ public slots:
 
 signals:
     void imageClicked(int x, int y);
-    void frameDisplayed(qint64 receiveTimestampNs, qint64 displayTs);
+    void frameDisplayed(const FrameTimestamps& ts);
     void imageDropped(const QString& path);
 
 protected:
@@ -120,6 +121,8 @@ private slots:
     void flushPendingFrame();
 
 private:
+    void submitFrame(const UiFrame& frame);
+
     void initialize();
 
     void updatePixmap(const QImage& img);
@@ -152,7 +155,7 @@ private:
     Qt::WindowFlags normalWindowFlags_;
 
     // --- Throttling ---
-    QImage pendingFrame_;
+    UiFrame pendingFrame_;
     bool hasPendingFrame_ = false;
 
     QElapsedTimer displayTimer_;
@@ -161,9 +164,6 @@ private:
     QTimer* throttleTimer_ = nullptr;
 
     QImage lastDisplayedImage_;
-
-    //! Last receive timestamp in nanoseconds.
-    qint64 lastReceiveTsNs_;
 
     ImageViewerInteraction* m_interaction_ = nullptr;
     ImageViewerListener* listener_ = nullptr;

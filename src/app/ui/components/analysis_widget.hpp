@@ -59,7 +59,7 @@ private:
     QLabel* text_list_length_;
     QString absolute_name_;
     QLabel* name_label_;
-    ImageViewerWidget* imageView_;
+    ImageViewerWidget* imageViewer_;
     QPushButton* open_button_;
 
     QComboBox* color_list_;

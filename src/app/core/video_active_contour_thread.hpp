@@ -4,8 +4,8 @@
 #pragma once
 
 #include "ac_types.hpp"
-#include "captured_frame.hpp"
 #include "common_settings.hpp"
+#include "frame_data.hpp"
 #include "image_view.hpp"
 #include "region_color_ac.hpp"
 #include "temporal_smoother.hpp"
@@ -17,16 +17,6 @@
 
 namespace fluvel_app
 {
-
-struct DisplayFrame
-{
-    QImage input;
-    QImage preprocessed;
-    fluvel_ip::ExportedContour outerContour;
-    fluvel_ip::ExportedContour innerContour;
-    qint64 receiveTimestampNs;
-    qint64 processTimestampNs;
-};
 
 class VideoActiveContourThread : public QThread
 {
@@ -59,6 +49,8 @@ private:
                                      const VideoComputeConfig& config, DisplayFrame& displayFrame);
 
     void exportContours(DisplayFrame& displayFrame);
+
+    static constexpr qint64 kTimeSliceMs = 20;
 
     VideoComputeConfig config_;
 

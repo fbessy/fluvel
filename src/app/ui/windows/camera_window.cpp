@@ -152,17 +152,17 @@ void CameraWindow::setupView()
 {
     const auto& app = ApplicationSettings::instance();
 
-    videoView_ =
-        new ImageViewerWidget(app.videoSettings().display, app.videoSettings().compute.downscale, central_);
+    imageViewer_ = new ImageViewerWidget(app.videoSettings().display,
+                                         app.videoSettings().compute.downscale, central_);
 
-    videoView_->setMaxDisplayFps(60.0);
+    imageViewer_->setMaxDisplayFps(30.0);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
-    videoView_->setInteraction(interaction.release());
+    imageViewer_->setInteraction(interaction.release());
 }
 
 void CameraWindow::setupController()
@@ -197,7 +197,7 @@ void CameraWindow::setupLayout()
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    contentLayout->addWidget(videoView_, 1);  // prend tout l'espace
+    contentLayout->addWidget(imageViewer_, 1); // prend tout l'espace
     contentLayout->addWidget(displayBar_, 0); // largeur naturelle
 
     // Assemblage global
@@ -243,12 +243,12 @@ void CameraWindow::setupConnections()
     connect(cameraController_, &CameraController::frameSizeStr, this,
             &CameraWindow::onFrameSizeStr);
 
-    connect(cameraController_, &CameraController::textStatsUpdated, videoView_,
+    connect(cameraController_, &CameraController::textStatsUpdated, imageViewer_,
             &ImageViewerWidget::setText);
 
     // ---  View → Controller for display stats ---
 
-    connect(videoView_, &ImageViewerWidget::frameDisplayed, cameraController_,
+    connect(imageViewer_, &ImageViewerWidget::frameDisplayed, cameraController_,
             &CameraController::onFrameDisplayed);
 
     // --- Application settings synchronization ---
@@ -278,8 +278,8 @@ void CameraWindow::applyInitialSettings()
 {
     const auto& app = ApplicationSettings::instance();
 
-    videoView_->applyDownscaleConfig(app.videoSettings().compute.downscale);
-    videoView_->applyDisplayConfig(app.videoSettings().display);
+    imageViewer_->applyDownscaleConfig(app.videoSettings().compute.downscale);
+    imageViewer_->applyDisplayConfig(app.videoSettings().display);
 
     bool preprocessing = app.videoSettings().compute.downscale.hasDownscale ||
                          app.videoSettings().compute.hasTemporalFiltering;
@@ -304,17 +304,17 @@ void CameraWindow::bindApplicationSettingsToController()
 
 void CameraWindow::bindApplicationSettingsToView()
 {
-    assert(videoView_);
+    assert(imageViewer_);
 
     const auto& app = ApplicationSettings::instance();
 
     connect(&app, &ApplicationSettings::videoSettingsChanged, this,
             [this](const VideoSessionSettings& conf)
             {
-                videoView_->applyDownscaleConfig(conf.compute.downscale);
+                imageViewer_->applyDownscaleConfig(conf.compute.downscale);
             });
 
-    connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, videoView_,
+    connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, imageViewer_,
             &ImageViewerWidget::applyDisplayConfig);
 }
 
@@ -501,7 +501,7 @@ void CameraWindow::connectFrameToView()
 {
     disconnect(frameToViewConnection_);
     frameToViewConnection_ = connect(cameraController_, &CameraController::imageAndContourUpdated,
-                                     videoView_, &ImageViewerWidget::setImageAndContour);
+                                     imageViewer_, &ImageViewerWidget::setImageAndContour);
 }
 
 void CameraWindow::startCamera()
@@ -525,7 +525,7 @@ void CameraWindow::onStreamingStarted(const QByteArray& deviceId)
 
     if (!switchingInProgress_)
     {
-        videoView_->showPlaceholder(false);
+        imageViewer_->showPlaceholder(false);
         connectFrameToView();
     }
 
@@ -548,7 +548,7 @@ void CameraWindow::onStreamingStopped()
     if (!switchingInProgress_)
     {
         disconnect(frameToViewConnection_);
-        videoView_->showPlaceholder(true);
+        imageViewer_->showPlaceholder(true);
 
         refreshUi();
     }
@@ -560,7 +560,7 @@ void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
                                  const QString& errorString)
 {
     disconnect(frameToViewConnection_);
-    videoView_->showPlaceholder(true);
+    imageViewer_->showPlaceholder(true);
 
     QMessageBox::warning(this, tr("Camera error"), errorString);
 
@@ -591,7 +591,7 @@ void CameraWindow::onStartupTimeout(const QByteArray& deviceId, double timeoutSe
 void CameraWindow::onStreamingLost(const QByteArray& deviceId, double frameAgeSec)
 {
     disconnect(frameToViewConnection_);
-    videoView_->showPlaceholder(true);
+    imageViewer_->showPlaceholder(true);
 
     QMessageBox::warning(
         this, tr("Camera stream lost"),

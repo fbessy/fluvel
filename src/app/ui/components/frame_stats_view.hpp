@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include "frame_data.hpp"
+
+#include <QElapsedTimer>
 #include <QMutex>
 #include <QtGlobal>
 
@@ -18,17 +21,18 @@ public:
         double processedFps = 0.0;
         double displayedFps = 0.0;
         double dropRate = 0.0;
-        double avgLatencyMs = 0.0;
-        double maxLatencyMs = 0.0;
+        double avgLatencyDisplayMs = 0.0;
+        double maxLatencyDisplayMs = 0.0;
+        double avgLatencyProcMs = 0.0;
         double avgContourSize = 0.0;
     };
 
     FrameStatsView();
 
     // événements
-    void frameCaptured(qint64 receiveTsNs);
+    void frameCaptured();
     void frameProcessed(quint64 contourSize);
-    void frameDisplayed(qint64 receiveTsNs, qint64 displayTsNs);
+    void frameDisplayed(const FrameTimestamps& ts);
 
     // lecture stable (fenêtre ~1s)
     Snapshot snapshot();
@@ -36,25 +40,24 @@ public:
     void reset();
 
 private:
-    void updateWindowLocked(qint64 nowNs);
+    void updateWindowLocked();
 
-private:
     QMutex mutex_;
 
     // compteurs fenêtre courante
-    quint64 capturedFrames_;
-    quint64 processedFrames_;
-    quint64 displayedFrames_;
-    quint64 droppedFrames_;
+    quint64 capturedFrames_ = 0;
+    quint64 processedFrames_ = 0;
+    quint64 displayedFrames_ = 0;
+    quint64 droppedFrames_ = 0;
 
-    quint64 contourSizeSum_;
+    quint64 contourSizeSum_ = 0;
 
     // latence fenêtre
-    double latencySumMs_;
-    double latencyMaxMs_;
+    double latencySumDisplayMs_ = 0.0;
+    double latencyMaxDisplayMs_ = 0.0;
+    double latencySumProcMs_ = 0.0;
 
-    // timestamps
-    qint64 windowStartNs_;
+    QElapsedTimer windowTimer_;
 
     // snapshot précédent (pour affichage stable)
     Snapshot lastSnapshot_;

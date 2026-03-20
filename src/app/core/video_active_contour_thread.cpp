@@ -94,8 +94,6 @@ QImage VideoActiveContourThread::applyDownscale(const QImage& input,
 
 DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 {
-    qint64 startTs = FrameClock::nowNs();
-
     VideoComputeConfig config;
 
     {
@@ -156,11 +154,18 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         activeContour_->resetExecutionState(algoImage);
     }
 
-    activeContour_->runCycles(config.cyclesNbr);
-    df.processTimestampNs = FrameClock::nowNs() - startTs;
+    QElapsedTimer timeSliceBudgetMs;
+    timeSliceBudgetMs.start();
+
+    while (!activeContour_->isStopped() && timeSliceBudgetMs.elapsed() < kTimeSliceMs)
+    {
+        activeContour_->runCycles(1);
+    }
 
     exportTemporalFilteredImage(algoImage, config, df);
     exportContours(df);
+
+    df.processTimestampNs = FrameClock::nowNs();
 
     return df;
 }

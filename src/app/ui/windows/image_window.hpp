@@ -134,7 +134,7 @@ private:
     QAction* languageAct_ = nullptr;
 
     // --- VIEW - CONTROLLER ---
-    ImageViewerWidget* imageView_ = nullptr;
+    ImageViewerWidget* imageViewer_ = nullptr;
     ImageController* imageController_ = nullptr;
 
     // --- Current image state ---

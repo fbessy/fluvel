@@ -229,7 +229,7 @@ void CameraController::onCapturedFrame(const QVideoFrame& frame)
         emit streamingStarted(deviceId_);
     }
 
-    frameStats_.frameCaptured(now);
+    frameStats_.frameCaptured();
 
     CapturedFrame cf;
     cf.frame = frame;
@@ -243,25 +243,30 @@ void CameraController::onFrameProcessed(quint64 contourSize)
     frameStats_.frameProcessed(contourSize);
 }
 
-void CameraController::onFrameDisplayed(qint64 receiveTsNs, qint64 displayTsNs)
+void CameraController::onFrameDisplayed(const FrameTimestamps& ts)
 {
-    frameStats_.frameDisplayed(receiveTsNs, displayTsNs);
+    frameStats_.frameDisplayed(ts);
 }
 
-void CameraController::onDisplayFrameReady(const DisplayFrame& result)
+void CameraController::onDisplayFrameReady(const DisplayFrame& displayFrame)
 {
-    auto q_l_out = convertToQVector(result.outerContour);
-    auto q_l_in = convertToQVector(result.innerContour);
-
-    QImage img;
+    UiFrame uiDisplayFrame;
 
     if (displayConfig_.image == ImageBase::Source)
-        img = result.input;
+        uiDisplayFrame.image = displayFrame.input;
     else if (displayConfig_.image == ImageBase::Preprocessed)
-        img = result.preprocessed;
+        uiDisplayFrame.image = displayFrame.preprocessed;
 
-    if (!img.isNull())
-        emit imageAndContourUpdated(img, q_l_out, q_l_in, result.receiveTimestampNs);
+    if (uiDisplayFrame.image.isNull())
+        return;
+
+    uiDisplayFrame.outerContour = convertToQVector(displayFrame.outerContour);
+    uiDisplayFrame.innerContour = convertToQVector(displayFrame.innerContour);
+
+    uiDisplayFrame.receiveTimestampNs = displayFrame.receiveTimestampNs;
+    uiDisplayFrame.processTimestampNs = displayFrame.processTimestampNs;
+
+    emit imageAndContourUpdated(uiDisplayFrame);
 }
 
 void CameraController::onStartupTimeout()
@@ -285,17 +290,18 @@ void CameraController::updateDiagnostics()
 {
     auto snap = frameStats_.snapshot();
 
-    CameraStats stats{snap.capturedFps,  snap.processedFps, snap.displayedFps,  snap.dropRate,
-                      snap.avgLatencyMs, snap.maxLatencyMs, snap.avgContourSize};
+    CameraStats stats{snap.capturedFps,      snap.processedFps,        snap.displayedFps,
+                      snap.dropRate,         snap.avgLatencyDisplayMs, snap.maxLatencyDisplayMs,
+                      snap.avgLatencyProcMs, snap.avgContourSize};
 
     QString textStats = QString(tr("In | Proc | Disp: %1 | %2 | %3 fps\n"
-                                   "Lat: %4 ms (max %5) | Drop: %6 %\n"
+                                   "Lat: %4 ms (proc %5) | Drop: %6 %\n"
                                    "Contour: %7 pts"))
                             .arg(stats.capturedFps, 0, 'f', 1)
                             .arg(stats.processedFps, 0, 'f', 1)
                             .arg(stats.displayedFps, 0, 'f', 1)
-                            .arg(stats.avgLatencyMs, 0, 'f', 1)
-                            .arg(stats.maxLatencyMs, 0, 'f', 1)
+                            .arg(stats.avgLatencyDisplayMs, 0, 'f', 1)
+                            .arg(stats.avgLatencyProcMs, 0, 'f', 1)
                             .arg(100.f * stats.dropRate, 0, 'f', 1)
                             .arg(stats.avgContourSize, 0, 'f', 0);
 

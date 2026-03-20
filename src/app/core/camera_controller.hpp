@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "captured_frame.hpp"
 #include "common_settings.hpp"
+#include "frame_data.hpp"
 #include "frame_stats_view.hpp"
 #include "video_active_contour_thread.hpp"
 
@@ -47,7 +47,7 @@ public:
     void onVideoSettingsChanged(const VideoSessionSettings& session);
     void onVideoDisplaySettingsChanged(const DisplayConfig& display);
 
-    void onFrameDisplayed(qint64 receiveTsNs, qint64 displayTsNs);
+    void onFrameDisplayed(const FrameTimestamps& ts);
 
 signals:
     void videoInputsChanged(const QList<QCameraDevice>& inputs);
@@ -59,8 +59,7 @@ signals:
 
     void frameSizeStr(const QString& str);
     void textStatsUpdated(const QString& textStats);
-    void imageAndContourUpdated(const QImage& img, const QVector<QPointF>& outerContour,
-                                const QVector<QPointF>& innerContour, qint64 receiveTimestampNs);
+    void imageAndContourUpdated(const UiFrame& uiFrame);
 
 private:
     QCameraFormat chooseBestFormat(const QCameraDevice& dev);
@@ -72,7 +71,7 @@ private:
     void onCapturedFrame(const QVideoFrame& frame);
 
     void onFrameProcessed(quint64 contourSize);
-    void onDisplayFrameReady(const DisplayFrame& result);
+    void onDisplayFrameReady(const DisplayFrame& displayFrame);
     void onStartupTimeout();
     void checkWatchdog();
     void updateDiagnostics();

@@ -15,6 +15,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QThread>
+#include <QTimer>
 #include <QWheelEvent>
 
 #include <cassert>
@@ -101,23 +102,36 @@ void ImageViewerWidget::setMaxDisplayFps(double fps)
     minDisplayIntervalMs_ = static_cast<int>(1000.0 / fps);
 }
 
-void ImageViewerWidget::setImage(const QImage& img)
+void ImageViewerWidget::displayFrameNow(const UiFrame& f)
 {
-    // Toujours garder la dernière image
-    pendingFrame_ = img;
+    updatePixmap(f.image);
+
+    if (!f.outerContour.isEmpty() || !f.innerContour.isEmpty())
+        setContour(f.outerContour, f.innerContour);
+    else
+        clearOverlays();
+
+    displayTimer_.restart();
+
+    QTimer::singleShot(0, this,
+                       [this, f]()
+                       {
+                           qint64 displayTs = FrameClock::nowNs();
+
+                           emit frameDisplayed(FrameTimestamps{f.receiveTimestampNs,
+                                                               f.processTimestampNs, displayTs});
+                       });
+}
+
+void ImageViewerWidget::submitFrame(const UiFrame& frame)
+{
+    pendingFrame_ = frame;
     hasPendingFrame_ = true;
 
-    // Pas de throttling
     if (minDisplayIntervalMs_ == 0)
     {
-        updatePixmap(pendingFrame_);
+        displayFrameNow(pendingFrame_);
         hasPendingFrame_ = false;
-        displayTimer_.restart();
-
-        qint64 displayTs = FrameClock::nowNs();
-
-        emit frameDisplayed(lastReceiveTsNs_, displayTs);
-
         return;
     }
 
@@ -125,29 +139,31 @@ void ImageViewerWidget::setImage(const QImage& img)
 
     if (elapsed >= minDisplayIntervalMs_)
     {
-        updatePixmap(pendingFrame_);
+        displayFrameNow(pendingFrame_);
         hasPendingFrame_ = false;
-        displayTimer_.restart();
-
-        qint64 displayTs = FrameClock::nowNs();
-
-        emit frameDisplayed(lastReceiveTsNs_, displayTs);
     }
-    else
+    else if (!throttleTimer_->isActive())
     {
-        if (!throttleTimer_->isActive())
+        const qint64 remaining = minDisplayIntervalMs_ - elapsed;
+
+        if (remaining > 0)
         {
-            const qint64 remaining = minDisplayIntervalMs_ - elapsed;
-
-            if (remaining > 0)
-            {
-                const int interval =
-                    static_cast<int>(std::min<qint64>(remaining, std::numeric_limits<int>::max()));
-
-                throttleTimer_->start(interval);
-            }
+            throttleTimer_->start(
+                static_cast<int>(std::min<qint64>(remaining, std::numeric_limits<int>::max())));
         }
     }
+}
+
+void ImageViewerWidget::setImage(const QImage& img)
+{
+    UiFrame f;
+    f.image = img;
+
+    qint64 now = FrameClock::nowNs();
+    f.receiveTimestampNs = now;
+    f.processTimestampNs = now;
+
+    submitFrame(f);
 }
 
 void ImageViewerWidget::setContour(const QVector<QPointF>& outerContour,
@@ -159,17 +175,9 @@ void ImageViewerWidget::setContour(const QVector<QPointF>& outerContour,
     l_in_->setPoints(innerContour);
 }
 
-void ImageViewerWidget::setImageAndContour(const QImage& image,
-                                           const QVector<QPointF>& outerContour,
-                                           const QVector<QPointF>& innerContour,
-                                           qint64 receiveTimestampNs)
+void ImageViewerWidget::setImageAndContour(const UiFrame& frame)
 {
-    assert(l_out_ && l_in_);
-
-    setImage(image);
-    setContour(outerContour, innerContour);
-
-    lastReceiveTsNs_ = receiveTimestampNs;
+    submitFrame(frame);
 }
 
 void ImageViewerWidget::clearOverlays()
@@ -188,13 +196,8 @@ void ImageViewerWidget::flushPendingFrame()
     if (!hasPendingFrame_)
         return;
 
-    updatePixmap(pendingFrame_);
+    displayFrameNow(pendingFrame_);
     hasPendingFrame_ = false;
-    displayTimer_.restart();
-
-    qint64 displayTs = FrameClock::nowNs();
-
-    emit frameDisplayed(lastReceiveTsNs_, displayTs);
 }
 
 void ImageViewerWidget::updatePixmap(const QImage& img)

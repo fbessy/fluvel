@@ -12,8 +12,9 @@ struct CameraStats
     double processedFps = 0.0;
     double displayedFps = 0.0;
     double dropRate = 0.0;
-    double avgLatencyMs = 0.0;
-    double maxLatencyMs = 0.0;
+    double avgLatencyDisplayMs = 0.0;
+    double maxLatencyDisplayMs = 0.0;
+    double avgLatencyProcMs = 0.0;
     double avgContourSize = 0.0;
 };
 

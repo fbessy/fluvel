@@ -83,7 +83,7 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     // Image preview
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    settingsView_ = new ImageViewerWidget(this);
+    imageViewer_ = new ImageViewerWidget(this);
     auto interaction = std::make_unique<InteractionSet>();
 
     auto initBehavior = std::make_unique<InitializationBehavior>();
@@ -91,7 +91,7 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
 
     interaction->addBehavior(std::move(initBehavior));
 
-    settingsView_->setInteraction(interaction.release());
+    imageViewer_->setInteraction(interaction.release());
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Layouts
@@ -100,7 +100,7 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     // Horizontal content: tabs | image
     QHBoxLayout* content_layout = new QHBoxLayout;
     content_layout->addWidget(tabs_);
-    content_layout->addWidget(settingsView_, 1); // l'image prend l'espace restant
+    content_layout->addWidget(imageViewer_, 1); // l'image prend l'espace restant
 
     // Vertical root layout: content + buttons
     QVBoxLayout* root_layout = new QVBoxLayout;
@@ -858,7 +858,7 @@ void SettingsWindow::setupConnections()
 
     connect(clearButton_, &QPushButton::clicked, this, &SettingsWindow::onClearPhi);
 
-    connect(imageSettingsController_, &ImageSettingsController::viewChanged, settingsView_,
+    connect(imageSettingsController_, &ImageSettingsController::viewChanged, imageViewer_,
             &ImageViewerWidget::setImage);
 
     connect(algoWidget_, &AlgoSettingsWidget::connectivityChanged, imageSettingsController_,
@@ -1299,10 +1299,10 @@ void SettingsWindow::onToggleShape()
 
 QPoint SettingsWindow::uiPositionFromView(const QPoint& viewPosition) const
 {
-    if (settingsView_->image().isNull())
+    if (imageViewer_->image().isNull())
         return QPoint(-1, -1);
 
-    QSize viewSize = settingsView_->image().size();
+    QSize viewSize = imageViewer_->image().size();
 
     float px = float(viewPosition.x()) / float(viewSize.width()) - 0.5f;
     float py = float(viewPosition.y()) / float(viewSize.height()) - 0.5f;

@@ -188,7 +188,7 @@ private:
     /////////    View - Controller    /////
     ///////////////////////////////////////
 
-    ImageViewerWidget* settingsView_ = nullptr;
+    ImageViewerWidget* imageViewer_ = nullptr;
     InitializationBehavior* initializationBehavior_ = nullptr;
     ImageSettingsController* imageSettingsController_ = nullptr;
     int wheelAccumulator_ = 0;

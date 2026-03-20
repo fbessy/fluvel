@@ -48,16 +48,16 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     ///////////////////////////////////////
 
-    imageView_ = new ImageViewerWidget(this);
+    imageViewer_ = new ImageViewerWidget(this);
     auto interaction = std::make_unique<InteractionSet>();
     // interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     // interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<ColorPickerBehavior>());
     interaction->addBehavior(std::make_unique<DragDropBehavior>());
-    imageView_->setInteraction(interaction.release());
+    imageViewer_->setInteraction(interaction.release());
 
-    imageView_->setListener(this);
+    imageViewer_->setListener(this);
 
     ///////////////////////////////////////
 
@@ -65,7 +65,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     QVBoxLayout* img_layout = new QVBoxLayout;
     img_layout->addWidget(name_label_);
-    img_layout->addWidget(imageView_);
+    img_layout->addWidget(imageViewer_);
     img_layout->addWidget(open_button_);
     QGroupBox* img_group = new QGroupBox(tr("Image") + " " + QString::number(id_this_));
     img_group->setLayout(img_layout);
@@ -146,7 +146,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     name_filters_.removeDuplicates();
 
-    imageView_->setListener(this);
+    imageViewer_->setListener(this);
 
     connect(open_button_, &QPushButton::clicked, this, &AnalysisWidget::open_filename);
 
@@ -286,7 +286,7 @@ void AnalysisWidget::refresh_img_noise(int noise_percent)
             }
         }
 
-        imageView_->setImage(img_noise_);
+        imageViewer_->setImage(img_noise_);
 
         create_list();
     }
