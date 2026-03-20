@@ -108,8 +108,6 @@ void ImageViewerWidget::displayFrameNow(const UiFrame& f)
 
     if (!f.outerContour.isEmpty() || !f.innerContour.isEmpty())
         setContour(f.outerContour, f.innerContour);
-    else
-        clearOverlays();
 
     displayTimer_.restart();
 

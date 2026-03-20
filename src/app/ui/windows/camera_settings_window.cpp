@@ -63,16 +63,9 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
 
     algoWidget_ = new AlgoSettingsWidget(config_.compute.algo, this);
 
-    phasesSb_ = new QSpinBox;
-    phasesSb_->setMinimum(1);
-
-    auto* fl = new QFormLayout;
-    fl->addRow(tr("phases (cycle 1 to 2) per frame"), phasesSb_);
-
     auto* algoLayout = new QVBoxLayout;
     algoLayout->addWidget(algoWidget_);
     algoLayout->addSpacing(8);
-    algoLayout->addLayout(fl);
     algoLayout->addStretch(1);
 
     auto* algo_gb = new QGroupBox;
@@ -119,7 +112,6 @@ void CameraSettingsWindow::accept()
     config_.compute.hasTemporalFiltering = filterCb_->isChecked();
 
     algoWidget_->accept();
-    config_.compute.cyclesNbr = phasesSb_->value();
 
     emit videoSessionSettingsAccepted(config_);
 
@@ -139,7 +131,6 @@ void CameraSettingsWindow::updateUIFromConfig()
     filterCb_->setChecked(config_.compute.hasTemporalFiltering);
 
     algoWidget_->reject();
-    phasesSb_->setValue(config_.compute.cyclesNbr);
 }
 
 void CameraSettingsWindow::reject()

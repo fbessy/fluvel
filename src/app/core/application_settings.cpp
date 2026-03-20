@@ -217,8 +217,6 @@ void ApplicationSettings::saveVideoSessionSettings()
 
     saveAlgo(Session::Camera, videoSettings_.compute.algo);
 
-    settings.setValue("algo/cycles_nbr", videoSettings_.compute.cyclesNbr);
-
     // preprocess
 
     saveDownscale(Session::Camera, videoSettings_.compute.downscale);
@@ -402,9 +400,6 @@ void ApplicationSettings::loadVideoSessionSettings()
     QSettings settings = camSessionSettings();
 
     loadAlgo(Session::Camera, videoSettings_.compute.algo);
-
-    videoSettings_.compute.cyclesNbr =
-        settings.value("algo/cycles_nbr", VideoComputeConfig::kDefaultCyclesNbr).toInt();
 
     // preprocess
     loadDownscale(Session::Camera, videoSettings_.compute.downscale);

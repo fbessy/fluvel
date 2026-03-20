@@ -58,7 +58,6 @@ private:
     QCheckBox* filterCb_ = nullptr;
 
     AlgoSettingsWidget* algoWidget_ = nullptr;
-    QSpinBox* phasesSb_ = nullptr;
 
     QDialogButtonBox* dialogButtons_ = nullptr;
 
