@@ -65,8 +65,6 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
 
     auto* algoLayout = new QVBoxLayout;
     algoLayout->addWidget(algoWidget_);
-    algoLayout->addSpacing(8);
-    algoLayout->addStretch(1);
 
     auto* algo_gb = new QGroupBox;
     algo_gb->setLayout(algoLayout);
