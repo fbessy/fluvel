@@ -63,9 +63,14 @@ QRectF ContourPointsItem::boundingRect() const
 void ContourPointsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     painter->setRenderHint(QPainter::Antialiasing, false);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, false);
     painter->setRenderHint(QPainter::TextAntialiasing, false);
 
-    painter->setPen(color_);
+    QPen pen(color_);
+    pen.setWidthF(1.1);
+    pen.setCosmetic(false);
+
+    painter->setPen(pen);
     painter->setBrush(Qt::NoBrush);
 
     painter->drawPoints(points_.data(), static_cast<int>(points_.size()));
