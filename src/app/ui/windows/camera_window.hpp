@@ -15,6 +15,7 @@
 class QWidget;
 class QComboBox;
 class QPushButton;
+class QLabel;
 
 class QShowEvent;
 class QCloseEvent;
@@ -76,6 +77,13 @@ private:
 
     void onToggleStreaming();
 
+    void onDeviceChanged(int index);
+    void refreshFormatListFromSelection();
+    void updateFormatList(const QList<QCameraFormat>& formats);
+    static QString pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt);
+    static QString formatToString(const QCameraFormat& fmt);
+    QCameraFormat getSelectedFormat() const;
+
     void onStreamingStarted(const QByteArray& deviceId);
     void onStreamingStopped();
     void onCameraError(const QByteArray& deviceId, QCamera::Error error,
@@ -99,7 +107,11 @@ private:
 
     QWidget* central_ = new QWidget(this);
 
+    QLabel* deviceLabel_ = nullptr;
     QComboBox* cameraSelector_ = nullptr;
+    QLabel* streamingFormatLabel_ = nullptr;
+    QLabel* formatLabel_ = nullptr;
+    QComboBox* formatSelector_ = nullptr;
     QPushButton* toggleStreamingButton_ = nullptr;
     RightPanelToggleButton* rightPanelToggle_ = nullptr;
     QPushButton* settingsButton_ = nullptr;
@@ -125,6 +137,9 @@ private:
     bool switchingInProgress_ = false;
 
     QHash<QByteArray, CameraStatus> cameraStatus_;
+
+    QCameraFormat currentActiveFormat_;
+    QCameraDevice currentActiveDevice_;
 };
 
 } // namespace fluvel_app

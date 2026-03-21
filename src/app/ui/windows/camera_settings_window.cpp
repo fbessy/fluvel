@@ -49,17 +49,20 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
     tabBar->setUsesScrollButtons(false);
     tabBar->setElideMode(Qt::ElideNone);
 
+    optimizedFormatCb_ = new QCheckBox(tr("Optimized format"));
+
     setupDownscaleGroup();
 
     filterCb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
 
-    auto* preprocess_layout = new QVBoxLayout(this);
-    preprocess_layout->addWidget(downscaleGb_);
-    preprocess_layout->addWidget(filterCb_);
-    preprocess_layout->addStretch(1);
+    auto* inputLayout = new QVBoxLayout(this);
+    inputLayout->addWidget(optimizedFormatCb_);
+    inputLayout->addWidget(downscaleGb_);
+    inputLayout->addWidget(filterCb_);
+    inputLayout->addStretch(1);
 
-    auto* preprocess_gb = new QGroupBox;
-    preprocess_gb->setLayout(preprocess_layout);
+    auto* inputGb = new QGroupBox;
+    inputGb->setLayout(inputLayout);
 
     algoWidget_ = new AlgoSettingsWidget(config_.compute.algo, this);
 
@@ -69,7 +72,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
     auto* algo_gb = new QGroupBox;
     algo_gb->setLayout(algoLayout);
 
-    tabs_->addTab(preprocess_gb, tr("Preprocessing"));
+    tabs_->addTab(inputGb, tr("Input"));
     tabs_->addTab(algo_gb, tr("Algorithm"));
 
     auto* layout = new QVBoxLayout;
@@ -105,6 +108,7 @@ void CameraSettingsWindow::setupDownscaleGroup()
 
 void CameraSettingsWindow::accept()
 {
+    config_.compute.useOptimizedFormat = optimizedFormatCb_->isChecked();
     config_.compute.downscale.hasDownscale = downscaleGb_->isChecked();
     config_.compute.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
     config_.compute.hasTemporalFiltering = filterCb_->isChecked();
@@ -119,6 +123,8 @@ void CameraSettingsWindow::accept()
 void CameraSettingsWindow::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
+
+    optimizedFormatCb_->setChecked(config_.compute.useOptimizedFormat);
 
     downscaleGb_->setChecked(config_.compute.downscale.hasDownscale);
 

@@ -556,10 +556,10 @@ void SettingsWindow::setupUiPreprocessingTab()
     elapsed_filt_layout->addWidget(timeFilt_);
     time_filt_groupbox->setLayout(elapsed_filt_layout);
 
-    QVBoxLayout* preprocess_layout = new QVBoxLayout;
-    preprocess_layout->addWidget(preprocessTabs_);
-    preprocess_layout->addWidget(time_filt_groupbox);
-    preprocessPage_->setLayout(preprocess_layout);
+    QVBoxLayout* inputLayout = new QVBoxLayout;
+    inputLayout->addWidget(preprocessTabs_);
+    inputLayout->addWidget(time_filt_groupbox);
+    preprocessPage_->setLayout(inputLayout);
 }
 
 void SettingsWindow::setupConnections()

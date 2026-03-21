@@ -38,7 +38,7 @@ public:
     explicit CameraController(const VideoSessionSettings& session, QObject* parent = nullptr);
     ~CameraController() override;
 
-    void start(const QByteArray& deviceId);
+    void start(const QByteArray& deviceId, const QCameraFormat& format);
     void stop();
     bool isStreaming() const;
 
@@ -76,6 +76,7 @@ private:
     void checkWatchdog();
     void updateDiagnostics();
 
+    bool useOptimizedFormat_{true};
     QCamera* camera_ = nullptr;
     QMediaCaptureSession* captureSession_ = nullptr;
     QVideoSink* videoSink_ = nullptr;

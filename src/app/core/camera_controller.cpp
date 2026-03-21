@@ -62,7 +62,7 @@ CameraController::~CameraController()
     activeContourThread_.wait();
 }
 
-void CameraController::start(const QByteArray& deviceId)
+void CameraController::start(const QByteArray& deviceId, const QCameraFormat& format)
 {
     if (state_ != StreamingState::Stopped)
         stop();
@@ -92,17 +92,35 @@ void CameraController::start(const QByteArray& deviceId)
             videoSink_ = new QVideoSink(this);
             captureSession_ = new QMediaCaptureSession(this);
 
-            QCameraFormat fmt = chooseBestFormat(cam);
-
-            if (!fmt.isNull())
+            // 👉 Application du format choisi (UI)
+            if (!format.isNull())
             {
-                // #ifdef FLUVEL_DEBUG
-                qDebug() << "Selected format:"
-                         << QVideoFrameFormat::pixelFormatToString(fmt.pixelFormat())
-                         << fmt.resolution() << fmt.maxFrameRate();
-                // #endif
+                const auto formats = cam.videoFormats();
 
-                camera_->setCameraFormat(fmt);
+                auto it = std::find_if(formats.begin(), formats.end(),
+                                       [&](const QCameraFormat& f)
+                                       {
+                                           return f.pixelFormat() == format.pixelFormat() &&
+                                                  f.resolution() == format.resolution() &&
+                                                  f.maxFrameRate() == format.maxFrameRate();
+                                       });
+
+                if (it != formats.end())
+                {
+                    camera_->setCameraFormat(*it);
+
+#ifdef FLUVEL_DEBUG
+                    qDebug() << "Selected UI format:"
+                             << QVideoFrameFormat::pixelFormatToString(it->pixelFormat())
+                             << it->resolution() << it->maxFrameRate();
+#endif
+                }
+                else
+                {
+#ifdef FLUVEL_DEBUG
+                    qDebug() << "UI format not found on device, using default";
+#endif
+                }
             }
 
             captureSession_->setCamera(camera_);
@@ -125,7 +143,9 @@ void CameraController::start(const QByteArray& deviceId)
     }
 
     if (!isFound)
+    {
         emit cameraError(deviceId, QCamera::CameraError, tr("Camera not found"));
+    }
 }
 
 QCameraFormat CameraController::chooseBestFormat(const QCameraDevice& dev)
@@ -342,6 +362,7 @@ void CameraController::onCameraError(QCamera::Error error, const QString& errorS
 
 void CameraController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
+    useOptimizedFormat_ = session.compute.useOptimizedFormat;
     activeContourThread_.setAlgoConfig(session.compute);
 }
 

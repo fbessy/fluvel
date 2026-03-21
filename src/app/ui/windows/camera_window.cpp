@@ -16,6 +16,7 @@
 
 #include <QCameraDevice>
 #include <QComboBox>
+#include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
@@ -68,6 +69,7 @@ void CameraWindow::createUi()
 
     central_ = new QWidget(this);
 
+    deviceLabel_ = new QLabel(tr("Device:"));
     cameraSelector_ = new QComboBox(this);
 
     // Adjust width to contents (needed when items have icons)
@@ -77,6 +79,11 @@ void CameraWindow::createUi()
     activeCameraIcon_ = createActiveCameraIcon();
     emptyCameraIcon_ = createEmptyCameraIcon();
     errorCameraIcon_ = createErrorCameraIcon();
+
+    streamingFormatLabel_ = new QLabel;
+
+    formatLabel_ = new QLabel(tr("Format:"));
+    formatSelector_ = new QComboBox(this);
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
                               ":/icons/toolbar/media-playback-start-symbolic.svg");
@@ -179,26 +186,47 @@ void CameraWindow::setupLayout()
     vLayout->setSpacing(0);
 
     QWidget* controlBar = new QWidget(central_);
-    QHBoxLayout* controlLayout = new QHBoxLayout(controlBar);
+    QVBoxLayout* controlLayout = new QVBoxLayout(controlBar);
     controlLayout->setContentsMargins(8, 4, 8, 4);
-    controlLayout->setSpacing(6);
-    controlLayout->addWidget(cameraSelector_);
-    controlLayout->addWidget(toggleStreamingButton_);
-    controlLayout->addStretch();
+    controlLayout->setSpacing(2); // compact entre les 2 lignes
 
-    controlLayout->addWidget(rightPanelToggle_);
+    // --- Ligne 1 : état + contrôle ---
+    QHBoxLayout* topRow = new QHBoxLayout();
+    topRow->setSpacing(6);
 
-    controlLayout->addSpacerItem(new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum));
+    topRow->addWidget(deviceLabel_);
+    topRow->addWidget(cameraSelector_);
 
-    controlLayout->addWidget(settingsButton_);
+    topRow->addWidget(streamingFormatLabel_); // format actif
 
-    // --- Layout horizontal contenu principal ---
+    topRow->addWidget(toggleStreamingButton_);
+
+    topRow->addStretch();
+
+    topRow->addWidget(rightPanelToggle_);
+
+    topRow->addSpacerItem(new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum));
+
+    topRow->addWidget(settingsButton_);
+
+    // --- Ligne 2 : configuration ---
+    QHBoxLayout* bottomRow = new QHBoxLayout();
+    bottomRow->setSpacing(6);
+
+    bottomRow->addWidget(formatLabel_);
+    bottomRow->addWidget(formatSelector_, 1); // prend l'espace
+
+    // Assemblage control bar
+    controlLayout->addLayout(topRow);
+    controlLayout->addLayout(bottomRow);
+
+    // --- Layout contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    contentLayout->addWidget(imageViewer_, 1); // prend tout l'espace
-    contentLayout->addWidget(displayBar_, 0); // largeur naturelle
+    contentLayout->addWidget(imageViewer_, 1);
+    contentLayout->addWidget(displayBar_, 0);
 
     // Assemblage global
     vLayout->addWidget(controlBar);
@@ -218,6 +246,8 @@ void CameraWindow::setupConnections()
 
     connect(settingsButton_, &QPushButton::clicked, cameraSettingsWindow_,
             &CameraSettingsWindow::show);
+
+    connect(cameraSelector_, &QComboBox::currentIndexChanged, this, &CameraWindow::onDeviceChanged);
 
     // --- Hardware events (camera devices) ---
 
@@ -385,6 +415,9 @@ void CameraWindow::updateCameraList(const QList<QCameraDevice>& inputs)
 
     cameraSelector_->setCurrentIndex(currentIndex);
 
+    if (currentIndex >= 0)
+        onDeviceChanged(currentIndex);
+
     emit cameraAvailabilityChanged(isCameraAvailable());
 }
 
@@ -451,6 +484,77 @@ void CameraWindow::onToggleStreaming()
     }
 }
 
+void CameraWindow::onDeviceChanged(int /*index*/)
+{
+    refreshFormatListFromSelection();
+}
+
+void CameraWindow::refreshFormatListFromSelection()
+{
+    int index = cameraSelector_->currentIndex();
+    if (index < 0)
+    {
+        formatSelector_->clear();
+        return;
+    }
+
+    QByteArray deviceId = cameraSelector_->itemData(index).toByteArray();
+
+    // 👉 récupérer directement depuis la liste actuelle
+    const auto devices = cameraController_->videoInputs();
+
+    const QCameraDevice* device = nullptr;
+
+    for (const auto& d : devices)
+    {
+        if (d.id() == deviceId)
+        {
+            device = &d;
+            break;
+        }
+    }
+
+    if (!device)
+    {
+        formatSelector_->clear();
+        return;
+    }
+
+    updateFormatList(device->videoFormats());
+}
+
+void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
+{
+    formatSelector_->blockSignals(true);
+
+    QCameraFormat previous = getSelectedFormat();
+
+    formatSelector_->clear();
+
+    int indexToSelect = -1;
+
+    for (int i = 0; i < formats.size(); ++i)
+    {
+        const auto& fmt = formats[i];
+
+        formatSelector_->addItem(formatToString(fmt), QVariant::fromValue(fmt));
+
+        if (fmt.pixelFormat() == previous.pixelFormat() &&
+            fmt.resolution() == previous.resolution() &&
+            fmt.maxFrameRate() == previous.maxFrameRate())
+        {
+            indexToSelect = i;
+        }
+    }
+
+    if (indexToSelect >= 0)
+        formatSelector_->setCurrentIndex(indexToSelect);
+    else if (formatSelector_->count() > 0)
+        formatSelector_->setCurrentIndex(0);
+
+    formatSelector_->blockSignals(false);
+}
+
 void CameraWindow::showEvent(QShowEvent* event)
 {
     emit cameraWindowShown();
@@ -506,11 +610,30 @@ void CameraWindow::connectFrameToView()
 
 void CameraWindow::startCamera()
 {
-    const QByteArray selectedId = cameraSelector_->currentData().toByteArray();
+    assert(cameraSelector_ && formatSelector_ && cameraController_);
+
+    if (cameraSelector_->currentIndex() < 0)
+        return;
+
+    QByteArray selectedId = cameraSelector_->currentData().toByteArray();
     if (selectedId.isEmpty())
         return;
 
-    cameraController_->start(selectedId);
+    // 👉 stocke juste le format choisi (intention utilisateur)
+    currentActiveFormat_ = getSelectedFormat();
+
+    // 👉 démarre
+    cameraController_->start(selectedId, currentActiveFormat_);
+}
+
+QCameraFormat CameraWindow::getSelectedFormat() const
+{
+    int index = formatSelector_->currentIndex();
+
+    if (index < 0)
+        return QCameraFormat();
+
+    return formatSelector_->itemData(index).value<QCameraFormat>();
 }
 
 void CameraWindow::stopCamera()
@@ -656,6 +779,35 @@ bool CameraWindow::isCameraAvailable() const
     assert(cameraSelector_);
 
     return cameraSelector_->count() > 0;
+}
+
+QString CameraWindow::pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt)
+{
+    switch (fmt)
+    {
+        case QVideoFrameFormat::Format_NV12:
+            return "NV12";
+        case QVideoFrameFormat::Format_NV21:
+            return "NV21";
+        case QVideoFrameFormat::Format_YUV420P:
+            return "YUV420";
+        case QVideoFrameFormat::Format_YUYV:
+            return "YUYV";
+        case QVideoFrameFormat::Format_Jpeg:
+            return "MJPEG";
+        default:
+            return "Other";
+    }
+}
+
+QString CameraWindow::formatToString(const QCameraFormat& fmt)
+{
+    const QSize res = fmt.resolution();
+    const int fps = static_cast<int>(fmt.maxFrameRate());
+
+    const QString pixelFormat = pixelFormatToShortString(fmt.pixelFormat());
+
+    return QString("%1 %2x%3 @%4").arg(pixelFormat).arg(res.width()).arg(res.height()).arg(fps);
 }
 
 } // namespace fluvel_app

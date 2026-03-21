@@ -213,16 +213,18 @@ void ApplicationSettings::saveVideoSessionSettings()
 {
     QSettings settings = camSessionSettings();
 
-    // algo
+    // input
 
-    saveAlgo(Session::Camera, videoSettings_.compute.algo);
-
-    // preprocess
+    settings.setValue("input/use_optimized_format", videoSettings_.compute.useOptimizedFormat);
 
     saveDownscale(Session::Camera, videoSettings_.compute.downscale);
 
     settings.setValue("preprocess/has_temporal_filtering",
                       videoSettings_.compute.hasTemporalFiltering);
+
+    // algo
+
+    saveAlgo(Session::Camera, videoSettings_.compute.algo);
 
     // display
 
@@ -399,9 +401,12 @@ void ApplicationSettings::loadVideoSessionSettings()
 {
     QSettings settings = camSessionSettings();
 
-    loadAlgo(Session::Camera, videoSettings_.compute.algo);
+    // input tab
 
-    // preprocess
+    videoSettings_.compute.useOptimizedFormat =
+        settings.value("input/use_optimized_format", VideoComputeConfig::kDefaultUseOptimizedFormat)
+            .toBool();
+
     loadDownscale(Session::Camera, videoSettings_.compute.downscale);
 
     videoSettings_.compute.hasTemporalFiltering =
@@ -409,6 +414,8 @@ void ApplicationSettings::loadVideoSessionSettings()
             .value("preprocess/has_temporal_filtering",
                    VideoComputeConfig::kDefaultHasTemporalFiltering)
             .toBool();
+
+    loadAlgo(Session::Camera, videoSettings_.compute.algo);
 
     // display
     loadDisplay(Session::Camera, videoSettings_.display);

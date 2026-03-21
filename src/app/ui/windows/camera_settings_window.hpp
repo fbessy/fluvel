@@ -52,6 +52,8 @@ private:
 
     QTabWidget* tabs_ = nullptr;
 
+    QCheckBox* optimizedFormatCb_ = nullptr;
+
     QGroupBox* downscaleGb_ = nullptr;
     QComboBox* downscaleFactorCb_ = nullptr;
 
