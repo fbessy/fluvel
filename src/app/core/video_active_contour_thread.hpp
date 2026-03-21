@@ -31,10 +31,7 @@ public:
 
 signals:
     void frameProcessed(quint64 contourSize);
-
     void displayFrameReady(fluvel_app::DisplayFrame displayFrame);
-
-    void frameSizeStr(QString str);
 
 protected:
     void run() override;

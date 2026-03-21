@@ -3,6 +3,10 @@
 
 #include "qcolor_utils.hpp"
 
+#include <QPainter>
+#include <QSize>
+#include <QString>
+
 namespace fluvel_app::qcolor_utils
 {
 
@@ -31,6 +35,20 @@ QColor desaturateAndDarken(const QColor& original, qreal saturationFactor, qreal
     v = static_cast<int>(v * valueFactor);
 
     return QColor::fromHsv(h, s, v, a);
+}
+
+QIcon colorizeIcon(const QIcon& baseIcon, const QColor& color, const QSize& size)
+{
+    QPixmap pixmap(size);
+    pixmap.fill(Qt::transparent);
+
+    QPainter painter(&pixmap);
+    baseIcon.paint(&painter, QRect(QPoint(0, 0), size));
+
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(pixmap.rect(), color);
+
+    return QIcon(pixmap);
 }
 
 } // namespace qcolor_utils

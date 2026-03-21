@@ -4,11 +4,17 @@
 #pragma once
 
 #include <QColor>
+#include <QIcon>
 #include <QtTypes>
+
+class QString;
+class QSize;
 
 namespace fluvel_app::qcolor_utils
 {
 
 QColor desaturateAndDarken(const QColor& original, qreal saturationFactor, qreal valueFactor);
+
+QIcon colorizeIcon(const QIcon& baseIcon, const QColor& color, const QSize& size);
 
 } // namespace fluvel_app::qcolor_utils

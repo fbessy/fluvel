@@ -30,6 +30,13 @@ enum class StreamingState
     Streaming
 };
 
+struct StreamingInfo
+{
+    QByteArray deviceId;
+    QString description;
+    QCameraFormat format;
+};
+
 class CameraController : public QObject
 {
     Q_OBJECT
@@ -51,13 +58,12 @@ public:
 
 signals:
     void videoInputsChanged(const QList<QCameraDevice>& inputs);
-    void streamingStarted(const QByteArray& deviceId);
+    void streamingStarted(const StreamingInfo& info);
     void streamingStopped();
     void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
     void startupTimeout(const QByteArray& deviceId, double timeoutSec);
     void streamingLost(const QByteArray& deviceId, double frameAgeSec);
 
-    void frameSizeStr(const QString& str);
     void textStatsUpdated(const QString& textStats);
     void imageAndContourUpdated(const UiFrame& uiFrame);
 

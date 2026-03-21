@@ -31,9 +31,6 @@ CameraController::CameraController(const VideoSessionSettings& session, QObject*
     connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
             &CameraController::onDisplayFrameReady, Qt::QueuedConnection);
 
-    connect(&activeContourThread_, &VideoActiveContourThread::frameSizeStr, this,
-            &CameraController::frameSizeStr);
-
     activeContourThread_.start();
 
     startupTimer_ = new QTimer(this);
@@ -246,7 +243,18 @@ void CameraController::onCapturedFrame(const QVideoFrame& frame)
         frameStats_.reset();
         diagnosticsTimer_->start();
 
-        emit streamingStarted(deviceId_);
+        if (camera_)
+        {
+            StreamingInfo info;
+
+            auto device = camera_->cameraDevice();
+            info.deviceId = device.id();
+            info.description = device.description();
+
+            info.format = camera_->cameraFormat();
+
+            emit streamingStarted(info);
+        }
     }
 
     frameStats_.frameCaptured();

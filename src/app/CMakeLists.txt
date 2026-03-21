@@ -235,6 +235,7 @@ set(APP_RESOURCES
     ${FLUVEL_RESOURCES_DIR}/icons/toolbar/right_panel_off.svg
     ${FLUVEL_RESOURCES_DIR}/icons/toolbar/right_panel_on.svg
     ${FLUVEL_RESOURCES_DIR}/icons/toolbar/camera-web-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/check-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/toolbar/configure-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-open-recent-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-open-symbolic.svg

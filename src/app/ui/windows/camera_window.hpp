@@ -12,6 +12,8 @@
 #include <QSet>
 #include <QString>
 
+#include "camera_controller.hpp"
+
 class QWidget;
 class QComboBox;
 class QPushButton;
@@ -27,7 +29,6 @@ class CameraSettingsWindow;
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
 class ImageViewerWidget;
-class CameraController;
 
 enum class CameraStatus
 {
@@ -57,8 +58,9 @@ private:
     void restoreSettings();
     void createUi();
     static QIcon createActiveCameraIcon();
-    static QIcon createEmptyCameraIcon();
+    static QIcon createEmptyIcon(int size);
     static QIcon createErrorCameraIcon();
+    static QIcon createActiveFormatIcon();
     void setupView();
     void setupController();
     void setupLayout();
@@ -80,18 +82,17 @@ private:
     void onDeviceChanged(int index);
     void refreshFormatListFromSelection();
     void updateFormatList(const QList<QCameraFormat>& formats);
+    bool isSameFormat(const QCameraFormat& a, const QCameraFormat& b) const;
     static QString pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt);
     static QString formatToString(const QCameraFormat& fmt);
     QCameraFormat getSelectedFormat() const;
 
-    void onStreamingStarted(const QByteArray& deviceId);
+    void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
     void onCameraError(const QByteArray& deviceId, QCamera::Error error,
                        const QString& errorString);
     void onStartupTimeout(const QByteArray& deviceId, double timeoutSec);
     void onStreamingLost(const QByteArray& deviceId, double frameAgeSec);
-
-    void onFrameSizeStr(const QString& str);
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
@@ -109,7 +110,6 @@ private:
 
     QLabel* deviceLabel_ = nullptr;
     QComboBox* cameraSelector_ = nullptr;
-    QLabel* streamingFormatLabel_ = nullptr;
     QLabel* formatLabel_ = nullptr;
     QComboBox* formatSelector_ = nullptr;
     QPushButton* toggleStreamingButton_ = nullptr;
@@ -134,12 +134,15 @@ private:
     QIcon emptyCameraIcon_;
     QIcon errorCameraIcon_;
 
+    QIcon emptyFormatIcon_;
+    QIcon activeFormatIcon_;
+
     bool switchingInProgress_ = false;
 
     QHash<QByteArray, CameraStatus> cameraStatus_;
 
-    QCameraFormat currentActiveFormat_;
-    QCameraDevice currentActiveDevice_;
+    QCameraFormat selectedFormat_;
+    QCameraFormat activeFormat_;
 };
 
 } // namespace fluvel_app

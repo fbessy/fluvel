@@ -12,6 +12,7 @@
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
+#include "qcolor_utils.hpp"
 #include "right_panel_toggle_button.hpp"
 
 #include <QCameraDevice>
@@ -50,7 +51,7 @@ CameraWindow::CameraWindow(QWidget* parent)
 void CameraWindow::setupWindow()
 {
     setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
-    setWindowTitle(tr("Fluvel - Camera"));
+    setWindowTitle(tr("Fluvel — Camera"));
 }
 
 void CameraWindow::restoreSettings()
@@ -74,16 +75,21 @@ void CameraWindow::createUi()
 
     // Adjust width to contents (needed when items have icons)
     cameraSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    cameraSelector_->setIconSize(QSize(13, 13));
+    static constexpr int kCameraIconSize = 13;
+    cameraSelector_->setIconSize(QSize(kCameraIconSize, kCameraIconSize));
 
     activeCameraIcon_ = createActiveCameraIcon();
-    emptyCameraIcon_ = createEmptyCameraIcon();
+    emptyCameraIcon_ = createEmptyIcon(kCameraIconSize);
     errorCameraIcon_ = createErrorCameraIcon();
-
-    streamingFormatLabel_ = new QLabel;
 
     formatLabel_ = new QLabel(tr("Format:"));
     formatSelector_ = new QComboBox(this);
+    formatSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    static constexpr int kFormatIconSize = 16;
+    formatSelector_->setIconSize(QSize(kFormatIconSize, kFormatIconSize));
+
+    activeFormatIcon_ = createActiveFormatIcon();
+    emptyFormatIcon_ = createEmptyIcon(kFormatIconSize);
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
                               ":/icons/toolbar/media-playback-start-symbolic.svg");
@@ -121,7 +127,7 @@ QIcon CameraWindow::createActiveCameraIcon()
     QPainter p(&pix);
     p.setRenderHint(QPainter::Antialiasing);
 
-    p.setBrush(QColor(0, 200, 0));
+    p.setBrush(QColor(0, 180, 0));
     p.setPen(QPen(QColor(40, 40, 40), 1));
 
     p.drawEllipse(1, 1, ellipseSize, ellipseSize);
@@ -129,11 +135,16 @@ QIcon CameraWindow::createActiveCameraIcon()
     return QIcon(pix);
 }
 
-QIcon CameraWindow::createEmptyCameraIcon()
+QIcon CameraWindow::createEmptyIcon(int size)
 {
-    QPixmap pix(13, 13);
+    QPixmap pix(size, size);
     pix.fill(Qt::transparent);
     return QIcon(pix);
+}
+
+QIcon CameraWindow::createActiveFormatIcon()
+{
+    return il::loadIcon("emblem-default", ":/icons/toolbar/check-symbolic.svg");
 }
 
 QIcon CameraWindow::createErrorCameraIcon()
@@ -180,45 +191,35 @@ void CameraWindow::setupController()
 
 void CameraWindow::setupLayout()
 {
-    // Layout principal vertical
     QVBoxLayout* vLayout = new QVBoxLayout(central_);
     vLayout->setContentsMargins(0, 0, 0, 0);
     vLayout->setSpacing(0);
 
     QWidget* controlBar = new QWidget(central_);
-    QVBoxLayout* controlLayout = new QVBoxLayout(controlBar);
+    QHBoxLayout* controlLayout = new QHBoxLayout(controlBar); // 👈 direct en horizontal
     controlLayout->setContentsMargins(8, 4, 8, 4);
-    controlLayout->setSpacing(2); // compact entre les 2 lignes
+    controlLayout->setSpacing(8);
 
-    // --- Ligne 1 : état + contrôle ---
-    QHBoxLayout* topRow = new QHBoxLayout();
-    topRow->setSpacing(6);
+    // Device
+    controlLayout->addWidget(deviceLabel_);
+    controlLayout->addWidget(cameraSelector_);
 
-    topRow->addWidget(deviceLabel_);
-    topRow->addWidget(cameraSelector_);
+    // Format
+    controlLayout->addSpacing(12);
+    controlLayout->addWidget(formatLabel_);
+    controlLayout->addWidget(formatSelector_);
 
-    topRow->addWidget(streamingFormatLabel_); // format actif
+    // Action principale
+    controlLayout->addSpacing(12);
+    controlLayout->addWidget(toggleStreamingButton_);
 
-    topRow->addWidget(toggleStreamingButton_);
+    // Stretch → pousse le reste à droite
+    controlLayout->addStretch();
 
-    topRow->addStretch();
-
-    topRow->addWidget(rightPanelToggle_);
-
-    topRow->addSpacerItem(new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum));
-
-    topRow->addWidget(settingsButton_);
-
-    // --- Ligne 2 : configuration ---
-    QHBoxLayout* bottomRow = new QHBoxLayout();
-    bottomRow->setSpacing(6);
-
-    bottomRow->addWidget(formatLabel_);
-    bottomRow->addWidget(formatSelector_, 1); // prend l'espace
-
-    // Assemblage control bar
-    controlLayout->addLayout(topRow);
-    controlLayout->addLayout(bottomRow);
+    // Actions secondaires
+    controlLayout->addWidget(rightPanelToggle_);
+    controlLayout->addSpacing(8);
+    controlLayout->addWidget(settingsButton_);
 
     // --- Layout contenu principal ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
@@ -228,7 +229,7 @@ void CameraWindow::setupLayout()
     contentLayout->addWidget(imageViewer_, 1);
     contentLayout->addWidget(displayBar_, 0);
 
-    // Assemblage global
+    // Assemblage
     vLayout->addWidget(controlBar);
     vLayout->addLayout(contentLayout);
 
@@ -269,9 +270,6 @@ void CameraWindow::setupConnections()
             &CameraWindow::onStartupTimeout);
 
     // --- Controller → View / Window updates ---
-
-    connect(cameraController_, &CameraController::frameSizeStr, this,
-            &CameraWindow::onFrameSizeStr);
 
     connect(cameraController_, &CameraController::textStatsUpdated, imageViewer_,
             &ImageViewerWidget::setText);
@@ -360,11 +358,6 @@ void CameraWindow::bindUiToApplicationSettings()
     // commit settings
     connect(cameraSettingsWindow_, &CameraSettingsWindow::videoSessionSettingsAccepted, &app,
             &ApplicationSettings::setVideoSessionSettings);
-}
-
-void CameraWindow::onFrameSizeStr(const QString& str)
-{
-    setWindowTitle(deviceWindowTitle_ + str);
 }
 
 void CameraWindow::updateCameraList(const QList<QCameraDevice>& inputs)
@@ -537,14 +530,13 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
     {
         const auto& fmt = formats[i];
 
-        formatSelector_->addItem(formatToString(fmt), QVariant::fromValue(fmt));
+        bool isActive = isSameFormat(fmt, activeFormat_);
 
-        if (fmt.pixelFormat() == previous.pixelFormat() &&
-            fmt.resolution() == previous.resolution() &&
-            fmt.maxFrameRate() == previous.maxFrameRate())
-        {
+        formatSelector_->addItem(isActive ? activeFormatIcon_ : emptyFormatIcon_,
+                                 formatToString(fmt), QVariant::fromValue(fmt));
+
+        if (isSameFormat(fmt, previous))
             indexToSelect = i;
-        }
     }
 
     if (indexToSelect >= 0)
@@ -553,6 +545,12 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
         formatSelector_->setCurrentIndex(0);
 
     formatSelector_->blockSignals(false);
+}
+
+bool CameraWindow::isSameFormat(const QCameraFormat& a, const QCameraFormat& b) const
+{
+    return a.pixelFormat() == b.pixelFormat() && a.resolution() == b.resolution() &&
+           a.maxFrameRate() == b.maxFrameRate();
 }
 
 void CameraWindow::showEvent(QShowEvent* event)
@@ -620,10 +618,10 @@ void CameraWindow::startCamera()
         return;
 
     // 👉 stocke juste le format choisi (intention utilisateur)
-    currentActiveFormat_ = getSelectedFormat();
+    selectedFormat_ = getSelectedFormat();
 
     // 👉 démarre
-    cameraController_->start(selectedId, currentActiveFormat_);
+    cameraController_->start(selectedId, selectedFormat_);
 }
 
 QCameraFormat CameraWindow::getSelectedFormat() const
@@ -641,10 +639,12 @@ void CameraWindow::stopCamera()
     cameraController_->stop();
 }
 
-void CameraWindow::onStreamingStarted(const QByteArray& deviceId)
+void CameraWindow::onStreamingStarted(const StreamingInfo& info)
 {
-    streamingCameraId_ = deviceId;
-    cameraStatus_[deviceId] = CameraStatus::Active;
+    streamingCameraId_ = info.deviceId;
+    cameraStatus_[info.deviceId] = CameraStatus::Active;
+
+    activeFormat_ = info.format;
 
     if (!switchingInProgress_)
     {
@@ -653,6 +653,10 @@ void CameraWindow::onStreamingStarted(const QByteArray& deviceId)
     }
 
     refreshUi();
+
+    setWindowTitle(
+        QString("Fluvel — %1 - %2").arg(info.description).arg(formatToString(activeFormat_)));
+
     saveSelectedCameraId();
 
     switchingInProgress_ = false;
@@ -667,6 +671,7 @@ void CameraWindow::onStreamingStopped()
     }
 
     streamingCameraId_.clear();
+    activeFormat_ = QCameraFormat();
 
     if (!switchingInProgress_)
     {
@@ -676,7 +681,7 @@ void CameraWindow::onStreamingStopped()
         refreshUi();
     }
 
-    setWindowTitle(tr("Fluvel - Camera"));
+    setWindowTitle(tr("Fluvel — Camera"));
 }
 
 void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,

@@ -132,16 +132,6 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 
         currentSize_ = newWSize;
         configChanged_ = false;
-
-        QString size_str = QString("%1×%2").arg(QString::number(df.preprocessed.width()),
-                                                QString::number(df.preprocessed.height()));
-
-        // if (downscale_fctr >= 2)
-        //{
-        // size_str += QString(" /%1").arg(downscale_fctr);
-        //}
-
-        emit frameSizeStr(size_str);
     }
     else
     {

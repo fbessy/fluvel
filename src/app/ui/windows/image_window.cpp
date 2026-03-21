@@ -697,7 +697,7 @@ void ImageWindow::updateWindowTitle()
 
         const QString sizeStr = QString("%1×%2").arg(imageSize_.width()).arg(imageSize_.height());
 
-        title += QString(" - %1 - %2 - %3").arg(fileName_, sizeStr, colorText);
+        title += QString(" — %1 - %2 - %3").arg(fileName_, sizeStr, colorText);
     }
 
     setWindowTitle(title);
