@@ -45,6 +45,7 @@ public:
     explicit CameraController(const VideoSessionSettings& session, QObject* parent = nullptr);
     ~CameraController() override;
 
+    void start(const QByteArray& deviceId);
     void start(const QByteArray& deviceId, const QCameraFormat& format);
     void stop();
     bool isStreaming() const;
@@ -68,8 +69,6 @@ signals:
     void imageAndContourUpdated(const UiFrame& uiFrame);
 
 private:
-    QCameraFormat chooseBestFormat(const QCameraDevice& dev);
-
     void onVideoInputsChanged();
     void handleActiveDeviceUnplug(const QList<QCameraDevice>& inputs);
 
