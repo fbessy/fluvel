@@ -49,20 +49,17 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
     tabBar->setUsesScrollButtons(false);
     tabBar->setElideMode(Qt::ElideNone);
 
-    optimizedFormatCb_ = new QCheckBox(tr("Optimized format"));
-
     setupDownscaleGroup();
 
     filterCb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
 
-    auto* inputLayout = new QVBoxLayout(this);
-    inputLayout->addWidget(optimizedFormatCb_);
-    inputLayout->addWidget(downscaleGb_);
-    inputLayout->addWidget(filterCb_);
-    inputLayout->addStretch(1);
+    auto* preprocessLayout = new QVBoxLayout(this);
+    preprocessLayout->addWidget(downscaleGb_);
+    preprocessLayout->addWidget(filterCb_);
+    preprocessLayout->addStretch(1);
 
-    auto* inputGb = new QGroupBox;
-    inputGb->setLayout(inputLayout);
+    auto* preprocessGb = new QGroupBox;
+    preprocessGb->setLayout(preprocessLayout);
 
     algoWidget_ = new AlgoSettingsWidget(config_.compute.algo, this);
 
@@ -72,7 +69,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
     auto* algo_gb = new QGroupBox;
     algo_gb->setLayout(algoLayout);
 
-    tabs_->addTab(inputGb, tr("Input"));
+    tabs_->addTab(preprocessGb, tr("Preprocess"));
     tabs_->addTab(algo_gb, tr("Algorithm"));
 
     auto* layout = new QVBoxLayout;
@@ -108,7 +105,6 @@ void CameraSettingsWindow::setupDownscaleGroup()
 
 void CameraSettingsWindow::accept()
 {
-    config_.compute.useOptimizedFormat = optimizedFormatCb_->isChecked();
     config_.compute.downscale.hasDownscale = downscaleGb_->isChecked();
     config_.compute.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
     config_.compute.hasTemporalFiltering = filterCb_->isChecked();
@@ -123,8 +119,6 @@ void CameraSettingsWindow::accept()
 void CameraSettingsWindow::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
-
-    optimizedFormatCb_->setChecked(config_.compute.useOptimizedFormat);
 
     downscaleGb_->setChecked(config_.compute.downscale.hasDownscale);
 

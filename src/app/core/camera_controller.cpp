@@ -309,7 +309,6 @@ void CameraController::onCameraError(QCamera::Error error, const QString& errorS
 
 void CameraController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
-    useOptimizedFormat_ = session.compute.useOptimizedFormat;
     activeContourThread_.setAlgoConfig(session.compute);
 }
 

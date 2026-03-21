@@ -108,8 +108,8 @@ private:
 
     /////////////////////////////////////////
 
-    QGroupBox* preprocessPage_ = nullptr;
-    QTabWidget* preprocessTabs_ = nullptr;
+    QGroupBox* processPage_ = nullptr;
+    QTabWidget* processInnerTabs_ = nullptr;
 
     QGroupBox* gaussianNoiseGroupbox_ = nullptr;
     QDoubleSpinBox* gaussianNoiseStdSpin_ = nullptr;

@@ -75,7 +75,7 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
     tabBar->setElideMode(Qt::ElideNone);
 
     tabs_->addTab(downscalePage_, tr("Downscale"));
-    tabs_->addTab(preprocessPage_, tr("Processing"));
+    tabs_->addTab(processPage_, tr("Processing"));
     tabs_->addTab(initPage_, tr("Initialization"));
     tabs_->addTab(algoPage_, tr("Algorithm"));
 
@@ -518,7 +518,7 @@ void SettingsWindow::setupUiPreprocessingTab()
 
     ////////////////////////////////////////////
 
-    preprocessTabs_ = new QTabWidget(this);
+    processInnerTabs_ = new QTabWidget(this);
 
     QWidget* page_noise = new QWidget;
     QWidget* page_filter_iso = new QWidget;
@@ -542,12 +542,12 @@ void SettingsWindow::setupUiPreprocessingTab()
     filter_tabs->addTab(page_filter_ansio, tr("Edge preserving"));
     filter_tabs->addTab(page_filter_morpho, tr("Math morpho"));
 
-    preprocessTabs_->addTab(page_noise, tr("Noise generators"));
-    preprocessTabs_->addTab(filter_tabs, tr("Filters"));
+    processInnerTabs_->addTab(page_noise, tr("Noise generators"));
+    processInnerTabs_->addTab(filter_tabs, tr("Filters"));
 
-    preprocessPage_ = new QGroupBox(tr("Processing"));
-    preprocessPage_->setCheckable(true);
-    preprocessPage_->setChecked(false);
+    processPage_ = new QGroupBox(tr("Processing"));
+    processPage_->setCheckable(true);
+    processPage_->setChecked(false);
 
     timeFilt_ = new QLabel(this);
     timeFilt_->setText(tr("time = "));
@@ -556,10 +556,10 @@ void SettingsWindow::setupUiPreprocessingTab()
     elapsed_filt_layout->addWidget(timeFilt_);
     time_filt_groupbox->setLayout(elapsed_filt_layout);
 
-    QVBoxLayout* inputLayout = new QVBoxLayout;
-    inputLayout->addWidget(preprocessTabs_);
-    inputLayout->addWidget(time_filt_groupbox);
-    preprocessPage_->setLayout(inputLayout);
+    QVBoxLayout* processLayout = new QVBoxLayout;
+    processLayout->addWidget(processInnerTabs_);
+    processLayout->addWidget(time_filt_groupbox);
+    processPage_->setLayout(processLayout);
 }
 
 void SettingsWindow::setupConnections()
@@ -616,7 +616,7 @@ void SettingsWindow::setupConnections()
                 onUiShapeChanged();
             });
 
-    connect(preprocessPage_, &QGroupBox::clicked, this,
+    connect(processPage_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
                 editedProcessingConfig_.enabled = checked;
@@ -937,7 +937,7 @@ void SettingsWindow::accept()
 
     auto& filt_config = committedConfig_.compute.processing;
 
-    filt_config.enabled = preprocessPage_->isChecked();
+    filt_config.enabled = processPage_->isChecked();
     filt_config.has_gaussian_noise = gaussianNoiseGroupbox_->isChecked();
     filt_config.std_noise = float(gaussianNoiseStdSpin_->value());
     filt_config.has_salt_noise = saltNoiseGroupbox_->isChecked();
@@ -1010,7 +1010,7 @@ void SettingsWindow::updateUIFromConfig()
 
     const auto& config_filter = committedConfig_.compute.processing;
 
-    preprocessPage_->setChecked(config_filter.enabled);
+    processPage_->setChecked(config_filter.enabled);
     gaussianNoiseGroupbox_->setChecked(config_filter.has_gaussian_noise);
     gaussianNoiseStdSpin_->setValue(double(config_filter.std_noise));
     saltNoiseGroupbox_->setChecked(config_filter.has_salt_noise);
@@ -1117,7 +1117,7 @@ void SettingsWindow::restoreDefaults()
     //        Preprocessing          //
     ///////////////////////////////////
 
-    preprocessPage_->setChecked(false);
+    processPage_->setChecked(false);
 
     gaussianNoiseGroupbox_->setChecked(false);
     gaussianNoiseStdSpin_->setValue(20.0);

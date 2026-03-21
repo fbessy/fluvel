@@ -213,9 +213,7 @@ void ApplicationSettings::saveVideoSessionSettings()
 {
     QSettings settings = camSessionSettings();
 
-    // input
-
-    settings.setValue("input/use_optimized_format", videoSettings_.compute.useOptimizedFormat);
+    // preprocess
 
     saveDownscale(Session::Camera, videoSettings_.compute.downscale);
 
@@ -401,11 +399,7 @@ void ApplicationSettings::loadVideoSessionSettings()
 {
     QSettings settings = camSessionSettings();
 
-    // input tab
-
-    videoSettings_.compute.useOptimizedFormat =
-        settings.value("input/use_optimized_format", VideoComputeConfig::kDefaultUseOptimizedFormat)
-            .toBool();
+    // preprocess tab
 
     loadDownscale(Session::Camera, videoSettings_.compute.downscale);
 

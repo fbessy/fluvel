@@ -218,10 +218,8 @@ struct ImageSessionSettings
 
 struct VideoComputeConfig
 {
-    static constexpr bool kDefaultUseOptimizedFormat = true;
     static constexpr bool kDefaultHasTemporalFiltering = true;
 
-    bool useOptimizedFormat = kDefaultUseOptimizedFormat;
     DownscaleConfig downscale;
     bool hasTemporalFiltering = kDefaultHasTemporalFiltering;
 
