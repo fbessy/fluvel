@@ -41,7 +41,7 @@ class CameraWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    explicit CameraWindow(QWidget* parent);
+    explicit CameraWindow(QWidget* parent = nullptr);
     bool isCameraAvailable() const;
 
 signals:

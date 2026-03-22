@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
+#if defined(Q_OS_ANDROID) && !defined(FLUVEL_UI_DESKTOP)
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
+#else
+#include "camera_window.hpp"
+#include "image_window.hpp"
+#endif
+
 #include "application_settings.hpp"
 #include "frame_clock.hpp"
-#include "image_window.hpp"
 
 #include <QApplication>
 #include <QCoreApplication>
 #include <QLibraryInfo>
 #include <QTranslator>
 
-#ifdef Q_OS_ANDROID
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#endif
-
 int main(int argc, char* argv[])
 {
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID) && !defined(FLUVEL_UI_DESKTOP)
     QGuiApplication app(argc, argv);
 #else
     QApplication app(argc, argv);
@@ -25,7 +27,7 @@ int main(int argc, char* argv[])
 #endif
 
     QCoreApplication::setOrganizationName("fluvel");
-    QCoreApplication::setOrganizationDomain("https://sourceforge.net/projects/fastlevelset/");
+    QCoreApplication::setOrganizationDomain("fluvel.org");
     QCoreApplication::setApplicationName("fluvel");
 
     fluvel_app::FrameClock::init();
@@ -51,18 +53,13 @@ int main(int argc, char* argv[])
             break;
     }
 
-    // Traductions Qt
     if (translator_qt.load("qt_" + locale, QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
-    {
         app.installTranslator(&translator_qt);
-    }
 
-    // Traductions Fluvel
     if (translator_fluvel.load(QString(":/i18n/fluvel_%1.qm").arg(locale)))
-    {
         app.installTranslator(&translator_fluvel);
-    }
 
+    // Icône (desktop uniquement utile, mais safe partout)
     QIcon appIcon;
     appIcon.addFile(":/icons/fluvel_16.png", QSize(16, 16));
     appIcon.addFile(":/icons/fluvel_22.png", QSize(22, 22));
@@ -72,22 +69,13 @@ int main(int argc, char* argv[])
     appIcon.addFile(":/icons/fluvel_128.png", QSize(128, 128));
     appIcon.addFile(":/icons/fluvel_256.png", QSize(256, 256));
 
+#ifndef Q_OS_ANDROID
     QApplication::setWindowIcon(appIcon);
+#endif
 
-    std::unique_ptr<QMainWindow> root;
+#if defined(Q_OS_ANDROID) && !defined(FLUVEL_UI_DESKTOP)
 
-#ifdef Q_OS_ANDROID
-    // root = std::make_unique<fluvel_app::CameraWindow>();
-    // root->show();
     QQmlApplicationEngine engine;
-    // engine.loadFromModule("fluvel", "Main");
-
-    // #include <QDir>
-    // #include <QDebug>
-
-    // qDebug() << "Resources root:" << QDir(":/").entryList(QDir::Files | QDir::Dirs);
-    // qDebug() << "Resources qml:" << QDir(":/qml").entryList(QDir::Files | QDir::Dirs);
-
     engine.load(QUrl("qrc:/qml/Main.qml"));
 
     QObject::connect(
@@ -100,12 +88,18 @@ int main(int argc, char* argv[])
         Qt::QueuedConnection);
 
     if (engine.rootObjects().isEmpty())
-    {
         return -1;
-    }
+
 #else
-    root = std::make_unique<fluvel_app::ImageWindow>();
+
+#if defined(Q_OS_ANDROID)
+    auto root = std::make_unique<fluvel_app::CameraWindow>();
+#else
+    auto root = std::make_unique<fluvel_app::ImageWindow>();
+#endif
+
     root->show();
+
 #endif
 
     return app.exec();

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(Fluvel VERSION 1.0.0 LANGUAGES CXX)
 
 option(ENABLE_ASAN "Enable Sanitizers" OFF)
+option(FLUVEL_UI_DESKTOP "Use QWidget UI on Mobile" ON)
 
 if(ENABLE_ASAN)
     message(STATUS "Sanitizers ENABLED")
@@ -42,7 +43,7 @@ set(QT_COMPONENTS
     Core Gui Multimedia MultimediaWidgets Widgets LinguistTools
 )
 
-if(ANDROID OR IOS)
+if((ANDROID OR IOS) AND NOT FLUVEL_UI_DESKTOP)
     list(APPEND QT_COMPONENTS Qml Quick)
 endif()
 

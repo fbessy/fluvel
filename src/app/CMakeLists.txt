@@ -152,20 +152,20 @@ qt_add_executable(${target_name}
     ${app_src}
     resources.qrc)
 
-if(ANDROID)
+#if(ANDROID)
     # qt_add_qml_module(${target_name}
     #     URI fluvel
     #     VERSION 1.0
     #     QML_FILES
     #         qml/Main.qml
     # )
-    qt_add_resources(${target_name} "qml"
-        PREFIX "/"
-        FILES
-            qml/Main.qml
-            qml/lenna.bmp
-    )
-endif()
+    # qt_add_resources(${target_name} "qml"
+    #     PREFIX "/"
+    #     FILES
+    #         qml/Main.qml
+    #         qml/lenna.bmp
+    # )
+#endif()
 
 if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE Fluvel.icns)
@@ -337,6 +337,10 @@ elseif (MSVC)
     )
 endif()
 
+if(FLUVEL_UI_DESKTOP)
+    target_compile_definitions(${target_name} PRIVATE FLUVEL_UI_DESKTOP)
+endif()
+
 set(APP_QT_LIBS
     Qt6::Core
     Qt6::Gui
@@ -345,7 +349,7 @@ set(APP_QT_LIBS
     Qt6::Widgets
 )
 
-if(ANDROID)
+if(ANDROID AND NOT FLUVEL_UI_DESKTOP)
     list(APPEND APP_QT_LIBS
         Qt6::Qml
         Qt6::Quick
@@ -356,6 +360,8 @@ target_link_libraries(${target_name} PRIVATE
     ${APP_QT_LIBS}
     fluvel::image_processing
 )
+
+
 
 execute_process(
     COMMAND git rev-parse --short HEAD
@@ -374,15 +380,33 @@ add_compile_definitions(
     FLUVEL_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
 )
 
-install(TARGETS ${target_name}
-        RUNTIME DESTINATION bin)
+if(ANDROID)
+    set_target_properties(${target_name} PROPERTIES
+        QT_ANDROID_PACKAGE_SOURCE_DIR ${FLUVEL_RESOURCES_DIR}/platforms/android
+        #QT_ANDROID_APP_NAME ${target_name}
+        #QT_ANDROID_APP_LIB_NAME ${target_name}
+        #QT_ANDROID_PACKAGE_NAME "org.fluvel.app"
+        #QT_ANDROID_APP_LIB_NAME fluvel
+        #QT_ANDROID_GUI TRUE
+        #QT_ANDROID_DEPLOYMENT_SETTINGS_FILE
+        #${CMAKE_CURRENT_BINARY_DIR}/android-${target_name}-deployment-settings.json
+        #OUTPUT_NAME "fluvel"
+    )
+else()
+    install(TARGETS ${target_name}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+    )
+endif()
 
-if(UNIX AND NOT APPLE)
-install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.desktop
-        DESTINATION share/applications)
 
-install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.svg
-        DESTINATION share/icons/hicolor/scalable/apps)
+if(UNIX AND NOT APPLE AND NOT ANDROID)
+    install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.desktop
+            DESTINATION share/applications)
+
+    install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.svg
+            DESTINATION share/icons/hicolor/scalable/apps)
 endif()
 
 # target_compile_features(my_target PUBLIC cxx_std_23) au lieu de global dans le fichier projet
@@ -394,3 +418,5 @@ endif()
 #     AUTOUIC ON
 #     AUTORCC ON
 # )
+
+qt_finalize_executable(${target_name})
