@@ -277,19 +277,19 @@ void CameraController::updateDiagnostics()
 
 void CameraController::onVideoInputsChanged()
 {
-    const auto inputs = QMediaDevices::videoInputs();
+    const auto devices = QMediaDevices::videoInputs();
 
-    handleActiveDeviceUnplug(inputs);
+    handleActiveDeviceUnplug(devices);
 
-    emit videoInputsChanged(inputs);
+    emit videoInputsChanged(devices);
 }
 
-void CameraController::handleActiveDeviceUnplug(const QList<QCameraDevice>& inputs)
+void CameraController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devices)
 {
     if (state_ == StreamingState::Stopped)
         return;
 
-    const bool cameraStillExists = std::any_of(inputs.begin(), inputs.end(),
+    const bool cameraStillExists = std::any_of(devices.begin(), devices.end(),
                                                [&](const QCameraDevice& dev)
                                                {
                                                    return dev.id() == deviceId_;

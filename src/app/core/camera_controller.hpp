@@ -58,7 +58,7 @@ public:
     void onFrameDisplayed(const FrameTimestamps& ts);
 
 signals:
-    void videoInputsChanged(const QList<QCameraDevice>& inputs);
+    void videoInputsChanged(const QList<QCameraDevice>& devices);
     void streamingStarted(const StreamingInfo& info);
     void streamingStopped();
     void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
@@ -70,7 +70,7 @@ signals:
 
 private:
     void onVideoInputsChanged();
-    void handleActiveDeviceUnplug(const QList<QCameraDevice>& inputs);
+    void handleActiveDeviceUnplug(const QList<QCameraDevice>& devices);
 
     void onCameraError(QCamera::Error error, const QString& errorString);
     void onCapturedFrame(const QVideoFrame& frame);
