@@ -547,9 +547,9 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
     ScopedUiUpdateGuard guard(isUpdatingUi_);
     QSignalBlocker blocker(formatSelector_);
 
-    QCameraFormat previous = getSelectedFormat();
-
     formatSelector_->clear();
+
+    int bestIndex = findBestFormatIndex(formats);
 
     int indexToSelect = -1;
 
@@ -558,9 +558,18 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
         const auto& fmt = formats[i];
 
         bool isActive = isSameFormat(fmt, activeFormat_);
+        bool isRecommended = (i == bestIndex);
 
-        formatSelector_->addItem(isActive ? formatActiveIcon_ : formatAvailableIcon_,
-                                 formatToString(fmt), QVariant::fromValue(fmt));
+        QString label = formatToString(fmt);
+
+        if (isRecommended)
+            label += "  *";
+
+        formatSelector_->addItem(isActive ? formatActiveIcon_ : formatAvailableIcon_, label,
+                                 QVariant::fromValue(fmt));
+
+        if (isRecommended)
+            formatSelector_->setItemData(i, tr("Recommended format"), Qt::ToolTipRole);
     }
 
     // 1. PRIORITÉ : format associé à CE device uniquement
@@ -583,9 +592,7 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
 
     // 2. fallback best format
     if (indexToSelect < 0 && !formats.isEmpty())
-    {
-        indexToSelect = findBestFormatIndex(formats);
-    }
+        indexToSelect = bestIndex;
 
     // application
     if (indexToSelect >= 0)

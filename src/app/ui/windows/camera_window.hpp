@@ -174,12 +174,12 @@ private:
     QIcon formatActiveIcon_;
     QIcon formatAvailableIcon_;
 
-    bool switchingInProgress_ = false;
+    bool switchingInProgress_{false};
 
     QHash<QByteArray, QCameraFormat> preferredFormats_;
     QCameraFormat activeFormat_;
 
-    bool isUpdatingUi_ = false;
+    bool isUpdatingUi_{false};
 };
 
 } // namespace fluvel_app
