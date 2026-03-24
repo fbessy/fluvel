@@ -549,7 +549,7 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
 
     formatSelector_->clear();
 
-    int bestIndex = findBestFormatIndex(formats);
+    int bestFormatIndex = findBestFormatIndex(formats);
 
     int indexToSelect = -1;
 
@@ -558,7 +558,7 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
         const auto& fmt = formats[i];
 
         bool isActive = isSameFormat(fmt, activeFormat_);
-        bool isRecommended = (i == bestIndex);
+        bool isRecommended = (i == bestFormatIndex);
 
         QString label = formatToString(fmt);
 
@@ -592,7 +592,7 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
 
     // 2. fallback best format
     if (indexToSelect < 0 && !formats.isEmpty())
-        indexToSelect = bestIndex;
+        indexToSelect = bestFormatIndex;
 
     // application
     if (indexToSelect >= 0)
@@ -888,7 +888,7 @@ int CameraWindow::findBestFormatIndex(const QList<QCameraFormat>& formats) const
 
     auto is30fps = [](float fps)
     {
-        return std::abs(fps - 30.0f) < 5.0f;
+        return std::abs(fps - 30.0f) < 1.0f;
     };
 
     auto findIndex = [&](auto pred)
@@ -935,7 +935,7 @@ int CameraWindow::findBestFormatIndex(const QList<QCameraFormat>& formats) const
         i >= 0)
         return i;
 
-    return 0;
+    return -1;
 }
 
 static constexpr auto kCameraDeviceKey = "camera/device";
