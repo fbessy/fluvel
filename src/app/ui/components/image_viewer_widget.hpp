@@ -124,7 +124,15 @@ private slots:
 private:
     void submitFrame(const UiFrame& frame);
 
-    void initialize();
+    void initializeView();
+
+    void setupView();
+    void setupScene();
+    void setupItems();
+    void setupGlobalOverlays();
+    void setupInfoOverlay();
+    void setupContourItems();
+    void setupTimers();
 
     bool handleInteractionWheel(QWheelEvent* event);
     double computeZoomFactor(QWheelEvent* event) const;

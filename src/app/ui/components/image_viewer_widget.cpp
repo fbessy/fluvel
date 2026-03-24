@@ -27,7 +27,7 @@ namespace fluvel_app
 ImageViewerWidget::ImageViewerWidget(QWidget* parent)
     : QGraphicsView(parent)
 {
-    initialize();
+    initializeView();
 }
 
 ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
@@ -36,29 +36,25 @@ ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig, const D
     , displayConfig_(displayConfig)
     , downscaleConfig_(downscaleConfig)
 {
-    initialize();
+    initializeView();
 
-    l_out_ = new ContourPointsItem(contentRoot_);
-    l_out_->setZValue(100.0);
-
-    l_in_ = new ContourPointsItem(contentRoot_);
-    l_in_->setZValue(100.0);
-
-    infoOverlay_ = new OverlayTextItem;
-    scene_->addItem(infoOverlay_);
-    infoOverlay_->setZValue(100.0);
-    infoOverlay_->hide();
-    infoOverlay_->setCursor(Qt::ArrowCursor);
-
-    zoomOverlayItem_ = new OverlayTextItem;
-    scene()->addItem(zoomOverlayItem_);
-    zoomOverlayController_ = new ZoomOverlayController(zoomOverlayItem_, this);
+    setupContourItems();
+    setupInfoOverlay();
 
     configUsed_ = true;
     updateSmoothDisplay();
 }
 
-void ImageViewerWidget::initialize()
+void ImageViewerWidget::initializeView()
+{
+    setupView();
+    setupScene();
+    setupItems();
+    setupGlobalOverlays();
+    setupTimers();
+}
+
+void ImageViewerWidget::setupView()
 {
     setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
@@ -67,24 +63,59 @@ void ImageViewerWidget::initialize()
     setResizeAnchor(QGraphicsView::NoAnchor);
     setDragMode(QGraphicsView::NoDrag);
     setAcceptDrops(true);
-    // viewport()->setAcceptDrops(true);
 
     setMouseTracking(true);
     viewport()->setMouseTracking(true);
+}
 
+void ImageViewerWidget::setupScene()
+{
     scene_ = new QGraphicsScene(this);
     setScene(scene_);
 
     contentRoot_ = new QGraphicsItemGroup;
     scene_->addItem(contentRoot_);
+}
 
+void ImageViewerWidget::setupItems()
+{
     pixmapItem_ = new QGraphicsPixmapItem(contentRoot_);
     pixmapItem_->setZValue(0);
 
     blur_ = new QGraphicsBlurEffect;
     pixmapItem_->setGraphicsEffect(blur_);
     blur_->setBlurRadius(0);
+}
 
+void ImageViewerWidget::setupGlobalOverlays()
+{
+    zoomOverlayItem_ = new OverlayTextItem;
+    scene_->addItem(zoomOverlayItem_);
+
+    zoomOverlayController_ = new ZoomOverlayController(zoomOverlayItem_, this);
+}
+
+void ImageViewerWidget::setupInfoOverlay()
+{
+    infoOverlay_ = new OverlayTextItem;
+    scene_->addItem(infoOverlay_);
+
+    infoOverlay_->setZValue(100.0);
+    infoOverlay_->hide();
+    infoOverlay_->setCursor(Qt::ArrowCursor);
+}
+
+void ImageViewerWidget::setupContourItems()
+{
+    l_out_ = new ContourPointsItem(contentRoot_);
+    l_out_->setZValue(100.0);
+
+    l_in_ = new ContourPointsItem(contentRoot_);
+    l_in_->setZValue(100.0);
+}
+
+void ImageViewerWidget::setupTimers()
+{
     displayTimer_.start();
 
     throttleTimer_ = new QTimer(this);
