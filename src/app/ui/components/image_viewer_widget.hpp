@@ -127,7 +127,9 @@ private:
     void initialize();
 
     bool handleInteractionWheel(QWheelEvent* event);
+    double computeZoomFactor(QWheelEvent* event) const;
     bool applyZoom(QWheelEvent* event, double factor);
+    void updateOverlays(const QPoint& cursorPosition, const QPoint& textPosition);
     void updateInteractionAfterZoom();
 
     void updatePixmap(const QImage& img);
@@ -179,10 +181,10 @@ private:
     ContourPointsItem* l_out_ = nullptr;
     ContourPointsItem* l_in_ = nullptr;
 
-    OverlayTextItem* overlay_ = nullptr;
+    OverlayTextItem* infoOverlay_ = nullptr;
 
     OverlayTextItem* zoomOverlayItem_ = nullptr;
-    ZoomOverlayController* zoomOverlay_ = nullptr;
+    ZoomOverlayController* zoomOverlayController_ = nullptr;
 
     bool paused_ = false;
     QGraphicsBlurEffect* blur_ = nullptr;

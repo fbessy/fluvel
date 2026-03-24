@@ -44,15 +44,15 @@ ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig, const D
     l_in_ = new ContourPointsItem(contentRoot_);
     l_in_->setZValue(100.0);
 
-    overlay_ = new OverlayTextItem;
-    scene_->addItem(overlay_);
-    overlay_->setZValue(100.0);
-    overlay_->hide();
-    overlay_->setCursor(Qt::ArrowCursor);
+    infoOverlay_ = new OverlayTextItem;
+    scene_->addItem(infoOverlay_);
+    infoOverlay_->setZValue(100.0);
+    infoOverlay_->hide();
+    infoOverlay_->setCursor(Qt::ArrowCursor);
 
     zoomOverlayItem_ = new OverlayTextItem;
     scene()->addItem(zoomOverlayItem_);
-    zoomOverlay_ = new ZoomOverlayController(zoomOverlayItem_, this);
+    zoomOverlayController_ = new ZoomOverlayController(zoomOverlayItem_, this);
 
     configUsed_ = true;
     updateSmoothDisplay();
@@ -218,7 +218,7 @@ void ImageViewerWidget::updatePixmap(const QImage& img)
 
     if (sizeChanged)
     {
-        setTextPosition({10, 20}, overlay_);
+        setTextPosition({10, 20}, infoOverlay_);
 
         if (l_out_ && l_in_)
             updateDisplayWithConfig();
@@ -234,20 +234,20 @@ double ImageViewerWidget::currentZoom() const
 
 void ImageViewerWidget::scaleView(double sx, double sy)
 {
-    const QPoint overlayPosition = textPosition(overlay_);
+    const QPoint overlayPosition = textPosition(infoOverlay_);
 
     scale(sx, sy);
 
-    setTextPosition(overlayPosition, overlay_);
+    setTextPosition(overlayPosition, infoOverlay_);
 }
 
 void ImageViewerWidget::translateView(double dx, double dy)
 {
-    const QPoint overlayPosition = textPosition(overlay_);
+    const QPoint overlayPosition = textPosition(infoOverlay_);
 
     translate(dx, dy);
 
-    setTextPosition(overlayPosition, overlay_);
+    setTextPosition(overlayPosition, infoOverlay_);
 }
 
 double ImageViewerWidget::getCurrentZoom() const
@@ -257,7 +257,7 @@ double ImageViewerWidget::getCurrentZoom() const
 
 void ImageViewerWidget::toggleFullscreen()
 {
-    const QPoint overlayPosition = textPosition(overlay_);
+    const QPoint overlayPosition = textPosition(infoOverlay_);
 
     if (!isFullScreenMode_)
     {
@@ -276,12 +276,12 @@ void ImageViewerWidget::toggleFullscreen()
         isFullScreenMode_ = false;
     }
 
-    setTextPosition(overlayPosition, overlay_);
+    setTextPosition(overlayPosition, infoOverlay_);
 }
 
 void ImageViewerWidget::applyAutoFit()
 {
-    const QPoint overlayPosition = textPosition(overlay_);
+    const QPoint overlayPosition = textPosition(infoOverlay_);
 
     if (!pixmapItem_)
         return;
@@ -290,7 +290,7 @@ void ImageViewerWidget::applyAutoFit()
     resetTransform();
     fitInView(pixmapItem_, Qt::KeepAspectRatio);
 
-    setTextPosition(overlayPosition, overlay_);
+    setTextPosition(overlayPosition, infoOverlay_);
 }
 
 void ImageViewerWidget::userInteracted()
@@ -333,29 +333,45 @@ void ImageViewerWidget::wheelEvent(QWheelEvent* event)
         return;
     }
 
-    // interception Ctrl + wheel
+    if (handleInteractionWheel(event))
+        return;
+
+    double factor = computeZoomFactor(event);
+
+    const QPoint textPos = textPosition(infoOverlay_);
+    const QPoint cursorPos = event->position().toPoint();
+
+    if (!applyZoom(event, factor))
+        return;
+
+    updateOverlays(cursorPos, textPos);
+    updateInteractionAfterZoom();
+
+    updateCursor(nullptr);
+}
+
+bool ImageViewerWidget::handleInteractionWheel(QWheelEvent* event)
+{
     if ((event->modifiers() & Qt::ControlModifier) && m_interaction_)
     {
         if (m_interaction_->wheel(*this, event))
         {
             event->accept();
-            return;
+            return true;
         }
     }
+    return false;
+}
 
-    const QPoint overlayPosition = textPosition(overlay_);
-
-    constexpr double zoomFactor = 1.15;
-
+bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
+{
     QPointF scenePosBefore = mapToScene(event->position().toPoint());
-
-    double factor = (event->angleDelta().y() > 0) ? zoomFactor : 1.0 / zoomFactor;
 
     double currentZoom = getCurrentZoom();
     double newZoom = currentZoom * factor;
 
     if (newZoom < minZoom_ || newZoom > maxZoom_)
-        return;
+        return false;
 
     scale(factor, factor);
 
@@ -371,64 +387,63 @@ void ImageViewerWidget::wheelEvent(QWheelEvent* event)
              << delta.y();
 #endif
 
-    setTextPosition(overlayPosition, overlay_);
+    return true;
+}
 
+void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoint& textPosition)
+{
+    setTextPosition(textPosition, infoOverlay_);
+
+    // zoom overlay
+    double newZoom = getCurrentZoom();
     int percent = static_cast<int>(std::round(newZoom * 100.0));
 
-    QPoint cursorPos = event->position().toPoint();
-    QPoint overlayPos = cursorPos + QPoint(20, -20);
+    zoomOverlayController_->show(percent);
 
-    // affichage uniquement
-    zoomOverlay_->show(percent);
+    const QPoint zoomOverlayPosition = cursorPosition + QPoint(20, -20);
 
-    // position écran stable
-    setTextPosition(overlayPos, zoomOverlayItem_);
+    setTextPosition(zoomOverlayPosition, zoomOverlayItem_);
+}
 
-    updateCursor(nullptr);
+void ImageViewerWidget::updateInteractionAfterZoom()
+{
+    if (!m_interaction_)
+        return;
 
-    if (m_interaction_)
-    {
-        QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
+    QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
 
-        QPointF localPos = pos;
-        QPointF scenePos = mapToScene(pos);
-        QPointF globalPos = QCursor::pos();
+    QPointF localPos = pos;
+    QPointF scenePos = mapToScene(pos);
+    QPointF globalPos = QCursor::pos();
 
-        QMouseEvent fake(QEvent::MouseMove, localPos, scenePos, globalPos, Qt::NoButton,
-                         Qt::RightButton, Qt::NoModifier);
+    QMouseEvent fake(QEvent::MouseMove, localPos, scenePos, globalPos, Qt::NoButton,
+                     Qt::RightButton, Qt::NoModifier);
 
-        m_interaction_->mouseMove(*this, &fake);
-    }
+    m_interaction_->mouseMove(*this, &fake);
+}
+
+double ImageViewerWidget::computeZoomFactor(QWheelEvent* event) const
+{
+    constexpr double zoomFactor = 1.15;
+    return (event->angleDelta().y() > 0) ? zoomFactor : 1.0 / zoomFactor;
 }
 
 void ImageViewerWidget::resizeEvent(QResizeEvent* event)
 {
-    const QPoint overlayPosition = textPosition(overlay_);
+    const QPoint overlayPosition = textPosition(infoOverlay_);
 
     QGraphicsView::resizeEvent(event);
 
     if (autoFitEnabled_)
         applyAutoFit();
 
-    setTextPosition(overlayPosition, overlay_);
+    setTextPosition(overlayPosition, infoOverlay_);
 }
 
 void ImageViewerWidget::setInteraction(ImageViewerInteraction* interaction)
 {
     m_interaction_ = interaction;
 }
-
-/*void ImageViewerWidget::wheelEvent(QWheelEvent* event)
-{
-    if (m_interaction)
-    {
-        m_interaction->wheel(*this, event);
-        event->accept();
-        return;
-    }
-
-    QGraphicsView::wheelEvent(event);
-}*/
 
 void ImageViewerWidget::mousePressEvent(QMouseEvent* event)
 {
@@ -805,10 +820,10 @@ void ImageViewerWidget::updateSmoothDisplay()
 
 void ImageViewerWidget::updateTextOverlayVisibility()
 {
-    if (!overlay_)
+    if (!infoOverlay_)
         return;
 
-    overlay_->setVisible(displayConfig_.algorithm_overlay);
+    infoOverlay_->setVisible(displayConfig_.algorithm_overlay);
 }
 
 void ImageViewerWidget::applyDownscaleConfig(const DownscaleConfig& downscale)
@@ -823,8 +838,8 @@ void ImageViewerWidget::applyDownscaleConfig(const DownscaleConfig& downscale)
 
 void ImageViewerWidget::setText(const QString& text)
 {
-    if (overlay_)
-        overlay_->setText(text);
+    if (infoOverlay_)
+        infoOverlay_->setText(text);
 }
 
 void ImageViewerWidget::showPlaceholder(bool showEffect)
