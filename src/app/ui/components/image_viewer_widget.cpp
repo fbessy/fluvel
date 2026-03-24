@@ -30,18 +30,18 @@ ImageViewerWidget::ImageViewerWidget(QWidget* parent)
     initializeView();
 }
 
-ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
-                     QWidget* parent)
+ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig,
+                                     const DownscaleConfig& downscaleConfig, QWidget* parent)
     : QGraphicsView(parent)
     , displayConfig_(displayConfig)
     , downscaleConfig_(downscaleConfig)
+    , configUsed_{true}
 {
     initializeView();
 
     setupContourItems();
     setupInfoOverlay();
 
-    configUsed_ = true;
     updateSmoothDisplay();
 }
 
@@ -236,26 +236,48 @@ void ImageViewerWidget::flushPendingFrame()
 
 void ImageViewerWidget::updatePixmap(const QImage& img)
 {
-    if (img.isNull() || !pixmapItem_)
+    assert(pixmapItem_);
+
+    if (img.isNull())
         return;
 
-    bool sizeChanged = (lastDisplayedImage_.size() != img.size());
+    const bool sizeChanged = (lastDisplayedImage_.size() != img.size());
+
+    updatePixmapItem(img);
+    updateSceneRect(img);
+
+    if (sizeChanged)
+        handleImageSizeChanged();
+}
+
+void ImageViewerWidget::updatePixmapItem(const QImage& img)
+{
+    assert(pixmapItem_);
 
     pixmapItem_->setPixmap(QPixmap::fromImage(img));
     lastDisplayedImage_ = img;
+}
+
+void ImageViewerWidget::updateSceneRect(const QImage& img)
+{
+    assert(scene_);
 
     scene_->setSceneRect(0.0, 0.0, static_cast<qreal>(img.width()),
                          static_cast<qreal>(img.height()));
+}
 
-    if (sizeChanged)
+void ImageViewerWidget::handleImageSizeChanged()
+{
+    if (infoOverlay_)
     {
-        setTextPosition({10, 20}, infoOverlay_);
-
-        if (l_out_ && l_in_)
-            updateDisplayWithConfig();
-
-        applyAutoFit();
+        constexpr QPoint kDefaultOverlayPos{10, 20};
+        setTextPosition(kDefaultOverlayPos, infoOverlay_);
     }
+
+    if (configUsed_)
+        updateDisplayWithConfig();
+
+    applyAutoFit();
 }
 
 double ImageViewerWidget::currentZoom() const

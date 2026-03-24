@@ -141,6 +141,10 @@ private:
     void updateInteractionAfterZoom();
 
     void updatePixmap(const QImage& img);
+    void updatePixmapItem(const QImage& img);
+    void updateSceneRect(const QImage& img);
+    void handleImageSizeChanged();
+
     double getCurrentZoom() const;
 
     QPoint textPosition(const OverlayTextItem* textOverlay) const;
@@ -199,7 +203,7 @@ private:
 
     bool dragHighlight_ = false;
 
-    bool configUsed_ = false;
+    const bool configUsed_ = false;
 
     bool placeholderVisible_ = false;
 };
