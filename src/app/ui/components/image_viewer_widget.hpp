@@ -30,6 +30,7 @@ namespace fluvel_app
 {
 
 class ImageViewerInteraction;
+class ZoomOverlayController;
 
 class ImageViewerWidget : public QGraphicsView
 {
@@ -125,11 +126,15 @@ private:
 
     void initialize();
 
+    bool handleInteractionWheel(QWheelEvent* event);
+    bool applyZoom(QWheelEvent* event, double factor);
+    void updateInteractionAfterZoom();
+
     void updatePixmap(const QImage& img);
     double getCurrentZoom() const;
 
-    QPoint textPosition() const;
-    void setTextPosition(QPoint position);
+    QPoint textPosition(const OverlayTextItem* textOverlay) const;
+    void setTextPosition(QPoint position, OverlayTextItem* textOverlay);
 
     void updateCursor(const QMouseEvent* e);
 
@@ -175,6 +180,9 @@ private:
     ContourPointsItem* l_in_ = nullptr;
 
     OverlayTextItem* overlay_ = nullptr;
+
+    OverlayTextItem* zoomOverlayItem_ = nullptr;
+    ZoomOverlayController* zoomOverlay_ = nullptr;
 
     bool paused_ = false;
     QGraphicsBlurEffect* blur_ = nullptr;

@@ -95,6 +95,9 @@ set(app_src
     ${UI_COMP_DIR}/overlay_text_item.cpp
     ${UI_COMP_DIR}/overlay_text_item.hpp
 
+    ${UI_COMP_DIR}/zoom_overlay_controller.cpp
+    ${UI_COMP_DIR}/zoom_overlay_controller.hpp
+
     ${UI_COMP_DIR}/right_panel_toggle_button.cpp
     ${UI_COMP_DIR}/right_panel_toggle_button.hpp
 

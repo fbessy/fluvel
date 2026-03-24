@@ -4,24 +4,25 @@
 #pragma once
 
 #include <QFont>
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QPainter>
 
 namespace fluvel_app
 {
 
-class OverlayTextItem : public QGraphicsItem
+class OverlayTextItem : public QGraphicsObject
 {
+    Q_OBJECT
 public:
     OverlayTextItem(QGraphicsItem* parent = nullptr);
 
     void setText(const QString& text);
 
+    QRectF boundingRect() const override;
+
 protected:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;
-
-    QRectF boundingRect() const override;
 
 private:
     QString text_;

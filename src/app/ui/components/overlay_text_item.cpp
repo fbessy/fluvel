@@ -7,7 +7,7 @@ namespace fluvel_app
 {
 
 OverlayTextItem::OverlayTextItem(QGraphicsItem* parent)
-    : QGraphicsItem(parent)
+    : QGraphicsObject(parent)
 {
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
     setFlag(QGraphicsItem::ItemIsMovable, true);
