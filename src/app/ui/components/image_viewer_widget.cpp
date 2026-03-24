@@ -35,7 +35,7 @@ ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig,
     : QGraphicsView(parent)
     , displayConfig_(displayConfig)
     , downscaleConfig_(downscaleConfig)
-    , configUsed_{true}
+    , useEnhancedDisplayConfig_{true}
 {
     initializeView();
 
@@ -107,11 +107,11 @@ void ImageViewerWidget::setupInfoOverlay()
 
 void ImageViewerWidget::setupContourItems()
 {
-    l_out_ = new ContourPointsItem(contentRoot_);
-    l_out_->setZValue(100.0);
+    outerContour_ = new ContourPointsItem(contentRoot_);
+    outerContour_->setZValue(100.0);
 
-    l_in_ = new ContourPointsItem(contentRoot_);
-    l_in_->setZValue(100.0);
+    innerContour_ = new ContourPointsItem(contentRoot_);
+    innerContour_->setZValue(100.0);
 }
 
 void ImageViewerWidget::setupTimers()
@@ -215,10 +215,10 @@ void ImageViewerWidget::setImage(const QImage& img)
 void ImageViewerWidget::setContour(const QVector<QPointF>& outerContour,
                                    const QVector<QPointF>& innerContour)
 {
-    assert(l_out_ && l_in_);
+    assert(outerContour_ && innerContour_);
 
-    l_out_->setPoints(outerContour);
-    l_in_->setPoints(innerContour);
+    outerContour_->setPoints(outerContour);
+    innerContour_->setPoints(innerContour);
 }
 
 void ImageViewerWidget::setImageAndContour(const UiFrame& frame)
@@ -226,12 +226,12 @@ void ImageViewerWidget::setImageAndContour(const UiFrame& frame)
     submitFrame(frame);
 }
 
-void ImageViewerWidget::clearOverlays()
+void ImageViewerWidget::clearContour()
 {
-    assert(l_out_ && l_in_);
+    assert(outerContour_ && innerContour_);
 
-    l_out_->clearPoints();
-    l_in_->clearPoints();
+    outerContour_->clearPoints();
+    innerContour_->clearPoints();
 }
 
 // ------------------------------------------------------------
@@ -286,15 +286,10 @@ void ImageViewerWidget::handleImageSizeChanged()
         setTextPosition(kDefaultOverlayPos, infoOverlay_);
     }
 
-    if (configUsed_)
+    if (useEnhancedDisplayConfig_)
         updateDisplayWithConfig();
 
     applyAutoFit();
-}
-
-double ImageViewerWidget::currentZoom() const
-{
-    return getCurrentZoom();
 }
 
 void ImageViewerWidget::scaleView(double sx, double sy)
@@ -315,7 +310,7 @@ void ImageViewerWidget::translateView(double dx, double dy)
     setTextPosition(overlayPosition, infoOverlay_);
 }
 
-double ImageViewerWidget::getCurrentZoom() const
+double ImageViewerWidget::currentZoom() const
 {
     return transform().m11(); // scale X
 }
@@ -417,9 +412,9 @@ void ImageViewerWidget::wheelEvent(QWheelEvent* event)
 
 bool ImageViewerWidget::handleInteractionWheel(QWheelEvent* event)
 {
-    if ((event->modifiers() & Qt::ControlModifier) && m_interaction_)
+    if ((event->modifiers() & Qt::ControlModifier) && interaction_)
     {
-        if (m_interaction_->wheel(*this, event))
+        if (interaction_->wheel(*this, event))
         {
             event->accept();
             return true;
@@ -432,8 +427,8 @@ bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
 {
     QPointF scenePosBefore = mapToScene(event->position().toPoint());
 
-    double currentZoom = getCurrentZoom();
-    double newZoom = currentZoom * factor;
+    double currZoom = currentZoom();
+    double newZoom = currZoom * factor;
 
     if (newZoom < minZoom_ || newZoom > maxZoom_)
         return false;
@@ -448,7 +443,7 @@ bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
 
 #ifdef FLUVEL_DEBUG
     qDebug() << "mouseDelta =" << event->angleDelta().x() << event->angleDelta().y()
-             << "zoom =" << currentZoom << " new zoom =" << newZoom << "delta =" << delta.x()
+             << "zoom =" << currZoom << " new zoom =" << newZoom << "delta =" << delta.x()
              << delta.y();
 #endif
 
@@ -460,7 +455,7 @@ void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoin
     setTextPosition(textPosition, infoOverlay_);
 
     // zoom overlay
-    double newZoom = getCurrentZoom();
+    double newZoom = currentZoom();
     int percent = static_cast<int>(std::round(newZoom * 100.0));
 
     zoomOverlayController_->show(percent);
@@ -472,7 +467,7 @@ void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoin
 
 void ImageViewerWidget::updateInteractionAfterZoom()
 {
-    if (!m_interaction_)
+    if (!interaction_)
         return;
 
     QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
@@ -484,7 +479,7 @@ void ImageViewerWidget::updateInteractionAfterZoom()
     QMouseEvent fake(QEvent::MouseMove, localPos, scenePos, globalPos, Qt::NoButton,
                      Qt::RightButton, Qt::NoModifier);
 
-    m_interaction_->mouseMove(*this, &fake);
+    interaction_->mouseMove(*this, &fake);
 }
 
 double ImageViewerWidget::computeZoomFactor(QWheelEvent* event) const
@@ -507,7 +502,7 @@ void ImageViewerWidget::resizeEvent(QResizeEvent* event)
 
 void ImageViewerWidget::setInteraction(ImageViewerInteraction* interaction)
 {
-    m_interaction_ = interaction;
+    interaction_ = interaction;
 }
 
 void ImageViewerWidget::mousePressEvent(QMouseEvent* event)
@@ -515,9 +510,9 @@ void ImageViewerWidget::mousePressEvent(QMouseEvent* event)
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
-    if (!itemMovable && m_interaction_)
+    if (!itemMovable && interaction_)
     {
-        m_interaction_->mousePress(*this, event);
+        interaction_->mousePress(*this, event);
         updateCursor(event);
     }
 
@@ -531,16 +526,16 @@ void ImageViewerWidget::mouseMoveEvent(QMouseEvent* event)
 
     if (itemMovable)
     {
-        if (m_interaction_)
-            m_interaction_->cancel(); // 👈 stop pixel info
+        if (interaction_)
+            interaction_->cancel(); // 👈 stop pixel info
 
         QGraphicsView::mouseMoveEvent(event);
         return;
     }
 
-    if (m_interaction_)
+    if (interaction_)
     {
-        m_interaction_->mouseMove(*this, event);
+        interaction_->mouseMove(*this, event);
         updateCursor(event);
     }
 
@@ -552,9 +547,9 @@ void ImageViewerWidget::mouseReleaseEvent(QMouseEvent* event)
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
-    if (!itemMovable && m_interaction_)
+    if (!itemMovable && interaction_)
     {
-        m_interaction_->mouseRelease(*this, event);
+        interaction_->mouseRelease(*this, event);
         updateCursor(event);
     }
 
@@ -563,8 +558,8 @@ void ImageViewerWidget::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageViewerWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    if (m_interaction_)
-        m_interaction_->mouseDoubleClick(*this, event);
+    if (interaction_)
+        interaction_->mouseDoubleClick(*this, event);
 
     if (!event->isAccepted())
         QGraphicsView::mouseDoubleClickEvent(event);
@@ -572,7 +567,7 @@ void ImageViewerWidget::mouseDoubleClickEvent(QMouseEvent* event)
 
 void ImageViewerWidget::updateCursor(const QMouseEvent* e)
 {
-    if (!m_interaction_)
+    if (!interaction_)
         return;
 
     QPoint pos = e ? e->pos() : viewport()->mapFromGlobal(QCursor::pos());
@@ -596,12 +591,12 @@ void ImageViewerWidget::updateCursor(const QMouseEvent* e)
     }
 
     // 3️⃣ sinon les interactions décident
-    viewport()->setCursor(m_interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), e));
+    viewport()->setCursor(interaction_->cursorForEvent(*this, hasImage(), isPanRelevant(), e));
 }
 
 bool ImageViewerWidget::viewportEvent(QEvent* event)
 {
-    if (!m_interaction_)
+    if (!interaction_)
         return QGraphicsView::viewportEvent(event);
 
     switch (event->type())
@@ -629,8 +624,8 @@ void ImageViewerWidget::dragEnterEvent(QDragEnterEvent* event)
 {
     bool handled = false;
 
-    if (m_interaction_)
-        handled = m_interaction_->dragEnter(*this, event);
+    if (interaction_)
+        handled = interaction_->dragEnter(*this, event);
 
     if (!handled)
         event->ignore();
@@ -640,8 +635,8 @@ void ImageViewerWidget::dragMoveEvent(QDragMoveEvent* event)
 {
     bool handled = false;
 
-    if (m_interaction_)
-        handled = m_interaction_->dragMove(*this, event);
+    if (interaction_)
+        handled = interaction_->dragMove(*this, event);
 
     if (!handled)
         event->ignore();
@@ -649,16 +644,16 @@ void ImageViewerWidget::dragMoveEvent(QDragMoveEvent* event)
 
 void ImageViewerWidget::dragLeaveEvent(QDragLeaveEvent* event)
 {
-    if (m_interaction_)
-        m_interaction_->dragLeave(*this, event);
+    if (interaction_)
+        interaction_->dragLeave(*this, event);
 }
 
 void ImageViewerWidget::dropEvent(QDropEvent* event)
 {
     bool handled = false;
 
-    if (m_interaction_)
-        handled = m_interaction_->drop(*this, event);
+    if (interaction_)
+        handled = interaction_->drop(*this, event);
 
     if (!handled)
         event->ignore();
@@ -711,7 +706,7 @@ QPoint ImageViewerWidget::imageCoordinatesFromView(const QPoint& viewPos) const
 
 void ImageViewerWidget::enterEvent(QEnterEvent*)
 {
-    if (!m_interaction_)
+    if (!interaction_)
         return;
 
     QPoint pos = viewport()->mapFromGlobal(QCursor::pos());
@@ -752,7 +747,9 @@ const QImage& ImageViewerWidget::image() const
 
 QImage ImageViewerWidget::renderToImage() const
 {
-    if (!scene_ || scene_->sceneRect().isEmpty())
+    assert(scene_);
+
+    if (scene_->sceneRect().isEmpty())
         return QImage();
 
     QRectF rect = scene_->sceneRect();
@@ -785,11 +782,6 @@ bool ImageViewerWidget::isPanRelevant() const
     return sceneRect.width() > viewRect.width() || sceneRect.height() > viewRect.height();
 }
 
-QGraphicsScene* ImageViewerWidget::graphicsScene() const
-{
-    return scene_;
-}
-
 bool ImageViewerWidget::isGrayscale() const
 {
     return lastDisplayedImage_.format() == QImage::Format_Grayscale8 ||
@@ -798,7 +790,7 @@ bool ImageViewerWidget::isGrayscale() const
 
 void ImageViewerWidget::upscaleItems()
 {
-    assert(configUsed_ && l_out_ && l_in_);
+    assert(useEnhancedDisplayConfig_ && outerContour_ && innerContour_);
 
     const bool has_ds = downscaleConfig_.hasDownscale;
     const int df = downscaleConfig_.downscaleFactor;
@@ -808,13 +800,13 @@ void ImageViewerWidget::upscaleItems()
     if (has_ds && displayConfig_.image == ImageBase::Source)
         factor = qreal(df);
 
-    l_out_->setScale(factor);
-    l_in_->setScale(factor);
+    outerContour_->setScale(factor);
+    innerContour_->setScale(factor);
 }
 
 void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
 {
-    assert(configUsed_);
+    assert(useEnhancedDisplayConfig_);
 
     displayConfig_ = display;
 
@@ -823,7 +815,7 @@ void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
 
 void ImageViewerWidget::updateDisplayWithConfig()
 {
-    assert(configUsed_);
+    assert(useEnhancedDisplayConfig_);
 
     updateContourColors();
     upscaleItems();
@@ -834,7 +826,7 @@ void ImageViewerWidget::updateDisplayWithConfig()
 
 void ImageViewerWidget::updateContourColors()
 {
-    assert(configUsed_ && l_out_ && l_in_);
+    assert(useEnhancedDisplayConfig_ && outerContour_ && innerContour_);
 
     QColor col_lout, col_lin;
 
@@ -848,13 +840,13 @@ void ImageViewerWidget::updateContourColors()
     else
         col_lin = Qt::transparent;
 
-    l_out_->setColor(col_lout);
-    l_in_->setColor(col_lin);
+    outerContour_->setColor(col_lout);
+    innerContour_->setColor(col_lin);
 }
 
 void ImageViewerWidget::updateFlip()
 {
-    assert(configUsed_);
+    assert(useEnhancedDisplayConfig_);
 
     contentRoot_->setTransformOriginPoint(0.0, 0.0);
 
@@ -875,7 +867,7 @@ void ImageViewerWidget::updateFlip()
 
 void ImageViewerWidget::updateSmoothDisplay()
 {
-    assert(configUsed_ && pixmapItem_);
+    assert(useEnhancedDisplayConfig_ && pixmapItem_);
 
     if (displayConfig_.smoothDisplay)
         pixmapItem_->setTransformationMode(Qt::SmoothTransformation);
@@ -893,7 +885,7 @@ void ImageViewerWidget::updateTextOverlayVisibility()
 
 void ImageViewerWidget::applyDownscaleConfig(const DownscaleConfig& downscale)
 {
-    if (!configUsed_)
+    if (!useEnhancedDisplayConfig_)
         return;
 
     downscaleConfig_ = downscale;
@@ -919,12 +911,12 @@ void ImageViewerWidget::showPlaceholder(bool showEffect)
         if (!lastDisplayedImage_.isNull())
             setImage(qimage_utils::darkenImage(lastDisplayedImage_));
 
-        if (l_out_)
-            l_out_->setColor(
+        if (outerContour_)
+            outerContour_->setColor(
                 qcolor_utils::desaturateAndDarken(toQColor(displayConfig_.l_out_color), 0.4, 0.6));
 
-        if (l_in_)
-            l_in_->setColor(
+        if (innerContour_)
+            innerContour_->setColor(
                 qcolor_utils::desaturateAndDarken(toQColor(displayConfig_.l_in_color), 0.4, 0.6));
 
         blur_->setBlurRadius(6);
@@ -951,7 +943,7 @@ void ImageViewerWidget::setDragHighlight(bool enabled)
 
 bool ImageViewerWidget::supportsDragDrop() const
 {
-    auto set = dynamic_cast<const InteractionSet*>(m_interaction_);
+    auto set = dynamic_cast<const InteractionSet*>(interaction_);
 
     return set && set->hasBehavior<DragDropBehavior>();
 }

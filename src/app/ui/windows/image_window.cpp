@@ -401,8 +401,8 @@ void ImageWindow::setupConnections()
 
     // to refresh the view and clear the former contour
     // (it's performed the first time or when a new image is loaded)
-    connect(imageController_, &ImageController::clearOverlaysRequested, imageViewer_,
-            &ImageViewerWidget::clearOverlays);
+    connect(imageController_, &ImageController::clearContourRequested, imageViewer_,
+            &ImageViewerWidget::clearContour);
 
     // to refresh the image window title
     connect(imageController_, &ImageController::displayedImageReady, this,

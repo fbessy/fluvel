@@ -43,7 +43,7 @@ signals:
 
     void textDiagnosticsUpdated(QString string);
 
-    void clearOverlaysRequested();
+    void clearContourRequested();
 
 private:
     void onProcessedImageReady(const QImage& processed);

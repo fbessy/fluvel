@@ -116,7 +116,7 @@ void ImageController::reinitializeWorker()
             downscaledImage_.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
     }
 
-    emit clearOverlaysRequested();
+    emit clearContourRequested();
 
 #ifdef FLUVEL_DEBUG
     qDebug() << __FILE__ << ":" << __LINE__ << __func__

@@ -32,7 +32,7 @@ bool PixelInfoBehavior::mousePress(ImageViewerWidget& view, QMouseEvent* event)
     active_ = true;
 
     if (!overlay_)
-        overlay_ = std::make_unique<PixelInfoOverlay>(view.graphicsScene());
+        overlay_ = std::make_unique<PixelInfoOverlay>(view.scene());
 
     updateOverlay(view, event->pos());
     overlay_->showOverlay();

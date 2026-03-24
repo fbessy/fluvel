@@ -37,62 +37,57 @@ class ImageViewerWidget : public QGraphicsView
     Q_OBJECT
 
 public:
+    // --- Public API (external users) ---
+
+    // init
     explicit ImageViewerWidget(QWidget* parent = nullptr);
 
     explicit ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
                        QWidget* parent = nullptr);
 
+    void setInteraction(ImageViewerInteraction* interaction);
+    void setListener(ImageViewerListener* listener);
+
     // Throttling : fps max (0 = désactivé)
     void setMaxDisplayFps(double fps);
 
-    void displayFrameNow(const UiFrame& f);
+    // config
+    void applyDisplayConfig(const fluvel_app::DisplayConfig& display);
+    void applyDownscaleConfig(const fluvel_app::DownscaleConfig& downscale);
 
-    const QImage& image() const;
-    QImage renderToImage() const;
-
-    void setInteraction(ImageViewerInteraction* interaction);
-
-    double currentZoom() const;
-    void scaleView(double sx, double sy);
-    void translateView(double dx, double dy);
-
-    void toggleFullscreen();
-    void applyAutoFit();
-    void userInteracted();
-
-    QPoint imageCoordinatesFromView(const QPoint& viewPos) const;
-    QRgb pixelColorAt(const QPoint& imagePos) const;
-
-    void setListener(ImageViewerListener* listener);
-    void onColorPicked(const QColor& color, const QPoint& imagePos);
-
-    bool hasImage() const;
-    bool isPanRelevant() const;
-    QGraphicsScene* graphicsScene() const;
-
-    bool isGrayscale() const;
-
-    void notifyImageDropped(const QString& path);
-    void setDragHighlight(bool enabled);
-
-    bool isPixelVisible(const QPoint& viewPos) const;
-
-public slots:
-
+    // display
     void setImage(const QImage& img);
     void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
     void setImageAndContour(const UiFrame& uiFrame);
-
+    void clearContour();
     void setText(const QString& text);
-
     void showPlaceholder(bool showEffect);
 
-    void applyDisplayConfig(const fluvel_app::DisplayConfig& display);
-    void applyDownscaleConfig(const fluvel_app::DownscaleConfig& downscale);
-    void updateFlip();
-    void updateSmoothDisplay();
-    void updateTextOverlayVisibility();
-    void clearOverlays();
+    // getters
+    const QImage& image() const;
+    QImage renderToImage() const;
+
+    // --- Internal API (used by interactions/behaviors) ---
+
+    void toggleFullscreen();
+    void applyAutoFit();
+
+    bool isPanRelevant() const;
+    void userInteracted();
+    void translateView(double dx, double dy);
+    void scaleView(double sx, double sy);
+
+    QPoint imageCoordinatesFromView(const QPoint& viewPos) const;
+    QRgb pixelColorAt(const QPoint& imagePos) const;
+    bool isPixelVisible(const QPoint& viewPos) const;
+    bool isGrayscale() const;
+
+    void onColorPicked(const QColor& color, const QPoint& imagePos);
+
+    bool hasImage() const;
+
+    void setDragHighlight(bool enabled);
+    void notifyImageDropped(const QString& path);
 
 signals:
     void imageClicked(int x, int y);
@@ -118,15 +113,8 @@ protected:
 
     void resizeEvent(QResizeEvent* event) override;
 
-private slots:
-    void flushPendingFrame();
-
 private:
-    void submitFrame(const UiFrame& frame);
-    bool shouldDisplayImmediately() const;
-    void schedulePendingFrame();
-    void displayPendingFrame();
-
+    // internal init
     void initializeView();
 
     void setupView();
@@ -137,78 +125,86 @@ private:
     void setupContourItems();
     void setupTimers();
 
+    // internal image display
+    void submitFrame(const UiFrame& frame);
+    bool shouldDisplayImmediately() const;
+    void schedulePendingFrame();
+    void displayPendingFrame();
+
+    void flushPendingFrame();
+    void displayFrameNow(const UiFrame& f);
+    void updatePixmap(const QImage& img);
+    void updatePixmapItem(const QImage& img);
+    void updateSceneRect(const QImage& img);
+    void handleImageSizeChanged();
+
+    // interactions
     bool handleInteractionWheel(QWheelEvent* event);
     double computeZoomFactor(QWheelEvent* event) const;
     bool applyZoom(QWheelEvent* event, double factor);
     void updateOverlays(const QPoint& cursorPosition, const QPoint& textPosition);
     void updateInteractionAfterZoom();
 
-    void updatePixmap(const QImage& img);
-    void updatePixmapItem(const QImage& img);
-    void updateSceneRect(const QImage& img);
-    void handleImageSizeChanged();
-
-    double getCurrentZoom() const;
-
     QPoint textPosition(const OverlayTextItem* textOverlay) const;
     void setTextPosition(QPoint position, OverlayTextItem* textOverlay);
 
     void updateCursor(const QMouseEvent* e);
+    double currentZoom() const;
 
+    void updateDisplayWithConfig();
     void updateContourColors();
     void upscaleItems();
-    void updateDisplayWithConfig();
+    void updateFlip();
+    void updateSmoothDisplay();
+    void updateTextOverlayVisibility();
 
     bool supportsDragDrop() const;
 
     QGraphicsScene* scene_ = nullptr;
     QGraphicsItemGroup* contentRoot_ = nullptr;
     QGraphicsPixmapItem* pixmapItem_ = nullptr;
-
-    bool autoFitEnabled_ = true;
-
-    // --- Zoom / Pan ---
-    const double minZoom_ = 0.1;
-    const double maxZoom_ = 20.0;
-
-    // --- Fullscreen ---
-    bool isFullScreenMode_ = false;
-    QRect normalGeometry_;
-    Qt::WindowFlags normalWindowFlags_;
-
-    // --- Throttling ---
-    UiFrame pendingFrame_;
-    bool hasPendingFrame_ = false;
-
-    QElapsedTimer displayTimer_;
-    int minDisplayIntervalMs_ = 0;
-
-    QTimer* throttleTimer_ = nullptr;
-
     QImage lastDisplayedImage_;
-
-    ImageViewerInteraction* m_interaction_ = nullptr;
-    ImageViewerListener* listener_ = nullptr;
 
     DisplayConfig displayConfig_;
     DownscaleConfig downscaleConfig_;
 
-    ContourPointsItem* l_out_ = nullptr;
-    ContourPointsItem* l_in_ = nullptr;
+    ContourPointsItem* outerContour_ = nullptr;
+    ContourPointsItem* innerContour_ = nullptr;
 
     OverlayTextItem* infoOverlay_ = nullptr;
 
     OverlayTextItem* zoomOverlayItem_ = nullptr;
     ZoomOverlayController* zoomOverlayController_ = nullptr;
 
-    bool paused_ = false;
+    ImageViewerInteraction* interaction_ = nullptr;
+    ImageViewerListener* listener_ = nullptr;
+
+    // --- Throttling ---
+    UiFrame pendingFrame_;
+    bool hasPendingFrame_{false};
+
+    QElapsedTimer displayTimer_;
+    int minDisplayIntervalMs_{0};
+
+    QTimer* throttleTimer_ = nullptr;
+
+    bool autoFitEnabled_{true};
+
+    // --- Zoom / Pan ---
+    const double minZoom_{0.1};
+    const double maxZoom_{20.0};
+
+    // --- Fullscreen ---
+    bool isFullScreenMode_{false};
+    QRect normalGeometry_;
+    Qt::WindowFlags normalWindowFlags_;
+
     QGraphicsBlurEffect* blur_ = nullptr;
+    bool placeholderVisible_{false};
 
-    bool dragHighlight_ = false;
+    bool dragHighlight_{false};
 
-    const bool configUsed_ = false;
-
-    bool placeholderVisible_ = false;
+    const bool useEnhancedDisplayConfig_{false};
 };
 
 } // namespace fluvel_app
