@@ -595,6 +595,9 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
         indexToSelect = bestFormatIndex;
 
     // application
+    if (indexToSelect < 0 && formatSelector_->count() > 0)
+        indexToSelect = 0;
+
     if (indexToSelect >= 0)
         formatSelector_->setCurrentIndex(indexToSelect);
 }
