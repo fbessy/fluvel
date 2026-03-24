@@ -162,30 +162,42 @@ void ImageViewerWidget::submitFrame(const UiFrame& frame)
     pendingFrame_ = frame;
     hasPendingFrame_ = true;
 
-    if (minDisplayIntervalMs_ == 0)
+    if (shouldDisplayImmediately())
     {
-        displayFrameNow(pendingFrame_);
-        hasPendingFrame_ = false;
+        displayPendingFrame();
         return;
     }
 
+    schedulePendingFrame();
+}
+
+bool ImageViewerWidget::shouldDisplayImmediately() const
+{
+    if (minDisplayIntervalMs_ == 0)
+        return true;
+
+    return displayTimer_.elapsed() >= minDisplayIntervalMs_;
+}
+
+void ImageViewerWidget::schedulePendingFrame()
+{
+    if (throttleTimer_->isActive())
+        return;
+
     const qint64 elapsed = displayTimer_.elapsed();
+    const qint64 remaining = minDisplayIntervalMs_ - elapsed;
 
-    if (elapsed >= minDisplayIntervalMs_)
+    if (remaining > 0)
     {
-        displayFrameNow(pendingFrame_);
-        hasPendingFrame_ = false;
+        throttleTimer_->start(
+            static_cast<int>(std::min<qint64>(remaining, std::numeric_limits<int>::max())));
     }
-    else if (!throttleTimer_->isActive())
-    {
-        const qint64 remaining = minDisplayIntervalMs_ - elapsed;
+}
 
-        if (remaining > 0)
-        {
-            throttleTimer_->start(
-                static_cast<int>(std::min<qint64>(remaining, std::numeric_limits<int>::max())));
-        }
-    }
+void ImageViewerWidget::displayPendingFrame()
+{
+    displayFrameNow(pendingFrame_);
+    hasPendingFrame_ = false;
 }
 
 void ImageViewerWidget::setImage(const QImage& img)

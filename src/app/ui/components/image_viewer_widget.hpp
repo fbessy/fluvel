@@ -123,6 +123,9 @@ private slots:
 
 private:
     void submitFrame(const UiFrame& frame);
+    bool shouldDisplayImmediately() const;
+    void schedulePendingFrame();
+    void displayPendingFrame();
 
     void initializeView();
 
