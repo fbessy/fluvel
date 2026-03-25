@@ -146,6 +146,8 @@ set(app_src
     ${CORE_DIR}/qcolor_utils.cpp
     ${CORE_DIR}/qcolor_utils.hpp
 
+    ${CORE_DIR}/device_id_utils.hpp
+
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
     ${INTEROP_DIR}/contour_adapters.hpp

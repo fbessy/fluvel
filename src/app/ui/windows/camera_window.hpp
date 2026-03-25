@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "common_settings.hpp"
+
 #include <QMainWindow>
 
 #include <QByteArray>
@@ -11,8 +13,6 @@
 #include <QMetaObject>
 #include <QSet>
 #include <QString>
-
-#include "camera_controller.hpp"
 
 class QWidget;
 class QComboBox;
@@ -25,6 +25,8 @@ class QCloseEvent;
 namespace fluvel_app
 {
 
+class StreamingInfo;
+class CameraController;
 class CameraSettingsWindow;
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
@@ -139,9 +141,6 @@ private:
 
     static QByteArray loadSelectedCameraId();
     void saveSelectedCameraId();
-
-    QString encodeDeviceId(const QByteArray& id);
-    QByteArray decodeDeviceId(const QString& key);
 
     CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
 

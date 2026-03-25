@@ -6,6 +6,7 @@
 #include "autofit_behavior.hpp"
 #include "camera_controller.hpp"
 #include "camera_settings_window.hpp"
+#include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
 #include "fullscreen_behavior.hpp"
 #include "icon_loader.hpp"
@@ -21,7 +22,6 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
-#include <QUrl>
 #include <QVBoxLayout>
 
 #ifdef Q_OS_ANDROID
@@ -977,7 +977,7 @@ void CameraWindow::savePreferredFormats()
         if (it.value().isNull())
             continue;
 
-        const QString key = encodeDeviceId(it.key());
+        const QString key = device::encodeDeviceId(it.key());
         const QCameraFormat& fmt = it.value();
 
         settings.beginGroup(key);
@@ -1018,7 +1018,7 @@ void CameraWindow::loadPreferredFormats()
 
         for (const auto& cam : cameraController_->videoInputs())
         {
-            QByteArray deviceId = decodeDeviceId(dev);
+            QByteArray deviceId = device::decodeDeviceId(dev);
 
             if (cam.id() != deviceId)
                 continue;
@@ -1036,16 +1036,6 @@ void CameraWindow::loadPreferredFormats()
     }
 
     settings.endGroup();
-}
-
-QString CameraWindow::encodeDeviceId(const QByteArray& id)
-{
-    return QString::fromUtf8(QUrl::toPercentEncoding(id));
-}
-
-QByteArray CameraWindow::decodeDeviceId(const QString& key)
-{
-    return QUrl::fromPercentEncoding(key.toUtf8()).toUtf8();
 }
 
 void CameraWindow::onDownscaleChanged(const DownscaleConfig& downscaleConfig)
