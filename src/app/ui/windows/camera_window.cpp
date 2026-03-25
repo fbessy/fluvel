@@ -54,7 +54,7 @@ CameraWindow::CameraWindow(QWidget* parent)
 void CameraWindow::setupWindow()
 {
     setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
-    setWindowTitle(tr("Fluvel — Camera"));
+    updateWindowTitle();
 }
 
 void CameraWindow::restoreSettings()
@@ -317,6 +317,9 @@ void CameraWindow::setupConnections()
     // refresh button in function of user action
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this,
             &CameraWindow::updateStreamingButton);
+
+    connect(cameraController_, &CameraController::downscaleChanged, this,
+            &CameraWindow::onDownscaleChanged);
 }
 
 void CameraWindow::applyInitialSettings()
@@ -324,8 +327,9 @@ void CameraWindow::applyInitialSettings()
     assert(imageViewer_ && displayBar_);
 
     const auto& app = ApplicationSettings::instance();
+    const auto& downscaleConfig = app.videoSettings().compute.downscale;
 
-    imageViewer_->applyDownscaleConfig(app.videoSettings().compute.downscale);
+    imageViewer_->applyDownscaleConfig(downscaleConfig);
     imageViewer_->applyDisplayConfig(app.videoSettings().display);
 
     bool preprocessing = app.videoSettings().compute.downscale.hasDownscale ||
@@ -334,6 +338,8 @@ void CameraWindow::applyInitialSettings()
     displayBar_->updatePipelineAvailability(preprocessing);
 
     refreshUi();
+
+    onDownscaleChanged(downscaleConfig);
 }
 
 void CameraWindow::bindApplicationSettingsToController()
@@ -715,8 +721,10 @@ void CameraWindow::onStreamingStarted(const StreamingInfo& info)
 
     refreshUi();
 
-    setWindowTitle(
-        QString("Fluvel — %1 - %2").arg(info.description).arg(formatToString(activeFormat_)));
+    deviceTitleStr_ =
+        QString("Fluvel — %1 - %2").arg(info.description).arg(formatToString(activeFormat_));
+
+    updateWindowTitle();
 
     saveSelectedCameraId();
     savePreferredFormats();
@@ -745,7 +753,7 @@ void CameraWindow::onStreamingStopped()
         refreshUi();
     }
 
-    setWindowTitle(tr("Fluvel — Camera"));
+    updateWindowTitle();
 }
 
 void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
@@ -1038,6 +1046,35 @@ QString CameraWindow::encodeDeviceId(const QByteArray& id)
 QByteArray CameraWindow::decodeDeviceId(const QString& key)
 {
     return QUrl::fromPercentEncoding(key.toUtf8()).toUtf8();
+}
+
+void CameraWindow::onDownscaleChanged(const DownscaleConfig& downscaleConfig)
+{
+    assert(cameraController_);
+
+    downscaleTitleStr_.clear();
+
+    if (downscaleConfig.hasDownscale)
+        downscaleTitleStr_ = QString("(/%1)").arg(downscaleConfig.downscaleFactor);
+
+    updateWindowTitle();
+}
+
+void CameraWindow::updateWindowTitle()
+{
+    if (cameraController_ && cameraController_->isStreaming())
+    {
+        QString title = deviceTitleStr_;
+
+        if (!downscaleTitleStr_.isEmpty())
+            title += " " + downscaleTitleStr_;
+
+        setWindowTitle(title);
+    }
+    else
+    {
+        setWindowTitle(tr("Fluvel — Camera"));
+    }
 }
 
 } // namespace fluvel_app

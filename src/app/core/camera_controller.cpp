@@ -310,6 +310,8 @@ void CameraController::onCameraError(QCamera::Error error, const QString& errorS
 void CameraController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
     activeContourThread_.setAlgoConfig(session.compute);
+
+    emit downscaleChanged(session.compute.downscale);
 }
 
 void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& display)

@@ -68,6 +68,8 @@ signals:
     void textStatsUpdated(const QString& textStats);
     void imageAndContourUpdated(const UiFrame& uiFrame);
 
+    void downscaleChanged(const DownscaleConfig& downscaleConfig);
+
 private:
     void onVideoInputsChanged();
     void handleActiveDeviceUnplug(const QList<QCameraDevice>& devices);

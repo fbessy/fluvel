@@ -84,6 +84,9 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
+    void onDownscaleChanged(const DownscaleConfig& downscaleConfig);
+    void updateWindowTitle();
+
     void setupWindow();
     void restoreSettings();
     void createUi();
@@ -180,6 +183,9 @@ private:
     QCameraFormat activeFormat_;
 
     bool isUpdatingUi_{false};
+
+    QString downscaleTitleStr_;
+    QString deviceTitleStr_;
 };
 
 } // namespace fluvel_app
