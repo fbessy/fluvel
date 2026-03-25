@@ -36,13 +36,7 @@ void ZoomOverlayController::show(int percent)
     }
 
     item_->setOpacity(1.0);
-
-    // texte
     item_->setText(QString("%1%").arg(percent));
-
-    // centrage
-    QRectF bounds = item_->boundingRect();
-
     item_->setVisible(true);
 
     // restart timer

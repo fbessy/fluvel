@@ -5,6 +5,7 @@
 #include "application_settings.hpp"
 #include "autofit_behavior.hpp"
 #include "camera_controller.hpp"
+#include "camera_format_utils.hpp"
 #include "camera_settings_window.hpp"
 #include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
@@ -563,7 +564,7 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
     {
         const auto& fmt = formats[i];
 
-        bool isActive = isSameFormat(fmt, activeFormat_);
+        bool isActive = camera_utils::isSameCameraFormat(fmt, activeFormat_);
         bool isRecommended = (i == bestFormatIndex);
 
         QString label = formatToString(fmt);
@@ -587,7 +588,7 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
         {
             for (int i = 0; i < formats.size(); ++i)
             {
-                if (isSameFormat(formats[i], preferred))
+                if (camera_utils::isSameCameraFormat(formats[i], preferred))
                 {
                     indexToSelect = i;
                     break;
@@ -606,12 +607,6 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
 
     if (indexToSelect >= 0)
         formatSelector_->setCurrentIndex(indexToSelect);
-}
-
-bool CameraWindow::isSameFormat(const QCameraFormat& a, const QCameraFormat& b) const
-{
-    return a.pixelFormat() == b.pixelFormat() && a.resolution() == b.resolution() &&
-           a.maxFrameRate() == b.maxFrameRate();
 }
 
 void CameraWindow::showEvent(QShowEvent* event)

@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "camera_controller.hpp"
+#include "camera_format_utils.hpp"
 #include "camera_stats.hpp"
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
@@ -94,9 +95,7 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
                 auto it = std::find_if(formats.begin(), formats.end(),
                                        [&](const QCameraFormat& f)
                                        {
-                                           return f.pixelFormat() == format.pixelFormat() &&
-                                                  f.resolution() == format.resolution() &&
-                                                  f.maxFrameRate() == format.maxFrameRate();
+                                           return camera_utils::isSameCameraFormat(f, format);
                                        });
 
                 if (it != formats.end())

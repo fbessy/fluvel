@@ -117,7 +117,6 @@ private:
     void onDeviceChanged(int index);
     void refreshFormatListFromSelection();
     void updateFormatList(const QList<QCameraFormat>& formats);
-    bool isSameFormat(const QCameraFormat& a, const QCameraFormat& b) const;
     static QString pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt);
     static QString formatToString(const QCameraFormat& fmt);
     QCameraFormat getSelectedFormat() const;
