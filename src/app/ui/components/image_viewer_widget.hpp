@@ -91,7 +91,7 @@ public:
 
 signals:
     void imageClicked(int x, int y);
-    void frameDisplayed(const FrameTimestamps& ts);
+    void frameDisplayed(const fluvel_app::FrameTimestamps& ts);
     void imageDropped(const QString& path);
 
 protected:

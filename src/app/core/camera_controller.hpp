@@ -59,16 +59,16 @@ public:
 
 signals:
     void videoInputsChanged(const QList<QCameraDevice>& devices);
-    void streamingStarted(const StreamingInfo& info);
+    void streamingStarted(const fluvel_app::StreamingInfo& info);
     void streamingStopped();
     void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
     void startupTimeout(const QByteArray& deviceId, double timeoutSec);
     void streamingLost(const QByteArray& deviceId, double frameAgeSec);
 
     void textStatsUpdated(const QString& textStats);
-    void imageAndContourUpdated(const UiFrame& uiFrame);
+    void imageAndContourUpdated(const fluvel_app::UiFrame& uiFrame);
 
-    void downscaleChanged(const DownscaleConfig& downscaleConfig);
+    void downscaleChanged(const fluvel_app::DownscaleConfig& downscaleConfig);
 
 private:
     void onVideoInputsChanged();
