@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Fluvel VERSION 1.0.0 LANGUAGES CXX)
 
+message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
+message(STATUS "C++ compiler ID: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
+
 option(ENABLE_ASAN "Enable Sanitizers" OFF)
 option(FLUVEL_UI_DESKTOP "Use QWidget UI on Mobile" ON)
 
