@@ -121,7 +121,14 @@ private:
     static QString pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt);
     static QString formatToString(const QCameraFormat& fmt);
     QCameraFormat getSelectedFormat() const;
+
     int findBestFormatIndex(const QList<QCameraFormat>& formats) const;
+
+    bool isYuv420(QVideoFrameFormat::PixelFormat fmt) const;
+    bool isYuv(QVideoFrameFormat::PixelFormat fmt) const;
+    bool is640x480(const QSize& s) const;
+    bool is30fps(float fps) const;
+
     void loadPreferredFormats();
     void savePreferredFormats();
 

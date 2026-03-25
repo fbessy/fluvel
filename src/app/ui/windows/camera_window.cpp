@@ -881,72 +881,56 @@ QString CameraWindow::formatToString(const QCameraFormat& fmt)
 
 int CameraWindow::findBestFormatIndex(const QList<QCameraFormat>& formats) const
 {
-    auto isYuv420 = [](auto fmt)
+    for (int i = 0; i < formats.size(); ++i)
     {
-        return fmt == QVideoFrameFormat::Format_YUV420P || fmt == QVideoFrameFormat::Format_NV12 ||
-               fmt == QVideoFrameFormat::Format_NV21;
-    };
+        const auto& f = formats[i];
+        if (isYuv420(f.pixelFormat()) && is640x480(f.resolution()) && is30fps(f.maxFrameRate()))
+            return i;
+    }
 
-    auto isYuv = [&](auto fmt)
+    for (int i = 0; i < formats.size(); ++i)
     {
-        return isYuv420(fmt) || fmt == QVideoFrameFormat::Format_YUYV;
-    };
+        const auto& f = formats[i];
+        if (isYuv(f.pixelFormat()) && is640x480(f.resolution()) && is30fps(f.maxFrameRate()))
+            return i;
+    }
 
-    auto is640x480 = [](const QSize& s)
+    for (int i = 0; i < formats.size(); ++i)
     {
-        return s.width() == 640 && s.height() == 480;
-    };
+        const auto& f = formats[i];
+        if (isYuv(f.pixelFormat()) && is640x480(f.resolution()))
+            return i;
+    }
 
-    auto is30fps = [](float fps)
+    for (int i = 0; i < formats.size(); ++i)
     {
-        return std::abs(fps - 30.0f) < 1.0f;
-    };
-
-    auto findIndex = [&](auto pred)
-    {
-        for (int i = 0; i < formats.size(); ++i)
-        {
-            if (pred(formats[i]))
-                return i;
-        }
-        return -1;
-    };
-
-    if (int i = findIndex(
-            [&](const auto& f)
-            {
-                return isYuv420(f.pixelFormat()) && is640x480(f.resolution()) &&
-                       is30fps(f.maxFrameRate());
-            });
-        i >= 0)
-        return i;
-
-    if (int i = findIndex(
-            [&](const auto& f)
-            {
-                return isYuv(f.pixelFormat()) && is640x480(f.resolution()) &&
-                       is30fps(f.maxFrameRate());
-            });
-        i >= 0)
-        return i;
-
-    if (int i = findIndex(
-            [&](const auto& f)
-            {
-                return isYuv(f.pixelFormat()) && is640x480(f.resolution());
-            });
-        i >= 0)
-        return i;
-
-    if (int i = findIndex(
-            [&](const auto& f)
-            {
-                return isYuv(f.pixelFormat());
-            });
-        i >= 0)
-        return i;
+        const auto& f = formats[i];
+        if (isYuv(f.pixelFormat()))
+            return i;
+    }
 
     return -1;
+}
+
+bool CameraWindow::isYuv420(QVideoFrameFormat::PixelFormat fmt) const
+{
+    return fmt == QVideoFrameFormat::Format_YUV420P || fmt == QVideoFrameFormat::Format_NV12 ||
+           fmt == QVideoFrameFormat::Format_NV21;
+}
+
+bool CameraWindow::isYuv(QVideoFrameFormat::PixelFormat fmt) const
+{
+    return isYuv420(fmt) || fmt == QVideoFrameFormat::Format_YUYV;
+}
+
+bool CameraWindow::is640x480(const QSize& s) const
+{
+    return s.width() == 640 && s.height() == 480;
+}
+
+bool CameraWindow::is30fps(float fps) const
+{
+    return std::abs(fps - 30.0f) < 1.0f;
 }
 
 static constexpr auto kCameraDeviceKey = "camera/device";
