@@ -25,7 +25,7 @@ class QCloseEvent;
 namespace fluvel_app
 {
 
-class StreamingInfo;
+struct StreamingInfo;
 class CameraController;
 class CameraSettingsWindow;
 class RightPanelToggleButton;
