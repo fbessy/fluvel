@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#if defined(Q_OS_ANDROID) && !defined(FLUVEL_UI_DESKTOP)
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
+#include <QtGlobal>
+
+// clang-format off
+#if defined(Q_OS_ANDROID)
+    #if defined(FLUVEL_UI_DESKTOP)
+        #include "camera_window.hpp"
+    #else
+        #include <QQmlApplicationEngine>
+        #include <QQmlContext>
+    #endif
 #else
-#include "camera_window.hpp"
-#include "image_window.hpp"
+    #include "image_window.hpp"
 #endif
+// clang-format on
 
 #include "application_settings.hpp"
 #include "frame_clock.hpp"
