@@ -90,6 +90,12 @@ void ImageViewerWidget::setupItems()
 void ImageViewerWidget::setupGlobalOverlays()
 {
     zoomOverlayItem_ = new OverlayTextItem;
+    zoomOverlayItem_->setAcceptedMouseButtons(Qt::NoButton);
+    zoomOverlayItem_->setFlag(QGraphicsItem::ItemIsSelectable, false);
+    zoomOverlayItem_->setFlag(QGraphicsItem::ItemIsMovable, false);
+    zoomOverlayItem_->setAcceptHoverEvents(false);
+    zoomOverlayItem_->setZValue(1000);
+
     scene_->addItem(zoomOverlayItem_);
 
     zoomOverlayController_ = new ZoomOverlayController(zoomOverlayItem_, this);
@@ -460,7 +466,7 @@ void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoin
 
     zoomOverlayController_->show(percent);
 
-    const QPoint zoomOverlayPosition = cursorPosition + QPoint(20, -20);
+    const QPoint zoomOverlayPosition = cursorPosition + QPoint(20, -26);
 
     setTextPosition(zoomOverlayPosition, zoomOverlayItem_);
 }
