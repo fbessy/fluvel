@@ -45,6 +45,8 @@ public:
     explicit ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
                        QWidget* parent = nullptr);
 
+    ~ImageViewerWidget() override;
+
     void setInteraction(ImageViewerInteraction* interaction);
     void setListener(ImageViewerListener* listener);
 

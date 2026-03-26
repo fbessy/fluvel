@@ -45,6 +45,12 @@ ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig,
     updateSmoothDisplay();
 }
 
+ImageViewerWidget::~ImageViewerWidget()
+{
+    delete interaction_;
+    interaction_ = nullptr;
+}
+
 void ImageViewerWidget::initializeView()
 {
     setupView();
@@ -508,6 +514,7 @@ void ImageViewerWidget::resizeEvent(QResizeEvent* event)
 
 void ImageViewerWidget::setInteraction(ImageViewerInteraction* interaction)
 {
+    delete interaction_;
     interaction_ = interaction;
 }
 
