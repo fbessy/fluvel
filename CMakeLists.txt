@@ -6,8 +6,13 @@ message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "C++ compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 
-option(ENABLE_ASAN "Enable Sanitizers" OFF)
 option(FLUVEL_UI_DESKTOP "Use QWidget UI on Mobile" ON)
+option(ENABLE_UNITY_BUILD "Enable unity build" ON)
+option(ENABLE_ASAN "Enable Sanitizers" OFF)
+
+if(ENABLE_UNITY_BUILD)
+    set(CMAKE_UNITY_BUILD ON)
+endif()
 
 if(ENABLE_ASAN)
     message(STATUS "Sanitizers ENABLED")
@@ -52,6 +57,7 @@ if((ANDROID OR IOS) AND NOT FLUVEL_UI_DESKTOP)
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
+qt_policy(SET QTP0002 NEW)
 
 add_subdirectory(src/image_processing)
 add_subdirectory(src/app)
