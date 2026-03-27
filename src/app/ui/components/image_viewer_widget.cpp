@@ -279,6 +279,14 @@ void ImageViewerWidget::updatePixmapItem(const QImage& img)
     assert(pixmapItem_);
 
     pixmapItem_->setPixmap(QPixmap::fromImage(img));
+
+#ifdef FLUVEL_DEBUG
+    qDebug() << "IMG null:" << img.isNull();
+    qDebug() << "IMG format:" << img.format();
+    qDebug() << "PIX null:" << pixmapItem_->pixmap().isNull();
+    qDebug() << "IMG size:" << img.size();
+#endif
+
     lastDisplayedImage_ = img;
 }
 

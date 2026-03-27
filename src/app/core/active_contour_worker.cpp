@@ -195,19 +195,20 @@ void ActiveContourWorker::applyProcessing()
     workerTimer_->stop();
     setState(WorkerState::Initializing);
 
-    processedImage_ = image_;
-
+    //--------------------------------------------------
+    // 1. Conversion FORMAT STRICT attendu par l'algo
+    //--------------------------------------------------
     QImage img;
-
-    int channelsNbr = 3;
+    int channelsNbr = 0;
 
     if (image_.format() == QImage::Format_Grayscale8)
     {
         img = image_;
         channelsNbr = 1;
     }
-    else if (image_.format() == QImage::Format_RGB32)
+    else
     {
+        // 👉 on force TOUJOURS RGB888 (clé du problème)
         img = image_.convertToFormat(QImage::Format_RGB888);
         channelsNbr = 3;
     }
@@ -216,80 +217,101 @@ void ActiveContourWorker::applyProcessing()
         return;
 
     const int width = img.width();
+    const int height = img.height();
 
-    if (img.bytesPerLine() != static_cast<qsizetype>(width * channelsNbr))
-        return;
+    //--------------------------------------------------
+    // 2. Garantir buffer PACKED (stride = width * channels)
+    //--------------------------------------------------
+    const unsigned char* dataPtr = nullptr;
+    std::vector<unsigned char> packedBuffer;
 
-    const qsizetype stride = img.bytesPerLine();
+    const qsizetype expectedStride = static_cast<qsizetype>(width * channelsNbr);
 
-    const int bytesPerPixel = static_cast<int>(stride / width);
+    if (img.bytesPerLine() == expectedStride)
+    {
+        dataPtr = img.constBits(); // ✅ const correct
+    }
+    else
+    {
+        packedBuffer.resize(static_cast<std::size_t>(width * height * channelsNbr));
 
-    fluvel_ip::Filters filters(img.constBits(), width, img.height(), bytesPerPixel);
+        for (int y = 0; y < height; ++y)
+        {
+            const uchar* src = img.constScanLine(y);
+            uchar* dst = packedBuffer.data() + y * width * channelsNbr;
 
+            memcpy(dst, src, static_cast<std::size_t>(width * channelsNbr));
+        }
+
+        dataPtr = packedBuffer.data(); // implicit const OK
+    }
+
+    //--------------------------------------------------
+    // 3. Pipeline filtres (buffer TOUJOURS valide ici)
+    //--------------------------------------------------
     const auto& fc = config_.processing;
 
     if (fc.hasProcessing())
     {
+        fluvel_ip::Filters filters(dataPtr, width, height, channelsNbr);
+
+        //--------------------------------------------------
+        // Bruits
+        //--------------------------------------------------
         if (fc.has_gaussian_noise)
-        {
             filters.gaussian_white_noise(fc.std_noise);
-        }
+
         if (fc.has_salt_noise)
-        {
             filters.impulsive_noise(fc.proba_noise);
-        }
+
         if (fc.has_speckle_noise)
-        {
             filters.speckle(fc.std_speckle_noise);
-        }
 
+        //--------------------------------------------------
+        // Filtres linéaires
+        //--------------------------------------------------
         if (fc.has_mean_filt)
-        {
             filters.mean_filtering(fc.kernel_mean_length);
-        }
-        if (fc.has_gaussian_filt)
-        {
-            filters.gaussian_filtering(fc.kernel_gaussian_length, fc.sigma);
-        }
 
+        if (fc.has_gaussian_filt)
+            filters.gaussian_filtering(fc.kernel_gaussian_length, fc.sigma);
+
+        //--------------------------------------------------
+        // Médian
+        //--------------------------------------------------
         if (fc.has_median_filt)
         {
             if (fc.has_O1_algo)
-            {
                 filters.median_filtering_o1(fc.kernel_median_length);
-            }
             else
-            {
                 filters.median_filtering_oNlogN(fc.kernel_median_length);
-            }
         }
+
+        //--------------------------------------------------
+        // Diffusion anisotrope
+        //--------------------------------------------------
         if (fc.has_aniso_diff)
         {
             filters.anisotropic_diffusion(fc.max_itera, fc.lambda, fc.kappa, fc.aniso_option);
         }
 
+        //--------------------------------------------------
+        // Morphologie
+        //--------------------------------------------------
         if (fc.has_open_filt)
         {
             if (fc.has_O1_morpho)
-            {
                 filters.opening_o1(fc.kernel_open_length);
-            }
             else
-            {
                 filters.opening(fc.kernel_open_length);
-            }
         }
 
         if (fc.has_close_filt)
         {
             if (fc.has_O1_morpho)
-            {
                 filters.closing_o1(fc.kernel_close_length);
-            }
             else
-            {
                 filters.closing(fc.kernel_close_length);
-            }
         }
 
         if (fc.has_top_hat_filt)
@@ -297,41 +319,44 @@ void ActiveContourWorker::applyProcessing()
             if (fc.is_white_top_hat)
             {
                 if (fc.has_O1_morpho)
-                {
                     filters.white_top_hat_o1(fc.kernel_tophat_length);
-                }
                 else
-                {
                     filters.white_top_hat(fc.kernel_tophat_length);
-                }
             }
             else
             {
                 if (fc.has_O1_morpho)
-                {
                     filters.black_top_hat_o1(fc.kernel_tophat_length);
-                }
                 else
-                {
                     filters.black_top_hat(fc.kernel_tophat_length);
-                }
             }
         }
 
-        if (img.format() == QImage::Format_RGB888)
+        //--------------------------------------------------
+        // 4. Reconstruction QImage (SAFE)
+        //--------------------------------------------------
+        const unsigned char* out = filters.get_filtered();
+
+        if (channelsNbr == 3)
         {
-            processedImage_ =
-                QImage(filters.get_filtered(), img.width(), img.height(), QImage::Format_RGB888)
-                    .convertToFormat(QImage::Format_RGB32);
+            QImage tmp(out, width, height, width * channelsNbr, QImage::Format_RGB888);
+            processedImage_ = tmp.convertToFormat(QImage::Format_RGB32).copy();
         }
-        else if (img.format() == QImage::Format_Grayscale8)
+        else
         {
-            processedImage_ =
-                QImage(filters.get_filtered(), img.width(), img.height(), QImage::Format_Grayscale8)
-                    .copy();
+            QImage tmp(out, width, height, width * channelsNbr, QImage::Format_Grayscale8);
+            processedImage_ = tmp.copy();
         }
     }
+    else
+    {
+        // 👉 pas de processing → on garde l'image convertie
+        processedImage_ = img;
+    }
 
+    //--------------------------------------------------
+    // 5. Emit
+    //--------------------------------------------------
     if (!processedImage_.isNull())
         emit processedImageReady(processedImage_);
 }
