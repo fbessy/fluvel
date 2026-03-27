@@ -27,8 +27,8 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
     source_rb_ = new QRadioButton(tr("Source"));
     preprocessed_rb_ = new QRadioButton(tr("Preprocessed"));
-    source_rb_->setChecked(config_.image == ImageBase::Source);
-    preprocessed_rb_->setChecked(config_.image == ImageBase::Preprocessed);
+    source_rb_->setChecked(config_.mode == ImageDisplayMode::Source);
+    preprocessed_rb_->setChecked(config_.mode == ImageDisplayMode::Preprocessed);
 
     QVBoxLayout* pipeline_layout = new QVBoxLayout;
     pipeline_layout->addWidget(source_rb_);
@@ -138,7 +138,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                 if (!checked)
                     return;
 
-                config_.image = ImageBase::Source;
+                config_.mode = ImageDisplayMode::Source;
                 displayConfigChanged(config_);
             });
 
@@ -148,7 +148,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                 if (!checked)
                     return;
 
-                config_.image = ImageBase::Preprocessed;
+                config_.mode = ImageDisplayMode::Preprocessed;
                 displayConfigChanged(config_);
             });
 

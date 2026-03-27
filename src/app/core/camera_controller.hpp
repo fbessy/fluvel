@@ -103,7 +103,6 @@ private:
     QTimer* watchdogTimer_ = nullptr;
     QTimer* diagnosticsTimer_ = nullptr;
 
-    DisplayConfig displayConfig_;
     StreamingState state_ = StreamingState::Stopped;
     QByteArray deviceId_;
 

@@ -218,10 +218,7 @@ void CameraController::onDisplayFrameReady(const DisplayFrame& displayFrame)
 {
     UiFrame uiDisplayFrame;
 
-    if (displayConfig_.image == ImageBase::Source)
-        uiDisplayFrame.image = displayFrame.input;
-    else if (displayConfig_.image == ImageBase::Preprocessed)
-        uiDisplayFrame.image = displayFrame.preprocessed;
+    uiDisplayFrame.image = displayFrame.image;
 
     if (uiDisplayFrame.image.isNull())
         return;
@@ -315,7 +312,7 @@ void CameraController::onVideoSettingsChanged(const VideoSessionSettings& sessio
 
 void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
 {
-    displayConfig_ = display;
+    activeContourThread_.setDisplayMode(display.mode);
 }
 
 bool CameraController::isStreaming() const

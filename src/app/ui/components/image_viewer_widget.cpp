@@ -818,7 +818,7 @@ void ImageViewerWidget::upscaleItems()
 
     qreal factor = 1.0;
 
-    if (has_ds && displayConfig_.image == ImageBase::Source)
+    if (has_ds && displayConfig_.mode == ImageDisplayMode::Source)
         factor = qreal(df);
 
     outerContour_->setScale(factor);

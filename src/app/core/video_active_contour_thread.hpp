@@ -28,6 +28,7 @@ public:
     void stop();
 
     void setAlgoConfig(const VideoComputeConfig& config);
+    void setDisplayMode(ImageDisplayMode mode);
 
 signals:
     void frameProcessed(quint64 contourSize);
@@ -40,16 +41,17 @@ private:
 
     QImage convertFrame(QVideoFrame frame) const;
     QImage applyDownscale(const QImage& input, const DownscaleConfig& config) const;
-    DisplayFrame processFrame(const QVideoFrame& frame);
+    DisplayFrame processFrame(const QVideoFrame& inputFrame);
 
     void exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
-                                     const VideoComputeConfig& config, DisplayFrame& displayFrame);
+                                     DisplayFrame& displayFrame);
 
     void exportContours(DisplayFrame& displayFrame);
 
     static constexpr qint64 kTimeSliceMs = 20;
 
     VideoComputeConfig config_;
+    ImageDisplayMode displayMode_;
 
     QMutex frameMutex_;
     QWaitCondition condition_;
@@ -57,6 +59,7 @@ private:
     bool frameAvailable_{false};
     bool running_{true};
     bool configChanged_{false};
+    bool displayModeChanged_{false};
 
     std::unique_ptr<fluvel_ip::RegionColorAc> activeContour_;
     QSize currentSize_ = {0, 0};

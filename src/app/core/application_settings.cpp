@@ -299,7 +299,7 @@ void ApplicationSettings::saveDisplay(Session session, const DisplayConfig& disp
 
     settings.setValue("display/algorithm_overlay", displayConfig.algorithm_overlay);
 
-    settings.setValue("display/base_image", to_string(displayConfig.image));
+    settings.setValue("display/mode", to_string(displayConfig.mode));
 
     settings.setValue("display/mirror_mode", displayConfig.mirrorMode);
 
@@ -504,11 +504,11 @@ void ApplicationSettings::loadDisplay(Session session, DisplayConfig& displayCon
 
     const QString s =
         settings
-            .value("display/base_image",
-                   QString::fromStdString(to_string(DisplayConfig::kDefaultImageBase)))
+            .value("display/mode",
+                   QString::fromStdString(to_string(DisplayConfig::kDefaultDisplayMode)))
             .toString();
 
-    displayConfig.image = ib_from_string(s.toStdString());
+    displayConfig.mode = ib_from_string(s.toStdString());
 
     displayConfig.mirrorMode =
         settings.value("display/mirror_mode", DisplayConfig::kDefaultOptions).toBool();

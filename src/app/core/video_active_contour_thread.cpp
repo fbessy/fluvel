@@ -95,27 +95,29 @@ QImage VideoActiveContourThread::applyDownscale(const QImage& input,
 DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 {
     VideoComputeConfig config;
+    ImageDisplayMode displayMode;
 
     {
         QMutexLocker locker(&frameMutex_);
         config = config_;
+        displayMode = displayMode_;
     }
 
     DisplayFrame df;
-    df.input = convertFrame(frame);
+    QImage inputImage = convertFrame(frame);
 
-    if (df.input.isNull())
+    if (inputImage.isNull())
         return df;
 
-    df.preprocessed = applyDownscale(df.input, config.downscale);
+    QImage preprocessed = applyDownscale(inputImage, config.downscale);
 
-    if (df.preprocessed.isNull())
+    if (preprocessed.isNull())
         return df;
 
-    auto algoImage = image_view_from_qimage(df.preprocessed);
+    auto algoImage = image_view_from_qimage(preprocessed);
     const auto& algoConfig = config.algo;
 
-    const auto newWSize = df.preprocessed.size();
+    const auto newWSize = preprocessed.size();
 
     if (!activeContour_ || configChanged_ || newWSize != currentSize_)
     {
@@ -152,7 +154,18 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         activeContour_->runCycles(1);
     }
 
-    exportTemporalFilteredImage(algoImage, config, df);
+    if (displayMode == ImageDisplayMode::Source)
+    {
+        df.image = inputImage;
+    }
+    else if (displayMode == ImageDisplayMode::Preprocessed)
+    {
+        if (config.hasTemporalFiltering)
+            exportTemporalFilteredImage(algoImage, df);
+        else
+            df.image = preprocessed;
+    }
+
     exportContours(df);
 
     df.processTimestampNs = FrameClock::nowNs();
@@ -161,13 +174,9 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 }
 
 void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
-                                                           const VideoComputeConfig& config,
                                                            DisplayFrame& displayFrame)
 {
-    if (!config.hasTemporalFiltering)
-        return;
-
-    displayFrame.preprocessed =
+    displayFrame.image =
         QImage(algoImage.data(), algoImage.width(), algoImage.height(),
                static_cast<qsizetype>(3 * algoImage.width()), QImage::Format_RGB888);
 }
@@ -193,6 +202,13 @@ void VideoActiveContourThread::setAlgoConfig(const VideoComputeConfig& config)
     QMutexLocker locker(&frameMutex_);
     config_ = config;
     configChanged_ = true;
+}
+
+void VideoActiveContourThread::setDisplayMode(ImageDisplayMode mode)
+{
+    QMutexLocker locker(&frameMutex_);
+    displayMode_ = mode;
+    displayModeChanged_ = true;
 }
 
 } // namespace fluvel_app

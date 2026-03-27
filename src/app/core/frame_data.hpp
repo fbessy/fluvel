@@ -20,8 +20,7 @@ struct CapturedFrame
 
 struct DisplayFrame
 {
-    QImage input;
-    QImage preprocessed;
+    QImage image;
     fluvel_ip::ExportedContour outerContour;
     fluvel_ip::ExportedContour innerContour;
     qint64 receiveTimestampNs = 0;

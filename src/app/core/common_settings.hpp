@@ -62,36 +62,36 @@ enum class Session
     Camera
 };
 
-enum class ImageBase
+enum class ImageDisplayMode
 {
     Source,
     Preprocessed
 };
 
-inline constexpr const char* to_string(ImageBase ib)
+inline constexpr const char* to_string(ImageDisplayMode ib)
 {
     switch (ib)
     {
-        case ImageBase::Source:
+        case ImageDisplayMode::Source:
             return "source";
-        case ImageBase::Preprocessed:
+        case ImageDisplayMode::Preprocessed:
             return "preprocessed";
     }
     return "source";
 }
 
-inline ImageBase ib_from_string(std::string_view s)
+inline ImageDisplayMode ib_from_string(std::string_view s)
 {
     if (s == "source")
-        return ImageBase::Source;
+        return ImageDisplayMode::Source;
     if (s == "preprocessed")
-        return ImageBase::Preprocessed;
-    return ImageBase::Source;
+        return ImageDisplayMode::Preprocessed;
+    return ImageDisplayMode::Source;
 }
 
 struct DisplayConfig
 {
-    static constexpr ImageBase kDefaultImageBase = ImageBase::Preprocessed;
+    static constexpr ImageDisplayMode kDefaultDisplayMode = ImageDisplayMode::Preprocessed;
 
     static constexpr bool kDefaultListDisplayed = true;
     static constexpr fluvel_ip::Rgb_uc kDefaultOut{64u, 0u, 255u};
@@ -100,7 +100,7 @@ struct DisplayConfig
     static constexpr bool kDefaultOptions = false;
     static constexpr bool kDefaultOverlay = true;
 
-    ImageBase image = kDefaultImageBase;
+    ImageDisplayMode mode = kDefaultDisplayMode;
 
     bool l_out_displayed = kDefaultListDisplayed;
     fluvel_ip::Rgb_uc l_out_color{kDefaultOut};
