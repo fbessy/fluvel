@@ -13,8 +13,7 @@ class EdgeAc : public ActiveContour
 {
 public:
     //! Constructor to initialize with an initial contour.
-    template <typename T>
-    EdgeAc(ImageView gradient_image, T&& initial_contour,
+    EdgeAc(ImageView gradient_image, ContourData initialContour,
            const AcConfig& config = AcConfig()); /* optional parameter */
 
     ~EdgeAc() override = default;
@@ -45,17 +44,5 @@ private:
     //! Global optimal threshold of #img_gradient_data.
     const unsigned char threshold_;
 };
-
-template <typename T>
-EdgeAc::EdgeAc(ImageView gradient_image, T&& initial_contour,
-               const AcConfig& config) /* optional parameter with AcConfig() */
-    : ActiveContour(std::forward<T>(initial_contour), config)
-    , gradient_image_(gradient_image)
-    , global_speed_sign_(get_global_speed_sign())
-    , threshold_(do_otsu_method(gradient_image))
-{
-    assert(gradient_image_.width() == cd_.phi().width() &&
-           gradient_image_.height() == cd_.phi().height());
-}
 
 } // namespace fluvel_ip

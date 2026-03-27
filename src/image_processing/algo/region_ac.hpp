@@ -13,9 +13,8 @@ class RegionAc : public ActiveContour
 {
 public:
     //! Constructor to initialize with an initial contour.
-    template <typename T>
-    RegionAc(ImageView image, T&& initial_contour,
-             const AcConfig& general_config = AcConfig(),         /* optional parameter */
+    RegionAc(ImageView image, ContourData initialContour,
+             const AcConfig& generalConfig = AcConfig(),         /* optional parameter */
              const RegionConfig& regionConfig = RegionConfig()); /* optional parameter */
 
     ~RegionAc() override = default;
@@ -76,20 +75,5 @@ private:
     //! >0\f$ .
     int64_t pxl_nbr_out_{0};
 };
-
-template <typename T>
-RegionAc::RegionAc(ImageView image, T&& initial_contour,
-                   const AcConfig& general_config,    /* optional parameter with AcConfig() */
-                   const RegionConfig& regionConfig) /* optional parameter with RegionConfig() */
-    : ActiveContour(std::forward<T>(initial_contour), general_config)
-    , image_(image)
-    , regionConfig_(regionConfig)
-    , pxl_nbr_total_(image.size())
-{
-    assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
-
-    initialize_sums();
-    RegionAc::do_specific_cycle1();
-}
 
 } // namespace fluvel_ip

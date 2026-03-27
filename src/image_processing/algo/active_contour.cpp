@@ -13,32 +13,10 @@ namespace fluvel_ip
 {
 
 // Definitions
-ActiveContour::ActiveContour(const ContourData& initialState, const AcConfig& config)
-    : cd_(initialState)
-    , config_(config)
-    , internalKernel_(makeInternalKernelOffsets(config.diskRadius, initialState.phi().width()))
-    , ctxIn_(BoundarySwitchContext::makeSwitchIn(cd_))
-    , ctxOut_(BoundarySwitchContext::makeSwitchOut(cd_))
-    , ctx_(&ctxIn_)
-    , state_(PhaseState::Cycle1)
-    , ed_(cd_)
-{
-    activeBoundaryStaging_.reserve(cd_.l_out().capacity());
-
-    if (config_.hasCycle2)
-    {
-        steps_per_cycle_ = config_.Na + config_.Ns;
-    }
-    else
-    {
-        steps_per_cycle_ = config_.Na;
-    }
-}
-
-ActiveContour::ActiveContour(ContourData&& initialState, const AcConfig& config)
+ActiveContour::ActiveContour(ContourData initialState, const AcConfig& config)
     : cd_(std::move(initialState))
     , config_(config)
-    , internalKernel_(makeInternalKernelOffsets(config.diskRadius, cd_.phi().width()))
+    , internalKernel_(makeInternalKernelOffsets(config.diskRadius, initialState.phi().width()))
     , ctxIn_(BoundarySwitchContext::makeSwitchIn(cd_))
     , ctxOut_(BoundarySwitchContext::makeSwitchOut(cd_))
     , ctx_(&ctxIn_)

@@ -4,10 +4,26 @@
 #include "region_ac.hpp"
 
 #include "fluvel_math.hpp"
+
+#include <cassert>
 #include <cmath>
 
 namespace fluvel_ip
 {
+
+RegionAc::RegionAc(ImageView image, ContourData initialContour,
+                   const AcConfig& generalConfig,    /* optional parameter with AcConfig() */
+                   const RegionConfig& regionConfig) /* optional parameter with RegionConfig() */
+    : ActiveContour(std::move(initialContour), generalConfig)
+    , image_(image)
+    , regionConfig_(regionConfig)
+    , pxl_nbr_total_(image.size())
+{
+    assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
+
+    initialize_sums();
+    RegionAc::do_specific_cycle1();
+}
 
 void RegionAc::initialize_sums()
 {

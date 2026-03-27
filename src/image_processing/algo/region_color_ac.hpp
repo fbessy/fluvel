@@ -16,10 +16,9 @@ class RegionColorAc : public ActiveContour
 {
 public:
     ///! Constructor to initialize with an initial contour.
-    template <typename T>
     RegionColorAc(
-        ImageView image, T&& initial_contour,
-        const AcConfig& general_config = AcConfig(),                   /* optional parameter */
+        ImageView image, ContourData initialContour,
+        const AcConfig& generalConfig = AcConfig(),                   /* optional parameter */
         const RegionColorConfig& regionConfig = RegionColorConfig()); /* optional parameter */
 
     ~RegionColorAc() override = default;
@@ -100,24 +99,6 @@ private:
     Rgb_64i sum2_out_;
     Rgb_64i sum2_total_;
 };
-
-// Definitions
-
-template <typename T>
-RegionColorAc::RegionColorAc(
-    ImageView image, T&& initial_contour,
-    const AcConfig& general_config,         /* optional parameter with AcConfig() */
-    const RegionColorConfig& regionConfig) /* optional parameter with RegionColorConfig() */
-    : ActiveContour(std::forward<T>(initial_contour), general_config)
-    , image_(image)
-    , regionConfig_(regionConfig)
-    , pxl_nbr_total_(image.size())
-{
-    assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
-
-    initialize_sums();
-    RegionColorAc::do_specific_cycle1();
-}
 
 } // namespace fluvel_ip
 

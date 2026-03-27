@@ -120,11 +120,7 @@ class ActiveContour
 public:
     //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and
     //! #l_out) with a copy semantic.
-    ActiveContour(const ContourData& initialState, const AcConfig& config);
-
-    //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and
-    //! #l_out) with a move semantic.
-    ActiveContour(ContourData&& initialState, const AcConfig& config);
+    ActiveContour(ContourData initialState, const AcConfig& config);
 
     //! Destructor.
     virtual ~ActiveContour() = default;

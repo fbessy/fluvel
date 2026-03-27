@@ -9,6 +9,21 @@
 namespace fluvel_ip
 {
 
+RegionColorAc::RegionColorAc(
+    ImageView image, ContourData initialContour,
+    const AcConfig& generalConfig,         /* optional parameter with AcConfig() */
+    const RegionColorConfig& regionConfig) /* optional parameter with RegionColorConfig() */
+    : ActiveContour(std::move(initialContour), generalConfig)
+    , image_(image)
+    , regionConfig_(regionConfig)
+    , pxl_nbr_total_(image.size())
+{
+    assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
+
+    initialize_sums();
+    RegionColorAc::do_specific_cycle1();
+}
+
 void RegionColorAc::initialize_sums()
 {
     sum_total_ = {0, 0, 0};

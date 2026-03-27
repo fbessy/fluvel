@@ -4,12 +4,22 @@
 #include "edge_ac.hpp"
 #include "fluvel_math.hpp"
 
+#include <cassert>
 #include <cstring>
 
 namespace fluvel_ip
 {
 
-constexpr auto kGrayscaleDepth = 256u;
+EdgeAc::EdgeAc(ImageView gradient_image, ContourData initialContour,
+               const AcConfig& config) /* optional parameter with AcConfig() */
+    : ActiveContour(std::move(initialContour), config)
+    , gradient_image_(gradient_image)
+    , global_speed_sign_(get_global_speed_sign())
+    , threshold_(do_otsu_method(gradient_image))
+{
+    assert(gradient_image_.width() == cd_.phi().width() &&
+           gradient_image_.height() == cd_.phi().height());
+}
 
 void EdgeAc::computeExternalSpeedFd(ContourPoint& point)
 {
@@ -84,6 +94,8 @@ int EdgeAc::get_global_speed_sign() const
 
     return sign;
 }
+
+constexpr auto kGrayscaleDepth = 256u;
 
 unsigned char EdgeAc::do_otsu_method(ImageView image)
 {
