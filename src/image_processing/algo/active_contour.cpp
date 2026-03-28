@@ -194,7 +194,7 @@ bool ActiveContour::directionalSubstep(BoundarySwitch ctxChoice)
 
     activeBoundaryStaging_.clear();
 
-    computeSpeeds(active);
+    updateSpeeds(active);
 
     for (std::size_t i = 0; i < active.size();)
     {
