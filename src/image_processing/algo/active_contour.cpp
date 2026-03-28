@@ -140,7 +140,7 @@ void ActiveContour::stepCycle1()
     if (state_ != PhaseState::Cycle1)
         return;
 
-    do_specific_cycle1();
+    onStepCycle1();
 
     bool isOutwardMoving = directionalSubstep(BoundarySwitch::In);
     bool isInwardMoving = directionalSubstep(BoundarySwitch::Out);
@@ -194,7 +194,7 @@ bool ActiveContour::directionalSubstep(BoundarySwitch ctxChoice)
 
     activeBoundaryStaging_.clear();
 
-    computeSpeed(active);
+    computeSpeeds(active);
 
     for (std::size_t i = 0; i < active.size();)
     {
@@ -204,7 +204,7 @@ bool ActiveContour::directionalSubstep(BoundarySwitch ctxChoice)
         {
             isMoving = true;
 
-            doSpecificWhenSwitch(point, ctxChoice);
+            onSwitch(point, ctxChoice);
 
             switchBoundaryPoint(point);
         }
@@ -313,32 +313,32 @@ void ActiveContour::promoteRegionToBoundary(int nx, int ny)
     }
 }
 
-void ActiveContour::computeSpeed(Contour& boundary)
+void ActiveContour::updateSpeeds(Contour& boundary)
 {
     assert(!isStopped());
 
     if (state_ == PhaseState::Cycle1)
     {
-        computeExternalSpeedFd(boundary);
+        computeSpeeds(boundary);
     }
     else if (state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2)
     {
-        computeInternalSpeedFint(boundary);
+        computeInternalSpeeds(boundary);
     }
 }
 
-void ActiveContour::computeExternalSpeedFd(Contour& boundary)
+void ActiveContour::computeSpeeds(Contour& boundary)
 {
     assert(state_ == PhaseState::Cycle1);
 
     for (auto& point : boundary)
     {
-        computeExternalSpeedFd(point);
+        computeSpeed(point);
     }
 }
 
 // input integer is an offset
-void ActiveContour::computeExternalSpeedFd(ContourPoint& point)
+void ActiveContour::computeSpeed(ContourPoint& point)
 {
     assert(state_ == PhaseState::Cycle1);
 
@@ -347,13 +347,13 @@ void ActiveContour::computeExternalSpeedFd(ContourPoint& point)
     point.setSpeed(SpeedValue::GoInward);
 }
 
-void ActiveContour::computeInternalSpeedFint(Contour& boundary)
+void ActiveContour::computeInternalSpeeds(Contour& boundary)
 {
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 
     for (auto& point : boundary)
     {
-        computeInternalSpeedFint(point);
+        computeInternalSpeed(point);
     }
 }
 
@@ -389,7 +389,7 @@ InternalKernel ActiveContour::makeInternalKernelOffsets(int diskRadius, int grid
     return kernel;
 }
 
-void ActiveContour::computeInternalSpeedFint(ContourPoint& point)
+void ActiveContour::computeInternalSpeed(ContourPoint& point)
 {
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 

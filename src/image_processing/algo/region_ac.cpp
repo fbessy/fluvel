@@ -22,7 +22,7 @@ RegionAc::RegionAc(ImageView image, ContourData initialContour,
     assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
 
     initialize_sums();
-    RegionAc::do_specific_cycle1();
+    RegionAc::onStepCycle1();
 }
 
 void RegionAc::initialize_sums()
@@ -49,7 +49,7 @@ void RegionAc::initialize_sums()
     }
 }
 
-void RegionAc::do_specific_cycle1()
+void RegionAc::onStepCycle1()
 {
     if (pxl_nbr_out_ >= 1)
         meanOut_ = std::lround(static_cast<float>(sum_out_) / pxl_nbr_out_);
@@ -61,7 +61,7 @@ void RegionAc::do_specific_cycle1()
         meanIn_ = std::lround(static_cast<float>(sum_in) / pxl_nbr_in);
 }
 
-void RegionAc::computeExternalSpeedFd(ContourPoint& point)
+void RegionAc::computeSpeed(ContourPoint& point)
 {
     const int pxl = static_cast<int>(image_.at(point.x(), point.y()));
 
@@ -74,7 +74,7 @@ void RegionAc::computeExternalSpeedFd(ContourPoint& point)
     point.setSpeed(speed_value::get_discrete_speed(speed));
 }
 
-void RegionAc::doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
+void RegionAc::onSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
 {
     const int64_t intensity = static_cast<int64_t>(image_.at(point.x(), point.y()));
 

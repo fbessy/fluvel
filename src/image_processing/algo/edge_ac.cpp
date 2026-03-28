@@ -21,7 +21,7 @@ EdgeAc::EdgeAc(ImageView gradient_image, ContourData initialContour,
            gradient_image_.height() == cd_.phi().height());
 }
 
-void EdgeAc::computeExternalSpeedFd(ContourPoint& point)
+void EdgeAc::computeSpeed(ContourPoint& point)
 {
     const int x = point.x();
     const int y = point.y();

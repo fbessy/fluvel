@@ -21,7 +21,7 @@ RegionColorAc::RegionColorAc(
     assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
 
     initialize_sums();
-    RegionColorAc::do_specific_cycle1();
+    RegionColorAc::onStepCycle1();
 }
 
 void RegionColorAc::initialize_sums()
@@ -48,7 +48,7 @@ void RegionColorAc::initialize_sums()
     }
 }
 
-void RegionColorAc::do_specific_cycle1()
+void RegionColorAc::onStepCycle1()
 {
     if (pxl_nbr_out_ >= 1)
     {
@@ -95,7 +95,7 @@ Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
     std::unreachable();
 }
 
-void RegionColorAc::computeExternalSpeedFd(ContourPoint& point)
+void RegionColorAc::computeSpeed(ContourPoint& point)
 {
     const Rgb_uc rgb = image_.atPixelRgb(point.x(), point.y());
 
@@ -117,7 +117,7 @@ void RegionColorAc::computeExternalSpeedFd(ContourPoint& point)
     point.setSpeed(speed_value::get_discrete_speed(lambdaOut * speed_out - lambdaIn * speed_in));
 }
 
-void RegionColorAc::doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
+void RegionColorAc::onSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
 {
     const Rgb_64i rgb = static_cast<Rgb_64i>(image_.atPixelRgb(point.x(), point.y()));
 
@@ -140,7 +140,7 @@ void RegionColorAc::resetExecutionState(ImageView image)
     image_ = image;
 
     initialize_sums();
-    do_specific_cycle1();
+    onStepCycle1();
 }
 
 void RegionColorAc::fillDiagnostics(ContourDiagnostics& d) const

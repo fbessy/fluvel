@@ -215,19 +215,19 @@ private:
     bool directionalSubstep(BoundarySwitch ctxChoice);
 
     //! Computes the speed for all points of a boundary list #l_out or #l_in.
-    void computeSpeed(Contour& boundary);
+    void updateSpeeds(Contour& boundary);
 
     //! Computes the external speed Fd for all points of a boundary list #l_out or #l_in.
-    void computeExternalSpeedFd(Contour& boundary);
+    void computeSpeeds(Contour& boundary);
 
     //! Computes the external speed \a Fd for a current point (\a x,\a y) of #l_out or #l_in.
-    virtual void computeExternalSpeedFd(ContourPoint& point);
+    virtual void computeSpeed(ContourPoint& point);
 
     //! Computes the internal speed  Fint for all points of a boundary list #l_out or #l_in.
-    void computeInternalSpeedFint(Contour& boundary);
+    void computeInternalSpeeds(Contour& boundary);
 
     //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
-    void computeInternalSpeedFint(ContourPoint& point);
+    void computeInternalSpeed(ContourPoint& point);
 
     //! Generic method to handle outward / inward local movement of a current boundary point (of
     //! #l_out or #l_in) and to switch it from one boundary list to the other.
@@ -237,12 +237,12 @@ private:
     void promoteRegionToBoundary(int nx, int ny);
 
     //! Specific step for each iteration in cycle 1.
-    virtual void do_specific_cycle1()
+    virtual void onStepCycle1()
     {
     }
 
     //! Specific step when switch in or a switch out procedure is performed.
-    virtual void doSpecificWhenSwitch(const ContourPoint& /*point*/, BoundarySwitch)
+    virtual void onSwitch(const ContourPoint& /*point*/, BoundarySwitch)
     {
     }
 

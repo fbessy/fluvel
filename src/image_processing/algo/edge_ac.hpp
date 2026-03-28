@@ -27,7 +27,7 @@ public:
 private:
     //! Computes external speed \a Fd with a geodesic model for a current point \a (x,y) of
     //! #l_out or #l_in.
-    void computeExternalSpeedFd(ContourPoint& point) override;
+    void computeSpeed(ContourPoint& point) override;
 
     //! Gets the global speed sign to evolve the initial active contour is the good way.
     int get_global_speed_sign() const;

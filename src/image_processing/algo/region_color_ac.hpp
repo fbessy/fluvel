@@ -47,15 +47,15 @@ private:
     //! Calculates means #CoutYUV and #CinYUV in \a O(1) or accounting for the previous updates
     //! of (#sum_out_R, #sum_out_G, #sum_out_B) and (#sum_in_R, #sum_in_G, #sum_in_B), in \a
     //! O(#lists_length) and not in \a O(#img_size).
-    void do_specific_cycle1() override;
+    void onStepCycle1() override;
 
     //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of
     //! #l_out or #l_in.
-    void computeExternalSpeedFd(ContourPoint& point) override;
+    void computeSpeed(ContourPoint& point) override;
 
     //! Updates the six sums, #n_in and #n_out, before each #switch_in, in the cycle 1, in order
     //! to calculate means #CoutYUV and #CinYUV.
-    void doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice) override;
+    void onSwitch(const ContourPoint& point, BoundarySwitch ctxChoice) override;
 
     //! Calculates components \a of a color space (in function of the color space option) with a
     //! rgb value.
@@ -200,7 +200,7 @@ private:
  */
 
 /**
- * \fn virtual signed char RegionColorAc::computeExternalSpeedFd(ContourPoint& point)
+ * \fn virtual signed char RegionColorAc::computeSpeed(ContourPoint& point)
  * \param offset offset of the image data buffer with \a offset = \a x + \a y × #img_width
  */
 
