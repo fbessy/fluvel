@@ -200,7 +200,7 @@ bool ActiveContour::directionalSubstep(BoundarySwitch ctxChoice)
     {
         auto& point = active[i];
 
-        if (point.speed_ == ctx.requiredSpeedSign)
+        if (point.speed() == ctx.requiredSpeedSign)
         {
             isMoving = true;
 
@@ -344,7 +344,7 @@ void ActiveContour::computeExternalSpeedFd(ContourPoint& point)
 
     // this class should never be instantiated
     // reimplement a better and data-dependent speed function in a child class
-    point.speed_ = SpeedValue::GoInward;
+    point.setSpeed(SpeedValue::GoInward);
 }
 
 void ActiveContour::computeInternalSpeedFint(Contour& boundary)
@@ -445,11 +445,11 @@ void ActiveContour::computeInternalSpeedFint(ContourPoint& point)
 
     // intentionally inverted, here.
     if (inside > outside)
-        point.speed_ = SpeedValue::GoOutward;
+        point.setSpeed(SpeedValue::GoOutward);
     else if (outside > inside)
-        point.speed_ = SpeedValue::GoInward;
+        point.setSpeed(SpeedValue::GoInward);
     else
-        point.speed_ = SpeedValue::NoMove;
+        point.setSpeed(SpeedValue::NoMove);
 }
 
 void ActiveContour::stop()
