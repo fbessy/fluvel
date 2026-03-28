@@ -71,7 +71,7 @@ void RegionAc::computeExternalSpeedFd(ContourPoint& point)
     const int speed = regionConfig_.lambdaOut * (math::square(diffOut)) -
                       regionConfig_.lambdaIn * (math::square(diffIn));
 
-    point.speed_ = speed_value::get_discrete_speed(speed);
+    point.setSpeed(speed_value::get_discrete_speed(speed));
 }
 
 void RegionAc::doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)

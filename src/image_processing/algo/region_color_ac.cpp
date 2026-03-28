@@ -114,7 +114,7 @@ void RegionColorAc::computeExternalSpeedFd(ContourPoint& point)
     const int speed_out = veloc_out.scalar();
     const int speed_in = veloc_in.scalar();
 
-    point.speed_ = speed_value::get_discrete_speed(lambdaOut * speed_out - lambdaIn * speed_in);
+    point.setSpeed(speed_value::get_discrete_speed(lambdaOut * speed_out - lambdaIn * speed_in));
 }
 
 void RegionColorAc::doSpecificWhenSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)

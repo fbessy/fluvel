@@ -58,6 +58,16 @@ public:
         return y_;
     }
 
+    SpeedValue speed() const noexcept
+    {
+        return speed_;
+    }
+
+    void setSpeed(SpeedValue s) noexcept
+    {
+        speed_ = s;
+    }
+
     bool operator==(const ContourPoint& other) const noexcept
     {
         return x_ == other.x_ && y_ == other.y_;
@@ -74,11 +84,6 @@ private:
 
     //! Pending sign speed of the algorithm to drive the contour
     SpeedValue speed_;
-
-    friend class ActiveContour;
-    friend class RegionAc;
-    friend class RegionColorAc;
-    friend class EdgeAc;
 };
 
 using Contour = std::vector<ContourPoint>;
