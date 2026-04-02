@@ -29,69 +29,69 @@ class AnalysisWidget : public QWidget, public ImageViewerListener
 public:
     AnalysisWidget(QWidget* parent = nullptr);
 
-    int get_img_width() const
+    int imageWidth() const
     {
-        return img_width_;
+        return imageWidth_;
     }
-    int get_img_height() const
+    int imageHeight() const
     {
-        return img_height_;
+        return imageHeight_;
     }
 
-    fluvel_ip::Shape& get_shape()
+    fluvel_ip::Shape& shape()
     {
         return shape_;
     }
-    const QImage get_image() const
+    const QImage image() const
     {
-        return img_;
+        return image_;
     }
-    const fluvel_ip::Rgb_uc& get_rgb() const
+    const fluvel_ip::Rgb_uc& rgb() const
     {
         return rgb_;
     }
 
-    void save_settings() const;
+    void saveSettings() const;
 
 private:
-    void create_list();
+    void createList();
 
-    QLabel* text_list_length_;
-    QString absolute_name_;
-    QLabel* name_label_;
+    QLabel* textListLength_;
+    QString absoluteName_;
+    QLabel* nameLabel_;
     ImageViewerWidget* imageViewer_;
-    QPushButton* open_button_;
+    QPushButton* openButton_;
 
-    QComboBox* color_list_;
+    QComboBox* colorList_;
     fluvel_ip::Rgb_uc selected_;
-    QSpinBox* noise_sp_;
+    QSpinBox* noiseSp_;
 
-    QImage img_;
-    QImage img_noise_;
-    int img_width_{0};
-    int img_height_{0};
+    QImage image_;
+    QImage noiseImage_;
+    int imageWidth_{0};
+    int imageHeight_{0};
 
     fluvel_ip::Shape shape_;
     fluvel_ip::Rgb_uc rgb_;
 
-    QString last_directory_used_;
-    QStringList name_filters_;
+    QString lastDirectoryUsed_;
+    QStringList nameFilters_;
 
-    static int count_this;
-    int id_this_;
+    static int countThis;
+    int idThis_;
 
 private slots:
 
-    void open_filename();
-    void open_img();
-    void get_list_color();
-    void refresh_rgb(int);
-    void refresh_img_noise(int noise_percent);
+    void openFilename();
+    void openImage();
+    void getListColor();
+    void refreshRgb(int);
+    void refreshNoiseImage(int noise_percent);
     void onColorPicked(const QColor& color, const QPoint& /*imagePos*/) override;
 
 signals:
 
-    void change_list();
+    void listChanged();
 };
 
 } // namespace fluvel_app

@@ -32,14 +32,14 @@ public:
     //! A parametric constructor with a pointer on the QWidget parent.
     AnalysisWindow(QWidget* parent);
 
-    void check_lists();
+    void checkLists();
 
 protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    void compute_hd();
-    void refresh_quantile(int hundredth);
+    void computeHd();
+    void refreshQuantile(int hundredth);
 
     void calculateShapesIntersection();
 

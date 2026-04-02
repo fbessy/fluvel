@@ -57,7 +57,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     input_layout->addLayout(lists_select_layout);
     input_layout->addWidget(computeButton_);
 
-    connect(computeButton_, &QPushButton::clicked, this, &AnalysisWindow::compute_hd);
+    connect(computeButton_, &QPushButton::clicked, this, &AnalysisWindow::computeHd);
 
     ///////////////////////////////////////
     ///////////////////////////////////////
@@ -89,7 +89,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     hundredth_layout->addRow("hundredth =", hundredthSp_);
 
     connect(hundredthSp_, QOverload<int>::of(&QSpinBox::valueChanged), this,
-            &AnalysisWindow::refresh_quantile);
+            &AnalysisWindow::refreshQuantile);
 
     quantileLabel_ = new QLabel(this);
     quantileLabel_->setText(tr("Hausdorff ratio = "));
@@ -135,7 +135,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     ///////////////////////////////////////
     ///////////////////////////////////////
 
-    check_lists();
+    checkLists();
 
     setLayout(input_layout);
 
@@ -144,7 +144,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     resultPopup_->setLayout(result_layout);
 }
 
-void AnalysisWindow::compute_hd()
+void AnalysisWindow::computeHd()
 {
     if (hd_ != nullptr)
     {
@@ -158,8 +158,7 @@ void AnalysisWindow::compute_hd()
     {
         std::clock_t start_time = std::clock();
 
-        hd_ = new fluvel_ip::HausdorffDistance(widget1_->get_shape(), widget2_->get_shape(),
-                                              intersection_);
+        hd_ = new fluvel_ip::HausdorffDistance(widget1_->shape(), widget2_->shape(), intersection_);
 
         elapsed = float(std::clock() - start_time) / float(CLOCKS_PER_SEC);
     }
@@ -169,8 +168,8 @@ void AnalysisWindow::compute_hd()
     float centr_gap = hd_->get_centroids_distance();
 
     factor_ = 100.f / fluvel_ip::Shape::gridDiagonal(
-                          std::max(widget1_->get_img_width(), widget2_->get_img_width()),
-                          std::max(widget1_->get_img_height(), widget2_->get_img_height()));
+                          std::max(widget1_->imageWidth(), widget2_->imageWidth()),
+                          std::max(widget1_->imageHeight(), widget2_->imageHeight()));
 
     float hd_ratio = factor_ * hausdorff_dist;
     float quantile_ratio = factor_ * hausdorffQuantile;
@@ -195,7 +194,7 @@ void AnalysisWindow::compute_hd()
     resultPopup_->show();
 }
 
-void AnalysisWindow::refresh_quantile(int hundredth)
+void AnalysisWindow::refreshQuantile(int hundredth)
 {
     if (hd_ != nullptr)
     {
@@ -209,9 +208,9 @@ void AnalysisWindow::refresh_quantile(int hundredth)
     }
 }
 
-void AnalysisWindow::check_lists()
+void AnalysisWindow::checkLists()
 {
-    if (widget1_->get_shape().isValid() && widget2_->get_shape().isValid())
+    if (widget1_->shape().isValid() && widget2_->shape().isValid())
     {
         calculateShapesIntersection();
         computeButton_->setEnabled(true);
@@ -224,17 +223,14 @@ void AnalysisWindow::check_lists()
 
 void AnalysisWindow::calculateShapesIntersection()
 {
-    std::size_t size1 = widget1_->get_shape().points().size();
-    std::size_t size2 = widget2_->get_shape().points().size();
+    std::size_t size1 = widget1_->shape().points().size();
+    std::size_t size2 = widget2_->shape().points().size();
 
-    const fluvel_ip::Shape& smaller_shape =
-        (size1 < size2) ? widget1_->get_shape() : widget2_->get_shape();
+    const fluvel_ip::Shape& smaller_shape = (size1 < size2) ? widget1_->shape() : widget2_->shape();
 
-    const QImage& larger_shape_img =
-        (size1 < size2) ? widget2_->get_image() : widget1_->get_image();
+    const QImage& larger_shape_img = (size1 < size2) ? widget2_->image() : widget1_->image();
 
-    const fluvel_ip::Rgb_uc& chosen_rgb =
-        (size1 < size2) ? widget2_->get_rgb() : widget1_->get_rgb();
+    const fluvel_ip::Rgb_uc& chosen_rgb = (size1 < size2) ? widget2_->rgb() : widget1_->rgb();
 
     QRgb rgb_pix;
 
@@ -261,8 +257,8 @@ void AnalysisWindow::closeEvent(QCloseEvent* event)
 
     settings.setValue("ui_geometry/analysis_window", saveGeometry());
 
-    widget1_->save_settings();
-    widget2_->save_settings();
+    widget1_->saveSettings();
+    widget2_->saveSettings();
 
     QDialog::closeEvent(event);
 }
