@@ -22,40 +22,40 @@ public:
     void clear();
 
     //! Push back a point into the shape.
-    void push_back(int x, int y);
+    void pushBack(int x, int y);
 
     //! Push back a point into the shape.
-    void push_back(const Point2D_i& p);
+    void pushBack(const Point2D_i& p);
 
     //! Push back a point into the shape.
-    void push_back(Point2D_i&& p);
+    void pushBack(Point2D_i&& p);
 
     //! Swap the shape *this with an other shape in constant time, i.e. O(1) complexity.
     void swap(Shape& other) noexcept;
 
     //! Shuffles points of the shape.
-    void shuffle_points();
+    void shufflePoints();
 
     //! Calculates the centroid of the shape in variables #centroid_x and #centroid_y.
-    void calculate_centroid();
+    void calculateCentroid();
 
     //! Returns true if the shape is ready for the hausdorff distance computation.
-    bool is_valid() const;
+    bool isValid() const;
 
     //! Gets the vector of points.
-    const std::vector<Point2D_i>& get_points() const
+    const std::vector<Point2D_i>& points() const
     {
         return points_;
     }
 
     //! Gets the centroid of the shape.
-    const Point2D_f& get_centroid() const
+    const Point2D_f& centroid() const
     {
         return centroid_;
     }
 
     //! Gets grid diagonal.
-    static float get_grid_diagonal(int grid_width, int grid_height);
+    static float gridDiagonal(int gridWidth, int gridHeight);
 
 private:
     std::vector<Point2D_i> points_;

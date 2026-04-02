@@ -21,11 +21,11 @@ public:
     BoundaryBuilder(int phi_width1, int phi_height1, Contour& l_out_init1, Contour& l_in_init1);
 
     //! Gets rectangle points with boundary box (x1,y1) and (x2,y2).
-    void generate_rectangle_points(Point2D_i top_left, Point2D_i bottom_right,
+    void generate_rectangle_points(Point2D_i topLeft, Point2D_i bottomRight,
                                    BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     //! Gets rectangle points with normalized boundary box (x1,y1) and (x2,y2).
-    void generate_rectangle_points(Point2D_f top_left, Point2D_f bottom_right,
+    void generate_rectangle_points(Point2D_f topLeft, Point2D_f bottomRight,
                                    BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     //! Gets ellipse points with center point and width and height.
@@ -48,7 +48,7 @@ private:
 
     void build_ellipse_midpoint_connected(int x0, int y0, int a, int b, Contour& list_out);
 
-    void build_inner_contiguous(int x0, int y0, const Contour& l_out, Contour& l_in);
+    void build_inner_contiguous(int x0, int y0, const Contour& outerBoundary, Contour& innerBoundary);
 
     void check_duplicates(const Contour& contour);
 

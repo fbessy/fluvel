@@ -17,6 +17,9 @@ set(ip_src
     ${ALGO_DIR}/active_contour.hpp
     ${ALGO_DIR}/ac_types.hpp
 
+    ${ALGO_DIR}/majority_internal_speed.cpp
+    ${ALGO_DIR}/majority_internal_speed.hpp
+
     ${ALGO_DIR}/region_ac.cpp
     ${ALGO_DIR}/region_ac.hpp
 

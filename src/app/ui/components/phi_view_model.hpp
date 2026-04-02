@@ -61,8 +61,8 @@ private:
     QImage phi_;
     QImage displayedPhi_;
 
-    std::vector<fluvel_ip::Point2D_i> l_out_;
-    std::vector<fluvel_ip::Point2D_i> l_in_;
+    std::vector<fluvel_ip::Point2D_i> outerBoundary_;
+    std::vector<fluvel_ip::Point2D_i> innerBoundary_;
 
     QSize listsGridSize_;
 

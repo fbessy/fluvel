@@ -6,7 +6,7 @@
 #include "ac_types.hpp"
 #include "contour_data.hpp"
 #include "contour_diagnostics.hpp"
-#include "point.hpp"
+#include "majority_internal_speed.hpp"
 #include "point_containers.hpp"
 #include "shape.hpp"
 
@@ -28,28 +28,20 @@ struct BoundarySwitchMapping
     SpeedValue requiredSpeedSign;
     PhiValue currentToAdjacentVal;
     PhiValue neighborFromRegionVal;
-    PhiValue neighbor_to_boundary_val;
+    PhiValue neighborToBoundaryVal;
     PhiValue redundantToRegionVal;
 
     static BoundarySwitchMapping makeSwitchIn(ContourData& cd)
     {
-        return {cd.l_out(),
-                cd.l_in(),
-                SpeedValue::GoOutward,
-                PhiValue::InteriorBoundary,
-                PhiValue::OutsideRegion,
-                PhiValue::ExteriorBoundary,
+        return {cd.outerBoundary(),         cd.innerBoundary(),      SpeedValue::GoOutward,
+                PhiValue::InteriorBoundary, PhiValue::OutsideRegion, PhiValue::ExteriorBoundary,
                 PhiValue::InsideRegion};
     }
 
     static BoundarySwitchMapping makeSwitchOut(ContourData& cd)
     {
-        return {cd.l_in(),
-                cd.l_out(),
-                SpeedValue::GoInward,
-                PhiValue::ExteriorBoundary,
-                PhiValue::InsideRegion,
-                PhiValue::InteriorBoundary,
+        return {cd.innerBoundary(),         cd.outerBoundary(),     SpeedValue::GoInward,
+                PhiValue::ExteriorBoundary, PhiValue::InsideRegion, PhiValue::InteriorBoundary,
                 PhiValue::OutsideRegion};
     }
 };
@@ -71,10 +63,10 @@ struct EvolutionData
     //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
     bool didMove{true};
 
-    //! l_out shape at the end of the cycle 2.
+    //! outerBoundary shape at the end of the cycle 2.
     Shape l_out_shape;
 
-    //! l_out shape at the end of the previous cycle 2.
+    //! outerBoundary shape at the end of the previous cycle 2.
     Shape previousShape;
 
     //! Total number of iterations the active contour has evolved from the initial contour
@@ -104,9 +96,9 @@ struct EvolutionData
     EvolutionData(const ContourData& cd)
         : maxStepCount(5 * std::max(cd.phi().width(), cd.phi().height()))
     {
-        l_out_shape.reserve(cd.l_out().capacity());
-        previousShape.reserve(cd.l_out().capacity());
-        intersection.reserve(cd.l_out().capacity());
+        l_out_shape.reserve(cd.outerBoundary().capacity());
+        previousShape.reserve(cd.outerBoundary().capacity());
+        intersection.reserve(cd.outerBoundary().capacity());
     }
 
     //! Reset execution state of evolution data. Used multiple times for video tracking.
@@ -121,10 +113,10 @@ struct EvolutionData
 class ActiveContour
 {
 public:
-    //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and
-    //! #l_out) with a copy semantic.
+    //! Constructor to initialize the active contour from an initial contour (#phi, #innerBoundary
+    //! and #outerBoundary) with a copy semantic.
     ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedModel> speedModel,
-                  const ActiveContourParams& configuration);
+                  const ActiveContourParams& params);
 
     //! Destructor.
     virtual ~ActiveContour();
@@ -146,13 +138,13 @@ public:
     //! tracking).
     void runCycles(int n_cycles);
 
-    //! Export the boundary list l_out_ as a copied geometric representation.
+    //! Export the boundary list outerBoundary_ as a copied geometric representation.
     ExportedContour export_l_out() const
     {
         return cd_.export_l_out();
     }
 
-    //! Export the boundary list l_in_ as a copied geometric representation.
+    //! Export the boundary list innerBoundary_ as a copied geometric representation.
     ExportedContour export_l_in() const
     {
         return cd_.export_l_in();
@@ -165,14 +157,14 @@ public:
     }
 
     //! Getter for the list of offset points representing the exterior boundary.
-    const Contour& l_out() const
+    const Contour& outerBoundary() const
     {
-        return cd_.l_out();
+        return cd_.outerBoundary();
     }
     //! Getter for the list of offset points representing the interior boundary.
-    const Contour& l_in() const
+    const Contour& innerBoundary() const
     {
-        return cd_.l_in();
+        return cd_.innerBoundary();
     }
 
     void fillDiagnostics(ContourDiagnostics& d) const;
@@ -213,20 +205,17 @@ private:
     //! and adjacent boundary cleanup.
     bool directionalSubstep(SwitchDirection direction);
 
-    //! Computes the speed for all points of a boundary list #l_out or #l_in.
+    //! Computes the speed for all points of a boundary list #outerBoundary or #innerBoundary.
     void updateSpeeds(Contour& boundary);
 
-    //! Computes the external speed Fd for all points of a boundary list #l_out or #l_in.
-    void computeSpeeds(Contour& boundary);
-
-    //! Computes the internal speed  Fint for all points of a boundary list #l_out or #l_in.
-    void computeInternalSpeeds(Contour& boundary);
-
-    //! Computes the internal speed  Fint for a current point (\a x,\a y) of #l_out or #l_in.
-    void computeInternalSpeed(ContourPoint& point);
+    template <typename SpeedModel> void computeSpeeds(Contour& boundary, SpeedModel&& model)
+    {
+        for (auto& point : boundary)
+            model.computeSpeed(point, cd_.phi());
+    }
 
     //! Generic method to handle outward / inward local movement of a current boundary point (of
-    //! #l_out or #l_in) and to switch it from one boundary list to the other.
+    //! #outerBoundary or #innerBoundary) and to switch it from one boundary list to the other.
     void switchBoundaryPoint(ContourPoint& point);
 
     //! Promote a neighboring region point to boundary.
@@ -253,20 +242,16 @@ private:
     //! to speed up the hausdorff distance computation.
     void calculateShapesIntersection();
 
-    //! Build kernel offsets.
-    static InternalKernel makeInternalKernelOffsets(int diskRadius, int grid_width);
-
     //! Representation data of the active contour
     //! (discret level-set function phi, Lin and Lout)
     ContourData cd_;
 
-    std::unique_ptr<ISpeedModel> speedModel_;
+    std::unique_ptr<ISpeedModel> externalSpeedModel_;
 
     //! Generic configuration of the active contour.
     const ActiveContourParams params_;
 
-    //! Precomputed disk-shaped kernel offsets for internal smoothing (Fint).
-    const InternalKernel internalKernel_;
+    MajorityInternalSpeed internalSpeedModel_;
 
     //! BoundarySwitchMapping for the procedure switch_in.
     const BoundarySwitchMapping switchInMapping_;
@@ -278,7 +263,7 @@ private:
     //! switchOutMapping_.
     const BoundarySwitchMapping* currentMapping_;
 
-    //! Temporary points to add after each scan of the list #l_in or #l_out.
+    //! Temporary points to add after each scan of the list #innerBoundary or #outerBoundary.
     Contour pendingBoundaryPoints_;
 
     //! Number of iterations in one cycle1-cycle2.

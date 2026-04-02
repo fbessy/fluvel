@@ -74,8 +74,8 @@ void PhiViewModel::updateFromEditor()
 
 void PhiViewModel::onClearFromEditor()
 {
-    l_out_.clear();
-    l_in_.clear();
+    outerBoundary_.clear();
+    innerBoundary_.clear();
     displayedPhi_ = background_;
 
     overlayVisible_ = false;
@@ -98,8 +98,8 @@ void PhiViewModel::updateLists()
     const int h = phi_.height();
 
     listsGridSize_ = phi_.size();
-    l_out_.clear();
-    l_in_.clear();
+    outerBoundary_.clear();
+    innerBoundary_.clear();
 
     for (int y = 0; y < h; ++y)
     {
@@ -113,11 +113,11 @@ void PhiViewModel::updateLists()
             {
                 if (I == 0)
                 {
-                    l_out_.emplace_back(x, y);
+                    outerBoundary_.emplace_back(x, y);
                 }
                 else if (I == 255)
                 {
-                    l_in_.emplace_back(x, y);
+                    innerBoundary_.emplace_back(x, y);
                 }
             }
         }
@@ -184,7 +184,7 @@ void PhiViewModel::updatePhiFromLists()
     const int width = displayedPhi_.width();
     const int height = displayedPhi_.height();
 
-    for (const auto& p : l_out_)
+    for (const auto& p : outerBoundary_)
     {
         if (p.y < 0 || p.y >= height || p.x < 0 || p.x >= width)
             continue;
@@ -193,7 +193,7 @@ void PhiViewModel::updatePhiFromLists()
         line[p.x] = outColor;
     }
 
-    for (const auto& p : l_in_)
+    for (const auto& p : innerBoundary_)
     {
         if (p.y < 0 || p.y >= height || p.x < 0 || p.x >= width)
             continue;

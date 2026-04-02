@@ -168,7 +168,7 @@ void AnalysisWindow::compute_hd()
     float hausdorffQuantile = hd_->hausdorffQuantile(hundredthSp_->value());
     float centr_gap = hd_->get_centroids_distance();
 
-    factor_ = 100.f / fluvel_ip::Shape::get_grid_diagonal(
+    factor_ = 100.f / fluvel_ip::Shape::gridDiagonal(
                           std::max(widget1_->get_img_width(), widget2_->get_img_width()),
                           std::max(widget1_->get_img_height(), widget2_->get_img_height()));
 
@@ -211,7 +211,7 @@ void AnalysisWindow::refresh_quantile(int hundredth)
 
 void AnalysisWindow::check_lists()
 {
-    if (widget1_->get_shape().is_valid() && widget2_->get_shape().is_valid())
+    if (widget1_->get_shape().isValid() && widget2_->get_shape().isValid())
     {
         calculateShapesIntersection();
         computeButton_->setEnabled(true);
@@ -224,8 +224,8 @@ void AnalysisWindow::check_lists()
 
 void AnalysisWindow::calculateShapesIntersection()
 {
-    std::size_t size1 = widget1_->get_shape().get_points().size();
-    std::size_t size2 = widget2_->get_shape().get_points().size();
+    std::size_t size1 = widget1_->get_shape().points().size();
+    std::size_t size2 = widget2_->get_shape().points().size();
 
     const fluvel_ip::Shape& smaller_shape =
         (size1 < size2) ? widget1_->get_shape() : widget2_->get_shape();
@@ -240,7 +240,7 @@ void AnalysisWindow::calculateShapesIntersection()
 
     intersection_.clear();
 
-    for (const auto& p : smaller_shape.get_points())
+    for (const auto& p : smaller_shape.points())
     {
         if (p.x >= 0 && p.x < larger_shape_img.width() && p.y >= 0 &&
             p.y < larger_shape_img.height())

@@ -47,11 +47,11 @@ HausdorffDistance::HausdorffDistance(Shape& shape_a1, Shape& shape_b1,
 
 void HausdorffDistance::compute()
 {
-    if (shape_a_.is_valid() && shape_b_.is_valid())
+    if (shape_a_.isValid() && shape_b_.isValid())
     {
 #if defined(RANDOM_SAMPLING) && !defined(NAIVE_ALGO)
-        shape_a_.shuffle_points();
-        shape_b_.shuffle_points();
+        shape_a_.shufflePoints();
+        shape_b_.shufflePoints();
 #endif
 
         // compute the directed or relative hausdorff distance in the both directions
@@ -74,7 +74,7 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1, const Shape& s
     directed_hd = 0.f;
 
     // outer loop
-    for (const auto& p1 : shape_1.get_points())
+    for (const auto& p1 : shape_1.points())
     {
         // intersection_a_b is optional and can be empty by default,
         // cf constructor documentation.
@@ -85,19 +85,19 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1, const Shape& s
         if (!intersection_a_b_.contains(p1))
         {
 #endif
-            relative_p1.x = float(p1.x) - shape_1.get_centroid().x;
-            relative_p1.y = float(p1.y) - shape_1.get_centroid().y;
+            relative_p1.x = float(p1.x) - shape_1.centroid().x;
+            relative_p1.y = float(p1.y) - shape_1.centroid().y;
 
             // initialization in order to minimize
             min_dist = std::numeric_limits<float>::max();
 
             // inner loop
-            for (const auto& p2 : shape_2.get_points())
+            for (const auto& p2 : shape_2.points())
             {
-                relative_p2.x = float(p2.x) - shape_2.get_centroid().x;
-                relative_p2.y = float(p2.y) - shape_2.get_centroid().y;
+                relative_p2.x = float(p2.x) - shape_2.centroid().x;
+                relative_p2.y = float(p2.y) - shape_2.centroid().y;
 
-                dist = math::euclidean_distance(relative_p1, relative_p2);
+                dist = math::euclideanDistance(relative_p1, relative_p2);
 
                 // it minimizes min_dist
                 if (dist < min_dist)
@@ -133,8 +133,7 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1, const Shape& s
     // even if shapes are not empty.
     // It forces to be able to pick up one coherent value
     // instead of float max.
-    if (directed_min_dists.empty() && !shape_1.get_points().empty() &&
-        !shape_2.get_points().empty())
+    if (directed_min_dists.empty() && !shape_1.points().empty() && !shape_2.points().empty())
     {
         directed_min_dists.push_back(0.f);
     }
@@ -210,9 +209,9 @@ float HausdorffDistance::get_centroids_distance() const
 {
     float gap_dist = std::numeric_limits<float>::quiet_NaN();
 
-    if (shape_a_.is_valid() && shape_b_.is_valid())
+    if (shape_a_.isValid() && shape_b_.isValid())
     {
-        gap_dist = math::euclidean_distance(shape_a_.get_centroid(), shape_b_.get_centroid());
+        gap_dist = math::euclideanDistance(shape_a_.centroid(), shape_b_.centroid());
     }
 
     return gap_dist;

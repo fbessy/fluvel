@@ -27,7 +27,7 @@ constexpr int sign(int v) noexcept
     return 0;
 }
 
-template <typename P> inline float euclidean_distance(const P& a, const P& b)
+template <typename P> inline float euclideanDistance(const P& a, const P& b)
 {
     const float dx = b.x - a.x;
     const float dy = b.y - a.y;

@@ -31,7 +31,7 @@ public:
     void onSwitch(const ContourPoint& point, SwitchDirection direction) override;
 
     //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of
-    //! #l_out or #l_in.
+    //! #outerBoundary or #innerBoundary.
     void computeSpeed(ContourPoint& point, const DiscreteLevelSet&) override;
 
     void fillDiagnostics(ContourDiagnostics& d) const override;

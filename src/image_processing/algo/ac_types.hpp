@@ -496,26 +496,4 @@ struct RegionColorParams : public RegionParams
     }
 };
 
-//! Kernel support to know the geometry limit of the internal kernel.
-struct KernelSupport
-{
-    int min_dx = 0;
-    int max_dx = 0;
-    int min_dy = 0;
-    int max_dy = 0;
-};
-
-//! Precomputed disk-shaped kernel offsets for internal smoothing (Fint).
-struct InternalKernel
-{
-    std::vector<int> offsets;
-    KernelSupport support;
-
-    bool fully_inside(int x, int y, int width, int height) const
-    {
-        return x + support.min_dx >= 0 && x + support.max_dx < width && y + support.min_dy >= 0 &&
-               y + support.max_dy < height;
-    }
-};
-
 } // namespace fluvel_ip

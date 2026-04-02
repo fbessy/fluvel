@@ -15,16 +15,16 @@ class ContourData
 {
 public:
     //! Constructor to initialize the contour with one ellipse.
-    ContourData(int phi_width, int phi_height, Connectivity connectivity = Connectivity::Four);
+    ContourData(int phiWidth, int phiHeight, Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour from a grayscale image of the levet-set function
     //! #phi.
-    ContourData(ImageView grayscale_phi, Connectivity connectivity = Connectivity::Four);
+    ContourData(ImageView grayscalePhi, Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of
-    //! #l_out and #l_in.
-    ContourData(const Contour& l_out, const Contour& l_in, int phi_width, int phi_height,
-                Connectivity connectivity = Connectivity::Four);
+    //! #outerBoundary and #innerBoundary.
+    ContourData(const Contour& outerBoundary, const Contour& innerBoundary, int phiWidth,
+                int phiHeight, Connectivity connectivity = Connectivity::Four);
 
     //! Copy constructor.
     ContourData(const ContourData& contour);
@@ -38,16 +38,16 @@ public:
         return phi_.coord(offet);
     }
 
-    //! Export the boundary list l_out_ as a copied geometric representation.
+    //! Export the boundary list outerBoundary_ as a copied geometric representation.
     ExportedContour export_l_out() const
     {
-        return export_contour(l_out_);
+        return exportContour(outerBoundary_);
     }
 
-    //! Export the boundary list l_in_ as a copied geometric representation.
+    //! Export the boundary list innerBoundary_ as a copied geometric representation.
     ExportedContour export_l_in() const
     {
-        return export_contour(l_in_);
+        return exportContour(innerBoundary_);
     }
 
     //! Getter function for the discrete level-set function #phi.
@@ -59,31 +59,31 @@ public:
     {
         return phi_;
     }
-    //! Getter function for the exterior boundary #l_out.
-    Contour& l_out()
+    //! Getter function for the exterior boundary #outerBoundary.
+    Contour& outerBoundary()
     {
-        return l_out_;
+        return outerBoundary_;
     }
-    const Contour& l_out() const
+    const Contour& outerBoundary() const
     {
-        return l_out_;
+        return outerBoundary_;
     }
-    //! Getter function for the interior boundary #l_in.
-    Contour& l_in()
+    //! Getter function for the interior boundary #innerBoundary.
+    Contour& innerBoundary()
     {
-        return l_in_;
+        return innerBoundary_;
     }
-    const Contour& l_in() const
+    const Contour& innerBoundary() const
     {
-        return l_in_;
+        return innerBoundary_;
     }
 
     bool empty() const
     {
-        return l_out_.empty() || l_in_.empty();
+        return outerBoundary_.empty() || innerBoundary_.empty();
     }
 
-    bool is_valid() const;
+    bool isValid() const;
 
     Connectivity connectivity() const
     {
@@ -93,52 +93,53 @@ public:
 private:
     //! Initializes the contour *this with one ellipse. It is performed when the simplest
     //! constructor is called or when one or both boundary lists is/are empty.
-    void define_from_ellipse();
+    void defineFromEllipse();
 
     //! Eliminates redundant points to maintain a contiguous boundary.
-    void eliminateRedundantPoints(Contour& boundary, PhiValue region_value);
+    void eliminateRedundantPoints(Contour& boundary, PhiValue regionValue);
 
-    //! To use define_from_ellipse and eliminateRedundantPoints
+    //! To use defineFromEllipse and eliminateRedundantPoints
     //! in ActiveContour.
     friend class ActiveContour;
 
     //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a
     //! different phi value sign comparing to the given point.
-    bool is_redundant(const ContourPoint& point) const;
+    bool isRedundant(const ContourPoint& point) const;
 
     //! Allocate lists.
-    void allocate_lists();
+    void allocateLists();
 
     //! Defines the boundary lists and phi from a binary phi.
-    void define_lists_and_phi_from_binary_phi();
+    void defineListsAndPhiFromBinaryPhi();
 
-    //! Defines the #phi level-set function from the boundary lists #l_out and #l_in.
-    void define_phi_from_lists();
+    //! Defines the #phi level-set function from the boundary lists #outerBoundary and
+    //! #innerBoundary.
+    void definePhiFromLists();
 
-    //! Performs a flood fill algorithm for the method #define_phi_from_lists().
-    void flood_fill(const Point2D_i& seed, PhiValue target_value, PhiValue replacement_value);
+    //! Performs a flood fill algorithm for the method #definePhiFromLists().
+    void floodFill(const Point2D_i& seed, PhiValue targetValue, PhiValue replacementValue);
 
     //! Eliminates redundant points for the both lists to maintain a contiguous boundary.
-    void eliminate_redundant_points_if_needed();
+    void eliminateRedundantPointsIfNeeded();
 
     //! Export a boundary list as a copied geometric representation.
-    std::vector<Point2D_i> export_contour(const Contour& boundary) const;
+    std::vector<Point2D_i> exportContour(const Contour& boundary) const;
 
-    template <typename T> static bool has_duplicates(const std::vector<T>& v);
+    template <typename T> static bool hasDuplicates(const std::vector<T>& v);
 
     //! Discrete level-set function with only 4 PhiValue possible.
     DiscreteLevelSet phi_;
 
     //! List of points representing the exterior boundary (called Lout in the reference paper).
-    Contour l_out_;
+    Contour outerBoundary_;
     //! List of points representing the interior boundary (called Lin in the reference paper).
-    Contour l_in_;
+    Contour innerBoundary_;
 
     //! Pixel connectivity of the neighborhood to define ContourData (4- or 8-connected).
     const Connectivity connectivity_;
 };
 
-template <typename T> bool ContourData::has_duplicates(const std::vector<T>& v)
+template <typename T> bool ContourData::hasDuplicates(const std::vector<T>& v)
 {
     for (std::size_t i = 0; i < v.size(); ++i)
         for (std::size_t j = i + 1; j < v.size(); ++j)

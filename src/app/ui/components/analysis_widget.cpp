@@ -32,12 +32,12 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     if (id_this_ == 1)
     {
         text_list_length_->setText("<font color=red>" + tr("List 1 length = ") +
-                                   QString::number(shape_.get_points().size()));
+                                   QString::number(shape_.points().size()));
     }
     else if (id_this_ == 2)
     {
         text_list_length_->setText("<font color=red>" + tr("List 2 length = ") +
-                                   QString::number(shape_.get_points().size()));
+                                   QString::number(shape_.points().size()));
     }
 
     /////////////////////////////////////////////////////////////////////////////////
@@ -202,13 +202,9 @@ void AnalysisWidget::open_img()
 void AnalysisWidget::refresh_rgb(int color_list_index)
 {
     if (color_list_index == ComboBoxColorIndex::SELECTED)
-    {
         rgb_ = selected_;
-    }
     else
-    {
         rgb_ = get_color(color_list_index);
-    }
 
     refresh_img_noise(noise_sp_->value());
 }
@@ -226,35 +222,25 @@ void AnalysisWidget::create_list()
             pix = img_noise_.pixel(x, y);
 
             if (toRgb_uc(pix) == rgb_)
-            {
-                shape_.push_back(x, y);
-            }
+                shape_.pushBack(x, y);
         }
     }
 
-    shape_.calculate_centroid();
+    shape_.calculateCentroid();
 
-    QString size_str = QString::number(shape_.get_points().size());
+    QString size_str = QString::number(shape_.points().size());
 
     QString color_str;
-    if (shape_.get_points().empty())
-    {
+    if (shape_.points().empty())
         color_str = "<font color=red>";
-    }
     else
-    {
         color_str = "<font color=green>";
-    }
 
     QString list_str;
     if (id_this_ == 1)
-    {
         list_str = tr("List 1 length = ");
-    }
     else if (id_this_ == 2)
-    {
         list_str = tr("List 2 length = ");
-    }
 
     text_list_length_->setText(color_str + list_str + size_str);
 
@@ -280,9 +266,7 @@ void AnalysisWidget::refresh_img_noise(int noise_percent)
             for (int x = 0; x < img_width_; ++x)
             {
                 if (proba_distri(gen))
-                {
                     img_noise_.setPixel(x, y, rgb_color);
-                }
             }
         }
 
@@ -313,13 +297,9 @@ void AnalysisWidget::get_list_color()
     QString title_str;
 
     if (id_this_ == 1)
-    {
         title_str = tr("Select list 1 color");
-    }
     else if (id_this_ == 2)
-    {
         title_str = tr("Select list 2 color");
-    }
 
     color = QColorDialog::getColor(Qt::white, this, title_str);
 

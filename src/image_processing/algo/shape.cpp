@@ -27,17 +27,17 @@ void Shape::clear()
     points_.clear();
 }
 
-void Shape::push_back(int x, int y)
+void Shape::pushBack(int x, int y)
 {
     points_.emplace_back(x, y);
 }
 
-void Shape::push_back(const Point2D_i& p)
+void Shape::pushBack(const Point2D_i& p)
 {
     points_.push_back(p);
 }
 
-void Shape::push_back(Point2D_i&& p)
+void Shape::pushBack(Point2D_i&& p)
 {
     points_.emplace_back(p);
 }
@@ -50,13 +50,13 @@ void Shape::swap(Shape& other) noexcept
     std::swap(this->centroid_.y, other.centroid_.y);
 }
 
-void Shape::shuffle_points()
+void Shape::shufflePoints()
 {
     auto rng = std::default_random_engine{};
     std::ranges::shuffle(points_, rng);
 }
 
-void Shape::calculate_centroid()
+void Shape::calculateCentroid()
 {
     centroid_.x = std::numeric_limits<float>::min();
     centroid_.y = std::numeric_limits<float>::min();
@@ -75,20 +75,20 @@ void Shape::calculate_centroid()
     }
 }
 
-bool Shape::is_valid() const
+bool Shape::isValid() const
 {
     return (!points_.empty() && centroid_.x >= 0.f && centroid_.y >= 0.f);
 }
 
-float Shape::get_grid_diagonal(int grid_width, int grid_height)
+float Shape::gridDiagonal(int gridWidth, int gridHeight)
 {
-    assert(grid_width >= 0);
-    assert(grid_height >= 0);
+    assert(gridWidth >= 0);
+    assert(gridHeight >= 0);
 
-    Point2D_i top_left{0, 0};
-    Point2D_i bottom_right{grid_width - 1, grid_height - 1};
+    Point2D_i topLeft{0, 0};
+    Point2D_i bottomRight{gridWidth - 1, gridHeight - 1};
 
-    return math::euclidean_distance(top_left, bottom_right);
+    return math::euclideanDistance(topLeft, bottomRight);
 }
 
 } // namespace fluvel_ip

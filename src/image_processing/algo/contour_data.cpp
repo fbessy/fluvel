@@ -11,214 +11,211 @@
 namespace fluvel_ip
 {
 
-ContourData::ContourData(int phi_width, int phi_height, Connectivity connectivity)
-    : phi_(phi_width, phi_height)
+ContourData::ContourData(int phiWidth, int phiHeight, Connectivity connectivity)
+    : phi_(phiWidth, phiHeight)
     , connectivity_(connectivity)
 {
-    assert(phi_width >= 1);
-    assert(phi_height >= 1);
+    assert(phiWidth >= 1);
+    assert(phiHeight >= 1);
 
-    allocate_lists();
-    define_from_ellipse();
+    allocateLists();
+    defineFromEllipse();
 
     // post condition
-    assert(is_valid());
+    assert(isValid());
 }
 
-ContourData::ContourData(ImageView grayscale_phi, Connectivity connectivity)
-    : phi_(grayscale_phi.width(), grayscale_phi.height())
+ContourData::ContourData(ImageView grayscalePhi, Connectivity connectivity)
+    : phi_(grayscalePhi.width(), grayscalePhi.height())
     , connectivity_(connectivity)
 {
     for (int y = 0; y < phi_.height(); ++y)
     {
         for (int x = 0; x < phi_.width(); ++x)
         {
-            if (grayscale_phi.at(x, y) >= 128u)
+            if (grayscalePhi.at(x, y) >= 128u)
                 phi_.at(x, y) = PhiValue::InteriorBoundary;
             else
                 phi_.at(x, y) = PhiValue::ExteriorBoundary;
         }
     }
 
-    define_lists_and_phi_from_binary_phi();
+    defineListsAndPhiFromBinaryPhi();
 
     if (empty())
-        define_from_ellipse();
+        defineFromEllipse();
     else
-        eliminate_redundant_points_if_needed();
+        eliminateRedundantPointsIfNeeded();
 
     // post condition
-    assert(is_valid());
+    assert(isValid());
 }
 
-ContourData::ContourData(const Contour& l_out, const Contour& l_in, int phi_width, int phi_height,
-                         Connectivity connectivity)
-    : phi_(phi_width, phi_height)
-    , l_out_(l_out)
-    , l_in_(l_in)
+ContourData::ContourData(const Contour& outerBoundary, const Contour& innerBoundary, int phiWidth,
+                         int phiHeight, Connectivity connectivity)
+    : phi_(phiWidth, phiHeight)
+    , outerBoundary_(outerBoundary)
+    , innerBoundary_(innerBoundary)
     , connectivity_(connectivity)
 {
-    assert(!l_out.empty());
-    assert(!l_in.empty());
-    assert(phi_width >= 1);
-    assert(phi_height >= 1);
+    assert(!outerBoundary.empty());
+    assert(!innerBoundary.empty());
+    assert(phiWidth >= 1);
+    assert(phiHeight >= 1);
 
-    allocate_lists();
+    allocateLists();
 
     if (empty())
-        define_from_ellipse();
+        defineFromEllipse();
     else
-        define_phi_from_lists();
+        definePhiFromLists();
 
     // post condition
-    assert(is_valid());
+    assert(isValid());
 }
 
 ContourData::ContourData(const ContourData& contour)
     : phi_(contour.phi_)
-    , l_out_(contour.l_out_)
-    , l_in_(contour.l_in_)
+    , outerBoundary_(contour.outerBoundary_)
+    , innerBoundary_(contour.innerBoundary_)
     , connectivity_(contour.connectivity_)
 {
-    allocate_lists();
+    allocateLists();
 }
 
 ContourData::ContourData(ContourData&& contour) noexcept
     : phi_(std::move(contour.phi_))
-    , l_out_(std::move(contour.l_out_))
-    , l_in_(std::move(contour.l_in_))
+    , outerBoundary_(std::move(contour.outerBoundary_))
+    , innerBoundary_(std::move(contour.innerBoundary_))
     , connectivity_(contour.connectivity_)
 {
-    allocate_lists();
+    allocateLists();
 }
 
-void ContourData::allocate_lists()
+void ContourData::allocateLists()
 {
     const size_t perimeter = static_cast<const size_t>(2 * (phi_.width() + phi_.height()));
     const size_t elem_alloc_size_ = 3 * perimeter;
 
-    l_out_.reserve(elem_alloc_size_);
-    l_in_.reserve(elem_alloc_size_);
+    outerBoundary_.reserve(elem_alloc_size_);
+    innerBoundary_.reserve(elem_alloc_size_);
 }
 
-void ContourData::define_from_ellipse()
+void ContourData::defineFromEllipse()
 {
-    l_out_.clear();
-    l_in_.clear();
+    outerBoundary_.clear();
+    innerBoundary_.clear();
 
-    BoundaryBuilder lists_init(phi_.width(), phi_.height(), l_out_, l_in_);
+    BoundaryBuilder lists_init(phi_.width(), phi_.height(), outerBoundary_, innerBoundary_);
 
     lists_init.generate_ellipse_points(0.8f, 0.8f);
 
-    define_phi_from_lists();
+    definePhiFromLists();
 }
 
-void ContourData::define_lists_and_phi_from_binary_phi()
+void ContourData::defineListsAndPhiFromBinaryPhi()
 {
     for (size_t offset = 0; offset < phi_.size(); ++offset)
     {
-        PhiValue& current_phi = phi_[offset];
-        PhiValue region_val;
+        PhiValue& currentPhi = phi_[offset];
+        PhiValue regionVal;
         Contour* boundary = nullptr;
-        bool is_boundary = false;
+        bool isBoundary = false;
 
         // get the generic currentMapping to eliminate redundant points
-        if (current_phi == PhiValue::ExteriorBoundary)
+        if (currentPhi == PhiValue::ExteriorBoundary)
         {
-            region_val = PhiValue::OutsideRegion;
-            boundary = &l_out_;
-            is_boundary = true;
+            regionVal = PhiValue::OutsideRegion;
+            boundary = &outerBoundary_;
+            isBoundary = true;
         }
-        else if (current_phi == PhiValue::InteriorBoundary)
+        else if (currentPhi == PhiValue::InteriorBoundary)
         {
-            region_val = PhiValue::InsideRegion;
-            boundary = &l_in_;
-            is_boundary = true;
+            regionVal = PhiValue::InsideRegion;
+            boundary = &innerBoundary_;
+            isBoundary = true;
         }
 
-        if (is_boundary)
+        if (isBoundary)
         {
-            const Point2D_i current_point = phi_.coord(offset);
-            const ContourPoint point{current_point.x, current_point.y};
+            const Point2D_i currentPoint = phi_.coord(offset);
+            const ContourPoint point{currentPoint.x, currentPoint.y};
 
-            if (is_redundant(point))
-                current_phi = region_val;
+            if (isRedundant(point))
+                currentPhi = regionVal;
             else
                 boundary->push_back(point);
         }
     }
 }
 
-void ContourData::define_phi_from_lists()
+void ContourData::definePhiFromLists()
 {
     phi_.fill(PhiValue::OutsideRegion);
 
-    for (const auto& p : l_out_)
-        phi_.at(p.x(), p.y()) = PhiValue::ExteriorBoundary;
+    for (const auto& point : outerBoundary_)
+        phi_.at(point.x(), point.y()) = PhiValue::ExteriorBoundary;
 
-    for (const auto& p : l_in_)
+    for (const auto& point : innerBoundary_)
     {
-        flood_fill({p.x(), p.y()}, PhiValue::OutsideRegion, PhiValue::InsideRegion);
+        floodFill({point.x(), point.y()}, PhiValue::OutsideRegion, PhiValue::InsideRegion);
 
-        phi_.at(p.x(), p.y()) = PhiValue::InteriorBoundary;
+        phi_.at(point.x(), point.y()) = PhiValue::InteriorBoundary;
     }
 
-    eliminate_redundant_points_if_needed();
+    eliminateRedundantPointsIfNeeded();
 }
 
-void ContourData::flood_fill(const Point2D_i& seed, PhiValue target_value,
-                             PhiValue replacement_value)
+void ContourData::floodFill(const Point2D_i& seed, PhiValue targetValue, PhiValue replacementValue)
 {
-    if (target_value != replacement_value && phi_.valid(seed))
+    if (targetValue != replacementValue && phi_.valid(seed))
     {
-        std::stack<Point2D_i> seeds_stack;
+        std::stack<Point2D_i> seedsStack;
         // top seed coordinates (x_ts,y_ts) and x for scan the row
         int x;
-        bool span_up, span_down;
+        bool spanUp, spanDown;
 
-        seeds_stack.push(seed);
+        seedsStack.push(seed);
 
-        while (!seeds_stack.empty())
+        while (!seedsStack.empty())
         {
             // unstack the top seed
-            const auto [x_ts, y_ts] = seeds_stack.top();
+            const auto [x_ts, y_ts] = seedsStack.top();
 
-            seeds_stack.pop();
+            seedsStack.pop();
 
             // x initialization at the left-most point of the seed
             x = x_ts;
-            while (x > 0 && phi_.at(x - 1, y_ts) == target_value)
-            {
+            while (x > 0 && phi_.at(x - 1, y_ts) == targetValue)
                 x--;
-            }
 
-            span_up = false;
-            span_down = false;
+            spanUp = false;
+            spanDown = false;
 
             // pixels are treated row-wise
-            while (x < phi_.width() && phi_.at(x, y_ts) == target_value)
+            while (x < phi_.width() && phi_.at(x, y_ts) == targetValue)
             {
-                phi_.at(x, y_ts) = replacement_value;
+                phi_.at(x, y_ts) = replacementValue;
 
-                if (!span_up && y_ts > 0 && phi_.at(x, y_ts - 1) == target_value)
+                if (!spanUp && y_ts > 0 && phi_.at(x, y_ts - 1) == targetValue)
                 {
-                    seeds_stack.emplace(x, y_ts - 1);
-                    span_up = true;
+                    seedsStack.emplace(x, y_ts - 1);
+                    spanUp = true;
                 }
-                else if (span_up && y_ts > 0 && phi_.at(x, y_ts - 1) != target_value)
+                else if (spanUp && y_ts > 0 && phi_.at(x, y_ts - 1) != targetValue)
                 {
-                    span_up = false;
+                    spanUp = false;
                 }
 
-                if (!span_down && y_ts < phi_.height() - 1 && phi_.at(x, y_ts + 1) == target_value)
+                if (!spanDown && y_ts < phi_.height() - 1 && phi_.at(x, y_ts + 1) == targetValue)
                 {
-                    seeds_stack.emplace(x, y_ts + 1);
-                    span_down = true;
+                    seedsStack.emplace(x, y_ts + 1);
+                    spanDown = true;
                 }
-                else if (span_down && y_ts < phi_.height() - 1 &&
-                         phi_.at(x, y_ts + 1) != target_value)
+                else if (spanDown && y_ts < phi_.height() - 1 &&
+                         phi_.at(x, y_ts + 1) != targetValue)
                 {
-                    span_down = false;
+                    spanDown = false;
                 }
 
                 ++x;
@@ -227,22 +224,22 @@ void ContourData::flood_fill(const Point2D_i& seed, PhiValue target_value,
     }
 }
 
-void ContourData::eliminate_redundant_points_if_needed()
+void ContourData::eliminateRedundantPointsIfNeeded()
 {
-    eliminateRedundantPoints(l_out_, PhiValue::OutsideRegion);
-    eliminateRedundantPoints(l_in_, PhiValue::InsideRegion);
+    eliminateRedundantPoints(outerBoundary_, PhiValue::OutsideRegion);
+    eliminateRedundantPoints(innerBoundary_, PhiValue::InsideRegion);
 }
 
-void ContourData::eliminateRedundantPoints(Contour& boundary, PhiValue region_value)
+void ContourData::eliminateRedundantPoints(Contour& boundary, PhiValue regionValue)
 {
     for (std::size_t i = 0; i < boundary.size();)
     {
-        auto& p = boundary[i];
+        auto& point = boundary[i];
 
-        if (is_redundant(p))
+        if (isRedundant(point))
         {
-            phi_.at(p.x(), p.y()) = region_value;
-            p = boundary.back();
+            phi_.at(point.x(), point.y()) = regionValue;
+            point = boundary.back();
             boundary.pop_back();
         }
         else
@@ -252,32 +249,34 @@ void ContourData::eliminateRedundantPoints(Contour& boundary, PhiValue region_va
     }
 }
 
-bool ContourData::is_redundant(const ContourPoint& p) const
+bool ContourData::isRedundant(const ContourPoint& point) const
 {
-    const int x = p.x();
-    const int y = p.y();
+    const int x = point.x();
+    const int y = point.y();
 
     const int w = phi_.width();
     const int h = phi_.height();
 
-    const auto phi_center = phi_.at(x, y);
+    const auto phiCenter = phi_.at(x, y);
     const auto connectivity = connectivity_;
 
-    if (fully_inside_8(x, y, w, h))
+    // dn, neighbor position difference
+
+    if (fullyInside8(x, y, w, h))
     {
         // FAST PATH: aucun valid(), aucune branche parasite
 
-        for (const auto& d : kNeighbors4)
+        for (const auto& dn : kNeighbors4)
         {
-            if (phi_value::differentSide(phi_.at(x + d.dx, y + d.dy), phi_center))
+            if (phi_value::differentSide(phi_.at(x + dn.dx, y + dn.dy), phiCenter))
                 return false;
         }
 
         if (connectivity == Connectivity::Eight)
         {
-            for (const auto& d : kNeighbors4Diag)
+            for (const auto& dn : kNeighbors4Diag)
             {
-                if (phi_value::differentSide(phi_.at(x + d.dx, y + d.dy), phi_center))
+                if (phi_value::differentSide(phi_.at(x + dn.dx, y + dn.dy), phiCenter))
                     return false;
             }
         }
@@ -288,29 +287,29 @@ bool ContourData::is_redundant(const ContourPoint& p) const
     {
         // SLOW PATH: bords
 
-        for (const auto& d : kNeighbors4)
+        for (const auto& dn : kNeighbors4)
         {
-            const int nx = x + d.dx;
-            const int ny = y + d.dy;
+            const int nx = x + dn.dx;
+            const int ny = y + dn.dy;
 
             if (!phi_.valid(nx, ny))
                 continue;
 
-            if (phi_value::differentSide(phi_.at(nx, ny), phi_center))
+            if (phi_value::differentSide(phi_.at(nx, ny), phiCenter))
                 return false;
         }
 
         if (connectivity == Connectivity::Eight)
         {
-            for (const auto& d : kNeighbors4Diag)
+            for (const auto& dn : kNeighbors4Diag)
             {
-                const int nx = x + d.dx;
-                const int ny = y + d.dy;
+                const int nx = x + dn.dx;
+                const int ny = y + dn.dy;
 
                 if (!phi_.valid(nx, ny))
                     continue;
 
-                if (phi_value::differentSide(phi_.at(nx, ny), phi_center))
+                if (phi_value::differentSide(phi_.at(nx, ny), phiCenter))
                     return false;
             }
         }
@@ -319,51 +318,51 @@ bool ContourData::is_redundant(const ContourPoint& p) const
     }
 }
 
-bool ContourData::is_valid() const
+bool ContourData::isValid() const
 {
     if (empty())
         return false;
 
-    for (const auto& p : l_out_)
+    for (const auto& p : outerBoundary_)
     {
         if (phi_.at(p.x(), p.y()) != PhiValue::ExteriorBoundary)
             return false;
 
-        if (is_redundant(p))
+        if (isRedundant(p))
             return false;
     }
 
-    for (const auto& p : l_in_)
+    for (const auto& p : innerBoundary_)
     {
         if (phi_.at(p.x(), p.y()) != PhiValue::InteriorBoundary)
             return false;
 
-        if (is_redundant(p))
+        if (isRedundant(p))
             return false;
     }
 
     Contour result;
-    result.reserve(l_out_.size() + l_in_.size());
-    result.insert(result.end(), l_out_.begin(), l_out_.end());
-    result.insert(result.end(), l_in_.begin(), l_in_.end());
+    result.reserve(outerBoundary_.size() + innerBoundary_.size());
+    result.insert(result.end(), outerBoundary_.begin(), outerBoundary_.end());
+    result.insert(result.end(), innerBoundary_.begin(), innerBoundary_.end());
 
-    if (has_duplicates(result))
+    if (hasDuplicates(result))
         return false;
 
     return true;
 }
 
-ExportedContour ContourData::export_contour(const Contour& boundary) const
+ExportedContour ContourData::exportContour(const Contour& boundary) const
 {
-    ExportedContour geometric_boundary;
-    geometric_boundary.reserve(boundary.size());
+    ExportedContour geometricBoundary;
+    geometricBoundary.reserve(boundary.size());
 
     for (const auto& point : boundary)
     {
-        geometric_boundary.emplace_back(point.x(), point.y());
+        geometricBoundary.emplace_back(point.x(), point.y());
     }
 
-    return geometric_boundary;
+    return geometricBoundary;
 }
 
 } // namespace fluvel_ip

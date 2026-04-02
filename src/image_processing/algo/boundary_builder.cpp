@@ -13,18 +13,18 @@
 namespace fluvel_ip
 {
 
-BoundaryBuilder::BoundaryBuilder(int phi_width, int phi_height, Contour& Lout_init,
+BoundaryBuilder::BoundaryBuilder(int phiWidth, int phiHeight, Contour& Lout_init,
                                  Contour& Lin_init)
-    : grid_width_(phi_width)
-    , grid_height_(phi_height)
+    : grid_width_(phiWidth)
+    , grid_height_(phiHeight)
     , Lout_init_(Lout_init)
     , Lin_init_(Lin_init)
 {
-    assert(phi_width >= 1);
-    assert(phi_height >= 1);
+    assert(phiWidth >= 1);
+    assert(phiHeight >= 1);
 }
 
-void BoundaryBuilder::generate_rectangle_points(Point2D_i top_left, Point2D_i bottom_right,
+void BoundaryBuilder::generate_rectangle_points(Point2D_i topLeft, Point2D_i bottomRight,
                                                 BoundaryOrientation orientation)
 {
     auto* list1 = &Lout_init_;
@@ -35,11 +35,11 @@ void BoundaryBuilder::generate_rectangle_points(Point2D_i top_left, Point2D_i bo
         std::swap(list1, list2);
     }
 
-    generate_rectangle_points(top_left.x, top_left.y, bottom_right.x, bottom_right.y, *list1,
+    generate_rectangle_points(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y, *list1,
                               *list2);
 }
 
-void BoundaryBuilder::generate_rectangle_points(Point2D_f top_left, Point2D_f bottom_right,
+void BoundaryBuilder::generate_rectangle_points(Point2D_f topLeft, Point2D_f bottomRight,
                                                 BoundaryOrientation orientation)
 {
     auto* list1 = &Lout_init_;
@@ -50,10 +50,10 @@ void BoundaryBuilder::generate_rectangle_points(Point2D_f top_left, Point2D_f bo
         std::swap(list1, list2);
     }
 
-    generate_rectangle_points(std::lround(top_left.x * grid_width_),
-                              std::lround(top_left.y * grid_height_),
-                              std::lround(bottom_right.x * grid_width_),
-                              std::lround(bottom_right.y * grid_height_), *list1, *list2);
+    generate_rectangle_points(std::lround(topLeft.x * grid_width_),
+                              std::lround(topLeft.y * grid_height_),
+                              std::lround(bottomRight.x * grid_width_),
+                              std::lround(bottomRight.y * grid_height_), *list1, *list2);
 }
 
 void BoundaryBuilder::generate_rectangle_points(int x1, int y1, int x2, int y2, Contour& list_out,
@@ -269,12 +269,12 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, in
     }
 }
 
-void BoundaryBuilder::build_inner_contiguous(int x0, int y0, const Contour& l_out, Contour& l_in)
+void BoundaryBuilder::build_inner_contiguous(int x0, int y0, const Contour& outerBoundary, Contour& innerBoundary)
 {
     PointSet seen;
-    seen.reserve(l_out.size());
+    seen.reserve(outerBoundary.size());
 
-    for (const auto& p : l_out)
+    for (const auto& p : outerBoundary)
     {
         const int sx = math::sign(x0 - p.x());
         const int sy = math::sign(y0 - p.y());
@@ -285,7 +285,7 @@ void BoundaryBuilder::build_inner_contiguous(int x0, int y0, const Contour& l_ou
             continue;
 
         if (seen.insert(pi).second)
-            l_in.emplace_back(pi);
+            innerBoundary.emplace_back(pi);
     }
 }
 
