@@ -3,6 +3,9 @@
 
 #include "region_ac.hpp"
 
+#include "ac_types.hpp"
+#include "contour_data.hpp"
+#include "contour_diagnostics.hpp"
 #include "fluvel_math.hpp"
 
 #include <cassert>
@@ -11,89 +14,87 @@
 namespace fluvel_ip
 {
 
-RegionAc::RegionAc(ImageView image, ContourData initialContour,
-                   const AcConfig& generalConfig,    /* optional parameter with AcConfig() */
-                   const RegionConfig& regionConfig) /* optional parameter with RegionConfig() */
-    : ActiveContour(std::move(initialContour), generalConfig)
-    , image_(image)
-    , regionConfig_(regionConfig)
-    , pxl_nbr_total_(image.size())
+RegionSpeedModel::RegionSpeedModel(
+    const RegionParams& configuration) /* optional parameter with RegionParams() */
+    : params_(configuration)
 {
-    assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
-
-    initialize_sums();
-    RegionAc::onStepCycle1();
 }
 
-void RegionAc::initialize_sums()
+void RegionSpeedModel::onImageChanged(ImageView image, const ContourData& contour)
 {
-    sum_total_ = 0;
+    assert(image.format() == ImageFormat::Gray8);
+    assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());
 
-    sum_out_ = 0;
-    pxl_nbr_out_ = 0;
+    image_ = image;
+    pxlNbrTotal_ = image_.size();
 
-    for (int y = 0; y < cd_.phi().height(); ++y)
+    sumTotal_ = 0;
+
+    sumOut_ = 0;
+    pxlNbrOut_ = 0;
+
+    const auto& phi = contour.phi();
+
+    for (int y = 0; y < phi.height(); ++y)
     {
-        for (int x = 0; x < cd_.phi().width(); ++x)
+        for (int x = 0; x < phi.width(); ++x)
         {
             const int64_t intensity = static_cast<int64_t>(image_.at(x, y));
 
-            sum_total_ += intensity;
+            sumTotal_ += intensity;
 
-            if (phi_value::isOutside(cd_.phi().at(x, y)))
+            if (phi_value::isOutside(phi.at(x, y)))
             {
-                sum_out_ += intensity;
-                ++pxl_nbr_out_;
+                sumOut_ += intensity;
+                ++pxlNbrOut_;
             }
         }
     }
 }
 
-void RegionAc::onStepCycle1()
+void RegionSpeedModel::onStepCycle1()
 {
-    if (pxl_nbr_out_ >= 1)
-        meanOut_ = std::lround(static_cast<float>(sum_out_) / pxl_nbr_out_);
+    if (pxlNbrOut_ >= 1)
+        meanOut_ = std::lround(static_cast<float>(sumOut_) / pxlNbrOut_);
 
-    const int64_t sum_in = sum_total_ - sum_out_;
-    const int64_t pxl_nbr_in = pxl_nbr_total_ - pxl_nbr_out_;
+    const int64_t sumIn = sumTotal_ - sumOut_;
+    const int64_t pxlNbrIn = pxlNbrTotal_ - pxlNbrOut_;
 
-    if (pxl_nbr_in >= 1)
-        meanIn_ = std::lround(static_cast<float>(sum_in) / pxl_nbr_in);
+    if (pxlNbrIn >= 1)
+        meanIn_ = std::lround(static_cast<float>(sumIn) / pxlNbrIn);
 }
 
-void RegionAc::computeSpeed(ContourPoint& point)
+void RegionSpeedModel::computeSpeed(ContourPoint& point, const DiscreteLevelSet&)
 {
     const int pxl = static_cast<int>(image_.at(point.x(), point.y()));
 
     const int diffOut = pxl - meanOut_;
     const int diffIn = pxl - meanIn_;
 
-    const int speed = regionConfig_.lambdaOut * (math::square(diffOut)) -
-                      regionConfig_.lambdaIn * (math::square(diffIn));
+    const int speed =
+        params_.lambdaOut * (math::square(diffOut)) - params_.lambdaIn * (math::square(diffIn));
 
     point.setSpeed(speed_value::get_discrete_speed(speed));
 }
 
-void RegionAc::onSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
+void RegionSpeedModel::onSwitch(const ContourPoint& point, SwitchDirection direction)
 {
     const int64_t intensity = static_cast<int64_t>(image_.at(point.x(), point.y()));
 
-    if (ctxChoice == BoundarySwitch::In)
+    if (direction == SwitchDirection::In)
     {
-        sum_out_ -= intensity;
-        --pxl_nbr_out_;
+        sumOut_ -= intensity;
+        --pxlNbrOut_;
     }
-    else if (ctxChoice == BoundarySwitch::Out)
+    else if (direction == SwitchDirection::Out)
     {
-        sum_out_ += intensity;
-        ++pxl_nbr_out_;
+        sumOut_ += intensity;
+        ++pxlNbrOut_;
     }
 }
 
-void RegionAc::fillDiagnostics(ContourDiagnostics& d) const
+void RegionSpeedModel::fillDiagnostics(ContourDiagnostics& d) const
 {
-    ActiveContour::fillDiagnostics(d);
-
     d.meanIn = ChannelVector(meanIn_);
     d.meanOut = ChannelVector(meanOut_);
 }

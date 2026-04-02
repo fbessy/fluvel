@@ -4,10 +4,10 @@
 #pragma once
 
 #include "ac_types.hpp"
+#include "active_contour.hpp"
 #include "common_settings.hpp"
 #include "frame_data.hpp"
 #include "image_view.hpp"
-#include "region_color_ac.hpp"
 #include "temporal_smoother.hpp"
 
 #include <QVideoFrame>
@@ -61,7 +61,7 @@ private:
     bool configChanged_{false};
     bool displayModeChanged_{false};
 
-    std::unique_ptr<fluvel_ip::RegionColorAc> activeContour_;
+    std::unique_ptr<fluvel_ip::ActiveContour> activeContour_;
     QSize currentSize_ = {0, 0};
 
     fluvel_ip::TemporalSmoother smoother_;

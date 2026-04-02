@@ -2,8 +2,10 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "active_contour.hpp"
+#include "ac_types.hpp"
 #include "hausdorff_distance.hpp"
 #include "neighborhood.hpp"
+#include "speed_model.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -13,27 +15,32 @@ namespace fluvel_ip
 {
 
 // Definitions
-ActiveContour::ActiveContour(ContourData initialState, const AcConfig& config)
-    : cd_(std::move(initialState))
-    , config_(config)
-    , internalKernel_(makeInternalKernelOffsets(config.diskRadius, initialState.phi().width()))
-    , ctxIn_(BoundarySwitchContext::makeSwitchIn(cd_))
-    , ctxOut_(BoundarySwitchContext::makeSwitchOut(cd_))
-    , ctx_(&ctxIn_)
+ActiveContour::ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedModel> speedModel,
+                             const ActiveContourParams& configuration)
+    : cd_(std::move(initialContour))
+    , speedModel_(std::move(speedModel))
+    , params_(configuration)
+    , internalKernel_(
+          makeInternalKernelOffsets(configuration.diskRadius, initialContour.phi().width()))
+    , switchInMapping_(BoundarySwitchMapping::makeSwitchIn(cd_))
+    , switchOutMapping_(BoundarySwitchMapping::makeSwitchOut(cd_))
+    , currentMapping_(&switchInMapping_)
     , state_(PhaseState::Cycle1)
     , ed_(cd_)
 {
-    activeBoundaryStaging_.reserve(cd_.l_out().capacity());
+    pendingBoundaryPoints_.reserve(cd_.l_out().capacity());
 
-    if (config_.hasCycle2)
+    if (params_.hasCycle2)
     {
-        steps_per_cycle_ = config_.Na + config_.Ns;
+        stepsPerCycle_ = params_.Na + params_.Ns;
     }
     else
     {
-        steps_per_cycle_ = config_.Na;
+        stepsPerCycle_ = params_.Na;
     }
 }
+
+ActiveContour::~ActiveContour() = default;
 
 void ActiveContour::handleFailure()
 {
@@ -45,7 +52,7 @@ void ActiveContour::handleFailure()
 
     // Recovery mode: the failure stops the current iteration,
     // but contour data are repaired to allow a future restart.
-    if (config_.failureMode == FailureHandlingMode::RecoverOnFailure)
+    if (params_.failureMode == FailureHandlingMode::RecoverOnFailure)
         cd_.define_from_ellipse();
 }
 
@@ -59,7 +66,7 @@ void ActiveContour::enforceIterationLimit()
     {
         ed_.stoppingStatus = StoppingStatus::MaxIteration;
 
-        if (config_.hasCycle2)
+        if (params_.hasCycle2)
         {
             state_ = PhaseState::FinalCycle2;
         }
@@ -123,7 +130,7 @@ void ActiveContour::runCycles(int n_cycles)
         n_cycles = 1;
     }
 
-    int n_steps = n_cycles * steps_per_cycle_;
+    int n_steps = n_cycles * stepsPerCycle_;
 
     runSteps(n_steps);
 }
@@ -140,15 +147,15 @@ void ActiveContour::stepCycle1()
     if (state_ != PhaseState::Cycle1)
         return;
 
-    onStepCycle1();
+    speedModel_->onStepCycle1();
 
-    bool isOutwardMoving = directionalSubstep(BoundarySwitch::In);
-    bool isInwardMoving = directionalSubstep(BoundarySwitch::Out);
+    bool didOutwardMove = directionalSubstep(SwitchDirection::In);
+    bool didInwardMove = directionalSubstep(SwitchDirection::Out);
 
     ++ed_.stepCount;
     ++ed_.phaseStepCount;
 
-    ed_.isMoving = (isOutwardMoving || isInwardMoving);
+    ed_.didMove = (didOutwardMove || didInwardMove);
 
     checkStateStep1();
 }
@@ -161,8 +168,8 @@ void ActiveContour::stepCycle2()
     if (isStopped())
         return;
 
-    directionalSubstep(BoundarySwitch::In);
-    directionalSubstep(BoundarySwitch::Out);
+    directionalSubstep(SwitchDirection::In);
+    directionalSubstep(SwitchDirection::Out);
 
     ++ed_.stepCount;
     ++ed_.phaseStepCount;
@@ -170,41 +177,41 @@ void ActiveContour::stepCycle2()
     updateStateCycle2();
 }
 
-void ActiveContour::selectContext(BoundarySwitch ctxChoice)
+void ActiveContour::selectCurrentMapping(SwitchDirection direction)
 {
     assert(!isStopped());
 
-    if (ctxChoice == BoundarySwitch::In)
-        ctx_ = &ctxIn_;
-    else if (ctxChoice == BoundarySwitch::Out)
-        ctx_ = &ctxOut_;
+    if (direction == SwitchDirection::In)
+        currentMapping_ = &switchInMapping_;
+    else if (direction == SwitchDirection::Out)
+        currentMapping_ = &switchOutMapping_;
 }
 
-bool ActiveContour::directionalSubstep(BoundarySwitch ctxChoice)
+bool ActiveContour::directionalSubstep(SwitchDirection direction)
 {
     assert(!isStopped());
 
-    bool isMoving = false;
+    bool didMove = false;
 
-    selectContext(ctxChoice);
-    const auto& ctx = context();
+    selectCurrentMapping(direction);
+    const auto& cm = currentMapping();
 
-    auto& active = ctx.activeBoundary;
-    auto& adjacent = ctx.adjacentBoundary;
+    auto& listToScan = cm.fromBoundary;
+    auto& adjacentList = cm.toBoundary;
 
-    activeBoundaryStaging_.clear();
+    pendingBoundaryPoints_.clear();
 
-    updateSpeeds(active);
+    updateSpeeds(listToScan);
 
-    for (std::size_t i = 0; i < active.size();)
+    for (std::size_t i = 0; i < listToScan.size();)
     {
-        auto& point = active[i];
+        auto& point = listToScan[i];
 
-        if (point.speed() == ctx.requiredSpeedSign)
+        if (point.speed() == cm.requiredSpeedSign)
         {
-            isMoving = true;
+            didMove = true;
 
-            onSwitch(point, ctxChoice);
+            speedModel_->onSwitch(point, direction);
 
             switchBoundaryPoint(point);
         }
@@ -214,14 +221,13 @@ bool ActiveContour::directionalSubstep(BoundarySwitch ctxChoice)
         }
     }
 
-    active.insert(active.end(), activeBoundaryStaging_.begin(), activeBoundaryStaging_.end());
+    listToScan.insert(listToScan.end(), pendingBoundaryPoints_.begin(),
+                      pendingBoundaryPoints_.end());
 
-    if (isMoving)
-    {
-        cd_.eliminateRedundantPoints(adjacent, ctx.redundantToRegionVal);
-    }
+    if (didMove)
+        cd_.eliminateRedundantPoints(adjacentList, cm.redundantToRegionVal);
 
-    return isMoving;
+    return didMove;
 }
 
 void ActiveContour::switchBoundaryPoint(ContourPoint& point)
@@ -283,33 +289,33 @@ void ActiveContour::switchBoundaryPoint(ContourPoint& point)
         }
     }
 
-    const auto& ctx = context();
+    const auto& cm = currentMapping();
 
     // bascule du point courant
-    cd_.phi().at(x, y) = ctx.currentToAdjacentVal;
+    cd_.phi().at(x, y) = cm.currentToAdjacentVal;
 
     // passage dans la boundary adjacente
-    ctx.adjacentBoundary.emplace_back(x, y);
+    cm.toBoundary.emplace_back(x, y);
 
-    point = ctx.activeBoundary.back();
-    ctx.activeBoundary.pop_back();
+    point = cm.fromBoundary.back();
+    cm.fromBoundary.pop_back();
 }
 
 void ActiveContour::promoteRegionToBoundary(int nx, int ny)
 {
     assert(!isStopped());
 
-    const auto& ctx = context();
+    const auto& cm = currentMapping();
 
     auto& phiNeighbor = cd_.phi().at(nx, ny);
 
     // neighbor ∈ region ?
-    if (phiNeighbor == ctx.neighborFromRegionVal)
+    if (phiNeighbor == cm.neighborFromRegionVal)
     {
-        phiNeighbor = ctx.neighbor_to_boundary_val;
+        phiNeighbor = cm.neighbor_to_boundary_val;
 
-        // neighbor pending to boundary active
-        activeBoundaryStaging_.emplace_back(nx, ny);
+        // neighbor pending to the scanned boundary
+        pendingBoundaryPoints_.emplace_back(nx, ny);
     }
 }
 
@@ -332,19 +338,7 @@ void ActiveContour::computeSpeeds(Contour& boundary)
     assert(state_ == PhaseState::Cycle1);
 
     for (auto& point : boundary)
-    {
-        computeSpeed(point);
-    }
-}
-
-// input integer is an offset
-void ActiveContour::computeSpeed(ContourPoint& point)
-{
-    assert(state_ == PhaseState::Cycle1);
-
-    // this class should never be instantiated
-    // reimplement a better and data-dependent speed function in a child class
-    point.setSpeed(SpeedValue::GoInward);
+        speedModel_->computeSpeed(point, cd_.phi());
 }
 
 void ActiveContour::computeInternalSpeeds(Contour& boundary)
@@ -463,11 +457,11 @@ void ActiveContour::checkStateStep1()
 {
     assert(state_ == PhaseState::Cycle1);
 
-    if (!ed_.isMoving)
+    if (!ed_.didMove)
     {
         ed_.stoppingStatus = StoppingStatus::ListsConverged;
 
-        if (config_.hasCycle2)
+        if (params_.hasCycle2)
         {
             ed_.phaseStepCount = 0;
             state_ = PhaseState::FinalCycle2;
@@ -477,7 +471,7 @@ void ActiveContour::checkStateStep1()
             stop();
         }
     }
-    else if (ed_.phaseStepCount >= config_.Na && config_.hasCycle2)
+    else if (ed_.phaseStepCount >= params_.Na && params_.hasCycle2)
     {
         ed_.phaseStepCount = 0;
         state_ = PhaseState::Cycle2;
@@ -489,14 +483,14 @@ void ActiveContour::updateStateCycle2()
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 
     // if at the end of one cycle 2
-    if (ed_.phaseStepCount >= config_.Ns)
+    if (ed_.phaseStepCount >= params_.Ns)
     {
         if (state_ == PhaseState::FinalCycle2)
         {
             stop();
         }
         else if (state_ == PhaseState::Cycle2 &&
-                 config_.failureMode == FailureHandlingMode::StopOnFailure)
+                 params_.failureMode == FailureHandlingMode::StopOnFailure)
         {
             check_hausdorff_stopping_condition();
         }
@@ -512,7 +506,7 @@ void ActiveContour::updateStateCycle2()
 void ActiveContour::check_hausdorff_stopping_condition()
 {
     assert(state_ == PhaseState::Cycle2 &&
-           config_.failureMode == FailureHandlingMode::StopOnFailure);
+           params_.failureMode == FailureHandlingMode::StopOnFailure);
 
     const float stepDelta = float(ed_.stepCount - ed_.previous_step_count);
 
@@ -574,12 +568,12 @@ void ActiveContour::calculateShapesIntersection()
     }
 }
 
-void ActiveContour::restart()
+void ActiveContour::update(ImageView image)
 {
-    // Intended to be used in RecoverOnFailure mode (video tracking).
-
     state_ = PhaseState::Cycle1;
     ed_.resetExecutionState();
+
+    speedModel_->onImageChanged(image, cd_);
 }
 
 void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const
@@ -591,8 +585,9 @@ void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const
     d.hausdorffQuantile = ed_.hausdorffQuantile;
     d.relativeCentroidDistance = ed_.relativeCentroidDistance;
 
-    // d.elapsedSec = ed.elapsedSec_;
     d.contourSize = cd_.l_out().size() + cd_.l_in().size();
+
+    speedModel_->fillDiagnostics(d);
 }
 
 } // namespace fluvel_ip

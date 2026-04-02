@@ -2,6 +2,8 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_active_contour_thread.hpp"
+#include "region_color_ac.hpp"
+#include "speed_model.hpp"
 
 #include "frame_clock.hpp"
 #include "image_adapters.hpp"
@@ -127,10 +129,10 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
             algoImage = smoother_.outputSpan();
         }
 
-        activeContour_ = std::make_unique<fluvel_ip::RegionColorAc>(
-            algoImage,
+        activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
             fluvel_ip::ContourData(algoImage.width(), algoImage.height(), algoConfig.connectivity),
-            algoConfig.acConfig, algoConfig.regionAcConfig);
+            std::make_unique<fluvel_ip::RegionColorSpeedModel>(algoConfig.regionAcConfig),
+            algoConfig.acConfig);
 
         currentSize_ = newWSize;
         configChanged_ = false;
@@ -142,9 +144,10 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
             smoother_.update(algoImage);
             algoImage = smoother_.outputSpan();
         }
-
-        activeContour_->resetExecutionState(algoImage);
     }
+
+    if (algoImage.data() != nullptr && activeContour_)
+        activeContour_->update(algoImage);
 
     QElapsedTimer timeSliceBudgetMs;
     timeSliceBudgetMs.start();

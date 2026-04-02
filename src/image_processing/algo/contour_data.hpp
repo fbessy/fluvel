@@ -147,47 +147,4 @@ template <typename T> bool ContourData::has_duplicates(const std::vector<T>& v)
     return false;
 }
 
-namespace phi_value
-{
-
-constexpr int phiSign(PhiValue v);
-constexpr bool isInside(PhiValue v);
-constexpr bool isOutside(PhiValue v);
-constexpr bool differentSide(PhiValue a, PhiValue b);
-
-/// Discrete sign of level-set function.
-/// Returns -1 for interior side, +1 for exterior side.
-/// Note: zero level-set is conceptual and never stored.
-constexpr int phiSign(PhiValue v)
-{
-    switch (v)
-    {
-        case PhiValue::InsideRegion:
-        case PhiValue::InteriorBoundary:
-            return -1;
-
-        case PhiValue::ExteriorBoundary:
-        case PhiValue::OutsideRegion:
-            return 1;
-    }
-    return 0; // unreachable
-}
-
-constexpr bool isInside(PhiValue v)
-{
-    return phiSign(v) < 0;
-}
-
-constexpr bool isOutside(PhiValue v)
-{
-    return !isInside(v);
-}
-
-constexpr bool differentSide(PhiValue a, PhiValue b)
-{
-    return phiSign(a) * phiSign(b) < 0;
-}
-
-} // namespace phi_value
-
 } // namespace fluvel_ip

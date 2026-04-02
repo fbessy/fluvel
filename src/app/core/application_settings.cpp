@@ -425,12 +425,12 @@ void ApplicationSettings::loadAlgo(Session session, AlgoConfig& algoConfig)
 
     algoConfig.connectivity = fluvel_ip::connectivity_from_string(s.toStdString());
 
-    algoConfig.acConfig.Na = settings.value("algo/Na", fluvel_ip::AcConfig::kDefaultNa).toInt();
+    algoConfig.acConfig.Na = settings.value("algo/Na", fluvel_ip::ActiveContourParams::kDefaultNa).toInt();
     algoConfig.acConfig.hasCycle2 =
-        settings.value("algo/has_smoothing_cycle", fluvel_ip::AcConfig::kDefaultIsCycle2).toBool();
-    algoConfig.acConfig.Ns = settings.value("algo/Ns", fluvel_ip::AcConfig::kDefaultNs).toInt();
+        settings.value("algo/has_smoothing_cycle", fluvel_ip::ActiveContourParams::kDefaultIsCycle2).toBool();
+    algoConfig.acConfig.Ns = settings.value("algo/Ns", fluvel_ip::ActiveContourParams::kDefaultNs).toInt();
     algoConfig.acConfig.diskRadius =
-        settings.value("algo/disk_radius", fluvel_ip::AcConfig::kDefaultDiskRadius).toInt();
+        settings.value("algo/disk_radius", fluvel_ip::ActiveContourParams::kDefaultDiskRadius).toInt();
 
     switch (session)
     {
@@ -445,26 +445,26 @@ void ApplicationSettings::loadAlgo(Session session, AlgoConfig& algoConfig)
     }
 
     algoConfig.regionAcConfig.lambdaOut =
-        settings.value("algo/lambda_out", fluvel_ip::RegionConfig::kDefaultLambdaOut).toInt();
+        settings.value("algo/lambda_out", fluvel_ip::RegionParams::kDefaultLambdaOut).toInt();
     algoConfig.regionAcConfig.lambdaIn =
-        settings.value("algo/lambda_in", fluvel_ip::RegionConfig::kDefaultLambdaIn).toInt();
+        settings.value("algo/lambda_in", fluvel_ip::RegionParams::kDefaultLambdaIn).toInt();
 
     const QString s_cs =
         settings
             .value("algo/color_space",
-                   fluvel_ip::to_string(fluvel_ip::RegionColorConfig::kDefaultColorSpace))
+                   fluvel_ip::to_string(fluvel_ip::RegionColorParams::kDefaultColorSpace))
             .toString();
 
     algoConfig.regionAcConfig.color_space = fluvel_ip::color_space_from_string(s_cs.toStdString());
 
     algoConfig.regionAcConfig.weights.c1 =
-        settings.value("algo/color_weight_w1", fluvel_ip::RegionColorConfig::kDefaultWeights.c1)
+        settings.value("algo/color_weight_w1", fluvel_ip::RegionColorParams::kDefaultWeights.c1)
             .toInt();
     algoConfig.regionAcConfig.weights.c2 =
-        settings.value("algo/color_weight_w2", fluvel_ip::RegionColorConfig::kDefaultWeights.c2)
+        settings.value("algo/color_weight_w2", fluvel_ip::RegionColorParams::kDefaultWeights.c2)
             .toInt();
     algoConfig.regionAcConfig.weights.c3 =
-        settings.value("algo/color_weight_w3", fluvel_ip::RegionColorConfig::kDefaultWeights.c3)
+        settings.value("algo/color_weight_w3", fluvel_ip::RegionColorParams::kDefaultWeights.c3)
             .toInt();
 }
 

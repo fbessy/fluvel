@@ -3,20 +3,20 @@
 
 #pragma once
 
-#include "active_contour.hpp"
+#include "ac_types.hpp"
 #include "image_view.hpp"
+#include "speed_model.hpp"
 
 namespace fluvel_ip
 {
 
-class EdgeAc : public ActiveContour
+class EdgeSpeedModel : public ISpeedModel
 {
 public:
     //! Constructor to initialize with an initial contour.
-    EdgeAc(ImageView gradient_image, ContourData initialContour,
-           const AcConfig& config = AcConfig()); /* optional parameter */
+    EdgeSpeedModel(ImageView gradient_image);
 
-    ~EdgeAc() override = default;
+    ~EdgeSpeedModel() override = default;
 
     //! Getter function for #threshold
     unsigned char get_threshold() const

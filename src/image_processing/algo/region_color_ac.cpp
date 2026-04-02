@@ -2,6 +2,8 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "region_color_ac.hpp"
+#include "contour_data.hpp"
+#include "contour_diagnostics.hpp"
 #include "fluvel_math.hpp"
 
 #include <cassert>
@@ -9,68 +11,66 @@
 namespace fluvel_ip
 {
 
-RegionColorAc::RegionColorAc(
-    ImageView image, ContourData initialContour,
-    const AcConfig& generalConfig,         /* optional parameter with AcConfig() */
-    const RegionColorConfig& regionConfig) /* optional parameter with RegionColorConfig() */
-    : ActiveContour(std::move(initialContour), generalConfig)
-    , image_(image)
-    , regionConfig_(regionConfig)
-    , pxl_nbr_total_(image.size())
+RegionColorSpeedModel::RegionColorSpeedModel(const RegionColorParams& configuration)
+    : params_(configuration)
 {
-    assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
-
-    initialize_sums();
-    RegionColorAc::onStepCycle1();
 }
 
-void RegionColorAc::initialize_sums()
+void RegionColorSpeedModel::onImageChanged(ImageView image, const ContourData& contour)
 {
-    sum_total_ = {0, 0, 0};
+    assert(image.format() != ImageFormat::Gray8);
+    assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());
 
-    sum_out_ = {0, 0, 0};
-    pxl_nbr_out_ = 0;
+    image_ = image;
+    pxlNbrTotal_ = image_.size();
 
-    for (int y = 0; y < cd_.phi().height(); ++y)
+    sumTotal_ = {0, 0, 0};
+
+    sumOut_ = {0, 0, 0};
+    pxlNbrOut_ = 0;
+
+    const auto& phi = contour.phi();
+
+    for (int y = 0; y < phi.height(); ++y)
     {
-        for (int x = 0; x < cd_.phi().width(); ++x)
+        for (int x = 0; x < phi.width(); ++x)
         {
             const Rgb_64i rgb = static_cast<Rgb_64i>(image_.atPixelRgb(x, y));
 
-            sum_total_ += rgb;
+            sumTotal_ += rgb;
 
-            if (phi_value::isOutside(cd_.phi().at(x, y)))
+            if (phi_value::isOutside(phi.at(x, y)))
             {
-                sum_out_ += rgb;
-                ++pxl_nbr_out_;
+                sumOut_ += rgb;
+                ++pxlNbrOut_;
             }
         }
     }
 }
 
-void RegionColorAc::onStepCycle1()
+void RegionColorSpeedModel::onStepCycle1()
 {
-    if (pxl_nbr_out_ >= 1)
+    if (pxlNbrOut_ >= 1)
     {
-        const auto rgb_f = sum_out_ / pxl_nbr_out_;
-        meanOut_ = rgb_f.rounded<unsigned char>();
-        average_color_out_ = rgb_to_color(meanOut_);
+        const Rgb<float> rgb = sumOut_ / pxlNbrOut_;
+        meanRgbOut_ = rgb.rounded<unsigned char>();
+        meanColorOut_ = rgbToColor(meanRgbOut_);
     }
 
-    const Rgb_64i sum_in = sum_total_ - sum_out_;
-    const int64_t pxl_nbr_in = pxl_nbr_total_ - pxl_nbr_out_;
+    const Rgb_64i sumIn = sumTotal_ - sumOut_;
+    const int64_t pxlNbrIn = pxlNbrTotal_ - pxlNbrOut_;
 
-    if (pxl_nbr_in >= 1)
+    if (pxlNbrIn >= 1)
     {
-        const auto rgb_f = sum_in / pxl_nbr_in;
-        meanIn_ = rgb_f.rounded<unsigned char>();
-        average_color_in_ = rgb_to_color(meanIn_);
+        const Rgb<float> rgb = sumIn / pxlNbrIn;
+        meanRgbIn_ = rgb.rounded<unsigned char>();
+        meanColorIn_ = rgbToColor(meanRgbIn_);
     }
 }
 
-Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
+Color_3i RegionColorSpeedModel::rgbToColor(const Rgb_uc& rgb) const
 {
-    switch (regionConfig_.color_space)
+    switch (params_.color_space)
     {
         case ColorSpaceOption::YUV:
             return color::rgb_to_yuv(rgb);
@@ -78,13 +78,13 @@ Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
         case ColorSpaceOption::Lab:
         {
             const auto col = color::rgb_to_Lab(rgb);
-            return scale_and_round(col.L, col.a, col.b);
+            return scaleAndRound(col.L, col.a, col.b);
         }
 
         case ColorSpaceOption::Luv:
         {
             const auto col = color::rgb_to_Luv(rgb);
-            return scale_and_round(col.L, col.u, col.v);
+            return scaleAndRound(col.L, col.u, col.v);
         }
 
         case ColorSpaceOption::RGB:
@@ -95,65 +95,53 @@ Color_3i RegionColorAc::rgb_to_color(const Rgb_uc& rgb) const
     std::unreachable();
 }
 
-void RegionColorAc::computeSpeed(ContourPoint& point)
+void RegionColorSpeedModel::computeSpeed(ContourPoint& point, const DiscreteLevelSet&)
 {
     const Rgb_uc rgb = image_.atPixelRgb(point.x(), point.y());
 
-    const auto col = rgb_to_color(rgb);
+    const auto col = rgbToColor(rgb);
 
-    const int lambdaOut = regionConfig_.lambdaOut;
-    const int lambdaIn = regionConfig_.lambdaIn;
+    const int lambdaOut = params_.lambdaOut;
+    const int lambdaIn = params_.lambdaIn;
 
-    const auto weights = regionConfig_.weights;
-    const auto avg_out = average_color_out_;
-    const auto avg_in = average_color_in_;
+    const auto weights = params_.weights;
+    const auto meanColorOut = meanColorOut_;
+    const auto meanColorIn = meanColorIn_;
 
-    const Color_3i veloc_out = weights * math::square(col - avg_out);
-    const Color_3i veloc_in = weights * math::square(col - avg_in);
+    const Color_3i speedOut = weights * math::square(col - meanColorOut);
+    const Color_3i speedIn = weights * math::square(col - meanColorIn);
 
-    const int speed_out = veloc_out.scalar();
-    const int speed_in = veloc_in.scalar();
+    const int scalarSpeedOut = speedOut.scalar();
+    const int scalarSpeedIn = speedIn.scalar();
 
-    point.setSpeed(speed_value::get_discrete_speed(lambdaOut * speed_out - lambdaIn * speed_in));
+    point.setSpeed(
+        speed_value::get_discrete_speed(lambdaOut * scalarSpeedOut - lambdaIn * scalarSpeedIn));
 }
 
-void RegionColorAc::onSwitch(const ContourPoint& point, BoundarySwitch ctxChoice)
+void RegionColorSpeedModel::onSwitch(const ContourPoint& point, SwitchDirection direction)
 {
     const Rgb_64i rgb = static_cast<Rgb_64i>(image_.atPixelRgb(point.x(), point.y()));
 
-    if (ctxChoice == BoundarySwitch::In)
+    if (direction == SwitchDirection::In)
     {
-        sum_out_ -= rgb;
-        --pxl_nbr_out_;
+        sumOut_ -= rgb;
+        --pxlNbrOut_;
     }
-    else if (ctxChoice == BoundarySwitch::Out)
+    else if (direction == SwitchDirection::Out)
     {
-        sum_out_ += rgb;
-        ++pxl_nbr_out_;
+        sumOut_ += rgb;
+        ++pxlNbrOut_;
     }
 }
 
-void RegionColorAc::resetExecutionState(ImageView image)
+void RegionColorSpeedModel::fillDiagnostics(ContourDiagnostics& d) const
 {
-    restart();
-
-    image_ = image;
-
-    initialize_sums();
-    onStepCycle1();
-}
-
-void RegionColorAc::fillDiagnostics(ContourDiagnostics& d) const
-{
-    ActiveContour::fillDiagnostics(d);
-
-    d.meanIn =
-        ChannelVector(static_cast<int>(meanIn_.red), static_cast<int>(meanIn_.green),
-                      static_cast<int>(meanIn_.blue));
+    d.meanIn = ChannelVector(static_cast<int>(meanRgbIn_.red), static_cast<int>(meanRgbIn_.green),
+                             static_cast<int>(meanRgbIn_.blue));
 
     d.meanOut =
-        ChannelVector(static_cast<int>(meanOut_.red), static_cast<int>(meanOut_.green),
-                      static_cast<int>(meanOut_.blue));
+        ChannelVector(static_cast<int>(meanRgbOut_.red), static_cast<int>(meanRgbOut_.green),
+                      static_cast<int>(meanRgbOut_.blue));
 }
 
 } // namespace fluvel_ip

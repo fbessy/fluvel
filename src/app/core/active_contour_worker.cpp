@@ -5,6 +5,7 @@
 
 #include "region_ac.hpp"
 #include "region_color_ac.hpp"
+#include "speed_model.hpp"
 
 #include "image_adapters.hpp"
 #include "image_view.hpp"
@@ -413,14 +414,20 @@ void ActiveContourWorker::initializeActiveContour()
 
     if (is_rgb)
     {
-        activeContour_ = std::make_unique<fluvel_ip::RegionColorAc>(
-            processedImg, std::move(initialCD), config_.algo.acConfig, config_.algo.regionAcConfig);
+        activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
+            std::move(initialCD),
+            std::make_unique<fluvel_ip::RegionColorSpeedModel>(config_.algo.regionAcConfig),
+            config_.algo.acConfig);
     }
     else
     {
-        activeContour_ = std::make_unique<fluvel_ip::RegionAc>(
-            processedImg, std::move(initialCD), config_.algo.acConfig, config_.algo.regionAcConfig);
+        activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
+            std::move(initialCD),
+            std::make_unique<fluvel_ip::RegionSpeedModel>(config_.algo.regionAcConfig),
+            config_.algo.acConfig);
     }
+
+    activeContour_->update(processedImg);
 
     setState(WorkerState::Ready);
     initialShown_ = false;

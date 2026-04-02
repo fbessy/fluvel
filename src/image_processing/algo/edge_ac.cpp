@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "edge_ac.hpp"
+#include "ac_types.hpp"
 #include "fluvel_math.hpp"
 
 #include <cassert>
@@ -10,10 +11,8 @@
 namespace fluvel_ip
 {
 
-EdgeAc::EdgeAc(ImageView gradient_image, ContourData initialContour,
-               const AcConfig& config) /* optional parameter with AcConfig() */
-    : ActiveContour(std::move(initialContour), config)
-    , gradient_image_(gradient_image)
+EdgeSpeedModel::EdgeSpeedModel(ImageView gradient_image) /* optional parameter with AcConfig() */
+    : gradient_image_(gradient_image)
     , global_speed_sign_(get_global_speed_sign())
     , threshold_(do_otsu_method(gradient_image))
 {
@@ -21,7 +20,7 @@ EdgeAc::EdgeAc(ImageView gradient_image, ContourData initialContour,
            gradient_image_.height() == cd_.phi().height());
 }
 
-void EdgeAc::computeSpeed(ContourPoint& point)
+void EdgeSpeedModel::computeSpeed(ContourPoint& point)
 {
     const int x = point.x();
     const int y = point.y();
@@ -59,7 +58,7 @@ void EdgeAc::computeSpeed(ContourPoint& point)
     point.setSpeed(speed_value::get_discrete_speed(3 * local_speed + global_speed));
 }
 
-int EdgeAc::get_global_speed_sign() const
+int EdgeSpeedModel::get_global_speed_sign() const
 {
     int sign = 0;
     unsigned int sum_in = 0;
@@ -97,7 +96,7 @@ int EdgeAc::get_global_speed_sign() const
 
 constexpr auto kGrayscaleDepth = 256u;
 
-unsigned char EdgeAc::do_otsu_method(ImageView image)
+unsigned char EdgeSpeedModel::do_otsu_method(ImageView image)
 {
     unsigned char threshold = 0;
 

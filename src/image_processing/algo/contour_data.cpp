@@ -122,7 +122,7 @@ void ContourData::define_lists_and_phi_from_binary_phi()
         Contour* boundary = nullptr;
         bool is_boundary = false;
 
-        // get the generic context to eliminate redundant points
+        // get the generic currentMapping to eliminate redundant points
         if (current_phi == PhiValue::ExteriorBoundary)
         {
             region_val = PhiValue::OutsideRegion;

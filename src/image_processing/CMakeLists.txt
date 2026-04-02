@@ -23,8 +23,8 @@ set(ip_src
     ${ALGO_DIR}/region_color_ac.cpp
     ${ALGO_DIR}/region_color_ac.hpp
 
-    ${ALGO_DIR}/edge_ac.cpp
-    ${ALGO_DIR}/edge_ac.hpp
+    #${ALGO_DIR}/edge_ac.cpp
+    #${ALGO_DIR}/edge_ac.hpp
 
     ${ALGO_DIR}/hausdorff_distance.cpp
     ${ALGO_DIR}/hausdorff_distance.hpp

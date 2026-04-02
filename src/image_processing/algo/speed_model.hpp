@@ -3,32 +3,35 @@
 
 #pragma once
 
+#include "ac_types.hpp"
+#include "image_view.hpp"
+
 namespace fluvel_ip
 {
 
 class ContourData;
-class ContourPoint;
 class ContourDiagnostics;
-enum class BoundarySwitch;
+enum class SwitchDirection;
 
 class ISpeedModel
 {
 public:
     virtual ~ISpeedModel() = default;
 
-    virtual void initialize(const ContourData& cd)
+    virtual void onImageChanged(ImageView image, const ContourData& contourData)
     {
     }
 
     virtual void onStepCycle1()
     {
-    } // default = no-op
+    }
 
-    virtual void computeSpeed(ContourPoint& p) = 0;
+    //! Interface to compute the speed of one point.
+    virtual void computeSpeed(ContourPoint& point, const DiscreteLevelSet& phi) = 0;
 
-    virtual void onSwitch(const ContourPoint&, BoundarySwitch)
+    virtual void onSwitch(const ContourPoint&, SwitchDirection)
     {
-    } // no-op
+    }
 
     virtual void fillDiagnostics(ContourDiagnostics&) const
     {

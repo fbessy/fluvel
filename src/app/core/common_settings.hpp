@@ -196,8 +196,8 @@ struct AlgoConfig
     static constexpr fluvel_ip::Connectivity kDefaultConnectivity = fluvel_ip::Connectivity::Four;
 
     fluvel_ip::Connectivity connectivity;
-    fluvel_ip::AcConfig acConfig;
-    fluvel_ip::RegionColorConfig regionAcConfig;
+    fluvel_ip::ActiveContourParams acConfig;
+    fluvel_ip::RegionColorParams regionAcConfig;
 };
 
 struct ImageComputeConfig

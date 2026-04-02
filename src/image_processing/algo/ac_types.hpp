@@ -22,12 +22,74 @@ enum class PhiValue : int8_t
 
 using DiscreteLevelSet = Grid2D<PhiValue>;
 
+namespace phi_value
+{
+
+constexpr int phiSign(PhiValue v);
+constexpr bool isInside(PhiValue v);
+constexpr bool isOutside(PhiValue v);
+constexpr bool differentSide(PhiValue a, PhiValue b);
+
+/// Discrete sign of level-set function.
+/// Returns -1 for interior side, +1 for exterior side.
+/// Note: zero level-set is conceptual and never stored.
+constexpr int phiSign(PhiValue v)
+{
+    switch (v)
+    {
+        case PhiValue::InsideRegion:
+        case PhiValue::InteriorBoundary:
+            return -1;
+
+        case PhiValue::ExteriorBoundary:
+        case PhiValue::OutsideRegion:
+            return 1;
+    }
+
+    assert(false);
+    return 0; // unreachable
+}
+
+constexpr bool isInside(PhiValue v)
+{
+    return phiSign(v) < 0;
+}
+
+constexpr bool isOutside(PhiValue v)
+{
+    return !isInside(v);
+}
+
+constexpr bool differentSide(PhiValue a, PhiValue b)
+{
+    return phiSign(a) * phiSign(b) < 0;
+}
+
+} // namespace phi_value
+
 enum class SpeedValue : int8_t
 {
     GoInward = -1,
     NoMove = 0,
     GoOutward = 1
 };
+
+namespace speed_value
+{
+
+//! Gets a discrete speed.
+constexpr SpeedValue get_discrete_speed(int speed);
+
+constexpr SpeedValue get_discrete_speed(int speed)
+{
+    if (speed < 0)
+        return SpeedValue::GoInward;
+    if (speed > 0)
+        return SpeedValue::GoOutward;
+    return SpeedValue::NoMove;
+}
+
+} // namespace speed_value
 
 class ContourPoint
 {
@@ -88,6 +150,11 @@ private:
 
 using Contour = std::vector<ContourPoint>;
 using ExportedContour = std::vector<Point2D_i>;
+
+inline Point2D_i from_ContourPoint(const ContourPoint& point)
+{
+    return {point.x(), point.y()};
+}
 
 //! Pixel connectivity of the neighborhood used by the algorithm (4- or 8-connected).
 enum class Connectivity
@@ -152,16 +219,16 @@ enum class PhaseState
     Stopped
 };
 
-//! BoundarySwitch to perform switch_in or switch_out procedures generically.
-enum class BoundarySwitch
+//! SwitchDirection to perform switch_in or switch_out procedures generically.
+enum class SwitchDirection
 {
-    In,
-    Out
+    In, // outside -> inside (=> outward move)
+    Out // inside -> outside (=> inward move)
 };
 
-//! \class AcConfig
+//! \class ActiveContourParams
 //! Active contour configuration
-struct AcConfig
+struct ActiveContourParams
 {
     static constexpr bool kDefaultIsCycle2 = true;
     static constexpr int kDefaultDiskRadius = 2;
@@ -199,17 +266,18 @@ struct AcConfig
     }
 
     //! Default constructor.
-    AcConfig()
+    ActiveContourParams()
         : hasCycle2(kDefaultIsCycle2)
         , diskRadius(kDefaultDiskRadius)
         , Na(kDefaultNa)
         , Ns(kDefaultNs)
         , failureMode(kDefaultFailureMode)
     {
+        this->normalize();
     }
 
     //! Copy constructor.
-    AcConfig(const AcConfig& copied)
+    ActiveContourParams(const ActiveContourParams& copied)
         : hasCycle2(copied.hasCycle2)
         , diskRadius(copied.diskRadius)
         , Na(copied.Na)
@@ -220,7 +288,7 @@ struct AcConfig
     }
 
     //! Copy assignement operator.
-    AcConfig& operator=(const AcConfig& rhs)
+    ActiveContourParams& operator=(const ActiveContourParams& rhs)
     {
         this->hasCycle2 = rhs.hasCycle2;
         this->diskRadius = rhs.diskRadius;
@@ -234,22 +302,22 @@ struct AcConfig
     }
 
     //! \a Equal operator overloading.
-    friend bool operator==(const AcConfig& lhs, const AcConfig& rhs)
+    friend bool operator==(const ActiveContourParams& lhs, const ActiveContourParams& rhs)
     {
         return (lhs.hasCycle2 == rhs.hasCycle2 && lhs.diskRadius == rhs.diskRadius &&
                 lhs.Na == rhs.Na && lhs.Ns == rhs.Ns && lhs.failureMode == rhs.failureMode);
     }
 
     //! \a Not equal operator overloading.
-    friend bool operator!=(const AcConfig& lhs, const AcConfig& rhs)
+    friend bool operator!=(const ActiveContourParams& lhs, const ActiveContourParams& rhs)
     {
         return !(lhs == rhs);
     }
 };
 
-//! \class RegionConfig
+//! \class RegionParams
 //! Specific configuration for region based active contour
-struct RegionConfig
+struct RegionParams
 {
     static constexpr int kDefaultLambdaIn = 1;
     static constexpr int kDefaultLambdaOut = 1;
@@ -270,17 +338,17 @@ struct RegionConfig
     }
 
     //! Default constructor.
-    RegionConfig()
+    RegionParams()
         : lambdaIn(kDefaultLambdaIn)
         , lambdaOut(kDefaultLambdaOut)
     {
     }
 
     //! Destructor.
-    virtual ~RegionConfig() = default;
+    virtual ~RegionParams() = default;
 
     //! Copy constructor.
-    RegionConfig(const RegionConfig& copied)
+    RegionParams(const RegionParams& copied)
         : lambdaIn(copied.lambdaIn)
         , lambdaOut(copied.lambdaOut)
     {
@@ -288,7 +356,7 @@ struct RegionConfig
     }
 
     //! Copy assignement operator.
-    RegionConfig& operator=(const RegionConfig& rhs)
+    RegionParams& operator=(const RegionParams& rhs)
     {
         this->lambdaIn = rhs.lambdaIn;
         this->lambdaOut = rhs.lambdaOut;
@@ -299,13 +367,13 @@ struct RegionConfig
     }
 
     //! \a Equal operator overloading.
-    friend bool operator==(const RegionConfig& lhs, const RegionConfig& rhs)
+    friend bool operator==(const RegionParams& lhs, const RegionParams& rhs)
     {
         return (lhs.lambdaIn == rhs.lambdaIn && lhs.lambdaOut == rhs.lambdaOut);
     }
 
     //! \a Not equal operator overloading.
-    friend bool operator!=(const RegionConfig& lhs, const RegionConfig& rhs)
+    friend bool operator!=(const RegionParams& lhs, const RegionParams& rhs)
     {
         return !(lhs == rhs);
     }
@@ -360,9 +428,9 @@ inline ColorSpaceOption color_space_from_string(std::string_view s)
     return ColorSpaceOption::RGB;
 }
 
-//! \class RegionColorConfig
+//! \class RegionColorParams
 //! Specific configuration for color region based active contour.
-struct RegionColorConfig : public RegionConfig
+struct RegionColorParams : public RegionParams
 {
     static constexpr ColorSpaceOption kDefaultColorSpace = ColorSpaceOption::RGB;
 
@@ -383,18 +451,18 @@ struct RegionColorConfig : public RegionConfig
     }
 
     //! Default constructor.
-    RegionColorConfig()
-        : RegionConfig()
+    RegionColorParams()
+        : RegionParams()
         , color_space(kDefaultColorSpace)
         , weights{kDefaultWeights}
     {
     }
 
-    ~RegionColorConfig() override = default;
+    ~RegionColorParams() override = default;
 
     //! Copy constructor.
-    RegionColorConfig(const RegionColorConfig& copied)
-        : RegionConfig(copied)
+    RegionColorParams(const RegionColorParams& copied)
+        : RegionParams(copied)
         , color_space(copied.color_space)
         , weights(copied.weights)
     {
@@ -402,9 +470,9 @@ struct RegionColorConfig : public RegionConfig
     }
 
     //! Copy assignement operator.
-    RegionColorConfig& operator=(const RegionColorConfig& rhs)
+    RegionColorParams& operator=(const RegionColorParams& rhs)
     {
-        RegionConfig::operator=(rhs);
+        RegionParams::operator=(rhs);
 
         this->color_space = rhs.color_space;
         this->weights = rhs.weights;
@@ -415,14 +483,14 @@ struct RegionColorConfig : public RegionConfig
     }
 
     //! \a Equal operator overloading.
-    friend bool operator==(const RegionColorConfig& lhs, const RegionColorConfig& rhs)
+    friend bool operator==(const RegionColorParams& lhs, const RegionColorParams& rhs)
     {
         return (lhs.color_space == rhs.color_space && lhs.lambdaIn == rhs.lambdaIn &&
                 lhs.lambdaOut == rhs.lambdaOut && lhs.weights == rhs.weights);
     }
 
     //! \a Not equal operator overloading.
-    friend bool operator!=(const RegionColorConfig& lhs, const RegionColorConfig& rhs)
+    friend bool operator!=(const RegionColorParams& lhs, const RegionColorParams& rhs)
     {
         return !(lhs == rhs);
     }

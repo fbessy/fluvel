@@ -11,24 +11,27 @@
 #include "shape.hpp"
 
 #include <cstddef>
+#include <memory>
 
 namespace fluvel_ip
 {
 
+class ISpeedModel;
+
 constexpr size_t kInitialSpeedArrayAllocSize = 10000u;
 
-//! \struct BoundarySwitchContext to perform generically a switch in or a switch out.
-struct BoundarySwitchContext
+//! \struct BoundarySwitchMapping to perform generically a switch in or a switch out.
+struct BoundarySwitchMapping
 {
-    Contour& activeBoundary;
-    Contour& adjacentBoundary;
+    Contour& fromBoundary;
+    Contour& toBoundary;
     SpeedValue requiredSpeedSign;
     PhiValue currentToAdjacentVal;
     PhiValue neighborFromRegionVal;
     PhiValue neighbor_to_boundary_val;
     PhiValue redundantToRegionVal;
 
-    static BoundarySwitchContext makeSwitchIn(ContourData& cd)
+    static BoundarySwitchMapping makeSwitchIn(ContourData& cd)
     {
         return {cd.l_out(),
                 cd.l_in(),
@@ -39,7 +42,7 @@ struct BoundarySwitchContext
                 PhiValue::InsideRegion};
     }
 
-    static BoundarySwitchContext makeSwitchOut(ContourData& cd)
+    static BoundarySwitchMapping makeSwitchOut(ContourData& cd)
     {
         return {cd.l_in(),
                 cd.l_out(),
@@ -66,7 +69,7 @@ struct EvolutionData
     const int maxStepCount;
 
     //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
-    bool isMoving{true};
+    bool didMove{true};
 
     //! l_out shape at the end of the cycle 2.
     Shape l_out_shape;
@@ -106,7 +109,7 @@ struct EvolutionData
         intersection.reserve(cd.l_out().capacity());
     }
 
-    //! Reset execution state of evolution data. Used for video tracking.
+    //! Reset execution state of evolution data. Used multiple times for video tracking.
     void resetExecutionState()
     {
         phaseStepCount = 0;
@@ -120,10 +123,14 @@ class ActiveContour
 public:
     //! Constructor to initialize the active contour from an initial contour (#phi, #l_in and
     //! #l_out) with a copy semantic.
-    ActiveContour(ContourData initialState, const AcConfig& config);
+    ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedModel> speedModel,
+                  const ActiveContourParams& configuration);
 
     //! Destructor.
-    virtual ~ActiveContour() = default;
+    virtual ~ActiveContour();
+
+    //! Updates the model with a new image matching phi's dimensions.
+    void update(ImageView image);
 
     //! Handles a failure case.
     void handleFailure();
@@ -168,7 +175,7 @@ public:
         return cd_.l_in();
     }
 
-    virtual void fillDiagnostics(ContourDiagnostics& d) const;
+    void fillDiagnostics(ContourDiagnostics& d) const;
 
     //! Gets if the active contour reaches the final state.
     bool isStopped() const
@@ -181,14 +188,6 @@ public:
         return ed_.stepCount == 0;
     }
 
-protected:
-    //! restart the active contour, used for video tracking.
-    void restart();
-
-    //! Representation data of the active contour
-    //! (discret level-set function phi, Lin and Lout)
-    ContourData cd_;
-
 private:
     //! Runs the active contour for a fixed number of elementary steps.
     //! Intended for incremental updates (e.g. video tracking).
@@ -200,28 +199,25 @@ private:
     //! Performs one elementary step in Cycle1 (external / data-dependent evolution, speed Fd).
     void stepCycle2();
 
-    //! It selects the context.
-    void selectContext(BoundarySwitch ctxChoice);
+    //! It selects the current mapping.
+    void selectCurrentMapping(SwitchDirection direction);
 
-    //! Get the selected context.
-    const BoundarySwitchContext& context()
+    //! Get the selected current mapping.
+    const BoundarySwitchMapping& currentMapping() const
     {
-        return *ctx_;
+        return *currentMapping_;
     }
 
     //! Performs one directional topological update step (in or out).
     //! The step includes velocity computation, boundary switching,
     //! and adjacent boundary cleanup.
-    bool directionalSubstep(BoundarySwitch ctxChoice);
+    bool directionalSubstep(SwitchDirection direction);
 
     //! Computes the speed for all points of a boundary list #l_out or #l_in.
     void updateSpeeds(Contour& boundary);
 
     //! Computes the external speed Fd for all points of a boundary list #l_out or #l_in.
     void computeSpeeds(Contour& boundary);
-
-    //! Computes the external speed \a Fd for a current point (\a x,\a y) of #l_out or #l_in.
-    virtual void computeSpeed(ContourPoint& point);
 
     //! Computes the internal speed  Fint for all points of a boundary list #l_out or #l_in.
     void computeInternalSpeeds(Contour& boundary);
@@ -235,16 +231,6 @@ private:
 
     //! Promote a neighboring region point to boundary.
     void promoteRegionToBoundary(int nx, int ny);
-
-    //! Specific step for each iteration in cycle 1.
-    virtual void onStepCycle1()
-    {
-    }
-
-    //! Specific step when switch in or a switch out procedure is performed.
-    virtual void onSwitch(const ContourPoint& /*point*/, BoundarySwitch)
-    {
-    }
 
     //! Stops the active contour and puts it in a terminal state.
     //! After this call, step(), converge(), and runCycles() have no effect.
@@ -270,29 +256,33 @@ private:
     //! Build kernel offsets.
     static InternalKernel makeInternalKernelOffsets(int diskRadius, int grid_width);
 
-    //! To transformate active contour data point to the points for the Hausdorff distance.
-    static Point2D_i from_ContourPoint(const ContourPoint& point);
+    //! Representation data of the active contour
+    //! (discret level-set function phi, Lin and Lout)
+    ContourData cd_;
+
+    std::unique_ptr<ISpeedModel> speedModel_;
 
     //! Generic configuration of the active contour.
-    const AcConfig config_;
+    const ActiveContourParams params_;
 
     //! Precomputed disk-shaped kernel offsets for internal smoothing (Fint).
     const InternalKernel internalKernel_;
 
-    //! BoundarySwitchContext for the procedure switch_in.
-    const BoundarySwitchContext ctxIn_;
+    //! BoundarySwitchMapping for the procedure switch_in.
+    const BoundarySwitchMapping switchInMapping_;
 
-    //! BoundarySwitchContext for the procedure switch_out.
-    const BoundarySwitchContext ctxOut_;
+    //! BoundarySwitchMapping for the procedure switch_out.
+    const BoundarySwitchMapping switchOutMapping_;
 
-    //! A selector (pointer) to perform a switch generically. It pointes to ctxIn_ or ctxOut_.
-    const BoundarySwitchContext* ctx_;
+    //! A selector (pointer) to perform a switch generically. It pointes to switchInMapping_ or
+    //! switchOutMapping_.
+    const BoundarySwitchMapping* currentMapping_;
 
     //! Temporary points to add after each scan of the list #l_in or #l_out.
-    Contour activeBoundaryStaging_;
+    Contour pendingBoundaryPoints_;
 
     //! Number of iterations in one cycle1-cycle2.
-    int steps_per_cycle_;
+    int stepsPerCycle_;
 
     //! Evolution state of the active contour given at a current iteration.
     //!  There are 4 states : Cycle1, Cycle2, FinalCycle2 and Stopped.
@@ -302,27 +292,5 @@ private:
     //! #updateStateCycle2() to calculate #state.
     EvolutionData ed_;
 };
-
-inline Point2D_i ActiveContour::from_ContourPoint(const ContourPoint& point)
-{
-    return {point.x(), point.y()};
-}
-
-namespace speed_value
-{
-
-//! Gets a discrete speed.
-constexpr SpeedValue get_discrete_speed(int speed);
-
-constexpr SpeedValue get_discrete_speed(int speed)
-{
-    if (speed < 0)
-        return SpeedValue::GoInward;
-    if (speed > 0)
-        return SpeedValue::GoOutward;
-    return SpeedValue::NoMove;
-}
-
-} // namespace speed_value
 
 } // namespace fluvel_ip

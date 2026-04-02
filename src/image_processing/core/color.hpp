@@ -221,7 +221,7 @@ struct Components_3i
 
 using Color_3i = Components_3i;
 
-inline Color_3i scale_and_round(float c1, float c2, float c3)
+inline Color_3i scaleAndRound(float c1, float c2, float c3)
 {
     constexpr float scale = 255.f;
 
