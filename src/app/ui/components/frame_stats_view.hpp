@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include "elapsed_timer.hpp"
 #include "frame_data.hpp"
 
-#include <QElapsedTimer>
 #include <QMutex>
 #include <QtGlobal>
 
@@ -57,7 +57,8 @@ private:
     double latencyMaxDisplayMs_ = 0.0;
     double latencySumProcMs_ = 0.0;
 
-    QElapsedTimer windowTimer_;
+    fluvel_ip::ElapsedTimer windowTimer_;
+    static constexpr std::chrono::milliseconds kWindowMs{1000}; // 1 seconde
 
     // snapshot précédent (pour affichage stable)
     Snapshot lastSnapshot_;

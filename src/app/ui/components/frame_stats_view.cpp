@@ -2,14 +2,10 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "frame_stats_view.hpp"
-
-#include <QElapsedTimer>
 #include <QMutexLocker>
 
 namespace fluvel_app
 {
-
-static constexpr qint64 kWindowMs = 1000; // 1 seconde
 
 FrameStatsView::FrameStatsView()
 {
@@ -31,7 +27,7 @@ void FrameStatsView::reset()
     latencyMaxDisplayMs_ = 0.0;
     latencySumProcMs_ = 0.0;
 
-    windowTimer_.restart(); // 🔥 remplace windowStartNs_
+    windowTimer_.restart();
 
     lastSnapshot_ = {};
 }
@@ -79,12 +75,10 @@ FrameStatsView::Snapshot FrameStatsView::snapshot()
 
 void FrameStatsView::updateWindowLocked()
 {
-    qint64 elapsedMs = windowTimer_.elapsed();
-
-    if (elapsedMs < kWindowMs)
+    if (windowTimer_.elapsedLessThan(kWindowMs))
         return;
 
-    double seconds = double(elapsedMs) * 1e-3;
+    double seconds = windowTimer_.elapsedSec();
 
     Snapshot snap;
 
