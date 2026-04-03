@@ -79,9 +79,9 @@ void RegionSpeedModel::onStepCycle1()
         {
             if (meanOut_ == meanIn_)
                 status_ = SpeedModelStatus::InitFailed;
-        }
 
-        initialMeansChecked_ = true;
+            initialMeansChecked_ = true;
+        }
     }
 }
 
