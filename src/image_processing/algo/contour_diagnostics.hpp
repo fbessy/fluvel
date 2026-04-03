@@ -42,8 +42,8 @@ struct ContourDiagnostics
 {
     int stepCount = 0;
     fluvel_ip::PhaseState state{fluvel_ip::PhaseState::Cycle1};
-    ChannelVector meanIn{0, 0, 0};
-    ChannelVector meanOut{0, 0, 0};
+    ChannelVector meanInside{0, 0, 0};
+    ChannelVector meanOutside{0, 0, 0};
     fluvel_ip::StoppingStatus stoppingStatus{fluvel_ip::StoppingStatus::None};
     float hausdorffQuantile = 0.f;
     float relativeCentroidDistance = 0.f;

@@ -17,8 +17,8 @@ class RegionColorSpeedModel : public ISpeedModel
 {
 public:
     ///! Constructor to initialize with an initial contour.
-    RegionColorSpeedModel(const RegionColorParams& configuration =
-                              RegionColorParams()); /* optional parameter */
+    RegionColorSpeedModel(
+        const RegionColorParams& params = RegionColorParams()); /* optional parameter */
 
     ~RegionColorSpeedModel() override = default;
 
@@ -41,15 +41,15 @@ public:
     void fillDiagnostics(ContourDiagnostics& d) const override;
 
     //! Getter function for #average_rgb_out
-    const Rgb_uc& meanOut() const
+    const Rgb_uc& meanOutside() const
     {
-        return meanRgbOut_;
+        return meanRgbOutside_;
     }
 
     //! Getter function for #average_rgb_in
-    const Rgb_uc& meanIn() const
+    const Rgb_uc& meanInside() const
     {
-        return meanRgbIn_;
+        return meanRgbInside_;
     }
 
 private:
@@ -74,24 +74,24 @@ private:
 
     //! RGB mean of the pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left(
     //! i\right) >0\f$ .
-    Rgb_uc meanRgbOut_{0u, 0u, 0u};
+    Rgb_uc meanRgbOutside_{0u, 0u, 0u};
 
     //! RGB mean of the pixels inside the curve, i.e. pixels \f$i\f$ with \f$\phi \left(
     //! i\right) <0\f$ .
-    Rgb_uc meanRgbIn_{0u, 0u, 0u};
+    Rgb_uc meanRgbInside_{0u, 0u, 0u};
 
     //! Sum of component #R, #G, #B of the pixels intside the curve, i.e. pixels \f$i\f$ with
     //! \f$\phi \left( i\right) <0\f$ .
     Rgb_64i sumTotal_{0, 0, 0};
     //! Number of pixels or bytes of #phi.
-    int64_t pxlNbrTotal_;
+    int64_t pixelCountTotal_;
 
     //! Sum of component #R, #G, #B of the pixels outside the curve, i.e. pixels \f$i\f$ with
     //! \f$\phi \left( i\right) >0\f$ .
-    Rgb_64i sumOut_{0, 0, 0};
+    Rgb_64i sumOutside_{0, 0, 0};
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right)
     //! >0\f$ .
-    int64_t pxlNbrOut_{0};
+    int64_t pixelCountOutside_{0};
 
     bool initialMeansChecked_{false};
 };

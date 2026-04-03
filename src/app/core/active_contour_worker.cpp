@@ -424,7 +424,7 @@ void ActiveContourWorker::initializeActiveContour()
     {
         activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
             std::move(initialCD),
-            std::make_unique<fluvel_ip::RegionSpeedModel>(config_.algo.regionAcConfig),
+            std::make_unique<fluvel_ip::RegionGraySpeedModel>(config_.algo.regionAcConfig),
             config_.algo.acConfig);
     }
 

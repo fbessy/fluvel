@@ -8,10 +8,10 @@
 #include "contour_diagnostics.hpp"
 #include "elapsed_timer.hpp"
 
-#include <QObject>
 #include <QImage>
-#include <QTimer>
 #include <QMutex>
+#include <QObject>
+#include <QTimer>
 
 #include <chrono>
 

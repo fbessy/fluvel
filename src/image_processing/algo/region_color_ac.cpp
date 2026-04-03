@@ -11,8 +11,8 @@
 namespace fluvel_ip
 {
 
-RegionColorSpeedModel::RegionColorSpeedModel(const RegionColorParams& configuration)
-    : params_(configuration)
+RegionColorSpeedModel::RegionColorSpeedModel(const RegionColorParams& params)
+    : params_(params)
 {
 }
 
@@ -25,12 +25,12 @@ void RegionColorSpeedModel::onImageChanged(ImageView image, const ContourData& c
     status_ = SpeedModelStatus::Ok;
 
     image_ = image;
-    pxlNbrTotal_ = image_.size();
+    pixelCountTotal_ = image_.size();
 
     sumTotal_ = {0, 0, 0};
 
-    sumOut_ = {0, 0, 0};
-    pxlNbrOut_ = 0;
+    sumOutside_ = {0, 0, 0};
+    pixelCountOutside_ = 0;
 
     const auto& phi = contour.phi();
 
@@ -44,8 +44,8 @@ void RegionColorSpeedModel::onImageChanged(ImageView image, const ContourData& c
 
             if (phi_value::isOutside(phi.at(x, y)))
             {
-                sumOut_ += rgb;
-                ++pxlNbrOut_;
+                sumOutside_ += rgb;
+                ++pixelCountOutside_;
             }
         }
     }
@@ -56,25 +56,25 @@ void RegionColorSpeedModel::onStepCycle1()
     if (status_ != SpeedModelStatus::Ok)
         return;
 
-    if (pxlNbrOut_ >= 1)
+    if (pixelCountOutside_ >= 1)
     {
-        const Rgb<float> rgb = sumOut_ / pxlNbrOut_;
-        meanRgbOut_ = rgb.rounded<unsigned char>();
-        meanColorOut_ = rgbToColor(meanRgbOut_);
+        const Rgb<float> rgb = sumOutside_ / pixelCountOutside_;
+        meanRgbOutside_ = rgb.rounded<unsigned char>();
+        meanColorOut_ = rgbToColor(meanRgbOutside_);
     }
     else
     {
         status_ = SpeedModelStatus::RuntimeFailure;
     }
 
-    const Rgb_64i sumIn = sumTotal_ - sumOut_;
-    const int64_t pxlNbrIn = pxlNbrTotal_ - pxlNbrOut_;
+    const Rgb_64i sumIn = sumTotal_ - sumOutside_;
+    const int64_t pxlNbrIn = pixelCountTotal_ - pixelCountOutside_;
 
     if (pxlNbrIn >= 1)
     {
         const Rgb<float> rgb = sumIn / pxlNbrIn;
-        meanRgbIn_ = rgb.rounded<unsigned char>();
-        meanColorIn_ = rgbToColor(meanRgbIn_);
+        meanRgbInside_ = rgb.rounded<unsigned char>();
+        meanColorIn_ = rgbToColor(meanRgbInside_);
     }
     else
     {
@@ -85,7 +85,7 @@ void RegionColorSpeedModel::onStepCycle1()
     {
         if (status_ == SpeedModelStatus::Ok)
         {
-            if (meanRgbOut_ == meanRgbIn_)
+            if (meanRgbOutside_ == meanRgbInside_)
                 status_ = SpeedModelStatus::InitFailed;
         }
 
@@ -149,24 +149,25 @@ void RegionColorSpeedModel::onSwitch(const ContourPoint& point, SwitchDirection 
 
     if (direction == SwitchDirection::In)
     {
-        sumOut_ -= rgb;
-        --pxlNbrOut_;
+        sumOutside_ -= rgb;
+        --pixelCountOutside_;
     }
     else if (direction == SwitchDirection::Out)
     {
-        sumOut_ += rgb;
-        ++pxlNbrOut_;
+        sumOutside_ += rgb;
+        ++pixelCountOutside_;
     }
 }
 
 void RegionColorSpeedModel::fillDiagnostics(ContourDiagnostics& d) const
 {
-    d.meanIn = ChannelVector(static_cast<int>(meanRgbIn_.red), static_cast<int>(meanRgbIn_.green),
-                             static_cast<int>(meanRgbIn_.blue));
+    d.meanInside =
+        ChannelVector(static_cast<int>(meanRgbInside_.red), static_cast<int>(meanRgbInside_.green),
+                      static_cast<int>(meanRgbInside_.blue));
 
-    d.meanOut =
-        ChannelVector(static_cast<int>(meanRgbOut_.red), static_cast<int>(meanRgbOut_.green),
-                      static_cast<int>(meanRgbOut_.blue));
+    d.meanOutside = ChannelVector(static_cast<int>(meanRgbOutside_.red),
+                                  static_cast<int>(meanRgbOutside_.green),
+                                  static_cast<int>(meanRgbOutside_.blue));
 }
 
 } // namespace fluvel_ip

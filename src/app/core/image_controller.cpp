@@ -232,11 +232,11 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
     else
         s += QString("\n");
 
-    if (!diag.meanIn.values().empty())
+    if (!diag.meanInside.values().empty())
     {
-        s += QString("Mean in: %1\n").arg(formatChannels(diag.meanIn));
+        s += QString("Mean in: %1\n").arg(formatChannels(diag.meanInside));
 
-        s += QString("Mean out: %1\n").arg(formatChannels(diag.meanOut));
+        s += QString("Mean out: %1\n").arg(formatChannels(diag.meanOutside));
     }
 
     s += QString("Hausdorff q: %1 %\n").arg(diag.hausdorffQuantile, 0, 'g', 3);

@@ -10,13 +10,13 @@
 namespace fluvel_ip
 {
 
-class RegionSpeedModel : public ISpeedModel
+class RegionGraySpeedModel : public ISpeedModel
 {
 public:
     //! Constructor to initialize with an initial contour.
-    RegionSpeedModel(const RegionParams& configuration = RegionParams()); /* optional parameter */
+    RegionGraySpeedModel(const RegionParams& params = RegionParams()); /* optional parameter */
 
-    ~RegionSpeedModel() override = default;
+    ~RegionGraySpeedModel() override = default;
 
     //! Initializes the variables #sumIn, #sum_out and #pxl_nbr_out with scanning through the
     //! image.
@@ -37,14 +37,14 @@ public:
     void fillDiagnostics(ContourDiagnostics& d) const override;
 
     //! Getter function for #Cout.
-    int meanOut() const
+    int meanOutside() const
     {
-        return meanOut_;
+        return meanOutside_;
     }
     //! Getter function for #Cin.
-    int meanIn() const
+    int meanInside() const
     {
-        return meanIn_;
+        return meanInside_;
     }
 
 private:
@@ -57,23 +57,23 @@ private:
 
     //! Average or mean of the intensities or grey-levels of the pixels outside the curve,
     //! called C2 in the Chan-Vese article.
-    int meanOut_{0};
+    int meanOutside_{0};
 
     //! Average or mean of the intensities or grey-levels of the pixels inside the curve, called
     //! C1 in the Chan-Vese article.
-    int meanIn_{0};
+    int meanInside_{0};
 
     //! Sum of the intensities or grey-levels of the whole image's pixels.
     int64_t sumTotal_{0};
     //! Number of pixels or bytes of #img_data.
-    int64_t pxlNbrTotal_{0};
+    int64_t pixelCountTotal_{0};
 
     //! Sum of the intensities or grey-levels of the pixels outside the curve, i.e. pixels
     //! \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
-    int64_t sumOut_{0};
+    int64_t sumOutside_{0};
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right)
     //! >0\f$ .
-    int64_t pxlNbrOut_{0};
+    int64_t pixelCountOutside_{0};
 
     bool initialMeansChecked_{false};
 };

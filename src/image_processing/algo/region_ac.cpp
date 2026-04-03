@@ -14,13 +14,13 @@
 namespace fluvel_ip
 {
 
-RegionSpeedModel::RegionSpeedModel(
-    const RegionParams& configuration) /* optional parameter with RegionParams() */
-    : params_(configuration)
+RegionGraySpeedModel::RegionGraySpeedModel(
+    const RegionParams& params) /* optional parameter with RegionParams() */
+    : params_(params)
 {
 }
 
-void RegionSpeedModel::onImageChanged(ImageView image, const ContourData& contour)
+void RegionGraySpeedModel::onImageChanged(ImageView image, const ContourData& contour)
 {
     assert(image.format() == ImageFormat::Gray8);
     assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());
@@ -29,12 +29,12 @@ void RegionSpeedModel::onImageChanged(ImageView image, const ContourData& contou
     status_ = SpeedModelStatus::Ok;
 
     image_ = image;
-    pxlNbrTotal_ = image_.size();
+    pixelCountTotal_ = image_.size();
 
     sumTotal_ = 0;
 
-    sumOut_ = 0;
-    pxlNbrOut_ = 0;
+    sumOutside_ = 0;
+    pixelCountOutside_ = 0;
 
     const auto& phi = contour.phi();
 
@@ -48,28 +48,28 @@ void RegionSpeedModel::onImageChanged(ImageView image, const ContourData& contou
 
             if (phi_value::isOutside(phi.at(x, y)))
             {
-                sumOut_ += intensity;
-                ++pxlNbrOut_;
+                sumOutside_ += intensity;
+                ++pixelCountOutside_;
             }
         }
     }
 }
 
-void RegionSpeedModel::onStepCycle1()
+void RegionGraySpeedModel::onStepCycle1()
 {
     if (status_ != SpeedModelStatus::Ok)
         return;
 
-    if (pxlNbrOut_ >= 1)
-        meanOut_ = std::lround(static_cast<float>(sumOut_) / pxlNbrOut_);
+    if (pixelCountOutside_ >= 1)
+        meanOutside_ = std::lround(static_cast<float>(sumOutside_) / pixelCountOutside_);
     else
         status_ = SpeedModelStatus::RuntimeFailure;
 
-    const int64_t sumIn = sumTotal_ - sumOut_;
-    const int64_t pxlNbrIn = pxlNbrTotal_ - pxlNbrOut_;
+    const int64_t sumInside = sumTotal_ - sumOutside_;
+    const int64_t pixelCountInside = pixelCountTotal_ - pixelCountOutside_;
 
-    if (pxlNbrIn >= 1)
-        meanIn_ = std::lround(static_cast<float>(sumIn) / pxlNbrIn);
+    if (pixelCountInside >= 1)
+        meanInside_ = std::lround(static_cast<float>(sumInside) / pixelCountInside);
     else
         status_ = SpeedModelStatus::RuntimeFailure;
 
@@ -77,7 +77,7 @@ void RegionSpeedModel::onStepCycle1()
     {
         if (status_ == SpeedModelStatus::Ok)
         {
-            if (meanOut_ == meanIn_)
+            if (meanOutside_ == meanInside_)
                 status_ = SpeedModelStatus::InitFailed;
 
             initialMeansChecked_ = true;
@@ -85,12 +85,12 @@ void RegionSpeedModel::onStepCycle1()
     }
 }
 
-void RegionSpeedModel::computeSpeed(ContourPoint& point, const DiscreteLevelSet&)
+void RegionGraySpeedModel::computeSpeed(ContourPoint& point, const DiscreteLevelSet&)
 {
     const int pxl = static_cast<int>(image_.at(point.x(), point.y()));
 
-    const int diffOut = pxl - meanOut_;
-    const int diffIn = pxl - meanIn_;
+    const int diffOut = pxl - meanOutside_;
+    const int diffIn = pxl - meanInside_;
 
     const int speed =
         params_.lambdaOut * (math::square(diffOut)) - params_.lambdaIn * (math::square(diffIn));
@@ -98,26 +98,26 @@ void RegionSpeedModel::computeSpeed(ContourPoint& point, const DiscreteLevelSet&
     point.setSpeed(speed_value::get_discrete_speed(speed));
 }
 
-void RegionSpeedModel::onSwitch(const ContourPoint& point, SwitchDirection direction)
+void RegionGraySpeedModel::onSwitch(const ContourPoint& point, SwitchDirection direction)
 {
     const int64_t intensity = static_cast<int64_t>(image_.at(point.x(), point.y()));
 
     if (direction == SwitchDirection::In)
     {
-        sumOut_ -= intensity;
-        --pxlNbrOut_;
+        sumOutside_ -= intensity;
+        --pixelCountOutside_;
     }
     else if (direction == SwitchDirection::Out)
     {
-        sumOut_ += intensity;
-        ++pxlNbrOut_;
+        sumOutside_ += intensity;
+        ++pixelCountOutside_;
     }
 }
 
-void RegionSpeedModel::fillDiagnostics(ContourDiagnostics& d) const
+void RegionGraySpeedModel::fillDiagnostics(ContourDiagnostics& d) const
 {
-    d.meanIn = ChannelVector(meanIn_);
-    d.meanOut = ChannelVector(meanOut_);
+    d.meanInside = ChannelVector(meanInside_);
+    d.meanOutside = ChannelVector(meanOutside_);
 }
 
 } // namespace fluvel_ip
