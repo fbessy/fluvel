@@ -198,14 +198,14 @@ enum class FailureHandlingMode
 //! \enum Stopping condition status.
 enum class StoppingStatus
 {
-    None,           //!< the active contour is not stopped.
-    ListsConverged, //!< speed <= 0 for all points of Lout and speed >= 0 for all points of Lin
-    Hausdorff,      //!< Hausorff distance fallback, available only in StopOnFailure mode.
-    MaxIteration,   //!< Maximum number of elementary steps reached, last fallback to avoid
-    //!  infinite loop of the method converge().
-    EmptyListFailure //!< One or the both lists is/are empty. The definition of both contiguous
-                     //!< lists
-    //!  as a boundary is not respected.
+    None,             //!< the active contour is not stopped.
+    ListsConverged,   //!< speed <= 0 for all points of Lout and speed >= 0 for all points of Lin
+    Hausdorff,        //!< Hausorff distance fallback, available only in StopOnFailure mode.
+    MaxIteration,     //!< Maximum number of elementary steps reached, last fallback to avoid
+                      //!  infinite loop of the method converge().
+    EmptyListFailure, //!< One or the both lists is/are empty. The definition of both contiguous
+                      //!< lists as a boundary is not respected.
+    SpeedModelFailure //!< Speed model failure (init or runtime speed error).
 };
 
 //! Internal phase state of the active contour.

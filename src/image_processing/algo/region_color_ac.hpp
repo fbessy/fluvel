@@ -92,6 +92,8 @@ private:
     //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right)
     //! >0\f$ .
     int64_t pxlNbrOut_{0};
+
+    bool initialMeansChecked_{false};
 };
 
 } // namespace fluvel_ip

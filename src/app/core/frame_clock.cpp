@@ -25,7 +25,7 @@ int64_t FrameClock::nowNs()
 
 double FrameClock::nowSec()
 {
-    return nowNs() * 1e-9;
+    return static_cast<double>(nowNs()) * 1e-9;
 }
 
 } // namespace fluvel_app

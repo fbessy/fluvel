@@ -124,8 +124,11 @@ public:
     //! Updates the model with a new image matching phi's dimensions.
     void update(ImageView image);
 
-    //! Handles a failure case.
-    void handleFailure();
+    //! Checks a generic failure case.
+    void checkContourFailure();
+
+    //! Checks external speed model failures.
+    void checkSpeedModelFailure();
 
     //! Runs or evolves the active contour until it reaches a terminal state.
     void converge();

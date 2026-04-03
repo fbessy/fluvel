@@ -7,7 +7,7 @@ message(STATUS "C++ compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 
 option(FLUVEL_UI_DESKTOP "Use QWidget UI on Mobile" ON)
-option(ENABLE_UNITY_BUILD "Enable unity build" OFF)
+option(ENABLE_UNITY_BUILD "Enable unity build" ON)
 option(ENABLE_ASAN "Enable Sanitizers" OFF)
 
 if(ENABLE_UNITY_BUILD)

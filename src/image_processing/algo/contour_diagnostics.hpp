@@ -82,6 +82,8 @@ inline const char* toString(StoppingStatus status)
             return "MaxIteration";
         case StoppingStatus::EmptyListFailure:
             return "EmptyListFailure";
+        case StoppingStatus::SpeedModelFailure:
+            return "SpeedModelFailure";
     }
 
     return "Unknown";

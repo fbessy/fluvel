@@ -25,6 +25,9 @@ void RegionSpeedModel::onImageChanged(ImageView image, const ContourData& contou
     assert(image.format() == ImageFormat::Gray8);
     assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());
 
+    initialMeansChecked_ = false;
+    status_ = SpeedModelStatus::Ok;
+
     image_ = image;
     pxlNbrTotal_ = image_.size();
 
@@ -54,14 +57,32 @@ void RegionSpeedModel::onImageChanged(ImageView image, const ContourData& contou
 
 void RegionSpeedModel::onStepCycle1()
 {
+    if (status_ != SpeedModelStatus::Ok)
+        return;
+
     if (pxlNbrOut_ >= 1)
         meanOut_ = std::lround(static_cast<float>(sumOut_) / pxlNbrOut_);
+    else
+        status_ = SpeedModelStatus::RuntimeFailure;
 
     const int64_t sumIn = sumTotal_ - sumOut_;
     const int64_t pxlNbrIn = pxlNbrTotal_ - pxlNbrOut_;
 
     if (pxlNbrIn >= 1)
         meanIn_ = std::lround(static_cast<float>(sumIn) / pxlNbrIn);
+    else
+        status_ = SpeedModelStatus::RuntimeFailure;
+
+    if (!initialMeansChecked_)
+    {
+        if (status_ == SpeedModelStatus::Ok)
+        {
+            if (meanOut_ == meanIn_)
+                status_ = SpeedModelStatus::InitFailed;
+        }
+
+        initialMeansChecked_ = true;
+    }
 }
 
 void RegionSpeedModel::computeSpeed(ContourPoint& point, const DiscreteLevelSet&)

@@ -41,12 +41,26 @@ ActiveContour::ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedM
 
 ActiveContour::~ActiveContour() = default;
 
-void ActiveContour::handleFailure()
+void ActiveContour::checkContourFailure()
 {
     if (!cd_.empty())
         return;
 
     ed_.stoppingStatus = StoppingStatus::EmptyListFailure;
+    stop();
+
+    // Recovery mode: the failure stops the current iteration,
+    // but contour data are repaired to allow a future restart.
+    if (params_.failureMode == FailureHandlingMode::RecoverOnFailure)
+        cd_.defineFromEllipse();
+}
+
+void ActiveContour::checkSpeedModelFailure()
+{
+    if (externalSpeedModel_->status() == SpeedModelStatus::Ok)
+        return;
+
+    ed_.stoppingStatus = StoppingStatus::SpeedModelFailure;
     stop();
 
     // Recovery mode: the failure stops the current iteration,
@@ -138,7 +152,7 @@ void ActiveContour::stepCycle1()
 {
     assert(state_ == PhaseState::Cycle1);
 
-    handleFailure();
+    checkContourFailure();
     if (isStopped())
         return;
 
@@ -147,6 +161,10 @@ void ActiveContour::stepCycle1()
         return;
 
     externalSpeedModel_->onStepCycle1();
+
+    checkSpeedModelFailure();
+    if (isStopped())
+        return;
 
     bool didOutwardMove = directionalSubstep(SwitchDirection::In);
     bool didInwardMove = directionalSubstep(SwitchDirection::Out);
@@ -163,7 +181,7 @@ void ActiveContour::stepCycle2()
 {
     assert(state_ == PhaseState::Cycle2 || state_ == PhaseState::FinalCycle2);
 
-    handleFailure();
+    checkContourFailure();
     if (isStopped())
         return;
 

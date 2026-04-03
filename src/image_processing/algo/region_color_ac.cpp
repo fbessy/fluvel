@@ -21,6 +21,9 @@ void RegionColorSpeedModel::onImageChanged(ImageView image, const ContourData& c
     assert(image.format() != ImageFormat::Gray8);
     assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());
 
+    initialMeansChecked_ = false;
+    status_ = SpeedModelStatus::Ok;
+
     image_ = image;
     pxlNbrTotal_ = image_.size();
 
@@ -50,11 +53,18 @@ void RegionColorSpeedModel::onImageChanged(ImageView image, const ContourData& c
 
 void RegionColorSpeedModel::onStepCycle1()
 {
+    if (status_ != SpeedModelStatus::Ok)
+        return;
+
     if (pxlNbrOut_ >= 1)
     {
         const Rgb<float> rgb = sumOut_ / pxlNbrOut_;
         meanRgbOut_ = rgb.rounded<unsigned char>();
         meanColorOut_ = rgbToColor(meanRgbOut_);
+    }
+    else
+    {
+        status_ = SpeedModelStatus::RuntimeFailure;
     }
 
     const Rgb_64i sumIn = sumTotal_ - sumOut_;
@@ -65,6 +75,21 @@ void RegionColorSpeedModel::onStepCycle1()
         const Rgb<float> rgb = sumIn / pxlNbrIn;
         meanRgbIn_ = rgb.rounded<unsigned char>();
         meanColorIn_ = rgbToColor(meanRgbIn_);
+    }
+    else
+    {
+        status_ = SpeedModelStatus::RuntimeFailure;
+    }
+
+    if (!initialMeansChecked_)
+    {
+        if (status_ == SpeedModelStatus::Ok)
+        {
+            if (meanRgbOut_ == meanRgbIn_)
+                status_ = SpeedModelStatus::InitFailed;
+        }
+
+        initialMeansChecked_ = true;
     }
 }
 
