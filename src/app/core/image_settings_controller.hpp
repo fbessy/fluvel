@@ -9,12 +9,8 @@
 
 #include <QObject>
 
-#include <chrono>
-
 namespace fluvel_app
 {
-
-using clock_type = std::chrono::steady_clock;
 
 // normalized shape in function of the image size
 struct UiShapeInfo

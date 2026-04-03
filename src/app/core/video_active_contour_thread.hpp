@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "ac_types.hpp"
 #include "active_contour.hpp"
 #include "common_settings.hpp"
 #include "frame_data.hpp"
@@ -14,6 +13,8 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+
+#include <chrono>
 
 namespace fluvel_app
 {
@@ -48,7 +49,7 @@ private:
 
     void exportContours(DisplayFrame& displayFrame);
 
-    static constexpr qint64 kTimeSliceMs = 20;
+    static constexpr std::chrono::milliseconds kTimeSliceMs{20};
 
     VideoComputeConfig config_;
     ImageDisplayMode displayMode_;

@@ -10,7 +10,8 @@
 #include "image_adapters.hpp"
 #include "image_view.hpp"
 
-#include <QElapsedTimer>
+#include "elapsed_timer.hpp"
+
 #include <QTimer>
 
 #ifdef FLUVEL_DEBUG
@@ -175,7 +176,7 @@ bool ActiveContourWorker::stepOnceAlgo()
         if (activeContour_->isFirstIteration())
         {
             isMeasuring_ = true;
-            measurementStartTime_ = clock_type::now();
+            measurementTimer_.start();
         }
 
         activeContour_->step();
@@ -472,10 +473,10 @@ void ActiveContourWorker::onTimeout()
     assert(activeContour_ != nullptr);
     assert(state_ == WorkerState::Running);
 
-    QElapsedTimer timeSliceBudgetMs;
-    timeSliceBudgetMs.start();
+    fluvel_ip::ElapsedTimer timeSliceBudget;
+    timeSliceBudget.start();
 
-    while (timeSliceBudgetMs.elapsed() < timeSliceMs_)
+    while (timeSliceBudget.elapsedLessThan(timeSliceMs_))
     {
         if (stepOnceAlgo())
         {
@@ -499,14 +500,9 @@ void ActiveContourWorker::updateDiagnostics()
     fluvel_ip::ContourDiagnostics diag;
 
     if (isMeasuring_)
-    {
-        auto endTime = clock_type::now();
-        diag.elapsedSec = std::chrono::duration<double>(endTime - measurementStartTime_).count();
-    }
+        diag.elapsedSec = measurementTimer_.elapsedSec();
     else
-    {
         diag.elapsedSec = 0.0;
-    }
 
     activeContour_->fillDiagnostics(diag);
 
@@ -540,7 +536,6 @@ void ActiveContourWorker::setState(WorkerState state)
 void ActiveContourWorker::resetMeasurement()
 {
     isMeasuring_ = false;
-    measurementStartTime_ = clock_type::time_point{};
 }
 
 } // namespace fluvel_app

@@ -4,13 +4,10 @@
 #include "temporal_smoother.hpp"
 
 #include <algorithm>
-#include <chrono>
 #include <cmath>
 
 namespace fluvel_ip
 {
-
-using clock_type = std::chrono::steady_clock;
 
 // ------------------------------------------------------------
 // RESET
@@ -55,18 +52,15 @@ void TemporalSmoother::update(ImageView src)
     // --------------------------------------------------------
     float dt_seconds = 0.033f;
 
-    const auto now = clock_type::now();
-
     if (!time_initialized_)
     {
-        last_time_ = now;
+        timer_.start();
         time_initialized_ = true;
     }
     else
     {
-        std::chrono::duration<float> dt = now - last_time_;
-        dt_seconds = dt.count();
-        last_time_ = now;
+        dt_seconds = timer_.elapsedSec<float>();
+        timer_.start();
     }
 
     dt_seconds = std::clamp(dt_seconds, 0.001f, 0.5f);

@@ -5,6 +5,7 @@
 #include "region_color_ac.hpp"
 #include "speed_model.hpp"
 
+#include "elapsed_timer.hpp"
 #include "frame_clock.hpp"
 #include "image_adapters.hpp"
 
@@ -149,10 +150,10 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     if (algoImage.data() != nullptr && activeContour_)
         activeContour_->update(algoImage);
 
-    QElapsedTimer timeSliceBudgetMs;
-    timeSliceBudgetMs.start();
+    fluvel_ip::ElapsedTimer timeSliceBudget;
+    timeSliceBudget.start();
 
-    while (!activeContour_->isStopped() && timeSliceBudgetMs.elapsed() < kTimeSliceMs)
+    while (!activeContour_->isStopped() && timeSliceBudget.elapsedLessThan(kTimeSliceMs))
     {
         activeContour_->runCycles(1);
     }

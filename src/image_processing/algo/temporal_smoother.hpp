@@ -7,9 +7,7 @@
 #include "grid2d.hpp"
 #include "image_view.hpp"
 
-#include <chrono>
-
-using clock_type = std::chrono::steady_clock;
+#include "elapsed_timer.hpp"
 
 namespace fluvel_ip
 {
@@ -40,7 +38,7 @@ private:
     float noise_estimate_;
     bool noise_initialized_ = false;
     bool time_initialized_ = false;
-    clock_type::time_point last_time_;
+    ElapsedTimer timer_;
     float time_since_init_;
 
     bool high_motion_ = false;

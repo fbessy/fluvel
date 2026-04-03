@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "image_settings_controller.hpp"
+#include "elapsed_timer.hpp"
 
 #include <QCoreApplication>
 
@@ -229,7 +230,8 @@ void ImageSettingsController::applyProcessing()
     emit processingStarted();
     QCoreApplication::processEvents();
 
-    clock_type::time_point measurementStartTime = clock_type::now();
+    fluvel_ip::ElapsedTimer measurementTimer;
+    measurementTimer.start();
 
     if (fc.hasProcessing())
     {
@@ -321,8 +323,7 @@ void ImageSettingsController::applyProcessing()
             }
         }
 
-        auto endTime = clock_type::now();
-        double elapsedSec = std::chrono::duration<double>(endTime - measurementStartTime).count();
+        double elapsedSec = measurementTimer.elapsedSec();
 
         emit filterPipelineProcessed(elapsedSec);
 

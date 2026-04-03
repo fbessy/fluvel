@@ -6,6 +6,7 @@
 #include "active_contour.hpp"
 #include "common_settings.hpp"
 #include "contour_diagnostics.hpp"
+#include "elapsed_timer.hpp"
 
 #include <QObject>
 #include <QImage>
@@ -16,8 +17,6 @@
 
 namespace fluvel_app
 {
-
-using clock_type = std::chrono::steady_clock;
 
 enum class RunMode
 {
@@ -90,16 +89,18 @@ private:
     QImage processedImage_;
 
     static constexpr int kWorkerPeriodMs = 16;
-    static constexpr qint64 kTimeSliceConvergeMs = 15;
-    static constexpr qint64 kTimeSliceInteractiveMs = 10;
-    qint64 timeSliceMs_{kTimeSliceInteractiveMs};
+
+    static constexpr std::chrono::milliseconds kTimeSliceConvergeMs{15};
+    static constexpr std::chrono::milliseconds kTimeSliceInteractiveMs{10};
+
+    std::chrono::milliseconds timeSliceMs_{kTimeSliceInteractiveMs};
 
     bool initialShown_{false};
 
     ImageComputeConfig config_;
 
     fluvel_ip::ContourDiagnostics diag_;
-    clock_type::time_point measurementStartTime_;
+    fluvel_ip::ElapsedTimer measurementTimer_;
     bool isMeasuring_{false};
 };
 

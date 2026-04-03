@@ -54,6 +54,7 @@ set(ip_src
     ${CORE_DIR}/fluvel_math.hpp
     ${CORE_DIR}/color.hpp
     ${CORE_DIR}/neighborhood.hpp
+    ${CORE_DIR}/elapsed_timer.hpp
 )
 
 add_library(${TARGET_NAME} STATIC ${ip_src})
