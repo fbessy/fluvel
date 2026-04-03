@@ -162,7 +162,7 @@ void ImageViewerWidget::displayFrameNow(const UiFrame& f)
     QTimer::singleShot(0, this,
                        [this, f]()
                        {
-                           qint64 displayTs = FrameClock::nowNs();
+                           int64_t displayTs = FrameClock::nowNs();
 
                            emit frameDisplayed(FrameTimestamps{f.receiveTimestampNs,
                                                                f.processTimestampNs, displayTs});
@@ -217,7 +217,7 @@ void ImageViewerWidget::setImage(const QImage& img)
     UiFrame f;
     f.image = img;
 
-    qint64 now = FrameClock::nowNs();
+    int64_t now = FrameClock::nowNs();
     f.receiveTimestampNs = now;
     f.processTimestampNs = now;
 

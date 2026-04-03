@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include <QElapsedTimer>
+#include <chrono>
+#include <cstdint>
 
 namespace fluvel_app
 {
@@ -11,11 +12,15 @@ namespace fluvel_app
 class FrameClock
 {
 public:
+    using clock = std::chrono::steady_clock;
+
     static void init();
-    static qint64 nowNs();
+    static int64_t nowNs();
+    static double nowSec();
 
 private:
-    static QElapsedTimer timer;
+    static inline clock::time_point start_{};
+    static inline bool initialized_ = false;
 };
 
 } // namespace fluvel_app

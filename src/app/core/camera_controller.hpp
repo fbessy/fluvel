@@ -95,7 +95,7 @@ private:
     // --- Timing configuration ---
 
     static constexpr int kStartupTimeoutMs = 7'000;               // 7 sec
-    static constexpr qint64 kStreamLossTimeoutNs = 2'000'000'000; // 2 sec
+    static constexpr int64_t kStreamLossTimeoutNs = 2'000'000'000; // 2 sec
     static constexpr int kWatchdogPeriodMs = 200;                 // 0.2 sec
     static constexpr int kDiagnosticsPeriodMs = 500;              // 0.5 sec
 
@@ -107,7 +107,7 @@ private:
     QByteArray deviceId_;
 
     //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.
-    qint64 lastValidFrameTsNs_{0};
+    int64_t lastValidFrameTsNs_{0};
 
     //! Timeout used to detect loss of video stream.
 

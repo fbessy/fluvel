@@ -168,7 +168,7 @@ void CameraController::onCapturedFrame(const QVideoFrame& frame)
         return;
 #endif
 
-    const qint64 now = FrameClock::nowNs();
+    const int64_t now = FrameClock::nowNs();
     lastValidFrameTsNs_ = now;
 
     if (state_ == StreamingState::Starting)
@@ -240,7 +240,7 @@ void CameraController::onStartupTimeout()
 
 void CameraController::checkWatchdog()
 {
-    const qint64 frameAgeNs = FrameClock::nowNs() - lastValidFrameTsNs_;
+    const int64_t frameAgeNs = FrameClock::nowNs() - lastValidFrameTsNs_;
 
     if (frameAgeNs > kStreamLossTimeoutNs)
     {

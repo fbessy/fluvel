@@ -6,17 +6,26 @@
 namespace fluvel_app
 {
 
-QElapsedTimer FrameClock::timer;
-
-void FrameClock::FrameClock::init()
+void FrameClock::init()
 {
-    if (!timer.isValid())
-        timer.start();
+    if (!initialized_)
+    {
+        start_ = clock::now();
+        initialized_ = true;
+    }
 }
 
-qint64 FrameClock::FrameClock::nowNs()
+int64_t FrameClock::nowNs()
 {
-    return timer.nsecsElapsed();
+    if (!initialized_)
+        init();
+
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(clock::now() - start_).count();
+}
+
+double FrameClock::nowSec()
+{
+    return nowNs() * 1e-9;
 }
 
 } // namespace fluvel_app
