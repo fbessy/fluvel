@@ -11,7 +11,20 @@
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 
-#include <QtWidgets>
+#include <QColorDialog>
+#include <QComboBox>
+#include <QDir>
+#include <QFileDialog>
+#include <QFormLayout>
+#include <QGroupBox>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QSettings>
+#include <QSpinBox>
+#include <QVBoxLayout>
+
+#include <random>
 
 namespace fluvel_app
 {

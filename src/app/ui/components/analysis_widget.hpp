@@ -7,15 +7,13 @@
 #include "image_viewer_listener.hpp"
 #include "shape.hpp"
 
+#include <QString>
 #include <QWidget>
 
-QT_BEGIN_NAMESPACE
 class QSpinBox;
 class QComboBox;
-class QMimeData;
 class QLabel;
 class QPushButton;
-QT_END_NAMESPACE
 
 namespace fluvel_app
 {

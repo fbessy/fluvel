@@ -995,14 +995,18 @@ void CameraWindow::loadPreferredFormats()
         // 👉 on ne peut pas reconstruire directement un QCameraFormat
         // donc on stocke une "cible" temporaire et on match plus tard
 
-        for (const auto& cam : cameraController_->videoInputs())
+        const auto inputs = cameraController_->videoInputs();
+
+        for (const auto& cam : inputs)
         {
             QByteArray deviceId = device::decodeDeviceId(dev);
 
             if (cam.id() != deviceId)
                 continue;
 
-            for (const auto& fmt : cam.videoFormats())
+            const auto formats = cam.videoFormats();
+
+            for (const auto& fmt : formats)
             {
                 if (fmt.resolution() == res && fmt.pixelFormat() == pf &&
                     std::abs(fmt.maxFrameRate() - fps) < 2.0f)

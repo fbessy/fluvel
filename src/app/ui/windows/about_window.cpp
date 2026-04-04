@@ -76,12 +76,20 @@ static QString buildFingerprint()
 
 QString buildTechnicalSection()
 {
+    const auto readFormatsRaw = QImageReader::supportedImageFormats();
+
     QStringList readFormats;
-    for (const QByteArray& f : QImageReader::supportedImageFormats())
+    readFormats.reserve(readFormatsRaw.size());
+
+    for (const auto& f : readFormatsRaw)
         readFormats << QString::fromLatin1(f).toUpper();
 
+    const auto writeFormatsRaw = QImageWriter::supportedImageFormats();
+
     QStringList writeFormats;
-    for (const QByteArray& f : QImageWriter::supportedImageFormats())
+    writeFormats.reserve(writeFormatsRaw.size());
+
+    for (const auto& f : writeFormatsRaw)
         writeFormats << QString::fromLatin1(f).toUpper();
 
     readFormats.sort();

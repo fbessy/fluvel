@@ -10,9 +10,17 @@
 namespace fluvel_app
 {
 
-static const QString kMaxText = "(0000, 0000)\n R:888  G:888  B:888";
+const QString& maxText()
+{
+    static const QString value = "(0000, 0000)\n R:888  G:888  B:888";
+    return value;
+}
 
-static const QString kMaxGrayText = "(0000, 0000)\n Gray:888";
+const QString& maxGrayText()
+{
+    static const QString value = "(0000, 0000)\n Gray:888";
+    return value;
+}
 
 PixelInfoOverlay::PixelInfoOverlay(QGraphicsScene* scene)
 {
@@ -51,13 +59,13 @@ void PixelInfoOverlay::updateInfo(const QPoint& pixel, const QRgb& color, bool i
 {
     if (isGrayImg)
     {
-        calc_bounding(kMaxGrayText);
+        calc_bounding(maxGrayText());
 
         text_ = QString("(%1, %2)\n Gray:%3").arg(pixel.x()).arg(pixel.y()).arg(qRed(color));
     }
     else
     {
-        calc_bounding(kMaxText);
+        calc_bounding(maxText());
 
         text_ = QString("(%1, %2)\n R:%3  G:%4  B:%5")
                     .arg(pixel.x())

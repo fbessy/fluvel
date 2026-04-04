@@ -101,35 +101,35 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
             [this](bool checked)
             {
                 config_.l_out_displayed = checked;
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(lout_selector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
                 config_.l_out_color = toRgb_uc(color);
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(lin_gb, &QGroupBox::toggled, this,
             [this](bool checked)
             {
                 config_.l_in_displayed = checked;
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(lin_selector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
                 config_.l_in_color = toRgb_uc(color);
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(display_overlay_cb_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.algorithm_overlay = checked;
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(source_rb_, &QRadioButton::toggled, this,
@@ -139,7 +139,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                     return;
 
                 config_.mode = ImageDisplayMode::Source;
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(preprocessed_rb_, &QRadioButton::toggled, this,
@@ -149,21 +149,21 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                     return;
 
                 config_.mode = ImageDisplayMode::Preprocessed;
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(flip_cb_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.mirrorMode = checked;
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 
     connect(smooth_cb_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.smoothDisplay = checked;
-                displayConfigChanged(config_);
+                emit displayConfigChanged(config_);
             });
 }
 
