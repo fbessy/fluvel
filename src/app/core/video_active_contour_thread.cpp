@@ -18,52 +18,48 @@ VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
 {
 }
 
-void VideoActiveContourThread::submitFrame(const CapturedFrame& capturedFrame)
+void VideoActiveContourThread::submitFrame(const CapturedFrame& frame)
 {
-    {
-        QMutexLocker locker(&frameMutex_);
-        lastCapturedFrame_ = capturedFrame;
-        frameAvailable_ = true;
-    }
+    int wi = writeIndex_.load(std::memory_order_relaxed);
+    int next = 1 - wi;
 
-    condition_.wakeOne();
+    buffers_[next] = frame;
+
+    writeIndex_.store(next, std::memory_order_release);
+    hasNewFrame_.store(true, std::memory_order_release);
 }
 
 void VideoActiveContourThread::run()
 {
-    running_ = true;
+    running_.store(true);
 
-    while (running_)
+    int readIndex = 0;
+
+    while (running_.load())
     {
-        CapturedFrame cf;
-        bool hasFrame = false;
-
+        if (hasNewFrame_.load(std::memory_order_acquire))
         {
-            QMutexLocker locker(&frameMutex_);
+            int wi = writeIndex_.load(std::memory_order_acquire);
 
-            if (frameAvailable_)
+            if (wi != readIndex)
             {
-                cf = lastCapturedFrame_;
-                frameAvailable_ = false;
-                hasFrame = true;
+                readIndex = wi;
+
+                CapturedFrame cf = buffers_[readIndex];
+
+                DisplayFrame df = processFrame(cf.frame);
+
+                df.receiveTimestampNs = cf.receiveTimestampNs;
+
+                emit frameProcessed(df.outerContour.size() + df.innerContour.size());
+                emit displayFrameReady(df);
             }
-        }
 
-        if (hasFrame)
-        {
-            DisplayFrame df = processFrame(cf.frame);
-
-            df.receiveTimestampNs = cf.receiveTimestampNs;
-
-            quint64 contourSize =
-                static_cast<quint64>(df.outerContour.size() + df.innerContour.size());
-
-            emit frameProcessed(contourSize);
-            emit displayFrameReady(df);
+            hasNewFrame_.store(false, std::memory_order_release);
         }
         else
         {
-            QThread::usleep(500);
+            QThread::usleep(200);
         }
     }
 }

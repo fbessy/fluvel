@@ -14,6 +14,7 @@
 #include <QMutex>
 #include <QWaitCondition>
 
+#include <atomic>
 #include <chrono>
 
 namespace fluvel_app
@@ -59,7 +60,7 @@ private:
     QWaitCondition condition_;
     CapturedFrame lastCapturedFrame_;
     bool frameAvailable_{false};
-    bool running_{true};
+    std::atomic<bool> running_{false};
     bool configChanged_{false};
     bool displayModeChanged_{false};
 
@@ -67,6 +68,10 @@ private:
     QSize currentSize_ = {0, 0};
 
     fluvel_ip::TemporalSmoother smoother_;
+
+    CapturedFrame buffers_[2];
+    std::atomic<int> writeIndex_{0};
+    std::atomic<bool> hasNewFrame_{false};
 };
 
 } // namespace fluvel_app
