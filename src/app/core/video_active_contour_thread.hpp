@@ -55,6 +55,7 @@ private:
     ImageDisplayMode displayMode_;
 
     QMutex frameMutex_;
+    QMutex configMutex_;
     QWaitCondition condition_;
     CapturedFrame lastCapturedFrame_;
     bool frameAvailable_{false};

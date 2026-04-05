@@ -31,32 +31,40 @@ void VideoActiveContourThread::submitFrame(const CapturedFrame& capturedFrame)
 
 void VideoActiveContourThread::run()
 {
-    QMutexLocker locker(&frameMutex_);
     running_ = true;
 
     while (running_)
     {
-        while (!frameAvailable_ && running_)
-            condition_.wait(&frameMutex_);
+        CapturedFrame cf;
+        bool hasFrame = false;
 
-        if (!running_)
-            break;
+        {
+            QMutexLocker locker(&frameMutex_);
 
-        CapturedFrame cf = lastCapturedFrame_;
-        frameAvailable_ = false;
-        locker.unlock();
+            if (frameAvailable_)
+            {
+                cf = lastCapturedFrame_;
+                frameAvailable_ = false;
+                hasFrame = true;
+            }
+        }
 
-        DisplayFrame df = processFrame(cf.frame);
+        if (hasFrame)
+        {
+            DisplayFrame df = processFrame(cf.frame);
 
-        df.receiveTimestampNs = cf.receiveTimestampNs;
+            df.receiveTimestampNs = cf.receiveTimestampNs;
 
-        quint64 contourSize = static_cast<quint64>(df.outerContour.size() + df.innerContour.size());
+            quint64 contourSize =
+                static_cast<quint64>(df.outerContour.size() + df.innerContour.size());
 
-        emit frameProcessed(contourSize);
-
-        emit displayFrameReady(df);
-
-        locker.relock();
+            emit frameProcessed(contourSize);
+            emit displayFrameReady(df);
+        }
+        else
+        {
+            QThread::usleep(500);
+        }
     }
 }
 
@@ -101,7 +109,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     ImageDisplayMode displayMode;
 
     {
-        QMutexLocker locker(&frameMutex_);
+        QMutexLocker locker(&configMutex_);
         config = config_;
         displayMode = displayMode_;
     }
@@ -203,14 +211,14 @@ void VideoActiveContourThread::stop()
 
 void VideoActiveContourThread::setAlgoConfig(const VideoComputeConfig& config)
 {
-    QMutexLocker locker(&frameMutex_);
+    QMutexLocker locker(&configMutex_);
     config_ = config;
     configChanged_ = true;
 }
 
 void VideoActiveContourThread::setDisplayMode(ImageDisplayMode mode)
 {
-    QMutexLocker locker(&frameMutex_);
+    QMutexLocker locker(&configMutex_);
     displayMode_ = mode;
     displayModeChanged_ = true;
 }
