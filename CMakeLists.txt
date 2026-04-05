@@ -11,6 +11,7 @@ message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 option(FLUVEL_UI_DESKTOP "Use QWidget UI on Mobile" ON)
 option(ENABLE_UNITY_BUILD "Enable unity build" OFF)
 option(ENABLE_ASAN "Enable Sanitizers" OFF)
+option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
 
 if(ENABLE_UNITY_BUILD)
     set(CMAKE_UNITY_BUILD ON)
@@ -29,6 +30,13 @@ if(ENABLE_ASAN)
     add_link_options(
         -fsanitize=address,undefined
     )
+endif()
+
+if(ENABLE_TSAN)
+    message(STATUS "ThreadSanitizer enabled")
+
+    add_compile_options(-fsanitize=thread -g -O1)
+    add_link_options(-fsanitize=thread)
 endif()
 
 set(CMAKE_CXX_STANDARD 23)
