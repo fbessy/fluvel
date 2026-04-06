@@ -84,6 +84,7 @@ void AnisotropicDiffusion::apply(int iterations, double lambda, double kappa,
 {
     const double invKappa2 = 1.0 / (kappa * kappa);
     const double dist[8] = {2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 2.0};
+    const bool useExp = (conduction == ConductionFunction::Exponential);
 
     for (int it = 0; it < iterations; ++it)
     {
@@ -112,9 +113,7 @@ void AnisotropicDiffusion::apply(int iterations, double lambda, double kappa,
                     {
                         double val = nabla[k] * nabla[k] * invKappa2;
 
-                        double cond = (conduction == ConductionFunction::Exponential)
-                                          ? std::exp(-val)
-                                          : 1.0 / (1.0 + val);
+                        double cond = useExp ? std::exp(-val) : 1.0 / (1.0 + val);
 
                         sigma += (cond * nabla[k]) / dist[k];
                     }
