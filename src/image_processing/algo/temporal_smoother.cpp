@@ -206,10 +206,16 @@ void TemporalSmoother::updateOutput()
     convertRgbFToBgr32(accum_, output_);
 }
 
-ImageView TemporalSmoother::output()
+ImageView TemporalSmoother::outputView()
 {
     updateOutput();
     return output_.view();
+}
+
+const ImageOwner& TemporalSmoother::output()
+{
+    updateOutput();
+    return output_;
 }
 
 } // namespace fluvel_ip

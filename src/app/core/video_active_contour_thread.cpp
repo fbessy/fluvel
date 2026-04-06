@@ -122,16 +122,24 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         return df;
 
     auto algoImage = imageViewFromQImage(preprocessed);
+
     const auto& algoConfig = config.algo;
 
     const auto newWSize = preprocessed.size();
 
     if (!activeContour_ || configChanged_ || newWSize != currentSize_)
     {
+        if (config.hasSpatialFiltering)
+        {
+            spatialFilter_.reset(algoImage);
+            spatialFilter_.apply(algoImage);
+            algoImage = spatialFilter_.outputView();
+        }
+
         if (config.hasTemporalFiltering)
         {
-            smoother_.reset(algoImage);
-            algoImage = smoother_.output();
+            temporalSmoother_.reset(algoImage);
+            algoImage = temporalSmoother_.outputView();
         }
 
         activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
@@ -144,10 +152,16 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     }
     else
     {
+        if (config.hasSpatialFiltering)
+        {
+            spatialFilter_.apply(algoImage);
+            algoImage = spatialFilter_.outputView();
+        }
+
         if (config.hasTemporalFiltering)
         {
-            smoother_.update(algoImage);
-            algoImage = smoother_.output();
+            temporalSmoother_.update(algoImage);
+            algoImage = temporalSmoother_.outputView();
         }
     }
 
@@ -168,8 +182,8 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     }
     else if (displayMode == ImageDisplayMode::Preprocessed)
     {
-        if (config.hasTemporalFiltering)
-            exportTemporalFilteredImage(algoImage, df);
+        if (config.hasSpatialFiltering || config.hasTemporalFiltering)
+            exportFilteredImage(algoImage, df);
         else
             df.image = preprocessed;
     }
@@ -181,8 +195,8 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     return df;
 }
 
-void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
-                                                           DisplayFrame& displayFrame)
+void VideoActiveContourThread::exportFilteredImage(const fluvel_ip::ImageView& algoImage,
+                                                   DisplayFrame& displayFrame)
 {
     displayFrame.image = toQImageCopy(algoImage);
 }

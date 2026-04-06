@@ -55,7 +55,8 @@ private:
     QGroupBox* downscaleGb_ = nullptr;
     QComboBox* downscaleFactorCb_ = nullptr;
 
-    QCheckBox* filterCb_ = nullptr;
+    QCheckBox* spatialCb_ = nullptr;
+    QCheckBox* temporalCb_ = nullptr;
 
     AlgoSettingsWidget* algoWidget_ = nullptr;
 

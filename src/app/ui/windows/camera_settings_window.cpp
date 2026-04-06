@@ -51,11 +51,13 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
 
     setupDownscaleGroup();
 
-    filterCb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
+    spatialCb_ = new QCheckBox(tr("Spatial Smoothing (3×3)"));
+    temporalCb_ = new QCheckBox(tr("Motion-Adaptive Smoothing"));
 
     auto* preprocessLayout = new QVBoxLayout(this);
     preprocessLayout->addWidget(downscaleGb_);
-    preprocessLayout->addWidget(filterCb_);
+    preprocessLayout->addWidget(spatialCb_);
+    preprocessLayout->addWidget(temporalCb_);
     preprocessLayout->addStretch(1);
 
     auto* preprocessGb = new QGroupBox;
@@ -107,7 +109,8 @@ void CameraSettingsWindow::accept()
 {
     config_.compute.downscale.hasDownscale = downscaleGb_->isChecked();
     config_.compute.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
-    config_.compute.hasTemporalFiltering = filterCb_->isChecked();
+    config_.compute.hasSpatialFiltering = spatialCb_->isChecked();
+    config_.compute.hasTemporalFiltering = temporalCb_->isChecked();
 
     algoWidget_->accept();
 
@@ -126,7 +129,8 @@ void CameraSettingsWindow::updateUIFromConfig()
     if (index >= 0)
         downscaleFactorCb_->setCurrentIndex(index);
 
-    filterCb_->setChecked(config_.compute.hasTemporalFiltering);
+    spatialCb_->setChecked(config_.compute.hasSpatialFiltering);
+    temporalCb_->setChecked(config_.compute.hasTemporalFiltering);
 
     algoWidget_->reject();
 }

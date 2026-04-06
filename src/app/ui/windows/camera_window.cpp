@@ -309,8 +309,9 @@ void CameraWindow::setupConnections()
     connect(&app, &ApplicationSettings::videoSettingsChanged, this,
             [this](const VideoSessionSettings& conf)
             {
-                bool hasPreprocessing =
-                    conf.compute.downscale.hasDownscale || conf.compute.hasTemporalFiltering;
+                bool hasPreprocessing = conf.compute.downscale.hasDownscale ||
+                                        conf.compute.hasSpatialFiltering ||
+                                        conf.compute.hasTemporalFiltering;
 
                 displayBar_->updatePipelineAvailability(hasPreprocessing);
             });

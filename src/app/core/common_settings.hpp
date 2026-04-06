@@ -218,9 +218,11 @@ struct ImageSessionSettings
 
 struct VideoComputeConfig
 {
+    static constexpr bool kDefaultHasSpatialFiltering = true;
     static constexpr bool kDefaultHasTemporalFiltering = true;
 
     DownscaleConfig downscale;
+    bool hasSpatialFiltering = kDefaultHasSpatialFiltering;
     bool hasTemporalFiltering = kDefaultHasTemporalFiltering;
 
     AlgoConfig algo;

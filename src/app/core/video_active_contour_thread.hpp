@@ -7,6 +7,7 @@
 #include "common_settings.hpp"
 #include "frame_data.hpp"
 #include "image_view.hpp"
+#include "spatial_filter.hpp"
 #include "temporal_smoother.hpp"
 
 #include <QVideoFrame>
@@ -45,8 +46,7 @@ private:
     QImage applyDownscale(const QImage& input, const DownscaleConfig& config) const;
     DisplayFrame processFrame(const QVideoFrame& inputFrame);
 
-    void exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
-                                     DisplayFrame& displayFrame);
+    void exportFilteredImage(const fluvel_ip::ImageView& algoImage, DisplayFrame& displayFrame);
 
     void exportContours(DisplayFrame& displayFrame);
 
@@ -67,7 +67,8 @@ private:
     std::unique_ptr<fluvel_ip::ActiveContour> activeContour_;
     QSize currentSize_ = {0, 0};
 
-    fluvel_ip::TemporalSmoother smoother_;
+    fluvel_ip::SpatialFilter spatialFilter_;
+    fluvel_ip::TemporalSmoother temporalSmoother_;
 
     CapturedFrame buffers_[2];
     std::atomic<int> writeIndex_{0};

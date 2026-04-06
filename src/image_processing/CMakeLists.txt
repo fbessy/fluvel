@@ -41,6 +41,9 @@ set(ip_src
     ${ALGO_DIR}/shape.cpp
     ${ALGO_DIR}/shape.hpp
 
+    ${ALGO_DIR}/spatial_filter.cpp
+    ${ALGO_DIR}/spatial_filter.hpp
+
     ${ALGO_DIR}/temporal_smoother.cpp
     ${ALGO_DIR}/temporal_smoother.hpp
 

@@ -217,6 +217,9 @@ void ApplicationSettings::saveVideoSessionSettings()
 
     saveDownscale(Session::Camera, videoSettings_.compute.downscale);
 
+    settings.setValue("preprocess/has_spatial_filtering",
+                      videoSettings_.compute.hasSpatialFiltering);
+
     settings.setValue("preprocess/has_temporal_filtering",
                       videoSettings_.compute.hasTemporalFiltering);
 
@@ -402,6 +405,12 @@ void ApplicationSettings::loadVideoSessionSettings()
     // preprocess tab
 
     loadDownscale(Session::Camera, videoSettings_.compute.downscale);
+
+    videoSettings_.compute.hasSpatialFiltering =
+        settings
+            .value("preprocess/has_spatial_filtering",
+                   VideoComputeConfig::kDefaultHasSpatialFiltering)
+            .toBool();
 
     videoSettings_.compute.hasTemporalFiltering =
         settings

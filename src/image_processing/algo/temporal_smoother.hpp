@@ -24,7 +24,8 @@ public:
         return accum_;
     }
 
-    ImageView output();
+    ImageView outputView();
+    const ImageOwner& output();
 
 private:
     void updateNoiseEstimate(float motion, float dt_seconds);
