@@ -134,6 +134,11 @@ public:
         return offset >= 0 && offset < static_cast<int>(size());
     }
 
+    const T* row(int y) const
+    {
+        return data() + y * width_;
+    }
+
 private:
     int width_ = 0;
     int height_ = 0;

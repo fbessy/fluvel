@@ -4,6 +4,7 @@
 #pragma once
 
 #include "color.hpp"
+#include "image_format.hpp"
 
 #include <cassert>
 #include <cstddef>
@@ -11,15 +12,6 @@
 
 namespace fluvel_ip
 {
-
-enum class ImageFormat
-{
-    Gray8,
-    Rgb24,
-    Bgr24,
-    Bgr32,
-    Rgba32
-};
 
 class ImageView final
 {

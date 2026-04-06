@@ -5,6 +5,7 @@
 
 #include "color.hpp"
 #include "grid2d.hpp"
+#include "image_owner.hpp"
 #include "image_view.hpp"
 
 #include "elapsed_timer.hpp"
@@ -23,7 +24,7 @@ public:
         return accum_;
     }
 
-    ImageView outputSpan();
+    ImageView output();
 
 private:
     void updateNoiseEstimate(float motion, float dt_seconds);
@@ -43,7 +44,7 @@ private:
 
     bool high_motion_ = false;
 
-    Grid2D<Rgb_uc> output_;
+    ImageOwner output_;
 
     float motion_ratio_filtered_ = 1.f;
 };

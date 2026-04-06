@@ -121,7 +121,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     if (preprocessed.isNull())
         return df;
 
-    auto algoImage = image_view_from_qimage(preprocessed);
+    auto algoImage = imageViewFromQImage(preprocessed);
     const auto& algoConfig = config.algo;
 
     const auto newWSize = preprocessed.size();
@@ -131,7 +131,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         if (config.hasTemporalFiltering)
         {
             smoother_.reset(algoImage);
-            algoImage = smoother_.outputSpan();
+            algoImage = smoother_.output();
         }
 
         activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
@@ -147,7 +147,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         if (config.hasTemporalFiltering)
         {
             smoother_.update(algoImage);
-            algoImage = smoother_.outputSpan();
+            algoImage = smoother_.output();
         }
     }
 
@@ -184,9 +184,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 void VideoActiveContourThread::exportTemporalFilteredImage(const fluvel_ip::ImageView& algoImage,
                                                            DisplayFrame& displayFrame)
 {
-    displayFrame.image =
-        QImage(algoImage.data(), algoImage.width(), algoImage.height(),
-               static_cast<qsizetype>(3 * algoImage.width()), QImage::Format_RGB888);
+    displayFrame.image = toQImageCopy(algoImage);
 }
 
 void VideoActiveContourThread::exportContours(DisplayFrame& displayFrame)

@@ -405,13 +405,13 @@ void ActiveContourWorker::initializeActiveContour()
 
     assert(!config_.initialPhi.isNull());
 
-    auto initialPhi = image_view_from_qimage(config_.initialPhi);
+    auto initialPhi = imageViewFromQImage(config_.initialPhi);
 
     fluvel_ip::ContourData initialCD(initialPhi, config_.algo.connectivity);
 
     bool is_rgb = (processedImage_.format() != QImage::Format_Grayscale8);
 
-    const auto processedImg = image_view_from_qimage(processedImage_);
+    const auto processedImg = imageViewFromQImage(processedImage_);
 
     if (is_rgb)
     {

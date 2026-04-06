@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "temporal_smoother.hpp"
+#include "image_conversions.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -14,6 +15,8 @@ namespace fluvel_ip
 // ------------------------------------------------------------
 void TemporalSmoother::reset(ImageView first_src)
 {
+    output_ = ImageOwner(first_src.width(), first_src.height(), ImageFormat::Bgr32);
+
     initialized_ = false;
     noise_initialized_ = false;
     time_initialized_ = false;
@@ -200,31 +203,13 @@ void TemporalSmoother::updateNoiseEstimate(float motion, float dt_seconds)
 // ------------------------------------------------------------
 void TemporalSmoother::updateOutput()
 {
-    output_.resize(accum_.width(), accum_.height());
-
-    for (int y = 0; y < accum_.height(); ++y)
-    {
-        for (int x = 0; x < accum_.width(); ++x)
-        {
-            const Rgb_f& a = accum_.at(x, y);
-
-            output_.at(x, y) = Rgb_uc{static_cast<unsigned char>(a.red + 0.5f),
-                                      static_cast<unsigned char>(a.green + 0.5f),
-                                      static_cast<unsigned char>(a.blue + 0.5f)};
-        }
-    }
+    convertRgbFToBgr32(accum_, output_);
 }
 
-ImageView TemporalSmoother::outputSpan()
+ImageView TemporalSmoother::output()
 {
     updateOutput();
-
-    static_assert(sizeof(Rgb_uc) == 3);
-    static_assert(alignof(Rgb_uc) == 1);
-    static_assert(std::is_standard_layout_v<Rgb_uc>);
-
-    return {reinterpret_cast<const unsigned char*>(output_.data()), output_.width(),
-            output_.height(), ImageFormat::Rgb24};
+    return output_.view();
 }
 
 } // namespace fluvel_ip
