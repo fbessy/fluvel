@@ -47,6 +47,9 @@ set(ip_src
     ${ALGO_DIR}/temporal_smoother.cpp
     ${ALGO_DIR}/temporal_smoother.hpp
 
+    ${ALGO_DIR}/anisotropic_diffusion.cpp
+    ${ALGO_DIR}/anisotropic_diffusion.hpp
+
     ${ALGO_DIR}/contour_diagnostics.hpp
 
     ${CORE_DIR}/grid2d.hpp
