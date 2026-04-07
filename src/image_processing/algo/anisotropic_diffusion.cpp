@@ -4,6 +4,7 @@
 #include "anisotropic_diffusion.hpp"
 
 #include <algorithm>
+#include <utility>
 
 namespace fluvel_ip::filter
 {
@@ -166,12 +167,28 @@ ImageOwner anisotropicDiffusion(const ImageView& input, int iterations, double l
     return impl.output(); // copy (safe)
 }
 
+void anisotropicDiffusion(const ImageView& input, ImageOwner& output, int iterations, double lambda,
+                          double kappa, ConductionFunction conduction)
+{
+    AnisotropicDiffusion impl;
+
+    impl.reset(input);
+    impl.apply(iterations, lambda, kappa, conduction);
+
+    std::swap(output, impl.outputRef());
+}
+
 ImageView AnisotropicDiffusion::outputView() const
 {
     return output_.view();
 }
 
 const ImageOwner& AnisotropicDiffusion::output() const
+{
+    return output_;
+}
+
+ImageOwner& AnisotropicDiffusion::outputRef()
 {
     return output_;
 }
