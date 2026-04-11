@@ -27,11 +27,12 @@ void SpatialFilter::reset(const ImageView& input)
 {
     const int w = input.width();
     const int h = input.height();
+    const auto fmt = input.format();
 
-    if (buffer1_.width() != w || buffer1_.height() != h || buffer1_.format() != ImageFormat::Bgr32)
+    if (buffer1_.width() != w || buffer1_.height() != h || buffer1_.format() != fmt)
     {
-        buffer1_ = ImageOwner(w, h, ImageFormat::Bgr32);
-        buffer2_ = ImageOwner(w, h, ImageFormat::Bgr32);
+        buffer1_ = ImageOwner(w, h, fmt);
+        buffer2_ = ImageOwner(w, h, fmt);
     }
 
     width_ = w;
@@ -44,133 +45,74 @@ void SpatialFilter::apply(const ImageView& input)
 
     const int stride1 = buffer1_.stride();
     const int stride2 = buffer2_.stride();
+    const int channels = input.channels();
 
     // =========================
     // PASS 1 — Horizontal
     // =========================
     for (int y = 0; y < height_; ++y)
     {
-        const unsigned char* src = input.row(y);
-        unsigned char* dst = buffer1_.data() + y * stride1;
+        const uint8_t* src = input.row(y);
+        uint8_t* dst = buffer1_.data() + y * stride1;
 
-        // --- left border (x = 0)
-        {
-            for (int c = 0; c < 3; ++c)
-            {
-                int sum = src[c] + src[c] + src[4 + c];
-                dst[c] = static_cast<unsigned char>((sum + 1) / 3);
-            }
-            dst[3] = 255;
-        }
-
-        // --- center (no clamp)
-        for (int x = 1; x < width_ - 1; ++x)
-        {
-            int base = 4 * x;
-
-            for (int c = 0; c < 3; ++c)
-            {
-                int sum = src[base - 4 + c] + src[base + c] + src[base + 4 + c];
-
-                dst[base + c] = static_cast<unsigned char>((sum + 1) / 3);
-            }
-
-            dst[base + 3] = 255;
-        }
-
-        // --- right border (x = width - 1)
-        {
-            int base = 4 * (width_ - 1);
-
-            for (int c = 0; c < 3; ++c)
-            {
-                int sum = src[base - 4 + c] + src[base + c] + src[base + c];
-
-                dst[base + c] = static_cast<unsigned char>((sum + 1) / 3);
-            }
-
-            dst[base + 3] = 255;
-        }
+        horizontalPass(src, dst, width_, channels);
     }
 
     // =========================
     // PASS 2 — Vertical
     // =========================
-
-    // --- top row (y = 0)
+    for (int y = 0; y < height_; ++y)
     {
-        unsigned char* dst = buffer2_.data();
+        const uint8_t* row_m1 = buffer1_.data() + std::max(0, y - 1) * stride1;
+        const uint8_t* row_0 = buffer1_.data() + y * stride1;
+        const uint8_t* row_p1 = buffer1_.data() + std::min(height_ - 1, y + 1) * stride1;
 
-        const unsigned char* row0 = buffer1_.data();
-        const unsigned char* row1 = buffer1_.data() + stride1;
+        uint8_t* dst = buffer2_.data() + y * stride2;
 
-        for (int x = 0; x < width_; ++x)
-        {
-            int base = 4 * x;
-
-            for (int c = 0; c < 3; ++c)
-            {
-                int sum = row0[base + c] + row0[base + c] + row1[base + c];
-
-                dst[base + c] = static_cast<unsigned char>((sum + 1) / 3);
-            }
-
-            dst[base + 3] = 255;
-        }
+        verticalPass(row_m1, row_0, row_p1, dst, width_, channels);
     }
 
-    // --- center rows (no clamp)
-    for (int y = 1; y < height_ - 1; ++y)
-    {
-        unsigned char* dst = buffer2_.data() + y * stride2;
-
-        const unsigned char* row_m1 = buffer1_.data() + (y - 1) * stride1;
-        const unsigned char* row_0 = buffer1_.data() + y * stride1;
-        const unsigned char* row_p1 = buffer1_.data() + (y + 1) * stride1;
-
-        for (int x = 0; x < width_; ++x)
-        {
-            int base = 4 * x;
-
-            for (int c = 0; c < 3; ++c)
-            {
-                int sum = row_m1[base + c] + row_0[base + c] + row_p1[base + c];
-
-                dst[base + c] = static_cast<unsigned char>((sum + 1) / 3);
-            }
-
-            dst[base + 3] = 255;
-        }
-    }
-
-    // --- bottom row (y = height - 1)
-    {
-        int y = height_ - 1;
-
-        unsigned char* dst = buffer2_.data() + y * stride2;
-
-        const unsigned char* row_m1 = buffer1_.data() + (y - 1) * stride1;
-        const unsigned char* row_0 = buffer1_.data() + y * stride1;
-
-        for (int x = 0; x < width_; ++x)
-        {
-            int base = 4 * x;
-
-            for (int c = 0; c < 3; ++c)
-            {
-                int sum = row_m1[base + c] + row_0[base + c] + row_0[base + c];
-
-                dst[base + c] = static_cast<unsigned char>((sum + 1) / 3);
-            }
-
-            dst[base + 3] = 255;
-        }
-    }
-
-    // =========================
-    // FINAL SWAP
-    // =========================
     std::swap(buffer1_, buffer2_);
+}
+
+void SpatialFilter::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels)
+{
+    const int rowSize = width * channels;
+
+    // --- left border
+    for (int c = 0; c < channels; ++c)
+    {
+        int sum = src[c] + src[c] + src[channels + c];
+        dst[c] = (sum + 1) / 3;
+    }
+
+    // --- center
+    for (int i = channels; i < rowSize - channels; ++i)
+    {
+        int sum = src[i - channels] + src[i] + src[i + channels];
+        dst[i] = (sum + 1) / 3;
+    }
+
+    // --- right border
+    int base = rowSize - channels;
+    for (int c = 0; c < channels; ++c)
+    {
+        int idx = base + c;
+        int sum = src[idx - channels] + src[idx] + src[idx];
+        dst[idx] = (sum + 1) / 3;
+    }
+}
+
+void SpatialFilter::verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const uint8_t* row_p1,
+                                 uint8_t* dst, int width, int channels)
+{
+    const int rowSize = width * channels;
+
+    for (int i = 0; i < rowSize; ++i)
+    {
+        int sum = row_m1[i] + row_0[i] + row_p1[i];
+        dst[i] = (sum + 1) / 3;
+    }
 }
 
 ImageView SpatialFilter::outputView() const

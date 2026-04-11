@@ -23,6 +23,10 @@ public:
     const ImageOwner& output() const;
 
 private:
+    void horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels);
+    void verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const uint8_t* row_p1,
+                      uint8_t* dst, int width, int channels);
+
     ImageOwner buffer1_;
     ImageOwner buffer2_;
 
