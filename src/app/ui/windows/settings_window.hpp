@@ -114,8 +114,8 @@ private:
     QGroupBox* gaussianNoiseGroupbox_ = nullptr;
     QDoubleSpinBox* gaussianNoiseStdSpin_ = nullptr;
 
-    QGroupBox* saltNoiseGroupbox_ = nullptr;
-    QDoubleSpinBox* saltNoisePercentSpin_ = nullptr;
+    QGroupBox* impulsiveNoiseGroupbox_ = nullptr;
+    QDoubleSpinBox* impulsiveNoisePercentSpin_ = nullptr;
 
     QGroupBox* speckleNoiseGroupbox_ = nullptr;
     QDoubleSpinBox* speckleNoiseStdSpin_ = nullptr;
@@ -200,7 +200,7 @@ private:
     ImageSessionSettings committedConfig_;
 
     DownscaleConfig editedDownscaleConfig_;
-    ProcessingConfig editedProcessingConfig_;
+    fluvel_ip::ProcessingConfig editedProcessingConfig_;
 };
 
 } // namespace fluvel_app

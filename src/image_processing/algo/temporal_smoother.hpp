@@ -10,7 +10,7 @@
 
 #include "elapsed_timer.hpp"
 
-namespace fluvel_ip
+namespace fluvel_ip::filter
 {
 
 class TemporalSmoother

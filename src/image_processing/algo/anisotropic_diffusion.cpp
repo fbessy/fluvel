@@ -9,6 +9,28 @@
 namespace fluvel_ip::filter
 {
 
+void anisotropicDiffusion(const ImageView& input, ImageOwner& output, int iterations, double lambda,
+                          double kappa, ConductionFunction conduction)
+{
+    AnisotropicDiffusion impl;
+
+    impl.reset(input);
+    impl.apply(iterations, lambda, kappa, conduction);
+
+    std::swap(output, impl.outputRef());
+}
+
+ImageOwner anisotropicDiffusion(const ImageView& input, int iterations, double lambda, double kappa,
+                                ConductionFunction conduction)
+{
+    AnisotropicDiffusion impl;
+
+    impl.reset(input);
+    impl.apply(iterations, lambda, kappa, conduction);
+
+    return impl.output(); // copy (safe)
+}
+
 void AnisotropicDiffusion::reset(const ImageView& input)
 {
     w_ = input.width();
@@ -154,28 +176,6 @@ void AnisotropicDiffusion::apply(int iterations, double lambda, double kappa,
             }
         }
     }
-}
-
-ImageOwner anisotropicDiffusion(const ImageView& input, int iterations, double lambda, double kappa,
-                                ConductionFunction conduction)
-{
-    AnisotropicDiffusion impl;
-
-    impl.reset(input);
-    impl.apply(iterations, lambda, kappa, conduction);
-
-    return impl.output(); // copy (safe)
-}
-
-void anisotropicDiffusion(const ImageView& input, ImageOwner& output, int iterations, double lambda,
-                          double kappa, ConductionFunction conduction)
-{
-    AnisotropicDiffusion impl;
-
-    impl.reset(input);
-    impl.apply(iterations, lambda, kappa, conduction);
-
-    std::swap(output, impl.outputRef());
 }
 
 ImageView AnisotropicDiffusion::outputView() const

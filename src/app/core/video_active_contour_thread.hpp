@@ -67,8 +67,8 @@ private:
     std::unique_ptr<fluvel_ip::ActiveContour> activeContour_;
     QSize currentSize_ = {0, 0};
 
-    fluvel_ip::SpatialFilter spatialFilter_;
-    fluvel_ip::TemporalSmoother temporalSmoother_;
+    fluvel_ip::filter::SpatialFilter spatialFilter_;
+    fluvel_ip::filter::TemporalSmoother temporalSmoother_;
 
     CapturedFrame buffers_[2];
     std::atomic<int> writeIndex_{0};

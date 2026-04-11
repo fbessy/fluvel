@@ -161,7 +161,7 @@ inline QImage toQImageCopy(const fluvel_ip::ImageView& view)
 
             for (int y = 0; y < view.height(); ++y)
             {
-                std::memcpy(img.scanLine(y), view.row(y), view.width());
+                std::memcpy(img.scanLine(y), view.row(y), static_cast<std::size_t>(view.width()));
             }
             break;
         }
@@ -172,7 +172,8 @@ inline QImage toQImageCopy(const fluvel_ip::ImageView& view)
 
             for (int y = 0; y < view.height(); ++y)
             {
-                std::memcpy(img.scanLine(y), view.row(y), view.width() * 3);
+                std::memcpy(img.scanLine(y), view.row(y),
+                            static_cast<std::size_t>(view.width() * 3));
             }
             break;
         }
@@ -183,7 +184,8 @@ inline QImage toQImageCopy(const fluvel_ip::ImageView& view)
 
             for (int y = 0; y < view.height(); ++y)
             {
-                std::memcpy(img.scanLine(y), view.row(y), view.width() * 4);
+                std::memcpy(img.scanLine(y), view.row(y),
+                            static_cast<std::size_t>(view.width() * 4));
             }
             break;
         }

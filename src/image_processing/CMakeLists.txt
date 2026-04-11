@@ -41,14 +41,23 @@ set(ip_src
     ${ALGO_DIR}/shape.cpp
     ${ALGO_DIR}/shape.hpp
 
+    ${ALGO_DIR}/image_pipeline.cpp
+    ${ALGO_DIR}/image_pipeline.hpp
+
+    ${ALGO_DIR}/noise.cpp
+    ${ALGO_DIR}/noise.hpp
+
+    ${ALGO_DIR}/mean_sliding.cpp
+    ${ALGO_DIR}/mean_sliding.hpp
+
+    ${ALGO_DIR}/anisotropic_diffusion.cpp
+    ${ALGO_DIR}/anisotropic_diffusion.hpp
+
     ${ALGO_DIR}/spatial_filter.cpp
     ${ALGO_DIR}/spatial_filter.hpp
 
     ${ALGO_DIR}/temporal_smoother.cpp
     ${ALGO_DIR}/temporal_smoother.hpp
-
-    ${ALGO_DIR}/anisotropic_diffusion.cpp
-    ${ALGO_DIR}/anisotropic_diffusion.hpp
 
     ${ALGO_DIR}/contour_diagnostics.hpp
 

@@ -136,14 +136,14 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     noiseSp_->setMaximum(100);
     noiseSp_->setSuffix(tr(" %"));
     noiseSp_->setValue(0);
-    QFormLayout* noise_layout = new QFormLayout;
-    noise_layout->addRow("noise =", noiseSp_);
+    QFormLayout* noiseLayout = new QFormLayout;
+    noiseLayout->addRow("noise =", noiseSp_);
 
     QVBoxLayout* this_layout = new QVBoxLayout;
     this_layout->addWidget(textListLength_);
     this_layout->addWidget(img_group);
     this_layout->addWidget(color_group);
-    this_layout->addLayout(noise_layout);
+    this_layout->addLayout(noiseLayout);
 
     setLayout(this_layout);
 

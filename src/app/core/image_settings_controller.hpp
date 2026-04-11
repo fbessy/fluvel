@@ -37,7 +37,7 @@ public:
     void onInputImageReady(const QImage& inputImage);
 
     void updateEditedConfig(const DownscaleConfig& downscaleConfig,
-                            const ProcessingConfig& processingConfig);
+                            const fluvel_ip::ProcessingConfig& processingConfig);
 
     QImage commit();
     void revert();
@@ -65,7 +65,7 @@ private:
     std::unique_ptr<PhiViewModel> phiViewModel_;
 
     DownscaleConfig editedDownscaleConfig_;
-    ProcessingConfig editedProcessingConfig_;
+    fluvel_ip::ProcessingConfig editedProcessingConfig_;
 
     QImage input_;
     QImage downscaled_;

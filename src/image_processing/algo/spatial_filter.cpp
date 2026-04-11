@@ -1,19 +1,47 @@
 #include "spatial_filter.hpp"
 
-namespace fluvel_ip
+namespace fluvel_ip::filter
 {
+
+void spatialFilter(const ImageView& input, ImageOwner& output)
+{
+    SpatialFilter impl;
+
+    impl.reset(input);
+    impl.apply(input);
+
+    output.copyFrom(impl.outputView());
+}
+
+ImageOwner spatialFilter(const ImageView& input)
+{
+    SpatialFilter impl;
+
+    impl.reset(input);
+    impl.apply(input);
+
+    return impl.output(); // copy (safe)
+}
 
 void SpatialFilter::reset(const ImageView& input)
 {
-    width_ = input.width();
-    height_ = input.height();
+    const int w = input.width();
+    const int h = input.height();
 
-    buffer1_ = ImageOwner(width_, height_, ImageFormat::Bgr32);
-    buffer2_ = ImageOwner(width_, height_, ImageFormat::Bgr32);
+    if (buffer1_.width() != w || buffer1_.height() != h || buffer1_.format() != ImageFormat::Bgr32)
+    {
+        buffer1_ = ImageOwner(w, h, ImageFormat::Bgr32);
+        buffer2_ = ImageOwner(w, h, ImageFormat::Bgr32);
+    }
+
+    width_ = w;
+    height_ = h;
 }
 
 void SpatialFilter::apply(const ImageView& input)
 {
+    reset(input);
+
     const int stride1 = buffer1_.stride();
     const int stride2 = buffer2_.stride();
 

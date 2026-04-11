@@ -4,6 +4,7 @@
 #include "settings_window.hpp"
 
 #include "algo_settings_widget.hpp"
+#include "image_pipeline.hpp"
 #include "image_viewer_widget.hpp"
 #include "initialization_behavior.hpp"
 #include "interaction_set.hpp"
@@ -123,11 +124,11 @@ void SettingsWindow::setupUiAlgoTab()
 {
     algoWidget_ = new AlgoSettingsWidget(committedConfig_.compute.algo, this);
 
-    QVBoxLayout* algo_layout = new QVBoxLayout;
-    algo_layout->addWidget(algoWidget_);
+    QVBoxLayout* algoLayout = new QVBoxLayout;
+    algoLayout->addWidget(algoWidget_);
 
     algoPage_ = new QWidget;
-    algoPage_->setLayout(algo_layout);
+    algoPage_->setLayout(algoLayout);
 }
 
 void SettingsWindow::setupUiInitTab()
@@ -317,7 +318,9 @@ void SettingsWindow::setupUiPreprocessingTab()
     /// Preprocessing tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    gaussianNoiseGroupbox_ = new QGroupBox(tr("Gaussian white noise"));
+    gaussianNoiseGroupbox_ = new QGroupBox(tr("Gaussian Noise"));
+    gaussianNoiseGroupbox_->setToolTip(
+        tr("Additive Gaussian (white) noise applied independently to each pixel."));
     gaussianNoiseGroupbox_->setCheckable(true);
     gaussianNoiseGroupbox_->setChecked(false);
     gaussianNoiseStdSpin_ = new QDoubleSpinBox;
@@ -329,19 +332,25 @@ void SettingsWindow::setupUiPreprocessingTab()
     QFormLayout* gaussian_noise_layout = new QFormLayout;
     gaussian_noise_layout->addRow("σ =", gaussianNoiseStdSpin_);
 
-    saltNoiseGroupbox_ = new QGroupBox(tr("Impulsional noise (salt and pepper)"));
-    saltNoiseGroupbox_->setCheckable(true);
-    saltNoiseGroupbox_->setChecked(false);
-    saltNoisePercentSpin_ = new QDoubleSpinBox;
-    saltNoisePercentSpin_->setSingleStep(1.0);
-    saltNoisePercentSpin_->setRange(0.0, 100.0);
-    saltNoisePercentSpin_->setSuffix(" %");
-    saltNoisePercentSpin_->setToolTip(tr("impulsional noise probability for each pixel"));
+    impulsiveNoiseGroupbox_ = new QGroupBox(tr("Impulsive Noise"));
+    impulsiveNoiseGroupbox_->setToolTip(
+        tr("Random pixel corruption. Grayscale: salt & pepper (black or white pixels). Color: each "
+           "channel can be independently corrupted."));
+    impulsiveNoiseGroupbox_->setCheckable(true);
+    impulsiveNoiseGroupbox_->setChecked(false);
+    impulsiveNoisePercentSpin_ = new QDoubleSpinBox;
+    impulsiveNoisePercentSpin_->setSingleStep(1.0);
+    impulsiveNoisePercentSpin_->setRange(0.0, 100.0);
+    impulsiveNoisePercentSpin_->setSuffix(" %");
+    impulsiveNoisePercentSpin_->setToolTip(tr("impulsional noise probability for each pixel"));
 
-    QFormLayout* salt_noise_layout = new QFormLayout;
-    salt_noise_layout->addRow(tr("d ="), saltNoisePercentSpin_);
+    QFormLayout* impulsiveNoiseLayout = new QFormLayout;
+    impulsiveNoiseLayout->addRow(tr("d ="), impulsiveNoisePercentSpin_);
 
-    speckleNoiseGroupbox_ = new QGroupBox(tr("Speckle noise"));
+    speckleNoiseGroupbox_ = new QGroupBox(tr("Speckle Noise"));
+    speckleNoiseGroupbox_->setToolTip(
+        tr("Multiplicative noise applied to pixel intensities. Based on a gamma distribution "
+           "(commonly used to model speckle in imaging systems)."));
     speckleNoiseGroupbox_->setCheckable(true);
     speckleNoiseGroupbox_->setChecked(false);
     speckleNoiseStdSpin_ = new QDoubleSpinBox;
@@ -349,18 +358,18 @@ void SettingsWindow::setupUiPreprocessingTab()
     speckleNoiseStdSpin_->setRange(0.0, 2.0);
     speckleNoiseStdSpin_->setToolTip(tr("standard deviation"));
 
-    QFormLayout* speckle_noise_layout = new QFormLayout;
-    speckle_noise_layout->addRow("σ =", speckleNoiseStdSpin_);
+    QFormLayout* speckleNoiseLayout = new QFormLayout;
+    speckleNoiseLayout->addRow("σ =", speckleNoiseStdSpin_);
 
     gaussianNoiseGroupbox_->setLayout(gaussian_noise_layout);
-    saltNoiseGroupbox_->setLayout(salt_noise_layout);
-    speckleNoiseGroupbox_->setLayout(speckle_noise_layout);
+    impulsiveNoiseGroupbox_->setLayout(impulsiveNoiseLayout);
+    speckleNoiseGroupbox_->setLayout(speckleNoiseLayout);
 
-    QVBoxLayout* noise_layout = new QVBoxLayout;
-    noise_layout->addWidget(gaussianNoiseGroupbox_);
-    noise_layout->addWidget(saltNoiseGroupbox_);
-    noise_layout->addWidget(speckleNoiseGroupbox_);
-    noise_layout->addStretch(1);
+    QVBoxLayout* noiseLayout = new QVBoxLayout;
+    noiseLayout->addWidget(gaussianNoiseGroupbox_);
+    noiseLayout->addWidget(impulsiveNoiseGroupbox_);
+    noiseLayout->addWidget(speckleNoiseGroupbox_);
+    noiseLayout->addStretch(1);
 
     ////////////////////////////////////////////
 
@@ -372,8 +381,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     meanKernelSizeSpin_->setMinimum(3);
     meanKernelSizeSpin_->setMaximum(499);
 
-    QFormLayout* mean_layout = new QFormLayout;
-    mean_layout->addRow(tr("kernel size ="), meanKernelSizeSpin_);
+    QFormLayout* meanLayout = new QFormLayout;
+    meanLayout->addRow(tr("kernel size ="), meanKernelSizeSpin_);
 
     gaussianGroupbox_ = new QGroupBox(tr("Gaussian filter"));
     gaussianGroupbox_->setCheckable(true);
@@ -388,9 +397,9 @@ void SettingsWindow::setupUiPreprocessingTab()
     gaussianSigmaSpin_->setMaximum(1000000.0);
     gaussianSigmaSpin_->setToolTip(tr("standard deviation"));
 
-    QFormLayout* gaussian_layout = new QFormLayout;
-    gaussian_layout->addRow(tr("kernel size ="), gaussianKernelSizeSpin_);
-    gaussian_layout->addRow("σ =", gaussianSigmaSpin_);
+    QFormLayout* gaussianLayout = new QFormLayout;
+    gaussianLayout->addRow(tr("kernel size ="), gaussianKernelSizeSpin_);
+    gaussianLayout->addRow("σ =", gaussianSigmaSpin_);
 
     ////////////////////////////////////////////
 
@@ -405,10 +414,10 @@ void SettingsWindow::setupUiPreprocessingTab()
     medianDirectRadio_ = new QRadioButton("O(r log r)×O(n)");
     medianPerreaultRadio_ = new QRadioButton("O(1)×O(n)");
 
-    QFormLayout* median_layout = new QFormLayout;
-    median_layout->addRow(tr("kernel size ="), medianKernelSizeSpin_);
-    median_layout->addRow(tr("Sort-based median"), medianDirectRadio_);
-    median_layout->addRow(tr("Perreault's algorithm"), medianPerreaultRadio_);
+    QFormLayout* medianLayout = new QFormLayout;
+    medianLayout->addRow(tr("kernel size ="), medianKernelSizeSpin_);
+    medianLayout->addRow(tr("Sort-based median"), medianDirectRadio_);
+    medianLayout->addRow(tr("Perreault's algorithm"), medianPerreaultRadio_);
 
     anisoGroupbox_ = new QGroupBox(tr("Perona-Malik anisotropic diffusion"));
     anisoGroupbox_->setCheckable(true);
@@ -428,12 +437,12 @@ void SettingsWindow::setupUiPreprocessingTab()
     kappaSpin_->setMinimum(0.0);
     kappaSpin_->setMaximum(10000.0);
 
-    QFormLayout* aniso_layout = new QFormLayout;
-    aniso_layout->addRow(tr("iterations ="), iterationFilterSpin_);
-    aniso_layout->addRow("λ =", lambdaSpin_);
-    aniso_layout->addRow("κ =", kappaSpin_);
-    aniso_layout->addRow(tr("function 1 :"), anisoExpConductionRadio_);
-    aniso_layout->addRow(tr("function 2 :"), anisoReciprocalConductionRadio_);
+    QFormLayout* anisoLayout = new QFormLayout;
+    anisoLayout->addRow(tr("iterations ="), iterationFilterSpin_);
+    anisoLayout->addRow("λ =", lambdaSpin_);
+    anisoLayout->addRow("κ =", kappaSpin_);
+    anisoLayout->addRow(tr("function 1 :"), anisoExpConductionRadio_);
+    anisoLayout->addRow(tr("function 2 :"), anisoReciprocalConductionRadio_);
 
     ////////////////////////////////////////////
 
@@ -447,8 +456,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     openKernelSizeSpin_->setToolTip(tr("the structuring element shape is a square and its "
                                        "origin is the center of the square"));
 
-    QFormLayout* open_layout = new QFormLayout;
-    open_layout->addRow(tr("SE size ="), openKernelSizeSpin_);
+    QFormLayout* openLayout = new QFormLayout;
+    openLayout->addRow(tr("SE size ="), openKernelSizeSpin_);
 
     closeGroupbox_ = new QGroupBox(tr("Closing"));
     closeGroupbox_->setCheckable(true);
@@ -460,8 +469,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     closeKernelSizeSpin_->setToolTip(tr("the structuring element shape is a square and its "
                                         "origin is the center of the square"));
 
-    QFormLayout* close_layout = new QFormLayout;
-    close_layout->addRow(tr("SE size ="), closeKernelSizeSpin_);
+    QFormLayout* closeLayout = new QFormLayout;
+    closeLayout->addRow(tr("SE size ="), closeKernelSizeSpin_);
 
     ////////////////////////////////////////////
 
@@ -479,71 +488,71 @@ void SettingsWindow::setupUiPreprocessingTab()
     tophatKernelSizeSpin_->setToolTip(tr("the structuring element shape is a square and its "
                                          "origin is the center of the square"));
 
-    QFormLayout* tophat_layout = new QFormLayout;
-    tophat_layout->addRow(" ", whitetophatRadio_);
-    tophat_layout->addRow(" ", blacktophatRadio_);
-    tophat_layout->addRow(tr("SE size ="), tophatKernelSizeSpin_);
+    QFormLayout* tophatLayout = new QFormLayout;
+    tophatLayout->addRow(" ", whitetophatRadio_);
+    tophatLayout->addRow(" ", blacktophatRadio_);
+    tophatLayout->addRow(tr("SE size ="), tophatKernelSizeSpin_);
 
     algoGroupbox_ = new QGroupBox(tr("Algorithm"));
     naiveRadio_ = new QRadioButton(tr("naïve algorithm in O(r)×O(n)"));
     perreaultRadio_ = new QRadioButton(tr("Perreault's algorithm in O(1)×O(n)"));
-    QVBoxLayout* algo_layout = new QVBoxLayout;
-    algo_layout->addWidget(naiveRadio_);
-    algo_layout->addWidget(perreaultRadio_);
+    QVBoxLayout* algoLayout = new QVBoxLayout;
+    algoLayout->addWidget(naiveRadio_);
+    algoLayout->addWidget(perreaultRadio_);
 
-    meanGroupbox_->setLayout(mean_layout);
-    gaussianGroupbox_->setLayout(gaussian_layout);
+    meanGroupbox_->setLayout(meanLayout);
+    gaussianGroupbox_->setLayout(gaussianLayout);
 
-    medianGroupbox_->setLayout(median_layout);
-    anisoGroupbox_->setLayout(aniso_layout);
+    medianGroupbox_->setLayout(medianLayout);
+    anisoGroupbox_->setLayout(anisoLayout);
 
-    openGroupbox_->setLayout(open_layout);
-    closeGroupbox_->setLayout(close_layout);
-    tophatGroupbox_->setLayout(tophat_layout);
-    algoGroupbox_->setLayout(algo_layout);
+    openGroupbox_->setLayout(openLayout);
+    closeGroupbox_->setLayout(closeLayout);
+    tophatGroupbox_->setLayout(tophatLayout);
+    algoGroupbox_->setLayout(algoLayout);
 
-    QVBoxLayout* filter_layout_linear = new QVBoxLayout;
-    filter_layout_linear->addWidget(meanGroupbox_);
-    filter_layout_linear->addWidget(gaussianGroupbox_);
+    QVBoxLayout* filterLayoutLinear = new QVBoxLayout;
+    filterLayoutLinear->addWidget(meanGroupbox_);
+    filterLayoutLinear->addWidget(gaussianGroupbox_);
 
-    QVBoxLayout* filter_layout_edge_preserv = new QVBoxLayout;
-    filter_layout_edge_preserv->addWidget(medianGroupbox_);
-    filter_layout_edge_preserv->addWidget(anisoGroupbox_);
+    QVBoxLayout* filterLayoutEdgePreserv = new QVBoxLayout;
+    filterLayoutEdgePreserv->addWidget(medianGroupbox_);
+    filterLayoutEdgePreserv->addWidget(anisoGroupbox_);
 
-    QVBoxLayout* filter_layout_mm = new QVBoxLayout;
-    filter_layout_mm->addWidget(openGroupbox_);
-    filter_layout_mm->addWidget(closeGroupbox_);
-    filter_layout_mm->addWidget(tophatGroupbox_);
-    filter_layout_mm->addWidget(algoGroupbox_);
+    QVBoxLayout* filterLayout = new QVBoxLayout;
+    filterLayout->addWidget(openGroupbox_);
+    filterLayout->addWidget(closeGroupbox_);
+    filterLayout->addWidget(tophatGroupbox_);
+    filterLayout->addWidget(algoGroupbox_);
 
     ////////////////////////////////////////////
 
     processInnerTabs_ = new QTabWidget(this);
 
-    QWidget* page_noise = new QWidget;
-    QWidget* page_filter_iso = new QWidget;
-    QWidget* page_filter_ansio = new QWidget;
-    QWidget* page_filter_morpho = new QWidget;
+    QWidget* pageNoise = new QWidget;
+    QWidget* pageFilterIso = new QWidget;
+    QWidget* pageFilterAnsio = new QWidget;
+    QWidget* pageFilterMorpho = new QWidget;
 
-    noise_layout->addStretch(1);
-    page_noise->setLayout(noise_layout);
+    noiseLayout->addStretch(1);
+    pageNoise->setLayout(noiseLayout);
 
-    filter_layout_linear->addStretch(1);
-    page_filter_iso->setLayout(filter_layout_linear);
+    filterLayoutLinear->addStretch(1);
+    pageFilterIso->setLayout(filterLayoutLinear);
 
-    filter_layout_edge_preserv->addStretch(1);
-    page_filter_ansio->setLayout(filter_layout_edge_preserv);
+    filterLayoutEdgePreserv->addStretch(1);
+    pageFilterAnsio->setLayout(filterLayoutEdgePreserv);
 
-    filter_layout_mm->addStretch(1);
-    page_filter_morpho->setLayout(filter_layout_mm);
+    filterLayout->addStretch(1);
+    pageFilterMorpho->setLayout(filterLayout);
 
-    QTabWidget* filter_tabs = new QTabWidget(this);
-    filter_tabs->addTab(page_filter_iso, tr("Linear"));
-    filter_tabs->addTab(page_filter_ansio, tr("Edge preserving"));
-    filter_tabs->addTab(page_filter_morpho, tr("Math morpho"));
+    QTabWidget* filterTabs = new QTabWidget(this);
+    filterTabs->addTab(pageFilterIso, tr("Linear"));
+    filterTabs->addTab(pageFilterAnsio, tr("Edge preserving"));
+    filterTabs->addTab(pageFilterMorpho, tr("Math morpho"));
 
-    processInnerTabs_->addTab(page_noise, tr("Noise generators"));
-    processInnerTabs_->addTab(filter_tabs, tr("Filters"));
+    processInnerTabs_->addTab(pageNoise, tr("Noise generators"));
+    processInnerTabs_->addTab(filterTabs, tr("Filters"));
 
     processPage_ = new QGroupBox(tr("Processing"));
     processPage_->setCheckable(true);
@@ -551,14 +560,14 @@ void SettingsWindow::setupUiPreprocessingTab()
 
     timeFilt_ = new QLabel(this);
     timeFilt_->setText(tr("time = "));
-    QGroupBox* time_filt_groupbox = new QGroupBox(tr("Processing time"));
-    QVBoxLayout* elapsed_filt_layout = new QVBoxLayout;
-    elapsed_filt_layout->addWidget(timeFilt_);
-    time_filt_groupbox->setLayout(elapsed_filt_layout);
+    QGroupBox* timeFiltGroupbox = new QGroupBox(tr("Processing time"));
+    QVBoxLayout* elapsedFiltLayout = new QVBoxLayout;
+    elapsedFiltLayout->addWidget(timeFilt_);
+    timeFiltGroupbox->setLayout(elapsedFiltLayout);
 
     QVBoxLayout* processLayout = new QVBoxLayout;
     processLayout->addWidget(processInnerTabs_);
-    processLayout->addWidget(time_filt_groupbox);
+    processLayout->addWidget(timeFiltGroupbox);
     processPage_->setLayout(processLayout);
 }
 
@@ -637,14 +646,14 @@ void SettingsWindow::setupConnections()
                 notifyConfigEdited();
             });
 
-    connect(saltNoiseGroupbox_, &QGroupBox::clicked, this,
+    connect(impulsiveNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
                 editedProcessingConfig_.has_salt_noise = checked;
                 notifyConfigEdited();
             });
 
-    connect(saltNoisePercentSpin_, &QDoubleSpinBox::valueChanged, this,
+    connect(impulsiveNoisePercentSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
                 editedProcessingConfig_.proba_noise = static_cast<float>(v) / 100.f;
@@ -738,14 +747,16 @@ void SettingsWindow::setupConnections()
     connect(anisoExpConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.aniso_option = fluvel_ip::AnisoDiff::FUNCTION1;
+                editedProcessingConfig_.aniso_option =
+                    fluvel_ip::filter::ConductionFunction::Exponential;
                 notifyConfigEdited();
             });
 
     connect(anisoReciprocalConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.aniso_option = fluvel_ip::AnisoDiff::FUNCTION2;
+                editedProcessingConfig_.aniso_option =
+                    fluvel_ip::filter::ConductionFunction::Rational;
                 notifyConfigEdited();
             });
 
@@ -940,8 +951,8 @@ void SettingsWindow::accept()
     filt_config.enabled = processPage_->isChecked();
     filt_config.has_gaussian_noise = gaussianNoiseGroupbox_->isChecked();
     filt_config.std_noise = float(gaussianNoiseStdSpin_->value());
-    filt_config.has_salt_noise = saltNoiseGroupbox_->isChecked();
-    filt_config.proba_noise = float(saltNoisePercentSpin_->value()) / 100.f;
+    filt_config.has_salt_noise = impulsiveNoiseGroupbox_->isChecked();
+    filt_config.proba_noise = float(impulsiveNoisePercentSpin_->value()) / 100.f;
     filt_config.has_speckle_noise = speckleNoiseGroupbox_->isChecked();
     filt_config.std_speckle_noise = float(speckleNoiseStdSpin_->value());
     filt_config.has_median_filt = medianGroupbox_->isChecked();
@@ -961,11 +972,11 @@ void SettingsWindow::accept()
     filt_config.kappa = float(kappaSpin_->value());
     if (anisoExpConductionRadio_->isChecked())
     {
-        filt_config.aniso_option = fluvel_ip::AnisoDiff::FUNCTION1;
+        filt_config.aniso_option = fluvel_ip::filter::ConductionFunction::Exponential;
     }
     else if (anisoReciprocalConductionRadio_->isChecked())
     {
-        filt_config.aniso_option = fluvel_ip::AnisoDiff::FUNCTION2;
+        filt_config.aniso_option = fluvel_ip::filter::ConductionFunction::Rational;
     }
 
     filt_config.has_open_filt = openGroupbox_->isChecked();
@@ -1013,8 +1024,8 @@ void SettingsWindow::updateUIFromConfig()
     processPage_->setChecked(config_filter.enabled);
     gaussianNoiseGroupbox_->setChecked(config_filter.has_gaussian_noise);
     gaussianNoiseStdSpin_->setValue(double(config_filter.std_noise));
-    saltNoiseGroupbox_->setChecked(config_filter.has_salt_noise);
-    saltNoisePercentSpin_->setValue(double(100.f * config_filter.proba_noise));
+    impulsiveNoiseGroupbox_->setChecked(config_filter.has_salt_noise);
+    impulsiveNoisePercentSpin_->setValue(double(100.f * config_filter.proba_noise));
     speckleNoiseGroupbox_->setChecked(config_filter.has_speckle_noise);
     speckleNoiseStdSpin_->setValue(double(config_filter.std_speckle_noise));
 
@@ -1041,12 +1052,12 @@ void SettingsWindow::updateUIFromConfig()
 
     anisoGroupbox_->setChecked(config_filter.has_aniso_diff);
     iterationFilterSpin_->setValue(config_filter.max_itera);
-    lambdaSpin_->setValue(double(config_filter.lambda));
-    kappaSpin_->setValue(double(config_filter.kappa));
+    lambdaSpin_->setValue(config_filter.lambda);
+    kappaSpin_->setValue(config_filter.kappa);
     anisoExpConductionRadio_->setChecked(config_filter.aniso_option ==
-                                         fluvel_ip::AnisoDiff::FUNCTION1);
+                                         fluvel_ip::filter::ConductionFunction::Exponential);
     anisoReciprocalConductionRadio_->setChecked(config_filter.aniso_option ==
-                                                fluvel_ip::AnisoDiff::FUNCTION2);
+                                                fluvel_ip::filter::ConductionFunction::Rational);
 
     openGroupbox_->setChecked(config_filter.has_open_filt);
     openKernelSizeSpin_->setValue(config_filter.kernel_open_length);
@@ -1078,6 +1089,11 @@ void SettingsWindow::updateUIFromConfig()
     imageSettingsController_->revert();
 
     algoWidget_->reject();
+
+    editedDownscaleConfig_ = committedConfig_.compute.downscale;
+    editedProcessingConfig_ = committedConfig_.compute.processing;
+
+    notifyConfigEdited();
 }
 
 void SettingsWindow::reject()
@@ -1122,8 +1138,8 @@ void SettingsWindow::restoreDefaults()
     gaussianNoiseGroupbox_->setChecked(false);
     gaussianNoiseStdSpin_->setValue(20.0);
 
-    saltNoiseGroupbox_->setChecked(false);
-    saltNoisePercentSpin_->setValue(0.05);
+    impulsiveNoiseGroupbox_->setChecked(false);
+    impulsiveNoisePercentSpin_->setValue(0.05);
 
     speckleNoiseGroupbox_->setChecked(false);
     speckleNoiseStdSpin_->setValue(0.16);
@@ -1175,6 +1191,11 @@ void SettingsWindow::restoreDefaults()
     // centered by default
     abscissaSpin_->setValue(0);
     ordinateSpin_->setValue(0);
+
+    editedDownscaleConfig_ = committedConfig_.compute.downscale;
+    editedProcessingConfig_ = committedConfig_.compute.processing;
+
+    notifyConfigEdited();
 }
 
 void SettingsWindow::onAddShape()

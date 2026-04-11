@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace fluvel_ip
+namespace fluvel_ip::filter
 {
 
 // ------------------------------------------------------------

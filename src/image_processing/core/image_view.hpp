@@ -126,11 +126,11 @@ public:
 
 private:
     const unsigned char* data_;
-    int widthPixels_;
-    int heightPixels_;
-    ImageFormat format_;
-    int channelsPerPixel_;
-    int strideBytes_; // bytes per row
+    int widthPixels_{0};
+    int heightPixels_{0};
+    ImageFormat format_{ImageFormat::Gray8};
+    int channelsPerPixel_{0};
+    int strideBytes_{0}; // bytes per row
 
     static int compute_stride(int width, int channels, int strideBytes)
     {

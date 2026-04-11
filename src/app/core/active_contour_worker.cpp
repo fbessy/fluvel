@@ -7,6 +7,7 @@
 #include "region_color_ac.hpp"
 #include "speed_model.hpp"
 
+#include "filters.hpp"
 #include "image_adapters.hpp"
 #include "image_view.hpp"
 
@@ -294,7 +295,7 @@ void ActiveContourWorker::applyProcessing()
         //--------------------------------------------------
         if (fc.has_aniso_diff)
         {
-            filters.anisotropic_diffusion(fc.max_itera, fc.lambda, fc.kappa, fc.aniso_option);
+            // filters.anisotropic_diffusion(fc.max_itera, fc.lambda, fc.kappa, fc.aniso_option);
         }
 
         //--------------------------------------------------

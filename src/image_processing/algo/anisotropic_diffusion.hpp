@@ -42,8 +42,10 @@ inline constexpr double kDefaultKappa = 30.0;
  *
  * @note This function is suitable for pipelines where memory reuse is desired.
  */
-void anisotropicDiffusion(const ImageView& input, ImageOwner& output, int iterations, double lambda,
-                          double kappa, ConductionFunction conduction);
+void anisotropicDiffusion(const ImageView& input, ImageOwner& output,
+                          int iterations = kDefaultIterations, double lambda = kDefaultLambda,
+                          double kappa = kDefaultKappa,
+                          ConductionFunction conduction = kDefaultConductionFunction);
 
 /**
  * @brief Apply Perona-Malik anisotropic diffusion on an image.
@@ -126,12 +128,17 @@ public:
      * @brief Get the result image with ownership.
      *      * @return Reference to the internal ImageOwner.
      */
-    ImageOwner& outputRef(); /**
-                              * @file anisotropic_diffusion.hpp
-                              * @brief Perona-Malik anisotropic diffusion filter implementation.
-                              */
+    ImageOwner& outputRef();
 
 private:
+    void initFromInput(const ImageView& input);
+    void padBorders();
+
+    int idx(int x, int y, int c) const
+    {
+        return ((x + 1) + (y + 1) * stridePad_) * activeChannels_ + c;
+    }
+
     int w_ = 0;
     int h_ = 0;
     int channels_ = 0;
@@ -142,14 +149,6 @@ private:
     std::vector<double> next_;
 
     ImageOwner output_;
-
-    int idx(int x, int y, int c) const
-    {
-        return ((x + 1) + (y + 1) * stridePad_) * activeChannels_ + c;
-    }
-
-    void initFromInput(const ImageView& input);
-    void padBorders();
 };
 
 } // namespace fluvel_ip::filter

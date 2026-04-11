@@ -6,8 +6,11 @@
 #include "image_owner.hpp"
 #include "image_view.hpp"
 
-namespace fluvel_ip
+namespace fluvel_ip::filter
 {
+
+void spatialFilter(const ImageView& input, ImageOwner& output);
+ImageOwner spatialFilter(const ImageView& input);
 
 class SpatialFilter
 {
