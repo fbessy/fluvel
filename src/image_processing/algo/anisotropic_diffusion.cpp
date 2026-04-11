@@ -42,7 +42,7 @@ void AnisotropicDiffusion::reset(const ImageView& input)
     current_.resize((w_ + 2) * (h_ + 2) * activeChannels_);
     next_.resize((w_ + 2) * (h_ + 2) * activeChannels_);
 
-    output_ = ImageOwner(w_, h_, input.format());
+    output_ = ImageOwner::like(input);
 
     initFromInput(input);
     padBorders();

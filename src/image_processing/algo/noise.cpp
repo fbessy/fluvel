@@ -18,12 +18,7 @@ ImageOwner gaussian(const ImageView& input, float sigma)
 
 void gaussian(const ImageView& input, ImageOwner& output, float sigma)
 {
-    // ensure output is valid
-    if (output.width() != input.width() || output.height() != input.height() ||
-        output.format() != input.format())
-    {
-        output = ImageOwner(input.width(), input.height(), input.format());
-    }
+    output.ensureLike(input);
 
     constexpr float kSigmaMin = 1e-3f;
     constexpr float kSigmaMax = 80.f;
@@ -69,12 +64,7 @@ ImageOwner impulsive(const ImageView& input, float probability)
 
 void impulsive(const ImageView& input, ImageOwner& output, float probability)
 {
-    // ensure output
-    if (output.width() != input.width() || output.height() != input.height() ||
-        output.format() != input.format())
-    {
-        output = ImageOwner(input.width(), input.height(), input.format());
-    }
+    output.ensureLike(input);
 
     probability = std::clamp(probability, 0.f, 1.f);
 
@@ -138,17 +128,12 @@ ImageOwner speckleUniform(const ImageView& input, float sigma)
 
 void speckleUniform(const ImageView& input, ImageOwner& output, float sigma)
 {
+    output.ensureLike(input);
+
     constexpr float kSigmaMin = 1e-3f;
     constexpr float kSigmaMax = 80.f;
 
     sigma = std::clamp(sigma, kSigmaMin, kSigmaMax);
-
-    // 🔹 ensure output
-    if (output.width() != input.width() || output.height() != input.height() ||
-        output.format() != input.format())
-    {
-        output = ImageOwner(input.width(), input.height(), input.format());
-    }
 
     std::mt19937 rng(std::random_device{}());
     std::normal_distribution<float> dist(0.f, sigma);
@@ -192,12 +177,7 @@ ImageOwner speckleGamma(const ImageView& input, float sigma)
 
 void speckleGamma(const ImageView& input, ImageOwner& output, float sigma)
 {
-    // Ensure output is valid
-    if (output.width() != input.width() || output.height() != input.height() ||
-        output.format() != input.format())
-    {
-        output = ImageOwner(input.width(), input.height(), input.format());
-    }
+    output.ensureLike(input);
 
     constexpr float kSigmaMin = 1e-3f;
     constexpr float kSigmaMax = 2.f;

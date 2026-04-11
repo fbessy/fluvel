@@ -13,11 +13,10 @@ namespace fluvel_ip
 void ImagePipeline::reset(const ImageView& input)
 {
     // Allouer si nécessaire
-    if (bufferA_.width() != input.width() || bufferA_.height() != input.height() ||
-        bufferA_.format() != input.format())
+    if (!bufferA_.hasSameLayout(input))
     {
-        bufferA_ = ImageOwner(input.width(), input.height(), input.format());
-        bufferB_ = ImageOwner(input.width(), input.height(), input.format());
+        bufferA_ = ImageOwner::like(input);
+        bufferB_ = ImageOwner::like(input);
     }
 }
 

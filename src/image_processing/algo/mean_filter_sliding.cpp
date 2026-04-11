@@ -22,11 +22,10 @@ ImageOwner meanSliding(const ImageView& input, int radius)
 
 void MeanSliding::reset(const ImageView& input)
 {
-    if (buffer1_.width() != input.width() || buffer1_.height() != input.height() ||
-        buffer1_.format() != input.format())
+    if (!buffer1_.hasSameLayout(input))
     {
-        buffer1_ = ImageOwner(input.width(), input.height(), input.format());
-        buffer2_ = ImageOwner(input.width(), input.height(), input.format());
+        buffer1_ = ImageOwner::like(input);
+        buffer2_ = ImageOwner::like(input);
     }
 
     width_ = input.width();

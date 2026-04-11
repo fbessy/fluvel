@@ -27,13 +27,25 @@ public:
     {
     }
 
+    static ImageOwner like(const ImageView& view)
+    {
+        return ImageOwner(view.width(), view.height(), view.format());
+    }
+
+    bool hasSameLayout(const ImageView& view) const noexcept
+    {
+        return width() == view.width() && height() == view.height() && format() == view.format();
+    }
+
+    void ensureLike(const ImageView& view)
+    {
+        if (!hasSameLayout(view))
+            *this = ImageOwner::like(view);
+    }
+
     void copyFrom(const ImageView& img)
     {
-        // Reallocate si nécessaire
-        if (width() != img.width() || height() != img.height() || format() != img.format())
-        {
-            *this = ImageOwner(img.width(), img.height(), img.format());
-        }
+        ensureLike(img);
 
         const int h = img.height();
         const std::size_t rowBytes = static_cast<std::size_t>(img.width() * img.channels());

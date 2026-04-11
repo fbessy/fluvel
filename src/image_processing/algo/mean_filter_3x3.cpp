@@ -25,18 +25,14 @@ ImageOwner mean3x3(const ImageView& input)
 
 void Mean3x3::reset(const ImageView& input)
 {
-    const int w = input.width();
-    const int h = input.height();
-    const auto fmt = input.format();
-
-    if (buffer1_.width() != w || buffer1_.height() != h || buffer1_.format() != fmt)
+    if (!buffer1_.hasSameLayout(input))
     {
-        buffer1_ = ImageOwner(w, h, fmt);
-        buffer2_ = ImageOwner(w, h, fmt);
+        buffer1_ = ImageOwner::like(input);
+        buffer2_ = ImageOwner::like(input);
     }
 
-    width_ = w;
-    height_ = h;
+    width_ = input.width();
+    height_ = input.height();
 }
 
 void Mean3x3::apply(const ImageView& input)
