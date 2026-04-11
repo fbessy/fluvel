@@ -27,4 +27,7 @@ ImageOwner topHat(const ImageView& input, int radius);
 void blackTopHat(const ImageView& input, ImageOwner& output, int radius);
 ImageOwner blackTopHat(const ImageView& input, int radius);
 
+void gradient(const ImageView& input, ImageOwner& output, int radius);
+ImageOwner gradient(const ImageView& input, int radius);
+
 } // namespace fluvel_ip::filter::morpho

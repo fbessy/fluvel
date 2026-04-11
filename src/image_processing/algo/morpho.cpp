@@ -97,4 +97,22 @@ ImageOwner blackTopHat(const ImageView& input, int radius)
     return out;
 }
 
+void gradient(const ImageView& input, ImageOwner& output, int radius)
+{
+    ImageOwner minImg(input.width(), input.height(), input.format());
+    ImageOwner maxImg(input.width(), input.height(), input.format());
+
+    min(input, minImg, radius);
+    max(input, maxImg, radius);
+
+    pixelwise::diff(maxImg.view(), minImg.view(), output);
+}
+
+ImageOwner gradient(const ImageView& input, int radius)
+{
+    ImageOwner out;
+    gradient(input, out, radius);
+    return out;
+}
+
 } // namespace fluvel_ip::filter::morpho
