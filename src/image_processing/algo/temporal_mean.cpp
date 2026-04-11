@@ -5,6 +5,7 @@
 #include "image_conversions.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 
 namespace fluvel_ip::filter
@@ -47,6 +48,9 @@ void TemporalMean::reset(ImageView first_src)
 // ------------------------------------------------------------
 void TemporalMean::update(ImageView src)
 {
+    assert(src.width() == accum_.width());
+    assert(src.height() == accum_.height());
+
     if (!initialized_)
         return;
 
