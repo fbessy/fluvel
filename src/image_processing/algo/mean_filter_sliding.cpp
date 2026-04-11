@@ -1,4 +1,4 @@
-#include "mean_sliding.hpp"
+#include "mean_filter_sliding.hpp"
 
 #include <algorithm>
 #include <cassert>

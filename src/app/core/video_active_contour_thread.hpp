@@ -7,8 +7,8 @@
 #include "common_settings.hpp"
 #include "frame_data.hpp"
 #include "image_view.hpp"
-#include "spatial_filter.hpp"
-#include "temporal_smoother.hpp"
+#include "mean_filter_3x3.hpp"
+#include "temporal_mean.hpp"
 
 #include <QVideoFrame>
 #include <QThread>
@@ -67,8 +67,8 @@ private:
     std::unique_ptr<fluvel_ip::ActiveContour> activeContour_;
     QSize currentSize_ = {0, 0};
 
-    fluvel_ip::filter::SpatialFilter spatialFilter_;
-    fluvel_ip::filter::TemporalSmoother temporalSmoother_;
+    fluvel_ip::filter::Mean3x3 spatialFilter_;
+    fluvel_ip::filter::TemporalMean temporalSmoother_;
 
     CapturedFrame buffers_[2];
     std::atomic<int> writeIndex_{0};

@@ -9,10 +9,10 @@
 namespace fluvel_ip::filter
 {
 
-void spatialFilter(const ImageView& input, ImageOwner& output);
-ImageOwner spatialFilter(const ImageView& input);
+void mean3x3(const ImageView& input, ImageOwner& output);
+ImageOwner mean3x3(const ImageView& input);
 
-class SpatialFilter
+class Mean3x3
 {
 public:
     void reset(const ImageView& input);
@@ -30,8 +30,8 @@ private:
     ImageOwner buffer1_;
     ImageOwner buffer2_;
 
-    int width_ = 0;
-    int height_ = 0;
+    int width_{0};
+    int height_{0};
 };
 
 } // namespace fluvel_ip

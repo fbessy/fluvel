@@ -47,17 +47,20 @@ set(ip_src
     ${ALGO_DIR}/noise.cpp
     ${ALGO_DIR}/noise.hpp
 
-    ${ALGO_DIR}/mean_sliding.cpp
-    ${ALGO_DIR}/mean_sliding.hpp
+    ${ALGO_DIR}/mean_filter.cpp
+    ${ALGO_DIR}/mean_filter.hpp
+
+    ${ALGO_DIR}/mean_filter_3x3.cpp
+    ${ALGO_DIR}/mean_filter_3x3.hpp
+
+    ${ALGO_DIR}/mean_filter_sliding.cpp
+    ${ALGO_DIR}/mean_filter_sliding.hpp
+
+    ${ALGO_DIR}/temporal_mean.cpp
+    ${ALGO_DIR}/temporal_mean.hpp
 
     ${ALGO_DIR}/anisotropic_diffusion.cpp
     ${ALGO_DIR}/anisotropic_diffusion.hpp
-
-    ${ALGO_DIR}/spatial_filter.cpp
-    ${ALGO_DIR}/spatial_filter.hpp
-
-    ${ALGO_DIR}/temporal_smoother.cpp
-    ${ALGO_DIR}/temporal_smoother.hpp
 
     ${ALGO_DIR}/contour_diagnostics.hpp
 

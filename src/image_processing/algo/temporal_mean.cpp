@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "temporal_smoother.hpp"
+#include "temporal_mean.hpp"
 #include "image_conversions.hpp"
 
 #include <algorithm>
@@ -13,7 +13,7 @@ namespace fluvel_ip::filter
 // ------------------------------------------------------------
 // RESET
 // ------------------------------------------------------------
-void TemporalSmoother::reset(ImageView first_src)
+void TemporalMean::reset(ImageView first_src)
 {
     output_ = ImageOwner(first_src.width(), first_src.height(), ImageFormat::Bgr32);
 
@@ -45,7 +45,7 @@ void TemporalSmoother::reset(ImageView first_src)
 // ------------------------------------------------------------
 // UPDATE
 // ------------------------------------------------------------
-void TemporalSmoother::update(ImageView src)
+void TemporalMean::update(ImageView src)
 {
     if (!initialized_)
         return;
@@ -167,7 +167,7 @@ void TemporalSmoother::update(ImageView src)
 // ------------------------------------------------------------
 // Noise estimation (FPS independent)
 // ------------------------------------------------------------
-void TemporalSmoother::updateNoiseEstimate(float motion, float dt_seconds)
+void TemporalMean::updateNoiseEstimate(float motion, float dt_seconds)
 {
     // Constantes de temps
     const float tau_init = 0.3f; // convergence rapide au démarrage
@@ -201,18 +201,18 @@ void TemporalSmoother::updateNoiseEstimate(float motion, float dt_seconds)
 // ------------------------------------------------------------
 // OUTPUT
 // ------------------------------------------------------------
-void TemporalSmoother::updateOutput()
+void TemporalMean::updateOutput()
 {
     convertRgbFToBgr32(accum_, output_);
 }
 
-ImageView TemporalSmoother::outputView()
+ImageView TemporalMean::outputView()
 {
     updateOutput();
     return output_.view();
 }
 
-const ImageOwner& TemporalSmoother::output()
+const ImageOwner& TemporalMean::output()
 {
     updateOutput();
     return output_;

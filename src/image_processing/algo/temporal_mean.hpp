@@ -13,7 +13,7 @@
 namespace fluvel_ip::filter
 {
 
-class TemporalSmoother
+class TemporalMean
 {
 public:
     void reset(ImageView first_src);

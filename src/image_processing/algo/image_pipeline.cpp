@@ -3,9 +3,8 @@
 
 #include "image_pipeline.hpp"
 #include "anisotropic_diffusion.hpp"
-#include "mean_sliding.hpp"
+#include "mean_filter.hpp"
 #include "noise.hpp"
-#include "spatial_filter.hpp"
 
 namespace fluvel_ip
 {
@@ -56,8 +55,7 @@ void ImagePipeline::apply(const ImageView& input, const ProcessingConfig& config
 
     if (config.has_mean_filt)
     {
-        // filter::meanSliding(src->view(), *dst, config.kernel_mean_length / 2);
-        filter::spatialFilter(src->view(), *dst);
+        filter::mean(src->view(), *dst, config.kernel_mean_length / 2);
         std::swap(src, dst);
     }
 

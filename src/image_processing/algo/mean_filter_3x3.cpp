@@ -1,11 +1,11 @@
-#include "spatial_filter.hpp"
+#include "mean_filter_3x3.hpp"
 
 namespace fluvel_ip::filter
 {
 
-void spatialFilter(const ImageView& input, ImageOwner& output)
+void mean3x3(const ImageView& input, ImageOwner& output)
 {
-    SpatialFilter impl;
+    Mean3x3 impl;
 
     impl.reset(input);
     impl.apply(input);
@@ -13,9 +13,9 @@ void spatialFilter(const ImageView& input, ImageOwner& output)
     output.copyFrom(impl.outputView());
 }
 
-ImageOwner spatialFilter(const ImageView& input)
+ImageOwner mean3x3(const ImageView& input)
 {
-    SpatialFilter impl;
+    Mean3x3 impl;
 
     impl.reset(input);
     impl.apply(input);
@@ -23,7 +23,7 @@ ImageOwner spatialFilter(const ImageView& input)
     return impl.output(); // copy (safe)
 }
 
-void SpatialFilter::reset(const ImageView& input)
+void Mean3x3::reset(const ImageView& input)
 {
     const int w = input.width();
     const int h = input.height();
@@ -39,7 +39,7 @@ void SpatialFilter::reset(const ImageView& input)
     height_ = h;
 }
 
-void SpatialFilter::apply(const ImageView& input)
+void Mean3x3::apply(const ImageView& input)
 {
     reset(input);
 
@@ -75,7 +75,7 @@ void SpatialFilter::apply(const ImageView& input)
     std::swap(buffer1_, buffer2_);
 }
 
-void SpatialFilter::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels)
+void Mean3x3::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels)
 {
     const int rowSize = width * channels;
 
@@ -103,8 +103,8 @@ void SpatialFilter::horizontalPass(const uint8_t* src, uint8_t* dst, int width, 
     }
 }
 
-void SpatialFilter::verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const uint8_t* row_p1,
-                                 uint8_t* dst, int width, int channels)
+void Mean3x3::verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const uint8_t* row_p1,
+                           uint8_t* dst, int width, int channels)
 {
     const int rowSize = width * channels;
 
@@ -115,12 +115,12 @@ void SpatialFilter::verticalPass(const uint8_t* row_m1, const uint8_t* row_0, co
     }
 }
 
-ImageView SpatialFilter::outputView() const
+ImageView Mean3x3::outputView() const
 {
     return buffer1_.view();
 }
 
-const ImageOwner& SpatialFilter::output() const
+const ImageOwner& Mean3x3::output() const
 {
     return buffer1_;
 }

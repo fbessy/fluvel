@@ -60,14 +60,17 @@ public:
     {
         return width_;
     }
+
     int height() const noexcept
     {
         return height_;
     }
+
     int stride() const noexcept
     {
         return stride_;
     }
+
     ImageFormat format() const noexcept
     {
         return format_;

@@ -39,27 +39,38 @@ public:
     {
         return data_;
     }
+
     int width() const noexcept
     {
         return widthPixels_;
     }
+
     int height() const noexcept
     {
         return heightPixels_;
     }
-    int size() const noexcept
+
+    int pixelCount() const noexcept
     {
         return widthPixels_ * heightPixels_;
     }
+
+    int byteSize() const noexcept
+    {
+        return strideBytes_ * heightPixels_;
+    }
+
     ImageFormat format() const noexcept
     {
         return format_;
     }
+
     int channels() const noexcept
     {
         return channelsPerPixel_;
     }
-    int strideBytes() const noexcept
+
+    int stride() const noexcept
     {
         return strideBytes_;
     }
@@ -81,38 +92,28 @@ public:
 
     inline Rgb_uc atPixelRgb(int x, int y) const noexcept
     {
-        const unsigned char* p = row(y);
+        const unsigned char* p = row(y) + static_cast<ptrdiff_t>(x * channelsPerPixel_);
 
         switch (format_)
         {
             case ImageFormat::Gray8:
             {
-                const unsigned char v = p[x];
+                const unsigned char v = p[0];
                 return {v, v, v};
             }
             case ImageFormat::Rgb24:
-            {
-                p += static_cast<ptrdiff_t>(x * 3);
                 return {p[0], p[1], p[2]};
-            }
+
             case ImageFormat::Bgr24:
-            {
-                p += static_cast<ptrdiff_t>(x * 3);
                 return {p[2], p[1], p[0]};
-            }
+
             case ImageFormat::Bgr32:
-            {
-                p += static_cast<ptrdiff_t>(x * 4);
                 return {p[2], p[1], p[0]};
-            }
+
             case ImageFormat::Rgba32:
-            {
-                p += static_cast<ptrdiff_t>(x * 4);
-                return {p[0], p[1], p[2]}; // ignore alpha
-            }
+                return {p[0], p[1], p[2]};
         }
 
-        // Violation de contrat : format_ invalide
         std::unreachable();
     }
 

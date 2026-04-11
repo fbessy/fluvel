@@ -29,7 +29,7 @@ void RegionGraySpeedModel::onImageChanged(ImageView image, const ContourData& co
     status_ = SpeedModelStatus::Ok;
 
     image_ = image;
-    pixelCountTotal_ = image_.size();
+    pixelCountTotal_ = image_.pixelCount();
 
     sumTotal_ = 0;
 
