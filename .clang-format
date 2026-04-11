@@ -57,4 +57,6 @@ NamespaceIndentation: None
 # Keep empty lines clean
 KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
+
+AlwaysBreakTemplateDeclarations: Yes
 ...

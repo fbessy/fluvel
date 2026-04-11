@@ -4,6 +4,7 @@
 #include "image_pipeline.hpp"
 #include "anisotropic_diffusion.hpp"
 #include "mean_filter.hpp"
+#include "morpho.hpp"
 #include "noise.hpp"
 
 namespace fluvel_ip
@@ -63,6 +64,28 @@ void ImagePipeline::apply(const ImageView& input, const ProcessingConfig& config
     {
         filter::anisotropicDiffusion(src->view(), *dst, config.max_itera, config.lambda,
                                      config.kappa, config.aniso_option);
+        std::swap(src, dst);
+    }
+
+    if (config.has_open_filt)
+    {
+        filter::morpho::opening(src->view(), *dst, config.kernel_open_length / 2);
+        std::swap(src, dst);
+    }
+
+    if (config.has_close_filt)
+    {
+        filter::morpho::closing(src->view(), *dst, config.kernel_close_length / 2);
+        std::swap(src, dst);
+    }
+
+    if (config.has_top_hat_filt)
+    {
+        if (config.is_white_top_hat)
+            filter::morpho::topHat(src->view(), *dst, config.kernel_tophat_length / 2);
+        else
+            filter::morpho::blackTopHat(src->view(), *dst, config.kernel_tophat_length / 2);
+
         std::swap(src, dst);
     }
 

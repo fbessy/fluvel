@@ -62,6 +62,15 @@ set(ip_src
     ${ALGO_DIR}/anisotropic_diffusion.cpp
     ${ALGO_DIR}/anisotropic_diffusion.hpp
 
+    ${ALGO_DIR}/morpho.cpp
+    ${ALGO_DIR}/morpho.hpp
+
+    ${ALGO_DIR}/naive_morpho.hpp
+    ${ALGO_DIR}/van_herk_morpho.hpp
+
+    ${ALGO_DIR}/pixel_wise.cpp
+    ${ALGO_DIR}/pixel_wise.hpp
+
     ${ALGO_DIR}/contour_diagnostics.hpp
 
     ${CORE_DIR}/grid2d.hpp
