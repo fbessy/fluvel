@@ -5,11 +5,15 @@
 #include "mean_filter_3x3.hpp"
 #include "mean_filter_sliding.hpp"
 
+#include <cassert>
+
 namespace fluvel_ip::filter
 {
 
 void mean(const ImageView& input, ImageOwner& output, int radius)
 {
+    assert(radius >= 1);
+
     if (radius >= 2)
         meanSliding(input, output, radius);
     else

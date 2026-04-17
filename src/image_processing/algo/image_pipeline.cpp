@@ -4,6 +4,7 @@
 #include "image_pipeline.hpp"
 #include "anisotropic_diffusion.hpp"
 #include "mean_filter.hpp"
+#include "median_filter.hpp"
 #include "morpho.hpp"
 #include "noise.hpp"
 
@@ -56,6 +57,12 @@ void ImagePipeline::apply(const ImageView& input, const ProcessingConfig& config
     if (config.has_mean_filt)
     {
         filter::mean(src->view(), *dst, config.kernel_mean_length / 2);
+        std::swap(src, dst);
+    }
+
+    if (config.has_median_filt)
+    {
+        filter::median(src->view(), *dst, config.kernel_median_length / 2);
         std::swap(src, dst);
     }
 

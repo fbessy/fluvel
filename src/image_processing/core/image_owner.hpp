@@ -59,6 +59,11 @@ public:
         }
     }
 
+    uint8_t& at(int x, int y, int c = 0) noexcept
+    {
+        return data_[y * stride_ + x * channels_ + c];
+    }
+
     unsigned char* data() noexcept
     {
         return data_.data();

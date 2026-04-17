@@ -56,6 +56,9 @@ set(ip_src
     ${ALGO_DIR}/mean_filter_sliding.cpp
     ${ALGO_DIR}/mean_filter_sliding.hpp
 
+    ${ALGO_DIR}/median_filter.cpp
+    ${ALGO_DIR}/median_filter.hpp
+
     ${ALGO_DIR}/temporal_mean.cpp
     ${ALGO_DIR}/temporal_mean.hpp
 

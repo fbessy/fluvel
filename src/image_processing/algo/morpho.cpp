@@ -6,11 +6,15 @@
 #include "pixel_wise.hpp"
 #include "van_herk_morpho.hpp"
 
+#include <cassert>
+
 namespace fluvel_ip::filter::morpho
 {
 
 void max(const ImageView& input, ImageOwner& output, int radius)
 {
+    assert(radius >= 1);
+
     if (radius >= 2)
         vanHerk<true>(input, output, radius);
     else
@@ -26,6 +30,8 @@ ImageOwner max(const ImageView& input, int radius)
 
 void min(const ImageView& input, ImageOwner& output, int radius)
 {
+    assert(radius >= 1);
+
     if (radius >= 2)
         vanHerk<false>(input, output, radius);
     else
