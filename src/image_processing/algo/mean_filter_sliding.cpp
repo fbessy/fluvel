@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: CeCILL-2.1
+// Copyright (C) 2010-2026 Fabien Bessy
+
 #include "mean_filter_sliding.hpp"
 
 #include <algorithm>
@@ -34,6 +37,8 @@ void MeanSliding::reset(const ImageView& input)
 
 void MeanSliding::apply(const ImageView& input, int radius)
 {
+    assert(radius >= 1);
+
     reset(input);
 
     const int channels = input.channels();
@@ -74,7 +79,7 @@ void MeanSliding::apply(const ImageView& input, int radius)
             }
 
             // -------- CENTER (FAST PATH) --------
-            for (int x = radius; x < width_ - radius; ++x)
+            for (int x = radius; x < width_ - radius - 1; ++x)
             {
                 dst[x * channels + c] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
 
@@ -141,7 +146,7 @@ void MeanSliding::apply(const ImageView& input, int radius)
             }
 
             // -------- CENTER (FAST PATH) --------
-            for (int y = radius; y < height_ - radius; ++y)
+            for (int y = radius; y < height_ - radius - 1; ++y)
             {
                 uint8_t* dst = buffer2_.data() + y * stride2;
 
