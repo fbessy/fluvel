@@ -118,6 +118,36 @@ public:
         std::unreachable();
     }
 
+    inline void readPixelRgb(const uint8_t* row, int idx, float& r, float& g,
+                             float& b) const noexcept
+    {
+        switch (format_)
+        {
+            case ImageFormat::Gray8:
+            {
+                float v = row[idx];
+                r = g = b = v;
+                break;
+            }
+            case ImageFormat::Rgb24:
+            case ImageFormat::Rgba32:
+            {
+                r = row[idx + 0];
+                g = row[idx + 1];
+                b = row[idx + 2];
+                break;
+            }
+            case ImageFormat::Bgr24:
+            case ImageFormat::Bgr32:
+            {
+                b = row[idx + 0];
+                g = row[idx + 1];
+                r = row[idx + 2];
+                break;
+            }
+        }
+    }
+
     uint8_t gray(int x, int y) const noexcept
     {
         assert(format_ == ImageFormat::Gray8);

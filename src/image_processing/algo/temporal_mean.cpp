@@ -14,8 +14,10 @@ namespace fluvel_ip::filter
 // ------------------------------------------------------------
 // RESET
 // ------------------------------------------------------------
-void TemporalMean::reset(ImageView first_src)
+void TemporalMean::reset(const ImageView& first_src)
 {
+    assert(first_src.channels() >= 3);
+
     output_ = ImageOwner(first_src.width(), first_src.height(), ImageFormat::Bgr32);
 
     initialized_ = false;
@@ -46,7 +48,7 @@ void TemporalMean::reset(ImageView first_src)
 // ------------------------------------------------------------
 // UPDATE
 // ------------------------------------------------------------
-void TemporalMean::update(ImageView src)
+void TemporalMean::update(const ImageView& src)
 {
     assert(src.width() == accum_.width());
     assert(src.height() == accum_.height());
@@ -154,16 +156,25 @@ void TemporalMean::update(ImageView src)
     // --------------------------------------------------------
     // 7) Apply smoothing
     // --------------------------------------------------------
+
+    const int channels = src.channels();
+
     for (int y = 0; y < accum_.height(); ++y)
     {
+        const uint8_t* row = src.row(y);
+
         for (int x = 0; x < accum_.width(); ++x)
         {
-            const Rgb_uc s = src.atPixelRgb(x, y);
+            const int idx = x * channels;
+
+            float r, g, b;
+            src.readPixelRgb(row, idx, r, g, b);
+
             Rgb_f& a = accum_.at(x, y);
 
-            a.red += alpha * (float(s.red) - a.red);
-            a.green += alpha * (float(s.green) - a.green);
-            a.blue += alpha * (float(s.blue) - a.blue);
+            a.red += alpha * (r - a.red);
+            a.green += alpha * (g - a.green);
+            a.blue += alpha * (b - a.blue);
         }
     }
 }

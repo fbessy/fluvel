@@ -125,48 +125,52 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 
     const auto& algoConfig = config.algo;
 
-    const auto newWSize = preprocessed.size();
+    const auto newSize = preprocessed.size();
+    const bool needReset = !activeContour_ || configChanged_ || newSize != currentSize_;
 
-    if (!activeContour_ || configChanged_ || newWSize != currentSize_)
+    // ------------------------------------------------------------
+    // 1) Filtering pipeline
+    // ------------------------------------------------------------
+    if (config.hasSpatialFiltering)
     {
-        if (config.hasSpatialFiltering)
-        {
+        if (needReset)
             spatialFilter_.reset(algoImage);
-            spatialFilter_.apply(algoImage);
-            algoImage = spatialFilter_.outputView();
-        }
 
-        if (config.hasTemporalFiltering)
-        {
+        spatialFilter_.apply(algoImage);
+        algoImage = spatialFilter_.outputView();
+    }
+
+    if (config.hasTemporalFiltering)
+    {
+        if (needReset)
             temporalSmoother_.reset(algoImage);
-            algoImage = temporalSmoother_.outputView();
-        }
+        else
+            temporalSmoother_.update(algoImage);
 
+        algoImage = temporalSmoother_.outputView();
+    }
+
+    // ------------------------------------------------------------
+    // 2) Active contour lifecycle
+    // ------------------------------------------------------------
+    if (needReset)
+    {
         activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
             fluvel_ip::ContourData(algoImage.width(), algoImage.height(), algoConfig.connectivity),
             std::make_unique<fluvel_ip::RegionColorSpeedModel>(algoConfig.regionAcConfig),
             algoConfig.acConfig);
 
-        currentSize_ = newWSize;
+        currentSize_ = newSize;
         configChanged_ = false;
     }
-    else
+
+    // ------------------------------------------------------------
+    // 3) Update
+    // ------------------------------------------------------------
+    if (algoImage.data() && activeContour_)
     {
-        if (config.hasSpatialFiltering)
-        {
-            spatialFilter_.apply(algoImage);
-            algoImage = spatialFilter_.outputView();
-        }
-
-        if (config.hasTemporalFiltering)
-        {
-            temporalSmoother_.update(algoImage);
-            algoImage = temporalSmoother_.outputView();
-        }
-    }
-
-    if (algoImage.data() != nullptr && activeContour_)
         activeContour_->update(algoImage);
+    }
 
     fluvel_ip::ElapsedTimer timeSliceBudget;
     timeSliceBudget.start();

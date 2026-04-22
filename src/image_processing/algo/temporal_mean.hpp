@@ -16,8 +16,8 @@ namespace fluvel_ip::filter
 class TemporalMean
 {
 public:
-    void reset(ImageView first_src);
-    void update(ImageView src);
+    void reset(const ImageView& first_src);
+    void update(const ImageView& src);
 
     const Grid2D<Rgb_f>& accum() const
     {
