@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_active_contour_thread.hpp"
-#include "region_color_ac.hpp"
+#include "region_color_speed_model.hpp"
 #include "speed_model.hpp"
 
 #include "elapsed_timer.hpp"

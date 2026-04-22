@@ -20,11 +20,11 @@ set(ip_src
     ${ALGO_DIR}/majority_internal_speed.cpp
     ${ALGO_DIR}/majority_internal_speed.hpp
 
-    ${ALGO_DIR}/region_ac.cpp
-    ${ALGO_DIR}/region_ac.hpp
+    ${ALGO_DIR}/region_gray_speed_model.cpp
+    ${ALGO_DIR}/region_gray_speed_model.hpp
 
-    ${ALGO_DIR}/region_color_ac.cpp
-    ${ALGO_DIR}/region_color_ac.hpp
+    ${ALGO_DIR}/region_color_speed_model.cpp
+    ${ALGO_DIR}/region_color_speed_model.hpp
 
     #${ALGO_DIR}/edge_ac.cpp
     #${ALGO_DIR}/edge_ac.hpp

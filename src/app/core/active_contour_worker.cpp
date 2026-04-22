@@ -3,8 +3,8 @@
 
 #include "active_contour_worker.hpp"
 
-#include "region_ac.hpp"
-#include "region_color_ac.hpp"
+#include "region_gray_speed_model.hpp"
+#include "region_color_speed_model.hpp"
 #include "speed_model.hpp"
 
 #include "filters.hpp"
