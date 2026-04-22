@@ -75,10 +75,6 @@ template <bool IsMax>
 void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, int height,
                      int channels, int radius)
 {
-    const int stride = buffer.stride();
-    const uint8_t* srcBase = buffer.data();
-    uint8_t* dstBase = output.data();
-
     const int K = 2 * radius + 1;
 
     for (int x = 0; x < width; ++x)
@@ -89,18 +85,18 @@ void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, in
 
             for (int y = 0; y < height; ++y)
             {
-                // remove out-of-window
                 if (!dq.empty() && dq.front() <= y - K)
                     dq.pop_front();
 
-                int idx = y * stride + x * channels + ch;
+                const uint8_t* row = buffer.rowPtr(y);
+                int idx = x * channels + ch;
 
                 while (!dq.empty())
                 {
-                    int backIdx = dq.back() * stride + x * channels + ch;
+                    const uint8_t* rowBack = buffer.rowPtr(dq.back());
 
-                    uint8_t a = srcBase[backIdx];
-                    uint8_t b = srcBase[idx];
+                    uint8_t a = rowBack[idx];
+                    uint8_t b = row[idx];
 
                     if constexpr (IsMax)
                     {
@@ -123,21 +119,22 @@ void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, in
                 if (y >= radius)
                 {
                     int out_y = y - radius;
-                    int outIdx = out_y * stride + x * channels + ch;
 
-                    int frontIdx = dq.front() * stride + x * channels + ch;
+                    uint8_t* dst = output.rowPtr(out_y);
+                    const uint8_t* rowFront = buffer.rowPtr(dq.front());
 
-                    dstBase[outIdx] = srcBase[frontIdx];
+                    dst[idx] = rowFront[idx];
                 }
             }
 
             // tail
             for (int y = height - radius; y < height; ++y)
             {
-                int outIdx = y * stride + x * channels + ch;
-                int frontIdx = dq.front() * stride + x * channels + ch;
+                uint8_t* dst = output.rowPtr(y);
+                const uint8_t* rowFront = buffer.rowPtr(dq.front());
 
-                dstBase[outIdx] = srcBase[frontIdx];
+                int idx = x * channels + ch;
+                dst[idx] = rowFront[idx];
             }
         }
     }
@@ -165,7 +162,7 @@ void vanHerk(const ImageView& input, ImageOwner& output, int radius)
     for (int y = 0; y < h; ++y)
     {
         const uint8_t* src = input.row(y);
-        uint8_t* dst = buffer.data() + y * buffer.stride();
+        uint8_t* dst = buffer.rowPtr(y);
 
         detail::vanHerkHorizontal<IsMax>(src, dst, w, c, radius);
     }

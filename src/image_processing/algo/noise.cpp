@@ -4,6 +4,7 @@
 #include "noise.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <random>
 
 namespace fluvel_ip::noise
@@ -35,22 +36,24 @@ void gaussian(const ImageView& input, ImageOwner& output, float sigma)
 
     for (int y = 0; y < h; ++y)
     {
-        const unsigned char* src = input.row(y);
-        unsigned char* dst = output.data() + y * output.stride();
+        const uint8_t* src = input.row(y);
+        uint8_t* dst = output.rowPtr(y);
 
         for (int x = 0; x < w; ++x)
         {
+            const int idx = x * channels;
+
             for (int c = 0; c < activeChannels; ++c)
             {
-                float v = src[x * channels + c] + dist(rng);
+                float v = src[idx + c] + dist(rng);
                 v = std::clamp(v, 0.f, 255.f);
 
-                dst[x * channels + c] = static_cast<unsigned char>(v + 0.5f);
+                dst[idx + c] = static_cast<uint8_t>(v + 0.5f);
             }
 
             // preserve alpha
             if (channels == 4)
-                dst[x * 4 + 3] = src[x * 4 + 3];
+                dst[idx + 3] = src[idx + 3];
         }
     }
 }
@@ -79,8 +82,8 @@ void impulsive(const ImageView& input, ImageOwner& output, float probability)
 
     for (int y = 0; y < h; ++y)
     {
-        const unsigned char* src = input.row(y);
-        unsigned char* dst = output.data() + y * output.stride();
+        const uint8_t* src = input.row(y);
+        uint8_t* dst = output.rowPtr(y);
 
         for (int x = 0; x < w; ++x)
         {
@@ -88,32 +91,26 @@ void impulsive(const ImageView& input, ImageOwner& output, float probability)
             {
                 // ===== Grayscale : salt & pepper =====
                 if (dist01(rng) < probability)
-                {
                     dst[x] = distSaltPepper(rng) ? 255 : 0;
-                }
                 else
-                {
                     dst[x] = src[x];
-                }
             }
             else
             {
+                const int idx = x * channels;
+
                 // ===== Couleur : impulsif par canal =====
                 for (int c = 0; c < activeChannels; ++c)
                 {
                     if (dist01(rng) < probability)
-                    {
-                        dst[x * channels + c] = distSaltPepper(rng) ? 255 : 0;
-                    }
+                        dst[idx + c] = distSaltPepper(rng) ? 255 : 0;
                     else
-                    {
-                        dst[x * channels + c] = src[x * channels + c];
-                    }
+                        dst[idx + c] = src[idx + c];
                 }
 
                 // preserve alpha
                 if (channels == 4)
-                    dst[x * 4 + 3] = src[x * 4 + 3];
+                    dst[idx + 3] = src[idx + 3];
             }
         }
     }
@@ -145,25 +142,27 @@ void speckleUniform(const ImageView& input, ImageOwner& output, float sigma)
 
     for (int y = 0; y < h; ++y)
     {
-        const unsigned char* src = input.row(y);
-        unsigned char* dst = output.data() + y * output.stride();
+        const uint8_t* src = input.row(y);
+        uint8_t* dst = output.rowPtr(y);
 
         for (int x = 0; x < w; ++x)
         {
+            const int idx = x * channels;
+
             // multiplicative noise factor
             float noise = 1.f + dist(rng);
 
             for (int c = 0; c < activeChannels; ++c)
             {
-                float v = src[x * channels + c] * noise;
+                float v = src[idx + c] * noise;
                 v = std::clamp(v, 0.f, 255.f);
 
-                dst[x * channels + c] = static_cast<unsigned char>(v + 0.5f);
+                dst[idx + c] = static_cast<uint8_t>(v + 0.5f);
             }
 
             // preserve alpha
             if (channels == 4)
-                dst[x * 4 + 3] = src[x * 4 + 3];
+                dst[idx + 3] = src[idx + 3];
         }
     }
 }
@@ -201,7 +200,7 @@ void speckleGamma(const ImageView& input, ImageOwner& output, float sigma)
     for (int y = 0; y < h; ++y)
     {
         const uint8_t* src = input.row(y);
-        uint8_t* dst = output.data() + y * output.stride();
+        uint8_t* dst = output.rowPtr(y);
 
         for (int x = 0; x < w; ++x)
         {

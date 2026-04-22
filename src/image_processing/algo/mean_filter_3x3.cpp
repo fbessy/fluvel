@@ -42,8 +42,6 @@ void Mean3x3::apply(const ImageView& input)
 {
     reset(input);
 
-    const int stride1 = buffer1_.stride();
-    const int stride2 = buffer2_.stride();
     const int channels = input.channels();
 
     // =========================
@@ -52,7 +50,7 @@ void Mean3x3::apply(const ImageView& input)
     for (int y = 0; y < height_; ++y)
     {
         const uint8_t* src = input.row(y);
-        uint8_t* dst = buffer1_.data() + y * stride1;
+        uint8_t* dst = buffer1_.rowPtr(y);
 
         horizontalPass(src, dst, width_, channels);
     }
@@ -62,11 +60,11 @@ void Mean3x3::apply(const ImageView& input)
     // =========================
     for (int y = 0; y < height_; ++y)
     {
-        const uint8_t* row_m1 = buffer1_.data() + std::max(0, y - 1) * stride1;
-        const uint8_t* row_0 = buffer1_.data() + y * stride1;
-        const uint8_t* row_p1 = buffer1_.data() + std::min(height_ - 1, y + 1) * stride1;
+        const uint8_t* row_m1 = buffer1_.rowPtr(std::max(0, y - 1));
+        const uint8_t* row_0 = buffer1_.rowPtr(y);
+        const uint8_t* row_p1 = buffer1_.rowPtr(std::min(height_ - 1, y + 1));
 
-        uint8_t* dst = buffer2_.data() + y * stride2;
+        uint8_t* dst = buffer2_.rowPtr(y);
 
         verticalPass(row_m1, row_0, row_p1, dst, width_, channels);
     }
@@ -76,7 +74,7 @@ void Mean3x3::apply(const ImageView& input)
 
 void Mean3x3::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels)
 {
-    const int rowSize = width * channels;
+    const int rowBytes = width * channels;
 
     // --- left border
     for (int c = 0; c < channels; ++c)
@@ -86,14 +84,14 @@ void Mean3x3::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int ch
     }
 
     // --- center
-    for (int i = channels; i < rowSize - channels; ++i)
+    for (int idx = channels; idx < rowBytes - channels; ++idx)
     {
-        int sum = src[i - channels] + src[i] + src[i + channels];
-        dst[i] = (sum + 1) / 3;
+        int sum = src[idx - channels] + src[idx] + src[idx + channels];
+        dst[idx] = (sum + 1) / 3;
     }
 
     // --- right border
-    int base = rowSize - channels;
+    const int base = rowBytes - channels;
     for (int c = 0; c < channels; ++c)
     {
         int idx = base + c;
@@ -105,12 +103,12 @@ void Mean3x3::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int ch
 void Mean3x3::verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const uint8_t* row_p1,
                            uint8_t* dst, int width, int channels)
 {
-    const int rowSize = width * channels;
+    const int rowBytes = width * channels;
 
-    for (int i = 0; i < rowSize; ++i)
+    for (int idx = 0; idx < rowBytes; ++idx)
     {
-        int sum = row_m1[i] + row_0[i] + row_p1[i];
-        dst[i] = (sum + 1) / 3;
+        int sum = row_m1[idx] + row_0[idx] + row_p1[idx];
+        dst[idx] = (sum + 1) / 3;
     }
 }
 

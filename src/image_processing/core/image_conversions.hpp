@@ -19,16 +19,18 @@ void convertRgbFToBgr32(const Grid2D<Rgb_f>& in, ImageOwner& out)
     for (int y = 0; y < in.height(); ++y)
     {
         const Rgb_f* src = in.row(y);
-        unsigned char* dst = out.data() + y * out.stride();
+        uint8_t* dst = out.rowPtr(y);
 
         for (int x = 0; x < in.width(); ++x)
         {
             const Rgb_f& p = src[x];
 
-            dst[4 * x + 0] = static_cast<unsigned char>(std::clamp(p.blue + 0.5f, 0.f, 255.f));
-            dst[4 * x + 1] = static_cast<unsigned char>(std::clamp(p.green + 0.5f, 0.f, 255.f));
-            dst[4 * x + 2] = static_cast<unsigned char>(std::clamp(p.red + 0.5f, 0.f, 255.f));
-            dst[4 * x + 3] = 255; // padding / alpha ignoré
+            const int idx = 4 * x;
+
+            dst[idx + 0] = static_cast<uint8_t>(std::clamp(p.blue + 0.5f, 0.f, 255.f));
+            dst[idx + 1] = static_cast<uint8_t>(std::clamp(p.green + 0.5f, 0.f, 255.f));
+            dst[idx + 2] = static_cast<uint8_t>(std::clamp(p.red + 0.5f, 0.f, 255.f));
+            dst[idx + 3] = 255; // padding / alpha ignoré
         }
     }
 }

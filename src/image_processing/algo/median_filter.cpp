@@ -77,7 +77,7 @@ void Median::applyNaive(const ImageView& input, int radius)
 
     for (int y = 0; y < height_; ++y)
     {
-        uint8_t* dst = output_.data() + y * output_.stride();
+        uint8_t* dst = output_.rowPtr(y);
 
         for (int x = 0; x < width_; ++x)
         {
@@ -111,6 +111,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
     assert(input.height() == height_);
     assert(radius >= 1);
 
+    static constexpr int kHistogramSize = 256;
+
     if (!output_.hasSameLayout(input))
         reset(input);
 
@@ -129,38 +131,30 @@ void Median::applyPerreault(const ImageView& input, int radius)
         // processing of the top of the image //
         ////////////////////////////////////////
 
-        // clear
-        for (I = 0; I < 256 * width_; I++)
-        {
-            columnsHisto_[I] = 0;
-        }
+        std::fill(columnsHisto_.begin(), columnsHisto_.end(), 0);
 
         // initialization
         for (x = 0; x < width_; x++)
         {
             for (y = 0; y < kernelSize; y++)
             {
-                columnsHisto_[256 * x + input.at(x, y, ch)]++;
+                columnsHisto_[kHistogramSize * x + input.at(x, y, ch)]++;
             }
         }
 
         // downward moving in the image
         for (y = 0; y < radius + 1; y++)
         {
-            // clear
-            for (I = 0; I < 256; I++)
-            {
-                kernelHisto_[I] = 0;
-            }
+            std::fill(kernelHisto_.begin(), kernelHisto_.end(), 0);
 
             // initialization for each new current row
             for (x = 0; x < kernelSize; x++)
             {
-                columnsHisto_[256 * x + input.at(x, y + radius + 1, ch)]--;
-                columnsHisto_[256 * x + input.at(x, y + radius, ch)]++;
-                for (I = 0; I < 256; I++)
+                columnsHisto_[kHistogramSize * x + input.at(x, y + radius + 1, ch)]--;
+                columnsHisto_[kHistogramSize * x + input.at(x, y + radius, ch)]++;
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] += columnsHisto_[256 * x + I];
+                    kernelHisto_[I] += columnsHisto_[kHistogramSize * x + I];
                 }
 
                 ///////////////////////////
@@ -189,15 +183,17 @@ void Median::applyPerreault(const ImageView& input, int radius)
             for (x = radius + 1; x < width_ - radius - 1; x++)
             {
                 // to update the column histogram H(x+radius)
-                columnsHisto_[256 * (x + radius) + input.at(x + radius, y + radius + 1, ch)]--;
-                columnsHisto_[256 * (x + radius) + input.at(x + radius, y + radius, ch)]++;
+                columnsHisto_[kHistogramSize * (x + radius) +
+                              input.at(x + radius, y + radius + 1, ch)]--;
+                columnsHisto_[kHistogramSize * (x + radius) +
+                              input.at(x + radius, y + radius, ch)]++;
 
                 // to update the mask histogram from the column histograms H(x+radius)
                 // and H(x-radius-1)
-                for (I = 0; I < 256; I++)
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] += columnsHisto_[256 * (x + radius) + I] -
-                                       columnsHisto_[256 * (x - radius - 1) + I];
+                    kernelHisto_[I] += columnsHisto_[kHistogramSize * (x + radius) + I] -
+                                       columnsHisto_[kHistogramSize * (x - radius - 1) + I];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -221,9 +217,9 @@ void Median::applyPerreault(const ImageView& input, int radius)
             {
                 // to update the mask histogram from the column histograms H(x+radius)
                 // and H(x-radius-1)
-                for (I = 0; I < 256; I++)
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] -= columnsHisto_[256 * (x - radius - 1) + I];
+                    kernelHisto_[I] -= columnsHisto_[kHistogramSize * (x - radius - 1) + I];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -243,38 +239,30 @@ void Median::applyPerreault(const ImageView& input, int radius)
         // processing of the image without top and bottom stripes  ///
         //////////////////////////////////////////////////////////////
 
-        // clear
-        for (I = 0; I < 256 * width_; I++)
-        {
-            columnsHisto_[I] = 0;
-        }
+        std::fill(columnsHisto_.begin(), columnsHisto_.end(), 0);
 
         // initialization
         for (x = 0; x < width_; x++)
         {
             for (y = 0; y < kernelSize; y++)
             {
-                columnsHisto_[256 * x + input.at(x, y, ch)]++;
+                columnsHisto_[kHistogramSize * x + input.at(x, y, ch)]++;
             }
         }
 
         // downward moving in the image
         for (y = radius + 1; y <= height_ - radius - 2; y++)
         {
-            // clear
-            for (I = 0; I < 256; I++)
-            {
-                kernelHisto_[I] = 0;
-            }
+            std::fill(kernelHisto_.begin(), kernelHisto_.end(), 0);
 
             // initialization for each new current row
             for (x = 0; x < kernelSize; x++)
             {
-                columnsHisto_[256 * x + input.at(x, y - radius - 1, ch)]--;
-                columnsHisto_[256 * x + input.at(x, y + radius, ch)]++;
-                for (I = 0; I < 256; I++)
+                columnsHisto_[kHistogramSize * x + input.at(x, y - radius - 1, ch)]--;
+                columnsHisto_[kHistogramSize * x + input.at(x, y + radius, ch)]++;
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] += columnsHisto_[256 * x + I];
+                    kernelHisto_[I] += columnsHisto_[kHistogramSize * x + I];
                 }
 
                 ///////////////////////////
@@ -303,15 +291,17 @@ void Median::applyPerreault(const ImageView& input, int radius)
             for (x = radius + 1; x < width_ - radius - 1; x++)
             {
                 // to update the column histogram H(x+radius)
-                columnsHisto_[256 * (x + radius) + input.at(x + radius, y - radius - 1, ch)]--;
-                columnsHisto_[256 * (x + radius) + input.at(x + radius, y + radius, ch)]++;
+                columnsHisto_[kHistogramSize * (x + radius) +
+                              input.at(x + radius, y - radius - 1, ch)]--;
+                columnsHisto_[kHistogramSize * (x + radius) +
+                              input.at(x + radius, y + radius, ch)]++;
 
                 // to update the mask histogram from the column histograms H(x+radius)
                 // and H(x-radius-1)
-                for (I = 0; I < 256; I++)
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] += columnsHisto_[256 * (x + radius) + I] -
-                                       columnsHisto_[256 * (x - radius - 1) + I];
+                    kernelHisto_[I] += columnsHisto_[kHistogramSize * (x + radius) + I] -
+                                       columnsHisto_[kHistogramSize * (x - radius - 1) + I];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -335,9 +325,9 @@ void Median::applyPerreault(const ImageView& input, int radius)
             {
                 // to update the mask histogram from the column histograms H(x+radius)
                 // and H(x-radius-1)
-                for (I = 0; I < 256; I++)
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] -= columnsHisto_[256 * (x - radius - 1) + I];
+                    kernelHisto_[I] -= columnsHisto_[kHistogramSize * (x - radius - 1) + I];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -360,20 +350,16 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
         for (y = height_ - radius - 1; y < height_; y++)
         {
-            // clear
-            for (I = 0; I < 256; I++)
-            {
-                kernelHisto_[I] = 0;
-            }
+            std::fill(kernelHisto_.begin(), kernelHisto_.end(), 0);
 
             // initialization for each new current row
             for (x = 0; x < kernelSize; x++)
             {
-                columnsHisto_[256 * x + input.at(x, y - radius - 1, ch)]--;
-                columnsHisto_[256 * x + input.at(x, y - radius, ch)]++;
-                for (I = 0; I < 256; I++)
+                columnsHisto_[kHistogramSize * x + input.at(x, y - radius - 1, ch)]--;
+                columnsHisto_[kHistogramSize * x + input.at(x, y - radius, ch)]++;
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] += columnsHisto_[256 * x + I];
+                    kernelHisto_[I] += columnsHisto_[kHistogramSize * x + I];
                 }
 
                 ///////////////////////////
@@ -401,15 +387,17 @@ void Median::applyPerreault(const ImageView& input, int radius)
             for (x = radius + 1; x < width_ - radius - 1; x++)
             {
                 // to update the column histogram H(x+radius)
-                columnsHisto_[256 * (x + radius) + input.at(x + radius, y - radius - 1, ch)]--;
-                columnsHisto_[256 * (x + radius) + input.at(x + radius, y - radius, ch)]++;
+                columnsHisto_[kHistogramSize * (x + radius) +
+                              input.at(x + radius, y - radius - 1, ch)]--;
+                columnsHisto_[kHistogramSize * (x + radius) +
+                              input.at(x + radius, y - radius, ch)]++;
 
                 // to update the mask histogram from the column histograms H(x+radius)
                 // and H(x-radius-1)
-                for (I = 0; I < 256; I++)
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] += columnsHisto_[256 * (x + radius) + I] -
-                                       columnsHisto_[256 * (x - radius - 1) + I];
+                    kernelHisto_[I] += columnsHisto_[kHistogramSize * (x + radius) + I] -
+                                       columnsHisto_[kHistogramSize * (x - radius - 1) + I];
                 }
 
                 // to find the value I of the median in the kernel histogram
@@ -433,9 +421,9 @@ void Median::applyPerreault(const ImageView& input, int radius)
             {
                 // to update the mask histogram from the column histograms H(x+radius)
                 // and H(x-radius-1)
-                for (I = 0; I < 256; I++)
+                for (I = 0; I < kHistogramSize; I++)
                 {
-                    kernelHisto_[I] -= columnsHisto_[256 * (x - radius - 1) + I];
+                    kernelHisto_[I] -= columnsHisto_[kHistogramSize * (x - radius - 1) + I];
                 }
 
                 // to find the value I of the median in the kernel histogram

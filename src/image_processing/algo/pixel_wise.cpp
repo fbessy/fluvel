@@ -19,20 +19,19 @@ void diff(const ImageView& a, const ImageView& b, ImageOwner& out)
     assert(out.height() == a.height());
     assert(out.format() == a.format());
 
-    const int w = a.width();
-    const int h = a.height();
-    const int c = a.channels();
+    const int h = out.height();
+    const int rowBytes = out.rowBytes();
 
     for (int y = 0; y < h; ++y)
     {
         const uint8_t* pa = a.row(y);
         const uint8_t* pb = b.row(y);
-        uint8_t* dst = out.data() + y * out.stride();
+        uint8_t* dst = out.rowPtr(y);
 
-        for (int i = 0; i < w * c; ++i)
+        for (int idx = 0; idx < rowBytes; ++idx)
         {
-            int v = int(pa[i]) - int(pb[i]);
-            dst[i] = static_cast<uint8_t>(std::max(0, v));
+            int diff = int(pa[idx]) - int(pb[idx]);
+            dst[idx] = static_cast<uint8_t>(std::max(0, diff));
         }
     }
 }

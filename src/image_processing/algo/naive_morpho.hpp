@@ -26,7 +26,7 @@ void naiveMorpho(const ImageView& input, ImageOwner& output, int radius)
 
     for (int y = 0; y < h; ++y)
     {
-        uint8_t* dst = output.data() + y * output.stride();
+        uint8_t* dst = output.rowPtr(y);
 
         for (int x = 0; x < w; ++x)
         {
@@ -42,7 +42,9 @@ void naiveMorpho(const ImageView& input, ImageOwner& output, int radius)
                     for (int kx = -radius; kx <= radius; ++kx)
                     {
                         int xx = std::clamp(x + kx, 0, w - 1);
-                        uint8_t val = row[xx * c + ch];
+
+                        int idx = xx * c + ch;
+                        uint8_t val = row[idx];
 
                         if constexpr (IsMax)
                             v = std::max(v, val);
@@ -51,7 +53,8 @@ void naiveMorpho(const ImageView& input, ImageOwner& output, int radius)
                     }
                 }
 
-                dst[x * c + ch] = v;
+                int outIdx = x * c + ch;
+                dst[outIdx] = v;
             }
         }
     }

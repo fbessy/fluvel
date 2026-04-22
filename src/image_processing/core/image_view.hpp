@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 
 namespace fluvel_ip
@@ -20,7 +21,7 @@ public:
 
     ImageView(const unsigned char* data, int widthPixels, int heightPixels,
               ImageFormat format = ImageFormat::Gray8, int strideBytes = 0)
-        : data_(data)
+        : data_(reinterpret_cast<const uint8_t*>(data))
         , widthPixels_(widthPixels)
         , heightPixels_(heightPixels)
         , format_(format)
@@ -35,7 +36,7 @@ public:
         assert(strideBytes_ >= widthPixels_ * channelsPerPixel_);
     }
 
-    const unsigned char* data() const noexcept
+    const uint8_t* data() const noexcept
     {
         return data_;
     }
@@ -75,13 +76,13 @@ public:
         return strideBytes_;
     }
 
-    const unsigned char* row(int y) const noexcept
+    const uint8_t* row(int y) const noexcept
     {
         assert(y >= 0 && y < heightPixels_);
         return data_ + static_cast<ptrdiff_t>(y * strideBytes_);
     }
 
-    unsigned char at(int x, int y, int c = 0) const noexcept
+    uint8_t at(int x, int y, int c = 0) const noexcept
     {
         assert(x >= 0 && x < widthPixels_);
         assert(y >= 0 && y < heightPixels_);
@@ -92,13 +93,13 @@ public:
 
     inline Rgb_uc atPixelRgb(int x, int y) const noexcept
     {
-        const unsigned char* p = row(y) + static_cast<ptrdiff_t>(x * channelsPerPixel_);
+        const uint8_t* p = row(y) + static_cast<ptrdiff_t>(x * channelsPerPixel_);
 
         switch (format_)
         {
             case ImageFormat::Gray8:
             {
-                const unsigned char v = p[0];
+                const uint8_t v = p[0];
                 return {v, v, v};
             }
             case ImageFormat::Rgb24:
@@ -117,7 +118,7 @@ public:
         std::unreachable();
     }
 
-    unsigned char gray(int x, int y) const noexcept
+    uint8_t gray(int x, int y) const noexcept
     {
         assert(format_ == ImageFormat::Gray8);
         assert(channelsPerPixel_ == 1);
@@ -126,7 +127,7 @@ public:
     }
 
 private:
-    const unsigned char* data_;
+    const uint8_t* data_;
     int widthPixels_{0};
     int heightPixels_{0};
     ImageFormat format_{ImageFormat::Gray8};

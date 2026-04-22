@@ -44,16 +44,13 @@ void MeanSliding::apply(const ImageView& input, int radius)
     const int channels = input.channels();
     const int kernelSize = 2 * radius + 1;
 
-    const int stride1 = buffer1_.stride();
-    const int stride2 = buffer2_.stride();
-
     // =========================
     // PASS 1 — Horizontal (sliding + fast path)
     // =========================
     for (int y = 0; y < height_; ++y)
     {
         const uint8_t* src = input.row(y);
-        uint8_t* dst = buffer1_.data() + y * stride1;
+        uint8_t* dst = buffer1_.rowPtr(y);
 
         for (int c = 0; c < channels; ++c)
         {
@@ -69,7 +66,8 @@ void MeanSliding::apply(const ImageView& input, int radius)
             // -------- LEFT BORDER --------
             for (int x = 0; x < radius; ++x)
             {
-                dst[x * channels + c] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
+                int idx = x * channels + c;
+                dst[idx] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
 
                 int x_out = std::clamp(x - radius, 0, width_ - 1);
                 int x_in = std::clamp(x + radius + 1, 0, width_ - 1);
@@ -81,7 +79,8 @@ void MeanSliding::apply(const ImageView& input, int radius)
             // -------- CENTER (FAST PATH) --------
             for (int x = radius; x < width_ - radius - 1; ++x)
             {
-                dst[x * channels + c] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
+                int idx = x * channels + c;
+                dst[idx] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
 
                 int x_out = x - radius;
                 int x_in = x + radius + 1;
@@ -93,7 +92,8 @@ void MeanSliding::apply(const ImageView& input, int radius)
             // -------- RIGHT BORDER --------
             for (int x = width_ - radius; x < width_; ++x)
             {
-                dst[x * channels + c] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
+                int idx = x * channels + c;
+                dst[idx] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
 
                 int x_out = std::clamp(x - radius, 0, width_ - 1);
                 int x_in = std::clamp(x + radius + 1, 0, width_ - 1);
@@ -103,6 +103,7 @@ void MeanSliding::apply(const ImageView& input, int radius)
             }
         }
 
+        // alpha à 255 si besoin
         if (channels == 4)
         {
             for (int x = 0; x < width_; ++x)
@@ -123,7 +124,7 @@ void MeanSliding::apply(const ImageView& input, int radius)
             for (int k = -radius; k <= radius; ++k)
             {
                 int yy = std::clamp(k, 0, height_ - 1);
-                const uint8_t* row = buffer1_.data() + yy * stride1;
+                const uint8_t* row = buffer1_.rowPtr(yy);
 
                 sum += row[x * channels + c];
             }
@@ -131,15 +132,16 @@ void MeanSliding::apply(const ImageView& input, int radius)
             // -------- TOP BORDER --------
             for (int y = 0; y < radius; ++y)
             {
-                uint8_t* dst = buffer2_.data() + y * stride2;
+                uint8_t* dst = buffer2_.rowPtr(y);
 
-                dst[x * channels + c] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
+                int idx = x * channels + c;
+                dst[idx] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
 
                 int y_out = std::clamp(y - radius, 0, height_ - 1);
                 int y_in = std::clamp(y + radius + 1, 0, height_ - 1);
 
-                const uint8_t* row_out = buffer1_.data() + y_out * stride1;
-                const uint8_t* row_in = buffer1_.data() + y_in * stride1;
+                const uint8_t* row_out = buffer1_.rowPtr(y_out);
+                const uint8_t* row_in = buffer1_.rowPtr(y_in);
 
                 sum -= row_out[x * channels + c];
                 sum += row_in[x * channels + c];
@@ -148,15 +150,16 @@ void MeanSliding::apply(const ImageView& input, int radius)
             // -------- CENTER (FAST PATH) --------
             for (int y = radius; y < height_ - radius - 1; ++y)
             {
-                uint8_t* dst = buffer2_.data() + y * stride2;
+                uint8_t* dst = buffer2_.rowPtr(y);
 
-                dst[x * channels + c] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
+                int idx = x * channels + c;
+                dst[idx] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
 
                 int y_out = y - radius;
                 int y_in = y + radius + 1;
 
-                const uint8_t* row_out = buffer1_.data() + y_out * stride1;
-                const uint8_t* row_in = buffer1_.data() + y_in * stride1;
+                const uint8_t* row_out = buffer1_.rowPtr(y_out);
+                const uint8_t* row_in = buffer1_.rowPtr(y_in);
 
                 sum -= row_out[x * channels + c];
                 sum += row_in[x * channels + c];
@@ -165,15 +168,16 @@ void MeanSliding::apply(const ImageView& input, int radius)
             // -------- BOTTOM BORDER --------
             for (int y = height_ - radius; y < height_; ++y)
             {
-                uint8_t* dst = buffer2_.data() + y * stride2;
+                uint8_t* dst = buffer2_.rowPtr(y);
 
-                dst[x * channels + c] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
+                int idx = x * channels + c;
+                dst[idx] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
 
                 int y_out = std::clamp(y - radius, 0, height_ - 1);
                 int y_in = std::clamp(y + radius + 1, 0, height_ - 1);
 
-                const uint8_t* row_out = buffer1_.data() + y_out * stride1;
-                const uint8_t* row_in = buffer1_.data() + y_in * stride1;
+                const uint8_t* row_out = buffer1_.rowPtr(y_out);
+                const uint8_t* row_in = buffer1_.rowPtr(y_in);
 
                 sum -= row_out[x * channels + c];
                 sum += row_in[x * channels + c];
@@ -186,7 +190,7 @@ void MeanSliding::apply(const ImageView& input, int radius)
     {
         for (int y = 0; y < height_; ++y)
         {
-            uint8_t* dst = buffer2_.data() + y * stride2;
+            uint8_t* dst = buffer2_.rowPtr(y);
             for (int x = 0; x < width_; ++x)
                 dst[x * channels + 3] = 255;
         }

@@ -6,7 +6,9 @@
 #include "image_format.hpp"
 #include "image_view.hpp"
 
+#include <cstdint>
 #include <cstring>
+#include <stdexcept>
 #include <vector>
 
 namespace fluvel_ip
@@ -53,14 +55,59 @@ public:
         for (int y = 0; y < h; ++y)
         {
             const uint8_t* src = img.row(y);
-            uint8_t* dst = data() + y * stride();
+            uint8_t* dst = rowPtr(y);
 
             std::memcpy(dst, src, rowBytes);
         }
     }
 
+    uint8_t* rowPtr(int y) noexcept
+    {
+        assert(y >= 0 && y < height_);
+        return data_.data() + y * stride_;
+    }
+
+    const uint8_t* rowPtr(int y) const noexcept
+    {
+        assert(y >= 0 && y < height_);
+        return data_.data() + y * stride_;
+    }
+
+    int rowBytes() const noexcept
+    {
+        return width_ * channels_;
+    }
+
+    uint8_t* pixelPtr(int x, int y) noexcept
+    {
+        assert(x >= 0 && x < width_);
+        assert(y >= 0 && y < height_);
+
+        return data_.data() + y * stride_ + x * channels_;
+    }
+
+    const uint8_t* pixelPtr(int x, int y) const noexcept
+    {
+        assert(x >= 0 && x < width_);
+        assert(y >= 0 && y < height_);
+
+        return data_.data() + y * stride_ + x * channels_;
+    }
+
     uint8_t& at(int x, int y, int c = 0) noexcept
     {
+        assert(x >= 0 && x < width_);
+        assert(y >= 0 && y < height_);
+        assert(c >= 0 && c < channels_);
+
+        return data_[y * stride_ + x * channels_ + c];
+    }
+
+    uint8_t& atSafe(int x, int y, int c = 0)
+    {
+        if (x < 0 || x >= width_ || y < 0 || y >= height_ || c < 0 || c >= channels_)
+            throw std::out_of_range("Image::at_safe - index out of bounds");
+
         return data_[y * stride_ + x * channels_ + c];
     }
 

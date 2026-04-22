@@ -4,6 +4,7 @@
 #include "anisotropic_diffusion.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <utility>
 
 namespace fluvel_ip::filter
@@ -52,7 +53,7 @@ void AnisotropicDiffusion::initFromInput(const ImageView& input)
 {
     for (int y = 0; y < h_; ++y)
     {
-        const unsigned char* row = input.row(y);
+        const uint8_t* row = input.row(y);
 
         for (int x = 0; x < w_; ++x)
         {
@@ -157,7 +158,7 @@ void AnisotropicDiffusion::apply(int iterations, double lambda, double kappa,
     // =========================
     for (int y = 0; y < h_; ++y)
     {
-        unsigned char* dst = output_.data() + y * output_.stride();
+        uint8_t* dst = output_.rowPtr(y);
 
         for (int x = 0; x < w_; ++x)
         {
