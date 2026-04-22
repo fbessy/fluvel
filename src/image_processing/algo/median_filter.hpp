@@ -35,6 +35,11 @@ private:
         std::fill(histo.begin(), histo.end(), 0);
     }
 
+    void initCurrentMedian()
+    {
+        currentMedian_ = kHistogramSize / 2;
+    }
+
     void accumulateColumn(int colIndex);
     void removeColumn(int colIndex);
     void updateKernel(int addColIndex, int removeColIndex);
@@ -48,6 +53,8 @@ private:
 
     std::vector<int> columnsHisto_; // size = width * 256
     std::array<int, kHistogramSize> kernelHisto_{};
+
+    int currentMedian_{kHistogramSize / 2};
 
     int width_{0};
     int height_{0};

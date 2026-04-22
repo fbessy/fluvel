@@ -97,14 +97,34 @@ uint8_t Median::findMedian(int targetRank)
 
     int cumulative = 0;
 
-    for (int i = 0; i < kHistogramSize; ++i)
-    {
+    // 1. Cumuler jusqu'à currentMedian
+    for (int i = 0; i <= currentMedian_; ++i)
         cumulative += kernelHisto_[i];
-        if (cumulative >= targetRank)
-            return static_cast<uint8_t>(i);
+
+    // 2. Ajuster vers le haut
+    if (cumulative < targetRank)
+    {
+        int i = currentMedian_;
+        while (cumulative < targetRank)
+        {
+            ++i;
+            cumulative += kernelHisto_[i];
+        }
+        currentMedian_ = i;
+    }
+    else
+    {
+        // 3. Ajuster vers le bas
+        int i = currentMedian_;
+        while (cumulative - kernelHisto_[i] >= targetRank)
+        {
+            cumulative -= kernelHisto_[i];
+            --i;
+        }
+        currentMedian_ = i;
     }
 
-    return 255;
+    return static_cast<uint8_t>(currentMedian_);
 }
 
 void Median::accumulateColumn(int colIndex)
@@ -176,6 +196,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
         for (int y = 0; y < radius + 1; ++y)
         {
             clearHistogram(kernelHisto_);
+            initCurrentMedian();
 
             for (int x = 0; x < kernelSize; ++x)
             {
@@ -235,6 +256,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
         for (int y = radius + 1; y < height_ - radius - 1; ++y)
         {
             clearHistogram(kernelHisto_);
+            initCurrentMedian();
 
             for (int x = 0; x < kernelSize; ++x)
             {
@@ -290,6 +312,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
         for (int y = height_ - radius - 1; y < height_; ++y)
         {
             clearHistogram(kernelHisto_);
+            initCurrentMedian();
 
             for (int x = 0; x < kernelSize; ++x)
             {

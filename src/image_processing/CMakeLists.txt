@@ -90,7 +90,6 @@ set(ip_src
 add_library(${TARGET_NAME} STATIC ${ip_src})
 add_library(fluvel::image_processing ALIAS ${TARGET_NAME})
 
-
 target_include_directories(${TARGET_NAME} PUBLIC
     ${CORE_DIR}
     ${ALGO_DIR}

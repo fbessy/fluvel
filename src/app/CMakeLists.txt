@@ -322,6 +322,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         >
         $<$<CONFIG:Release>:
             -O3
+            -march=native
             -DNDEBUG
         >
         $<$<CONFIG:RelWithDebInfo>:
