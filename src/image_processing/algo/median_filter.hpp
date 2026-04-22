@@ -27,12 +27,27 @@ private:
     void applyPerreault(const ImageView& input, int radius);
     void applyNaive(const ImageView& input, int radius);
 
-private:
+    static constexpr int kHistogramSize = 256;
+
+    template <typename Container>
+    void clearHistogram(Container& histo)
+    {
+        std::fill(histo.begin(), histo.end(), 0);
+    }
+
+    void accumulateColumn(int colIndex);
+    void removeColumn(int colIndex);
+    void updateKernel(int addColIndex, int removeColIndex);
+    uint8_t findMedian(int targetRank);
+
+    void initColumnsHisto(const ImageView& input, int ch, int kernelSize);
+    void updateColumnsHisto(int colIndex, uint8_t valRemove, uint8_t valAdd);
+
     ImageOwner buffer_;
     ImageOwner output_;
 
     std::vector<int> columnsHisto_; // size = width * 256
-    std::array<int, 256> kernelHisto_{};
+    std::array<int, kHistogramSize> kernelHisto_{};
 
     int width_{0};
     int height_{0};

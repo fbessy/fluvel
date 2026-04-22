@@ -105,336 +105,233 @@ void Median::applyNaive(const ImageView& input, int radius)
     }
 }
 
+uint8_t Median::findMedian(int targetRank)
+{
+    assert(targetRank > 0);
+
+    int cumulative = 0;
+
+    for (int i = 0; i < kHistogramSize; ++i)
+    {
+        cumulative += kernelHisto_[i];
+        if (cumulative >= targetRank)
+            return static_cast<uint8_t>(i);
+    }
+
+    return 255;
+}
+
+void Median::accumulateColumn(int colIndex)
+{
+    const int base = kHistogramSize * colIndex;
+
+    for (int i = 0; i < kHistogramSize; ++i)
+        kernelHisto_[i] += columnsHisto_[base + i];
+}
+
+void Median::removeColumn(int colIndex)
+{
+    const int base = kHistogramSize * colIndex;
+
+    for (int i = 0; i < kHistogramSize; ++i)
+        kernelHisto_[i] -= columnsHisto_[base + i];
+}
+
+void Median::updateKernel(int addColIndex, int removeColIndex)
+{
+    const int addBase = kHistogramSize * addColIndex;
+    const int remBase = kHistogramSize * removeColIndex;
+
+    for (int i = 0; i < kHistogramSize; ++i)
+        kernelHisto_[i] += columnsHisto_[addBase + i] - columnsHisto_[remBase + i];
+}
+
+void Median::initColumnsHisto(const ImageView& input, int ch, int kernelSize)
+{
+    for (int x = 0; x < width_; ++x)
+    {
+        int base = kHistogramSize * x;
+
+        for (int y = 0; y < kernelSize; ++y)
+        {
+            uint8_t val = input.at(x, y, ch);
+            columnsHisto_[base + val]++;
+        }
+    }
+}
+
+void Median::updateColumnsHisto(int colIndex, uint8_t valRemove, uint8_t valAdd)
+{
+    const int base = kHistogramSize * colIndex;
+
+    columnsHisto_[base + valRemove]--;
+    columnsHisto_[base + valAdd]++;
+}
+
 void Median::applyPerreault(const ImageView& input, int radius)
 {
     assert(input.width() == width_);
     assert(input.height() == height_);
     assert(radius >= 1);
 
-    static constexpr int kHistogramSize = 256;
-
     if (!output_.hasSameLayout(input))
         reset(input);
 
     const int kernelSize = 2 * radius + 1;
-    const int medianRank = 1 + kernelSize * kernelSize / 2;
-
-    int I; // pixel intensity, grey-level or channel value for rgb image
-
-    int x, y; // position of the current pixel
-
-    int rank, m;
+    const int medianRank = kernelSize * kernelSize / 2 + 1;
 
     for (int ch = 0; ch < channels_; ch++)
     {
-        /////////////////////////////////////////
-        // processing of the top of the image //
-        ////////////////////////////////////////
+        // ================= TOP =================
+        clearHistogram(columnsHisto_);
 
-        std::fill(columnsHisto_.begin(), columnsHisto_.end(), 0);
+        initColumnsHisto(input, ch, kernelSize);
 
-        // initialization
-        for (x = 0; x < width_; x++)
+        for (int y = 0; y < radius + 1; ++y)
         {
-            for (y = 0; y < kernelSize; y++)
+            clearHistogram(kernelHisto_);
+
+            for (int x = 0; x < kernelSize; ++x)
             {
-                columnsHisto_[kHistogramSize * x + input.at(x, y, ch)]++;
-            }
-        }
+                uint8_t valRemove = input.at(x, y + radius + 1, ch);
+                uint8_t valAdd = input.at(x, y + radius, ch);
 
-        // downward moving in the image
-        for (y = 0; y < radius + 1; y++)
-        {
-            std::fill(kernelHisto_.begin(), kernelHisto_.end(), 0);
+                updateColumnsHisto(x, valRemove, valAdd);
 
-            // initialization for each new current row
-            for (x = 0; x < kernelSize; x++)
-            {
-                columnsHisto_[kHistogramSize * x + input.at(x, y + radius + 1, ch)]--;
-                columnsHisto_[kHistogramSize * x + input.at(x, y + radius, ch)]++;
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] += columnsHisto_[kHistogramSize * x + I];
-                }
-
-                ///////////////////////////
-                // left border processed //
-                ///////////////////////////
+                accumulateColumn(x);
 
                 if (x >= radius)
                 {
-                    // to find the value I of the median in the kernel histogram
-                    rank = 0;
-                    I = -1;
-                    while (rank < 1 + kernelSize * (x + 1) / 2)
-                    {
-                        rank += kernelHisto_[++I];
-                    }
-
-                    output_.at(x - radius, y, ch) = (unsigned char)(I);
+                    const int rank = (kernelSize * (x + 1) / 2) + 1;
+                    uint8_t val = findMedian(rank);
+                    output_.at(x - radius, y, ch) = val;
                 }
             }
 
-            //////////////////////
-            // center processed //
-            //////////////////////
-
-            // rightward moving in the image
-            for (x = radius + 1; x < width_ - radius - 1; x++)
+            for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
-                // to update the column histogram H(x+radius)
-                columnsHisto_[kHistogramSize * (x + radius) +
-                              input.at(x + radius, y + radius + 1, ch)]--;
-                columnsHisto_[kHistogramSize * (x + radius) +
-                              input.at(x + radius, y + radius, ch)]++;
+                int col = x + radius;
 
-                // to update the mask histogram from the column histograms H(x+radius)
-                // and H(x-radius-1)
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] += columnsHisto_[kHistogramSize * (x + radius) + I] -
-                                       columnsHisto_[kHistogramSize * (x - radius - 1) + I];
-                }
+                uint8_t valRemove = input.at(col, y + radius + 1, ch);
+                uint8_t valAdd = input.at(col, y + radius, ch);
 
-                // to find the value I of the median in the kernel histogram
-                rank = 0;
-                I = -1;
-                while (rank < medianRank)
-                {
-                    rank += kernelHisto_[++I];
-                }
+                updateColumnsHisto(col, valRemove, valAdd);
 
-                output_.at(x, y, ch) = (unsigned char)(I);
+                updateKernel(col, x - radius - 1);
+
+                uint8_t val = findMedian(medianRank);
+                output_.at(x, y, ch) = val;
             }
 
-            ////////////////////////////
-            // right border processed //
-            ////////////////////////////
-
-            // rightward moving in the image
-            m = 1;
-            for (; x < width_; x++)
+            int m = 1;
+            for (int x = width_ - radius - 1; x < width_; ++x)
             {
-                // to update the mask histogram from the column histograms H(x+radius)
-                // and H(x-radius-1)
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] -= columnsHisto_[kHistogramSize * (x - radius - 1) + I];
-                }
+                removeColumn(x - radius - 1);
 
-                // to find the value I of the median in the kernel histogram
-                rank = 0;
-                I = -1;
-                while (rank < 1 + kernelSize * (kernelSize - m) / 2)
-                {
-                    rank += kernelHisto_[++I];
-                }
-
-                output_.at(x, y, ch) = (unsigned char)(I);
+                const int rank = (kernelSize * (kernelSize - m) / 2) + 1;
+                uint8_t val = findMedian(rank);
+                output_.at(x, y, ch) = val;
                 m++;
             }
         }
 
-        //////////////////////////////////////////////////////////////
-        // processing of the image without top and bottom stripes  ///
-        //////////////////////////////////////////////////////////////
+        // ================= MIDDLE =================
+        clearHistogram(columnsHisto_);
 
-        std::fill(columnsHisto_.begin(), columnsHisto_.end(), 0);
+        initColumnsHisto(input, ch, kernelSize);
 
-        // initialization
-        for (x = 0; x < width_; x++)
+        for (int y = radius + 1; y < height_ - radius - 1; ++y)
         {
-            for (y = 0; y < kernelSize; y++)
+            clearHistogram(kernelHisto_);
+
+            for (int x = 0; x < kernelSize; ++x)
             {
-                columnsHisto_[kHistogramSize * x + input.at(x, y, ch)]++;
-            }
-        }
+                uint8_t valRemove = input.at(x, y - radius - 1, ch);
+                uint8_t valAdd = input.at(x, y + radius, ch);
 
-        // downward moving in the image
-        for (y = radius + 1; y <= height_ - radius - 2; y++)
-        {
-            std::fill(kernelHisto_.begin(), kernelHisto_.end(), 0);
+                updateColumnsHisto(x, valRemove, valAdd);
 
-            // initialization for each new current row
-            for (x = 0; x < kernelSize; x++)
-            {
-                columnsHisto_[kHistogramSize * x + input.at(x, y - radius - 1, ch)]--;
-                columnsHisto_[kHistogramSize * x + input.at(x, y + radius, ch)]++;
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] += columnsHisto_[kHistogramSize * x + I];
-                }
-
-                ///////////////////////////
-                // left border processed //
-                ///////////////////////////
+                accumulateColumn(x);
 
                 if (x >= radius)
                 {
-                    // to find the value I of the median in the kernel histogram
-                    rank = 0;
-                    I = -1;
-                    while (rank < 1 + kernelSize * (x + 1) / 2)
-                    {
-                        rank += kernelHisto_[++I];
-                    }
-
-                    output_.at(x - radius, y, ch) = (unsigned char)(I);
+                    const int rank = (kernelSize * (x + 1) / 2) + 1;
+                    uint8_t val = findMedian(rank);
+                    output_.at(x - radius, y, ch) = val;
                 }
             }
 
-            //////////////////////
-            // center processed //
-            //////////////////////
-
-            // rightward moving in the image
-            for (x = radius + 1; x < width_ - radius - 1; x++)
+            for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
-                // to update the column histogram H(x+radius)
-                columnsHisto_[kHistogramSize * (x + radius) +
-                              input.at(x + radius, y - radius - 1, ch)]--;
-                columnsHisto_[kHistogramSize * (x + radius) +
-                              input.at(x + radius, y + radius, ch)]++;
+                int col = x + radius;
 
-                // to update the mask histogram from the column histograms H(x+radius)
-                // and H(x-radius-1)
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] += columnsHisto_[kHistogramSize * (x + radius) + I] -
-                                       columnsHisto_[kHistogramSize * (x - radius - 1) + I];
-                }
+                uint8_t valRemove = input.at(col, y - radius - 1, ch);
+                uint8_t valAdd = input.at(col, y + radius, ch);
 
-                // to find the value I of the median in the kernel histogram
-                rank = 0;
-                I = -1;
-                while (rank < medianRank)
-                {
-                    rank += kernelHisto_[++I];
-                }
+                updateColumnsHisto(col, valRemove, valAdd);
 
-                output_.at(x, y, ch) = (unsigned char)(I);
+                updateKernel(col, x - radius - 1);
+
+                uint8_t val = findMedian(medianRank);
+                output_.at(x, y, ch) = val;
             }
 
-            ////////////////////////////
-            // right border processed //
-            ////////////////////////////
-
-            // rightward moving in the image
-            m = 1;
-            for (; x < width_; x++)
+            int m = 1;
+            for (int x = width_ - radius - 1; x < width_; ++x)
             {
-                // to update the mask histogram from the column histograms H(x+radius)
-                // and H(x-radius-1)
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] -= columnsHisto_[kHistogramSize * (x - radius - 1) + I];
-                }
+                removeColumn(x - radius - 1);
 
-                // to find the value I of the median in the kernel histogram
-                rank = 0;
-                I = -1;
-                while (rank < 1 + kernelSize * (kernelSize - m) / 2)
-                {
-                    rank += kernelHisto_[++I];
-                }
-                output_.at(x, y, ch) = (unsigned char)(I);
+                const int rank = (kernelSize * (kernelSize - m) / 2) + 1;
+                uint8_t val = findMedian(rank);
+                output_.at(x, y, ch) = val;
                 m++;
             }
         }
 
-        ///////////////////////////////////////////
-        // processing of the bottom of the image //
-        ///////////////////////////////////////////
-
-        // no need to clear and to initialize columns_histo
-
-        for (y = height_ - radius - 1; y < height_; y++)
+        // ================= BOTTOM =================
+        for (int y = height_ - radius - 1; y < height_; ++y)
         {
-            std::fill(kernelHisto_.begin(), kernelHisto_.end(), 0);
+            clearHistogram(kernelHisto_);
 
-            // initialization for each new current row
-            for (x = 0; x < kernelSize; x++)
+            for (int x = 0; x < kernelSize; ++x)
             {
-                columnsHisto_[kHistogramSize * x + input.at(x, y - radius - 1, ch)]--;
-                columnsHisto_[kHistogramSize * x + input.at(x, y - radius, ch)]++;
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] += columnsHisto_[kHistogramSize * x + I];
-                }
+                uint8_t valRemove = input.at(x, y - radius - 1, ch);
+                uint8_t valAdd = input.at(x, y - radius, ch);
 
-                ///////////////////////////
-                // left border processed //
-                ///////////////////////////
+                updateColumnsHisto(x, valRemove, valAdd);
+
+                accumulateColumn(x);
 
                 if (x >= radius)
                 {
-                    // to find the value I of the median in the kernel histogram
-                    rank = 0;
-                    I = -1;
-                    while (rank < 1 + kernelSize * (x + 1) / 2)
-                    {
-                        rank += kernelHisto_[++I];
-                    }
-                    output_.at(x - radius, y, ch) = (unsigned char)(I);
+                    const int rank = (kernelSize * (x + 1) / 2) + 1;
+                    uint8_t val = findMedian(rank);
+                    output_.at(x - radius, y, ch) = val;
                 }
             }
 
-            //////////////////////
-            // center processed //
-            //////////////////////
-
-            // rightward moving in the image
-            for (x = radius + 1; x < width_ - radius - 1; x++)
+            for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
-                // to update the column histogram H(x+radius)
-                columnsHisto_[kHistogramSize * (x + radius) +
-                              input.at(x + radius, y - radius - 1, ch)]--;
-                columnsHisto_[kHistogramSize * (x + radius) +
-                              input.at(x + radius, y - radius, ch)]++;
+                int col = x + radius;
+                uint8_t valRemove = input.at(col, y - radius - 1, ch);
+                uint8_t valAdd = input.at(col, y - radius, ch);
 
-                // to update the mask histogram from the column histograms H(x+radius)
-                // and H(x-radius-1)
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] += columnsHisto_[kHistogramSize * (x + radius) + I] -
-                                       columnsHisto_[kHistogramSize * (x - radius - 1) + I];
-                }
+                updateColumnsHisto(col, valRemove, valAdd);
 
-                // to find the value I of the median in the kernel histogram
-                rank = 0;
-                I = -1;
-                while (rank < medianRank)
-                {
-                    rank += kernelHisto_[++I];
-                }
+                updateKernel(col, x - radius - 1);
 
-                output_.at(x, y, ch) = (unsigned char)(I);
+                uint8_t val = findMedian(medianRank);
+                output_.at(x, y, ch) = val;
             }
 
-            ////////////////////////////
-            // right border processed //
-            ////////////////////////////
-
-            // rightward moving in the image
-            m = 1;
-            for (; x < width_; x++)
+            int m = 1;
+            for (int x = width_ - radius - 1; x < width_; ++x)
             {
-                // to update the mask histogram from the column histograms H(x+radius)
-                // and H(x-radius-1)
-                for (I = 0; I < kHistogramSize; I++)
-                {
-                    kernelHisto_[I] -= columnsHisto_[kHistogramSize * (x - radius - 1) + I];
-                }
+                removeColumn(x - radius - 1);
 
-                // to find the value I of the median in the kernel histogram
-                rank = 0;
-                I = -1;
-                while (rank < 1 + kernelSize * (kernelSize - m) / 2)
-                {
-                    rank += kernelHisto_[++I];
-                }
-
-                output_.at(x, y, ch) = (unsigned char)(I);
+                const int rank = (kernelSize * (kernelSize - m) / 2) + 1;
+                uint8_t val = findMedian(rank);
+                output_.at(x, y, ch) = val;
                 m++;
             }
         }
