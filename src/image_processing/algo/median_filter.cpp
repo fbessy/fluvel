@@ -26,20 +26,6 @@ ImageOwner median(const ImageView& input, int radius)
     return out;
 }
 
-static inline uint8_t findMedian(const std::array<int, 256>& histogram, int targetRank)
-{
-    int sum = 0;
-
-    for (int i = 0; i < 256; ++i)
-    {
-        sum += histogram[i];
-        if (sum >= targetRank)
-            return static_cast<uint8_t>(i);
-    }
-
-    return 255;
-}
-
 void Median::reset(const ImageView& input)
 {
     width_ = input.width();
