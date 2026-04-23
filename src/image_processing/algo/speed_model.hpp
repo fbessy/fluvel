@@ -26,7 +26,7 @@ class ISpeedModel
 public:
     virtual ~ISpeedModel() = default;
 
-    virtual void onImageChanged(ImageView, const ContourData&)
+    virtual void onImageChanged(const ImageView&, const ContourData&)
     {
     }
 

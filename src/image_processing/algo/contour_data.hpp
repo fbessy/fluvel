@@ -19,7 +19,7 @@ public:
 
     //! Constructor to initialize the contour from a grayscale image of the levet-set function
     //! #phi.
-    ContourData(ImageView grayscalePhi, Connectivity connectivity = Connectivity::Four);
+    ContourData(const ImageView& grayscalePhi, Connectivity connectivity = Connectivity::Four);
 
     //! Constructor to initialize the contour with the both neighbouring boundaries lists of
     //! #outerBoundary and #innerBoundary.

@@ -122,7 +122,7 @@ public:
     virtual ~ActiveContour();
 
     //! Updates the model with a new image matching phi's dimensions.
-    void update(ImageView image);
+    void update(const ImageView& image);
 
     //! Checks a generic failure case.
     void checkContourFailure();

@@ -23,7 +23,7 @@ public:
     ~RegionColorSpeedModel() override = default;
 
     //! Initializes the six sums and #n_in and #n_out with scanning through the image.
-    void onImageChanged(ImageView image, const ContourData& contour) override;
+    void onImageChanged(const ImageView& image, const ContourData& contour) override;
 
     //! Calculates means #CoutYUV and #CinYUV in \a O(1) or accounting for the previous updates
     //! of (#sum_out_R, #sum_out_G, #sum_out_B) and (#sum_in_R, #sum_in_G, #sum_in_B), in \a

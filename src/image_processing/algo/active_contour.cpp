@@ -470,7 +470,7 @@ void ActiveContour::calculateShapesIntersection()
     }
 }
 
-void ActiveContour::update(ImageView image)
+void ActiveContour::update(const ImageView& image)
 {
     state_ = PhaseState::Cycle1;
     ed_.resetExecutionState();

@@ -20,7 +20,7 @@ RegionGraySpeedModel::RegionGraySpeedModel(
 {
 }
 
-void RegionGraySpeedModel::onImageChanged(ImageView image, const ContourData& contour)
+void RegionGraySpeedModel::onImageChanged(const ImageView& image, const ContourData& contour)
 {
     assert(image.format() == ImageFormat::Gray8);
     assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());

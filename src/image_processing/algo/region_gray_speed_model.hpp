@@ -20,7 +20,7 @@ public:
 
     //! Initializes the variables #sumIn, #sum_out and #pxl_nbr_out with scanning through the
     //! image.
-    void onImageChanged(ImageView image, const ContourData& cd) override;
+    void onImageChanged(const ImageView& image, const ContourData& cd) override;
 
     //! Calculates means #Cout and #Cin in \a O(1) or accounting for the previous updates of
     //! #sum_out and #sumIn, in \a O(#lists_length) and not in \a O(#img_size).

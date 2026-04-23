@@ -17,7 +17,7 @@ RegionColorSpeedModel::RegionColorSpeedModel(const RegionColorParams& params)
 {
 }
 
-void RegionColorSpeedModel::onImageChanged(ImageView image, const ContourData& contour)
+void RegionColorSpeedModel::onImageChanged(const ImageView& image, const ContourData& contour)
 {
     assert(image.format() != ImageFormat::Gray8);
     assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());
