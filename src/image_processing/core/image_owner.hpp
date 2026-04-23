@@ -100,7 +100,11 @@ public:
         assert(y >= 0 && y < height_);
         assert(c >= 0 && c < channels_);
 
-        return data_[y * stride_ + x * channels_ + c];
+        const size_t idx = static_cast<size_t>(y) * static_cast<size_t>(stride_) +
+                           static_cast<size_t>(x) * static_cast<size_t>(channels_) +
+                           static_cast<size_t>(c);
+
+        return data_[idx];
     }
 
     uint8_t& atSafe(int x, int y, int c = 0)
@@ -108,14 +112,18 @@ public:
         if (x < 0 || x >= width_ || y < 0 || y >= height_ || c < 0 || c >= channels_)
             throw std::out_of_range("Image::at_safe - index out of bounds");
 
-        return data_[y * stride_ + x * channels_ + c];
+        const size_t idx = static_cast<size_t>(y) * static_cast<size_t>(stride_) +
+                           static_cast<size_t>(x) * static_cast<size_t>(channels_) +
+                           static_cast<size_t>(c);
+
+        return data_[idx];
     }
 
-    unsigned char* data() noexcept
+    uint8_t* data() noexcept
     {
         return data_.data();
     }
-    const unsigned char* data() const noexcept
+    const uint8_t* data() const noexcept
     {
         return data_.data();
     }
@@ -151,7 +159,7 @@ private:
     ImageFormat format_{ImageFormat::Gray8};
     int channels_{0};
     int stride_{0};
-    std::vector<unsigned char> data_;
+    std::vector<uint8_t> data_;
 
     static constexpr int channels_from_format(ImageFormat fmt) noexcept
     {
