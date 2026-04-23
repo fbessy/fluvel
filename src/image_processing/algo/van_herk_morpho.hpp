@@ -152,6 +152,13 @@ void vanHerk(const ImageView& input, ImageOwner& output, int radius)
     const int w = input.width();
     const int h = input.height();
     const int c = input.channels();
+    const int k = 2 * radius + 1;
+
+    if (k > w || k > h)
+    {
+        output.copyFrom(input);
+        return;
+    }
 
     // buffer intermédiaire
     ImageOwner buffer(w, h, input.format());
