@@ -6,6 +6,7 @@
 #include "color.hpp"
 #include "image_format.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
@@ -82,11 +83,24 @@ public:
         return data_ + static_cast<ptrdiff_t>(y * strideBytes_);
     }
 
+    const uint8_t* rowClamped(int y) const noexcept
+    {
+        return row(std::clamp(y, 0, heightPixels_ - 1));
+    }
+
     uint8_t at(int x, int y, int c = 0) const noexcept
     {
         assert(x >= 0 && x < widthPixels_);
         assert(y >= 0 && y < heightPixels_);
         assert(c >= 0 && c < channelsPerPixel_);
+
+        return row(y)[x * channelsPerPixel_ + c];
+    }
+
+    uint8_t atClamped(int x, int y, int c = 0) const noexcept
+    {
+        x = std::clamp(x, 0, widthPixels_ - 1);
+        y = std::clamp(y, 0, heightPixels_ - 1);
 
         return row(y)[x * channelsPerPixel_ + c];
     }

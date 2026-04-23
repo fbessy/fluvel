@@ -55,8 +55,14 @@ void Median::applyNaive(const ImageView& input, int radius)
     if (!output_.hasSameLayout(input))
         reset(input);
 
+    const int maxValidRadius = std::min(width_ - 1, height_ - 1);
+
+    // clamp radius to avoid out-of-bounds when kernel exceeds image size
+    radius = std::min(radius, maxValidRadius);
+
     const int k = 2 * radius + 1;
     const int size = k * k;
+    const int medianIndex = size / 2;
 
     std::vector<uint8_t> window;
     window.reserve(size);
@@ -83,9 +89,9 @@ void Median::applyNaive(const ImageView& input, int radius)
                     }
                 }
 
-                std::nth_element(window.begin(), window.begin() + window.size() / 2, window.end());
+                std::nth_element(window.begin(), window.begin() + medianIndex, window.end());
 
-                dst[x * channels_ + ch] = window[window.size() / 2];
+                dst[x * channels_ + ch] = window[medianIndex];
             }
         }
     }
@@ -202,8 +208,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = 0; x < kernelSize; ++x)
             {
-                uint8_t valRemove = input.at(x, y + radius + 1, ch);
-                uint8_t valAdd = input.at(x, y + radius, ch);
+                uint8_t valRemove = input.atClamped(x, y + radius + 1, ch);
+                uint8_t valAdd = input.atClamped(x, y + radius, ch);
 
                 updateColumnsHisto(x, valRemove, valAdd);
 
@@ -224,8 +230,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
             {
                 const int col = x + radius;
 
-                uint8_t valRemove = input.at(col, y + radius + 1, ch);
-                uint8_t valAdd = input.at(col, y + radius, ch);
+                uint8_t valRemove = input.atClamped(col, y + radius + 1, ch);
+                uint8_t valAdd = input.atClamped(col, y + radius, ch);
 
                 updateColumnsHisto(col, valRemove, valAdd);
 
@@ -264,8 +270,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = 0; x < kernelSize; ++x)
             {
-                uint8_t valRemove = input.at(x, y - radius - 1, ch);
-                uint8_t valAdd = input.at(x, y + radius, ch);
+                uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
+                uint8_t valAdd = input.atClamped(x, y + radius, ch);
 
                 updateColumnsHisto(x, valRemove, valAdd);
 
@@ -319,8 +325,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = 0; x < kernelSize; ++x)
             {
-                uint8_t valRemove = input.at(x, y - radius - 1, ch);
-                uint8_t valAdd = input.at(x, y - radius, ch);
+                uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
+                uint8_t valAdd = input.atClamped(x, y - radius, ch);
 
                 updateColumnsHisto(x, valRemove, valAdd);
 
@@ -340,8 +346,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
             for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
                 const int col = x + radius;
-                uint8_t valRemove = input.at(col, y - radius - 1, ch);
-                uint8_t valAdd = input.at(col, y - radius, ch);
+                uint8_t valRemove = input.atClamped(col, y - radius - 1, ch);
+                uint8_t valAdd = input.atClamped(col, y - radius, ch);
 
                 updateColumnsHisto(col, valRemove, valAdd);
 

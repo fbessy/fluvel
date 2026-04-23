@@ -41,6 +41,11 @@ void MeanSliding::apply(const ImageView& input, int radius)
 
     reset(input);
 
+    const int maxValidRadius = std::min(width_ - 1, height_ - 1);
+
+    // clamp radius to avoid out-of-bounds when kernel exceeds image size
+    radius = std::min(radius, maxValidRadius);
+
     const int channels = input.channels();
     const int kernelSize = 2 * radius + 1;
 
