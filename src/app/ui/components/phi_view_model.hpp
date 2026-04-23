@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "ac_types.hpp"
+#include "contour_types.hpp"
 #include "phi_editor.hpp"
 #include "point.hpp"
 

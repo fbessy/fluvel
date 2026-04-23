@@ -4,6 +4,7 @@
 #include "region_color_speed_model.hpp"
 #include "contour_data.hpp"
 #include "contour_diagnostics.hpp"
+#include "contour_types.hpp"
 #include "fluvel_math.hpp"
 
 #include <cassert>

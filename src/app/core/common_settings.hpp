@@ -3,9 +3,11 @@
 
 #pragma once
 
-#include "ac_types.hpp"
+#include "active_contour_types.hpp"
 #include "color.hpp"
+#include "contour_types.hpp"
 #include "image_pipeline.hpp"
+#include "speed_model_types.hpp"
 
 #include <QImage>
 #include <string_view>

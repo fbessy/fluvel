@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "ac_types.hpp"
+#include "active_contour_types.hpp"
 
 #include <cstddef>
 #include <vector>

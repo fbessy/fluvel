@@ -3,12 +3,13 @@
 
 #pragma once
 
-#include "ac_types.hpp"
+#include "contour_types.hpp"
 #include "image_view.hpp"
 
 namespace fluvel_ip
 {
 
+class ContourPoint;
 class ContourData;
 struct ContourDiagnostics;
 enum class SwitchDirection;

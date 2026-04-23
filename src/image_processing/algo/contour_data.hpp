@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "ac_types.hpp"
+#include "contour_types.hpp"
 #include "image_view.hpp"
 
 #include <vector>

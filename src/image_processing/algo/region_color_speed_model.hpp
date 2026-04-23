@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "ac_types.hpp"
 #include "color.hpp"
 #include "image_view.hpp"
 #include "speed_model.hpp"
+#include "speed_model_types.hpp"
 
 #include <cstdint>
 

@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "active_contour.hpp"
-#include "ac_types.hpp"
+#include "active_contour_types.hpp"
 #include "hausdorff_distance.hpp"
 #include "neighborhood.hpp"
 #include "speed_model.hpp"

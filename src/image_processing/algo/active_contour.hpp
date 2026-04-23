@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "ac_types.hpp"
+#include "active_contour_types.hpp"
 #include "contour_data.hpp"
 #include "contour_diagnostics.hpp"
 #include "majority_internal_speed.hpp"

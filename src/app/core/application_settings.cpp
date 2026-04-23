@@ -2,7 +2,6 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "application_settings.hpp"
-#include "ac_types.hpp"
 
 #include <QPainter>
 #include <QSettings>

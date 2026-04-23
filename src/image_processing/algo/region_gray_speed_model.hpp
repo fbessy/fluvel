@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "ac_types.hpp"
 #include "image_view.hpp"
 #include "speed_model.hpp"
+#include "speed_model_types.hpp"
 
 namespace fluvel_ip
 {
