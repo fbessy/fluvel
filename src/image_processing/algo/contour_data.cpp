@@ -19,6 +19,14 @@ ContourData::ContourData(int phiWidth, int phiHeight, Connectivity connectivity)
     assert(phiHeight >= 1);
 
     allocateLists();
+
+    if (phiWidth < 2 || phiHeight < 2)
+    {
+        outerBoundary_.clear();
+        innerBoundary_.clear();
+        return;
+    }
+
     defineFromEllipse();
 
     // post condition
@@ -38,6 +46,13 @@ ContourData::ContourData(ImageView grayscalePhi, Connectivity connectivity)
             else
                 phi_.at(x, y) = PhiValue::ExteriorBoundary;
         }
+    }
+
+    if (isTrivialDomain())
+    {
+        outerBoundary_.clear();
+        innerBoundary_.clear();
+        return;
     }
 
     defineListsAndPhiFromBinaryPhi();
@@ -64,6 +79,13 @@ ContourData::ContourData(const Contour& outerBoundary, const Contour& innerBound
     assert(phiHeight >= 1);
 
     allocateLists();
+
+    if (isTrivialDomain())
+    {
+        outerBoundary_.clear();
+        innerBoundary_.clear();
+        return;
+    }
 
     if (empty())
         defineFromEllipse();

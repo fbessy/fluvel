@@ -27,6 +27,12 @@ ActiveContour::ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedM
     , state_(PhaseState::Cycle1)
     , ed_(cd_)
 {
+    if (cd_.empty())
+    {
+        ed_.stoppingStatus = StoppingStatus::EmptyListFailure;
+        state_ = PhaseState::Stopped;
+    }
+
     pendingBoundaryPoints_.reserve(cd_.outerBoundary().capacity());
 
     if (params_.hasCycle2)

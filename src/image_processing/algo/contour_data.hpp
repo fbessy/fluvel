@@ -90,6 +90,11 @@ public:
         return connectivity_;
     }
 
+    bool isTrivialDomain() const
+    {
+        return phi_.width() < 2 || phi_.height() < 2;
+    }
+
 private:
     //! Initializes the contour *this with one ellipse. It is performed when the simplest
     //! constructor is called or when one or both boundary lists is/are empty.
