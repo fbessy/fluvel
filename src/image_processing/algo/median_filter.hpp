@@ -5,6 +5,7 @@
 
 #include "image_owner.hpp"
 #include "image_view.hpp"
+#include <algorithm>
 #include <array>
 
 namespace fluvel_ip::filter
@@ -38,6 +39,11 @@ private:
     void initCurrentMedian()
     {
         currentMedian_ = kHistogramSize / 2;
+    }
+
+    int clampX(int x) const noexcept
+    {
+        return std::clamp(x, 0, width_ - 1);
     }
 
     void accumulateColumn(int colIndex);

@@ -3,7 +3,6 @@
 
 #include "median_filter.hpp"
 
-#include <algorithm>
 #include <cassert>
 
 namespace fluvel_ip::filter
@@ -111,7 +110,7 @@ uint8_t Median::findMedian(int targetRank)
     if (cumulative < targetRank)
     {
         int i = currentMedian_;
-        while (cumulative < targetRank)
+        while (cumulative < targetRank && i < kHistogramSize - 1)
         {
             ++i;
             cumulative += kernelHisto_[i];
@@ -122,7 +121,7 @@ uint8_t Median::findMedian(int targetRank)
     {
         // 3. Ajuster vers le bas
         int i = currentMedian_;
-        while (cumulative - kernelHisto_[i] >= targetRank)
+        while (i > 0 && cumulative - kernelHisto_[i] >= targetRank)
         {
             cumulative -= kernelHisto_[i];
             --i;
@@ -162,7 +161,7 @@ void Median::initColumnsHisto(const ImageView& input, int ch, int kernelSize)
 {
     for (int y = 0; y < kernelSize; ++y)
     {
-        const uint8_t* row = input.row(y);
+        const uint8_t* row = input.rowClamped(y);
 
         for (int x = 0; x < width_; ++x)
         {
@@ -191,6 +190,11 @@ void Median::applyPerreault(const ImageView& input, int radius)
     if (!output_.hasSameLayout(input))
         reset(input);
 
+    const int maxValidRadius = std::min(width_ - 1, height_ - 1);
+
+    // clamp radius to avoid out-of-bounds when kernel exceeds image size
+    radius = std::min(radius, maxValidRadius);
+
     const int kernelSize = 2 * radius + 1;
     const int medianRank = kernelSize * kernelSize / 2 + 1;
 
@@ -211,9 +215,9 @@ void Median::applyPerreault(const ImageView& input, int radius)
                 uint8_t valRemove = input.atClamped(x, y + radius + 1, ch);
                 uint8_t valAdd = input.atClamped(x, y + radius, ch);
 
-                updateColumnsHisto(x, valRemove, valAdd);
+                updateColumnsHisto(clampX(x), valRemove, valAdd);
 
-                accumulateColumn(x);
+                accumulateColumn(clampX(x));
 
                 if (x >= radius)
                 {
@@ -228,14 +232,14 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
-                const int col = x + radius;
+                const int col = clampX(x + radius);
 
                 uint8_t valRemove = input.atClamped(col, y + radius + 1, ch);
                 uint8_t valAdd = input.atClamped(col, y + radius, ch);
 
                 updateColumnsHisto(col, valRemove, valAdd);
 
-                updateKernel(col, x - radius - 1);
+                updateKernel(col, clampX(x - radius - 1));
 
                 uint8_t val = findMedian(medianRank);
                 output_.at(x, y, ch) = val;
@@ -244,7 +248,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
             int columnsRemoved = 0;
             for (int x = width_ - radius - 1; x < width_; ++x)
             {
-                removeColumn(x - radius - 1);
+                removeColumn(clampX(x - radius - 1));
                 ++columnsRemoved;
 
                 const int remainingColumns = kernelSize - columnsRemoved;
@@ -273,9 +277,9 @@ void Median::applyPerreault(const ImageView& input, int radius)
                 uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
                 uint8_t valAdd = input.atClamped(x, y + radius, ch);
 
-                updateColumnsHisto(x, valRemove, valAdd);
+                updateColumnsHisto(clampX(x), valRemove, valAdd);
 
-                accumulateColumn(x);
+                accumulateColumn(clampX(x));
 
                 if (x >= radius)
                 {
@@ -290,7 +294,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
-                const int col = x + radius;
+                const int col = clampX(x + radius);
 
                 uint8_t valRemove = input.at(col, y - radius - 1, ch);
                 uint8_t valAdd = input.at(col, y + radius, ch);
@@ -305,7 +309,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
             int columnsRemoved = 0;
             for (int x = width_ - radius - 1; x < width_; ++x)
             {
-                removeColumn(x - radius - 1);
+                removeColumn(clampX(x - radius - 1));
                 ++columnsRemoved;
 
                 const int remainingColumns = kernelSize - columnsRemoved;
@@ -328,9 +332,9 @@ void Median::applyPerreault(const ImageView& input, int radius)
                 uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
                 uint8_t valAdd = input.atClamped(x, y - radius, ch);
 
-                updateColumnsHisto(x, valRemove, valAdd);
+                updateColumnsHisto(clampX(x), valRemove, valAdd);
 
-                accumulateColumn(x);
+                accumulateColumn(clampX(x));
 
                 if (x >= radius)
                 {
@@ -345,13 +349,13 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
-                const int col = x + radius;
+                const int col = clampX(x + radius);
                 uint8_t valRemove = input.atClamped(col, y - radius - 1, ch);
                 uint8_t valAdd = input.atClamped(col, y - radius, ch);
 
                 updateColumnsHisto(col, valRemove, valAdd);
 
-                updateKernel(col, x - radius - 1);
+                updateKernel(col, clampX(x - radius - 1));
 
                 uint8_t val = findMedian(medianRank);
                 output_.at(x, y, ch) = val;
@@ -360,7 +364,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
             int columnsRemoved = 0;
             for (int x = width_ - radius - 1; x < width_; ++x)
             {
-                removeColumn(x - radius - 1);
+                removeColumn(clampX(x - radius - 1));
                 ++columnsRemoved;
 
                 const int remainingColumns = kernelSize - columnsRemoved;

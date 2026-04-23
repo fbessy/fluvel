@@ -74,6 +74,13 @@ void Mean3x3::apply(const ImageView& input)
 
 void Mean3x3::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels)
 {
+    if (width == 1)
+    {
+        for (int c = 0; c < channels; ++c)
+            dst[c] = src[c];
+        return;
+    }
+
     const int rowBytes = width * channels;
 
     // --- left border
