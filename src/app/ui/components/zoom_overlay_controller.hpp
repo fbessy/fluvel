@@ -34,8 +34,8 @@ private:
     QTimer timer_;
     QPropertyAnimation* anim_ = nullptr;
 
-    int displayDurationMs_ = 800;
-    int fadeDurationMs_ = 250;
+    int displayDurationMs_{800};
+    int fadeDurationMs_{250};
 };
 
 } // namespace fluvel_app

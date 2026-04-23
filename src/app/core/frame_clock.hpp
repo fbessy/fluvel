@@ -20,7 +20,7 @@ public:
 
 private:
     static inline clock::time_point start_{};
-    static inline bool initialized_ = false;
+    static inline bool initialized_{false};
 };
 
 } // namespace fluvel_app

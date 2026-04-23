@@ -17,14 +17,14 @@ class FrameStatsView
 public:
     struct Snapshot
     {
-        double capturedFps = 0.0;
-        double processedFps = 0.0;
-        double displayedFps = 0.0;
-        double dropRate = 0.0;
-        double avgLatencyDisplayMs = 0.0;
-        double maxLatencyDisplayMs = 0.0;
-        double avgLatencyProcMs = 0.0;
-        double avgContourSize = 0.0;
+        double capturedFps{0.0};
+        double processedFps{0.0};
+        double displayedFps{0.0};
+        double dropRate{0.0};
+        double avgLatencyDisplayMs{0.0};
+        double maxLatencyDisplayMs{0.0};
+        double avgLatencyProcMs{0.0};
+        double avgContourSize{0.0};
     };
 
     FrameStatsView();
@@ -45,23 +45,23 @@ private:
     QMutex mutex_;
 
     // compteurs fenêtre courante
-    quint64 capturedFrames_ = 0;
-    quint64 processedFrames_ = 0;
-    quint64 displayedFrames_ = 0;
-    quint64 droppedFrames_ = 0;
+    quint64 capturedFrames_{0};
+    quint64 processedFrames_{0};
+    quint64 displayedFrames_{0};
+    quint64 droppedFrames_{0};
 
-    quint64 contourSizeSum_ = 0;
+    quint64 contourSizeSum_{0};
 
     // latence fenêtre
-    double latencySumDisplayMs_ = 0.0;
-    double latencyMaxDisplayMs_ = 0.0;
-    double latencySumProcMs_ = 0.0;
+    double latencySumDisplayMs_{0.0};
+    double latencyMaxDisplayMs_{0.0};
+    double latencySumProcMs_{0.0};
 
     fluvel_ip::ElapsedTimer windowTimer_;
     static constexpr std::chrono::milliseconds kWindowMs{1000}; // 1 seconde
 
     // snapshot précédent (pour affichage stable)
-    Snapshot lastSnapshot_;
+    Snapshot lastSnapshot_{};
 };
 
 } // namespace fluvel_app

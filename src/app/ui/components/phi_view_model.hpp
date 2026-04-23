@@ -70,8 +70,8 @@ private:
 
     fluvel_ip::Connectivity connectivity_;
 
-    bool interactiveMode_ = false;
-    bool overlayVisible_ = false;
+    bool interactiveMode_{false};
+    bool overlayVisible_{false};
 };
 
 } // namespace fluvel_app

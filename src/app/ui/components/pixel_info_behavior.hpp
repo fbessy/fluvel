@@ -54,7 +54,7 @@ private:
     void updateOverlay(ImageViewerWidget& view, const QPoint& viewPos);
 
 private:
-    bool active_ = false;
+    bool active_{false};
 
     std::unique_ptr<PixelInfoOverlay> overlay_;
 };

@@ -29,7 +29,7 @@ private:
 
     QFont font_;
     QRectF rect_;
-    int padding_ = 8;
+    int padding_{8};
 };
 
 } // namespace fluvel_app

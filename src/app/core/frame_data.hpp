@@ -15,7 +15,7 @@ namespace fluvel_app
 struct CapturedFrame
 {
     QVideoFrame frame;
-    int64_t receiveTimestampNs = 0;
+    int64_t receiveTimestampNs{0};
 };
 
 struct DisplayFrame
@@ -23,8 +23,8 @@ struct DisplayFrame
     QImage image;
     fluvel_ip::ExportedContour outerContour;
     fluvel_ip::ExportedContour innerContour;
-    int64_t receiveTimestampNs = 0;
-    int64_t processTimestampNs = 0;
+    int64_t receiveTimestampNs{0};
+    int64_t processTimestampNs{0};
 };
 
 struct UiFrame
@@ -34,15 +34,15 @@ struct UiFrame
     QVector<QPointF> outerContour;
     QVector<QPointF> innerContour;
 
-    int64_t receiveTimestampNs = 0;
-    int64_t processTimestampNs = 0;
+    int64_t receiveTimestampNs{0};
+    int64_t processTimestampNs{0};
 };
 
 struct FrameTimestamps
 {
-    int64_t receiveTimestampNs = 0;
-    int64_t processTimestampNs = 0;
-    int64_t displayTimestampNs = 0;
+    int64_t receiveTimestampNs{0};
+    int64_t processTimestampNs{0};
+    int64_t displayTimestampNs{0};
 };
 
 } // namespace fluvel_app

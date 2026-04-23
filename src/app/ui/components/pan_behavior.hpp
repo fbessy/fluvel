@@ -63,7 +63,7 @@ public:
 
 private:
     Qt::MouseButton button_;
-    bool capturing_ = false;
+    bool capturing_{false};
     QPoint lastPos_;
 };
 
