@@ -102,6 +102,8 @@ private:
     fluvel_ip::ContourDiagnostics diag_;
     fluvel_ip::ElapsedTimer measurementTimer_;
     bool isMeasuring_{false};
+
+    bool processingDirty_{true};
 };
 
 } // namespace fluvel_app

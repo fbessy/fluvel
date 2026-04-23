@@ -29,9 +29,6 @@ set(ip_src
     ${ALGO_DIR}/hausdorff_distance.cpp
     ${ALGO_DIR}/hausdorff_distance.hpp
 
-    ${ALGO_DIR}/filters.cpp
-    ${ALGO_DIR}/filters.hpp
-
     ${ALGO_DIR}/boundary_builder.cpp
     ${ALGO_DIR}/boundary_builder.hpp
 

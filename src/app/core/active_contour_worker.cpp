@@ -7,8 +7,8 @@
 #include "region_color_speed_model.hpp"
 #include "speed_model.hpp"
 
-#include "filters.hpp"
 #include "image_adapters.hpp"
+#include "image_pipeline.hpp"
 #include "image_view.hpp"
 
 #include "elapsed_timer.hpp"
@@ -41,12 +41,10 @@ void ActiveContourWorker::restart()
 
     const auto& fc = config_.processing;
 
-    // if there is at least one random operation,
-    // preprocessing is done at each restart
-    if (fc.hasProcessing() && (fc.has_gaussian_noise || fc.has_salt_noise || fc.has_speckle_noise))
-    {
+    const bool hasRandom = fc.has_gaussian_noise || fc.has_salt_noise || fc.has_speckle_noise;
+
+    if (processingDirty_ || hasRandom)
         applyProcessing();
-    }
 
     initializeActiveContour();
 
@@ -188,180 +186,36 @@ bool ActiveContourWorker::stepOnceAlgo()
 
 void ActiveContourWorker::applyProcessing()
 {
+    workerTimer_->stop();
+    setState(WorkerState::Initializing);
+
+    processedImage_ = image_;
+
     if (image_.isNull())
+    {
+        processingDirty_ = false;
         return;
+    }
 
 #ifdef FLUVEL_DEBUG
     qDebug() << __FILE__ << " applyProcessing() " << __LINE__ << __func__;
 #endif
 
-    workerTimer_->stop();
-    setState(WorkerState::Initializing);
+    fluvel_ip::ImagePipeline preprocess;
+    auto img = imageViewFromQImage(image_);
 
-    //--------------------------------------------------
-    // 1. Conversion FORMAT STRICT attendu par l'algo
-    //--------------------------------------------------
-    QImage img;
-    int channelsNbr = 0;
+    preprocess.reset(img);
+    preprocess.apply(img, config_.processing);
 
-    if (image_.format() == QImage::Format_Grayscale8)
-    {
-        img = image_;
-        channelsNbr = 1;
-    }
-    else
-    {
-        // 👉 on force TOUJOURS RGB888 (clé du problème)
-        img = image_.convertToFormat(QImage::Format_RGB888);
-        channelsNbr = 3;
-    }
-
-    if (img.isNull())
-        return;
-
-    const int width = img.width();
-    const int height = img.height();
-
-    //--------------------------------------------------
-    // 2. Garantir buffer PACKED (stride = width * channels)
-    //--------------------------------------------------
-    const unsigned char* dataPtr = nullptr;
-    std::vector<unsigned char> packedBuffer;
-
-    const qsizetype expectedStride = static_cast<qsizetype>(width * channelsNbr);
-
-    if (img.bytesPerLine() == expectedStride)
-    {
-        dataPtr = img.constBits(); // ✅ const correct
-    }
-    else
-    {
-        packedBuffer.resize(static_cast<std::size_t>(width * height * channelsNbr));
-
-        for (int y = 0; y < height; ++y)
-        {
-            const uchar* src = img.constScanLine(y);
-            uchar* dst = packedBuffer.data() + y * width * channelsNbr;
-
-            memcpy(dst, src, static_cast<std::size_t>(width * channelsNbr));
-        }
-
-        dataPtr = packedBuffer.data(); // implicit const OK
-    }
-
-    //--------------------------------------------------
-    // 3. Pipeline filtres (buffer TOUJOURS valide ici)
-    //--------------------------------------------------
-    const auto& fc = config_.processing;
-
-    if (fc.hasProcessing())
-    {
-        fluvel_ip::Filters filters(dataPtr, width, height, channelsNbr);
-
-        //--------------------------------------------------
-        // Bruits
-        //--------------------------------------------------
-        if (fc.has_gaussian_noise)
-            filters.gaussian_white_noise(fc.std_noise);
-
-        if (fc.has_salt_noise)
-            filters.impulsive_noise(fc.proba_noise);
-
-        if (fc.has_speckle_noise)
-            filters.speckle(fc.std_speckle_noise);
-
-        //--------------------------------------------------
-        // Filtres linéaires
-        //--------------------------------------------------
-        if (fc.has_mean_filt)
-            filters.mean_filtering(fc.kernel_mean_length);
-
-        if (fc.has_gaussian_filt)
-            filters.gaussian_filtering(fc.kernel_gaussian_length, fc.sigma);
-
-        //--------------------------------------------------
-        // Médian
-        //--------------------------------------------------
-        if (fc.has_median_filt)
-        {
-            if (fc.has_O1_algo)
-                filters.median_filtering_o1(fc.kernel_median_length);
-            else
-                filters.median_filtering_oNlogN(fc.kernel_median_length);
-        }
-
-        //--------------------------------------------------
-        // Diffusion anisotrope
-        //--------------------------------------------------
-        if (fc.has_aniso_diff)
-        {
-            // filters.anisotropic_diffusion(fc.max_itera, fc.lambda, fc.kappa, fc.aniso_option);
-        }
-
-        //--------------------------------------------------
-        // Morphologie
-        //--------------------------------------------------
-        if (fc.has_open_filt)
-        {
-            if (fc.has_O1_morpho)
-                filters.opening_o1(fc.kernel_open_length);
-            else
-                filters.opening(fc.kernel_open_length);
-        }
-
-        if (fc.has_close_filt)
-        {
-            if (fc.has_O1_morpho)
-                filters.closing_o1(fc.kernel_close_length);
-            else
-                filters.closing(fc.kernel_close_length);
-        }
-
-        if (fc.has_top_hat_filt)
-        {
-            if (fc.is_white_top_hat)
-            {
-                if (fc.has_O1_morpho)
-                    filters.white_top_hat_o1(fc.kernel_tophat_length);
-                else
-                    filters.white_top_hat(fc.kernel_tophat_length);
-            }
-            else
-            {
-                if (fc.has_O1_morpho)
-                    filters.black_top_hat_o1(fc.kernel_tophat_length);
-                else
-                    filters.black_top_hat(fc.kernel_tophat_length);
-            }
-        }
-
-        //--------------------------------------------------
-        // 4. Reconstruction QImage (SAFE)
-        //--------------------------------------------------
-        const unsigned char* out = filters.get_filtered();
-
-        if (channelsNbr == 3)
-        {
-            QImage tmp(out, width, height, width * channelsNbr, QImage::Format_RGB888);
-            processedImage_ = tmp.convertToFormat(QImage::Format_RGB32).copy();
-        }
-        else
-        {
-            QImage tmp(out, width, height, width * channelsNbr, QImage::Format_Grayscale8);
-            processedImage_ = tmp.copy();
-        }
-    }
-    else
-    {
-        // 👉 pas de processing → on garde l'image convertie
-        processedImage_ = img;
-    }
+    processedImage_ = toQImageCopy(preprocess.outputView());
 
     //--------------------------------------------------
     // 5. Emit
     //--------------------------------------------------
     if (!processedImage_.isNull())
         emit processedImageReady(processedImage_);
+
+    processingDirty_ = false;
 }
 
 void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConfig& config)
@@ -371,6 +225,7 @@ void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConf
 
     image_ = image;
     config_ = config;
+    processingDirty_ = true;
 
     applyProcessing();
 
