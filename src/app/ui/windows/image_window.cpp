@@ -361,7 +361,7 @@ void ImageWindow::applyInitialSettings()
     imageViewer_->applyDisplayConfig(config.display);
 
     bool preprocessing =
-        config.compute.downscale.downscaleEnabled || config.compute.processing.hasProcessing();
+        config.compute.downscale.downscaleEnabled || config.compute.processing.hasActiveProcessing();
 
     displayBar_->updatePipelineAvailability(preprocessing);
 
@@ -432,7 +432,7 @@ void ImageWindow::setupConnections()
             [this](const ImageSessionSettings& conf)
             {
                 bool hasPreprocessing =
-                    conf.compute.downscale.downscaleEnabled || conf.compute.processing.hasProcessing();
+                    conf.compute.downscale.downscaleEnabled || conf.compute.processing.hasActiveProcessing();
 
                 displayBar_->updatePipelineAvailability(hasPreprocessing);
             });

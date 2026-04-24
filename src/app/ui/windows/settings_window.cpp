@@ -384,23 +384,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     QFormLayout* meanLayout = new QFormLayout;
     meanLayout->addRow(tr("kernel size ="), meanKernelSizeSpin_);
 
-    gaussianGroupbox_ = new QGroupBox(tr("Gaussian filter"));
-    gaussianGroupbox_->setCheckable(true);
-    gaussianGroupbox_->setChecked(false);
-    gaussianKernelSizeSpin_ = new KernelSizeSpinBox;
-    gaussianKernelSizeSpin_->setSingleStep(2);
-    gaussianKernelSizeSpin_->setMinimum(3);
-    gaussianKernelSizeSpin_->setMaximum(499);
-    gaussianSigmaSpin_ = new QDoubleSpinBox;
-    gaussianSigmaSpin_->setSingleStep(0.1);
-    gaussianSigmaSpin_->setMinimum(0.0);
-    gaussianSigmaSpin_->setMaximum(1000000.0);
-    gaussianSigmaSpin_->setToolTip(tr("standard deviation"));
-
-    QFormLayout* gaussianLayout = new QFormLayout;
-    gaussianLayout->addRow(tr("kernel size ="), gaussianKernelSizeSpin_);
-    gaussianLayout->addRow("σ =", gaussianSigmaSpin_);
-
     ////////////////////////////////////////////
 
     medianGroupbox_ = new QGroupBox(tr("Median filter"));
@@ -411,13 +394,9 @@ void SettingsWindow::setupUiPreprocessingTab()
     medianKernelSizeSpin_->setMinimum(3);
     medianKernelSizeSpin_->setMaximum(499);
     // klength_median_spin->setSuffix("²");
-    medianDirectRadio_ = new QRadioButton("O(r log r)×O(n)");
-    medianPerreaultRadio_ = new QRadioButton("O(1)×O(n)");
 
     QFormLayout* medianLayout = new QFormLayout;
     medianLayout->addRow(tr("kernel size ="), medianKernelSizeSpin_);
-    medianLayout->addRow(tr("Sort-based median"), medianDirectRadio_);
-    medianLayout->addRow(tr("Perreault's algorithm"), medianPerreaultRadio_);
 
     anisoGroupbox_ = new QGroupBox(tr("Perona-Malik anisotropic diffusion"));
     anisoGroupbox_->setCheckable(true);
@@ -493,15 +472,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     tophatLayout->addRow(" ", blacktophatRadio_);
     tophatLayout->addRow(tr("SE size ="), tophatKernelSizeSpin_);
 
-    algoGroupbox_ = new QGroupBox(tr("Algorithm"));
-    naiveRadio_ = new QRadioButton(tr("naïve algorithm in O(r)×O(n)"));
-    perreaultRadio_ = new QRadioButton(tr("Perreault's algorithm in O(1)×O(n)"));
-    QVBoxLayout* algoLayout = new QVBoxLayout;
-    algoLayout->addWidget(naiveRadio_);
-    algoLayout->addWidget(perreaultRadio_);
-
     meanGroupbox_->setLayout(meanLayout);
-    gaussianGroupbox_->setLayout(gaussianLayout);
 
     medianGroupbox_->setLayout(medianLayout);
     anisoGroupbox_->setLayout(anisoLayout);
@@ -509,11 +480,9 @@ void SettingsWindow::setupUiPreprocessingTab()
     openGroupbox_->setLayout(openLayout);
     closeGroupbox_->setLayout(closeLayout);
     tophatGroupbox_->setLayout(tophatLayout);
-    algoGroupbox_->setLayout(algoLayout);
 
     QVBoxLayout* filterLayoutLinear = new QVBoxLayout;
     filterLayoutLinear->addWidget(meanGroupbox_);
-    filterLayoutLinear->addWidget(gaussianGroupbox_);
 
     QVBoxLayout* filterLayoutEdgePreserv = new QVBoxLayout;
     filterLayoutEdgePreserv->addWidget(medianGroupbox_);
@@ -523,7 +492,6 @@ void SettingsWindow::setupUiPreprocessingTab()
     filterLayout->addWidget(openGroupbox_);
     filterLayout->addWidget(closeGroupbox_);
     filterLayout->addWidget(tophatGroupbox_);
-    filterLayout->addWidget(algoGroupbox_);
 
     ////////////////////////////////////////////
 
@@ -628,126 +596,91 @@ void SettingsWindow::setupConnections()
     connect(processPage_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.enabled = checked;
+                editedProcessingParams_.processingEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(gaussianNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_gaussian_noise = checked;
+                editedProcessingParams_.gaussianNoiseEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(gaussianNoiseStdSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.std_noise = static_cast<float>(v);
+                editedProcessingParams_.noiseStdDev = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(impulsiveNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_salt_noise = checked;
+                editedProcessingParams_.saltNoiseEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(impulsiveNoisePercentSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.proba_noise = static_cast<float>(v) / 100.f;
+                editedProcessingParams_.saltNoiseProbability = static_cast<float>(v) / 100.f;
                 notifyConfigEdited();
             });
 
     connect(speckleNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_speckle_noise = checked;
+                editedProcessingParams_.speckleNoiseEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(speckleNoiseStdSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.std_speckle_noise = static_cast<float>(v);
+                editedProcessingParams_.speckleNoiseStdDev = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(meanGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_mean_filt = checked;
+                editedProcessingParams_.meanFilterEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(meanKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.kernel_mean_length = v;
-                notifyConfigEdited();
-            });
-
-    connect(gaussianGroupbox_, &QGroupBox::clicked, this,
-            [this](bool checked)
-            {
-                editedProcessingParams_.has_gaussian_filt = checked;
-                notifyConfigEdited();
-            });
-
-    connect(gaussianKernelSizeSpin_, &QSpinBox::valueChanged, this,
-            [this](int v)
-            {
-                editedProcessingParams_.kernel_gaussian_length = v;
-                notifyConfigEdited();
-            });
-
-    connect(gaussianSigmaSpin_, &QDoubleSpinBox::valueChanged, this,
-            [this](double v)
-            {
-                editedProcessingParams_.sigma = static_cast<float>(v);
+                editedProcessingParams_.meanKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(medianGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_median_filt = checked;
+                editedProcessingParams_.medianFilterEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(medianKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.kernel_median_length = v;
-                notifyConfigEdited();
-            });
-
-    connect(medianDirectRadio_, &QRadioButton::clicked, this,
-            [this]()
-            {
-                editedProcessingParams_.has_O1_algo = false;
-                notifyConfigEdited();
-            });
-
-    connect(medianPerreaultRadio_, &QRadioButton::clicked, this,
-            [this]()
-            {
-                editedProcessingParams_.has_O1_algo = true;
+                editedProcessingParams_.medianKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(anisoGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_aniso_diff = checked;
+                editedProcessingParams_.anisotropicDiffusionEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(anisoExpConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.aniso_option =
+                editedProcessingParams_.conductionFunction =
                     fluvel_ip::filter::ConductionFunction::Exponential;
                 notifyConfigEdited();
             });
@@ -755,7 +688,7 @@ void SettingsWindow::setupConnections()
     connect(anisoReciprocalConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.aniso_option =
+                editedProcessingParams_.conductionFunction =
                     fluvel_ip::filter::ConductionFunction::Rational;
                 notifyConfigEdited();
             });
@@ -763,7 +696,7 @@ void SettingsWindow::setupConnections()
     connect(iterationFilterSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.max_itera = v;
+                editedProcessingParams_.maxIterations = v;
                 notifyConfigEdited();
             });
 
@@ -784,70 +717,56 @@ void SettingsWindow::setupConnections()
     connect(openGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_open_filt = checked;
+                editedProcessingParams_.openingEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(openKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.kernel_open_length = v;
+                editedProcessingParams_.openingKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(closeGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_close_filt = checked;
+                editedProcessingParams_.closingEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(closeKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.kernel_close_length = v;
+                editedProcessingParams_.closingKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(tophatGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.has_top_hat_filt = checked;
+                editedProcessingParams_.topHatEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(whitetophatRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.is_white_top_hat = true;
+                editedProcessingParams_.useWhiteTopHat = true;
                 notifyConfigEdited();
             });
 
     connect(blacktophatRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.is_white_top_hat = false;
+                editedProcessingParams_.useWhiteTopHat = false;
                 notifyConfigEdited();
             });
 
     connect(tophatKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.kernel_tophat_length = v;
-                notifyConfigEdited();
-            });
-
-    connect(naiveRadio_, &QRadioButton::clicked, this,
-            [this]()
-            {
-                editedProcessingParams_.has_O1_morpho = true;
-                notifyConfigEdited();
-            });
-
-    connect(perreaultRadio_, &QRadioButton::clicked, this,
-            [this]()
-            {
-                editedProcessingParams_.has_O1_morpho = false;
+                editedProcessingParams_.topHatKernelSize = v;
                 notifyConfigEdited();
             });
 
@@ -948,45 +867,39 @@ void SettingsWindow::accept()
 
     auto& filt_config = committedConfig_.compute.processing;
 
-    filt_config.enabled = processPage_->isChecked();
-    filt_config.has_gaussian_noise = gaussianNoiseGroupbox_->isChecked();
-    filt_config.std_noise = float(gaussianNoiseStdSpin_->value());
-    filt_config.has_salt_noise = impulsiveNoiseGroupbox_->isChecked();
-    filt_config.proba_noise = float(impulsiveNoisePercentSpin_->value()) / 100.f;
-    filt_config.has_speckle_noise = speckleNoiseGroupbox_->isChecked();
-    filt_config.std_speckle_noise = float(speckleNoiseStdSpin_->value());
-    filt_config.has_median_filt = medianGroupbox_->isChecked();
-    filt_config.kernel_median_length = medianKernelSizeSpin_->value();
-    filt_config.has_O1_algo = medianPerreaultRadio_->isChecked();
+    filt_config.processingEnabled = processPage_->isChecked();
+    filt_config.gaussianNoiseEnabled = gaussianNoiseGroupbox_->isChecked();
+    filt_config.noiseStdDev = float(gaussianNoiseStdSpin_->value());
+    filt_config.saltNoiseEnabled = impulsiveNoiseGroupbox_->isChecked();
+    filt_config.saltNoiseProbability = float(impulsiveNoisePercentSpin_->value()) / 100.f;
+    filt_config.speckleNoiseEnabled = speckleNoiseGroupbox_->isChecked();
+    filt_config.speckleNoiseStdDev = float(speckleNoiseStdSpin_->value());
+    filt_config.medianFilterEnabled = medianGroupbox_->isChecked();
+    filt_config.medianKernelSize = medianKernelSizeSpin_->value();
 
-    filt_config.has_mean_filt = meanGroupbox_->isChecked();
-    filt_config.kernel_mean_length = meanKernelSizeSpin_->value();
+    filt_config.meanFilterEnabled = meanGroupbox_->isChecked();
+    filt_config.meanKernelSize = meanKernelSizeSpin_->value();
 
-    filt_config.has_gaussian_filt = gaussianGroupbox_->isChecked();
-    filt_config.kernel_gaussian_length = gaussianKernelSizeSpin_->value();
-    filt_config.sigma = float(gaussianSigmaSpin_->value());
-    filt_config.has_aniso_diff = anisoGroupbox_->isChecked();
-
-    filt_config.max_itera = iterationFilterSpin_->value();
+    filt_config.anisotropicDiffusionEnabled = anisoGroupbox_->isChecked();
+    filt_config.maxIterations = iterationFilterSpin_->value();
     filt_config.lambda = float(lambdaSpin_->value());
     filt_config.kappa = float(kappaSpin_->value());
     if (anisoExpConductionRadio_->isChecked())
     {
-        filt_config.aniso_option = fluvel_ip::filter::ConductionFunction::Exponential;
+        filt_config.conductionFunction = fluvel_ip::filter::ConductionFunction::Exponential;
     }
     else if (anisoReciprocalConductionRadio_->isChecked())
     {
-        filt_config.aniso_option = fluvel_ip::filter::ConductionFunction::Rational;
+        filt_config.conductionFunction = fluvel_ip::filter::ConductionFunction::Rational;
     }
 
-    filt_config.has_open_filt = openGroupbox_->isChecked();
-    filt_config.kernel_open_length = openKernelSizeSpin_->value();
-    filt_config.has_close_filt = closeGroupbox_->isChecked();
-    filt_config.kernel_close_length = closeKernelSizeSpin_->value();
-    filt_config.has_top_hat_filt = tophatGroupbox_->isChecked();
-    filt_config.is_white_top_hat = whitetophatRadio_->isChecked();
-    filt_config.kernel_tophat_length = tophatKernelSizeSpin_->value();
-    filt_config.has_O1_morpho = perreaultRadio_->isChecked();
+    filt_config.openingEnabled = openGroupbox_->isChecked();
+    filt_config.openingKernelSize = openKernelSizeSpin_->value();
+    filt_config.closingEnabled = closeGroupbox_->isChecked();
+    filt_config.closingKernelSize = closeKernelSizeSpin_->value();
+    filt_config.topHatEnabled = tophatGroupbox_->isChecked();
+    filt_config.useWhiteTopHat = whitetophatRadio_->isChecked();
+    filt_config.topHatKernelSize = tophatKernelSizeSpin_->value();
 
 #ifdef FLUVEL_DEBUG
     qDebug() << __FILE__ << ":" << __LINE__ << __func__
@@ -1021,53 +934,38 @@ void SettingsWindow::updateUIFromConfig()
 
     const auto& config_filter = committedConfig_.compute.processing;
 
-    processPage_->setChecked(config_filter.enabled);
-    gaussianNoiseGroupbox_->setChecked(config_filter.has_gaussian_noise);
-    gaussianNoiseStdSpin_->setValue(double(config_filter.std_noise));
-    impulsiveNoiseGroupbox_->setChecked(config_filter.has_salt_noise);
-    impulsiveNoisePercentSpin_->setValue(double(100.f * config_filter.proba_noise));
-    speckleNoiseGroupbox_->setChecked(config_filter.has_speckle_noise);
-    speckleNoiseStdSpin_->setValue(double(config_filter.std_speckle_noise));
+    processPage_->setChecked(config_filter.processingEnabled);
+    gaussianNoiseGroupbox_->setChecked(config_filter.gaussianNoiseEnabled);
+    gaussianNoiseStdSpin_->setValue(double(config_filter.noiseStdDev));
+    impulsiveNoiseGroupbox_->setChecked(config_filter.saltNoiseEnabled);
+    impulsiveNoisePercentSpin_->setValue(double(100.f * config_filter.saltNoiseProbability));
+    speckleNoiseGroupbox_->setChecked(config_filter.speckleNoiseEnabled);
+    speckleNoiseStdSpin_->setValue(double(config_filter.speckleNoiseStdDev));
 
-    medianGroupbox_->setChecked(config_filter.has_median_filt);
-    medianKernelSizeSpin_->setValue(config_filter.kernel_median_length);
+    medianGroupbox_->setChecked(config_filter.medianFilterEnabled);
+    medianKernelSizeSpin_->setValue(config_filter.medianKernelSize);
 
-    if (config_filter.has_O1_algo)
-    {
-        medianPerreaultRadio_->setChecked(true);
-        medianDirectRadio_->setChecked(false);
-    }
-    else
-    {
-        medianDirectRadio_->setChecked(true);
-        medianPerreaultRadio_->setChecked(false);
-    }
+    meanGroupbox_->setChecked(config_filter.meanFilterEnabled);
+    meanKernelSizeSpin_->setValue(config_filter.meanKernelSize);
 
-    meanGroupbox_->setChecked(config_filter.has_mean_filt);
-    meanKernelSizeSpin_->setValue(config_filter.kernel_mean_length);
-
-    gaussianGroupbox_->setChecked(config_filter.has_gaussian_filt);
-    gaussianKernelSizeSpin_->setValue(config_filter.kernel_gaussian_length);
-    gaussianSigmaSpin_->setValue(double(config_filter.sigma));
-
-    anisoGroupbox_->setChecked(config_filter.has_aniso_diff);
-    iterationFilterSpin_->setValue(config_filter.max_itera);
+    anisoGroupbox_->setChecked(config_filter.anisotropicDiffusionEnabled);
+    iterationFilterSpin_->setValue(config_filter.maxIterations);
     lambdaSpin_->setValue(config_filter.lambda);
     kappaSpin_->setValue(config_filter.kappa);
-    anisoExpConductionRadio_->setChecked(config_filter.aniso_option ==
+    anisoExpConductionRadio_->setChecked(config_filter.conductionFunction ==
                                          fluvel_ip::filter::ConductionFunction::Exponential);
-    anisoReciprocalConductionRadio_->setChecked(config_filter.aniso_option ==
+    anisoReciprocalConductionRadio_->setChecked(config_filter.conductionFunction ==
                                                 fluvel_ip::filter::ConductionFunction::Rational);
 
-    openGroupbox_->setChecked(config_filter.has_open_filt);
-    openKernelSizeSpin_->setValue(config_filter.kernel_open_length);
+    openGroupbox_->setChecked(config_filter.openingEnabled);
+    openKernelSizeSpin_->setValue(config_filter.openingKernelSize);
 
-    closeGroupbox_->setChecked(config_filter.has_close_filt);
-    closeKernelSizeSpin_->setValue(config_filter.kernel_close_length);
+    closeGroupbox_->setChecked(config_filter.closingEnabled);
+    closeKernelSizeSpin_->setValue(config_filter.closingKernelSize);
 
-    tophatGroupbox_->setChecked(config_filter.has_top_hat_filt);
+    tophatGroupbox_->setChecked(config_filter.topHatEnabled);
 
-    if (config_filter.is_white_top_hat)
+    if (config_filter.useWhiteTopHat)
     {
         whitetophatRadio_->setChecked(true);
     }
@@ -1075,16 +973,7 @@ void SettingsWindow::updateUIFromConfig()
     {
         blacktophatRadio_->setChecked(true);
     }
-    tophatKernelSizeSpin_->setValue(config_filter.kernel_tophat_length);
-
-    if (config_filter.has_O1_morpho)
-    {
-        perreaultRadio_->setChecked(true);
-    }
-    else
-    {
-        naiveRadio_->setChecked(true);
-    }
+    tophatKernelSizeSpin_->setValue(config_filter.topHatKernelSize);
 
     imageSettingsController_->revert();
 
@@ -1147,18 +1036,10 @@ void SettingsWindow::restoreDefaults()
     medianGroupbox_->setChecked(false);
     medianKernelSizeSpin_->setValue(5);
 
-    // has_O1_algo
-    medianPerreaultRadio_->setChecked(true);
-
     meanGroupbox_->setChecked(false);
     meanKernelSizeSpin_->setValue(5);
 
-    gaussianGroupbox_->setChecked(false);
-    gaussianKernelSizeSpin_->setValue(5);
-    gaussianSigmaSpin_->setValue(2.0);
-
     anisoGroupbox_->setChecked(false);
-    // AnisoDiff::FUNCTION1
     anisoExpConductionRadio_->setChecked(true);
     anisoReciprocalConductionRadio_->setChecked(false);
     iterationFilterSpin_->setValue(10);
@@ -1174,9 +1055,6 @@ void SettingsWindow::restoreDefaults()
     tophatGroupbox_->setChecked(false);
     whitetophatRadio_->setChecked(true);
     tophatKernelSizeSpin_->setValue(5);
-
-    // config.has_O1_morpho
-    perreaultRadio_->setChecked(true);
 
     ///////////////////////////////////
     //       Initialization          //

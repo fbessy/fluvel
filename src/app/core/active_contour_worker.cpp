@@ -41,7 +41,7 @@ void ActiveContourWorker::restart()
 
     const auto& fc = config_.processing;
 
-    const bool hasRandom = fc.has_gaussian_noise || fc.has_salt_noise || fc.has_speckle_noise;
+    const bool hasRandom = fc.gaussianNoiseEnabled || fc.saltNoiseEnabled || fc.speckleNoiseEnabled;
 
     if (processingDirty_ || hasRandom)
         applyProcessing();

@@ -30,67 +30,67 @@ void ImagePipeline::apply(const ImageView& input, const ProcessingParams& params
     ImageOwner* src = &bufferA_;
     ImageOwner* dst = &bufferB_;
 
-    if (!params.hasProcessing())
+    if (!params.hasActiveProcessing())
     {
         currentPtr_ = src;
         return;
     }
 
-    if (params.has_gaussian_noise)
+    if (params.gaussianNoiseEnabled)
     {
-        noise::gaussian(src->view(), *dst, params.std_noise);
+        noise::gaussian(src->view(), *dst, params.noiseStdDev);
         std::swap(src, dst);
     }
 
-    if (params.has_salt_noise)
+    if (params.saltNoiseEnabled)
     {
-        noise::impulsive(src->view(), *dst, params.proba_noise);
+        noise::impulsive(src->view(), *dst, params.saltNoiseProbability);
         std::swap(src, dst);
     }
 
-    if (params.has_speckle_noise)
+    if (params.speckleNoiseEnabled)
     {
-        noise::speckleGamma(src->view(), *dst, params.std_speckle_noise);
+        noise::speckleGamma(src->view(), *dst, params.speckleNoiseStdDev);
         std::swap(src, dst);
     }
 
-    if (params.has_mean_filt)
+    if (params.meanFilterEnabled)
     {
-        filter::mean(src->view(), *dst, params.kernel_mean_length / 2);
+        filter::mean(src->view(), *dst, params.meanKernelSize / 2);
         std::swap(src, dst);
     }
 
-    if (params.has_median_filt)
+    if (params.medianFilterEnabled)
     {
-        filter::median(src->view(), *dst, params.kernel_median_length / 2);
+        filter::median(src->view(), *dst, params.medianKernelSize / 2);
         std::swap(src, dst);
     }
 
-    if (params.has_aniso_diff)
+    if (params.anisotropicDiffusionEnabled)
     {
-        filter::anisotropicDiffusion(src->view(), *dst, params.max_itera, params.lambda,
-                                     params.kappa, params.aniso_option);
+        filter::anisotropicDiffusion(src->view(), *dst, params.maxIterations, params.lambda,
+                                     params.kappa, params.conductionFunction);
         std::swap(src, dst);
     }
 
-    if (params.has_open_filt)
+    if (params.openingEnabled)
     {
-        filter::morpho::opening(src->view(), *dst, params.kernel_open_length / 2);
+        filter::morpho::opening(src->view(), *dst, params.openingKernelSize / 2);
         std::swap(src, dst);
     }
 
-    if (params.has_close_filt)
+    if (params.closingEnabled)
     {
-        filter::morpho::closing(src->view(), *dst, params.kernel_close_length / 2);
+        filter::morpho::closing(src->view(), *dst, params.closingKernelSize / 2);
         std::swap(src, dst);
     }
 
-    if (params.has_top_hat_filt)
+    if (params.topHatEnabled)
     {
-        if (params.is_white_top_hat)
-            filter::morpho::topHat(src->view(), *dst, params.kernel_tophat_length / 2);
+        if (params.useWhiteTopHat)
+            filter::morpho::topHat(src->view(), *dst, params.topHatKernelSize / 2);
         else
-            filter::morpho::blackTopHat(src->view(), *dst, params.kernel_tophat_length / 2);
+            filter::morpho::blackTopHat(src->view(), *dst, params.topHatKernelSize / 2);
 
         std::swap(src, dst);
     }

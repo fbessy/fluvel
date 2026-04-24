@@ -10,70 +10,61 @@ namespace fluvel_ip
 
 struct ProcessingParams
 {
-    static constexpr bool kDefaultProcess = false;
+    static constexpr bool kDefaultDisabled = false;
 
     static constexpr float kDefaultStdNoise = 20.f;
     static constexpr float kDefaultSaltNoise = 0.05f;
     static constexpr float kDefaultSpeckleNoise = 0.16f;
 
-    static constexpr int kDefaultKernelLength = 5;
-    static constexpr float kDefaultGaussianSigma = 2.f;
+    static constexpr int kDefaultKernelSize = 5;
 
-    static constexpr bool kDefault01Algo = true;
-
-    static constexpr filter::ConductionFunction kDefaultAnisoOption =
+    static constexpr filter::ConductionFunction kDefaultConductionFunction =
         filter::ConductionFunction::Exponential;
-    static constexpr int kDefaultMaxItera = 10;
+    static constexpr int kDefaultMaxIterations = 10;
     static constexpr double kDefaultLambda = 1.0 / 7.0;
     static constexpr double kDefaultKappa = 30.0;
 
     static constexpr bool kDefaultWhiteTopHat = true;
 
-    bool enabled = false;
+    bool processingEnabled = kDefaultDisabled;
 
-    bool has_gaussian_noise = kDefaultProcess;
-    float std_noise = kDefaultStdNoise;
+    bool gaussianNoiseEnabled = kDefaultDisabled;
+    float noiseStdDev = kDefaultStdNoise;
 
-    bool has_salt_noise = kDefaultProcess;
-    float proba_noise = kDefaultSaltNoise;
+    bool saltNoiseEnabled = kDefaultDisabled;
+    float saltNoiseProbability = kDefaultSaltNoise;
 
-    bool has_speckle_noise = kDefaultProcess;
-    float std_speckle_noise = kDefaultSpeckleNoise;
+    bool speckleNoiseEnabled = kDefaultDisabled;
+    float speckleNoiseStdDev = kDefaultSpeckleNoise;
 
-    bool has_median_filt = kDefaultProcess;
-    int kernel_median_length = kDefaultKernelLength;
-    bool has_O1_algo = kDefault01Algo;
+    bool medianFilterEnabled = kDefaultDisabled;
+    int medianKernelSize = kDefaultKernelSize;
 
-    bool has_mean_filt = kDefaultProcess;
-    int kernel_mean_length = kDefaultKernelLength;
+    bool meanFilterEnabled = kDefaultDisabled;
+    int meanKernelSize = kDefaultKernelSize;
 
-    bool has_gaussian_filt = kDefaultProcess;
-    int kernel_gaussian_length = kDefaultKernelLength;
-    float sigma = kDefaultGaussianSigma;
-
-    bool has_aniso_diff = kDefaultProcess;
-    filter::ConductionFunction aniso_option = kDefaultAnisoOption;
-    int max_itera = kDefaultMaxItera;
+    bool anisotropicDiffusionEnabled = kDefaultDisabled;
+    filter::ConductionFunction conductionFunction = kDefaultConductionFunction;
+    int maxIterations = kDefaultMaxIterations;
     double lambda = kDefaultLambda;
     double kappa = kDefaultKappa;
 
-    bool has_open_filt = kDefaultProcess;
-    int kernel_open_length = kDefaultKernelLength;
+    bool openingEnabled = kDefaultDisabled;
+    int openingKernelSize = kDefaultKernelSize;
 
-    bool has_close_filt = kDefaultProcess;
-    int kernel_close_length = kDefaultKernelLength;
+    bool closingEnabled = kDefaultDisabled;
+    int closingKernelSize = kDefaultKernelSize;
 
-    bool has_top_hat_filt = kDefaultProcess;
-    bool is_white_top_hat = kDefaultWhiteTopHat;
-    int kernel_tophat_length = kDefaultKernelLength;
+    bool topHatEnabled = kDefaultDisabled;
+    bool useWhiteTopHat = kDefaultWhiteTopHat;
+    int topHatKernelSize = kDefaultKernelSize;
 
-    bool has_O1_morpho = kDefault01Algo;
-
-    bool hasProcessing() const
+    bool hasActiveProcessing() const noexcept
     {
-        return enabled && (has_gaussian_noise || has_salt_noise || has_speckle_noise ||
-                           has_median_filt || has_mean_filt || has_gaussian_filt ||
-                           has_aniso_diff || has_open_filt || has_close_filt || has_top_hat_filt);
+        return processingEnabled &&
+               (gaussianNoiseEnabled || saltNoiseEnabled || speckleNoiseEnabled ||
+                medianFilterEnabled || meanFilterEnabled || anisotropicDiffusionEnabled ||
+                openingEnabled || closingEnabled || topHatEnabled);
     }
 };
 

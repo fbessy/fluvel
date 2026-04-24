@@ -122,15 +122,9 @@ private:
 
     QGroupBox* medianGroupbox_ = nullptr;
     KernelSizeSpinBox* medianKernelSizeSpin_ = nullptr;
-    QRadioButton* medianDirectRadio_ = nullptr;
-    QRadioButton* medianPerreaultRadio_ = nullptr;
 
     QGroupBox* meanGroupbox_ = nullptr;
     KernelSizeSpinBox* meanKernelSizeSpin_ = nullptr;
-
-    QGroupBox* gaussianGroupbox_ = nullptr;
-    KernelSizeSpinBox* gaussianKernelSizeSpin_ = nullptr;
-    QDoubleSpinBox* gaussianSigmaSpin_ = nullptr;
 
     QGroupBox* anisoGroupbox_ = nullptr;
     QRadioButton* anisoExpConductionRadio_ = nullptr;
@@ -149,10 +143,6 @@ private:
     QRadioButton* whitetophatRadio_ = nullptr;
     QRadioButton* blacktophatRadio_ = nullptr;
     KernelSizeSpinBox* tophatKernelSizeSpin_ = nullptr;
-
-    QGroupBox* algoGroupbox_ = nullptr;
-    QRadioButton* naiveRadio_ = nullptr;
-    QRadioButton* perreaultRadio_ = nullptr;
 
     QLabel* timeFilt_ = nullptr;
 

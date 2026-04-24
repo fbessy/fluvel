@@ -131,59 +131,55 @@ void ApplicationSettings::saveImageSessionSettings()
 
     saveDownscale(Session::Image, imageSettings_.compute.downscale);
 
-    settings.setValue("preprocess/enabled", imageSettings_.compute.processing.enabled);
+    settings.setValue("preprocess/processing_enabled",
+                      imageSettings_.compute.processing.processingEnabled);
 
-    settings.setValue("preprocess/has_gaussian_noise",
-                      imageSettings_.compute.processing.has_gaussian_noise);
-    settings.setValue("preprocess/std_noise", imageSettings_.compute.processing.std_noise);
-    settings.setValue("preprocess/has_salt_noise",
-                      imageSettings_.compute.processing.has_salt_noise);
-    settings.setValue("preprocess/proba_noise", imageSettings_.compute.processing.proba_noise);
-    settings.setValue("preprocess/has_speckle_noise",
-                      imageSettings_.compute.processing.has_speckle_noise);
-    settings.setValue("preprocess/std_speckle_noise",
-                      imageSettings_.compute.processing.std_speckle_noise);
+    settings.setValue("preprocess/gaussian_noise_enabled",
+                      imageSettings_.compute.processing.gaussianNoiseEnabled);
+    settings.setValue("preprocess/noise_std_dev", imageSettings_.compute.processing.noiseStdDev);
+    settings.setValue("preprocess/salt_noise_enabled",
+                      imageSettings_.compute.processing.saltNoiseEnabled);
+    settings.setValue("preprocess/salt_noise_probability",
+                      imageSettings_.compute.processing.saltNoiseProbability);
+    settings.setValue("preprocess/speckle_noise_enabled",
+                      imageSettings_.compute.processing.speckleNoiseEnabled);
+    settings.setValue("preprocess/speckle_noise_std_dev",
+                      imageSettings_.compute.processing.speckleNoiseStdDev);
 
-    settings.setValue("preprocess/has_median_filt",
-                      imageSettings_.compute.processing.has_median_filt);
-    settings.setValue("preprocess/kernel_median_length",
-                      imageSettings_.compute.processing.kernel_median_length);
+    settings.setValue("preprocess/median_filter_enabled",
+                      imageSettings_.compute.processing.medianFilterEnabled);
+    settings.setValue("preprocess/median_kernel_size",
+                      imageSettings_.compute.processing.medianKernelSize);
 
-    settings.setValue("preprocess/has_O1_algo", imageSettings_.compute.processing.has_O1_algo);
-    settings.setValue("preprocess/has_mean_filt", imageSettings_.compute.processing.has_mean_filt);
-    settings.setValue("preprocess/kernel_mean_length",
-                      imageSettings_.compute.processing.kernel_mean_length);
-    settings.setValue("preprocess/has_gaussian_filt",
-                      imageSettings_.compute.processing.has_gaussian_filt);
-    settings.setValue("preprocess/kernel_gaussian_length",
-                      imageSettings_.compute.processing.kernel_gaussian_length);
-    settings.setValue("preprocess/sigma", imageSettings_.compute.processing.sigma);
+    settings.setValue("preprocess/mean_filter_enabled",
+                      imageSettings_.compute.processing.meanFilterEnabled);
+    settings.setValue("preprocess/mean_kernel_size",
+                      imageSettings_.compute.processing.meanKernelSize);
 
-    settings.setValue("preprocess/has_aniso_diff",
-                      imageSettings_.compute.processing.has_aniso_diff);
-    settings.setValue("preprocess/aniso_option",
-                      static_cast<int>(imageSettings_.compute.processing.aniso_option));
-    settings.setValue("preprocess/max_itera", imageSettings_.compute.processing.max_itera);
+    settings.setValue("preprocess/anisotropic_diffusion_enabled",
+                      imageSettings_.compute.processing.anisotropicDiffusionEnabled);
+    settings.setValue("preprocess/conduction_function",
+                      static_cast<int>(imageSettings_.compute.processing.conductionFunction));
+    settings.setValue("preprocess/max_iterations", imageSettings_.compute.processing.maxIterations);
     settings.setValue("preprocess/lambda", imageSettings_.compute.processing.lambda);
     settings.setValue("preprocess/kappa", imageSettings_.compute.processing.kappa);
 
-    settings.setValue("preprocess/has_open_filt", imageSettings_.compute.processing.has_open_filt);
-    settings.setValue("preprocess/kernel_open_length",
-                      imageSettings_.compute.processing.kernel_open_length);
+    settings.setValue("preprocess/opening_enabled",
+                      imageSettings_.compute.processing.openingEnabled);
+    settings.setValue("preprocess/opening_kernel_size",
+                      imageSettings_.compute.processing.openingKernelSize);
 
-    settings.setValue("preprocess/has_close_filt",
-                      imageSettings_.compute.processing.has_close_filt);
-    settings.setValue("preprocess/kernel_close_length",
-                      imageSettings_.compute.processing.kernel_close_length);
+    settings.setValue("preprocess/closing_enabled",
+                      imageSettings_.compute.processing.closingEnabled);
+    settings.setValue("preprocess/closing_kernel_size",
+                      imageSettings_.compute.processing.closingKernelSize);
 
-    settings.setValue("preprocess/has_top_hat_filt",
-                      imageSettings_.compute.processing.has_top_hat_filt);
-    settings.setValue("preprocess/is_white_top_hat",
-                      imageSettings_.compute.processing.is_white_top_hat);
-    settings.setValue("preprocess/kernel_tophat_length",
-                      imageSettings_.compute.processing.kernel_tophat_length);
-
-    settings.setValue("preprocess/has_O1_morpho", imageSettings_.compute.processing.has_O1_morpho);
+    settings.setValue("preprocess/top_hat_enabled",
+                      imageSettings_.compute.processing.topHatEnabled);
+    settings.setValue("preprocess/use_white_top_hat",
+                      imageSettings_.compute.processing.useWhiteTopHat);
+    settings.setValue("preprocess/top_hat_kernel_size",
+                      imageSettings_.compute.processing.topHatKernelSize);
 
     // display
 
@@ -247,11 +243,11 @@ void ApplicationSettings::saveAlgo(Session session, const ActiveContourConfig& a
 
     settings.setValue("algo/connectivity", fluvel_ip::to_string(algoConfig.connectivity));
 
-    settings.setValue("algo/Na", algoConfig.contourParams.Na);
+    settings.setValue("algo/cycle1_iterations", algoConfig.contourParams.Na);
 
-    settings.setValue("algo/smoothing/enabled", algoConfig.contourParams.cycle2Enabled);
+    settings.setValue("algo/cycle2_smoothing_enabled", algoConfig.contourParams.cycle2Enabled);
 
-    settings.setValue("algo/Ns", algoConfig.contourParams.Ns);
+    settings.setValue("algo/cycle2_iterations", algoConfig.contourParams.Ns);
 
     settings.setValue("algo/disk_radius", algoConfig.contourParams.diskRadius);
 
@@ -327,104 +323,95 @@ void ApplicationSettings::loadImageSessionSettings()
 
     auto& fc = imageSettings_.compute.processing;
 
-    fc.enabled = settings.value("preprocess/enabled", false).toBool();
+    fc.processingEnabled = settings.value("preprocess/processing_enabled", false).toBool();
 
-    fc.has_gaussian_noise =
+    fc.gaussianNoiseEnabled = settings
+                                  .value("preprocess/gaussian_noise_enabled",
+                                         fluvel_ip::ProcessingParams::kDefaultDisabled)
+                                  .toBool();
+    fc.noiseStdDev =
+        settings.value("preprocess/noise_std_dev", fluvel_ip::ProcessingParams::kDefaultStdNoise)
+            .toFloat();
+    fc.saltNoiseEnabled =
         settings
-            .value("preprocess/has_gaussian_noise", fluvel_ip::ProcessingParams::kDefaultProcess)
+            .value("preprocess/salt_noise_enabled", fluvel_ip::ProcessingParams::kDefaultDisabled)
             .toBool();
-    fc.std_noise =
-        settings.value("preprocess/std_noise", fluvel_ip::ProcessingParams::kDefaultStdNoise)
-            .toFloat();
-    fc.has_salt_noise =
-        settings.value("preprocess/has_salt_noise", fluvel_ip::ProcessingParams::kDefaultProcess)
-            .toBool();
-    fc.proba_noise =
-        settings.value("preprocess/proba_noise", fluvel_ip::ProcessingParams::kDefaultSaltNoise)
-            .toFloat();
-    fc.has_speckle_noise =
-        settings.value("preprocess/has_speckle_noise", fluvel_ip::ProcessingParams::kDefaultProcess)
-            .toBool();
-    fc.std_speckle_noise = settings
-                               .value("preprocess/std_speckle_noise",
-                                      fluvel_ip::ProcessingParams::kDefaultSpeckleNoise)
-                               .toFloat();
+    fc.saltNoiseProbability = settings
+                                  .value("preprocess/salt_noise_probability",
+                                         fluvel_ip::ProcessingParams::kDefaultSaltNoise)
+                                  .toFloat();
+    fc.speckleNoiseEnabled = settings
+                                 .value("preprocess/speckle_noise_enabled",
+                                        fluvel_ip::ProcessingParams::kDefaultDisabled)
+                                 .toBool();
+    fc.speckleNoiseStdDev = settings
+                                .value("preprocess/speckle_noise_std_dev",
+                                       fluvel_ip::ProcessingParams::kDefaultSpeckleNoise)
+                                .toFloat();
 
-    fc.has_median_filt =
-        settings.value("preprocess/has_median_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
-            .toBool();
-    fc.kernel_median_length = settings
-                                  .value("preprocess/kernel_median_length",
-                                         fluvel_ip::ProcessingParams::kDefaultKernelLength)
-                                  .toInt();
-    fc.has_O1_algo =
-        settings.value("preprocess/has_O1_algo", fluvel_ip::ProcessingParams::kDefault01Algo)
-            .toBool();
-    fc.has_mean_filt =
-        settings.value("preprocess/has_mean_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
-            .toBool();
-    fc.kernel_mean_length = settings
-                                .value("preprocess/kernel_mean_length",
-                                       fluvel_ip::ProcessingParams::kDefaultKernelLength)
-                                .toInt();
-    fc.has_gaussian_filt =
-        settings.value("preprocess/has_gaussian_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
-            .toBool();
-    fc.kernel_gaussian_length = settings
-                                    .value("preprocess/kernel_gaussian_length",
-                                           fluvel_ip::ProcessingParams::kDefaultKernelLength)
-                                    .toInt();
-    fc.sigma =
-        settings.value("preprocess/sigma", fluvel_ip::ProcessingParams::kDefaultGaussianSigma)
-            .toFloat();
-
-    fc.has_aniso_diff =
-        settings.value("preprocess/has_aniso_diff", fluvel_ip::ProcessingParams::kDefaultProcess)
-            .toBool();
-
-    fc.aniso_option = static_cast<fluvel_ip::filter::ConductionFunction>(
+    fc.medianFilterEnabled = settings
+                                 .value("preprocess/median_filter_enabled",
+                                        fluvel_ip::ProcessingParams::kDefaultDisabled)
+                                 .toBool();
+    fc.medianKernelSize =
         settings
-            .value("preprocess/aniso_option",
-                   static_cast<int>(fluvel_ip::ProcessingParams::kDefaultAnisoOption))
+            .value("preprocess/median_kernel_size", fluvel_ip::ProcessingParams::kDefaultKernelSize)
+            .toInt();
+
+    fc.meanFilterEnabled =
+        settings
+            .value("preprocess/mean_filter_enabled", fluvel_ip::ProcessingParams::kDefaultDisabled)
+            .toBool();
+    fc.meanKernelSize =
+        settings
+            .value("preprocess/mean_kernel_size", fluvel_ip::ProcessingParams::kDefaultKernelSize)
+            .toInt();
+
+    fc.anisotropicDiffusionEnabled = settings
+                                         .value("preprocess/anisotropic_diffusion_enabled",
+                                                fluvel_ip::ProcessingParams::kDefaultDisabled)
+                                         .toBool();
+
+    fc.conductionFunction = static_cast<fluvel_ip::filter::ConductionFunction>(
+        settings
+            .value("preprocess/conduction_function",
+                   static_cast<int>(fluvel_ip::ProcessingParams::kDefaultConductionFunction))
             .toInt());
 
-    fc.max_itera =
-        settings.value("preprocess/max_itera", fluvel_ip::ProcessingParams::kDefaultMaxItera)
+    fc.maxIterations =
+        settings
+            .value("preprocess/max_iterations", fluvel_ip::ProcessingParams::kDefaultMaxIterations)
             .toInt();
     fc.lambda =
         settings.value("preprocess/lambda", fluvel_ip::ProcessingParams::kDefaultLambda).toDouble();
     fc.kappa =
         settings.value("preprocess/kappa", fluvel_ip::ProcessingParams::kDefaultKappa).toDouble();
 
-    fc.has_open_filt =
-        settings.value("preprocess/has_open_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
+    fc.openingEnabled =
+        settings.value("preprocess/opening_enabled", fluvel_ip::ProcessingParams::kDefaultDisabled)
             .toBool();
-    fc.kernel_open_length = settings
-                                .value("preprocess/kernel_open_length",
-                                       fluvel_ip::ProcessingParams::kDefaultKernelLength)
-                                .toInt();
-    fc.has_close_filt =
-        settings.value("preprocess/has_close_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
+    fc.openingKernelSize = settings
+                               .value("preprocess/opening_kernel_size",
+                                      fluvel_ip::ProcessingParams::kDefaultKernelSize)
+                               .toInt();
+    fc.closingEnabled =
+        settings.value("preprocess/closing_enabled", fluvel_ip::ProcessingParams::kDefaultDisabled)
             .toBool();
-    fc.kernel_close_length = settings
-                                 .value("preprocess/kernel_close_length",
-                                        fluvel_ip::ProcessingParams::kDefaultKernelLength)
-                                 .toInt();
-    fc.has_top_hat_filt =
-        settings.value("preprocess/has_top_hat_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
+    fc.closingKernelSize = settings
+                               .value("preprocess/closing_kernel_size",
+                                      fluvel_ip::ProcessingParams::kDefaultKernelSize)
+                               .toInt();
+    fc.topHatEnabled =
+        settings.value("preprocess/top_hat_enabled", fluvel_ip::ProcessingParams::kDefaultDisabled)
             .toBool();
-    fc.is_white_top_hat =
+    fc.useWhiteTopHat =
         settings
-            .value("preprocess/is_white_top_hat", fluvel_ip::ProcessingParams::kDefaultWhiteTopHat)
+            .value("preprocess/use_white_top_hat", fluvel_ip::ProcessingParams::kDefaultWhiteTopHat)
             .toBool();
-    fc.kernel_tophat_length = settings
-                                  .value("preprocess/kernel_tophat_length",
-                                         fluvel_ip::ProcessingParams::kDefaultKernelLength)
-                                  .toInt();
-
-    fc.has_O1_morpho =
-        settings.value("preprocess/has_O1_morpho", fluvel_ip::ProcessingParams::kDefault01Algo)
-            .toBool();
+    fc.topHatKernelSize = settings
+                              .value("preprocess/top_hat_kernel_size",
+                                     fluvel_ip::ProcessingParams::kDefaultKernelSize)
+                              .toInt();
 
     // display
     loadDisplay(Session::Image, imageSettings_.display);
@@ -468,12 +455,16 @@ void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoCon
     algoConfig.connectivity = fluvel_ip::connectivity_from_string(s.toStdString());
 
     algoConfig.contourParams.Na =
-        settings.value("algo/Na", fluvel_ip::ActiveContourParams::kDefaultNa).toInt();
+        settings.value("algo/cycle1_iterations", fluvel_ip::ActiveContourParams::kDefaultNa)
+            .toInt();
     algoConfig.contourParams.cycle2Enabled =
-        settings.value("algo/smoothing/enabled", fluvel_ip::ActiveContourParams::kDefaultIsCycle2)
+        settings
+            .value("algo/cycle2_smoothing_enabled",
+                   fluvel_ip::ActiveContourParams::kDefaultIsCycle2)
             .toBool();
     algoConfig.contourParams.Ns =
-        settings.value("algo/Ns", fluvel_ip::ActiveContourParams::kDefaultNs).toInt();
+        settings.value("algo/cycle2_iterations", fluvel_ip::ActiveContourParams::kDefaultNs)
+            .toInt();
     algoConfig.contourParams.diskRadius =
         settings.value("algo/disk_radius", fluvel_ip::ActiveContourParams::kDefaultDiskRadius)
             .toInt();
