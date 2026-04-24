@@ -239,7 +239,7 @@ private:
 
     //! Check an internal condition, based on the contour state rather than image data,
     //! to stop the algorithm if the nominal convergence condition is not reached.
-    void check_hausdorff_stopping_condition();
+    void checkHausdorffStoppingCondition();
 
     //! Computes the shapes intersection between #ed.l_out_shape and #ed.previousShape
     //! to speed up the hausdorff distance computation.

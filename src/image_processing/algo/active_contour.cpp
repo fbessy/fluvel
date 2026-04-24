@@ -398,7 +398,7 @@ void ActiveContour::updateStateCycle2()
         else if (state_ == PhaseState::Cycle2 &&
                  params_.failureMode == FailureHandlingMode::StopOnFailure)
         {
-            check_hausdorff_stopping_condition();
+            checkHausdorffStoppingCondition();
         }
 
         if (!isStopped())
@@ -409,7 +409,7 @@ void ActiveContour::updateStateCycle2()
     }
 }
 
-void ActiveContour::check_hausdorff_stopping_condition()
+void ActiveContour::checkHausdorffStoppingCondition()
 {
     assert(state_ == PhaseState::Cycle2 &&
            params_.failureMode == FailureHandlingMode::StopOnFailure);
@@ -433,16 +433,16 @@ void ActiveContour::check_hausdorff_stopping_condition()
 
         calculateShapesIntersection();
 
-        HausdorffDistance hd(ed_.l_out_shape, ed_.previousShape, ed_.intersection);
+        HausdorffDistance hd(ed_.l_out_shape, ed_.previousShape, &ed_.intersection);
 
         const float sizeFactor = 100.f / diagonal;
         ed_.hausdorffQuantile = sizeFactor * hd.hausdorffQuantile(80);
-        ed_.relativeCentroidDistance = sizeFactor * hd.get_centroids_distance();
-        const float delta_quantile = ed_.previousQuantile - ed_.hausdorffQuantile;
+        ed_.relativeCentroidDistance = sizeFactor * hd.centroidsDistance();
+        const float deltaQuantile = ed_.previousQuantile - ed_.hausdorffQuantile;
 
         if ((ed_.relativeCentroidDistance < 1.f && ed_.hausdorffQuantile < 1.f) ||
             (ed_.relativeCentroidDistance < 1.f && ed_.hausdorffQuantile < 2.f &&
-             delta_quantile < 0.f))
+             deltaQuantile < 0.f))
         {
             ed_.stoppingStatus = StoppingStatus::Hausdorff;
             stop();

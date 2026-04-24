@@ -4,6 +4,7 @@
 #pragma once
 
 #include "analysis_widget.hpp"
+#include "hausdorff_distance.hpp"
 #include "point_containers.hpp"
 
 #include <QDialog>
@@ -13,11 +14,6 @@ class QCloseEvent;
 class QPushButton;
 class QLabel;
 class QSpinBox;
-
-namespace fluvel_ip
-{
-class HausdorffDistance;
-}
 
 namespace fluvel_app
 {
@@ -59,7 +55,7 @@ private:
     QLabel* centroidsRatio_Label_ = nullptr;
     QLabel* timeLabel_ = nullptr;
 
-    fluvel_ip::HausdorffDistance* hd_ = nullptr;
+    std::unique_ptr<fluvel_ip::HausdorffDistance> hd_;
     float factor_{0.f};
 };
 

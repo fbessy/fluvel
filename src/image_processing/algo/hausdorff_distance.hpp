@@ -15,22 +15,23 @@ class HausdorffDistance
 {
 public:
     //! Constructor.
-    HausdorffDistance(Shape& shape_a1, Shape& shape_b1, const PointSet& intersection1 = PointSet());
+    HausdorffDistance(const Shape& shapeA, const Shape& shapeB,
+                      const PointSet* intersectionAB = nullptr);
 
     //! Gets the hausdorff distance between #shape_a and #shape_b.
-    float get_distance() const;
+    float distance() const;
 
     //! Gets the modified hausdorff distance between #shape_a and #shape_b.
     //! Note : the result of the modified hausdorff distance is not exact (and higher than the
     //! exact value) if the optimization EARLY_BREAKING is applied.
-    float get_modified() const;
+    float modifiedDistance() const;
 
     //! Gets the hausdorff quantile between #shape_a and #shape_b.
     float hausdorffQuantile(int hundredth);
 
     //! Gets the centroids distance, i.e. the gap between the #shape_a 's centroid and the
     //! #shape_b 's centroid.
-    float get_centroids_distance() const;
+    float centroidsDistance() const;
 
 private:
     //! Computes the hausdorff distance (and minimum distances in same time).
@@ -38,42 +39,42 @@ private:
 
     //! Computes the directed or relative hausdorff distance
     //! (and minimum distances in same time, in one direction).
-    void compute_directed_hd(const Shape& shape_1, const Shape& shape_2, float& directed_hd,
-                             std::vector<float>& directed_min_dists);
+    void computeDirectedHausdorff(const Shape& fromShape, const Shape& toShape,
+                                  float& directedDistance, std::vector<float>& minDistances);
 
     //! Mean or average of the directed/relative minimum distances.
-    static float calculate_mean(const std::vector<float>& min_dists);
+    static float calculateMean(const std::vector<float>& minDists);
 
     //! Gets the directed/relative minimum Hausdforff quantile.
-    static float hausdorffQuantile(const std::vector<float>& min_dists, int hundredth);
+    static float hausdorffQuantile(const std::vector<float>& minDists, int hundredth);
 
     //! Shape a defined by its points offsets.
-    Shape& shape_a_;
+    Shape shapeA_;
 
     //! Shape b defined by its points offsets.
-    Shape& shape_b_;
+    Shape shapeB_;
 
-    //! Optional intersection with common points between #shape_a and #shape_b.
-    const PointSet& intersection_a_b_;
+    //! Optionnal intersection (points in common between A and B).
+    const PointSet* intersectionAB_{nullptr};
 
     //! Directed or relative hausdorff distance from #shape_a (outer loop) to #shape_b (inner
     //! loop).
-    float hd_a_to_b_{0.f};
+    float distanceFromAToB_{0.f};
 
     //! Directed or relative hausdorff distance from #shape_b (outer loop) to #shape_a (inner
     //! loop).
-    float hd_b_to_a_{0.f};
+    float distanceFromBToA_{0.f};
 
     //! Minimum distances computed in the direction from #shape_a (outer loop) to #shape_b
     //! (inner loop).
-    std::vector<float> min_dists_a_to_b_;
+    std::vector<float> minDistancesFromAToB_;
 
     //! Minimum distances computed in the direction from #shape_b (outer loop) to #shape_a
     //! (inner loop).
-    std::vector<float> min_dists_b_to_a_;
+    std::vector<float> minDistancesFromBToA_;
 
-    //! Boolean to know if min_dists are already sorted.
-    bool is_sorted_{false};
+    //! Boolean to know if minDists are already sorted.
+    bool isSorted_{false};
 };
 
 } // namespace fluvel_ip

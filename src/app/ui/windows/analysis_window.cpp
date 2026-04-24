@@ -146,48 +146,38 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
 void AnalysisWindow::computeHd()
 {
-    if (hd_ != nullptr)
-    {
-        delete hd_;
-        hd_ = nullptr;
-    }
+    const std::clock_t startTime = std::clock();
 
-    float elapsed = std::numeric_limits<float>().max();
+    hd_ = std::make_unique<fluvel_ip::HausdorffDistance>(widget1_->shape(), widget2_->shape(),
+                                                         &intersection_);
 
-    if (hd_ == nullptr)
-    {
-        std::clock_t start_time = std::clock();
+    const float elapsed = float(std::clock() - startTime) / float(CLOCKS_PER_SEC);
 
-        hd_ = new fluvel_ip::HausdorffDistance(widget1_->shape(), widget2_->shape(), intersection_);
-
-        elapsed = float(std::clock() - start_time) / float(CLOCKS_PER_SEC);
-    }
-
-    float hausdorff_dist = hd_->get_distance();
-    float hausdorffQuantile = hd_->hausdorffQuantile(hundredthSp_->value());
-    float centr_gap = hd_->get_centroids_distance();
+    const float hausdorffDist = hd_->distance();
+    const float hausdorffQuantile = hd_->hausdorffQuantile(hundredthSp_->value());
+    const float centroidsGap = hd_->centroidsDistance();
 
     factor_ = 100.f / fluvel_ip::Shape::gridDiagonal(
                           std::max(widget1_->imageWidth(), widget2_->imageWidth()),
                           std::max(widget1_->imageHeight(), widget2_->imageHeight()));
 
-    float hd_ratio = factor_ * hausdorff_dist;
-    float quantile_ratio = factor_ * hausdorffQuantile;
-    float gap_ratio = factor_ * centr_gap;
+    const float hdRatio = factor_ * hausdorffDist;
+    const float quantileRatio = factor_ * hausdorffQuantile;
+    const float gapRatio = factor_ * centroidsGap;
 
-    hausdorffLabel_->setText(tr("Hausdorff distance = ") + QString::number(hausdorff_dist) +
-                              (tr(" pixels")));
-    hausdorffRatioLabel_->setText(tr("Hausdorff ratio = ") + QString::number(hd_ratio) + (" %"));
+    hausdorffLabel_->setText(tr("Hausdorff distance = ") + QString::number(hausdorffDist) +
+                             (tr(" pixels")));
+    hausdorffRatioLabel_->setText(tr("Hausdorff ratio = ") + QString::number(hdRatio) + (" %"));
 
     quantileLabel_->setText(tr("Hausdorff quantile = ") + QString::number(hausdorffQuantile) +
-                             (tr(" pixels")));
+                            (tr(" pixels")));
     quantileRatioLabel_->setText(tr("Hausdorff quantile ratio = ") +
-                                   QString::number(quantile_ratio) + (" %"));
+                                 QString::number(quantileRatio) + (" %"));
 
     centroidsDistLabel_->setText(tr("distance between centroids = ") +
-                                   QString::number(centr_gap) + (tr(" pixels")));
-    centroidsRatio_Label_->setText(tr("ratio between centroids = ") + QString::number(gap_ratio) +
-                                    (" %"));
+                                 QString::number(centroidsGap) + (tr(" pixels")));
+    centroidsRatio_Label_->setText(tr("ratio between centroids = ") + QString::number(gapRatio) +
+                                   (" %"));
 
     timeLabel_->setText(tr("time = ") + QString::number(elapsed, 'g', 4) + (" s"));
 

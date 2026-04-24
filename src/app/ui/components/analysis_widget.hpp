@@ -4,6 +4,7 @@
 #pragma once
 
 #include "color.hpp"
+#include "color_selector_widget.hpp"
 #include "image_viewer_listener.hpp"
 #include "shape.hpp"
 
@@ -11,7 +12,6 @@
 #include <QWidget>
 
 class QSpinBox;
-class QComboBox;
 class QLabel;
 class QPushButton;
 
@@ -36,11 +36,11 @@ public:
         return imageHeight_;
     }
 
-    fluvel_ip::Shape& shape()
+    const fluvel_ip::Shape& shape() const
     {
         return shape_;
     }
-    const QImage image() const
+    const QImage& image() const
     {
         return image_;
     }
@@ -60,7 +60,7 @@ private:
     ImageViewerWidget* imageViewer_;
     QPushButton* openButton_;
 
-    QComboBox* colorList_;
+    ColorSelectorWidget* colorSelector_;
     fluvel_ip::Rgb_uc selected_;
     QSpinBox* noiseSp_;
 
@@ -82,10 +82,10 @@ private slots:
 
     void openFilename();
     void openImage();
-    void getListColor();
-    void refreshRgb(int);
+    void refreshRgb();
     void refreshNoiseImage(int noise_percent);
     void onColorPicked(const QColor& color, const QPoint& /*imagePos*/) override;
+    void onColorSelected(const QColor& c);
 
 signals:
 

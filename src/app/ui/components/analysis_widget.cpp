@@ -11,8 +11,6 @@
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 
-#include <QColorDialog>
-#include <QComboBox>
 #include <QDir>
 #include <QFileDialog>
 #include <QFormLayout>
@@ -85,27 +83,6 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     //////////////////////////////////////////////////////////////////////////////////
 
-    colorList_ = new QComboBox;
-
-    QPixmap pm(12, 12);
-
-    pm.fill(Qt::red);
-    colorList_->addItem(pm, tr("Red"));
-    pm.fill(Qt::green);
-    colorList_->addItem(pm, tr("Green"));
-    pm.fill(Qt::blue);
-    colorList_->addItem(pm, tr("Blue"));
-    pm.fill(Qt::cyan);
-    colorList_->addItem(pm, tr("Cyan"));
-    pm.fill(Qt::magenta);
-    colorList_->addItem(pm, tr("Magenta"));
-    pm.fill(Qt::yellow);
-    colorList_->addItem(pm, tr("Yellow"));
-    pm.fill(Qt::black);
-    colorList_->addItem(pm, tr("Black"));
-    pm.fill(Qt::white);
-    colorList_->addItem(pm, tr("White"));
-
     selected_.red = static_cast<unsigned char>(
         settings.value("Analysis/R" + QString::number(idThis_), 128).toInt());
     selected_.green = static_cast<unsigned char>(
@@ -113,22 +90,16 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     selected_.blue = static_cast<unsigned char>(
         settings.value("Analysis/B" + QString::number(idThis_), 255).toInt());
 
-    pm.fill(toQColor(selected_));
-    colorList_->addItem(pm, tr("Selected"));
-
-    colorList_->setCurrentIndex(
-        settings.value("Analysis/combo" + QString::number(idThis_), 0).toInt());
-
-    ///////////////////////////////////////
-
-    QPushButton* color_select = new QPushButton(tr("Select"));
+    QColor initialColor = toQColor(selected_);
+    colorSelector_ = new ColorSelectorWidget(this, initialColor);
 
     QFormLayout* form = new QFormLayout;
-    form->addRow(tr("List from :"), colorList_);
-    form->addRow(tr("<click on image> |"), color_select);
+    form->addRow(tr("Color :"), colorSelector_);
 
     QGroupBox* color_group = new QGroupBox(tr("Color") + " " + QString::number(idThis_));
     color_group->setLayout(form);
+
+    ///////////////////////////////////////
 
     noiseSp_ = new QSpinBox;
     noiseSp_->setSingleStep(1);
@@ -159,14 +130,10 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     nameFilters_.removeDuplicates();
 
-    imageViewer_->setListener(this);
-
     connect(openButton_, &QPushButton::clicked, this, &AnalysisWidget::openFilename);
 
-    connect(colorList_, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-            &AnalysisWidget::refreshRgb);
-
-    connect(color_select, &QPushButton::clicked, this, &AnalysisWidget::getListColor);
+    connect(colorSelector_, &ColorSelectorWidget::colorSelected, this,
+            &AnalysisWidget::onColorSelected);
 
     auto* analysisWindow = qobject_cast<AnalysisWindow*>(parentWidget());
     Q_ASSERT(analysisWindow);
@@ -175,6 +142,14 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     connect(noiseSp_, QOverload<int>::of(&QSpinBox::valueChanged), this,
             &AnalysisWidget::refreshNoiseImage);
+
+    refreshRgb();
+}
+
+void AnalysisWidget::onColorSelected(const QColor& c)
+{
+    selected_ = toRgb_uc(c);
+    refreshRgb();
 }
 
 void AnalysisWidget::openFilename()
@@ -201,7 +176,7 @@ void AnalysisWidget::openImage()
             return;
         }
 
-        refreshRgb(colorList_->currentIndex());
+        refreshRgb();
 
         QFileInfo fi(absoluteName_);
         QString name = fi.fileName();
@@ -212,13 +187,9 @@ void AnalysisWidget::openImage()
     }
 }
 
-void AnalysisWidget::refreshRgb(int color_list_index)
+void AnalysisWidget::refreshRgb()
 {
-    if (color_list_index == ComboBoxColorIndex::SELECTED)
-        rgb_ = selected_;
-    else
-        rgb_ = get_color(color_list_index);
-
+    rgb_ = selected_;
     refreshNoiseImage(noiseSp_->value());
 }
 
@@ -289,45 +260,12 @@ void AnalysisWidget::refreshNoiseImage(int noise_percent)
     }
 }
 
-void AnalysisWidget::onColorPicked(const QColor& color, const QPoint& /*imagePos*/)
+void AnalysisWidget::onColorPicked(const QColor& color, const QPoint&)
 {
     if (image_.isNull())
         return;
 
-    selected_ = toRgb_uc(color);
-
-    QPixmap pm(12, 12);
-    pm.fill(toQColor(selected_));
-    colorList_->setItemIcon(ComboBoxColorIndex::SELECTED, pm);
-    colorList_->setCurrentIndex(ComboBoxColorIndex::SELECTED);
-
-    refreshRgb(ComboBoxColorIndex::SELECTED);
-}
-
-void AnalysisWidget::getListColor()
-{
-    QColor color;
-    QString title_str;
-
-    if (idThis_ == 1)
-        title_str = tr("Select list 1 color");
-    else if (idThis_ == 2)
-        title_str = tr("Select list 2 color");
-
-    color = QColorDialog::getColor(Qt::white, this, title_str);
-
-    if (color.isValid())
-    {
-        selected_ = toRgb_uc(color);
-
-        QPixmap pm(12, 12);
-        pm.fill(color);
-        colorList_->setItemIcon(ComboBoxColorIndex::SELECTED, pm);
-
-        colorList_->setCurrentIndex(ComboBoxColorIndex::SELECTED);
-
-        refreshRgb(int(ComboBoxColorIndex::SELECTED));
-    }
+    colorSelector_->setSelectedColor(color);
 }
 
 void AnalysisWidget::saveSettings() const
@@ -336,7 +274,7 @@ void AnalysisWidget::saveSettings() const
 
     settings.setValue("history/last_directory", lastDirectoryUsed_);
 
-    settings.setValue("Analysis/combo" + QString::number(idThis_), colorList_->currentIndex());
+    // settings.setValue("Analysis/combo" + QString::number(idThis_), colorList_->currentIndex());
 
     settings.setValue("Analysis/R" + QString::number(idThis_), int(selected_.red));
     settings.setValue("Analysis/G" + QString::number(idThis_), int(selected_.green));

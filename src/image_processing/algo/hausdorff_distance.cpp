@@ -33,48 +33,48 @@ constexpr size_t kInitialArrayAllocSize = 10000u;
 //! the points (offsets) in common. It's an optional parameter. It can speed up
 //! the computation (proportionally of the intersection part) in case of the intersection is
 //! easily to compute in constant time ( complexity in 0(1) ), with an image or a matrix.
-HausdorffDistance::HausdorffDistance(Shape& shape_a1, Shape& shape_b1,
-                                     const PointSet& intersection1)
-    : shape_a_(shape_a1)
-    , shape_b_(shape_b1)
-    , intersection_a_b_(intersection1)
+HausdorffDistance::HausdorffDistance(const Shape& shapeA, const Shape& shapeB,
+                                     const PointSet* intersectionAB)
+    : shapeA_(shapeA)
+    , shapeB_(shapeB)
+    , intersectionAB_(intersectionAB)
 {
-    min_dists_a_to_b_.reserve(kInitialArrayAllocSize);
-    min_dists_b_to_a_.reserve(kInitialArrayAllocSize);
+    minDistancesFromAToB_.reserve(kInitialArrayAllocSize);
+    minDistancesFromBToA_.reserve(kInitialArrayAllocSize);
 
     compute();
 }
 
 void HausdorffDistance::compute()
 {
-    if (shape_a_.isValid() && shape_b_.isValid())
+    if (shapeA_.isValid() && shapeB_.isValid())
     {
 #if defined(RANDOM_SAMPLING) && !defined(NAIVE_ALGO)
-        shape_a_.shufflePoints();
-        shape_b_.shufflePoints();
+        shapeA_.shufflePoints();
+        shapeB_.shufflePoints();
 #endif
 
         // compute the directed or relative hausdorff distance in the both directions
-        compute_directed_hd(shape_a_, shape_b_, hd_a_to_b_, min_dists_a_to_b_);
+        computeDirectedHausdorff(shapeA_, shapeB_, distanceFromAToB_, minDistancesFromAToB_);
 
-        compute_directed_hd(shape_b_, shape_a_, hd_b_to_a_, min_dists_b_to_a_);
+        computeDirectedHausdorff(shapeB_, shapeA_, distanceFromBToA_, minDistancesFromBToA_);
     }
 }
 
-void HausdorffDistance::compute_directed_hd(const Shape& shape_1, const Shape& shape_2,
-                                            float& directed_hd,
-                                            std::vector<float>& directed_min_dists)
+void HausdorffDistance::computeDirectedHausdorff(const Shape& fromShape, const Shape& toShape,
+                                                 float& directedDistance,
+                                                 std::vector<float>& minDistances)
 {
-    Point2D_f relative_p1, relative_p2;
+    Point2D_f fromPointRel, toPointRel;
 
-    float dist, min_dist;
+    float dist, minDist;
 
     // initialization with a minimum value in order to maximize
     // the directed or relative hausdorff distance
-    directed_hd = 0.f;
+    directedDistance = 0.f;
 
     // outer loop
-    for (const auto& p1 : shape_1.points())
+    for (const auto& fromPoint : fromShape.points())
     {
         // intersection_a_b is optional and can be empty by default,
         // cf constructor documentation.
@@ -82,43 +82,43 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1, const Shape& s
         // due to the stl unordered set container.
 
 #if defined(INTERSECTION_EXCLUSION) && !defined(NAIVE_ALGO)
-        if (!intersection_a_b_.contains(p1))
+        if (intersectionAB_ && !intersectionAB_->contains(fromPoint))
         {
 #endif
-            relative_p1.x = float(p1.x) - shape_1.centroid().x;
-            relative_p1.y = float(p1.y) - shape_1.centroid().y;
+            fromPointRel.x = float(fromPoint.x) - fromShape.centroid().x;
+            fromPointRel.y = float(fromPoint.y) - fromShape.centroid().y;
 
             // initialization in order to minimize
-            min_dist = std::numeric_limits<float>::max();
+            minDist = std::numeric_limits<float>::max();
 
             // inner loop
-            for (const auto& p2 : shape_2.points())
+            for (const auto& toPoint : toShape.points())
             {
-                relative_p2.x = float(p2.x) - shape_2.centroid().x;
-                relative_p2.y = float(p2.y) - shape_2.centroid().y;
+                toPointRel.x = float(toPoint.x) - toShape.centroid().x;
+                toPointRel.y = float(toPoint.y) - toShape.centroid().y;
 
-                dist = math::euclideanDistance(relative_p1, relative_p2);
+                dist = math::euclideanDistance(fromPointRel, toPointRel);
 
-                // it minimizes min_dist
-                if (dist < min_dist)
+                // it minimizes minDist
+                if (dist < minDist)
                 {
-                    min_dist = dist;
+                    minDist = dist;
                 }
 
 #if defined(EARLY_BREAKING) && !defined(NAIVE_ALGO)
-                if (min_dist < directed_hd)
+                if (minDist < directedDistance)
                 {
                     break;
                 }
 #endif
             }
 
-            directed_min_dists.push_back(min_dist);
+            minDistances.push_back(minDist);
 
             // it maximizes the relative or directed hausdorff distance
-            if (min_dist > directed_hd)
+            if (minDist > directedDistance)
             {
-                directed_hd = min_dist;
+                directedDistance = minDist;
             }
 
 #if defined(INTERSECTION_EXCLUSION) && !defined(NAIVE_ALGO)
@@ -133,88 +133,62 @@ void HausdorffDistance::compute_directed_hd(const Shape& shape_1, const Shape& s
     // even if shapes are not empty.
     // It forces to be able to pick up one coherent value
     // instead of float max.
-    if (directed_min_dists.empty() && !shape_1.points().empty() && !shape_2.points().empty())
-    {
-        directed_min_dists.push_back(0.f);
-    }
+    if (minDistances.empty() && !fromShape.points().empty() && !toShape.points().empty())
+        minDistances.push_back(0.f);
 }
 
-float HausdorffDistance::get_distance() const
+float HausdorffDistance::distance() const
 {
-    return std::max(hd_a_to_b_, hd_b_to_a_);
+    return std::max(distanceFromAToB_, distanceFromBToA_);
 }
 
-float HausdorffDistance::get_modified() const
+float HausdorffDistance::modifiedDistance() const
 {
-    return std::max(calculate_mean(min_dists_a_to_b_), calculate_mean(min_dists_b_to_a_));
+    return std::max(calculateMean(minDistancesFromAToB_), calculateMean(minDistancesFromBToA_));
 }
 
 float HausdorffDistance::hausdorffQuantile(int hundredth)
 {
-    if (!is_sorted_)
+    if (!isSorted_)
     {
-        std::ranges::sort(min_dists_a_to_b_);
-        std::ranges::sort(min_dists_b_to_a_);
+        std::ranges::sort(minDistancesFromAToB_);
+        std::ranges::sort(minDistancesFromBToA_);
 
-        is_sorted_ = true;
+        isSorted_ = true;
     }
 
-    return std::max(hausdorffQuantile(min_dists_a_to_b_, hundredth),
-                    hausdorffQuantile(min_dists_b_to_a_, hundredth));
+    return std::max(hausdorffQuantile(minDistancesFromAToB_, hundredth),
+                    hausdorffQuantile(minDistancesFromBToA_, hundredth));
 }
 
-float HausdorffDistance::calculate_mean(const std::vector<float>& min_dists)
+float HausdorffDistance::calculateMean(const std::vector<float>& minDists)
 {
-    float mean = std::numeric_limits<float>::quiet_NaN();
+    if (minDists.empty())
+        return std::numeric_limits<float>::quiet_NaN();
 
-    float sum = std::accumulate(min_dists.cbegin(), min_dists.cend(), 0.f);
+    const float sum = std::accumulate(minDists.begin(), minDists.end(), 0.f);
 
-    if (min_dists.size() >= 1)
-    {
-        mean = (sum / float(min_dists.size()));
-    }
-
-    return mean;
+    return sum / static_cast<float>(minDists.size());
 }
 
-float HausdorffDistance::hausdorffQuantile(const std::vector<float>& min_dists, int hundredth)
+float HausdorffDistance::hausdorffQuantile(const std::vector<float>& minDists, int hundredth)
 {
-    float quantile = std::numeric_limits<float>::quiet_NaN();
-    int idx;
+    if (minDists.empty())
+        return std::numeric_limits<float>::quiet_NaN();
 
-    if (hundredth < 0)
-    {
-        // fist index
-        idx = 0;
-    }
-    else if (hundredth > 100)
-    {
-        // last index
-        idx = (min_dists.size() - 1);
-    }
-    else
-    {
-        idx = ((int(min_dists.size()) - 1) * hundredth / 100);
-    }
+    const int h = std::clamp(hundredth, 0, 100);
 
-    if (idx >= 0 && idx < int(min_dists.size()))
-    {
-        quantile = min_dists[idx];
-    }
+    const int idx = ((int(minDists.size()) - 1) * h) / 100;
 
-    return quantile;
+    return minDists[idx];
 }
 
-float HausdorffDistance::get_centroids_distance() const
+float HausdorffDistance::centroidsDistance() const
 {
-    float gap_dist = std::numeric_limits<float>::quiet_NaN();
+    if (!shapeA_.isValid() || !shapeB_.isValid())
+        return std::numeric_limits<float>::quiet_NaN();
 
-    if (shape_a_.isValid() && shape_b_.isValid())
-    {
-        gap_dist = math::euclideanDistance(shape_a_.centroid(), shape_b_.centroid());
-    }
-
-    return gap_dist;
+    return math::euclideanDistance(shapeA_.centroid(), shapeB_.centroid());
 }
 
 } // namespace fluvel_ip
