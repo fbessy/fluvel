@@ -25,7 +25,7 @@ ImageSettingsController::ImageSettingsController(const ImageSessionSettings& ses
 
     phiEditor_ = std::make_unique<PhiEditor>(sc.initialPhi);
 
-    phiViewModel_ = std::make_unique<PhiViewModel>(phiEditor_.get(), sc.algo.connectivity);
+    phiViewModel_ = std::make_unique<PhiViewModel>(phiEditor_.get(), sc.contourConfig.connectivity);
 
     connect(phiViewModel_.get(), &PhiViewModel::viewChanged, this,
             &ImageSettingsController::onViewChanged);
@@ -174,7 +174,7 @@ void ImageSettingsController::applyDownscale()
     if (input_.format() != QImage::Format_Grayscale8 && input_.format() != QImage::Format_RGB32)
         return;
 
-    if (editedDownscaleConfig_.hasDownscale)
+    if (editedDownscaleConfig_.downscaleEnabled)
     {
         const int df = editedDownscaleConfig_.downscaleFactor;
 

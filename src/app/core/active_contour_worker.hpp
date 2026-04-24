@@ -4,7 +4,7 @@
 #pragma once
 
 #include "active_contour.hpp"
-#include "common_settings.hpp"
+#include "application_settings_types.hpp"
 #include "contour_diagnostics.hpp"
 #include "elapsed_timer.hpp"
 

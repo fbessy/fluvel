@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "common_settings.hpp"
+#include "application_settings_types.hpp"
 
 #include <QDialog>
 

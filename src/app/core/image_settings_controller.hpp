@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "common_settings.hpp"
+#include "application_settings_types.hpp"
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"
 

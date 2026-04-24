@@ -4,7 +4,7 @@
 #pragma once
 
 #include "active_contour.hpp"
-#include "common_settings.hpp"
+#include "application_settings_types.hpp"
 #include "frame_data.hpp"
 #include "image_view.hpp"
 #include "mean_filter_3x3.hpp"

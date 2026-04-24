@@ -4,7 +4,7 @@
 #pragma once
 
 #include "active_contour_worker.hpp"
-#include "common_settings.hpp"
+#include "application_settings_types.hpp"
 
 #include <QImage>
 #include <QObject>

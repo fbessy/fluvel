@@ -13,7 +13,7 @@
 namespace fluvel_app
 {
 
-AlgoSettingsWidget::AlgoSettingsWidget(AlgoConfig& config, QWidget* parent)
+AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* parent)
     : QWidget(parent)
     , config_(config)
 {
@@ -165,20 +165,20 @@ void AlgoSettingsWidget::accept()
 {
     config_.connectivity = connectivity_cb_->currentData().value<fluvel_ip::Connectivity>();
 
-    config_.acConfig.Na = Na_spin_->value();
-    config_.acConfig.Ns = Ns_spin_->value();
-    config_.acConfig.hasCycle2 = internalspeed_groupbox_->isChecked();
-    config_.acConfig.diskRadius = disk_radius_spin_->value();
+    config_.contourParams.Na = Na_spin_->value();
+    config_.contourParams.Ns = Ns_spin_->value();
+    config_.contourParams.hasCycle2 = internalspeed_groupbox_->isChecked();
+    config_.contourParams.diskRadius = disk_radius_spin_->value();
 
-    config_.regionAcConfig.lambdaOut = lambda_out_spin_->value();
-    config_.regionAcConfig.lambdaIn = lambda_in_spin_->value();
+    config_.regionParams.lambdaOut = lambda_out_spin_->value();
+    config_.regionParams.lambdaIn = lambda_in_spin_->value();
 
-    config_.regionAcConfig.color_space =
+    config_.regionParams.color_space =
         color_space_cb_->currentData().value<fluvel_ip::ColorSpaceOption>();
 
-    config_.regionAcConfig.weights.c1 = alpha_spin_->value();
-    config_.regionAcConfig.weights.c2 = beta_spin_->value();
-    config_.regionAcConfig.weights.c3 = gamma_spin_->value();
+    config_.regionParams.weights.c1 = alpha_spin_->value();
+    config_.regionParams.weights.c2 = beta_spin_->value();
+    config_.regionParams.weights.c3 = gamma_spin_->value();
 }
 
 void AlgoSettingsWidget::reject()
@@ -187,21 +187,21 @@ void AlgoSettingsWidget::reject()
     if (index >= 0)
         connectivity_cb_->setCurrentIndex(index);
 
-    Na_spin_->setValue(config_.acConfig.Na);
-    Ns_spin_->setValue(config_.acConfig.Ns);
-    internalspeed_groupbox_->setChecked(config_.acConfig.hasCycle2);
-    disk_radius_spin_->setValue(config_.acConfig.diskRadius);
+    Na_spin_->setValue(config_.contourParams.Na);
+    Ns_spin_->setValue(config_.contourParams.Ns);
+    internalspeed_groupbox_->setChecked(config_.contourParams.hasCycle2);
+    disk_radius_spin_->setValue(config_.contourParams.diskRadius);
 
-    lambda_out_spin_->setValue(config_.regionAcConfig.lambdaOut);
-    lambda_in_spin_->setValue(config_.regionAcConfig.lambdaIn);
+    lambda_out_spin_->setValue(config_.regionParams.lambdaOut);
+    lambda_in_spin_->setValue(config_.regionParams.lambdaIn);
 
-    index = color_space_cb_->findData(QVariant::fromValue(config_.regionAcConfig.color_space));
+    index = color_space_cb_->findData(QVariant::fromValue(config_.regionParams.color_space));
     if (index >= 0)
         color_space_cb_->setCurrentIndex(index);
 
-    alpha_spin_->setValue(config_.regionAcConfig.weights.c1);
-    beta_spin_->setValue(config_.regionAcConfig.weights.c2);
-    gamma_spin_->setValue(config_.regionAcConfig.weights.c3);
+    alpha_spin_->setValue(config_.regionParams.weights.c1);
+    beta_spin_->setValue(config_.regionParams.weights.c2);
+    gamma_spin_->setValue(config_.regionParams.weights.c3);
 }
 
 } // namespace fluvel_app

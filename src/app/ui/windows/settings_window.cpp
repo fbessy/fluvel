@@ -122,7 +122,7 @@ SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& conf
 
 void SettingsWindow::setupUiAlgoTab()
 {
-    algoWidget_ = new AlgoSettingsWidget(committedConfig_.compute.algo, this);
+    algoWidget_ = new AlgoSettingsWidget(committedConfig_.compute.contourConfig, this);
 
     QVBoxLayout* algoLayout = new QVBoxLayout;
     algoLayout->addWidget(algoWidget_);
@@ -606,7 +606,7 @@ void SettingsWindow::setupConnections()
     connect(downscalePage_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedDownscaleConfig_.hasDownscale = checked;
+                editedDownscaleConfig_.downscaleEnabled = checked;
                 notifyConfigEdited();
 
                 onUiShapeChanged();
@@ -943,7 +943,7 @@ void SettingsWindow::accept()
 {
     auto& ds_config = committedConfig_.compute.downscale;
 
-    ds_config.hasDownscale = downscalePage_->isChecked();
+    ds_config.downscaleEnabled = downscalePage_->isChecked();
     ds_config.downscaleFactor = downscaleFactorCb_->currentData().toInt();
 
     auto& filt_config = committedConfig_.compute.processing;
@@ -1013,7 +1013,7 @@ void SettingsWindow::updateUIFromConfig()
 
     const auto& ds_config = committedConfig_.compute.downscale;
 
-    downscalePage_->setChecked(ds_config.hasDownscale);
+    downscalePage_->setChecked(ds_config.downscaleEnabled);
 
     int index = downscaleFactorCb_->findData(ds_config.downscaleFactor);
     if (index >= 0)

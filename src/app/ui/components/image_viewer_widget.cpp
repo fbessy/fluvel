@@ -2,8 +2,8 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "image_viewer_widget.hpp"
+#include "application_settings_types.hpp"
 #include "color_adapters.hpp"
-#include "common_settings.hpp"
 #include "drag_drop_behavior.hpp"
 #include "frame_clock.hpp"
 #include "image_viewer_interaction.hpp"
@@ -813,12 +813,12 @@ void ImageViewerWidget::upscaleItems()
 {
     assert(useEnhancedDisplayConfig_ && outerContour_ && innerContour_);
 
-    const bool has_ds = downscaleConfig_.hasDownscale;
+    const bool has_ds = downscaleConfig_.downscaleEnabled;
     const int df = downscaleConfig_.downscaleFactor;
 
     qreal factor = 1.0;
 
-    if (has_ds && displayConfig_.mode == ImageDisplayMode::Source)
+    if (has_ds && displayConfig_.displayMode == ImageDisplayMode::Source)
         factor = qreal(df);
 
     outerContour_->setScale(factor);
@@ -851,13 +851,13 @@ void ImageViewerWidget::updateContourColors()
 
     QColor col_lout, col_lin;
 
-    if (displayConfig_.l_out_displayed)
-        col_lout = toQColor(displayConfig_.l_out_color);
+    if (displayConfig_.outerContourVisible)
+        col_lout = toQColor(displayConfig_.outerContourColor);
     else
         col_lout = Qt::transparent;
 
-    if (displayConfig_.l_in_displayed)
-        col_lin = toQColor(displayConfig_.l_in_color);
+    if (displayConfig_.innerContourVisible)
+        col_lin = toQColor(displayConfig_.innerContourColor);
     else
         col_lin = Qt::transparent;
 
@@ -901,7 +901,7 @@ void ImageViewerWidget::updateTextOverlayVisibility()
     if (!infoOverlay_)
         return;
 
-    infoOverlay_->setVisible(displayConfig_.algorithm_overlay);
+    infoOverlay_->setVisible(displayConfig_.algorithmOverlayEnabled);
 }
 
 void ImageViewerWidget::applyDownscaleConfig(const DownscaleConfig& downscale)
@@ -933,12 +933,12 @@ void ImageViewerWidget::showPlaceholder(bool showEffect)
             setImage(qimage_utils::darkenImage(lastDisplayedImage_));
 
         if (outerContour_)
-            outerContour_->setColor(
-                qcolor_utils::desaturateAndDarken(toQColor(displayConfig_.l_out_color), 0.4, 0.6));
+            outerContour_->setColor(qcolor_utils::desaturateAndDarken(
+                toQColor(displayConfig_.outerContourColor), 0.4, 0.6));
 
         if (innerContour_)
-            innerContour_->setColor(
-                qcolor_utils::desaturateAndDarken(toQColor(displayConfig_.l_in_color), 0.4, 0.6));
+            innerContour_->setColor(qcolor_utils::desaturateAndDarken(
+                toQColor(displayConfig_.innerContourColor), 0.4, 0.6));
 
         blur_->setBlurRadius(6);
     }

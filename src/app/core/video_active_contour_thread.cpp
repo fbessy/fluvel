@@ -88,7 +88,7 @@ QImage VideoActiveContourThread::applyDownscale(const QImage& input,
     if (input.isNull())
         return input;
 
-    if (!config.hasDownscale)
+    if (!config.downscaleEnabled)
         return input;
 
     const int factor = config.downscaleFactor;
@@ -123,7 +123,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 
     auto algoImage = imageViewFromQImage(preprocessed);
 
-    const auto& algoConfig = config.algo;
+    const auto& algoConfig = config.contourConfig;
 
     const auto newSize = preprocessed.size();
     const bool needReset = !activeContour_ || configChanged_ || newSize != currentSize_;
@@ -131,7 +131,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     // ------------------------------------------------------------
     // 1) Filtering pipeline
     // ------------------------------------------------------------
-    if (config.hasSpatialFiltering)
+    if (config.spatialFilteringEnabled)
     {
         if (needReset)
             spatialFilter_.reset(algoImage);
@@ -140,7 +140,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         algoImage = spatialFilter_.outputView();
     }
 
-    if (config.hasTemporalFiltering)
+    if (config.temporalFilteringEnabled)
     {
         if (needReset)
             temporalSmoother_.reset(algoImage);
@@ -157,8 +157,8 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     {
         activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
             fluvel_ip::ContourData(algoImage.width(), algoImage.height(), algoConfig.connectivity),
-            std::make_unique<fluvel_ip::RegionColorSpeedModel>(algoConfig.regionAcConfig),
-            algoConfig.acConfig);
+            std::make_unique<fluvel_ip::RegionColorSpeedModel>(algoConfig.regionParams),
+            algoConfig.contourParams);
 
         currentSize_ = newSize;
         configChanged_ = false;
@@ -186,7 +186,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     }
     else if (displayMode == ImageDisplayMode::Preprocessed)
     {
-        if (config.hasSpatialFiltering || config.hasTemporalFiltering)
+        if (config.spatialFilteringEnabled || config.temporalFilteringEnabled)
             exportFilteredImage(algoImage, df);
         else
             df.image = preprocessed;

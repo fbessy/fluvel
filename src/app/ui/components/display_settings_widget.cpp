@@ -4,7 +4,7 @@
 #include "display_settings_widget.hpp"
 #include "color_adapters.hpp"
 #include "color_selector_widget.hpp"
-#include "common_settings.hpp"
+#include "application_settings_types.hpp"
 
 #include <QColorDialog>
 #include <QGroupBox>
@@ -27,17 +27,17 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
     source_rb_ = new QRadioButton(tr("Source"));
     preprocessed_rb_ = new QRadioButton(tr("Preprocessed"));
-    source_rb_->setChecked(config_.mode == ImageDisplayMode::Source);
-    preprocessed_rb_->setChecked(config_.mode == ImageDisplayMode::Preprocessed);
+    source_rb_->setChecked(config_.displayMode == ImageDisplayMode::Source);
+    preprocessed_rb_->setChecked(config_.displayMode == ImageDisplayMode::Preprocessed);
 
     QVBoxLayout* pipeline_layout = new QVBoxLayout;
     pipeline_layout->addWidget(source_rb_);
     pipeline_layout->addWidget(preprocessed_rb_);
     pipeline_displayed_gb_->setLayout(pipeline_layout);
 
-    lout_selector_ = new ColorSelectorWidget(this, toQColor(config_.l_out_color));
+    lout_selector_ = new ColorSelectorWidget(this, toQColor(config_.outerContourColor));
 
-    lin_selector_ = new ColorSelectorWidget(this, toQColor(config_.l_in_color));
+    lin_selector_ = new ColorSelectorWidget(this, toQColor(config_.innerContourColor));
 
     QVBoxLayout* lout_layout = new QVBoxLayout;
     lout_layout->addWidget(lout_selector_);
@@ -47,7 +47,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     QGroupBox* lout_gb = new QGroupBox(tr("Outer Contour"));
     lout_gb->setLayout(lout_layout);
     lout_gb->setCheckable(true);
-    lout_gb->setChecked(config_.l_out_displayed);
+    lout_gb->setChecked(config_.outerContourVisible);
 
     lout_gb->setFlat(true);
     lout_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -60,7 +60,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     QGroupBox* lin_gb = new QGroupBox(tr("Inner Contour"));
     lin_gb->setLayout(lin_layout);
     lin_gb->setCheckable(true);
-    lin_gb->setChecked(config_.l_in_displayed);
+    lin_gb->setChecked(config_.innerContourVisible);
 
     lin_gb->setFlat(true);
     lin_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -78,7 +78,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     rendering_gb->setLayout(rendering_layout);
 
     display_overlay_cb_ = new QCheckBox(tr("Algorithm Overlay"));
-    display_overlay_cb_->setChecked(config_.algorithm_overlay);
+    display_overlay_cb_->setChecked(config_.algorithmOverlayEnabled);
 
     auto* title = new QLabel("View");
     title->setStyleSheet("font-weight: bold; font-size: 14px;");
@@ -100,35 +100,35 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     connect(lout_gb, &QGroupBox::toggled, this,
             [this](bool checked)
             {
-                config_.l_out_displayed = checked;
+                config_.outerContourVisible = checked;
                 emit displayConfigChanged(config_);
             });
 
     connect(lout_selector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
-                config_.l_out_color = toRgb_uc(color);
+                config_.outerContourColor = toRgb_uc(color);
                 emit displayConfigChanged(config_);
             });
 
     connect(lin_gb, &QGroupBox::toggled, this,
             [this](bool checked)
             {
-                config_.l_in_displayed = checked;
+                config_.innerContourVisible = checked;
                 emit displayConfigChanged(config_);
             });
 
     connect(lin_selector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
-                config_.l_in_color = toRgb_uc(color);
+                config_.innerContourColor = toRgb_uc(color);
                 emit displayConfigChanged(config_);
             });
 
     connect(display_overlay_cb_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
-                config_.algorithm_overlay = checked;
+                config_.algorithmOverlayEnabled = checked;
                 emit displayConfigChanged(config_);
             });
 
@@ -138,7 +138,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                 if (!checked)
                     return;
 
-                config_.mode = ImageDisplayMode::Source;
+                config_.displayMode = ImageDisplayMode::Source;
                 emit displayConfigChanged(config_);
             });
 
@@ -148,7 +148,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                 if (!checked)
                     return;
 
-                config_.mode = ImageDisplayMode::Preprocessed;
+                config_.displayMode = ImageDisplayMode::Preprocessed;
                 emit displayConfigChanged(config_);
             });
 

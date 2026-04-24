@@ -63,7 +63,7 @@ CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSe
     auto* preprocessGb = new QGroupBox;
     preprocessGb->setLayout(preprocessLayout);
 
-    algoWidget_ = new AlgoSettingsWidget(config_.compute.algo, this);
+    algoWidget_ = new AlgoSettingsWidget(config_.compute.contourConfig, this);
 
     auto* algoLayout = new QVBoxLayout;
     algoLayout->addWidget(algoWidget_);
@@ -107,10 +107,10 @@ void CameraSettingsWindow::setupDownscaleGroup()
 
 void CameraSettingsWindow::accept()
 {
-    config_.compute.downscale.hasDownscale = downscaleGb_->isChecked();
+    config_.compute.downscale.downscaleEnabled = downscaleGb_->isChecked();
     config_.compute.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
-    config_.compute.hasSpatialFiltering = spatialCb_->isChecked();
-    config_.compute.hasTemporalFiltering = temporalCb_->isChecked();
+    config_.compute.spatialFilteringEnabled = spatialCb_->isChecked();
+    config_.compute.temporalFilteringEnabled = temporalCb_->isChecked();
 
     algoWidget_->accept();
 
@@ -123,14 +123,14 @@ void CameraSettingsWindow::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
 
-    downscaleGb_->setChecked(config_.compute.downscale.hasDownscale);
+    downscaleGb_->setChecked(config_.compute.downscale.downscaleEnabled);
 
     int index = downscaleFactorCb_->findData(config_.compute.downscale.downscaleFactor);
     if (index >= 0)
         downscaleFactorCb_->setCurrentIndex(index);
 
-    spatialCb_->setChecked(config_.compute.hasSpatialFiltering);
-    temporalCb_->setChecked(config_.compute.hasTemporalFiltering);
+    spatialCb_->setChecked(config_.compute.spatialFilteringEnabled);
+    temporalCb_->setChecked(config_.compute.temporalFilteringEnabled);
 
     algoWidget_->reject();
 }

@@ -124,7 +124,7 @@ void ApplicationSettings::saveImageSessionSettings()
 
     // algo
 
-    saveAlgo(Session::Image, imageSettings_.compute.algo);
+    saveAlgo(Session::Image, imageSettings_.compute.contourConfig);
 
     // phi init used only for image session
     saveInitialPhi();
@@ -218,14 +218,14 @@ void ApplicationSettings::saveVideoSessionSettings()
     saveDownscale(Session::Camera, videoSettings_.compute.downscale);
 
     settings.setValue("preprocess/has_spatial_filtering",
-                      videoSettings_.compute.hasSpatialFiltering);
+                      videoSettings_.compute.spatialFilteringEnabled);
 
     settings.setValue("preprocess/has_temporal_filtering",
-                      videoSettings_.compute.hasTemporalFiltering);
+                      videoSettings_.compute.temporalFilteringEnabled);
 
     // algo
 
-    saveAlgo(Session::Camera, videoSettings_.compute.algo);
+    saveAlgo(Session::Camera, videoSettings_.compute.contourConfig);
 
     // display
 
@@ -241,39 +241,39 @@ void ApplicationSettings::setVideoSessionSettings(const VideoSessionSettings& co
     saveVideoSessionSettings();
 }
 
-void ApplicationSettings::saveAlgo(Session session, const AlgoConfig& algoConfig)
+void ApplicationSettings::saveAlgo(Session session, const ActiveContourConfig& algoConfig)
 {
     QSettings settings = sessionSettings(session);
 
     settings.setValue("algo/connectivity", fluvel_ip::to_string(algoConfig.connectivity));
 
-    settings.setValue("algo/Na", algoConfig.acConfig.Na);
+    settings.setValue("algo/Na", algoConfig.contourParams.Na);
 
-    settings.setValue("algo/has_smoothing_cycle", algoConfig.acConfig.hasCycle2);
+    settings.setValue("algo/has_smoothing_cycle", algoConfig.contourParams.hasCycle2);
 
-    settings.setValue("algo/Ns", algoConfig.acConfig.Ns);
+    settings.setValue("algo/Ns", algoConfig.contourParams.Ns);
 
-    settings.setValue("algo/disk_radius", algoConfig.acConfig.diskRadius);
+    settings.setValue("algo/disk_radius", algoConfig.contourParams.diskRadius);
 
-    settings.setValue("algo/lambda_out", algoConfig.regionAcConfig.lambdaOut);
+    settings.setValue("algo/lambda_out", algoConfig.regionParams.lambdaOut);
 
-    settings.setValue("algo/lambda_in", algoConfig.regionAcConfig.lambdaIn);
+    settings.setValue("algo/lambda_in", algoConfig.regionParams.lambdaIn);
 
     settings.setValue("algo/color_space",
-                      fluvel_ip::to_string(algoConfig.regionAcConfig.color_space));
+                      fluvel_ip::to_string(algoConfig.regionParams.color_space));
 
-    settings.setValue("algo/color_weight_w1", algoConfig.regionAcConfig.weights.c1);
+    settings.setValue("algo/color_weight_w1", algoConfig.regionParams.weights.c1);
 
-    settings.setValue("algo/color_weight_w2", algoConfig.regionAcConfig.weights.c2);
+    settings.setValue("algo/color_weight_w2", algoConfig.regionParams.weights.c2);
 
-    settings.setValue("algo/color_weight_w3", algoConfig.regionAcConfig.weights.c3);
+    settings.setValue("algo/color_weight_w3", algoConfig.regionParams.weights.c3);
 }
 
 void ApplicationSettings::saveDownscale(Session session, const DownscaleConfig& downscaleConfig)
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("preprocess/has_downscale", downscaleConfig.hasDownscale);
+    settings.setValue("preprocess/has_downscale", downscaleConfig.downscaleEnabled);
 
     settings.setValue("preprocess/downscale_factor", downscaleConfig.downscaleFactor);
 }
@@ -294,15 +294,15 @@ void ApplicationSettings::saveDisplay(Session session, const DisplayConfig& disp
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("display/contour_out/enabled", displayConfig.l_out_displayed);
-    settings.setValue("display/contour_out/rgb", rgbToString(displayConfig.l_out_color));
+    settings.setValue("display/contour_out/enabled", displayConfig.outerContourVisible);
+    settings.setValue("display/contour_out/rgb", rgbToString(displayConfig.outerContourColor));
 
-    settings.setValue("display/contour_in/enabled", displayConfig.l_in_displayed);
-    settings.setValue("display/contour_in/rgb", rgbToString(displayConfig.l_in_color));
+    settings.setValue("display/contour_in/enabled", displayConfig.innerContourVisible);
+    settings.setValue("display/contour_in/rgb", rgbToString(displayConfig.innerContourColor));
 
-    settings.setValue("display/algorithm_overlay", displayConfig.algorithm_overlay);
+    settings.setValue("display/algorithm_overlay", displayConfig.algorithmOverlayEnabled);
 
-    settings.setValue("display/mode", to_string(displayConfig.mode));
+    settings.setValue("display/display_mode", to_string(displayConfig.displayMode));
 
     settings.setValue("display/mirror_mode", displayConfig.mirrorMode);
 
@@ -313,7 +313,7 @@ void ApplicationSettings::loadImageSessionSettings()
 {
     QSettings settings = imgSessionSettings();
 
-    loadAlgo(Session::Image, imageSettings_.compute.algo);
+    loadAlgo(Session::Image, imageSettings_.compute.contourConfig);
 
     bool isOk = loadInitialPhi();
 
@@ -438,56 +438,61 @@ void ApplicationSettings::loadVideoSessionSettings()
 
     loadDownscale(Session::Camera, videoSettings_.compute.downscale);
 
-    videoSettings_.compute.hasSpatialFiltering =
+    videoSettings_.compute.spatialFilteringEnabled =
         settings
             .value("preprocess/has_spatial_filtering",
-                   VideoComputeConfig::kDefaultHasSpatialFiltering)
+                   VideoComputeConfig::kDefaultSpatialFilteringEnabled)
             .toBool();
 
-    videoSettings_.compute.hasTemporalFiltering =
+    videoSettings_.compute.temporalFilteringEnabled =
         settings
             .value("preprocess/has_temporal_filtering",
-                   VideoComputeConfig::kDefaultHasTemporalFiltering)
+                   VideoComputeConfig::kDefaultTemporalFilteringEnabled)
             .toBool();
 
-    loadAlgo(Session::Camera, videoSettings_.compute.algo);
+    loadAlgo(Session::Camera, videoSettings_.compute.contourConfig);
 
     // display
     loadDisplay(Session::Camera, videoSettings_.display);
 }
 
-void ApplicationSettings::loadAlgo(Session session, AlgoConfig& algoConfig)
+void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoConfig)
 {
     QSettings settings = sessionSettings(session);
 
-    const QString s =
-        settings.value("algo/connectivity", fluvel_ip::to_string(AlgoConfig::kDefaultConnectivity))
-            .toString();
+    const QString s = settings
+                          .value("algo/connectivity",
+                                 fluvel_ip::to_string(ActiveContourConfig::kDefaultConnectivity))
+                          .toString();
 
     algoConfig.connectivity = fluvel_ip::connectivity_from_string(s.toStdString());
 
-    algoConfig.acConfig.Na = settings.value("algo/Na", fluvel_ip::ActiveContourParams::kDefaultNa).toInt();
-    algoConfig.acConfig.hasCycle2 =
-        settings.value("algo/has_smoothing_cycle", fluvel_ip::ActiveContourParams::kDefaultIsCycle2).toBool();
-    algoConfig.acConfig.Ns = settings.value("algo/Ns", fluvel_ip::ActiveContourParams::kDefaultNs).toInt();
-    algoConfig.acConfig.diskRadius =
-        settings.value("algo/disk_radius", fluvel_ip::ActiveContourParams::kDefaultDiskRadius).toInt();
+    algoConfig.contourParams.Na =
+        settings.value("algo/Na", fluvel_ip::ActiveContourParams::kDefaultNa).toInt();
+    algoConfig.contourParams.hasCycle2 =
+        settings.value("algo/has_smoothing_cycle", fluvel_ip::ActiveContourParams::kDefaultIsCycle2)
+            .toBool();
+    algoConfig.contourParams.Ns =
+        settings.value("algo/Ns", fluvel_ip::ActiveContourParams::kDefaultNs).toInt();
+    algoConfig.contourParams.diskRadius =
+        settings.value("algo/disk_radius", fluvel_ip::ActiveContourParams::kDefaultDiskRadius)
+            .toInt();
 
     switch (session)
     {
         case Session::Camera:
-            algoConfig.acConfig.failureMode = fluvel_ip::FailureHandlingMode::RecoverOnFailure;
+            algoConfig.contourParams.failureMode = fluvel_ip::FailureHandlingMode::RecoverOnFailure;
             break;
 
         case Session::Image:
         default:
-            algoConfig.acConfig.failureMode = fluvel_ip::FailureHandlingMode::StopOnFailure;
+            algoConfig.contourParams.failureMode = fluvel_ip::FailureHandlingMode::StopOnFailure;
             break;
     }
 
-    algoConfig.regionAcConfig.lambdaOut =
+    algoConfig.regionParams.lambdaOut =
         settings.value("algo/lambda_out", fluvel_ip::RegionParams::kDefaultLambdaOut).toInt();
-    algoConfig.regionAcConfig.lambdaIn =
+    algoConfig.regionParams.lambdaIn =
         settings.value("algo/lambda_in", fluvel_ip::RegionParams::kDefaultLambdaIn).toInt();
 
     const QString s_cs =
@@ -496,15 +501,15 @@ void ApplicationSettings::loadAlgo(Session session, AlgoConfig& algoConfig)
                    fluvel_ip::to_string(fluvel_ip::RegionColorParams::kDefaultColorSpace))
             .toString();
 
-    algoConfig.regionAcConfig.color_space = fluvel_ip::color_space_from_string(s_cs.toStdString());
+    algoConfig.regionParams.color_space = fluvel_ip::color_space_from_string(s_cs.toStdString());
 
-    algoConfig.regionAcConfig.weights.c1 =
+    algoConfig.regionParams.weights.c1 =
         settings.value("algo/color_weight_w1", fluvel_ip::RegionColorParams::kDefaultWeights.c1)
             .toInt();
-    algoConfig.regionAcConfig.weights.c2 =
+    algoConfig.regionParams.weights.c2 =
         settings.value("algo/color_weight_w2", fluvel_ip::RegionColorParams::kDefaultWeights.c2)
             .toInt();
-    algoConfig.regionAcConfig.weights.c3 =
+    algoConfig.regionParams.weights.c3 =
         settings.value("algo/color_weight_w3", fluvel_ip::RegionColorParams::kDefaultWeights.c3)
             .toInt();
 }
@@ -515,7 +520,7 @@ void ApplicationSettings::loadDownscale(Session session, DownscaleConfig& downsc
 
     bool defaultIsDownscale = (session == Session::Camera);
 
-    downscaleConfig.hasDownscale =
+    downscaleConfig.downscaleEnabled =
         settings.value("preprocess/has_downscale", defaultIsDownscale).toBool();
 
     downscaleConfig.downscaleFactor =
@@ -526,36 +531,40 @@ void ApplicationSettings::loadDisplay(Session session, DisplayConfig& displayCon
 {
     QSettings settings = sessionSettings(session);
 
-    displayConfig.l_out_displayed =
-        settings.value("display/contour_out/enabled", DisplayConfig::kDefaultListDisplayed)
+    displayConfig.outerContourVisible =
+        settings.value("display/contour_out/enabled", DisplayConfig::kDefaultContourVisible)
             .toBool();
-    displayConfig.l_out_color = rgbFromString(
-        settings.value("display/contour_out/rgb", rgbToString(DisplayConfig::kDefaultOut))
+    displayConfig.outerContourColor = rgbFromString(
+        settings
+            .value("display/contour_out/rgb", rgbToString(DisplayConfig::kDefaultOuterContourColor))
             .toString(),
-        DisplayConfig::kDefaultOut);
+        DisplayConfig::kDefaultOuterContourColor);
 
-    displayConfig.l_in_displayed =
-        settings.value("display/contour_in/enabled", DisplayConfig::kDefaultListDisplayed).toBool();
-    displayConfig.l_in_color = rgbFromString(
-        settings.value("display/contour_in/rgb", rgbToString(DisplayConfig::kDefaultIn)).toString(),
-        DisplayConfig::kDefaultIn);
+    displayConfig.innerContourVisible =
+        settings.value("display/contour_in/enabled", DisplayConfig::kDefaultContourVisible)
+            .toBool();
+    displayConfig.innerContourColor = rgbFromString(
+        settings
+            .value("display/contour_in/rgb", rgbToString(DisplayConfig::kDefaultInnerContourColor))
+            .toString(),
+        DisplayConfig::kDefaultInnerContourColor);
 
-    displayConfig.algorithm_overlay =
-        settings.value("display/algorithm_overlay", DisplayConfig::kDefaultOverlay).toBool();
+    displayConfig.algorithmOverlayEnabled =
+        settings.value("display/algorithm_overlay", DisplayConfig::kDefaultOverlayEnabled).toBool();
 
     const QString s =
         settings
-            .value("display/mode",
+            .value("display/display_mode",
                    QString::fromStdString(to_string(DisplayConfig::kDefaultDisplayMode)))
             .toString();
 
-    displayConfig.mode = ib_from_string(s.toStdString());
+    displayConfig.displayMode = imageDisplayModeFromString(s.toStdString());
 
     displayConfig.mirrorMode =
-        settings.value("display/mirror_mode", DisplayConfig::kDefaultOptions).toBool();
+        settings.value("display/mirror_mode", DisplayConfig::kDefaultOptionDisabled).toBool();
 
     displayConfig.smoothDisplay =
-        settings.value("display/smooth_display", DisplayConfig::kDefaultOptions).toBool();
+        settings.value("display/smooth_display", DisplayConfig::kDefaultOptionDisabled).toBool();
 }
 
 QDir ApplicationSettings::settingsDirectory()

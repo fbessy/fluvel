@@ -75,7 +75,7 @@ void ImageController::downscaleImage()
         inputImage_.format() != QImage::Format_RGB32)
         return;
 
-    if (computeConfig_.downscale.hasDownscale)
+    if (computeConfig_.downscale.downscaleEnabled)
     {
         const int df = computeConfig_.downscale.downscaleFactor;
 
@@ -142,7 +142,7 @@ void ImageController::onImageSettingsChanged(const ImageSessionSettings& session
 
 void ImageController::onImageDisplaySettingsChanged(const DisplayConfig& display)
 {
-    bool needs_refresh = (displayConfig_.mode != display.mode);
+    bool needs_refresh = (displayConfig_.displayMode != display.displayMode);
 
     displayConfig_ = display;
 
@@ -157,9 +157,9 @@ void ImageController::refreshView()
 
     QImage img;
 
-    if (displayConfig_.mode == ImageDisplayMode::Source)
+    if (displayConfig_.displayMode == ImageDisplayMode::Source)
         img = inputImage_;
-    else if (displayConfig_.mode == ImageDisplayMode::Preprocessed)
+    else if (displayConfig_.displayMode == ImageDisplayMode::Preprocessed)
         img = processedImage_;
 
     emit displayedImageReady(img);

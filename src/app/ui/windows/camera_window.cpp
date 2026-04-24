@@ -309,9 +309,9 @@ void CameraWindow::setupConnections()
     connect(&app, &ApplicationSettings::videoSettingsChanged, this,
             [this](const VideoSessionSettings& conf)
             {
-                bool hasPreprocessing = conf.compute.downscale.hasDownscale ||
-                                        conf.compute.hasSpatialFiltering ||
-                                        conf.compute.hasTemporalFiltering;
+                bool hasPreprocessing = conf.compute.downscale.downscaleEnabled ||
+                                        conf.compute.spatialFilteringEnabled ||
+                                        conf.compute.temporalFilteringEnabled;
 
                 displayBar_->updatePipelineAvailability(hasPreprocessing);
             });
@@ -334,8 +334,8 @@ void CameraWindow::applyInitialSettings()
     imageViewer_->applyDownscaleConfig(downscaleConfig);
     imageViewer_->applyDisplayConfig(app.videoSettings().display);
 
-    bool preprocessing = app.videoSettings().compute.downscale.hasDownscale ||
-                         app.videoSettings().compute.hasTemporalFiltering;
+    bool preprocessing = app.videoSettings().compute.downscale.downscaleEnabled ||
+                         app.videoSettings().compute.temporalFilteringEnabled;
 
     displayBar_->updatePipelineAvailability(preprocessing);
 
@@ -1028,7 +1028,7 @@ void CameraWindow::onDownscaleChanged(const DownscaleConfig& downscaleConfig)
 
     downscaleTitleStr_.clear();
 
-    if (downscaleConfig.hasDownscale)
+    if (downscaleConfig.downscaleEnabled)
         downscaleTitleStr_ = QString("(/%1)").arg(downscaleConfig.downscaleFactor);
 
     updateWindowTitle();

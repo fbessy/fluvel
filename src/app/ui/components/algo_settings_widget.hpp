@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "common_settings.hpp"
+#include "application_settings_types.hpp"
 
 #include <QWidget>
 
@@ -19,7 +19,7 @@ class AlgoSettingsWidget : public QWidget
     Q_OBJECT
 
 public:
-    AlgoSettingsWidget(AlgoConfig& config, QWidget* parent = nullptr);
+    AlgoSettingsWidget(ActiveContourConfig& config, QWidget* parent = nullptr);
 
     void accept();
     void reject();
@@ -47,7 +47,7 @@ private:
     QGroupBox* internalspeed_groupbox_;
     QSpinBox* disk_radius_spin_;
 
-    AlgoConfig& config_;
+    ActiveContourConfig& config_;
 };
 
 } // namespace fluvel_app

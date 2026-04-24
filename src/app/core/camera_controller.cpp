@@ -312,7 +312,7 @@ void CameraController::onVideoSettingsChanged(const VideoSessionSettings& sessio
 
 void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
 {
-    activeContourThread_.setDisplayMode(display.mode);
+    activeContourThread_.setDisplayMode(display.displayMode);
 }
 
 bool CameraController::isStreaming() const

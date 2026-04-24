@@ -263,7 +263,7 @@ void ActiveContourWorker::initializeActiveContour()
 
     auto initialPhi = imageViewFromQImage(config_.initialPhi);
 
-    fluvel_ip::ContourData initialCD(initialPhi, config_.algo.connectivity);
+    fluvel_ip::ContourData initialCD(initialPhi, config_.contourConfig.connectivity);
 
     bool is_rgb = (processedImage_.format() != QImage::Format_Grayscale8);
 
@@ -273,15 +273,15 @@ void ActiveContourWorker::initializeActiveContour()
     {
         activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
             std::move(initialCD),
-            std::make_unique<fluvel_ip::RegionColorSpeedModel>(config_.algo.regionAcConfig),
-            config_.algo.acConfig);
+            std::make_unique<fluvel_ip::RegionColorSpeedModel>(config_.contourConfig.regionParams),
+            config_.contourConfig.contourParams);
     }
     else
     {
         activeContour_ = std::make_unique<fluvel_ip::ActiveContour>(
             std::move(initialCD),
-            std::make_unique<fluvel_ip::RegionGraySpeedModel>(config_.algo.regionAcConfig),
-            config_.algo.acConfig);
+            std::make_unique<fluvel_ip::RegionGraySpeedModel>(config_.contourConfig.regionParams),
+            config_.contourConfig.contourParams);
     }
 
     activeContour_->update(processedImg);
