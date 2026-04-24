@@ -1,13 +1,14 @@
-PROJECT_NAME           = "Ofeli"
+PROJECT_NAME           = "Fluvel"
 PROJECT_BRIEF          = "Active contour image processing engine"
 
 IMAGE_PATH = docs/images
-HTML_EXTRA_FILES = docs/images/Ofeli.svg
+HTML_EXTRA_FILES = docs/images/fluvel.svg
 
 INPUT                  = src README.md
 RECURSIVE              = YES
 
 OUTPUT_DIRECTORY       = docs
+HTML_OUTPUT = html
 CREATE_SUBDIRS         = NO
 
 USE_MDFILE_AS_MAINPAGE = README.md
@@ -28,4 +29,18 @@ WARN_IF_UNDOCUMENTED   = NO
 GENERATE_TREEVIEW      = YES
 FULL_PATH_NAMES        = NO
 
+SOURCE_BROWSER         = NO
+INLINE_SOURCES         = NO
+
+HAVE_DOT               = YES
+
+CLASS_DIAGRAMS         = YES
+COLLABORATION_GRAPH    = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+
+DOT_GRAPH_MAX_NODES    = 50
 
