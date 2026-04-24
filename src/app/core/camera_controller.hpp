@@ -68,7 +68,7 @@ signals:
     void textStatsUpdated(const QString& textStats);
     void imageAndContourUpdated(const fluvel_app::UiFrame& uiFrame);
 
-    void downscaleChanged(const fluvel_app::DownscaleConfig& downscaleConfig);
+    void downscaleChanged(const fluvel_app::DownscaleParams& downscaleParams);
 
 private:
     void onVideoInputsChanged();

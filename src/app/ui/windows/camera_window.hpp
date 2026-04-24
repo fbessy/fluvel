@@ -86,7 +86,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    void onDownscaleChanged(const DownscaleConfig& downscaleConfig);
+    void onDownscaleChanged(const DownscaleParams& downscaleParams);
     void updateWindowTitle();
 
     void setupWindow();

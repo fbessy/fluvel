@@ -43,7 +43,7 @@ protected:
 private:
 
     QImage convertFrame(QVideoFrame frame) const;
-    QImage applyDownscale(const QImage& input, const DownscaleConfig& config) const;
+    QImage applyDownscale(const QImage& input, const DownscaleParams& config) const;
     DisplayFrame processFrame(const QVideoFrame& inputFrame);
 
     void exportFilteredImage(const fluvel_ip::ImageView& algoImage, DisplayFrame& displayFrame);

@@ -103,7 +103,7 @@ struct DisplayConfig
     bool algorithmOverlayEnabled = kDefaultOverlayEnabled;
 };
 
-struct DownscaleConfig
+struct DownscaleParams
 {
     static constexpr bool kDefaultDownscaleEnabled = false;
     static constexpr int kDefaultDownscaleFactor = 2;
@@ -127,8 +127,8 @@ struct ImageComputeConfig
 
     QImage initialPhi;
 
-    DownscaleConfig downscale{};
-    fluvel_ip::ProcessingConfig processing{};
+    DownscaleParams downscale{};
+    fluvel_ip::ProcessingParams processing{};
 };
 
 struct ImageSessionSettings
@@ -142,7 +142,7 @@ struct VideoComputeConfig
     static constexpr bool kDefaultSpatialFilteringEnabled = true;
     static constexpr bool kDefaultTemporalFilteringEnabled = true;
 
-    DownscaleConfig downscale{};
+    DownscaleParams downscale{};
     bool spatialFilteringEnabled = kDefaultSpatialFilteringEnabled;
     bool temporalFilteringEnabled = kDefaultTemporalFilteringEnabled;
 

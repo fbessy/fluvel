@@ -199,8 +199,8 @@ private:
 
     ImageSessionSettings committedConfig_;
 
-    DownscaleConfig editedDownscaleConfig_;
-    fluvel_ip::ProcessingConfig editedProcessingConfig_;
+    DownscaleParams editedDownscaleParams_;
+    fluvel_ip::ProcessingParams editedProcessingParams_;
 };
 
 } // namespace fluvel_app

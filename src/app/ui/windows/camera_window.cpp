@@ -329,9 +329,9 @@ void CameraWindow::applyInitialSettings()
     assert(imageViewer_ && displayBar_);
 
     const auto& app = ApplicationSettings::instance();
-    const auto& downscaleConfig = app.videoSettings().compute.downscale;
+    const auto& downscaleParams = app.videoSettings().compute.downscale;
 
-    imageViewer_->applyDownscaleConfig(downscaleConfig);
+    imageViewer_->applyDownscaleConfig(downscaleParams);
     imageViewer_->applyDisplayConfig(app.videoSettings().display);
 
     bool preprocessing = app.videoSettings().compute.downscale.downscaleEnabled ||
@@ -341,7 +341,7 @@ void CameraWindow::applyInitialSettings()
 
     refreshUi();
 
-    onDownscaleChanged(downscaleConfig);
+    onDownscaleChanged(downscaleParams);
 }
 
 void CameraWindow::bindApplicationSettingsToController()
@@ -1022,14 +1022,14 @@ void CameraWindow::loadPreferredFormats()
     settings.endGroup();
 }
 
-void CameraWindow::onDownscaleChanged(const DownscaleConfig& downscaleConfig)
+void CameraWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
 {
     assert(cameraController_);
 
     downscaleTitleStr_.clear();
 
-    if (downscaleConfig.downscaleEnabled)
-        downscaleTitleStr_ = QString("(/%1)").arg(downscaleConfig.downscaleFactor);
+    if (downscaleParams.downscaleEnabled)
+        downscaleTitleStr_ = QString("(/%1)").arg(downscaleParams.downscaleFactor);
 
     updateWindowTitle();
 }

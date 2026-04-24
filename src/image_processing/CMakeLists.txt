@@ -41,6 +41,8 @@ set(ip_src
     ${ALGO_DIR}/image_pipeline.cpp
     ${ALGO_DIR}/image_pipeline.hpp
 
+    ${ALGO_DIR}/processing_params.hpp
+
     ${ALGO_DIR}/noise.cpp
     ${ALGO_DIR}/noise.hpp
 

@@ -42,7 +42,7 @@ public:
     // init
     explicit ImageViewerWidget(QWidget* parent = nullptr);
 
-    explicit ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleConfig& downscaleConfig,
+    explicit ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleParams& downscaleParams,
                        QWidget* parent = nullptr);
 
     ~ImageViewerWidget() override;
@@ -55,7 +55,7 @@ public:
 
     // config
     void applyDisplayConfig(const fluvel_app::DisplayConfig& display);
-    void applyDownscaleConfig(const fluvel_app::DownscaleConfig& downscale);
+    void applyDownscaleConfig(const fluvel_app::DownscaleParams& downscale);
 
     // display
     void setImage(const QImage& img);
@@ -168,7 +168,7 @@ private:
     QImage lastDisplayedImage_;
 
     DisplayConfig displayConfig_;
-    DownscaleConfig downscaleConfig_;
+    DownscaleParams downscaleConfig_;
 
     ContourPointsItem* outerContour_ = nullptr;
     ContourPointsItem* innerContour_ = nullptr;

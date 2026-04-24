@@ -34,8 +34,8 @@ namespace fluvel_app
 SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& config)
     : QDialog(parent)
     , committedConfig_(config)
-    , editedDownscaleConfig_(config.compute.downscale)
-    , editedProcessingConfig_(config.compute.processing)
+    , editedDownscaleParams_(config.compute.downscale)
+    , editedProcessingParams_(config.compute.processing)
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -606,7 +606,7 @@ void SettingsWindow::setupConnections()
     connect(downscalePage_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedDownscaleConfig_.downscaleEnabled = checked;
+                editedDownscaleParams_.downscaleEnabled = checked;
                 notifyConfigEdited();
 
                 onUiShapeChanged();
@@ -618,7 +618,7 @@ void SettingsWindow::setupConnections()
                 if (index < 0)
                     return;
 
-                editedDownscaleConfig_.downscaleFactor =
+                editedDownscaleParams_.downscaleFactor =
                     downscaleFactorCb_->itemData(index).toInt();
                 notifyConfigEdited();
 
@@ -628,126 +628,126 @@ void SettingsWindow::setupConnections()
     connect(processPage_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.enabled = checked;
+                editedProcessingParams_.enabled = checked;
                 notifyConfigEdited();
             });
 
     connect(gaussianNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_gaussian_noise = checked;
+                editedProcessingParams_.has_gaussian_noise = checked;
                 notifyConfigEdited();
             });
 
     connect(gaussianNoiseStdSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingConfig_.std_noise = static_cast<float>(v);
+                editedProcessingParams_.std_noise = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(impulsiveNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_salt_noise = checked;
+                editedProcessingParams_.has_salt_noise = checked;
                 notifyConfigEdited();
             });
 
     connect(impulsiveNoisePercentSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingConfig_.proba_noise = static_cast<float>(v) / 100.f;
+                editedProcessingParams_.proba_noise = static_cast<float>(v) / 100.f;
                 notifyConfigEdited();
             });
 
     connect(speckleNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_speckle_noise = checked;
+                editedProcessingParams_.has_speckle_noise = checked;
                 notifyConfigEdited();
             });
 
     connect(speckleNoiseStdSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingConfig_.std_speckle_noise = static_cast<float>(v);
+                editedProcessingParams_.std_speckle_noise = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(meanGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_mean_filt = checked;
+                editedProcessingParams_.has_mean_filt = checked;
                 notifyConfigEdited();
             });
 
     connect(meanKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingConfig_.kernel_mean_length = v;
+                editedProcessingParams_.kernel_mean_length = v;
                 notifyConfigEdited();
             });
 
     connect(gaussianGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_gaussian_filt = checked;
+                editedProcessingParams_.has_gaussian_filt = checked;
                 notifyConfigEdited();
             });
 
     connect(gaussianKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingConfig_.kernel_gaussian_length = v;
+                editedProcessingParams_.kernel_gaussian_length = v;
                 notifyConfigEdited();
             });
 
     connect(gaussianSigmaSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingConfig_.sigma = static_cast<float>(v);
+                editedProcessingParams_.sigma = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(medianGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_median_filt = checked;
+                editedProcessingParams_.has_median_filt = checked;
                 notifyConfigEdited();
             });
 
     connect(medianKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingConfig_.kernel_median_length = v;
+                editedProcessingParams_.kernel_median_length = v;
                 notifyConfigEdited();
             });
 
     connect(medianDirectRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.has_O1_algo = false;
+                editedProcessingParams_.has_O1_algo = false;
                 notifyConfigEdited();
             });
 
     connect(medianPerreaultRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.has_O1_algo = true;
+                editedProcessingParams_.has_O1_algo = true;
                 notifyConfigEdited();
             });
 
     connect(anisoGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_aniso_diff = checked;
+                editedProcessingParams_.has_aniso_diff = checked;
                 notifyConfigEdited();
             });
 
     connect(anisoExpConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.aniso_option =
+                editedProcessingParams_.aniso_option =
                     fluvel_ip::filter::ConductionFunction::Exponential;
                 notifyConfigEdited();
             });
@@ -755,7 +755,7 @@ void SettingsWindow::setupConnections()
     connect(anisoReciprocalConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.aniso_option =
+                editedProcessingParams_.aniso_option =
                     fluvel_ip::filter::ConductionFunction::Rational;
                 notifyConfigEdited();
             });
@@ -763,91 +763,91 @@ void SettingsWindow::setupConnections()
     connect(iterationFilterSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingConfig_.max_itera = v;
+                editedProcessingParams_.max_itera = v;
                 notifyConfigEdited();
             });
 
     connect(lambdaSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingConfig_.lambda = static_cast<float>(v);
+                editedProcessingParams_.lambda = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(kappaSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingConfig_.kappa = static_cast<float>(v);
+                editedProcessingParams_.kappa = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(openGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_open_filt = checked;
+                editedProcessingParams_.has_open_filt = checked;
                 notifyConfigEdited();
             });
 
     connect(openKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingConfig_.kernel_open_length = v;
+                editedProcessingParams_.kernel_open_length = v;
                 notifyConfigEdited();
             });
 
     connect(closeGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_close_filt = checked;
+                editedProcessingParams_.has_close_filt = checked;
                 notifyConfigEdited();
             });
 
     connect(closeKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingConfig_.kernel_close_length = v;
+                editedProcessingParams_.kernel_close_length = v;
                 notifyConfigEdited();
             });
 
     connect(tophatGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingConfig_.has_top_hat_filt = checked;
+                editedProcessingParams_.has_top_hat_filt = checked;
                 notifyConfigEdited();
             });
 
     connect(whitetophatRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.is_white_top_hat = true;
+                editedProcessingParams_.is_white_top_hat = true;
                 notifyConfigEdited();
             });
 
     connect(blacktophatRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.is_white_top_hat = false;
+                editedProcessingParams_.is_white_top_hat = false;
                 notifyConfigEdited();
             });
 
     connect(tophatKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingConfig_.kernel_tophat_length = v;
+                editedProcessingParams_.kernel_tophat_length = v;
                 notifyConfigEdited();
             });
 
     connect(naiveRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.has_O1_morpho = true;
+                editedProcessingParams_.has_O1_morpho = true;
                 notifyConfigEdited();
             });
 
     connect(perreaultRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingConfig_.has_O1_morpho = false;
+                editedProcessingParams_.has_O1_morpho = false;
                 notifyConfigEdited();
             });
 
@@ -1090,8 +1090,8 @@ void SettingsWindow::updateUIFromConfig()
 
     algoWidget_->reject();
 
-    editedDownscaleConfig_ = committedConfig_.compute.downscale;
-    editedProcessingConfig_ = committedConfig_.compute.processing;
+    editedDownscaleParams_ = committedConfig_.compute.downscale;
+    editedProcessingParams_ = committedConfig_.compute.processing;
 
     notifyConfigEdited();
 }
@@ -1192,8 +1192,8 @@ void SettingsWindow::restoreDefaults()
     abscissaSpin_->setValue(0);
     ordinateSpin_->setValue(0);
 
-    editedDownscaleConfig_ = committedConfig_.compute.downscale;
-    editedProcessingConfig_ = committedConfig_.compute.processing;
+    editedDownscaleParams_ = committedConfig_.compute.downscale;
+    editedProcessingParams_ = committedConfig_.compute.processing;
 
     notifyConfigEdited();
 }
@@ -1262,8 +1262,8 @@ void SettingsWindow::closeEvent(QCloseEvent* event)
 void SettingsWindow::notifyConfigEdited()
 {
     if (imageSettingsController_)
-        imageSettingsController_->updateEditedConfig(editedDownscaleConfig_,
-                                                     editedProcessingConfig_);
+        imageSettingsController_->updateEditedConfig(editedDownscaleParams_,
+                                                     editedProcessingParams_);
 }
 
 void SettingsWindow::onPreviewShapeAt(QPoint position)

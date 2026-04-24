@@ -20,8 +20,8 @@ ImageSettingsController::ImageSettingsController(const ImageSessionSettings& ses
     : QObject(parent)
 {
     const auto& sc = session.compute;
-    editedDownscaleConfig_ = sc.downscale;
-    editedProcessingConfig_ = sc.processing;
+    editedDownscaleParams_ = sc.downscale;
+    editedProcessingParams_ = sc.processing;
 
     phiEditor_ = std::make_unique<PhiEditor>(sc.initialPhi);
 
@@ -32,10 +32,10 @@ ImageSettingsController::ImageSettingsController(const ImageSessionSettings& ses
 }
 
 void ImageSettingsController::updateEditedConfig(
-    const DownscaleConfig& downscaleConfig, const fluvel_ip::ProcessingConfig& processingConfig)
+    const DownscaleParams& downscaleParams, const fluvel_ip::ProcessingParams& processingParams)
 {
-    editedDownscaleConfig_ = downscaleConfig;
-    editedProcessingConfig_ = processingConfig;
+    editedDownscaleParams_ = downscaleParams;
+    editedProcessingParams_ = processingParams;
 
     refreshPreview();
 }
@@ -174,9 +174,9 @@ void ImageSettingsController::applyDownscale()
     if (input_.format() != QImage::Format_Grayscale8 && input_.format() != QImage::Format_RGB32)
         return;
 
-    if (editedDownscaleConfig_.downscaleEnabled)
+    if (editedDownscaleParams_.downscaleEnabled)
     {
-        const int df = editedDownscaleConfig_.downscaleFactor;
+        const int df = editedDownscaleParams_.downscaleFactor;
 
         assert(df == 2 || df == 4);
 
@@ -207,7 +207,7 @@ void ImageSettingsController::applyProcessing()
     fluvel_ip::ElapsedTimer measurementTimer;
     measurementTimer.start();
 
-    filter.apply(img, editedProcessingConfig_);
+    filter.apply(img, editedProcessingParams_);
 
     double elapsedSec = measurementTimer.elapsedSec();
 

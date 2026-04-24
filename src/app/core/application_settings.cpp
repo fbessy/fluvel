@@ -269,13 +269,13 @@ void ApplicationSettings::saveAlgo(Session session, const ActiveContourConfig& a
     settings.setValue("algo/color_weight_w3", algoConfig.regionParams.weights.c3);
 }
 
-void ApplicationSettings::saveDownscale(Session session, const DownscaleConfig& downscaleConfig)
+void ApplicationSettings::saveDownscale(Session session, const DownscaleParams& downscaleParams)
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("preprocess/downscale_enabled", downscaleConfig.downscaleEnabled);
+    settings.setValue("preprocess/downscale_enabled", downscaleParams.downscaleEnabled);
 
-    settings.setValue("preprocess/downscale_factor", downscaleConfig.downscaleFactor);
+    settings.setValue("preprocess/downscale_factor", downscaleParams.downscaleFactor);
 }
 
 void ApplicationSettings::setImageDisplayConfig(const DisplayConfig& displayConfig)
@@ -331,99 +331,99 @@ void ApplicationSettings::loadImageSessionSettings()
 
     fc.has_gaussian_noise =
         settings
-            .value("preprocess/has_gaussian_noise", fluvel_ip::ProcessingConfig::kDefaultProcess)
+            .value("preprocess/has_gaussian_noise", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.std_noise =
-        settings.value("preprocess/std_noise", fluvel_ip::ProcessingConfig::kDefaultStdNoise)
+        settings.value("preprocess/std_noise", fluvel_ip::ProcessingParams::kDefaultStdNoise)
             .toFloat();
     fc.has_salt_noise =
-        settings.value("preprocess/has_salt_noise", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_salt_noise", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.proba_noise =
-        settings.value("preprocess/proba_noise", fluvel_ip::ProcessingConfig::kDefaultSaltNoise)
+        settings.value("preprocess/proba_noise", fluvel_ip::ProcessingParams::kDefaultSaltNoise)
             .toFloat();
     fc.has_speckle_noise =
-        settings.value("preprocess/has_speckle_noise", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_speckle_noise", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.std_speckle_noise = settings
                                .value("preprocess/std_speckle_noise",
-                                      fluvel_ip::ProcessingConfig::kDefaultSpeckleNoise)
+                                      fluvel_ip::ProcessingParams::kDefaultSpeckleNoise)
                                .toFloat();
 
     fc.has_median_filt =
-        settings.value("preprocess/has_median_filt", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_median_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.kernel_median_length = settings
                                   .value("preprocess/kernel_median_length",
-                                         fluvel_ip::ProcessingConfig::kDefaultKernelLength)
+                                         fluvel_ip::ProcessingParams::kDefaultKernelLength)
                                   .toInt();
     fc.has_O1_algo =
-        settings.value("preprocess/has_O1_algo", fluvel_ip::ProcessingConfig::kDefault01Algo)
+        settings.value("preprocess/has_O1_algo", fluvel_ip::ProcessingParams::kDefault01Algo)
             .toBool();
     fc.has_mean_filt =
-        settings.value("preprocess/has_mean_filt", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_mean_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.kernel_mean_length = settings
                                 .value("preprocess/kernel_mean_length",
-                                       fluvel_ip::ProcessingConfig::kDefaultKernelLength)
+                                       fluvel_ip::ProcessingParams::kDefaultKernelLength)
                                 .toInt();
     fc.has_gaussian_filt =
-        settings.value("preprocess/has_gaussian_filt", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_gaussian_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.kernel_gaussian_length = settings
                                     .value("preprocess/kernel_gaussian_length",
-                                           fluvel_ip::ProcessingConfig::kDefaultKernelLength)
+                                           fluvel_ip::ProcessingParams::kDefaultKernelLength)
                                     .toInt();
     fc.sigma =
-        settings.value("preprocess/sigma", fluvel_ip::ProcessingConfig::kDefaultGaussianSigma)
+        settings.value("preprocess/sigma", fluvel_ip::ProcessingParams::kDefaultGaussianSigma)
             .toFloat();
 
     fc.has_aniso_diff =
-        settings.value("preprocess/has_aniso_diff", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_aniso_diff", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
 
     fc.aniso_option = static_cast<fluvel_ip::filter::ConductionFunction>(
         settings
             .value("preprocess/aniso_option",
-                   static_cast<int>(fluvel_ip::ProcessingConfig::kDefaultAnisoOption))
+                   static_cast<int>(fluvel_ip::ProcessingParams::kDefaultAnisoOption))
             .toInt());
 
     fc.max_itera =
-        settings.value("preprocess/max_itera", fluvel_ip::ProcessingConfig::kDefaultMaxItera)
+        settings.value("preprocess/max_itera", fluvel_ip::ProcessingParams::kDefaultMaxItera)
             .toInt();
     fc.lambda =
-        settings.value("preprocess/lambda", fluvel_ip::ProcessingConfig::kDefaultLambda).toDouble();
+        settings.value("preprocess/lambda", fluvel_ip::ProcessingParams::kDefaultLambda).toDouble();
     fc.kappa =
-        settings.value("preprocess/kappa", fluvel_ip::ProcessingConfig::kDefaultKappa).toDouble();
+        settings.value("preprocess/kappa", fluvel_ip::ProcessingParams::kDefaultKappa).toDouble();
 
     fc.has_open_filt =
-        settings.value("preprocess/has_open_filt", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_open_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.kernel_open_length = settings
                                 .value("preprocess/kernel_open_length",
-                                       fluvel_ip::ProcessingConfig::kDefaultKernelLength)
+                                       fluvel_ip::ProcessingParams::kDefaultKernelLength)
                                 .toInt();
     fc.has_close_filt =
-        settings.value("preprocess/has_close_filt", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_close_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.kernel_close_length = settings
                                  .value("preprocess/kernel_close_length",
-                                        fluvel_ip::ProcessingConfig::kDefaultKernelLength)
+                                        fluvel_ip::ProcessingParams::kDefaultKernelLength)
                                  .toInt();
     fc.has_top_hat_filt =
-        settings.value("preprocess/has_top_hat_filt", fluvel_ip::ProcessingConfig::kDefaultProcess)
+        settings.value("preprocess/has_top_hat_filt", fluvel_ip::ProcessingParams::kDefaultProcess)
             .toBool();
     fc.is_white_top_hat =
         settings
-            .value("preprocess/is_white_top_hat", fluvel_ip::ProcessingConfig::kDefaultWhiteTopHat)
+            .value("preprocess/is_white_top_hat", fluvel_ip::ProcessingParams::kDefaultWhiteTopHat)
             .toBool();
     fc.kernel_tophat_length = settings
                                   .value("preprocess/kernel_tophat_length",
-                                         fluvel_ip::ProcessingConfig::kDefaultKernelLength)
+                                         fluvel_ip::ProcessingParams::kDefaultKernelLength)
                                   .toInt();
 
     fc.has_O1_morpho =
-        settings.value("preprocess/has_O1_morpho", fluvel_ip::ProcessingConfig::kDefault01Algo)
+        settings.value("preprocess/has_O1_morpho", fluvel_ip::ProcessingParams::kDefault01Algo)
             .toBool();
 
     // display
@@ -514,17 +514,17 @@ void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoCon
             .toInt();
 }
 
-void ApplicationSettings::loadDownscale(Session session, DownscaleConfig& downscaleConfig)
+void ApplicationSettings::loadDownscale(Session session, DownscaleParams& downscaleParams)
 {
     QSettings settings = sessionSettings(session);
 
     bool defaultIsDownscale = (session == Session::Camera);
 
-    downscaleConfig.downscaleEnabled =
+    downscaleParams.downscaleEnabled =
         settings.value("preprocess/downscale_enabled", defaultIsDownscale).toBool();
 
-    downscaleConfig.downscaleFactor =
-        settings.value("preprocess/downscale_factor", DownscaleConfig::kDefaultDownscaleFactor)
+    downscaleParams.downscaleFactor =
+        settings.value("preprocess/downscale_factor", DownscaleParams::kDefaultDownscaleFactor)
             .toInt();
 }
 void ApplicationSettings::loadDisplay(Session session, DisplayConfig& displayConfig)

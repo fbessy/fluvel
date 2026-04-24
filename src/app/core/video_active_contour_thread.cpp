@@ -83,7 +83,7 @@ QImage VideoActiveContourThread::convertFrame(QVideoFrame frame) const
 }
 
 QImage VideoActiveContourThread::applyDownscale(const QImage& input,
-                                                const DownscaleConfig& config) const
+                                                const DownscaleParams& config) const
 {
     if (input.isNull())
         return input;

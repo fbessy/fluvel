@@ -31,10 +31,10 @@ ImageViewerWidget::ImageViewerWidget(QWidget* parent)
 }
 
 ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig,
-                                     const DownscaleConfig& downscaleConfig, QWidget* parent)
+                                     const DownscaleParams& downscaleParams, QWidget* parent)
     : QGraphicsView(parent)
     , displayConfig_(displayConfig)
-    , downscaleConfig_(downscaleConfig)
+    , downscaleConfig_(downscaleParams)
     , useEnhancedDisplayConfig_{true}
 {
     initializeView();
@@ -904,7 +904,7 @@ void ImageViewerWidget::updateTextOverlayVisibility()
     infoOverlay_->setVisible(displayConfig_.algorithmOverlayEnabled);
 }
 
-void ImageViewerWidget::applyDownscaleConfig(const DownscaleConfig& downscale)
+void ImageViewerWidget::applyDownscaleConfig(const DownscaleParams& downscale)
 {
     if (!useEnhancedDisplayConfig_)
         return;

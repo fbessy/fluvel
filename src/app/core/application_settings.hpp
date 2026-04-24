@@ -50,11 +50,11 @@ private:
     void saveVideoSessionSettings();
 
     void loadAlgo(Session session, ActiveContourConfig& algoConfig);
-    void loadDownscale(Session session, DownscaleConfig& downscaleConfig);
+    void loadDownscale(Session session, DownscaleParams& downscaleParams);
     void loadDisplay(Session session, DisplayConfig& displayConfig);
 
     void saveAlgo(Session session, const ActiveContourConfig& algoConfig);
-    void saveDownscale(Session session, const DownscaleConfig& downscaleConfig);
+    void saveDownscale(Session session, const DownscaleParams& downscaleParams);
     void saveDisplay(Session session, const DisplayConfig& displayConfig);
 
     QDir settingsDirectory();
