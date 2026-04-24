@@ -82,5 +82,8 @@ Thumbs.db
 docs/html/
 docs/latex/
 
+# AddressSanitizer log files
+tools/asan_log.*
+
 secure/
 *.keystore
