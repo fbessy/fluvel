@@ -10,6 +10,32 @@
 namespace fluvel_ip
 {
 
+/**
+ * @brief Convert a floating-point RGB grid to a BGR32 image.
+ *
+ * This function converts a Grid2D of floating-point RGB values (Rgb_f)
+ * into an ImageOwner with Bgr32 format (8-bit per channel + alpha).
+ *
+ * Each channel is:
+ * - rounded using +0.5f
+ * - clamped to [0, 255]
+ * - cast to uint8_t
+ *
+ * Output layout:
+ * - B (byte 0)
+ * - G (byte 1)
+ * - R (byte 2)
+ * - A (byte 3, set to 255)
+ *
+ * @param in Input grid of Rgb_f pixels.
+ * @param out Output image (must be preallocated with matching size and Bgr32 format).
+ *
+ * @pre out.format() == ImageFormat::Bgr32
+ * @pre out.width() == in.width()
+ * @pre out.height() == in.height()
+ *
+ * @note Alpha channel is set to 255 (opaque) and not derived from input.
+ */
 void convertRgbFToBgr32(const Grid2D<Rgb_f>& in, ImageOwner& out)
 {
     assert(out.format() == ImageFormat::Bgr32);

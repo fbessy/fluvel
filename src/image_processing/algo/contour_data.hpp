@@ -11,140 +11,256 @@
 namespace fluvel_ip
 {
 
+/**
+ * @brief Represents the full data structure of an active contour.
+ *
+ * This class encapsulates:
+ * - the discrete level-set function (@c phi),
+ * - the outer boundary (Lout),
+ * - the inner boundary (Lin).
+ *
+ * It provides multiple initialization modes:
+ * - automatic ellipse initialization,
+ * - initialization from a binary image,
+ * - initialization from explicit boundary lists.
+ *
+ * It also ensures consistency between the level-set representation
+ * and the boundary lists.
+ */
 class ContourData
 {
 public:
-    //! Constructor to initialize the contour with one ellipse.
+    /**
+     * @brief Construct a contour initialized with a default ellipse.
+     *
+     * @param phiWidth Width of the domain.
+     * @param phiHeight Height of the domain.
+     * @param connectivity Neighborhood connectivity (4 or 8).
+     */
     ContourData(int phiWidth, int phiHeight, Connectivity connectivity = Connectivity::Four);
 
-    //! Constructor to initialize the contour from a grayscale image of the levet-set function
-    //! #phi.
+    /**
+     * @brief Construct a contour from a grayscale level-set image.
+     *
+     * The input image is interpreted as a discrete level-set function.
+     *
+     * @param grayscalePhi Input grayscale image representing phi.
+     * @param connectivity Neighborhood connectivity (4 or 8).
+     */
     ContourData(const ImageView& grayscalePhi, Connectivity connectivity = Connectivity::Four);
 
-    //! Constructor to initialize the contour with the both neighbouring boundaries lists of
-    //! #outerBoundary and #innerBoundary.
+    /**
+     * @brief Construct a contour from explicit boundary lists.
+     *
+     * @param outerBoundary Exterior boundary (Lout).
+     * @param innerBoundary Interior boundary (Lin).
+     * @param phiWidth Width of the domain.
+     * @param phiHeight Height of the domain.
+     * @param connectivity Neighborhood connectivity (4 or 8).
+     */
     ContourData(const Contour& outerBoundary, const Contour& innerBoundary, int phiWidth,
                 int phiHeight, Connectivity connectivity = Connectivity::Four);
 
-    //! Copy constructor.
+    /**
+     * @brief Copy constructor.
+     */
     ContourData(const ContourData& contour);
 
-    //! Move constructor.
+    /**
+     * @brief Move constructor.
+     */
     ContourData(ContourData&& contour) noexcept;
 
-    //! Wrapper to use directly with offset lists without the need to get the variable #phi.
+    /**
+     * @brief Convert an offset index into 2D coordinates.
+     *
+     * @param offet Linear offset in the phi buffer.
+     * @return Corresponding 2D coordinates.
+     */
     Point2D_i coord(size_t offet) const
     {
         return phi_.coord(offet);
     }
 
-    //! Export the boundary list outerBoundary_ as a copied geometric representation.
+    /**
+     * @brief Export the outer boundary as a geometric contour.
+     *
+     * @return A vector of 2D points representing Lout.
+     */
     ExportedContour exportOuterBoundary() const
     {
         return exportContour(outerBoundary_);
     }
 
-    //! Export the boundary list innerBoundary_ as a copied geometric representation.
+    /**
+     * @brief Export the inner boundary as a geometric contour.
+     *
+     * @return A vector of 2D points representing Lin.
+     */
     ExportedContour exportInnerBoundary() const
     {
         return exportContour(innerBoundary_);
     }
 
-    //! Getter function for the discrete level-set function #phi.
+    /**
+     * @brief Access the discrete level-set function.
+     */
     DiscreteLevelSet& phi()
     {
         return phi_;
     }
+
+    /**
+     * @brief Const access to the discrete level-set function.
+     */
     const DiscreteLevelSet& phi() const
     {
         return phi_;
     }
-    //! Getter function for the exterior boundary #outerBoundary.
+
+    /**
+     * @brief Access the outer boundary (Lout).
+     */
     Contour& outerBoundary()
     {
         return outerBoundary_;
     }
+
+    /**
+     * @brief Const access to the outer boundary (Lout).
+     */
     const Contour& outerBoundary() const
     {
         return outerBoundary_;
     }
-    //! Getter function for the interior boundary #innerBoundary.
+
+    /**
+     * @brief Access the inner boundary (Lin).
+     */
     Contour& innerBoundary()
     {
         return innerBoundary_;
     }
+
+    /**
+     * @brief Const access to the inner boundary (Lin).
+     */
     const Contour& innerBoundary() const
     {
         return innerBoundary_;
     }
 
+    /**
+     * @brief Check if one of the boundary lists is empty.
+     *
+     * @return True if either Lout or Lin is empty.
+     */
     bool empty() const
     {
         return outerBoundary_.empty() || innerBoundary_.empty();
     }
 
+    /**
+     * @brief Check if the contour data is valid.
+     *
+     * This typically ensures consistency between phi and the boundary lists.
+     */
     bool isValid() const;
 
+    /**
+     * @brief Get the connectivity used by this contour.
+     */
     Connectivity connectivity() const
     {
         return connectivity_;
     }
 
+    /**
+     * @brief Check if the domain is too small to be meaningful.
+     *
+     * @return True if width < 2 or height < 2.
+     */
     bool isTrivialDomain() const
     {
         return phi_.width() < 2 || phi_.height() < 2;
     }
 
 private:
-    //! Initializes the contour *this with one ellipse. It is performed when the simplest
-    //! constructor is called or when one or both boundary lists is/are empty.
+    /**
+     * @brief Initialize the contour with a default ellipse.
+     *
+     * Used when no valid boundary is provided.
+     */
     void defineFromEllipse();
 
-    //! Eliminates redundant points to maintain a contiguous boundary.
+    /**
+     * @brief Remove redundant points from a boundary.
+     *
+     * Ensures the contour remains contiguous and minimal.
+     */
     void eliminateRedundantPoints(Contour& boundary, PhiValue regionValue);
 
-    //! To use defineFromEllipse and eliminateRedundantPoints
-    //! in ActiveContour.
+    /**
+     * @brief Allow ActiveContour to access internal helpers.
+     */
     friend class ActiveContour;
 
-    //! Checks if a given point is redundant to define a boundary, i.e. if no neighbors have a
-    //! different phi value sign comparing to the given point.
+    /**
+     * @brief Check if a point is redundant in the boundary.
+     *
+     * A point is redundant if all its neighbors belong to the same region.
+     */
     bool isRedundant(const ContourPoint& point) const;
 
-    //! Allocate lists.
+    /**
+     * @brief Allocate memory for boundary lists.
+     */
     void allocateLists();
 
-    //! Defines the boundary lists and phi from a binary phi.
+    /**
+     * @brief Initialize phi and boundaries from a binary level-set.
+     */
     void defineListsAndPhiFromBinaryPhi();
 
-    //! Defines the #phi level-set function from the boundary lists #outerBoundary and
-    //! #innerBoundary.
+    /**
+     * @brief Rebuild phi from boundary lists.
+     */
     void definePhiFromLists();
 
-    //! Performs a flood fill algorithm for the method #definePhiFromLists().
+    /**
+     * @brief Flood fill used during phi reconstruction.
+     */
     void floodFill(const Point2D_i& seed, PhiValue targetValue, PhiValue replacementValue);
 
-    //! Eliminates redundant points for the both lists to maintain a contiguous boundary.
+    /**
+     * @brief Remove redundant points in both boundaries if needed.
+     */
     void eliminateRedundantPointsIfNeeded();
 
-    //! Export a boundary list as a copied geometric representation.
+    /**
+     * @brief Export a contour as a vector of points.
+     */
     std::vector<Point2D_i> exportContour(const Contour& boundary) const;
 
-    template <typename T> static bool hasDuplicates(const std::vector<T>& v);
+    /**
+     * @brief Check if a vector contains duplicate elements.
+     */
+    template <typename T>
+    static bool hasDuplicates(const std::vector<T>& v);
 
-    //! Discrete level-set function with only 4 PhiValue possible.
-    DiscreteLevelSet phi_;
+    DiscreteLevelSet phi_; ///< Discrete level-set function (4 possible values).
 
-    //! List of points representing the exterior boundary (called Lout in the reference paper).
-    Contour outerBoundary_;
-    //! List of points representing the interior boundary (called Lin in the reference paper).
-    Contour innerBoundary_;
+    Contour outerBoundary_; ///< Exterior boundary (Lout).
+    Contour innerBoundary_; ///< Interior boundary (Lin).
 
-    //! Pixel connectivity of the neighborhood to define ContourData (4- or 8-connected).
-    const Connectivity connectivity_;
+    const Connectivity connectivity_; ///< Pixel connectivity (4- or 8-connected).
 };
 
-template <typename T> bool ContourData::hasDuplicates(const std::vector<T>& v)
+/**
+ * @brief Check if a vector contains duplicate elements.
+ */
+template <typename T>
+bool ContourData::hasDuplicates(const std::vector<T>& v)
 {
     for (std::size_t i = 0; i < v.size(); ++i)
         for (std::size_t j = i + 1; j < v.size(); ++j)

@@ -10,71 +10,118 @@
 namespace fluvel_ip
 {
 
+/**
+ * @brief Region-based grayscale speed model for active contours (Chan-Vese).
+ *
+ * This model computes the external speed Fd using intensity statistics
+ * (mean gray level inside and outside the contour).
+ *
+ * It is a simplified version of the Chan-Vese model for single-channel images.
+ *
+ * The implementation maintains incremental sums to allow efficient updates
+ * in O(1) per iteration instead of rescanning the whole image.
+ */
 class RegionGraySpeedModel : public ISpeedModel
 {
 public:
-    //! Constructor to initialize with an initial contour.
-    RegionGraySpeedModel(const RegionParams& params = RegionParams()); /* optional parameter */
+    /**
+     * @brief Constructor.
+     *
+     * @param params Configuration parameters for the region-based model.
+     */
+    RegionGraySpeedModel(const RegionParams& params = RegionParams());
 
+    /// Destructor.
     ~RegionGraySpeedModel() override = default;
 
-    //! Initializes the variables #sumIn, #sum_out and #pxl_nbr_out with scanning through the
-    //! image.
+    /**
+     * @brief Initialize internal statistics from the input image and contour.
+     *
+     * Computes initial sums and pixel counts for inside and outside regions.
+     *
+     * @param image Input grayscale image.
+     * @param cd Contour data.
+     */
     void onImageChanged(const ImageView& image, const ContourData& cd) override;
 
-    //! Calculates means #Cout and #Cin in \a O(1) or accounting for the previous updates of
-    //! #sum_out and #sumIn, in \a O(#lists_length) and not in \a O(#img_size).
+    /**
+     * @brief Update region means at the beginning of Cycle 1.
+     *
+     * Means are computed incrementally from maintained sums,
+     * avoiding a full image scan.
+     */
     void onStepCycle1() override;
 
-    //! Updates variables #sumIn, #sum_out and #pxl_nbr_out in order to calculate the means
-    //! #average_out and #average_in in constant time ( complexity 0(1) ).
+    /**
+     * @brief Update region statistics when a point switches region.
+     *
+     * This updates sums and counters incrementally during contour evolution.
+     *
+     * @param point Contour point being switched.
+     * @param direction Direction of the switch (in/out).
+     */
     void onSwitch(const ContourPoint& point, SwitchDirection direction) override;
 
-    //! Computes external speed \a Fd with the Chan-Vese model for a current point \a (x,y) of
-    //! #outerBoundary or #innerBoundary.
+    /**
+     * @brief Compute external speed Fd for a contour point.
+     *
+     * The speed is computed using the Chan-Vese energy model
+     * based on the difference between pixel intensity and region means.
+     *
+     * @param point Contour point to update.
+     * @param DiscreteLevelSet Unused here but required by interface.
+     */
     void computeSpeed(ContourPoint& point, const DiscreteLevelSet&) override;
 
+    /**
+     * @brief Fill diagnostic information.
+     *
+     * @param d Output diagnostics structure.
+     */
     void fillDiagnostics(ContourDiagnostics& d) const override;
 
-    //! Getter function for #Cout.
+    /**
+     * @brief Get mean intensity outside the contour.
+     */
     int meanOutside() const
     {
         return meanOutside_;
     }
-    //! Getter function for #Cin.
+
+    /**
+     * @brief Get mean intensity inside the contour.
+     */
     int meanInside() const
     {
         return meanInside_;
     }
 
 private:
-
-    //! Image wrapper.
+    /// Reference to the current image.
     ImageView image_;
 
-    //! Specific configuration for region based active contour.
+    /// Configuration parameters for the region-based model.
     const RegionParams params_;
 
-    //! Average or mean of the intensities or grey-levels of the pixels outside the curve,
-    //! called C2 in the Chan-Vese article.
+    /// Mean intensity outside the contour (C_out in Chan-Vese).
     int meanOutside_{0};
 
-    //! Average or mean of the intensities or grey-levels of the pixels inside the curve, called
-    //! C1 in the Chan-Vese article.
+    /// Mean intensity inside the contour (C_in in Chan-Vese).
     int meanInside_{0};
 
-    //! Sum of the intensities or grey-levels of the whole image's pixels.
+    /// Sum of intensities over the whole image.
     int64_t sumTotal_{0};
-    //! Number of pixels or bytes of #img_data.
+
+    /// Total number of pixels in the image.
     int64_t pixelCountTotal_{0};
 
-    //! Sum of the intensities or grey-levels of the pixels outside the curve, i.e. pixels
-    //! \f$i\f$ with \f$\phi \left( i\right) >0\f$ .
+    /// Sum of intensities outside the contour.
     int64_t sumOutside_{0};
-    //! Number of pixels outside the curve, i.e. pixels \f$i\f$ with \f$\phi \left( i\right)
-    //! >0\f$ .
+
+    /// Number of pixels outside the contour.
     int64_t pixelCountOutside_{0};
 
+    /// Indicates whether initial means have been validated.
     bool initialMeansChecked_{false};
 };
 

@@ -10,34 +10,49 @@
 namespace fluvel_ip
 {
 
-//! \class RegionParams
-//! Specific configuration for region based active contour
+/**
+ * @brief Parameters for region-based active contour (Chan-Vese model).
+ *
+ * This structure defines the weights associated with the homogeneity terms
+ * inside and outside the contour.
+ */
 struct RegionParams
 {
+    /// Default weight for inside region.
     static constexpr int kDefaultLambdaIn = 1;
+
+    /// Default weight for outside region.
     static constexpr int kDefaultLambdaOut = 1;
 
-    //! Weight of the inside homogeneity criterion in the Chan-Vese model
-    //! (called lambda 1 in the article "Active contour without edges.").
+    /**
+     * @brief Weight of the inside homogeneity term (λ₁ in Chan-Vese).
+     */
     int lambdaIn;
 
-    //! Weight of the outside homogeneity criterion in the Chan-Vese model
-    //! (called lambda 2 in the article "Active contour without edges.").
+    /**
+     * @brief Weight of the outside homogeneity term (λ₂ in Chan-Vese).
+     */
     int lambdaOut;
 
-    //! Default constructor.
+    /**
+     * @brief Default constructor.
+     */
     RegionParams()
         : lambdaIn(kDefaultLambdaIn)
         , lambdaOut(kDefaultLambdaOut)
     {
     }
 
-    //! Destructor.
-    //! Non-virtual on purpose: this is a value-type configuration struct,
-    //! not intended for polymorphic use or deletion through a base pointer.
+    /**
+     * @brief Destructor.
+     *
+     * Non-virtual on purpose: this is a value-type configuration struct.
+     */
     ~RegionParams() = default;
 
-    //! Copy constructor.
+    /**
+     * @brief Copy constructor.
+     */
     RegionParams(const RegionParams& copied)
         : lambdaIn(copied.lambdaIn)
         , lambdaOut(copied.lambdaOut)
@@ -45,7 +60,9 @@ struct RegionParams
         this->normalize();
     }
 
-    //! Copy assignement operator.
+    /**
+     * @brief Copy assignment operator.
+     */
     RegionParams& operator=(const RegionParams& rhs)
     {
         this->lambdaIn = rhs.lambdaIn;
@@ -56,20 +73,31 @@ struct RegionParams
         return *this;
     }
 
-    //! \a Equal operator overloading.
+    /**
+     * @brief Equality operator.
+     */
     friend bool operator==(const RegionParams& lhs, const RegionParams& rhs)
     {
         return (lhs.lambdaIn == rhs.lambdaIn && lhs.lambdaOut == rhs.lambdaOut);
     }
 
-    //! \a Not equal operator overloading.
+    /**
+     * @brief Inequality operator.
+     */
     friend bool operator!=(const RegionParams& lhs, const RegionParams& rhs)
     {
         return !(lhs == rhs);
     }
 
 protected:
-    //! Normalize value weight and returns the same value or a default value.
+    /**
+     * @brief Normalize a weight value.
+     *
+     * Ensures that weights are strictly positive.
+     *
+     * @param weight Input weight.
+     * @return Normalized weight.
+     */
     static int normalize(int weight)
     {
         if (weight < 1)
@@ -79,7 +107,9 @@ protected:
     }
 
 private:
-    //! Check values of a configuration.
+    /**
+     * @brief Normalize all parameters.
+     */
     void normalize()
     {
         lambdaIn = normalize(lambdaIn);
@@ -87,14 +117,20 @@ private:
     }
 };
 
+/**
+ * @brief Supported color spaces for region-based models.
+ */
 enum class ColorSpaceOption
 {
-    RGB,
-    YUV,
-    Lab,
-    Luv
+    RGB, ///< Red-Green-Blue
+    YUV, ///< Luminance-Chrominance
+    Lab, ///< CIE Lab color space
+    Luv  ///< CIE Luv color space
 };
 
+/**
+ * @brief Convert ColorSpaceOption to string.
+ */
 inline constexpr const char* to_string(ColorSpaceOption clrOpt)
 {
     switch (clrOpt)
@@ -112,7 +148,12 @@ inline constexpr const char* to_string(ColorSpaceOption clrOpt)
     return "RGB";
 }
 
-inline ColorSpaceOption color_space_from_string(std::string_view s)
+/**
+ * @brief Convert string to ColorSpaceOption.
+ *
+ * Defaults to RGB if the string is not recognized.
+ */
+inline ColorSpaceOption colorSpaceFromString(std::string_view s)
 {
     if (s == "RGB")
         return ColorSpaceOption::RGB;
@@ -126,66 +167,93 @@ inline ColorSpaceOption color_space_from_string(std::string_view s)
     return ColorSpaceOption::RGB;
 }
 
-//! \class RegionColorParams
-//! Specific configuration for color region based active contour.
+/**
+ * @brief Parameters for color-based region active contour.
+ *
+ * Extends RegionParams by adding:
+ * - color space selection
+ * - per-channel weighting
+ *
+ * Used in multi-channel Chan-Vese models.
+ */
 struct RegionColorParams : public RegionParams
 {
+    /// Default color space.
     static constexpr ColorSpaceOption kDefaultColorSpace = ColorSpaceOption::RGB;
 
+    /// Default channel weights.
     static constexpr Components_3i kDefaultWeights{1, 1, 1};
 
-    //! Color space option
-    ColorSpaceOption color_space;
+    /**
+     * @brief Color space used for computation.
+     */
+    ColorSpaceOption colorSpace;
 
-    //! Weights \a to calculate external speed \a Fd.
+    /**
+     * @brief Per-channel weights for the energy computation.
+     *
+     * These weights control the influence of each channel (e.g. R/G/B or Y/U/V).
+     */
     Components_3i weights;
 
-    //! Normalize values of a configuration.
-    void normalize_region_color()
+    /**
+     * @brief Normalize channel weights.
+     */
+    void normalizeColorParams()
     {
         weights.c1 = normalize(weights.c1);
         weights.c2 = normalize(weights.c2);
         weights.c3 = normalize(weights.c3);
     }
 
-    //! Default constructor.
+    /**
+     * @brief Default constructor.
+     */
     RegionColorParams()
         : RegionParams()
-        , color_space(kDefaultColorSpace)
+        , colorSpace(kDefaultColorSpace)
         , weights{kDefaultWeights}
     {
     }
 
-    //! Copy constructor.
+    /**
+     * @brief Copy constructor.
+     */
     RegionColorParams(const RegionColorParams& copied)
         : RegionParams(copied)
-        , color_space(copied.color_space)
+        , colorSpace(copied.colorSpace)
         , weights(copied.weights)
     {
-        this->normalize_region_color();
+        this->normalizeColorParams();
     }
 
-    //! Copy assignement operator.
+    /**
+     * @brief Copy assignment operator.
+     */
     RegionColorParams& operator=(const RegionColorParams& rhs)
     {
         RegionParams::operator=(rhs);
 
-        this->color_space = rhs.color_space;
+        this->colorSpace = rhs.colorSpace;
         this->weights = rhs.weights;
 
-        this->normalize_region_color();
+        this->normalizeColorParams();
 
         return *this;
     }
 
-    //! \a Equal operator overloading.
+    /**
+     * @brief Equality operator.
+     */
     friend bool operator==(const RegionColorParams& lhs, const RegionColorParams& rhs)
     {
-        return (lhs.color_space == rhs.color_space && lhs.lambdaIn == rhs.lambdaIn &&
+        return (lhs.colorSpace == rhs.colorSpace && lhs.lambdaIn == rhs.lambdaIn &&
                 lhs.lambdaOut == rhs.lambdaOut && lhs.weights == rhs.weights);
     }
 
-    //! \a Not equal operator overloading.
+    /**
+     * @brief Inequality operator.
+     */
     friend bool operator!=(const RegionColorParams& lhs, const RegionColorParams& rhs)
     {
         return !(lhs == rhs);

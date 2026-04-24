@@ -9,58 +9,121 @@
 namespace fluvel_ip
 {
 
+/**
+ * @brief Geometric shape represented as a set of 2D integer points.
+ *
+ * This class is primarily used to represent contour shapes and supports
+ * operations such as centroid computation and Hausdorff distance evaluation.
+ */
 class Shape
 {
 public:
-    //! Constructor.
+    /**
+     * @brief Default constructor.
+     */
     Shape();
 
-    //! Increase the capacity of the vector points.
+    /**
+     * @brief Reserve memory for points.
+     *
+     * @param elem_alloc_size Number of elements to reserve.
+     */
     void reserve(size_t elem_alloc_size);
 
-    //! Clear all the points of the shape.
+    /**
+     * @brief Remove all points from the shape.
+     */
     void clear();
 
-    //! Push back a point into the shape.
+    /**
+     * @brief Add a point to the shape.
+     *
+     * @param x X coordinate.
+     * @param y Y coordinate.
+     */
     void pushBack(int x, int y);
 
-    //! Push back a point into the shape.
+    /**
+     * @brief Add a point to the shape.
+     *
+     * @param p Point to add.
+     */
     void pushBack(const Point2D_i& p);
 
-    //! Push back a point into the shape.
+    /**
+     * @brief Add a point to the shape (move version).
+     *
+     * @param p Point to move into the container.
+     */
     void pushBack(Point2D_i&& p);
 
-    //! Swap the shape *this with an other shape in constant time, i.e. O(1) complexity.
+    /**
+     * @brief Swap this shape with another in constant time.
+     *
+     * @param other Shape to swap with.
+     */
     void swap(Shape& other) noexcept;
 
-    //! Shuffles points of the shape.
+    /**
+     * @brief Randomly shuffle the points of the shape.
+     *
+     * Useful for stochastic algorithms or randomized sampling.
+     */
     void shufflePoints();
 
-    //! Calculates the centroid of the shape in variables #centroid_x and #centroid_y.
+    /**
+     * @brief Compute the centroid of the shape.
+     *
+     * The result is stored internally and accessible via centroid().
+     */
     void calculateCentroid();
 
-    //! Returns true if the shape is ready for the hausdorff distance computation.
+    /**
+     * @brief Check if the shape is valid.
+     *
+     * A valid shape typically contains enough points for geometric
+     * computations such as Hausdorff distance.
+     *
+     * @return True if the shape is valid.
+     */
     bool isValid() const;
 
-    //! Gets the vector of points.
+    /**
+     * @brief Get the points composing the shape.
+     *
+     * @return Const reference to the internal vector of points.
+     */
     const std::vector<Point2D_i>& points() const
     {
         return points_;
     }
 
-    //! Gets the centroid of the shape.
+    /**
+     * @brief Get the centroid of the shape.
+     *
+     * @return Centroid as a floating-point 2D point.
+     */
     const Point2D_f& centroid() const
     {
         return centroid_;
     }
 
-    //! Gets grid diagonal.
+    /**
+     * @brief Compute the diagonal length of a grid.
+     *
+     * Useful for normalization (e.g. Hausdorff distance).
+     *
+     * @param gridWidth Grid width.
+     * @param gridHeight Grid height.
+     * @return Diagonal length.
+     */
     static float gridDiagonal(int gridWidth, int gridHeight);
 
 private:
+    /// List of points composing the shape.
     std::vector<Point2D_i> points_;
 
-    //! Position of the shape's centroid.
+    /// Centroid of the shape.
     Point2D_f centroid_;
 };
 

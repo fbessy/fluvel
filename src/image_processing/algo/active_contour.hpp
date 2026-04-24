@@ -18,19 +18,35 @@ namespace fluvel_ip
 
 class ISpeedModel;
 
+/**
+ * @brief Initial allocation size for speed arrays.
+ *
+ * Used to avoid frequent reallocations when computing speeds.
+ */
 constexpr size_t kInitialSpeedArrayAllocSize = 10000u;
 
-//! \struct BoundarySwitchMapping to perform generically a switch in or a switch out.
+/**
+ * @brief Mapping used to perform generic boundary switching operations.
+ *
+ * This structure encapsulates all required parameters to perform
+ * either a "switch in" or "switch out" operation on contour boundaries.
+ */
 struct BoundarySwitchMapping
 {
-    Contour& fromBoundary;
-    Contour& toBoundary;
-    SpeedValue requiredSpeedSign;
-    PhiValue currentToAdjacentVal;
-    PhiValue neighborFromRegionVal;
-    PhiValue neighborToBoundaryVal;
-    PhiValue redundantToRegionVal;
+    Contour& fromBoundary;          //!< Source boundary (points to remove from).
+    Contour& toBoundary;            //!< Destination boundary (points to add to).
+    SpeedValue requiredSpeedSign;   //!< Required speed sign to trigger the switch.
+    PhiValue currentToAdjacentVal;  //!< Phi value for adjacent transition.
+    PhiValue neighborFromRegionVal; //!< Phi value for neighbor in source region.
+    PhiValue neighborToBoundaryVal; //!< Phi value for neighbor in destination boundary.
+    PhiValue redundantToRegionVal;  //!< Phi value for redundant region update.
 
+    /**
+     * @brief Creates a mapping for a "switch in" operation.
+     *
+     * @param cd Contour data.
+     * @return Mapping configured for inward switching.
+     */
     static BoundarySwitchMapping makeSwitchIn(ContourData& cd)
     {
         return {cd.outerBoundary(),         cd.innerBoundary(),      SpeedValue::GoOutward,
@@ -38,6 +54,12 @@ struct BoundarySwitchMapping
                 PhiValue::InsideRegion};
     }
 
+    /**
+     * @brief Creates a mapping for a "switch out" operation.
+     *
+     * @param cd Contour data.
+     * @return Mapping configured for outward switching.
+     */
     static BoundarySwitchMapping makeSwitchOut(ContourData& cd)
     {
         return {cd.innerBoundary(),         cd.outerBoundary(),     SpeedValue::GoInward,
@@ -46,53 +68,44 @@ struct BoundarySwitchMapping
     }
 };
 
-//! \class EvolutionData
-//! Holds the evolution data of the active contour.
+/**
+ * @brief Stores runtime evolution data of the active contour.
+ *
+ * This structure tracks iteration counts, geometric evolution,
+ * convergence metrics, and stopping conditions.
+ */
 struct EvolutionData
 {
-    //! Iterations number in a cycle (cycle 1 or cycle 2). It is set to 0 at the end of one
-    //! cycle.
-    int phaseStepCount{0};
+    int phaseStepCount{0};  //!< Number of iterations within the current phase.
+    int stepCount{0};       //!< Total number of iterations since initialization.
+    const int maxStepCount; //!< Maximum allowed number of iterations.
 
-    //! Total number of iterations the active contour has evolved from the initial contour.
-    int stepCount{0};
+    bool didMove{true}; //!< Indicates if the contour moved during Cycle1.
 
-    //! Maximum number of times the active contour can evolve.
-    const int maxStepCount;
+    Shape l_out_shape;   //!< Outer boundary shape at the end of the current Cycle2.
+    Shape previousShape; //!< Outer boundary shape at the end of the previous Cycle2.
 
-    //! Boolean egals to true if the active contour evolves in one way (at least) in cycle 1.
-    bool didMove{true};
+    int previous_step_count{0}; //!< Step count at the previous Cycle2.
 
-    //! outerBoundary shape at the end of the cycle 2.
-    Shape l_out_shape;
+    float previousQuantile{
+        std::numeric_limits<float>::quiet_NaN()}; //!< Previous Hausdorff quantile.
+    float hausdorffQuantile{
+        std::numeric_limits<float>::quiet_NaN()}; //!< Current Hausdorff quantile.
+    float relativeCentroidDistance{
+        std::numeric_limits<float>::quiet_NaN()}; //!< Normalized centroid distance.
 
-    //! outerBoundary shape at the end of the previous cycle 2.
-    Shape previousShape;
+    PointSet intersection; //!< Intersection between current and previous shapes.
 
-    //! Total number of iterations the active contour has evolved from the initial contour
-    //! at the end of the previous cycle 2.
-    int previous_step_count{0};
+    StoppingStatus stoppingStatus{StoppingStatus::None}; //!< Current stopping condition.
 
-    //! Hausdorff quantile
-    //! at the end of the previous cycle 2.
-    float previousQuantile{std::numeric_limits<float>::quiet_NaN()};
-
-    //! Hausdorff quantile
-    //! at the end of the cycle 2. It is a normalized value, divided by the diagonal size of
-    //! #phi, in percent.
-    float hausdorffQuantile{std::numeric_limits<float>::quiet_NaN()};
-
-    //! Centroids gap between #l_out_shape and previousShape#. It is a normalized value,
-    //! divided by the diagonal size of #phi, in percent.
-    float relativeCentroidDistance{std::numeric_limits<float>::quiet_NaN()};
-
-    //! Intersection, i.e common points between #l_out_shape and #previousShape.
-    PointSet intersection;
-
-    //! Stopping condition status.
-    StoppingStatus stoppingStatus{StoppingStatus::None};
-
-    //! Constructor.
+    /**
+     * @brief Constructor.
+     *
+     * Initializes buffers and computes the maximum number of iterations
+     * based on image dimensions.
+     *
+     * @param cd Contour data.
+     */
     EvolutionData(const ContourData& cd)
         : maxStepCount(5 * std::max(cd.phi().width(), cd.phi().height()))
     {
@@ -101,7 +114,12 @@ struct EvolutionData
         intersection.reserve(cd.outerBoundary().capacity());
     }
 
-    //! Reset execution state of evolution data. Used multiple times for video tracking.
+    /**
+     * @brief Resets runtime execution state.
+     *
+     * Keeps allocated buffers but resets iteration counters and status.
+     * Typically used for video tracking scenarios.
+     */
     void resetExecutionState()
     {
         phaseStepCount = 0;
@@ -110,175 +128,250 @@ struct EvolutionData
     }
 };
 
+/**
+ * @brief Active contour (level-set based) implementation.
+ *
+ * This class implements a discrete active contour algorithm using
+ * two alternating phases:
+ * - Cycle1: data-driven evolution
+ * - Cycle2: smoothing / regularization
+ *
+ * It supports both image segmentation and video tracking scenarios.
+ */
 class ActiveContour
 {
 public:
-    //! Constructor to initialize the active contour from an initial contour (#phi, #innerBoundary
-    //! and #outerBoundary) with a copy semantic.
+    /**
+     * @brief Constructs an active contour instance.
+     *
+     * @param initialContour Initial contour data (copied).
+     * @param speedModel External speed model.
+     * @param params Algorithm parameters.
+     */
     ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedModel> speedModel,
                   const ActiveContourParams& params);
 
-    //! Destructor.
+    /**
+     * @brief Destructor.
+     */
     virtual ~ActiveContour();
 
-    //! Updates the model with a new image matching phi's dimensions.
+    /**
+     * @brief Updates the contour with a new input image.
+     *
+     * The image must match the dimensions of the level-set function.
+     *
+     * @param image Input image.
+     */
     void update(const ImageView& image);
 
-    //! Checks a generic failure case.
+    /**
+     * @brief Checks for contour-related failure conditions.
+     */
     void checkContourFailure();
 
-    //! Checks external speed model failures.
+    /**
+     * @brief Checks for failures in the external speed model.
+     */
     void checkSpeedModelFailure();
 
-    //! Runs or evolves the active contour until it reaches a terminal state.
+    /**
+     * @brief Runs the contour evolution until a stopping condition is reached.
+     */
     void converge();
 
-    //! The active contour evolves to one iteration.
+    /**
+     * @brief Performs a single iteration step.
+     */
     void step();
 
-    //! Runs the active contour for a fixed number of full cycles (cycle1 + cycle2).
-    //! Ensures the contour is geometrically stable at the end of each cycle2 (used for video
-    //! tracking).
+    /**
+     * @brief Runs a fixed number of full cycles (Cycle1 + Cycle2).
+     *
+     * Used for stable updates in video tracking.
+     *
+     * @param n_cycles Number of cycles.
+     */
     void runCycles(int n_cycles);
 
-    //! Export the boundary list outerBoundary_ as a copied geometric representation.
+    /**
+     * @brief Exports the outer boundary as a geometric contour.
+     *
+     * @return Copy of the outer boundary.
+     */
     ExportedContour exportOuterBoundary() const
     {
         return cd_.exportOuterBoundary();
     }
 
-    //! Export the boundary list innerBoundary_ as a copied geometric representation.
+    /**
+     * @brief Exports the inner boundary as a geometric contour.
+     *
+     * @return Copy of the inner boundary.
+     */
     ExportedContour exportInnerBoundary() const
     {
         return cd_.exportInnerBoundary();
     }
 
-    //! Getter for the discrete level-set function with only 4 PhiValue possible.
+    /**
+     * @brief Returns the discrete level-set function.
+     */
     const DiscreteLevelSet& phi() const
     {
         return cd_.phi();
     }
 
-    //! Getter for the list of offset points representing the exterior boundary.
+    /**
+     * @brief Returns the outer boundary.
+     */
     const Contour& outerBoundary() const
     {
         return cd_.outerBoundary();
     }
-    //! Getter for the list of offset points representing the interior boundary.
+
+    /**
+     * @brief Returns the inner boundary.
+     */
     const Contour& innerBoundary() const
     {
         return cd_.innerBoundary();
     }
 
+    /**
+     * @brief Fills diagnostic information.
+     *
+     * @param d Output diagnostics structure.
+     */
     void fillDiagnostics(ContourDiagnostics& d) const;
 
-    //! Gets if the active contour reaches the final state.
+    /**
+     * @brief Indicates whether the contour has reached a terminal state.
+     */
     bool isStopped() const
     {
         return state_ == PhaseState::Stopped;
     }
 
+    /**
+     * @brief Indicates whether this is the first iteration.
+     */
     bool isFirstIteration() const
     {
         return ed_.stepCount == 0;
     }
 
 private:
-    //! Runs the active contour for a fixed number of elementary steps.
-    //! Intended for incremental updates (e.g. video tracking).
+    /**
+     * @brief Runs a fixed number of elementary steps.
+     */
     void runSteps(int n_steps);
 
-    //! Performs one elementary step in Cycle1 (external / data-dependent evolution, speed Fd).
+    /**
+     * @brief Performs one Cycle1 step (data-driven evolution).
+     */
     void stepCycle1();
 
-    //! Performs one elementary step in Cycle1 (external / data-dependent evolution, speed Fd).
+    /**
+     * @brief Performs one Cycle2 step (smoothing phase).
+     */
     void stepCycle2();
 
-    //! It selects the current mapping.
+    /**
+     * @brief Selects the current boundary mapping (in/out).
+     */
     void selectCurrentMapping(SwitchDirection direction);
 
-    //! Get the selected current mapping.
+    /**
+     * @brief Returns the currently selected mapping.
+     */
     const BoundarySwitchMapping& currentMapping() const
     {
         return *currentMapping_;
     }
 
-    //! Performs one directional topological update step (in or out).
-    //! The step includes velocity computation, boundary switching,
-    //! and adjacent boundary cleanup.
+    /**
+     * @brief Performs one directional substep (inward or outward).
+     *
+     * @return True if any movement occurred.
+     */
     bool directionalSubstep(SwitchDirection direction);
 
-    //! Computes the speed for all points of a boundary list #outerBoundary or #innerBoundary.
+    /**
+     * @brief Updates speeds for all points in a boundary.
+     */
     void updateSpeeds(Contour& boundary);
 
-    template <typename SpeedModel> void computeSpeeds(Contour& boundary, SpeedModel&& model)
+    /**
+     * @brief Generic speed computation loop.
+     */
+    template <typename SpeedModel>
+    void computeSpeeds(Contour& boundary, SpeedModel&& model)
     {
         for (auto& point : boundary)
             model.computeSpeed(point, cd_.phi());
     }
 
-    //! Generic method to handle outward / inward local movement of a current boundary point (of
-    //! #outerBoundary or #innerBoundary) and to switch it from one boundary list to the other.
+    /**
+     * @brief Switches a boundary point between inner and outer lists.
+     */
     void switchBoundaryPoint(ContourPoint& point);
 
-    //! Promote a neighboring region point to boundary.
+    /**
+     * @brief Promotes a region point to a boundary point.
+     */
     void promoteRegionToBoundary(int nx, int ny);
 
-    //! Stops the active contour and puts it in a terminal state.
-    //! After this call, step(), converge(), and runCycles() have no effect.
+    /**
+     * @brief Stops the contour evolution.
+     */
     void stop();
 
-    //! Check if iteration limit is not reached.
+    /**
+     * @brief Enforces iteration limit.
+     */
     void enforceIterationLimit();
 
-    //! Calculates the active contour state at the end of each iteration of a cycle 1.
+    /**
+     * @brief Updates state after Cycle1.
+     */
     void checkStateStep1();
 
-    //! Updates the active contour state at the end of a cycle 2.
+    /**
+     * @brief Updates state after Cycle2.
+     */
     void updateStateCycle2();
 
-    //! Check an internal condition, based on the contour state rather than image data,
-    //! to stop the algorithm if the nominal convergence condition is not reached.
+    /**
+     * @brief Checks Hausdorff-based stopping condition.
+     */
     void checkHausdorffStoppingCondition();
 
-    //! Computes the shapes intersection between #ed.l_out_shape and #ed.previousShape
-    //! to speed up the hausdorff distance computation.
+    /**
+     * @brief Computes intersection between current and previous shapes.
+     */
     void calculateShapesIntersection();
 
-    //! Representation data of the active contour
-    //! (discret level-set function phi, Lin and Lout)
-    ContourData cd_;
+    ContourData cd_; //!< Core contour representation.
 
-    std::unique_ptr<ISpeedModel> externalSpeedModel_;
+    std::unique_ptr<ISpeedModel> externalSpeedModel_; //!< External speed model.
 
-    //! Generic configuration of the active contour.
-    const ActiveContourParams params_;
+    const ActiveContourParams params_; //!< Algorithm parameters.
 
-    MajorityInternalSpeed internalSpeedModel_;
+    MajorityInternalSpeed internalSpeedModel_; //!< Internal smoothing speed model.
 
-    //! BoundarySwitchMapping for the procedure switch_in.
-    const BoundarySwitchMapping switchInMapping_;
+    const BoundarySwitchMapping switchInMapping_;  //!< Mapping for inward switch.
+    const BoundarySwitchMapping switchOutMapping_; //!< Mapping for outward switch.
 
-    //! BoundarySwitchMapping for the procedure switch_out.
-    const BoundarySwitchMapping switchOutMapping_;
+    const BoundarySwitchMapping* currentMapping_; //!< Currently selected mapping.
 
-    //! A selector (pointer) to perform a switch generically. It pointes to switchInMapping_ or
-    //! switchOutMapping_.
-    const BoundarySwitchMapping* currentMapping_;
+    Contour pendingBoundaryPoints_; //!< Temporary storage for boundary updates.
 
-    //! Temporary points to add after each scan of the list #innerBoundary or #outerBoundary.
-    Contour pendingBoundaryPoints_;
+    int stepsPerCycle_; //!< Number of steps per full cycle.
 
-    //! Number of iterations in one cycle1-cycle2.
-    int stepsPerCycle_;
+    PhaseState state_; //!< Current phase state.
 
-    //! Evolution state of the active contour given at a current iteration.
-    //!  There are 4 states : Cycle1, Cycle2, FinalCycle2 and Stopped.
-    PhaseState state_;
-
-    //! Evolution data of the active contour used by #checkStateStep1() and
-    //! #updateStateCycle2() to calculate #state.
-    EvolutionData ed_;
+    EvolutionData ed_; //!< Evolution tracking data.
 };
 
 } // namespace fluvel_ip

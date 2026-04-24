@@ -14,6 +14,19 @@ namespace fluvel_ip::filter::morpho
 namespace detail
 {
 
+/**
+ * @brief Horizontal pass of the Van Herk algorithm.
+ *
+ * Computes sliding-window min/max (depending on IsMax) along image rows
+ * using a monotonic deque for O(N) complexity.
+ *
+ * @tparam IsMax If true computes dilation (max), otherwise erosion (min).
+ * @param src Pointer to input row data.
+ * @param dst Pointer to output row data.
+ * @param width Image width.
+ * @param channels Number of channels per pixel.
+ * @param radius Radius of the structuring element.
+ */
 template <bool IsMax>
 void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels, int radius)
 {
@@ -25,13 +38,13 @@ void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels
 
         for (int i = 0; i < width; ++i)
         {
-            // remove out-of-window
+            // Remove indices outside the sliding window
             if (!dq.empty() && dq.front() <= i - K)
                 dq.pop_front();
 
             int idx = i * channels + ch;
 
-            // maintain monotonic deque
+            // Maintain monotonic deque
             while (!dq.empty())
             {
                 uint8_t a = src[dq.back() * channels + ch];
@@ -55,7 +68,7 @@ void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels
 
             dq.push_back(i);
 
-            // write result (centered window)
+            // Write centered result
             if (i >= radius)
             {
                 int out_i = i - radius;
@@ -63,7 +76,7 @@ void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels
             }
         }
 
-        // tail (bord droit)
+        // Handle right border (tail)
         for (int i = width - radius; i < width; ++i)
         {
             dst[i * channels + ch] = src[dq.front() * channels + ch];
@@ -71,6 +84,20 @@ void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels
     }
 }
 
+/**
+ * @brief Vertical pass of the Van Herk algorithm.
+ *
+ * Applies the same sliding-window logic as the horizontal pass,
+ * but along image columns.
+ *
+ * @tparam IsMax If true computes dilation (max), otherwise erosion (min).
+ * @param buffer Intermediate buffer from horizontal pass.
+ * @param output Output image.
+ * @param width Image width.
+ * @param height Image height.
+ * @param channels Number of channels per pixel.
+ * @param radius Radius of the structuring element.
+ */
 template <bool IsMax>
 void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, int height,
                      int channels, int radius)
@@ -127,7 +154,7 @@ void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, in
                 }
             }
 
-            // tail
+            // Handle bottom border (tail)
             for (int y = height - radius; y < height; ++y)
             {
                 uint8_t* dst = output.rowPtr(y);
@@ -142,35 +169,51 @@ void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, in
 
 } // namespace detail
 
+/**
+ * @brief Morphological filter using the Van Herk algorithm.
+ *
+ * Computes grayscale dilation (max) or erosion (min) with a square
+ * structuring element of size (2 * radius + 1).
+ *
+ * This implementation achieves O(N) complexity per row/column using
+ * a sliding-window monotonic deque.
+ *
+ * The algorithm is applied in two separable passes:
+ * - horizontal
+ * - vertical
+ *
+ * @tparam IsMax If true computes dilation, otherwise erosion.
+ * @param input Input image.
+ * @param output Output image (must have same layout as input).
+ * @param radius Radius of the structuring element.
+ */
 template <bool IsMax>
 void vanHerk(const ImageView& input, ImageOwner& output, int radius)
 {
     assert(output.width() == input.width());
     assert(output.height() == input.height());
     assert(output.format() == input.format());
-
     assert(radius >= 1);
 
     const int w = input.width();
     const int h = input.height();
     const int c = input.channels();
-    const int k = 2 * radius + 1;
 
+    // Degenerate case: no spatial neighborhood
     if (w == 1 || h == 1)
     {
         output.copyFrom(input);
         return;
     }
 
+    // Clamp radius to valid range
     int maxRadius = std::min((w - 1) / 2, (h - 1) / 2);
     radius = std::min(radius, maxRadius);
 
-    // buffer intermédiaire
+    // Intermediate buffer
     ImageOwner buffer(w, h, input.format());
 
-    // =========================
-    // PASS 1 — Horizontal
-    // =========================
+    // Horizontal pass
     for (int y = 0; y < h; ++y)
     {
         const uint8_t* src = input.row(y);
@@ -179,9 +222,7 @@ void vanHerk(const ImageView& input, ImageOwner& output, int radius)
         detail::vanHerkHorizontal<IsMax>(src, dst, w, c, radius);
     }
 
-    // =========================
-    // PASS 2 — Vertical
-    // =========================
+    // Vertical pass
     detail::vanHerkVertical<IsMax>(buffer, output, w, h, c, radius);
 }
 

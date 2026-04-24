@@ -173,7 +173,7 @@ void AlgoSettingsWidget::accept()
     config_.regionParams.lambdaOut = lambda_out_spin_->value();
     config_.regionParams.lambdaIn = lambda_in_spin_->value();
 
-    config_.regionParams.color_space =
+    config_.regionParams.colorSpace =
         color_space_cb_->currentData().value<fluvel_ip::ColorSpaceOption>();
 
     config_.regionParams.weights.c1 = alpha_spin_->value();
@@ -195,7 +195,7 @@ void AlgoSettingsWidget::reject()
     lambda_out_spin_->setValue(config_.regionParams.lambdaOut);
     lambda_in_spin_->setValue(config_.regionParams.lambdaIn);
 
-    index = color_space_cb_->findData(QVariant::fromValue(config_.regionParams.color_space));
+    index = color_space_cb_->findData(QVariant::fromValue(config_.regionParams.colorSpace));
     if (index >= 0)
         color_space_cb_->setCurrentIndex(index);
 

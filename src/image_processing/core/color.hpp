@@ -11,25 +11,49 @@
 namespace fluvel_ip
 {
 
+/**
+ * @brief 32-bit BGRA pixel layout.
+ *
+ * Channel order in memory:
+ * - blue
+ * - green
+ * - red
+ * - alpha
+ */
 struct Bgra32
 {
-    unsigned char blue;
-    unsigned char green;
-    unsigned char red;
-    unsigned char alpha;
+    unsigned char blue;  ///< Blue channel
+    unsigned char green; ///< Green channel
+    unsigned char red;   ///< Red channel
+    unsigned char alpha; ///< Alpha channel
 };
 
+/**
+ * @brief Concept for arithmetic types.
+ *
+ * Accepts both integral and floating-point types.
+ */
 template <typename T>
 concept Arithmetic = std::integral<T> || std::floating_point<T>;
 
-template <Arithmetic T> struct Rgb
+/**
+ * @brief Generic RGB color container.
+ *
+ * @tparam T Channel type (e.g. uint8_t, float, int)
+ */
+template <Arithmetic T>
+struct Rgb
 {
-    T red{};
-    T green{};
-    T blue{};
+    T red{};   ///< Red channel
+    T green{}; ///< Green channel
+    T blue{};  ///< Blue channel
 
+    /// Default constructor.
     constexpr Rgb() = default;
 
+    /**
+     * @brief Construct RGB color.
+     */
     constexpr Rgb(T r, T g, T b)
         : red(r)
         , green(g)
@@ -37,6 +61,9 @@ template <Arithmetic T> struct Rgb
     {
     }
 
+    /**
+     * @brief Conversion constructor between RGB types.
+     */
     template <typename U>
     explicit Rgb(const Rgb<U>& other)
         : red(static_cast<T>(other.red))
@@ -45,17 +72,23 @@ template <Arithmetic T> struct Rgb
     {
     }
 
+    /// Equality comparison.
     bool operator==(const Rgb& other) const noexcept
     {
         return red == other.red && green == other.green && blue == other.blue;
     }
 
+    /// Inequality comparison.
     bool operator!=(const Rgb& other) const noexcept
     {
         return !(*this == other);
     }
 
-    template <Arithmetic U> Rgb& operator+=(const Rgb<U>& rhs)
+    /**
+     * @brief In-place addition.
+     */
+    template <Arithmetic U>
+    Rgb& operator+=(const Rgb<U>& rhs)
     {
         red += static_cast<T>(rhs.red);
         green += static_cast<T>(rhs.green);
@@ -63,7 +96,13 @@ template <Arithmetic T> struct Rgb
         return *this;
     }
 
-    template <typename U> Rgb& operator-=(const Rgb<U>& rhs)
+    /**
+     * @brief In-place subtraction.
+     *
+     * @note Requires signed type if T is integral.
+     */
+    template <typename U>
+    Rgb& operator-=(const Rgb<U>& rhs)
     {
         static_assert(!std::integral<T> || std::signed_integral<T>,
                       "Rgb<T>::operator-= requires T to be signed if integral");
@@ -74,7 +113,11 @@ template <Arithmetic T> struct Rgb
         return *this;
     }
 
-    template <Arithmetic U> Rgb& operator*=(const Rgb<U>& rhs)
+    /**
+     * @brief In-place component-wise multiplication.
+     */
+    template <Arithmetic U>
+    Rgb& operator*=(const Rgb<U>& rhs)
     {
         red *= static_cast<T>(rhs.red);
         green *= static_cast<T>(rhs.green);
@@ -82,53 +125,75 @@ template <Arithmetic T> struct Rgb
         return *this;
     }
 
-    // ---- opérateurs non-mutants ----
-    template <Arithmetic U> Rgb operator+(const Rgb<U>& rhs) const
+    /// Addition operator.
+    template <Arithmetic U>
+    Rgb operator+(const Rgb<U>& rhs) const
     {
         Rgb result = *this;
         result += rhs;
         return result;
     }
 
-    template <Arithmetic U> Rgb operator-(const Rgb<U>& rhs) const
+    /// Subtraction operator.
+    template <Arithmetic U>
+    Rgb operator-(const Rgb<U>& rhs) const
     {
         Rgb result = *this;
         result -= rhs;
         return result;
     }
 
-    template <Arithmetic U> Rgb operator*(const Rgb<U>& rhs) const
+    /// Component-wise multiplication operator.
+    template <Arithmetic U>
+    Rgb operator*(const Rgb<U>& rhs) const
     {
         Rgb result = *this;
         result *= rhs;
         return result;
     }
 
-    template <Arithmetic U> Rgb<float> operator/(U denom) const
+    /**
+     * @brief Scalar division.
+     *
+     * @return Floating-point RGB.
+     */
+    template <Arithmetic U>
+    Rgb<float> operator/(U denom) const
     {
         return {static_cast<float>(red) / denom, static_cast<float>(green) / denom,
                 static_cast<float>(blue) / denom};
     }
 
-    template <std::integral I> Rgb<I> rounded() const
+    /**
+     * @brief Round components to an integral RGB type.
+     */
+    template <std::integral I>
+    Rgb<I> rounded() const
     {
         return {static_cast<I>(std::lround(red)), static_cast<I>(std::lround(green)),
                 static_cast<I>(std::lround(blue))};
     }
 
+    /**
+     * @brief Sum of components.
+     */
     auto scalar() const
     {
         using R = std::conditional_t<std::integral<T>, int, T>;
         return static_cast<R>(red) + static_cast<R>(green) + static_cast<R>(blue);
     }
 
-    template <Arithmetic U> Rgb operator*(U scalar) const
+    /// Scalar multiplication.
+    template <Arithmetic U>
+    Rgb operator*(U scalar) const
     {
         return {static_cast<T>(red * scalar), static_cast<T>(green * scalar),
                 static_cast<T>(blue * scalar)};
     }
 
-    template <Arithmetic U> Rgb& operator*=(U scalar)
+    /// In-place scalar multiplication.
+    template <Arithmetic U>
+    Rgb& operator*=(U scalar)
     {
         red = static_cast<T>(red * scalar);
         green = static_cast<T>(green * scalar);
@@ -137,17 +202,26 @@ template <Arithmetic T> struct Rgb
     }
 };
 
+/// 8-bit RGB
 using Rgb_uc = Rgb<unsigned char>;
+/// 64-bit integer RGB (for accumulation)
 using Rgb_64i = Rgb<int64_t>;
+/// Floating-point RGB
 using Rgb_f = Rgb<float>;
 
+/**
+ * @brief CIE L*a*b* color representation.
+ */
 struct Lab_f
 {
-    float L;
-    float a;
-    float b;
+    float L; ///< Lightness
+    float a; ///< Green-red axis
+    float b; ///< Blue-yellow axis
 };
 
+/**
+ * @brief CIE L*u*v* color representation.
+ */
 struct Luv_f
 {
     float L;
@@ -155,6 +229,9 @@ struct Luv_f
     float v;
 };
 
+/**
+ * @brief CIE XYZ color representation.
+ */
 struct Xyz_f
 {
     float X;
@@ -162,12 +239,16 @@ struct Xyz_f
     float Z;
 };
 
-//! Generic 3 components.
+/**
+ * @brief Generic 3-component integer container.
+ *
+ * Used for color representations (e.g. YUV) or generic vector operations.
+ */
 struct Components_3i
 {
-    int c1;
-    int c2;
-    int c3;
+    int c1; ///< First component
+    int c2; ///< Second component
+    int c3; ///< Third component
 
     bool operator==(const Components_3i&) const = default;
 
@@ -195,6 +276,7 @@ struct Components_3i
         return *this;
     }
 
+    /// Sum of components.
     int scalar() const
     {
         return c1 + c2 + c3;
@@ -219,8 +301,12 @@ struct Components_3i
     }
 };
 
+/// Alias for 3-component color representation
 using Color_3i = Components_3i;
 
+/**
+ * @brief Scale normalized values to [0,255] and round.
+ */
 inline Color_3i scaleAndRound(float c1, float c2, float c3)
 {
     constexpr float scale = 255.f;
@@ -232,16 +318,8 @@ inline Color_3i scaleAndRound(float c1, float c2, float c3)
 namespace color
 {
 
-//! Color space conversion functions.
-//!
-static Xyz_f rgb_to_xyz(const Rgb_uc& rgb);
-static Lab_f xyz_to_Lab(const Xyz_f& xyz);
-static Luv_f xyz_to_Luv(const Xyz_f& xyz);
-static Lab_f rgb_to_Lab(const Rgb_uc& rgb);
-static Luv_f rgb_to_Luv(const Rgb_uc& rgb);
-
 /**
- * @brief Inverse sRGB gamma correction, transforms R' to R
+ * @brief Inverse sRGB gamma correction (R' -> R).
  */
 constexpr float INV_GAMMA_CORRECTION(float val)
 {
@@ -263,14 +341,16 @@ constexpr float kLabKappa = 841.f / 108.f;
 constexpr float kLabDelta = 4.f / 29.f;
 
 /**
- * @brief CIE L*a*b* f function (used to convert XYZ to L*a*b*)
- * http://en.wikipedia.org/wiki/Lab_color_space
+ * @brief CIE L*a*b* helper function f(t).
  */
 inline float LAB_FUNC(float val)
 {
     return val >= kLabEpsilon ? std::cbrtf(val) : kLabKappa * (val) + kLabDelta;
 }
 
+/**
+ * @brief Convert RGB to XYZ color space.
+ */
 inline Xyz_f rgb_to_xyz(const Rgb_uc& rgb)
 {
     Rgb_f rgb_f = rgb / 255.f;
@@ -284,6 +364,9 @@ inline Xyz_f rgb_to_xyz(const Rgb_uc& rgb)
             0.019297216f * rgb_f.red + 0.11918387f * rgb_f.green + 0.95049715f * rgb_f.blue};
 }
 
+/**
+ * @brief Convert XYZ to Lab color space.
+ */
 inline Lab_f xyz_to_Lab(const Xyz_f& xyz)
 {
     Xyz_f tmp = xyz;
@@ -299,12 +382,7 @@ inline Lab_f xyz_to_Lab(const Xyz_f& xyz)
 }
 
 /**
- * Convert CIE XYZ to CIE L*u*v* (CIELUV) with the D65 white point
- *
- * @param L, u, v pointers to hold the result
- * @param X, Y, Z the input XYZ values
- *
- * Wikipedia: http://en.wikipedia.org/wiki/CIELUV_color_space
+ * @brief Convert XYZ to Luv color space.
  */
 inline Luv_f xyz_to_Luv(const Xyz_f& xyz)
 {
@@ -332,16 +410,25 @@ inline Luv_f xyz_to_Luv(const Xyz_f& xyz)
     return {L, 13.f * L * (u1 - kWhitePointU), 13.f * L * (v1 - kWhitePointV)};
 }
 
+/**
+ * @brief Convert RGB to Lab color space.
+ */
 inline Lab_f rgb_to_Lab(const Rgb_uc& rgb)
 {
     return xyz_to_Lab(rgb_to_xyz(rgb));
 }
 
+/**
+ * @brief Convert RGB to Luv color space.
+ */
 inline Luv_f rgb_to_Luv(const Rgb_uc& rgb)
 {
     return xyz_to_Luv(rgb_to_xyz(rgb));
 }
 
+/**
+ * @brief Convert RGB to YUV (integer approximation).
+ */
 inline Color_3i rgb_to_yuv(const Rgb_uc& rgb)
 {
     return {((66 * int(rgb.red) + 129 * int(rgb.green) + 25 * int(rgb.blue) + 128) >> 8) + 16,

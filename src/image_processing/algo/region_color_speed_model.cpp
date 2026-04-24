@@ -96,7 +96,7 @@ void RegionColorSpeedModel::onStepCycle1()
 
 Color_3i RegionColorSpeedModel::rgbToColor(const Rgb_uc& rgb) const
 {
-    switch (params_.color_space)
+    switch (params_.colorSpace)
     {
         case ColorSpaceOption::YUV:
             return color::rgb_to_yuv(rgb);

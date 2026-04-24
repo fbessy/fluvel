@@ -11,11 +11,25 @@ namespace fluvel_ip
 namespace math
 {
 
-template <typename T> constexpr T square(T v) noexcept
+/**
+ * @brief Compute the square of a value.
+ *
+ * @tparam T Arithmetic type.
+ * @param v Input value.
+ * @return v * v.
+ */
+template <typename T>
+constexpr T square(T v) noexcept
 {
     return v * v;
 }
 
+/**
+ * @brief Compute the sign of an integer.
+ *
+ * @param v Input value.
+ * @return +1 if v > 0, -1 if v < 0, 0 if v == 0.
+ */
 constexpr int sign(int v) noexcept
 {
     if (v > 0)
@@ -27,13 +41,25 @@ constexpr int sign(int v) noexcept
     return 0;
 }
 
-template <typename P> inline float euclideanDistance(const P& a, const P& b)
+/**
+ * @brief Compute the Euclidean distance between two 2D points.
+ *
+ * The point type P must expose members `x` and `y`.
+ *
+ * @tparam P Point type.
+ * @param a First point.
+ * @param b Second point.
+ * @return Euclidean distance between a and b.
+ *
+ * @note sqrt(0.f) is well-defined and returns 0.f (IEEE-754),
+ *       so no special handling is required for coincident points.
+ */
+template <typename P>
+inline float euclideanDistance(const P& a, const P& b)
 {
     const float dx = b.x - a.x;
     const float dy = b.y - a.y;
 
-    // sqrt(0.f) is well-defined and returns 0.f (IEEE-754),
-    // no special-case needed for coincident points.
     return std::sqrt(dx * dx + dy * dy);
 }
 

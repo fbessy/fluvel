@@ -255,8 +255,7 @@ void ApplicationSettings::saveAlgo(Session session, const ActiveContourConfig& a
 
     settings.setValue("algo/lambda_in", algoConfig.regionParams.lambdaIn);
 
-    settings.setValue("algo/color_space",
-                      fluvel_ip::to_string(algoConfig.regionParams.color_space));
+    settings.setValue("algo/color_space", fluvel_ip::to_string(algoConfig.regionParams.colorSpace));
 
     settings.setValue("algo/color_weight_w1", algoConfig.regionParams.weights.c1);
 
@@ -492,7 +491,7 @@ void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoCon
                    fluvel_ip::to_string(fluvel_ip::RegionColorParams::kDefaultColorSpace))
             .toString();
 
-    algoConfig.regionParams.color_space = fluvel_ip::color_space_from_string(s_cs.toStdString());
+    algoConfig.regionParams.colorSpace = fluvel_ip::colorSpaceFromString(s_cs.toStdString());
 
     algoConfig.regionParams.weights.c1 =
         settings.value("algo/color_weight_w1", fluvel_ip::RegionColorParams::kDefaultWeights.c1)

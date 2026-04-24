@@ -16,16 +16,22 @@
 namespace fluvel_ip::filter
 {
 
+/**
+ * @brief Conduction function used in anisotropic diffusion.
+ *
+ * Defines how gradients influence diffusion strength.
+ */
 enum class ConductionFunction
 {
-    Exponential, ///< exp(-(∇I/kappa)^2)
-    Rational     ///< 1 / (1 + (∇I/kappa)^2)
+    Exponential, ///< exp(-(∇I/kappa)^2), preserves strong edges.
+    Rational     ///< 1 / (1 + (∇I/kappa)^2), smoother transition.
 };
 
-inline constexpr ConductionFunction kDefaultConductionFunction = ConductionFunction::Exponential;
-inline constexpr int kDefaultIterations = 10;
-inline constexpr double kDefaultLambda = 1.0 / 7.0;
-inline constexpr double kDefaultKappa = 30.0;
+inline constexpr ConductionFunction kDefaultConductionFunction =
+    ConductionFunction::Exponential;                //!< Default conduction model.
+inline constexpr int kDefaultIterations = 10;       //!< Default number of iterations.
+inline constexpr double kDefaultLambda = 1.0 / 7.0; //!< Default time step (stable value).
+inline constexpr double kDefaultKappa = 30.0;       //!< Default conduction coefficient.
 
 /**
  * @brief Apply anisotropic diffusion using a preallocated output buffer.
@@ -36,11 +42,11 @@ inline constexpr double kDefaultKappa = 30.0;
  * @param input Input image view.
  * @param output Output image owner (may be reused).
  * @param iterations Number of iterations.
- * @param lambda Time step.
- * @param kappa Conduction coefficient.
+ * @param lambda Time step controlling diffusion speed (stability parameter).
+ * @param kappa Conduction coefficient controlling edge sensitivity.
  * @param conduction Conduction function model.
  *
- * @note This function is suitable for pipelines where memory reuse is desired.
+ * @note Recommended for pipelines where memory reuse is important.
  */
 void anisotropicDiffusion(const ImageView& input, ImageOwner& output,
                           int iterations = kDefaultIterations, double lambda = kDefaultLambda,
@@ -48,34 +54,32 @@ void anisotropicDiffusion(const ImageView& input, ImageOwner& output,
                           ConductionFunction conduction = kDefaultConductionFunction);
 
 /**
- * @brief Apply Perona-Malik anisotropic diffusion on an image.
+ * @brief Apply Perona-Malik anisotropic diffusion and return a new image.
  *
- * This function performs anisotropic diffusion using either exponential or
- * rational conduction functions. It smooths homogeneous regions while preserving edges.
- *
- * A new image is allocated and returned.
+ * This function smooths homogeneous regions while preserving edges
+ * using a conduction function driven by local gradients.
  *
  * @param input Input image view (grayscale or multi-channel).
  * @param iterations Number of diffusion iterations.
  * @param lambda Time step (stability parameter).
- * @param kappa Conduction coefficient controlling sensitivity to edges.
- * @param conduction Conduction function model (Exponential or Rational).
+ * @param kappa Conduction coefficient controlling edge sensitivity.
+ * @param conduction Conduction function model.
  *
  * @return A new ImageOwner containing the filtered image.
  *
- * @note This is a convenience wrapper. For better performance in repeated calls,
- *       prefer using the AnisotropicDiffusion class to reuse internal buffers.
+ * @note Convenience wrapper. For repeated calls, prefer the class version
+ *       to reuse internal buffers and improve performance.
  */
 ImageOwner anisotropicDiffusion(const ImageView& input, int iterations = kDefaultIterations,
                                 double lambda = kDefaultLambda, double kappa = kDefaultKappa,
                                 ConductionFunction conduction = kDefaultConductionFunction);
 
 /**
- * @brief Stateful implementation of anisotropic diffusion (Perona-Malik).
+ * @brief Stateful implementation of Perona-Malik anisotropic diffusion.
  *
- * This class allows reusing internal buffers across multiple calls, avoiding
- * repeated memory allocations. It is suitable for batch processing or repeated
- * filtering of images with the same size and format.
+ * This class enables buffer reuse across multiple executions, avoiding
+ * repeated memory allocations. It is particularly suitable for batch
+ * processing or real-time pipelines.
  *
  * Typical usage:
  * @code
@@ -85,70 +89,95 @@ ImageOwner anisotropicDiffusion(const ImageView& input, int iterations = kDefaul
  * auto result = diff.outputView();
  * @endcode
  *
- * @note The input image is copied into an internal double-precision buffer.
+ * @note Internally, the input image is converted to double precision
+ *       and processed in padded buffers.
  */
 class AnisotropicDiffusion
 {
 public:
     /**
-     * @brief Initialize the internal buffers from an input image.
-     *      * This function prepares internal padded buffers and copies the input data.
-     * It must be called before apply().
-     *      * @param input Input image view.
+     * @brief Initializes internal buffers from an input image.
+     *
+     * Prepares padded buffers and copies input data.
+     * Must be called before apply().
+     *
+     * @param input Input image view.
      */
     void reset(const ImageView& input);
 
     /**
-     * @brief Run anisotropic diffusion iterations.
-     *      * Performs the diffusion process on the internal buffers initialized by reset().
-     *      * @param iterations Number of iterations.
+     * @brief Runs anisotropic diffusion iterations.
+     *
+     * Applies the diffusion process using the internal buffers initialized by reset().
+     *
+     * @param iterations Number of iterations.
      * @param lambda Time step controlling diffusion speed.
-     * @param kappa Edge threshold controlling conduction.
+     * @param kappa Conduction coefficient controlling edge sensitivity.
      * @param conduction Conduction function model.
-     *      * @note This function does not reallocate memory.
+     *
+     * @note This function does not perform memory allocation.
      */
     void apply(int iterations = kDefaultIterations, double lambda = kDefaultLambda,
                double kappa = kDefaultKappa,
                ConductionFunction conduction = kDefaultConductionFunction);
 
     /**
-     * @brief Get a non-owning view of the result image.
-     *      * @return ImageView referencing the internal output buffer.
-     *      * @warning The returned view is valid as long as the object is alive.
+     * @brief Returns a non-owning view of the result image.
+     *
+     * @return ImageView referencing the internal output buffer.
+     *
+     * @warning The returned view is only valid while the object exists.
      */
     ImageView outputView() const;
 
     /**
-     * @brief Get the result image with ownership.
-     *      * @return Reference to the internal ImageOwner.
+     * @brief Returns the result image (const access).
+     *
+     * @return Reference to the internal ImageOwner.
      */
     const ImageOwner& output() const;
 
     /**
-     * @brief Get the result image with ownership.
-     *      * @return Reference to the internal ImageOwner.
+     * @brief Returns the result image (mutable access).
+     *
+     * @return Reference to the internal ImageOwner.
      */
     ImageOwner& outputRef();
 
 private:
+    /**
+     * @brief Initializes internal buffers from input data.
+     */
     void initFromInput(const ImageView& input);
+
+    /**
+     * @brief Pads borders to simplify neighborhood access.
+     */
     void padBorders();
 
+    /**
+     * @brief Computes linear index in padded buffer.
+     *
+     * @param x X coordinate.
+     * @param y Y coordinate.
+     * @param c Channel index.
+     * @return Linear index in padded storage.
+     */
     int idx(int x, int y, int c) const
     {
         return ((x + 1) + (y + 1) * stridePad_) * activeChannels_ + c;
     }
 
-    int w_ = 0;
-    int h_ = 0;
-    int channels_ = 0;
-    int activeChannels_ = 0;
-    int stridePad_ = 0;
+    int w_ = 0;              //!< Image width.
+    int h_ = 0;              //!< Image height.
+    int channels_ = 0;       //!< Number of input channels.
+    int activeChannels_ = 0; //!< Number of processed channels.
+    int stridePad_ = 0;      //!< Stride of padded buffers.
 
-    std::vector<double> current_;
-    std::vector<double> next_;
+    std::vector<double> current_; //!< Current diffusion buffer.
+    std::vector<double> next_;    //!< Next diffusion buffer.
 
-    ImageOwner output_;
+    ImageOwner output_; //!< Output image storage.
 };
 
 } // namespace fluvel_ip::filter

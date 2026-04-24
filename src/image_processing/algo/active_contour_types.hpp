@@ -6,73 +6,123 @@
 namespace fluvel_ip
 {
 
-//! Defines how the algorithm handles degraded or failure cases.
-//! Typically used for image segmentation (StopOnFailure)
-//! and video tracking (RecoverOnFailure).
+/**
+ * @brief Defines how the algorithm handles degraded or failure cases.
+ *
+ * This mode controls the behavior of the active contour when encountering
+ * unstable or invalid states. It is typically used to distinguish between:
+ * - image segmentation (strict behavior)
+ * - video tracking (more tolerant behavior)
+ */
 enum class FailureHandlingMode
 {
-    StopOnFailure,   //!< Intended for image segmentation.
-    RecoverOnFailure //!< Intended for video tracking.
+    StopOnFailure, //!< Stop the algorithm immediately when a failure occurs (recommended for static
+                   //!< image segmentation).
+    RecoverOnFailure //!< Attempt to recover from failure and continue processing (recommended for
+                     //!< video tracking).
 };
 
-//! \enum Stopping condition status.
+/**
+ * @brief Describes the stopping condition of the active contour algorithm.
+ *
+ * This status indicates why the evolution of the contour has stopped.
+ */
 enum class StoppingStatus
 {
-    None,             //!< the active contour is not stopped.
-    ListsConverged,   //!< speed <= 0 for all points of Lout and speed >= 0 for all points of Lin
-    Hausdorff,        //!< Hausorff distance fallback, available only in StopOnFailure mode.
-    MaxIteration,     //!< Maximum number of elementary steps reached, last fallback to avoid
-                      //!  infinite loop of the method converge().
-    EmptyListFailure, //!< One or the both lists is/are empty. The definition of both contiguous
-                      //!< lists as a boundary is not respected.
-    SpeedModelFailure //!< Speed model failure (init or runtime speed error).
+    None,           //!< The active contour is still evolving.
+    ListsConverged, //!< Convergence reached: all Lout points have speed <= 0 and all Lin points
+                    //!< have speed >= 0.
+    Hausdorff,      //!< Hausdorff distance fallback (available only in StopOnFailure mode).
+    MaxIteration, //!< Maximum number of iterations reached (safety stop to prevent infinite loops).
+    EmptyListFailure, //!< One or both contour lists are empty, violating the boundary definition.
+    SpeedModelFailure //!< Failure in the speed model (initialization or runtime error).
 };
 
-//! Internal phase state of the active contour.
-//! A logical cycle consists of Phase Cycle1 followed by Phase Cycle2,
-//! as described in the reference paper.
+/**
+ * @brief Internal phase state of the active contour algorithm.
+ *
+ * A complete iteration typically consists of:
+ * - Cycle1 (data-driven evolution)
+ * - Cycle2 (regularization/smoothing)
+ */
 enum class PhaseState
 {
-    Cycle1,      //!< Phase 1 (called "Cycle 1" in the reference paper)
-    Cycle2,      //!< Phase 2 (called "Cycle 2" in the reference paper)
-    FinalCycle2, //!< Final Phase 2 before termination
-    Stopped
+    Cycle1,      //!< First phase ("Cycle 1" in the reference paper).
+    Cycle2,      //!< Second phase ("Cycle 2" in the reference paper).
+    FinalCycle2, //!< Final smoothing phase before termination.
+    Stopped      //!< Algorithm has stopped.
 };
 
-//! SwitchDirection to perform switch_in or switch_out procedures generically.
+/**
+ * @brief Direction used for switching operations in the contour.
+ *
+ * This is used to generalize inward/outward movements of the contour.
+ */
 enum class SwitchDirection
 {
-    In, // outside -> inside (=> outward move)
-    Out // inside -> outside (=> inward move)
+    In, //!< Outside → inside transition (outward expansion of the contour).
+    Out //!< Inside → outside transition (inward contraction of the contour).
 };
 
-//! \class ActiveContourParams
-//! Active contour configuration
+/**
+ * @brief Configuration parameters for the active contour algorithm.
+ *
+ * This structure defines all tunable parameters controlling the contour evolution,
+ * including iteration limits, smoothing behavior, and failure handling.
+ *
+ * All values are normalized to valid ranges after construction or assignment.
+ */
 struct ActiveContourParams
 {
-    static constexpr bool kDefaultIsCycle2 = true;
-    static constexpr int kDefaultDiskRadius = 2;
-    static constexpr int kDefaultNa = 30;
-    static constexpr int kDefaultNs = 3;
-    static constexpr FailureHandlingMode kDefaultFailureMode = FailureHandlingMode::StopOnFailure;
+    static constexpr bool kDefaultIsCycle2 = true; //!< Default: enable smoothing cycle.
+    static constexpr int kDefaultDiskRadius = 2;   //!< Default smoothing radius.
+    static constexpr int kDefaultNa = 30;          //!< Default max iterations for Cycle1.
+    static constexpr int kDefaultNs = 3;           //!< Default max iterations for Cycle2.
+    static constexpr FailureHandlingMode kDefaultFailureMode =
+        FailureHandlingMode::StopOnFailure; //!< Default failure handling mode.
 
-    //! Boolean egals to \c true to have the curve smoothing, evolutions in the cycle 2 with the
-    //! internal speed Fint.
+    /**
+     * @brief Enables smoothing evolution (Cycle 2).
+     *
+     * When true, the contour performs an additional smoothing phase using
+     * the internal speed (Fint).
+     */
     bool cycle2Enabled;
 
-    //!  Disk radius for the curve smoothing.
+    /**
+     * @brief Disk radius used for contour smoothing.
+     *
+     * Must be >= 1. Larger values produce stronger smoothing.
+     */
     int diskRadius;
 
-    //! Maximum number of times the active contour can evolve in a cycle 1 with \a Fd speed.
+    /**
+     * @brief Maximum number of iterations for Cycle1 (data-driven evolution).
+     *
+     * Must be >= 1.
+     */
     int Na;
 
-    //! Maximum number of times the active contour can evolve in a cycle 2 with \a Fint speed.
+    /**
+     * @brief Maximum number of iterations for Cycle2 (smoothing phase).
+     *
+     * Must be >= 1.
+     */
     int Ns;
 
-    ///! Defines how the algorithm handles degraded or failure cases.
+    /**
+     * @brief Defines how failures are handled during execution.
+     */
     FailureHandlingMode failureMode;
 
-    //! Normalize values of a configuration.
+    /**
+     * @brief Normalizes parameter values to valid ranges.
+     *
+     * Ensures that all parameters satisfy minimal constraints:
+     * - diskRadius >= 1
+     * - Na >= 1
+     * - Ns >= 1
+     */
     void normalize()
     {
         if (diskRadius < 1)
@@ -85,7 +135,11 @@ struct ActiveContourParams
             Ns = 1;
     }
 
-    //! Default constructor.
+    /**
+     * @brief Default constructor.
+     *
+     * Initializes parameters with default values and normalizes them.
+     */
     ActiveContourParams()
         : cycle2Enabled(kDefaultIsCycle2)
         , diskRadius(kDefaultDiskRadius)
@@ -96,7 +150,13 @@ struct ActiveContourParams
         this->normalize();
     }
 
-    //! Copy constructor.
+    /**
+     * @brief Copy constructor.
+     *
+     * Copies all parameters and normalizes them.
+     *
+     * @param copied Source parameters.
+     */
     ActiveContourParams(const ActiveContourParams& copied)
         : cycle2Enabled(copied.cycle2Enabled)
         , diskRadius(copied.diskRadius)
@@ -107,7 +167,14 @@ struct ActiveContourParams
         this->normalize();
     }
 
-    //! Copy assignement operator.
+    /**
+     * @brief Copy assignment operator.
+     *
+     * Assigns all parameters and normalizes them.
+     *
+     * @param rhs Source parameters.
+     * @return Reference to this instance.
+     */
     ActiveContourParams& operator=(const ActiveContourParams& rhs)
     {
         this->cycle2Enabled = rhs.cycle2Enabled;
@@ -121,14 +188,26 @@ struct ActiveContourParams
         return *this;
     }
 
-    //! \a Equal operator overloading.
+    /**
+     * @brief Equality operator.
+     *
+     * @param lhs Left-hand side.
+     * @param rhs Right-hand side.
+     * @return True if all parameters are equal.
+     */
     friend bool operator==(const ActiveContourParams& lhs, const ActiveContourParams& rhs)
     {
         return (lhs.cycle2Enabled == rhs.cycle2Enabled && lhs.diskRadius == rhs.diskRadius &&
                 lhs.Na == rhs.Na && lhs.Ns == rhs.Ns && lhs.failureMode == rhs.failureMode);
     }
 
-    //! \a Not equal operator overloading.
+    /**
+     * @brief Inequality operator.
+     *
+     * @param lhs Left-hand side.
+     * @param rhs Right-hand side.
+     * @return True if parameters differ.
+     */
     friend bool operator!=(const ActiveContourParams& lhs, const ActiveContourParams& rhs)
     {
         return !(lhs == rhs);
