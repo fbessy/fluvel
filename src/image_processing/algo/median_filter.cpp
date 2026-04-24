@@ -34,7 +34,7 @@ void Median::reset(const ImageView& input)
     buffer_ = ImageOwner::like(input);
     output_ = ImageOwner::like(input);
 
-    columnsHisto_.resize(width_ * 256);
+    columnsHisto_.resize(width_ * kHistogramSize);
 }
 
 void Median::apply(const ImageView& input, int radius)
@@ -189,6 +189,12 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
     if (!output_.hasSameLayout(input))
         reset(input);
+
+    if (width_ == 1 || height_ == 1)
+    {
+        output_.copyFrom(input);
+        return;
+    }
 
     const int maxValidRadius = std::min(width_ - 1, height_ - 1);
 

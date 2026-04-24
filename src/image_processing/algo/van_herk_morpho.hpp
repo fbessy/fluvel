@@ -149,16 +149,21 @@ void vanHerk(const ImageView& input, ImageOwner& output, int radius)
     assert(output.height() == input.height());
     assert(output.format() == input.format());
 
+    assert(radius >= 1);
+
     const int w = input.width();
     const int h = input.height();
     const int c = input.channels();
     const int k = 2 * radius + 1;
 
-    if (k > w || k > h)
+    if (w == 1 || h == 1)
     {
         output.copyFrom(input);
         return;
     }
+
+    int maxRadius = std::min((w - 1) / 2, (h - 1) / 2);
+    radius = std::min(radius, maxRadius);
 
     // buffer intermédiaire
     ImageOwner buffer(w, h, input.format());
