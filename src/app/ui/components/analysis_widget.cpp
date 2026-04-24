@@ -108,7 +108,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     noiseSp_->setSuffix(tr(" %"));
     noiseSp_->setValue(0);
     QFormLayout* noiseLayout = new QFormLayout;
-    noiseLayout->addRow("noise =", noiseSp_);
+    noiseLayout->addRow("Noise", noiseSp_);
 
     QVBoxLayout* this_layout = new QVBoxLayout;
     this_layout->addWidget(textListLength_);
