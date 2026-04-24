@@ -142,15 +142,15 @@ public:
     void runCycles(int n_cycles);
 
     //! Export the boundary list outerBoundary_ as a copied geometric representation.
-    ExportedContour export_l_out() const
+    ExportedContour exportOuterBoundary() const
     {
-        return cd_.export_l_out();
+        return cd_.exportOuterBoundary();
     }
 
     //! Export the boundary list innerBoundary_ as a copied geometric representation.
-    ExportedContour export_l_in() const
+    ExportedContour exportInnerBoundary() const
     {
-        return cd_.export_l_in();
+        return cd_.exportInnerBoundary();
     }
 
     //! Getter for the discrete level-set function with only 4 PhiValue possible.

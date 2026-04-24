@@ -58,7 +58,7 @@ struct ActiveContourParams
 
     //! Boolean egals to \c true to have the curve smoothing, evolutions in the cycle 2 with the
     //! internal speed Fint.
-    bool hasCycle2;
+    bool cycle2Enabled;
 
     //!  Disk radius for the curve smoothing.
     int diskRadius;
@@ -87,7 +87,7 @@ struct ActiveContourParams
 
     //! Default constructor.
     ActiveContourParams()
-        : hasCycle2(kDefaultIsCycle2)
+        : cycle2Enabled(kDefaultIsCycle2)
         , diskRadius(kDefaultDiskRadius)
         , Na(kDefaultNa)
         , Ns(kDefaultNs)
@@ -98,7 +98,7 @@ struct ActiveContourParams
 
     //! Copy constructor.
     ActiveContourParams(const ActiveContourParams& copied)
-        : hasCycle2(copied.hasCycle2)
+        : cycle2Enabled(copied.cycle2Enabled)
         , diskRadius(copied.diskRadius)
         , Na(copied.Na)
         , Ns(copied.Ns)
@@ -110,7 +110,7 @@ struct ActiveContourParams
     //! Copy assignement operator.
     ActiveContourParams& operator=(const ActiveContourParams& rhs)
     {
-        this->hasCycle2 = rhs.hasCycle2;
+        this->cycle2Enabled = rhs.cycle2Enabled;
         this->diskRadius = rhs.diskRadius;
         this->Na = rhs.Na;
         this->Ns = rhs.Ns;
@@ -124,7 +124,7 @@ struct ActiveContourParams
     //! \a Equal operator overloading.
     friend bool operator==(const ActiveContourParams& lhs, const ActiveContourParams& rhs)
     {
-        return (lhs.hasCycle2 == rhs.hasCycle2 && lhs.diskRadius == rhs.diskRadius &&
+        return (lhs.cycle2Enabled == rhs.cycle2Enabled && lhs.diskRadius == rhs.diskRadius &&
                 lhs.Na == rhs.Na && lhs.Ns == rhs.Ns && lhs.failureMode == rhs.failureMode);
     }
 

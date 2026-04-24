@@ -370,7 +370,8 @@ void ActiveContourWorker::emitContour()
     if (!activeContour_)
         return;
 
-    emit contourUpdated(activeContour_->export_l_out(), activeContour_->export_l_in());
+    emit contourUpdated(activeContour_->exportOuterBoundary(),
+                        activeContour_->exportInnerBoundary());
 }
 
 void ActiveContourWorker::setMode(RunMode mode)

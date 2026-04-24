@@ -35,7 +35,7 @@ ActiveContour::ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedM
 
     pendingBoundaryPoints_.reserve(cd_.outerBoundary().capacity());
 
-    if (params_.hasCycle2)
+    if (params_.cycle2Enabled)
     {
         stepsPerCycle_ = params_.Na + params_.Ns;
     }
@@ -85,7 +85,7 @@ void ActiveContour::enforceIterationLimit()
     {
         ed_.stoppingStatus = StoppingStatus::MaxIteration;
 
-        if (params_.hasCycle2)
+        if (params_.cycle2Enabled)
         {
             state_ = PhaseState::FinalCycle2;
         }
@@ -367,7 +367,7 @@ void ActiveContour::checkStateStep1()
     {
         ed_.stoppingStatus = StoppingStatus::ListsConverged;
 
-        if (params_.hasCycle2)
+        if (params_.cycle2Enabled)
         {
             ed_.phaseStepCount = 0;
             state_ = PhaseState::FinalCycle2;
@@ -377,7 +377,7 @@ void ActiveContour::checkStateStep1()
             stop();
         }
     }
-    else if (ed_.phaseStepCount >= params_.Na && params_.hasCycle2)
+    else if (ed_.phaseStepCount >= params_.Na && params_.cycle2Enabled)
     {
         ed_.phaseStepCount = 0;
         state_ = PhaseState::Cycle2;

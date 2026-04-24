@@ -167,7 +167,7 @@ void AlgoSettingsWidget::accept()
 
     config_.contourParams.Na = Na_spin_->value();
     config_.contourParams.Ns = Ns_spin_->value();
-    config_.contourParams.hasCycle2 = internalspeed_groupbox_->isChecked();
+    config_.contourParams.cycle2Enabled = internalspeed_groupbox_->isChecked();
     config_.contourParams.diskRadius = disk_radius_spin_->value();
 
     config_.regionParams.lambdaOut = lambda_out_spin_->value();
@@ -189,7 +189,7 @@ void AlgoSettingsWidget::reject()
 
     Na_spin_->setValue(config_.contourParams.Na);
     Ns_spin_->setValue(config_.contourParams.Ns);
-    internalspeed_groupbox_->setChecked(config_.contourParams.hasCycle2);
+    internalspeed_groupbox_->setChecked(config_.contourParams.cycle2Enabled);
     disk_radius_spin_->setValue(config_.contourParams.diskRadius);
 
     lambda_out_spin_->setValue(config_.regionParams.lambdaOut);

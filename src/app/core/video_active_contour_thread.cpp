@@ -209,8 +209,8 @@ void VideoActiveContourThread::exportContours(DisplayFrame& displayFrame)
 {
     if (activeContour_)
     {
-        displayFrame.outerContour = activeContour_->export_l_out();
-        displayFrame.innerContour = activeContour_->export_l_in();
+        displayFrame.outerContour = activeContour_->exportOuterBoundary();
+        displayFrame.innerContour = activeContour_->exportInnerBoundary();
     }
 }
 

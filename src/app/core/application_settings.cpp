@@ -217,10 +217,10 @@ void ApplicationSettings::saveVideoSessionSettings()
 
     saveDownscale(Session::Camera, videoSettings_.compute.downscale);
 
-    settings.setValue("preprocess/has_spatial_filtering",
+    settings.setValue("preprocess/spatial_filtering_enabled",
                       videoSettings_.compute.spatialFilteringEnabled);
 
-    settings.setValue("preprocess/has_temporal_filtering",
+    settings.setValue("preprocess/temporal_filtering_enabled",
                       videoSettings_.compute.temporalFilteringEnabled);
 
     // algo
@@ -249,7 +249,7 @@ void ApplicationSettings::saveAlgo(Session session, const ActiveContourConfig& a
 
     settings.setValue("algo/Na", algoConfig.contourParams.Na);
 
-    settings.setValue("algo/has_smoothing_cycle", algoConfig.contourParams.hasCycle2);
+    settings.setValue("algo/smoothing/enabled", algoConfig.contourParams.cycle2Enabled);
 
     settings.setValue("algo/Ns", algoConfig.contourParams.Ns);
 
@@ -273,7 +273,7 @@ void ApplicationSettings::saveDownscale(Session session, const DownscaleConfig& 
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("preprocess/has_downscale", downscaleConfig.downscaleEnabled);
+    settings.setValue("preprocess/downscale_enabled", downscaleConfig.downscaleEnabled);
 
     settings.setValue("preprocess/downscale_factor", downscaleConfig.downscaleFactor);
 }
@@ -294,15 +294,15 @@ void ApplicationSettings::saveDisplay(Session session, const DisplayConfig& disp
 {
     QSettings settings = sessionSettings(session);
 
-    settings.setValue("display/contour_out/enabled", displayConfig.outerContourVisible);
-    settings.setValue("display/contour_out/rgb", rgbToString(displayConfig.outerContourColor));
+    settings.setValue("display/outer_contour/visible", displayConfig.outerContourVisible);
+    settings.setValue("display/outer_contour/rgb", rgbToString(displayConfig.outerContourColor));
 
-    settings.setValue("display/contour_in/enabled", displayConfig.innerContourVisible);
-    settings.setValue("display/contour_in/rgb", rgbToString(displayConfig.innerContourColor));
+    settings.setValue("display/inner_contour/visible", displayConfig.innerContourVisible);
+    settings.setValue("display/inner_contour/rgb", rgbToString(displayConfig.innerContourColor));
 
-    settings.setValue("display/algorithm_overlay", displayConfig.algorithmOverlayEnabled);
+    settings.setValue("display/algorithm_overlay/enabled", displayConfig.algorithmOverlayEnabled);
 
-    settings.setValue("display/display_mode", to_string(displayConfig.displayMode));
+    settings.setValue("display/mode", to_string(displayConfig.displayMode));
 
     settings.setValue("display/mirror_mode", displayConfig.mirrorMode);
 
@@ -440,13 +440,13 @@ void ApplicationSettings::loadVideoSessionSettings()
 
     videoSettings_.compute.spatialFilteringEnabled =
         settings
-            .value("preprocess/has_spatial_filtering",
+            .value("preprocess/spatial_filtering_enabled",
                    VideoComputeConfig::kDefaultSpatialFilteringEnabled)
             .toBool();
 
     videoSettings_.compute.temporalFilteringEnabled =
         settings
-            .value("preprocess/has_temporal_filtering",
+            .value("preprocess/temporal_filtering_enabled",
                    VideoComputeConfig::kDefaultTemporalFilteringEnabled)
             .toBool();
 
@@ -469,8 +469,8 @@ void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoCon
 
     algoConfig.contourParams.Na =
         settings.value("algo/Na", fluvel_ip::ActiveContourParams::kDefaultNa).toInt();
-    algoConfig.contourParams.hasCycle2 =
-        settings.value("algo/has_smoothing_cycle", fluvel_ip::ActiveContourParams::kDefaultIsCycle2)
+    algoConfig.contourParams.cycle2Enabled =
+        settings.value("algo/smoothing/enabled", fluvel_ip::ActiveContourParams::kDefaultIsCycle2)
             .toBool();
     algoConfig.contourParams.Ns =
         settings.value("algo/Ns", fluvel_ip::ActiveContourParams::kDefaultNs).toInt();
@@ -521,7 +521,7 @@ void ApplicationSettings::loadDownscale(Session session, DownscaleConfig& downsc
     bool defaultIsDownscale = (session == Session::Camera);
 
     downscaleConfig.downscaleEnabled =
-        settings.value("preprocess/has_downscale", defaultIsDownscale).toBool();
+        settings.value("preprocess/downscale_enabled", defaultIsDownscale).toBool();
 
     downscaleConfig.downscaleFactor =
         settings.value("preprocess/downscale_factor", DownscaleConfig::kDefaultDownscaleFactor)
@@ -532,29 +532,32 @@ void ApplicationSettings::loadDisplay(Session session, DisplayConfig& displayCon
     QSettings settings = sessionSettings(session);
 
     displayConfig.outerContourVisible =
-        settings.value("display/contour_out/enabled", DisplayConfig::kDefaultContourVisible)
+        settings.value("display/outer_contour/visible", DisplayConfig::kDefaultContourVisible)
             .toBool();
-    displayConfig.outerContourColor = rgbFromString(
-        settings
-            .value("display/contour_out/rgb", rgbToString(DisplayConfig::kDefaultOuterContourColor))
-            .toString(),
-        DisplayConfig::kDefaultOuterContourColor);
+    displayConfig.outerContourColor =
+        rgbFromString(settings
+                          .value("display/outer_contour/rgb",
+                                 rgbToString(DisplayConfig::kDefaultOuterContourColor))
+                          .toString(),
+                      DisplayConfig::kDefaultOuterContourColor);
 
     displayConfig.innerContourVisible =
-        settings.value("display/contour_in/enabled", DisplayConfig::kDefaultContourVisible)
+        settings.value("display/inner_contour/visible", DisplayConfig::kDefaultContourVisible)
             .toBool();
-    displayConfig.innerContourColor = rgbFromString(
-        settings
-            .value("display/contour_in/rgb", rgbToString(DisplayConfig::kDefaultInnerContourColor))
-            .toString(),
-        DisplayConfig::kDefaultInnerContourColor);
+    displayConfig.innerContourColor =
+        rgbFromString(settings
+                          .value("display/inner_contour/rgb",
+                                 rgbToString(DisplayConfig::kDefaultInnerContourColor))
+                          .toString(),
+                      DisplayConfig::kDefaultInnerContourColor);
 
     displayConfig.algorithmOverlayEnabled =
-        settings.value("display/algorithm_overlay", DisplayConfig::kDefaultOverlayEnabled).toBool();
+        settings.value("display/algorithm_overlay/enabled", DisplayConfig::kDefaultOverlayEnabled)
+            .toBool();
 
     const QString s =
         settings
-            .value("display/display_mode",
+            .value("display/mode",
                    QString::fromStdString(to_string(DisplayConfig::kDefaultDisplayMode)))
             .toString();
 

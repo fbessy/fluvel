@@ -39,13 +39,13 @@ public:
     }
 
     //! Export the boundary list outerBoundary_ as a copied geometric representation.
-    ExportedContour export_l_out() const
+    ExportedContour exportOuterBoundary() const
     {
         return exportContour(outerBoundary_);
     }
 
     //! Export the boundary list innerBoundary_ as a copied geometric representation.
-    ExportedContour export_l_in() const
+    ExportedContour exportInnerBoundary() const
     {
         return exportContour(innerBoundary_);
     }
