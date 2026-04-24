@@ -26,8 +26,8 @@ public:
         , widthPixels_(widthPixels)
         , heightPixels_(heightPixels)
         , format_(format)
-        , channelsPerPixel_(channels_from_format(format))
-        , strideBytes_(compute_stride(widthPixels_, channelsPerPixel_, strideBytes))
+        , channelsPerPixel_(channelsFromFormat(format))
+        , strideBytes_(computeStride(widthPixels_, channelsPerPixel_, strideBytes))
     {
         assert(data != nullptr);
         assert(widthPixels > 0);
@@ -178,14 +178,14 @@ private:
     int channelsPerPixel_{0};
     int strideBytes_{0}; // bytes per row
 
-    static int compute_stride(int width, int channels, int strideBytes)
+    static int computeStride(int width, int channels, int strideOverride)
     {
-        return (strideBytes == 0) ? width * channels : strideBytes;
+        return (strideOverride == 0) ? width * channels : strideOverride;
     }
 
-    static constexpr int channels_from_format(ImageFormat fmt) noexcept
+    static constexpr int channelsFromFormat(ImageFormat format) noexcept
     {
-        switch (fmt)
+        switch (format)
         {
             case ImageFormat::Gray8:
                 return 1;

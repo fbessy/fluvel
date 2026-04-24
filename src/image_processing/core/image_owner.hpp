@@ -19,14 +19,17 @@ class ImageOwner
 public:
     ImageOwner() = default;
 
-    ImageOwner(int w, int h, ImageFormat fmt)
-        : width_(w)
-        , height_(h)
-        , format_(fmt)
-        , channels_(channels_from_format(fmt))
-        , stride_(w * channels_)
-        , data_(static_cast<size_t>(stride_) * static_cast<size_t>(h))
+    ImageOwner(int widthPixels, int heightPixels, ImageFormat format)
+        : width_(widthPixels)
+        , height_(heightPixels)
+        , format_(format)
+        , channels_(channelsFromFormat(format))
+        , stride_(widthPixels * channels_)
+        , data_(static_cast<size_t>(stride_) * static_cast<size_t>(heightPixels))
     {
+        assert(widthPixels > 0);
+        assert(heightPixels > 0);
+        assert(channels_ > 0);
     }
 
     static ImageOwner like(const ImageView& view)
@@ -161,7 +164,7 @@ private:
     int stride_{0};
     std::vector<uint8_t> data_;
 
-    static constexpr int channels_from_format(ImageFormat fmt) noexcept
+    static constexpr int channelsFromFormat(ImageFormat fmt) noexcept
     {
         switch (fmt)
         {
