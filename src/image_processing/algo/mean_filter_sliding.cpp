@@ -82,7 +82,7 @@ void MeanSliding::apply(const ImageView& input, int radius)
             }
 
             // -------- CENTER (FAST PATH) --------
-            for (int x = radius; x < width_ - radius - 1; ++x)
+            for (int x = radius; x < width_ - radius; ++x)
             {
                 int idx = x * channels + c;
                 dst[idx] = static_cast<uint8_t>((sum + kernelSize / 2) / kernelSize);
@@ -153,7 +153,7 @@ void MeanSliding::apply(const ImageView& input, int radius)
             }
 
             // -------- CENTER (FAST PATH) --------
-            for (int y = radius; y < height_ - radius - 1; ++y)
+            for (int y = radius; y < height_ - radius; ++y)
             {
                 uint8_t* dst = buffer2_.rowPtr(y);
 
