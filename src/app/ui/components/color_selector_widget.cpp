@@ -101,6 +101,8 @@ void ColorSelectorWidget::setSelectedColor(const QColor& color)
         if (v.canConvert<QColor>() && v.value<QColor>() == color)
         {
             color_cb_->setCurrentIndex(i);
+
+            emit colorSelected(color);
             return;
         }
     }
@@ -112,6 +114,8 @@ void ColorSelectorWidget::setSelectedColor(const QColor& color)
         color_cb_->setItemIcon(customIndex, drawColorSquare(color));
         color_cb_->setItemData(customIndex, color);
         color_cb_->setCurrentIndex(customIndex);
+
+        emit colorSelected(color);
     }
 }
 
