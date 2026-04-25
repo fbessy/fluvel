@@ -6,6 +6,8 @@
 #include "image_owner.hpp"
 #include "image_view.hpp"
 
+#include <random>
+
 /**
  * @brief Default standard deviation for additive Gaussian noise.
  */
@@ -111,5 +113,25 @@ ImageOwner speckleGamma(const ImageView& input, float sigma = kDefaultSpeckleNoi
  * @param sigma Noise parameter.
  */
 void speckleGamma(const ImageView& input, ImageOwner& output, float sigma = kDefaultSpeckleNoise);
+
+/**
+ * @brief Returns a thread-local random number generator.
+ *
+ * Provides a fast, reusable pseudo-random generator for noise functions.
+ *
+ * - One instance per thread (thread-safe, no locking).
+ * - Initialized once per thread using std::random_device.
+ * - Shared across all noise functions to ensure statistical continuity.
+ *
+ * This avoids the cost of repeatedly constructing RNGs and ensures good
+ * statistical properties when chaining multiple noise operations.
+ *
+ * @return Reference to a thread-local std::mt19937 generator.
+ */
+inline std::mt19937& rng()
+{
+    static thread_local std::mt19937 gen{std::random_device{}()};
+    return gen;
+}
 
 } // namespace fluvel_ip::noise

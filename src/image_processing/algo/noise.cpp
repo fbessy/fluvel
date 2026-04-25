@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <random>
 
 namespace fluvel_ip::noise
 {
@@ -26,13 +25,14 @@ void gaussian(const ImageView& input, ImageOwner& output, float sigma)
 
     sigma = std::clamp(sigma, kSigmaMin, kSigmaMax);
 
-    std::mt19937 rng(std::random_device{}());
     std::normal_distribution<float> dist(0.f, sigma);
 
     const int w = input.width();
     const int h = input.height();
     const int channels = input.channels();
     const int activeChannels = std::min(channels, 3);
+
+    auto& rng = noise::rng();
 
     for (int y = 0; y < h; ++y)
     {
@@ -71,7 +71,6 @@ void impulsive(const ImageView& input, ImageOwner& output, float probability)
 
     probability = std::clamp(probability, 0.f, 1.f);
 
-    std::mt19937 rng(std::random_device{}());
     std::uniform_real_distribution<float> dist01(0.f, 1.f);
     std::uniform_int_distribution<int> distSaltPepper(0, 1);
 
@@ -79,6 +78,8 @@ void impulsive(const ImageView& input, ImageOwner& output, float probability)
     const int h = input.height();
     const int channels = input.channels();
     const int activeChannels = std::min(channels, 3);
+
+    auto& rng = noise::rng();
 
     for (int y = 0; y < h; ++y)
     {
@@ -132,13 +133,14 @@ void speckleUniform(const ImageView& input, ImageOwner& output, float sigma)
 
     sigma = std::clamp(sigma, kSigmaMin, kSigmaMax);
 
-    std::mt19937 rng(std::random_device{}());
     std::normal_distribution<float> dist(0.f, sigma);
 
     const int w = input.width();
     const int h = input.height();
     const int channels = input.channels();
     const int activeChannels = std::min(channels, 3);
+
+    auto& rng = noise::rng();
 
     for (int y = 0; y < h; ++y)
     {
@@ -186,9 +188,6 @@ void speckleGamma(const ImageView& input, ImageOwner& output, float sigma)
     // Mapping sigma -> L (nombre de looks)
     const float L = 1.f / (sigma * sigma);
 
-    // RNG thread-safe
-    static thread_local std::mt19937 gen(std::random_device{}());
-
     // Gamma(L, 1/L) → mean = 1
     std::gamma_distribution<float> dist(L, 1.f / L);
 
@@ -196,6 +195,8 @@ void speckleGamma(const ImageView& input, ImageOwner& output, float sigma)
     const int h = input.height();
     const int channels = input.channels();
     const int activeChannels = std::min(channels, 3);
+
+    auto& rng = noise::rng();
 
     for (int y = 0; y < h; ++y)
     {
@@ -208,7 +209,7 @@ void speckleGamma(const ImageView& input, ImageOwner& output, float sigma)
 
             for (int c = 0; c < activeChannels; ++c)
             {
-                float n = dist(gen); // multiplicatif (mean = 1)
+                float n = dist(rng); // multiplicatif (mean = 1)
 
                 float v = src[idx + c] * n;
 
