@@ -5,6 +5,7 @@
 
 #include "color.hpp"
 
+#include <compare>
 #include <string_view>
 
 namespace fluvel_ip
@@ -74,20 +75,12 @@ struct RegionParams
     }
 
     /**
-     * @brief Equality operator.
+     * @brief Default comparison operator (C++20).
+     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     * by comparing members in declaration order.
+     *      * @note Requires <compare>.
      */
-    friend bool operator==(const RegionParams& lhs, const RegionParams& rhs)
-    {
-        return (lhs.lambdaIn == rhs.lambdaIn && lhs.lambdaOut == rhs.lambdaOut);
-    }
-
-    /**
-     * @brief Inequality operator.
-     */
-    friend bool operator!=(const RegionParams& lhs, const RegionParams& rhs)
-    {
-        return !(lhs == rhs);
-    }
+    auto operator<=>(const RegionParams&) const = default;
 
 protected:
     /**
@@ -243,21 +236,12 @@ struct RegionColorParams : public RegionParams
     }
 
     /**
-     * @brief Equality operator.
+     * @brief Default comparison operator (C++20).
+     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     * by comparing members in declaration order.
+     *      * @note Requires <compare>.
      */
-    friend bool operator==(const RegionColorParams& lhs, const RegionColorParams& rhs)
-    {
-        return (lhs.colorSpace == rhs.colorSpace && lhs.lambdaIn == rhs.lambdaIn &&
-                lhs.lambdaOut == rhs.lambdaOut && lhs.weights == rhs.weights);
-    }
-
-    /**
-     * @brief Inequality operator.
-     */
-    friend bool operator!=(const RegionColorParams& lhs, const RegionColorParams& rhs)
-    {
-        return !(lhs == rhs);
-    }
+    auto operator<=>(const RegionColorParams&) const = default;
 };
 
 } // namespace fluvel_ip

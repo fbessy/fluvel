@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <cassert>
 #include <cmath>
+#include <compare>
 #include <concepts>
 #include <cstdint>
 #include <type_traits>
@@ -42,6 +44,7 @@ concept Arithmetic = std::integral<T> || std::floating_point<T>;
  * @tparam T Channel type (e.g. uint8_t, float, int)
  */
 template <Arithmetic T>
+    requires std::three_way_comparable<T>
 struct Rgb
 {
     T red{};   ///< Red channel
@@ -72,17 +75,13 @@ struct Rgb
     {
     }
 
-    /// Equality comparison.
-    bool operator==(const Rgb& other) const noexcept
-    {
-        return red == other.red && green == other.green && blue == other.blue;
-    }
-
-    /// Inequality comparison.
-    bool operator!=(const Rgb& other) const noexcept
-    {
-        return !(*this == other);
-    }
+    /**
+     * @brief Default comparison operator (C++20).
+     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     * by comparing members in declaration order.
+     *      * @note Requires <compare>.
+     */
+    auto operator<=>(const Rgb&) const = default;
 
     /**
      * @brief In-place addition.
@@ -101,12 +100,10 @@ struct Rgb
      *
      * @note Requires signed type if T is integral.
      */
-    template <typename U>
+    template <Arithmetic U>
+        requires(!std::integral<T> || std::signed_integral<T>)
     Rgb& operator-=(const Rgb<U>& rhs)
     {
-        static_assert(!std::integral<T> || std::signed_integral<T>,
-                      "Rgb<T>::operator-= requires T to be signed if integral");
-
         red -= static_cast<T>(rhs.red);
         green -= static_cast<T>(rhs.green);
         blue -= static_cast<T>(rhs.blue);
@@ -160,6 +157,15 @@ struct Rgb
     template <Arithmetic U>
     Rgb<float> operator/(U denom) const
     {
+        if constexpr (std::floating_point<U>)
+        {
+            assert(std::abs(denom) > std::numeric_limits<U>::epsilon());
+        }
+        else
+        {
+            assert(denom != 0);
+        }
+
         return {static_cast<float>(red) / denom, static_cast<float>(green) / denom,
                 static_cast<float>(blue) / denom};
     }
@@ -250,7 +256,13 @@ struct Components_3i
     int c2; ///< Second component
     int c3; ///< Third component
 
-    bool operator==(const Components_3i&) const = default;
+    /**
+     * @brief Default comparison operator (C++20).
+     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     * by comparing members in declaration order.
+     *      * @note Requires <compare>.
+     */
+    auto operator<=>(const Components_3i&) const = default;
 
     Components_3i& operator+=(const Components_3i& rhs)
     {

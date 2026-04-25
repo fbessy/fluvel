@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <compare>
+
 namespace fluvel_ip
 {
 
@@ -189,29 +191,12 @@ struct ActiveContourParams
     }
 
     /**
-     * @brief Equality operator.
-     *
-     * @param lhs Left-hand side.
-     * @param rhs Right-hand side.
-     * @return True if all parameters are equal.
+     * @brief Default comparison operator (C++20).
+     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     * by comparing members in declaration order.
+     *      * @note Requires <compare>.
      */
-    friend bool operator==(const ActiveContourParams& lhs, const ActiveContourParams& rhs)
-    {
-        return (lhs.cycle2Enabled == rhs.cycle2Enabled && lhs.diskRadius == rhs.diskRadius &&
-                lhs.Na == rhs.Na && lhs.Ns == rhs.Ns && lhs.failureMode == rhs.failureMode);
-    }
-
-    /**
-     * @brief Inequality operator.
-     *
-     * @param lhs Left-hand side.
-     * @param rhs Right-hand side.
-     * @return True if parameters differ.
-     */
-    friend bool operator!=(const ActiveContourParams& lhs, const ActiveContourParams& rhs)
-    {
-        return !(lhs == rhs);
-    }
+    auto operator<=>(const ActiveContourParams&) const = default;
 };
 
 } // namespace fluvel_ip
