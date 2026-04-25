@@ -1,0 +1,31 @@
+stages:
+  - build
+  - doc
+
+build:
+  stage: build
+  image: ubuntu:22.04
+  before_script:
+    - apt update
+    - apt install -y \
+        cmake \
+        clang \
+        build-essential \
+        qt6-base-dev \
+        qt6-multimedia-dev
+  script:
+    - cmake -S . -B build
+    - cmake --build build
+
+
+doc:
+  stage: doc
+  image: ubuntu:22.04
+  before_script:
+    - apt update
+    - apt install -y doxygen graphviz
+  script:
+    - doxygen docs/Doxyfile
+  artifacts:
+    paths:
+      - docs/html
