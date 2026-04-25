@@ -149,6 +149,15 @@ inline fluvel_ip::ImageView imageViewFromQImage(const QImage& img)
     }
 }
 
+inline fluvel_ip::ImageOwner imageOwnerFromQImage(const QImage& img)
+{
+    assert(!img.isNull());
+
+    fluvel_ip::ImageOwner out;
+    out.copyFrom(imageViewFromQImage(img));
+    return out;
+}
+
 inline QImage toQImageCopy(const fluvel_ip::ImageView& view)
 {
     QImage img;
@@ -195,6 +204,11 @@ inline QImage toQImageCopy(const fluvel_ip::ImageView& view)
     }
 
     return img;
+}
+
+inline QImage toQImageCopy(const fluvel_ip::ImageOwner& owner)
+{
+    return toQImageCopy(owner.view());
 }
 
 inline QImage toQImageUnsafe(const fluvel_ip::ImageOwner& img)

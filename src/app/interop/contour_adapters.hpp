@@ -7,16 +7,24 @@
 #include <QPoint>
 #include <QVector>
 
+/**
+ * @brief Convert a Fluvel contour to a Qt QVector of QPointF.
+ *
+ * Each discrete contour point (integer pixel coordinates) is converted
+ * to continuous scene coordinates by mapping the pixel to its geometric center.
+ *
+ * In image space, a pixel (x, y) spans the region [x, x+1) × [y, y+1).
+ * Its center is therefore located at (x + 0.5, y + 0.5).
+ *
+ * @param contour Input contour defined as discrete pixel coordinates.
+ * @return QVector of QPointF representing the contour in continuous space.
+ */
 [[nodiscard]] inline QVector<QPointF> convertToQVector(const fluvel_ip::ExportedContour& contour)
 {
     QVector<QPointF> q_contour;
     q_contour.reserve(static_cast<qsizetype>(contour.size()));
 
-    // Convert from discrete pixel indices (top-left corner convention)
-    // to continuous scene coordinates centered on the pixel.
-    // Pixel (x, y) spans [x, x+1) × [y, y+1) in image space.
-    // Its geometric center is therefore at (x + 0.5, y + 0.5).
-
+    // map pixel to its center (x + 0.5, y + 0.5)
     constexpr qreal kPixelCenterOffset = 0.5;
 
     for (const auto& point : contour)

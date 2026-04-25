@@ -774,6 +774,7 @@ void SettingsWindow::setupConnections()
             [this]()
             {
                 timeFilt_->setText("...");
+                timeFilt_->repaint();
             });
 
     connect(imageSettingsController_, &ImageSettingsController::filterPipelineProcessed, this,

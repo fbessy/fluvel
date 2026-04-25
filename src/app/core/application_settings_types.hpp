@@ -1,12 +1,23 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
+/**
+ * @file application_settings_types.hpp
+ * @brief Application-level configuration types for Fluvel.
+ *
+ * This module defines configuration structures used by the application layer
+ * (fluvel_app), including display settings, processing parameters, and session
+ * configurations for both image and video workflows.
+ *
+ * These types act as a bridge between UI controls and the core processing layer.
+ */
+
 #pragma once
 
 #include "active_contour_types.hpp"
 #include "color.hpp"
 #include "contour_types.hpp"
-#include "image_pipeline.hpp"
+#include "processing_params.hpp"
 #include "speed_model_types.hpp"
 
 #include <QImage>
@@ -15,13 +26,22 @@
 namespace fluvel_app
 {
 
+/**
+ * @brief Application language selection.
+ */
 enum class Language
 {
-    System = 0,
-    English,
-    French
+    System,  ///< Use system locale
+    English, ///< English language
+    French   ///< French language
 };
 
+/**
+ * @brief Convert language enum to string identifier.
+ *
+ * @param lang Language value.
+ * @return Corresponding string ("system", "en", "fr").
+ */
 inline constexpr const char* to_string(Language lang)
 {
     switch (lang)
@@ -36,6 +56,12 @@ inline constexpr const char* to_string(Language lang)
     return "system";
 }
 
+/**
+ * @brief Convert string identifier to Language enum.
+ *
+ * @param s Input string.
+ * @return Corresponding Language value (defaults to System).
+ */
 inline Language language_from_string(std::string_view s)
 {
     if (s == "en")
@@ -45,18 +71,31 @@ inline Language language_from_string(std::string_view s)
     return Language::System;
 }
 
+/**
+ * @brief Session type.
+ *
+ * Defines the current processing context.
+ */
 enum class Session
 {
-    Image,
-    Camera
+    Image, ///< Static image processing
+    Camera ///< Live camera processing
 };
 
+/**
+ * @brief Image display mode.
+ *
+ * Controls which image representation is shown in the UI.
+ */
 enum class ImageDisplayMode
 {
-    Source,
-    Preprocessed
+    Source,      ///< Original input image
+    Preprocessed ///< Processed image after pipeline
 };
 
+/**
+ * @brief Convert display mode to string.
+ */
 inline constexpr const char* to_string(ImageDisplayMode mode)
 {
     switch (mode)
@@ -69,6 +108,9 @@ inline constexpr const char* to_string(ImageDisplayMode mode)
     return "source";
 }
 
+/**
+ * @brief Convert string to display mode.
+ */
 inline ImageDisplayMode imageDisplayModeFromString(std::string_view s)
 {
     if (s == "source")
@@ -78,6 +120,12 @@ inline ImageDisplayMode imageDisplayModeFromString(std::string_view s)
     return ImageDisplayMode::Source;
 }
 
+/**
+ * @brief Display configuration for rendering images and contours.
+ *
+ * Controls visualization options such as contour visibility, colors,
+ * and rendering effects.
+ */
 struct DisplayConfig
 {
     static constexpr ImageDisplayMode kDefaultDisplayMode = ImageDisplayMode::Preprocessed;
@@ -103,6 +151,11 @@ struct DisplayConfig
     bool algorithmOverlayEnabled = kDefaultOverlayEnabled;
 };
 
+/**
+ * @brief Parameters controlling optional image downscaling.
+ *
+ * Used to reduce computation cost by processing a lower-resolution image.
+ */
 struct DownscaleParams
 {
     static constexpr bool kDefaultDownscaleEnabled = false;
@@ -112,6 +165,11 @@ struct DownscaleParams
     int downscaleFactor = kDefaultDownscaleFactor;
 };
 
+/**
+ * @brief Parameters controlling optional image downscaling.
+ *
+ * Used to reduce computation cost by processing a lower-resolution image.
+ */
 struct ActiveContourConfig
 {
     static constexpr fluvel_ip::Connectivity kDefaultConnectivity = fluvel_ip::Connectivity::Four;
@@ -121,6 +179,11 @@ struct ActiveContourConfig
     fluvel_ip::RegionColorParams regionParams{};
 };
 
+/**
+ * @brief Configuration for image processing pipeline.
+ *
+ * Combines active contour parameters, preprocessing, and optional downscaling.
+ */
 struct ImageComputeConfig
 {
     ActiveContourConfig contourConfig{};
@@ -131,12 +194,22 @@ struct ImageComputeConfig
     fluvel_ip::ProcessingParams processing{};
 };
 
+/**
+ * @brief Complete settings for an image session.
+ *
+ * Includes both computation and display configuration.
+ */
 struct ImageSessionSettings
 {
     ImageComputeConfig compute{};
     DisplayConfig display{};
 };
 
+/**
+ * @brief Complete settings for an image session.
+ *
+ * Includes both computation and display configuration.
+ */
 struct VideoComputeConfig
 {
     static constexpr bool kDefaultSpatialFilteringEnabled = true;
@@ -149,6 +222,11 @@ struct VideoComputeConfig
     ActiveContourConfig contourConfig{};
 };
 
+/**
+ * @brief Complete settings for a video session.
+ *
+ * Includes both computation and display configuration.
+ */
 struct VideoSessionSettings
 {
     VideoComputeConfig compute{};

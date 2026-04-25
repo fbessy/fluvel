@@ -158,10 +158,14 @@ public:
 
     /**
      * @brief Updates the contour with a new input image.
-     *
-     * The image must match the dimensions of the level-set function.
-     *
-     * @param image Input image.
+     *      * The image must match the dimensions of the level-set function.
+     *      * ⚠️ Lifetime requirement:
+     * The provided ImageView is stored internally and reused across iterations.
+     * The underlying image data MUST remain valid for the entire lifetime of
+     * the ActiveContour (or until a new image is provided).
+     *      * Passing a temporary or short-lived ImageView will lead to undefined behavior.
+     * Use an ImageOwner to guarantee safe lifetime when needed.
+     *      * @param image Input image.
      */
     void update(const ImageView& image);
 

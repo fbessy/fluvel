@@ -41,10 +41,11 @@ public:
 
     /**
      * @brief Construct a contour from a grayscale level-set image.
-     *
-     * The input image is interpreted as a discrete level-set function.
-     *
-     * @param grayscalePhi Input grayscale image representing phi.
+     *      * The input image is interpreted as a discrete level-set function.
+     *      * The pixel values are read and fully copied into the internal phi buffer.
+     * The provided ImageView is NOT stored and is only used during construction.
+     *      * This means it is safe to pass temporary or short-lived ImageView instances.
+     *      * @param grayscalePhi Input grayscale image representing the level-set function.
      * @param connectivity Neighborhood connectivity (4 or 8).
      */
     ContourData(const ImageView& grayscalePhi, Connectivity connectivity = Connectivity::Four);

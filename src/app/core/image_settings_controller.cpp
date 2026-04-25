@@ -196,18 +196,18 @@ void ImageSettingsController::applyProcessing()
     qDebug() << __FILE__ << " applyProcessing() " << __LINE__ << __func__;
 #endif
 
-    fluvel_ip::ImageView img = imageViewFromQImage(downscaled_);
-    fluvel_ip::ImagePipeline filter;
-
-    filter.reset(img);
-
     emit processingStarted();
-    QCoreApplication::processEvents();
+
+    // ✅ SAFE : copie indépendante
+    auto input = imageOwnerFromQImage(downscaled_);
+
+    fluvel_ip::ImagePipeline filter;
+    filter.reset(input.view());
 
     fluvel_ip::ElapsedTimer measurementTimer;
     measurementTimer.start();
 
-    filter.apply(img, editedProcessingParams_);
+    filter.apply(input.view(), editedProcessingParams_);
 
     double elapsedSec = measurementTimer.elapsedSec();
 

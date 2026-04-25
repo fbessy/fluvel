@@ -132,7 +132,7 @@ void ActiveContourWorker::step()
 
 void ActiveContourWorker::performStep()
 {
-    if (stepOnceAlgo())
+    if (!stepOnceAlgo())
     {
         finalizeAndPrepareNextRun();
     }
@@ -181,7 +181,7 @@ bool ActiveContourWorker::stepOnceAlgo()
         activeContour_->step();
     }
 
-    return activeContour_->isStopped();
+    return !activeContour_->isStopped();
 }
 
 void ActiveContourWorker::applyProcessing()
@@ -202,10 +202,10 @@ void ActiveContourWorker::applyProcessing()
 #endif
 
     fluvel_ip::ImagePipeline preprocess;
-    auto img = imageViewFromQImage(image_);
+    auto img = imageOwnerFromQImage(image_);
 
-    preprocess.reset(img);
-    preprocess.apply(img, config_.processing);
+    preprocess.reset(img.view());
+    preprocess.apply(img.view(), config_.processing);
 
     processedImage_ = toQImageCopy(preprocess.outputView());
 
@@ -261,13 +261,13 @@ void ActiveContourWorker::initializeActiveContour()
 
     assert(!config_.initialPhi.isNull());
 
-    auto initialPhi = imageViewFromQImage(config_.initialPhi);
+    auto initialPhi = imageOwnerFromQImage(config_.initialPhi);
 
-    fluvel_ip::ContourData initialCD(initialPhi, config_.contourConfig.connectivity);
+    fluvel_ip::ContourData initialCD(initialPhi.view(), config_.contourConfig.connectivity);
 
     bool is_rgb = (processedImage_.format() != QImage::Format_Grayscale8);
 
-    const auto processedImg = imageViewFromQImage(processedImage_);
+    processedOwner_ = imageOwnerFromQImage(processedImage_);
 
     if (is_rgb)
     {
@@ -284,7 +284,7 @@ void ActiveContourWorker::initializeActiveContour()
             config_.contourConfig.contourParams);
     }
 
-    activeContour_->update(processedImg);
+    activeContour_->update(processedOwner_.view());
 
     setState(WorkerState::Ready);
     initialShown_ = false;
@@ -334,7 +334,7 @@ void ActiveContourWorker::onTimeout()
 
     while (timeSliceBudget.elapsedLessThan(timeSliceMs_))
     {
-        if (stepOnceAlgo())
+        if (!stepOnceAlgo())
         {
             finalizeAndPrepareNextRun();
             return;
