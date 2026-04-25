@@ -22,8 +22,6 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
-#include <random>
-
 namespace fluvel_app
 {
 
@@ -83,14 +81,14 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     //////////////////////////////////////////////////////////////////////////////////
 
-    selected_.red = static_cast<unsigned char>(
+    selectedColor_.red = static_cast<unsigned char>(
         settings.value("Analysis/R" + QString::number(idThis_), 128).toInt());
-    selected_.green = static_cast<unsigned char>(
+    selectedColor_.green = static_cast<unsigned char>(
         settings.value("Analysis/G" + QString::number(idThis_), 0).toInt());
-    selected_.blue = static_cast<unsigned char>(
+    selectedColor_.blue = static_cast<unsigned char>(
         settings.value("Analysis/B" + QString::number(idThis_), 255).toInt());
 
-    QColor initialColor = toQColor(selected_);
+    QColor initialColor = toQColor(selectedColor_);
     colorSelector_ = new ColorSelectorWidget(this, initialColor);
 
     QFormLayout* form = new QFormLayout;
@@ -150,19 +148,19 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     connect(noiseGroup_, &QGroupBox::toggled, this,
             [this](bool)
             {
-                refreshNoiseImage(noiseSp_->value());
+                refreshWithNoise(noiseSp_->value());
             });
 
     connect(noiseSp_, QOverload<int>::of(&QSpinBox::valueChanged), this,
-            &AnalysisWidget::refreshNoiseImage);
+            &AnalysisWidget::refreshWithNoise);
 
-    refreshRgb();
+    refresh();
 }
 
 void AnalysisWidget::onColorSelected(const QColor& c)
 {
-    selected_ = toRgb_uc(c);
-    refreshRgb();
+    selectedColor_ = toRgb_uc(c);
+    refresh();
 }
 
 void AnalysisWidget::openFilename()
@@ -189,7 +187,7 @@ void AnalysisWidget::openImage()
             return;
         }
 
-        refreshRgb();
+        refresh();
 
         QFileInfo fi(absoluteName_);
         QString name = fi.fileName();
@@ -200,10 +198,9 @@ void AnalysisWidget::openImage()
     }
 }
 
-void AnalysisWidget::refreshRgb()
+void AnalysisWidget::refresh()
 {
-    rgb_ = selected_;
-    refreshNoiseImage(noiseSp_->value());
+    refreshWithNoise(noiseSp_->value());
 }
 
 void AnalysisWidget::createList()
@@ -218,7 +215,7 @@ void AnalysisWidget::createList()
         {
             pix = noiseImage_.pixel(x, y);
 
-            if (toRgb_uc(pix) == rgb_)
+            if (toRgb_uc(pix) == selectedColor_)
                 shape_.pushBack(x, y);
         }
     }
@@ -244,7 +241,7 @@ void AnalysisWidget::createList()
     emit listChanged();
 }
 
-void AnalysisWidget::refreshNoiseImage(int noise_percent)
+void AnalysisWidget::refreshWithNoise(int noisePercent)
 {
     if (image_.isNull())
         return;
@@ -252,23 +249,23 @@ void AnalysisWidget::refreshNoiseImage(int noise_percent)
     noiseImage_ = image_;
 
     // 🔥 si désactivé → early return propre
-    if (!noiseGroup_->isChecked() || noise_percent == 0)
+    if (!noiseGroup_->isChecked() || noisePercent == 0)
     {
         imageViewer_->setImage(noiseImage_);
         createList();
         return;
     }
 
-    std::mt19937 gen(std::random_device{}());
-    std::bernoulli_distribution proba_distri{float(noise_percent) / 100.f};
+    std::bernoulli_distribution proba_distri{float(noisePercent) / 100.f};
 
-    QRgb rgb_color = QColor(int(rgb_.red), int(rgb_.green), int(rgb_.blue)).rgb();
+    QRgb rgb_color =
+        QColor(int(selectedColor_.red), int(selectedColor_.green), int(selectedColor_.blue)).rgb();
 
     for (int y = 0; y < imageHeight_; ++y)
     {
         for (int x = 0; x < imageWidth_; ++x)
         {
-            if (proba_distri(gen))
+            if (proba_distri(rng_))
                 noiseImage_.setPixel(x, y, rgb_color);
         }
     }
@@ -293,9 +290,9 @@ void AnalysisWidget::saveSettings() const
 
     // settings.setValue("Analysis/combo" + QString::number(idThis_), colorList_->currentIndex());
 
-    settings.setValue("Analysis/R" + QString::number(idThis_), int(selected_.red));
-    settings.setValue("Analysis/G" + QString::number(idThis_), int(selected_.green));
-    settings.setValue("Analysis/B" + QString::number(idThis_), int(selected_.blue));
+    settings.setValue("Analysis/R" + QString::number(idThis_), int(selectedColor_.red));
+    settings.setValue("Analysis/G" + QString::number(idThis_), int(selectedColor_.green));
+    settings.setValue("Analysis/B" + QString::number(idThis_), int(selectedColor_.blue));
 }
 
 } // namespace fluvel_app
