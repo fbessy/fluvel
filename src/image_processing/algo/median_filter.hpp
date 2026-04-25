@@ -113,7 +113,7 @@ private:
      */
     void applyNaive(const ImageView& input, int radius);
 
-    static constexpr int kHistogramSize = 256; ///< Histogram size for 8-bit images.
+    static constexpr int kHistogramSize{256}; ///< Histogram size for 8-bit images.
 
     /**
      * @brief Reset histogram values to zero.

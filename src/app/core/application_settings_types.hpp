@@ -128,14 +128,14 @@ inline ImageDisplayMode imageDisplayModeFromString(std::string_view s)
  */
 struct DisplayConfig
 {
-    static constexpr ImageDisplayMode kDefaultDisplayMode = ImageDisplayMode::Preprocessed;
+    static constexpr ImageDisplayMode kDefaultDisplayMode{ImageDisplayMode::Preprocessed};
 
-    static constexpr bool kDefaultContourVisible = true;
+    static constexpr bool kDefaultContourVisible{true};
     static constexpr fluvel_ip::Rgb_uc kDefaultOuterContourColor{64u, 0u, 255u};
     static constexpr fluvel_ip::Rgb_uc kDefaultInnerContourColor{0u, 230u, 118u};
 
-    static constexpr bool kDefaultOptionDisabled = false;
-    static constexpr bool kDefaultOverlayEnabled = true;
+    static constexpr bool kDefaultOptionDisabled{false};
+    static constexpr bool kDefaultOverlayEnabled{true};
 
     ImageDisplayMode displayMode = kDefaultDisplayMode;
 
@@ -158,8 +158,8 @@ struct DisplayConfig
  */
 struct DownscaleParams
 {
-    static constexpr bool kDefaultDownscaleEnabled = false;
-    static constexpr int kDefaultDownscaleFactor = 2;
+    static constexpr bool kDefaultDownscaleEnabled{false};
+    static constexpr int kDefaultDownscaleFactor{2};
 
     bool downscaleEnabled = kDefaultDownscaleEnabled;
     int downscaleFactor = kDefaultDownscaleFactor;
@@ -172,7 +172,7 @@ struct DownscaleParams
  */
 struct ActiveContourConfig
 {
-    static constexpr fluvel_ip::Connectivity kDefaultConnectivity = fluvel_ip::Connectivity::Four;
+    static constexpr fluvel_ip::Connectivity kDefaultConnectivity{fluvel_ip::Connectivity::Four};
 
     fluvel_ip::Connectivity connectivity = kDefaultConnectivity;
     fluvel_ip::ActiveContourParams contourParams{};
@@ -212,8 +212,8 @@ struct ImageSessionSettings
  */
 struct VideoComputeConfig
 {
-    static constexpr bool kDefaultSpatialFilteringEnabled = true;
-    static constexpr bool kDefaultTemporalFilteringEnabled = true;
+    static constexpr bool kDefaultSpatialFilteringEnabled{true};
+    static constexpr bool kDefaultTemporalFilteringEnabled{true};
 
     DownscaleParams downscale{};
     bool spatialFilteringEnabled = kDefaultSpatialFilteringEnabled;

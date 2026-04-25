@@ -76,12 +76,12 @@ enum class SwitchDirection
  */
 struct ActiveContourParams
 {
-    static constexpr bool kDefaultIsCycle2 = true; //!< Default: enable smoothing cycle.
-    static constexpr int kDefaultDiskRadius = 2;   //!< Default smoothing radius.
-    static constexpr int kDefaultNa = 30;          //!< Default max iterations for Cycle1.
-    static constexpr int kDefaultNs = 3;           //!< Default max iterations for Cycle2.
-    static constexpr FailureHandlingMode kDefaultFailureMode =
-        FailureHandlingMode::StopOnFailure; //!< Default failure handling mode.
+    static constexpr bool kDefaultIsCycle2{true}; //!< Default: enable smoothing cycle.
+    static constexpr int kDefaultDiskRadius{2};   //!< Default smoothing radius.
+    static constexpr int kDefaultNa{30};          //!< Default max iterations for Cycle1.
+    static constexpr int kDefaultNs{3};           //!< Default max iterations for Cycle2.
+    static constexpr FailureHandlingMode kDefaultFailureMode{
+        FailureHandlingMode::StopOnFailure}; //!< Default failure handling mode.
 
     /**
      * @brief Enables smoothing evolution (Cycle 2).

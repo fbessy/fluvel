@@ -24,108 +24,108 @@ namespace fluvel_ip
  */
 struct ProcessingParams
 {
-    static constexpr bool kDefaultDisabled = false;
+    static constexpr bool kDefaultDisabled{false};
 
-    static constexpr float kDefaultStdNoise = 20.f;
-    static constexpr float kDefaultSaltNoise = 0.05f;
-    static constexpr float kDefaultSpeckleNoise = 0.16f;
+    static constexpr float kDefaultStdNoise{20.f};
+    static constexpr float kDefaultSaltNoise{0.05f};
+    static constexpr float kDefaultSpeckleNoise{0.16f};
 
-    static constexpr int kDefaultKernelSize = 5;
+    static constexpr int kDefaultKernelSize{5};
 
-    static constexpr filter::ConductionFunction kDefaultConductionFunction =
-        filter::ConductionFunction::Exponential;
-    static constexpr int kDefaultMaxIterations = 10;
-    static constexpr double kDefaultLambda = 1.0 / 7.0;
-    static constexpr double kDefaultKappa = 30.0;
+    static constexpr filter::ConductionFunction kDefaultConductionFunction{
+        filter::ConductionFunction::Exponential};
+    static constexpr int kDefaultMaxIterations{10};
+    static constexpr double kDefaultLambda{1.0 / 7.0};
+    static constexpr double kDefaultKappa{30.0};
 
-    static constexpr bool kDefaultWhiteTopHat = true;
+    static constexpr bool kDefaultWhiteTopHat{true};
 
     /**
      * @brief Global flag enabling or disabling all processing.
      */
-    bool processingEnabled = kDefaultDisabled;
+    bool processingEnabled{kDefaultDisabled};
 
     // =========================
     // Noise
     // =========================
 
     /// Enable additive Gaussian noise.
-    bool gaussianNoiseEnabled = kDefaultDisabled;
+    bool gaussianNoiseEnabled{kDefaultDisabled};
 
     /// Standard deviation of Gaussian noise.
-    float noiseStdDev = kDefaultStdNoise;
+    float noiseStdDev{kDefaultStdNoise};
 
     /// Enable impulsive (salt-and-pepper) noise.
-    bool saltNoiseEnabled = kDefaultDisabled;
+    bool saltNoiseEnabled{kDefaultDisabled};
 
     /// Probability of salt-and-pepper noise.
-    float saltNoiseProbability = kDefaultSaltNoise;
+    float saltNoiseProbability{kDefaultSaltNoise};
 
     /// Enable multiplicative speckle noise.
-    bool speckleNoiseEnabled = kDefaultDisabled;
+    bool speckleNoiseEnabled{kDefaultDisabled};
 
     /// Standard deviation of speckle noise.
-    float speckleNoiseStdDev = kDefaultSpeckleNoise;
+    float speckleNoiseStdDev{kDefaultSpeckleNoise};
 
     // =========================
     // Filtering
     // =========================
 
     /// Enable median filter.
-    bool medianFilterEnabled = kDefaultDisabled;
+    bool medianFilterEnabled{kDefaultDisabled};
 
     /// Kernel size (radius-based) for median filter.
-    int medianKernelSize = kDefaultKernelSize;
+    int medianKernelSize{kDefaultKernelSize};
 
     /// Enable mean (box) filter.
-    bool meanFilterEnabled = kDefaultDisabled;
+    bool meanFilterEnabled{kDefaultDisabled};
 
     /// Kernel size (radius-based) for mean filter.
-    int meanKernelSize = kDefaultKernelSize;
+    int meanKernelSize{kDefaultKernelSize};
 
     // =========================
     // Anisotropic diffusion
     // =========================
 
     /// Enable anisotropic diffusion.
-    bool anisotropicDiffusionEnabled = kDefaultDisabled;
+    bool anisotropicDiffusionEnabled{kDefaultDisabled};
 
     /// Conduction function model.
-    filter::ConductionFunction conductionFunction = kDefaultConductionFunction;
+    filter::ConductionFunction conductionFunction{kDefaultConductionFunction};
 
     /// Number of diffusion iterations.
-    int maxIterations = kDefaultMaxIterations;
+    int maxIterations{kDefaultMaxIterations};
 
     /// Time step (stability parameter).
-    double lambda = kDefaultLambda;
+    double lambda{kDefaultLambda};
 
     /// Edge threshold parameter.
-    double kappa = kDefaultKappa;
+    double kappa{kDefaultKappa};
 
     // =========================
     // Morphological operations
     // =========================
 
     /// Enable morphological opening.
-    bool openingEnabled = kDefaultDisabled;
+    bool openingEnabled{kDefaultDisabled};
 
     /// Kernel size for opening.
-    int openingKernelSize = kDefaultKernelSize;
+    int openingKernelSize{kDefaultKernelSize};
 
     /// Enable morphological closing.
-    bool closingEnabled = kDefaultDisabled;
+    bool closingEnabled{kDefaultDisabled};
 
     /// Kernel size for closing.
-    int closingKernelSize = kDefaultKernelSize;
+    int closingKernelSize{kDefaultKernelSize};
 
     /// Enable top-hat transform.
-    bool topHatEnabled = kDefaultDisabled;
+    bool topHatEnabled{kDefaultDisabled};
 
     /// Select white (true) or black (false) top-hat.
-    bool useWhiteTopHat = kDefaultWhiteTopHat;
+    bool useWhiteTopHat{kDefaultWhiteTopHat};
 
     /// Kernel size for top-hat.
-    int topHatKernelSize = kDefaultKernelSize;
+    int topHatKernelSize{kDefaultKernelSize};
 
     /**
      * @brief Check if any processing step is active.

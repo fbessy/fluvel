@@ -11,17 +11,17 @@
 /**
  * @brief Default standard deviation for additive Gaussian noise.
  */
-static constexpr float kDefaultGaussianSigmaNoise = 20.f;
+static constexpr float kDefaultGaussianSigmaNoise{20.f};
 
 /**
  * @brief Default probability for impulsive (salt-and-pepper) noise.
  */
-static constexpr float kDefaultImpulsiveNoise = 0.05f;
+static constexpr float kDefaultImpulsiveNoise{0.05f};
 
 /**
  * @brief Default standard deviation for multiplicative speckle noise.
  */
-static constexpr float kDefaultSpeckleNoise = 0.16f;
+static constexpr float kDefaultSpeckleNoise{0.16f};
 
 namespace fluvel_ip::noise
 {

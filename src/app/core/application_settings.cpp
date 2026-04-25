@@ -16,7 +16,8 @@ namespace fluvel_app
 
 namespace
 {
-static constexpr const char* kPhiInitFilename = "initial_phi.png";
+
+static constexpr auto kPhiInitFilename = "initial_phi.png";
 
 QSettings userSettings()
 {

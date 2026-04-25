@@ -118,7 +118,7 @@ private:
     QAction* openAct_ = nullptr;
     QAction* separatorAct_ = nullptr;
 
-    static constexpr qsizetype kMaxRecentFiles = 5;
+    static constexpr qsizetype kMaxRecentFiles{5};
     std::array<QAction*, kMaxRecentFiles> recentFileActs_;
 
     QAction* clearAct_ = nullptr;

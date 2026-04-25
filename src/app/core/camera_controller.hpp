@@ -203,10 +203,10 @@ private:
 
     // --- Timing configuration ---
 
-    static constexpr int kStartupTimeoutMs = 7'000;               // 7 sec
-    static constexpr int64_t kStreamLossTimeoutNs = 2'000'000'000; // 2 sec
-    static constexpr int kWatchdogPeriodMs = 200;                 // 0.2 sec
-    static constexpr int kDiagnosticsPeriodMs = 500;              // 0.5 sec
+    static constexpr int kStartupTimeoutMs{7'000};                // 7 sec
+    static constexpr int64_t kStreamLossTimeoutNs{2'000'000'000}; // 2 sec
+    static constexpr int kWatchdogPeriodMs{200};                  // 0.2 sec
+    static constexpr int kDiagnosticsPeriodMs{500};               // 0.5 sec
 
     /// Timer used to detect startup timeout.
     QTimer* startupTimer_ = nullptr;

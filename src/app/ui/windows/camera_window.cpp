@@ -79,7 +79,7 @@ void CameraWindow::createUi()
 
     // Adjust width to contents (needed when items have icons)
     deviceSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    static constexpr int kCameraIconSize = 13;
+    static constexpr int kCameraIconSize{13};
     deviceSelector_->setIconSize(QSize(kCameraIconSize, kCameraIconSize));
 
     deviceActiveIcon_ = createActiveCameraIcon();
@@ -89,7 +89,7 @@ void CameraWindow::createUi()
     formatLabel_ = new QLabel(tr("Format:"));
     formatSelector_ = new QComboBox(this);
     formatSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    static constexpr int kFormatIconSize = 16;
+    static constexpr int kFormatIconSize{16};
     formatSelector_->setIconSize(QSize(kFormatIconSize, kFormatIconSize));
 
     formatActiveIcon_ = createActiveFormatIcon();

@@ -20,10 +20,10 @@ namespace fluvel_ip
 struct RegionParams
 {
     /// Default weight for inside region.
-    static constexpr int kDefaultLambdaIn = 1;
+    static constexpr int kDefaultLambdaIn{1};
 
     /// Default weight for outside region.
-    static constexpr int kDefaultLambdaOut = 1;
+    static constexpr int kDefaultLambdaOut{1};
 
     /**
      * @brief Weight of the inside homogeneity term (λ₁ in Chan-Vese).
@@ -172,7 +172,7 @@ inline ColorSpaceOption colorSpaceFromString(std::string_view s)
 struct RegionColorParams : public RegionParams
 {
     /// Default color space.
-    static constexpr ColorSpaceOption kDefaultColorSpace = ColorSpaceOption::RGB;
+    static constexpr ColorSpaceOption kDefaultColorSpace{ColorSpaceOption::RGB};
 
     /// Default channel weights.
     static constexpr Components_3i kDefaultWeights{1, 1, 1};
