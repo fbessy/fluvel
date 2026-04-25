@@ -107,14 +107,21 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     noiseSp_->setMaximum(100);
     noiseSp_->setSuffix(tr(" %"));
     noiseSp_->setValue(0);
+
+    noiseGroup_ = new QGroupBox(tr("Noise"));
+    noiseGroup_->setCheckable(true);
+    noiseGroup_->setChecked(false);
+
     QFormLayout* noiseLayout = new QFormLayout;
-    noiseLayout->addRow("Noise", noiseSp_);
+    noiseLayout->addRow(tr("Amount:"), noiseSp_);
+
+    noiseGroup_->setLayout(noiseLayout);
 
     QVBoxLayout* this_layout = new QVBoxLayout;
     this_layout->addWidget(textListLength_);
     this_layout->addWidget(img_group);
     this_layout->addWidget(color_group);
-    this_layout->addLayout(noiseLayout);
+    this_layout->addWidget(noiseGroup_);
 
     setLayout(this_layout);
 
@@ -139,6 +146,12 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     Q_ASSERT(analysisWindow);
 
     connect(this, &AnalysisWidget::listChanged, analysisWindow, &AnalysisWindow::checkLists);
+
+    connect(noiseGroup_, &QGroupBox::toggled, this,
+            [this](bool)
+            {
+                refreshNoiseImage(noiseSp_->value());
+            });
 
     connect(noiseSp_, QOverload<int>::of(&QSpinBox::valueChanged), this,
             &AnalysisWidget::refreshNoiseImage);
@@ -233,31 +246,35 @@ void AnalysisWidget::createList()
 
 void AnalysisWidget::refreshNoiseImage(int noise_percent)
 {
-    if (!image_.isNull())
+    if (image_.isNull())
+        return;
+
+    noiseImage_ = image_;
+
+    // 🔥 si désactivé → early return propre
+    if (!noiseGroup_->isChecked() || noise_percent == 0)
     {
-        noiseImage_ = image_;
-
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::bernoulli_distribution proba_distri{float(noise_percent) / 100.f};
-
-        QColor color(int(rgb_.red), int(rgb_.green), int(rgb_.blue));
-
-        QRgb rgb_color = color.rgb();
-
-        for (int y = 0; y < imageHeight_; ++y)
-        {
-            for (int x = 0; x < imageWidth_; ++x)
-            {
-                if (proba_distri(gen))
-                    noiseImage_.setPixel(x, y, rgb_color);
-            }
-        }
-
         imageViewer_->setImage(noiseImage_);
-
         createList();
+        return;
     }
+
+    std::mt19937 gen(std::random_device{}());
+    std::bernoulli_distribution proba_distri{float(noise_percent) / 100.f};
+
+    QRgb rgb_color = QColor(int(rgb_.red), int(rgb_.green), int(rgb_.blue)).rgb();
+
+    for (int y = 0; y < imageHeight_; ++y)
+    {
+        for (int x = 0; x < imageWidth_; ++x)
+        {
+            if (proba_distri(gen))
+                noiseImage_.setPixel(x, y, rgb_color);
+        }
+    }
+
+    imageViewer_->setImage(noiseImage_);
+    createList();
 }
 
 void AnalysisWidget::onColorPicked(const QColor& color, const QPoint&)

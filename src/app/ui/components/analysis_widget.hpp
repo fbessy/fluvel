@@ -14,6 +14,7 @@
 class QSpinBox;
 class QLabel;
 class QPushButton;
+class QGroupBox;
 
 namespace fluvel_app
 {
@@ -62,6 +63,7 @@ private:
 
     ColorSelectorWidget* colorSelector_;
     fluvel_ip::Rgb_uc selected_;
+    QGroupBox* noiseGroup_;
     QSpinBox* noiseSp_;
 
     QImage image_;
