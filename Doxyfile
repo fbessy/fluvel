@@ -15,8 +15,8 @@ USE_MDFILE_AS_MAINPAGE = README.md
 
 FILE_PATTERNS          = *.hpp *.cpp *.md
 
-EXTRACT_ALL            = NO
-EXTRACT_PRIVATE        = NO
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = NO
 
 GENERATE_HTML          = YES
@@ -43,4 +43,7 @@ DOT_IMAGE_FORMAT       = svg
 INTERACTIVE_SVG        = YES
 
 DOT_GRAPH_MAX_NODES    = 50
+
+INLINE_INFO            = YES
+ALWAYS_DETAILED_SEC    = YES
 

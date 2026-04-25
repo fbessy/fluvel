@@ -6,7 +6,8 @@ Active contour (level-set) image processing engine written in modern C++.
 
 Fluvel is a region-based active contour engine focused on clarity, performance,
 and clean architecture. The core processing logic is independent from the UI,
-allowing reuse as a standalone library.
+allowing reuse as a standalone library and facilitating testing
+and integration in different environments.
 
 The project is currently under active development.
 
@@ -52,6 +53,13 @@ Visualization and UI components are separated from the core algorithmic logic.
 
 ---
 
+### Modules
+
+- **fluvel_app** — Application layer (UI and orchestration)
+- **fluvel_ip** — Image processing engine (algorithms and data processing)
+
+---
+
 ### Build
 
 #### Requirements
@@ -65,3 +73,4 @@ Visualization and UI components are separated from the core algorithmic logic.
 ```bash
 cmake -S . -B build
 cmake --build build
+./build/fluvel   # ou le nom de ton binaire
