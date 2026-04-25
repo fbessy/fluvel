@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <cassert>
 #include <limits>
-#include <random>
 
 namespace fluvel_ip
 {
@@ -44,16 +43,13 @@ void Shape::pushBack(Point2D_i&& p)
 
 void Shape::swap(Shape& other) noexcept
 {
-    this->points_.swap(other.points_);
-
-    std::swap(this->centroid_.x, other.centroid_.x);
-    std::swap(this->centroid_.y, other.centroid_.y);
+    std::swap(points_, other.points_);
+    std::swap(centroid_, other.centroid_);
 }
 
 void Shape::shufflePoints()
 {
-    auto rng = std::default_random_engine{};
-    std::ranges::shuffle(points_, rng);
+    std::ranges::shuffle(points_, rng_);
 }
 
 void Shape::calculateCentroid()

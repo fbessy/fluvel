@@ -4,6 +4,8 @@
 #pragma once
 
 #include "point.hpp"
+
+#include <random>
 #include <vector>
 
 namespace fluvel_ip
@@ -125,6 +127,9 @@ private:
 
     /// Centroid of the shape.
     Point2D_f centroid_;
+
+    /// Random generator.
+    std::mt19937 rng_{std::random_device{}()};
 };
 
 } // namespace fluvel_ip
