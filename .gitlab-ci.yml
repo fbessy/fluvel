@@ -10,6 +10,7 @@ build:
     - apt install -y cmake clang build-essential qt6-base-dev qt6-multimedia-dev libgl1-mesa-dev qt6-tools-dev qt6-tools-dev-tools
   script:
     - export PATH=/usr/lib/qt6/bin:$PATH
+    - - if [ -f /usr/lib/qt6/bin/lconvert-qt6 ]; then ln -s /usr/lib/qt6/bin/lconvert-qt6 /usr/lib/qt6/bin/lconvert || true; fi
     - cmake -S . -B build
     - cmake --build build
 
