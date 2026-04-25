@@ -24,12 +24,32 @@ namespace fluvel_app
 
 class ImageViewerWidget;
 
+/**
+ * @brief Widget for image analysis and shape extraction.
+ *
+ * This widget provides tools to:
+ * - load and display images
+ * - select colors for analysis
+ * - generate and update shapes based on the selected color
+ * - optionally apply noise for testing
+ *
+ * It integrates an ImageViewerWidget and reacts to user interactions
+ * (e.g. color picking) via the ImageViewerListener interface.
+ *
+ * The widget maintains the current image, selected color, and resulting shape.
+ */
 class AnalysisWidget : public QWidget, public ImageViewerListener
 {
     Q_OBJECT
 
 public:
     AnalysisWidget(QWidget* parent = nullptr);
+
+    /**
+     * @name Accessors
+     * @brief Read-only access to current analysis data.
+     * @{
+     */
 
     [[nodiscard]] int imageWidth() const
     {
@@ -54,17 +74,39 @@ public:
         return selectedColor_;
     }
 
+    /** @} */
+
+    /**
+     * @brief Saves current widget settings.
+     */
     void saveSettings() const;
 
 signals:
+    /**
+     * @brief Emitted when the internal list or shape changes.
+     */
     void listChanged();
 
 private:
+    /**
+     * @brief Handles color picking events from the image viewer.
+     *      * Updates the selected color and refreshes the analysis.
+     */
+    void onColorPicked(const QColor& color, const QPoint& imagePos) override;
+
+    /// Opens a file dialog to select an image.
     void openFilename();
+
+    /// Loads the selected image.
     void openImage();
+
+    /// Refreshes the analysis.
     void refresh();
+
+    /// Refreshes the analysis with noise applied.
     void refreshWithNoise(int noisePercent);
-    void onColorPicked(const QColor& color, const QPoint& /*imagePos*/) override;
+
+    /// Handles color selection from the UI widget.
     void onColorSelected(const QColor& c);
 
     void createList();

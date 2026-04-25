@@ -22,30 +22,63 @@ namespace fluvel_app
 
 class AlgoSettingsWidget;
 
+/**
+ * @brief Dialog for configuring video session and processing settings.
+ *
+ * This dialog allows the user to configure parameters related to
+ * video acquisition and processing, including:
+ * - downscaling options
+ * - spatial and temporal processing
+ * - algorithm parameters via AlgoSettingsWidget
+ *
+ * The configuration is applied when the dialog is accepted.
+ */
 class CameraSettingsWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    CameraSettingsWindow(QWidget* parent, const VideoSessionSettings& config);
+    /**
+     * @brief Constructs the camera settings dialog.
+     * @param config Initial video session configuration.
+     * @param parent Optional parent widget.
+     *
+     */
+    CameraSettingsWindow(const VideoSessionSettings& config, QWidget* parent = nullptr);
 
 signals:
+    /**
+     * @brief Emitted when the configuration is accepted.
+     *      * @param config Updated video session configuration.
+     */
     void videoSessionSettingsAccepted(const fluvel_app::VideoSessionSettings& config);
 
 protected:
-    //! Save the configuration chosen into the ApplicationSettings.
+    /**
+     * @brief Applies the current UI values and emits the updated configuration.
+     */
     void accept() override;
 
-    //! Restore the ui states in function of the ApplicationSettings.
+    /**
+     * @brief Restores UI values from the current configuration.
+     */
     void reject() override;
 
+    /**
+     * @brief Handles dialog close events.
+     */
     void closeEvent(QCloseEvent* event) override;
 
 private:
     // --- Setup ---
 
+    /// Initializes the downscale configuration UI.
     void setupDownscaleGroup();
+
+    /// Updates UI elements from the current configuration.
     void updateUIFromConfig();
+
+    /// Restores default configuration values.
     void restoreToDefaults();
 
     // --- UI ---

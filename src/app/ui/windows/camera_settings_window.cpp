@@ -19,7 +19,7 @@
 namespace fluvel_app
 {
 
-CameraSettingsWindow::CameraSettingsWindow(QWidget* parent, const VideoSessionSettings& config)
+CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, QWidget* parent)
     : QDialog(parent)
     , config_(config)
 {

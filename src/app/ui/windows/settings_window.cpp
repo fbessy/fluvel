@@ -31,7 +31,7 @@
 namespace fluvel_app
 {
 
-SettingsWindow::SettingsWindow(QWidget* parent, const ImageSessionSettings& config)
+SettingsWindow::SettingsWindow(const ImageSessionSettings& config, QWidget* parent)
     : QDialog(parent)
     , committedConfig_(config)
     , editedDownscaleParams_(config.compute.downscale)

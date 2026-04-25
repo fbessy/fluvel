@@ -106,12 +106,12 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     centroidsDistLabel_ = new QLabel(this);
     centroidsDistLabel_->setText(tr("distance between centroids = "));
     centroidsDistLabel_->setAlignment(Qt::AlignCenter);
-    centroidsRatio_Label_ = new QLabel(this);
-    centroidsRatio_Label_->setText(tr("ratio between centroids = "));
-    centroidsRatio_Label_->setAlignment(Qt::AlignCenter);
+    centroidsRatioLabel_ = new QLabel(this);
+    centroidsRatioLabel_->setText(tr("ratio between centroids = "));
+    centroidsRatioLabel_->setAlignment(Qt::AlignCenter);
     QVBoxLayout* centroids_layout = new QVBoxLayout;
     centroids_layout->addWidget(centroidsDistLabel_);
-    centroids_layout->addWidget(centroidsRatio_Label_);
+    centroids_layout->addWidget(centroidsRatioLabel_);
     QGroupBox* centroids_group = new QGroupBox(tr("Shapes gap"));
     centroids_group->setLayout(centroids_layout);
 
@@ -176,7 +176,7 @@ void AnalysisWindow::computeHd()
 
     centroidsDistLabel_->setText(tr("distance between centroids = ") +
                                  QString::number(centroidsGap) + (tr(" pixels")));
-    centroidsRatio_Label_->setText(tr("ratio between centroids = ") + QString::number(gapRatio) +
+    centroidsRatioLabel_->setText(tr("ratio between centroids = ") + QString::number(gapRatio) +
                                    (" %"));
 
     timeLabel_->setText(tr("time = ") + QString::number(elapsed, 'f', 2) + " s");

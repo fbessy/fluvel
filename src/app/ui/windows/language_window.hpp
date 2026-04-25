@@ -12,21 +12,38 @@ class QWidget;
 namespace fluvel_app
 {
 
+/**
+ * @brief Dialog for selecting the application language.
+ *
+ * This dialog allows the user to choose the UI language.
+ * The selection is applied when the dialog is accepted and
+ * restored when rejected.
+ */
 class LanguageWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    //! A parametric constructor with a pointer on the QWidget parent.
-    LanguageWindow(QWidget* parent);
+    /**
+     * @brief Constructs the language selection dialog.
+     *      * @param parent Optional parent widget.
+     */
+    LanguageWindow(QWidget* parent = nullptr);
 
 protected:
-    //! Save the language chosen into the ApplicationSettings.
+    /**
+     * @brief Applies the selected language to application settings.
+     */
     void accept() override;
 
-    //! Restore the language combobox state in function of the ApplicationSettings language.
+    /**
+     * @brief Restores the language selection from current settings.
+     */
     void reject() override;
 
+    /**
+     * @brief Handles dialog close events.
+     */
     void closeEvent(QCloseEvent* event) override;
 
 private:

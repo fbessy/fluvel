@@ -18,11 +18,37 @@ namespace fluvel_app
 
 class ImageViewerWidget;
 
+/**
+ * @brief Base interface for image viewer interaction handling.
+ *
+ * This interface defines how input events (mouse, wheel, drag & drop)
+ * are processed by an ImageViewerWidget.
+ *
+ * Implementations can override only the relevant methods. By default,
+ * all event handlers return false (event not handled).
+ *
+ * Event handling:
+ * - Returning true means the event is handled
+ * - Returning false allows further propagation
+ *
+ * Cursor handling:
+ * - cursorForEvent() provides the cursor shape depending on the
+ *   current interaction state
+ *
+ * @note This interface does not enforce any ownership or lifetime.
+ *       Multiple interaction layers may exist (e.g. InteractionSet).
+ *       Implementations should remain stateless or explicitly manage state.
+ */
 class ImageViewerInteraction
 {
 public:
     virtual ~ImageViewerInteraction() = default;
 
+    /**
+     * @name Event handlers
+     * @brief Input event callbacks. Return true if the event is handled.
+     * @{
+     */
     virtual bool wheel(ImageViewerWidget&, QWheelEvent*)
     {
         return false;
@@ -42,13 +68,6 @@ public:
     virtual bool mouseDoubleClick(ImageViewerWidget&, QMouseEvent*)
     {
         return false;
-    }
-
-    virtual Qt::CursorShape cursorForEvent(const ImageViewerWidget& /*view*/, bool /*hasImage*/,
-                                           bool /*isPanRelevant*/,
-                                           const QMouseEvent* /*event*/) const
-    {
-        return Qt::ArrowCursor;
     }
 
     virtual bool dragEnter(ImageViewerWidget&, QDragEnterEvent*)
@@ -71,9 +90,24 @@ public:
         return false;
     }
 
+    /** @} */
+
+    /**
+     * @name Interaction state
+     * @brief Cursor and lifecycle control.
+     * @{
+     */
+    virtual Qt::CursorShape cursorForEvent(const ImageViewerWidget& /*view*/, bool /*hasImage*/,
+                                           bool /*isPanRelevant*/,
+                                           const QMouseEvent* /*event*/) const
+    {
+        return Qt::ArrowCursor;
+    }
+
     virtual void cancel()
     {
     }
+    /** @} */
 };
 
 } // namespace fluvel_app

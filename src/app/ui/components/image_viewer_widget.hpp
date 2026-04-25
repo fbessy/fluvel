@@ -32,14 +32,34 @@ namespace fluvel_app
 class ImageViewerInteraction;
 class ZoomOverlayController;
 
+/**
+ * @brief Image viewer widget with interaction and overlay support.
+ *
+ * This widget provides a complete image viewing component based on QGraphicsView,
+ * including:
+ * - image display and scaling
+ * - contour rendering
+ * - user interactions (zoom, pan, behaviors)
+ * - overlays (text, pixel info, zoom feedback)
+ * - optional frame throttling for controlled display rate
+ *
+ * Architecture:
+ * - Rendering is handled via a QGraphicsScene (pixmap + items)
+ * - Interactions are delegated to an ImageViewerInteraction
+ * - External callbacks are forwarded through ImageViewerListener
+ *
+ * The widget supports both direct image updates and frame-based updates
+ * (UiFrame), with optional throttling for performance control.
+ *
+ * @note Interaction and listener are not owned by this class.
+ *       Their lifetime must exceed the widget.
+ */
 class ImageViewerWidget : public QGraphicsView
 {
     Q_OBJECT
 
 public:
     // --- Public API (external users) ---
-
-    // init
     explicit ImageViewerWidget(QWidget* parent = nullptr);
 
     explicit ImageViewerWidget(const DisplayConfig& displayConfig, const DownscaleParams& downscaleParams,
@@ -47,29 +67,90 @@ public:
 
     ~ImageViewerWidget() override;
 
+    /**
+     * @brief Sets the interaction handler.
+     *      * @param interaction Interaction object (not owned).
+     */
     void setInteraction(ImageViewerInteraction* interaction);
+
+    /**
+     * @brief Sets the listener for external callbacks.
+     *      * @param listener Listener object (not owned).
+     */
     void setListener(ImageViewerListener* listener);
 
-    // Throttling : fps max (0 = désactivé)
+    /**
+     * @brief Sets the maximum display frame rate.
+     *      * If fps > 0, frames are throttled to the specified rate.
+     * If fps == 0, throttling is disabled.
+     *      * @param fps Maximum frames per second.
+     */
     void setMaxDisplayFps(double fps);
 
-    // config
+    /**
+     * @name Configuration
+     * @brief Runtime configuration of display and processing parameters.
+     *      * These functions update internal rendering behavior without recreating the widget.
+     * @{
+     */
     void applyDisplayConfig(const fluvel_app::DisplayConfig& display);
     void applyDownscaleConfig(const fluvel_app::DownscaleParams& downscale);
+    /** @} */
 
-    // display
+    /**
+     * @name Display
+     * @brief Functions related to image and overlay display.
+     *      * These functions update what is rendered in the viewer,
+     * including image content, contours and UI overlays.
+     * @{
+     */
+
+    /**
+     * @brief Sets the current image.
+     */
     void setImage(const QImage& img);
-    void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
-    void setImageAndContour(const UiFrame& uiFrame);
-    void clearContour();
-    void setText(const QString& text);
-    void showPlaceholder(bool showEffect);
 
-    // getters
+    /**
+     * @brief Sets contour overlays.
+     */
+    void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
+
+    /**
+     * @brief Sets both image and contour from a frame.
+     */
+    void setImageAndContour(const UiFrame& uiFrame);
+
+    /**
+     * @brief Clears contour overlays.
+     */
+    void clearContour();
+
+    /**
+     * @brief Displays a text overlay.
+     */
+    void setText(const QString& text);
+
+    /**
+     * @brief Shows or hides a placeholder effect.
+     */
+    void showPlaceholder(bool showEffect);
+    /** @} */
+
+    /**
+     * @brief Returns the current image.
+     */
     const QImage& image() const;
+
+    /**
+     * @brief Renders the current view to an image.
+     */
     QImage renderToImage() const;
 
-    // --- Internal API (used by interactions/behaviors) ---
+    /**
+     * @name Internal API
+     * @brief Functions used by behaviors and interaction system.
+     * @{
+     */
 
     void toggleFullscreen();
     void applyAutoFit();
@@ -91,9 +172,22 @@ public:
     void setDragHighlight(bool enabled);
     void notifyImageDropped(const QString& path);
 
+    /** @} */
+
 signals:
+    /**
+     * @brief Emitted when the image is clicked.
+     */
     void imageClicked(int x, int y);
+
+    /**
+     * @brief Emitted when a frame is displayed.
+     */
     void frameDisplayed(const fluvel_app::FrameTimestamps& ts);
+
+    /**
+     * @brief Emitted when an image is dropped.
+     */
     void imageDropped(const QString& path);
 
 protected:

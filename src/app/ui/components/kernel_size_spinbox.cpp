@@ -12,21 +12,21 @@ KernelSizeSpinBox::KernelSizeSpinBox(QWidget* parent)
     setSuffix(" × ");
 
     connect(this, QOverload<const QString&>::of(&QSpinBox::textChanged), this,
-            &KernelSizeSpinBox::set_suffix, Qt::UniqueConnection);
+            &KernelSizeSpinBox::setSuffix, Qt::UniqueConnection);
 }
 
 QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
 {
-    QString text_without_suffix(text);
-    text_without_suffix.chop(suffix().size());
+    QString textWithoutSuffix(text);
+    textWithoutSuffix.chop(suffix().size());
 
-    qsizetype size = text_without_suffix.size();
+    qsizetype size = textWithoutSuffix.size();
     bool is_successed;
-    int value = text_without_suffix.toInt(&is_successed);
+    int value = textWithoutSuffix.toInt(&is_successed);
 
     QValidator::State result;
 
-    if (text_without_suffix.isEmpty())
+    if (textWithoutSuffix.isEmpty())
     {
         result = QValidator::Intermediate;
     }
@@ -67,7 +67,7 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
         }
         else if (result == QValidator::Invalid)
         {
-            if (previous_result_ == QValidator::Acceptable)
+            if (previousResult_ == QValidator::Acceptable)
             {
                 const_cast<KernelSizeSpinBox*>(this)->setStyleSheet("color:green");
             }
@@ -84,19 +84,20 @@ QValidator::State KernelSizeSpinBox::validate(QString& text, int& pos) const
 
     if (result != QValidator::Invalid)
     {
-        const_cast<KernelSizeSpinBox*>(this)->previous_result_ = result;
+        const_cast<KernelSizeSpinBox*>(this)->previousResult_ = result;
     }
 
     return result;
 }
 
-void KernelSizeSpinBox::set_suffix(const QString& text)
+void KernelSizeSpinBox::setSuffix(const QString& text)
 {
-    QString text_without_suffix(text);
-    text_without_suffix.chop(suffix().size());
+    QString textWithoutSuffix(text);
+    textWithoutSuffix.chop(suffix().size());
 
-    text_without_suffix = " × " + text_without_suffix;
-    const_cast<KernelSizeSpinBox*>(this)->setSuffix(text_without_suffix);
+    textWithoutSuffix = " × " + textWithoutSuffix;
+
+    QSpinBox::setSuffix(textWithoutSuffix);
 }
 
 void KernelSizeSpinBox::focusInEvent(QFocusEvent* event)

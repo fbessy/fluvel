@@ -344,7 +344,7 @@ void ImageWindow::setupChildWindows()
 {
     const auto& config = ApplicationSettings::instance().imageSettings();
 
-    settingsWindow_ = new SettingsWindow(this, config);
+    settingsWindow_ = new SettingsWindow(config, this);
     cameraWindow_ = new CameraWindow(this);
     analysisWindow_ = new AnalysisWindow(this);
     aboutWindow_ = new AboutWindow(this);

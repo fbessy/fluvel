@@ -117,7 +117,7 @@ void CameraWindow::createUi()
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
-    cameraSettingsWindow_ = new CameraSettingsWindow(this, config);
+    cameraSettingsWindow_ = new CameraSettingsWindow(config, this);
 }
 
 QIcon CameraWindow::createActiveCameraIcon()

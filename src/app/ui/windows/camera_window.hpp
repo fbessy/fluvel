@@ -32,6 +32,9 @@ class RightPanelToggleButton;
 class DisplaySettingsWidget;
 class ImageViewerWidget;
 
+/**
+ * @brief Streaming status for a camera device.
+ */
 enum class DeviceStreamingStatus
 {
     Idle,
@@ -39,6 +42,12 @@ enum class DeviceStreamingStatus
     Error
 };
 
+/**
+ * @brief Stores a preferred camera format.
+ *
+ * A format is considered valid if it has a valid resolution
+ * and pixel format.
+ */
 struct SavedFormat
 {
     QSize resolution;
@@ -51,6 +60,12 @@ struct SavedFormat
     }
 };
 
+/**
+ * @brief RAII guard to temporarily disable UI updates.
+ *
+ * Sets the given flag to true on construction and restores it
+ * to false on destruction.
+ */
 class ScopedUiUpdateGuard
 {
 public:
@@ -69,20 +84,64 @@ private:
     bool& flag_;
 };
 
+/**
+ * @brief Main window handling camera streaming and visualization.
+ *
+ * This window provides the user interface to:
+ * - select a camera device and format
+ * - start and stop video streaming
+ * - display frames in an ImageViewerWidget
+ * - configure processing and display settings
+ *
+ * It coordinates interactions between:
+ * - CameraController (capture and streaming)
+ * - ImageViewerWidget (display)
+ * - settings widgets (camera and display)
+ *
+ * The class also manages device availability, preferred formats,
+ * and streaming state.
+ */
 class CameraWindow : public QMainWindow
 {
     Q_OBJECT
 public:
+    /**
+     * @brief Constructs the camera window.
+     *      * @param parent Optional parent widget.
+     */
     explicit CameraWindow(QWidget* parent = nullptr);
+
+    /**
+     * @brief Returns whether at least one camera device is available.
+     */
     bool isCameraAvailable() const;
 
 signals:
-    bool cameraAvailabilityChanged(bool available);
+
+    /**
+     * @brief Emitted when camera availability changes.
+     */
+    void cameraAvailabilityChanged(bool available);
+
+    /**
+     * @brief Emitted when the window is shown.
+     */
     void cameraWindowShown();
+
+    /**
+     * @brief Emitted when the window is closed.
+     */
     void cameraWindowClosed();
 
 protected:
+    /**
+     * @brief Handles window show events.
+     */
     void showEvent(QShowEvent* event) override;
+
+    /**
+     * @brief Handles window close events.
+     */
     void closeEvent(QCloseEvent* event) override;
 
 private:

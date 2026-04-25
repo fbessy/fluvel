@@ -36,19 +36,55 @@ class DisplaySettingsWidget;
 class ImageViewerWidget;
 class ImageController;
 
+/**
+ * @brief Main application window for image processing and segmentation.
+ *
+ * This window provides the primary user interface to:
+ * - open and display images
+ * - control segmentation and processing workflows
+ * - manage sessions (image, camera, analysis)
+ * - access application settings and tools
+ *
+ * It coordinates:
+ * - ImageViewerWidget for rendering
+ * - ImageController for processing logic
+ * - multiple child windows (camera, analysis, settings, etc.)
+ *
+ * The class also manages recent files, user actions, and application state.
+ */
 class ImageWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs the main image window.
+     *      * @param parent Optional parent widget.
+     */
     explicit ImageWindow(QWidget* parent = nullptr);
 
 signals:
+    /**
+     * @brief Emitted when a file is selected.
+     *      * @param fileName Path to the selected file.
+     */
     void fileSelected(const QString& fileName);
+
+    /**
+     * @brief Emitted when an image is dropped into the window.
+     *      * @param path Path to the dropped file.
+     */
     void imageDropped(const QString& path);
 
 protected:
+    /**
+     * @brief Handles window show events.
+     */
     void showEvent(QShowEvent* event) override;
+
+    /**
+     * @brief Handles window close events.
+     */
     void closeEvent(QCloseEvent* event) override;
 
 private:

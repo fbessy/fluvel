@@ -31,6 +31,9 @@ class InitializationBehavior;
 class KernelSizeSpinBox;
 class AlgoSettingsWidget;
 
+/**
+ * @brief Tab indices for the settings dialog.
+ */
 enum class TabIndex
 {
     Downscale,
@@ -39,28 +42,77 @@ enum class TabIndex
     Algorithm
 };
 
+/**
+ * @brief Dialog for configuring image processing and segmentation settings.
+ *
+ * This dialog allows the user to configure all aspects of an image session,
+ * including:
+ * - downscaling
+ * - preprocessing filters and noise
+ * - initialization shapes
+ * - segmentation algorithm parameters
+ *
+ * The configuration is organized into multiple tabs and can be applied
+ * or discarded via accept() / reject().
+ *
+ * It also provides interactive shape initialization through an
+ * ImageViewerWidget and InitializationBehavior.
+ *
+ * @note The dialog maintains both committed and edited configurations.
+ */
 class SettingsWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    SettingsWindow(QWidget* parent, const ImageSessionSettings& config);
+    /**
+     * @brief Constructs the settings dialog.
+     *      * @param config Initial image session configuration.
+     * @param parent Optional parent widget.
+     */
+    SettingsWindow(const ImageSessionSettings& config, QWidget* parent = nullptr);
 
+    /**
+     * @brief Updates the dialog with a new input image.
+     *      * @param inputImage Input image used for preview and initialization.
+     */
     void handleInputImageReady(const QImage& inputImage);
 
 signals:
+    /**
+     * @brief Emitted when the configuration is accepted.
+     */
     void imageSessionSettingsAccepted(const fluvel_app::ImageSessionSettings& config);
+
+    /**
+     * @brief Emitted when initialization mode is toggled.
+     */
     void initializationModeChanged(bool enabled);
-    void updateOverlay(fluvel_app::UiShapeInfo uiShape);
+
+    /**
+     * @brief Requests overlay update in the viewer.
+     */
+    void updateOverlay(const fluvel_app::UiShapeInfo& uiShape);
 
 protected:
-    //! Save the configuration chosen into the ApplicationSettings.
+    /**
+     * @brief Applies the edited configuration.
+     */
     void accept() override;
 
-    //! Restore the ui states in function of the ApplicationSettings.
+    /**
+     * @brief Restores UI values from the committed configuration.
+     */
     void reject() override;
 
+    /**
+     * @brief Handles dialog show events.
+     */
     void showEvent(QShowEvent* event) override;
+
+    /**
+     * @brief Handles dialog close events.
+     */
     void closeEvent(QCloseEvent* event) override;
 
 private:

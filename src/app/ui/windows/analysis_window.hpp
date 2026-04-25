@@ -20,14 +20,28 @@ namespace fluvel_app
 
 class AnalysisWidget;
 
+/**
+ * @brief Dialog for comparing analysis results between two images.
+ *
+ * This window allows the user to compare shapes extracted from two
+ * AnalysisWidget instances. It computes various metrics such as:
+ * - Hausdorff distance
+ * - quantile distance
+ * - centroid distance
+ * - shape intersection
+ *
+ * Results are displayed in a dedicated popup.
+ */
 class AnalysisWindow : public QDialog
 {
     Q_OBJECT
 
 public:
-    //! A parametric constructor with a pointer on the QWidget parent.
-    AnalysisWindow(QWidget* parent);
-
+    /**
+     * @brief Constructs the analysis window.
+     *      * @param parent Optional parent widget.
+     */
+    AnalysisWindow(QWidget* parent = nullptr);
     void checkLists();
 
 protected:
@@ -52,7 +66,7 @@ private:
     QLabel* hausdorffRatioLabel_ = nullptr;
     QLabel* quantileRatioLabel_ = nullptr;
     QLabel* centroidsDistLabel_ = nullptr;
-    QLabel* centroidsRatio_Label_ = nullptr;
+    QLabel* centroidsRatioLabel_ = nullptr;
     QLabel* timeLabel_ = nullptr;
 
     std::unique_ptr<fluvel_ip::HausdorffDistance> hd_;
