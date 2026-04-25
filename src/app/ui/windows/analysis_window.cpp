@@ -5,6 +5,7 @@
 
 #include "analysis_widget.hpp"
 #include "color_adapters.hpp"
+#include "elapsed_timer.hpp"
 #include "hausdorff_distance.hpp"
 
 #include <QFormLayout>
@@ -14,8 +15,6 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSpinBox>
-
-#include <ctime>
 
 namespace fluvel_app
 {
@@ -146,12 +145,13 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
 void AnalysisWindow::computeHd()
 {
-    const std::clock_t startTime = std::clock();
+    fluvel_ip::ElapsedTimer timer;
+    timer.start();
 
     hd_ = std::make_unique<fluvel_ip::HausdorffDistance>(widget1_->shape(), widget2_->shape(),
                                                          &intersection_);
 
-    const float elapsed = float(std::clock() - startTime) / float(CLOCKS_PER_SEC);
+    const double elapsed = timer.elapsedSec();
 
     const float hausdorffDist = hd_->distance();
     const float hausdorffQuantile = hd_->hausdorffQuantile(hundredthSp_->value());
@@ -179,7 +179,7 @@ void AnalysisWindow::computeHd()
     centroidsRatio_Label_->setText(tr("ratio between centroids = ") + QString::number(gapRatio) +
                                    (" %"));
 
-    timeLabel_->setText(tr("time = ") + QString::number(elapsed, 'g', 4) + (" s"));
+    timeLabel_->setText(tr("time = ") + QString::number(elapsed, 'f', 2) + " s");
 
     resultPopup_->show();
 }
