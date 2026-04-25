@@ -187,14 +187,20 @@ private:
     QImage processedImage_;
     fluvel_ip::ImageOwner processedOwner_;
 
-    /// Timer period for interactive mode (ms).
-    static constexpr int kWorkerPeriodMs = 16;
+    /// Period of the worker QTimer in ms (~16 ms ≈ 60 FPS target).
+    static constexpr int kWorkerPeriodMs{16};
 
     /// Time slice for converge mode.
     static constexpr std::chrono::milliseconds kTimeSliceConvergeMs{15};
 
     /// Time slice for interactive mode.
     static constexpr std::chrono::milliseconds kTimeSliceInteractiveMs{10};
+
+    static_assert(kTimeSliceConvergeMs.count() <= kWorkerPeriodMs,
+                  "Converge time slice must be <= worker period");
+
+    static_assert(kTimeSliceInteractiveMs.count() <= kWorkerPeriodMs,
+                  "Interactive time slice must be <= worker period");
 
     std::chrono::milliseconds timeSliceMs_{kTimeSliceInteractiveMs};
 
