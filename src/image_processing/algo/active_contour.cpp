@@ -45,8 +45,6 @@ ActiveContour::ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedM
     }
 }
 
-ActiveContour::~ActiveContour() = default;
-
 void ActiveContour::checkContourFailure()
 {
     if (!cd_.empty())

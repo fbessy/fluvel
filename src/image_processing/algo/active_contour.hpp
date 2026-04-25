@@ -152,11 +152,6 @@ public:
                   const ActiveContourParams& params);
 
     /**
-     * @brief Destructor.
-     */
-    virtual ~ActiveContour();
-
-    /**
      * @brief Updates the contour with a new input image.
      *      * The image must match the dimensions of the level-set function.
      *      * ⚠️ Lifetime requirement:
