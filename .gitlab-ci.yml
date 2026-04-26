@@ -2,6 +2,9 @@ stages:
   - build
   - doc
 
+variables:
+  QT_VERSION: "6.7.2"
+
 build:
   stage: build
   image: ubuntu:24.04
@@ -17,15 +20,22 @@ build:
 
     - pip install aqtinstall
 
+    # debug utile (optionnel)
+    - python3 -m aqt list-qt linux desktop
+
     # Installer Qt seulement si absent
     - |
-      if [ ! -d "$HOME/Qt/6.10.2" ]; then
-        aqt install-qt linux desktop 6.10.2 gcc_64
+      if [ ! -d "$HOME/Qt/$QT_VERSION" ]; then
+        python3 -m aqt install-qt linux desktop $QT_VERSION gcc_64
       fi
 
-    - export QT_ROOT="$HOME/Qt/6.10.2/gcc_64"
+    - export QT_ROOT="$HOME/Qt/$QT_VERSION/gcc_64"
     - export PATH="$QT_ROOT/bin:$PATH"
     - export CMAKE_PREFIX_PATH="$QT_ROOT/lib/cmake"
+
+  script:
+    - cmake -S . -B build -G Ninja
+    - cmake --build build
 
 doc:
   stage: doc
