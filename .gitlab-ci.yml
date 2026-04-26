@@ -20,16 +20,16 @@ build:
 
     - pip install aqtinstall --break-system-packages
 
-    # debug utile (optionnel)
-    - python3 -m aqt list-qt linux desktop
+    # debug utile
+    - python3 -m aqt list-qt linux desktop --arch $QT_VERSION
 
     # Installer Qt seulement si absent
     - |
       if [ ! -d "$HOME/Qt/$QT_VERSION" ]; then
-        python3 -m aqt install-qt linux desktop $QT_VERSION gcc_64
+        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64
       fi
 
-    - export QT_ROOT="$HOME/Qt/$QT_VERSION/gcc_64"
+    - export QT_ROOT="$HOME/Qt/$QT_VERSION/linux_gcc_64"
     - export PATH="$QT_ROOT/bin:$PATH"
     - export CMAKE_PREFIX_PATH="$QT_ROOT/lib/cmake"
 
