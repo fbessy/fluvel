@@ -21,6 +21,8 @@ namespace fluvel_app
 namespace
 {
 
+constexpr auto kProjectUrl = "https://fabienip.gitlab.io/fluvel/";
+
 static QString packageType()
 {
 #ifdef FLUVEL_PACKAGE_TYPE
@@ -484,8 +486,7 @@ AboutWindow::AboutWindow(QWidget* parent)
 
 void AboutWindow::openWebPage()
 {
-    QDesktopServices::openUrl(
-        QUrl("https://sourceforge.net/projects/fastlevelset/", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(kProjectUrl, QUrl::TolerantMode));
 }
 
 void AboutWindow::closeEvent(QCloseEvent* event)
