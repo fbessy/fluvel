@@ -51,7 +51,7 @@ doc:
     - apt install -y doxygen graphviz
 
   script:
-    - doxygen docs/Doxyfile
+    - doxygen Doxyfile
     - mv docs/html public
 
   artifacts:
