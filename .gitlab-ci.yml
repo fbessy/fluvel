@@ -21,13 +21,15 @@ build:
     # Installer aqt
     - pip install aqtinstall --break-system-packages
 
-    # Debug : voir les archs disponibles
-    - python3 -m aqt list-qt linux desktop --arch $QT_VERSION
+    # Debug : voir les modules disponibles
+    - python3 -m aqt list-qt linux desktop --modules $QT_VERSION
 
-    # Installer Qt seulement si absent
+    # Installer Qt + modules nécessaires
     - |
       if [ ! -d "$HOME/Qt/$QT_VERSION" ]; then
-        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 -O $HOME/Qt
+        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 \
+          -O $HOME/Qt \
+          -m qtbase qtmultimedia qtmultimediawidgets
       fi
 
     # 🔍 Trouver automatiquement Qt6Config.cmake
