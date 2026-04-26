@@ -60,7 +60,7 @@ doc:
       - public
 
   only:
-    - $CI_DEFAULT_BRANCH
+    - master
 
 pages:
   stage: pages
@@ -75,4 +75,4 @@ pages:
       - public
 
   only:
-    - $CI_DEFAULT_BRANCH
+    - master
