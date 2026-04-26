@@ -4,6 +4,7 @@ stages:
 
 variables:
   QT_VERSION: "6.7.2"
+  QT_ARCH: "gcc_64"
 
 build:
   stage: build
@@ -18,36 +19,27 @@ build:
     - apt update
     - apt install -y python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev
 
-    # Installer aqt
     - pip install aqtinstall --break-system-packages
 
-    # Debug : voir les modules disponibles
-    - python3 -m aqt list-qt linux desktop --modules $QT_VERSION
-
-    # Installer Qt + modules nécessaires
+    # Install Qt if not cached
     - |
-      if [ ! -d "$HOME/Qt/$QT_VERSION" ]; then
+      if [ ! -d "$HOME/Qt/$QT_VERSION/$QT_ARCH" ]; then
         python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 \
           -O $HOME/Qt \
           -m qtbase qtmultimedia qtmultimediawidgets
       fi
 
-    # 🔍 Trouver automatiquement Qt6Config.cmake
-    - export Qt6_DIR=$(find $HOME/Qt -name Qt6Config.cmake | head -n 1 | xargs dirname)
-
-    # Déduire QT_ROOT proprement
-    - export QT_ROOT=$(dirname $(dirname $Qt6_DIR))
-
-    # Setup environnement
+    # Setup Qt env
+    - export QT_ROOT="$HOME/Qt/$QT_VERSION/$QT_ARCH"
+    - export Qt6_DIR="$QT_ROOT/lib/cmake/Qt6"
     - export PATH="$QT_ROOT/bin:$PATH"
     - export CMAKE_PREFIX_PATH="$QT_ROOT/lib/cmake"
 
-    # Debug utile
     - echo "QT_ROOT=$QT_ROOT"
     - echo "Qt6_DIR=$Qt6_DIR"
 
   script:
-    - cmake -S . -B build -G Ninja
+    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR
     - cmake --build build
 
 doc:
