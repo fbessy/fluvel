@@ -27,11 +27,32 @@ enum class ConductionFunction
     Rational     ///< 1 / (1 + (∇I/kappa)^2), smoother transition.
 };
 
-inline constexpr ConductionFunction kDefaultConductionFunction =
-    ConductionFunction::Exponential;                //!< Default conduction model.
-inline constexpr int kDefaultIterations = 10;       //!< Default number of iterations.
-inline constexpr double kDefaultLambda = 1.0 / 7.0; //!< Default time step (stable value).
-inline constexpr double kDefaultKappa = 30.0;       //!< Default conduction coefficient.
+struct AnisoParams
+{
+    //!< Default conduction model.
+    static constexpr ConductionFunction kDefaultConduction = {ConductionFunction::Exponential};
+
+    //!< Default number of iterations.
+    static constexpr int kDefaultIterations{10};
+
+    //!< Default time step (stable value).
+    static constexpr double kDefaultLambda{1.0 / 7.0};
+
+    //!< Default conduction coefficient.
+    static constexpr double kDefaultKappa{30.0};
+
+    /// Conduction function model.
+    ConductionFunction conduction{kDefaultConduction};
+
+    /// Number of diffusion iterations.
+    int iterations{kDefaultIterations};
+
+    /// Time step (stability parameter).
+    double lambda{kDefaultLambda};
+
+    /// Edge threshold parameter.
+    double kappa{kDefaultKappa};
+};
 
 /**
  * @brief Apply anisotropic diffusion using a preallocated output buffer.
@@ -49,9 +70,7 @@ inline constexpr double kDefaultKappa = 30.0;       //!< Default conduction coef
  * @note Recommended for pipelines where memory reuse is important.
  */
 void anisotropicDiffusion(const ImageView& input, ImageOwner& output,
-                          int iterations = kDefaultIterations, double lambda = kDefaultLambda,
-                          double kappa = kDefaultKappa,
-                          ConductionFunction conduction = kDefaultConductionFunction);
+                          const AnisoParams& params = AnisoParams{});
 
 /**
  * @brief Apply Perona-Malik anisotropic diffusion and return a new image.
@@ -70,9 +89,7 @@ void anisotropicDiffusion(const ImageView& input, ImageOwner& output,
  * @note Convenience wrapper. For repeated calls, prefer the class version
  *       to reuse internal buffers and improve performance.
  */
-ImageOwner anisotropicDiffusion(const ImageView& input, int iterations = kDefaultIterations,
-                                double lambda = kDefaultLambda, double kappa = kDefaultKappa,
-                                ConductionFunction conduction = kDefaultConductionFunction);
+ImageOwner anisotropicDiffusion(const ImageView& input, const AnisoParams& params = AnisoParams{});
 
 /**
  * @brief Stateful implementation of Perona-Malik anisotropic diffusion.
@@ -117,9 +134,7 @@ public:
      *
      * @note This function does not perform memory allocation.
      */
-    void apply(int iterations = kDefaultIterations, double lambda = kDefaultLambda,
-               double kappa = kDefaultKappa,
-               ConductionFunction conduction = kDefaultConductionFunction);
+    void apply(const AnisoParams& params = AnisoParams{});
 
     /**
      * @brief Returns a non-owning view of the result image.

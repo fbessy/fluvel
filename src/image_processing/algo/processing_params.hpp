@@ -32,12 +32,6 @@ struct ProcessingParams
 
     static constexpr int kDefaultKernelSize{5};
 
-    static constexpr filter::ConductionFunction kDefaultConductionFunction{
-        filter::ConductionFunction::Exponential};
-    static constexpr int kDefaultMaxIterations{10};
-    static constexpr double kDefaultLambda{1.0 / 7.0};
-    static constexpr double kDefaultKappa{30.0};
-
     static constexpr bool kDefaultWhiteTopHat{true};
 
     /**
@@ -90,17 +84,8 @@ struct ProcessingParams
     /// Enable anisotropic diffusion.
     bool anisotropicDiffusionEnabled{kDefaultDisabled};
 
-    /// Conduction function model.
-    filter::ConductionFunction conductionFunction{kDefaultConductionFunction};
-
-    /// Number of diffusion iterations.
-    int maxIterations{kDefaultMaxIterations};
-
-    /// Time step (stability parameter).
-    double lambda{kDefaultLambda};
-
-    /// Edge threshold parameter.
-    double kappa{kDefaultKappa};
+    /// Anistropic diffusion parameters.
+    filter::AnisoParams aniso{};
 
     // =========================
     // Morphological operations

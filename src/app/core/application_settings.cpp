@@ -160,10 +160,10 @@ void ApplicationSettings::saveImageSessionSettings()
     settings.setValue("preprocess/anisotropic_diffusion_enabled",
                       imageSettings_.compute.processing.anisotropicDiffusionEnabled);
     settings.setValue("preprocess/conduction_function",
-                      static_cast<int>(imageSettings_.compute.processing.conductionFunction));
-    settings.setValue("preprocess/max_iterations", imageSettings_.compute.processing.maxIterations);
-    settings.setValue("preprocess/lambda", imageSettings_.compute.processing.lambda);
-    settings.setValue("preprocess/kappa", imageSettings_.compute.processing.kappa);
+                      static_cast<int>(imageSettings_.compute.processing.aniso.conduction));
+    settings.setValue("preprocess/iterations", imageSettings_.compute.processing.aniso.iterations);
+    settings.setValue("preprocess/lambda", imageSettings_.compute.processing.aniso.lambda);
+    settings.setValue("preprocess/kappa", imageSettings_.compute.processing.aniso.kappa);
 
     settings.setValue("preprocess/opening_enabled",
                       imageSettings_.compute.processing.openingEnabled);
@@ -372,20 +372,21 @@ void ApplicationSettings::loadImageSessionSettings()
                                                 fluvel_ip::ProcessingParams::kDefaultDisabled)
                                          .toBool();
 
-    fc.conductionFunction = static_cast<fluvel_ip::filter::ConductionFunction>(
+    fc.aniso.conduction = static_cast<fluvel_ip::filter::ConductionFunction>(
         settings
             .value("preprocess/conduction_function",
-                   static_cast<int>(fluvel_ip::ProcessingParams::kDefaultConductionFunction))
+                   static_cast<int>(fluvel_ip::filter::AnisoParams::kDefaultConduction))
             .toInt());
 
-    fc.maxIterations =
-        settings
-            .value("preprocess/max_iterations", fluvel_ip::ProcessingParams::kDefaultMaxIterations)
+    fc.aniso.iterations =
+        settings.value("preprocess/iterations", fluvel_ip::filter::AnisoParams::kDefaultIterations)
             .toInt();
-    fc.lambda =
-        settings.value("preprocess/lambda", fluvel_ip::ProcessingParams::kDefaultLambda).toDouble();
-    fc.kappa =
-        settings.value("preprocess/kappa", fluvel_ip::ProcessingParams::kDefaultKappa).toDouble();
+    fc.aniso.lambda =
+        settings.value("preprocess/lambda", fluvel_ip::filter::AnisoParams::kDefaultLambda)
+            .toDouble();
+    fc.aniso.kappa =
+        settings.value("preprocess/kappa", fluvel_ip::filter::AnisoParams::kDefaultKappa)
+            .toDouble();
 
     fc.openingEnabled =
         settings.value("preprocess/opening_enabled", fluvel_ip::ProcessingParams::kDefaultDisabled)

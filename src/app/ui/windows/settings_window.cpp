@@ -4,7 +4,6 @@
 #include "settings_window.hpp"
 
 #include "algo_settings_widget.hpp"
-#include "image_pipeline.hpp"
 #include "image_viewer_widget.hpp"
 #include "initialization_behavior.hpp"
 #include "interaction_set.hpp"
@@ -679,7 +678,7 @@ void SettingsWindow::setupConnections()
     connect(anisoExpConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedConfig_.processing.conductionFunction =
+                editedConfig_.processing.aniso.conduction =
                     fluvel_ip::filter::ConductionFunction::Exponential;
                 notifyConfigEdited();
             });
@@ -687,7 +686,7 @@ void SettingsWindow::setupConnections()
     connect(anisoReciprocalConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedConfig_.processing.conductionFunction =
+                editedConfig_.processing.aniso.conduction =
                     fluvel_ip::filter::ConductionFunction::Rational;
                 notifyConfigEdited();
             });
@@ -695,21 +694,21 @@ void SettingsWindow::setupConnections()
     connect(iterationFilterSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedConfig_.processing.maxIterations = v;
+                editedConfig_.processing.aniso.iterations = v;
                 notifyConfigEdited();
             });
 
     connect(lambdaSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedConfig_.processing.lambda = static_cast<float>(v);
+                editedConfig_.processing.aniso.lambda = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(kappaSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedConfig_.processing.kappa = static_cast<float>(v);
+                editedConfig_.processing.aniso.kappa = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
@@ -904,12 +903,12 @@ void SettingsWindow::updateUIFromConfig()
     meanKernelSizeSpin_->setValue(config_filter.meanKernelSize);
 
     anisoGroupbox_->setChecked(config_filter.anisotropicDiffusionEnabled);
-    iterationFilterSpin_->setValue(config_filter.maxIterations);
-    lambdaSpin_->setValue(config_filter.lambda);
-    kappaSpin_->setValue(config_filter.kappa);
-    anisoExpConductionRadio_->setChecked(config_filter.conductionFunction ==
+    iterationFilterSpin_->setValue(config_filter.aniso.iterations);
+    lambdaSpin_->setValue(config_filter.aniso.lambda);
+    kappaSpin_->setValue(config_filter.aniso.kappa);
+    anisoExpConductionRadio_->setChecked(config_filter.aniso.conduction ==
                                          fluvel_ip::filter::ConductionFunction::Exponential);
-    anisoReciprocalConductionRadio_->setChecked(config_filter.conductionFunction ==
+    anisoReciprocalConductionRadio_->setChecked(config_filter.aniso.conduction ==
                                                 fluvel_ip::filter::ConductionFunction::Rational);
 
     openGroupbox_->setChecked(config_filter.openingEnabled);

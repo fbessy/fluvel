@@ -10,24 +10,22 @@
 namespace fluvel_ip::filter
 {
 
-void anisotropicDiffusion(const ImageView& input, ImageOwner& output, int iterations, double lambda,
-                          double kappa, ConductionFunction conduction)
+void anisotropicDiffusion(const ImageView& input, ImageOwner& output, const AnisoParams& params)
 {
     AnisotropicDiffusion impl;
 
     impl.reset(input);
-    impl.apply(iterations, lambda, kappa, conduction);
+    impl.apply(params);
 
     std::swap(output, impl.outputRef());
 }
 
-ImageOwner anisotropicDiffusion(const ImageView& input, int iterations, double lambda, double kappa,
-                                ConductionFunction conduction)
+ImageOwner anisotropicDiffusion(const ImageView& input, const AnisoParams& params)
 {
     AnisotropicDiffusion impl;
 
     impl.reset(input);
-    impl.apply(iterations, lambda, kappa, conduction);
+    impl.apply(params);
 
     return impl.output(); // copy (safe)
 }
@@ -103,9 +101,13 @@ void AnisotropicDiffusion::padBorders()
     }
 }
 
-void AnisotropicDiffusion::apply(int iterations, double lambda, double kappa,
-                                 ConductionFunction conduction)
+void AnisotropicDiffusion::apply(const AnisoParams& params)
 {
+    const ConductionFunction conduction = params.conduction;
+    const int iterations = params.iterations;
+    const double lambda = params.lambda;
+    const double kappa = params.kappa;
+
     const double invKappa2 = 1.0 / (kappa * kappa);
     const double dist[8] = {2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 2.0};
     const bool useExp = (conduction == ConductionFunction::Exponential);

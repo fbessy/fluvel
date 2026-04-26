@@ -68,8 +68,7 @@ void ImagePipeline::apply(const ImageView& input, const ProcessingParams& params
 
     if (params.anisotropicDiffusionEnabled)
     {
-        filter::anisotropicDiffusion(src->view(), *dst, params.maxIterations, params.lambda,
-                                     params.kappa, params.conductionFunction);
+        filter::anisotropicDiffusion(src->view(), *dst, params.aniso);
         std::swap(src, dst);
     }
 
