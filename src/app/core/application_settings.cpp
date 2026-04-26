@@ -193,7 +193,7 @@ void ApplicationSettings::setImageComputeSettings(const ImageComputeConfig& conf
 {
 #ifdef FLUVEL_DEBUG
     qDebug() << __FILE__ << ":" << __LINE__ << __func__
-             << "phi:" << image_debug::describeImage(config.compute.initialPhi);
+             << "phi:" << image_debug::describeImage(config.initialPhi);
 #endif
 
     imageSettings_.compute = config;
