@@ -16,7 +16,7 @@
 
 #include <QColor>
 #include <QIcon>
-#include <QtTypes>
+#include <QtCore/qglobal.h>
 
 class QString;
 class QSize;

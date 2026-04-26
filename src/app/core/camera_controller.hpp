@@ -28,7 +28,7 @@
 #include <QByteArray>
 #include <QCamera>
 #include <QObject>
-#include <QtTypes>
+#include <QtCore/qglobal.h>
 
 // #define FLUVEL_SIMULATE_STARTUP_TIMEOUT
 // #define FLUVEL_SIMULATE_STREAM_LOSS

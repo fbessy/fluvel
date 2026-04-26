@@ -20,7 +20,7 @@
 
 #include <QImage>
 #include <QVideoFrame>
-#include <QtTypes>
+#include <QtCore/qglobal.h>
 
 namespace fluvel_app
 {
