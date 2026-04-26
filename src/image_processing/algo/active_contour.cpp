@@ -474,6 +474,7 @@ void ActiveContour::update(const ImageView& image)
     ed_.resetExecutionState();
 
     externalSpeedModel_->onImageChanged(image, cd_);
+    externalSpeedModel_->onStepCycle1();
 }
 
 void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const

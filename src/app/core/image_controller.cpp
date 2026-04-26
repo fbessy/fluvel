@@ -230,7 +230,7 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
     if (diag.stoppingStatus != fluvel_ip::StoppingStatus::None)
         s += QString("Reason: %1\n").arg(fluvel_ip::toString(diag.stoppingStatus));
     else
-        s += QString("\n");
+        s += QString("Reason:               \n");
 
     if (!diag.meanInside.values().empty())
     {
