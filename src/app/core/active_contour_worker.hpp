@@ -3,21 +3,21 @@
 
 #pragma once
 
-#ifndef Q_MOC_RUN
-#include "active_contour.hpp"
-#include "application_settings_types.hpp"
-#include "image_owner.hpp"
-#endif
-
-#include "contour_diagnostics.hpp"
-#include "elapsed_timer.hpp"
-
 #include <QImage>
 #include <QMutex>
 #include <QObject>
 #include <QTimer>
 
+#ifndef Q_MOC_RUN
+
+#include "active_contour.hpp"
+#include "application_settings_types.hpp"
+#include "contour_diagnostics.hpp"
+#include "elapsed_timer.hpp"
+#include "image_owner.hpp"
 #include <chrono>
+
+#endif
 
 namespace fluvel_app
 {
