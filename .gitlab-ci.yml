@@ -26,7 +26,7 @@ build:
       if [ ! -d "$HOME/Qt/$QT_VERSION/$QT_ARCH" ]; then
         python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 \
           -O $HOME/Qt \
-          -m qtbase qtmultimedia qtmultimediawidgets
+          -m qtmultimedia
       fi
 
     # Setup Qt env
