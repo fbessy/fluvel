@@ -18,9 +18,10 @@ build:
     - apt update
     - apt install -y python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev
 
+    # Installer aqt
     - pip install aqtinstall --break-system-packages
 
-    # debug utile
+    # Debug : voir les archs disponibles
     - python3 -m aqt list-qt linux desktop --arch $QT_VERSION
 
     # Installer Qt seulement si absent
@@ -29,9 +30,19 @@ build:
         python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 -O $HOME/Qt
       fi
 
-    - export QT_ROOT="$HOME/Qt/$QT_VERSION/linux_gcc_64"
+    # 🔍 Trouver automatiquement Qt6Config.cmake
+    - export Qt6_DIR=$(find $HOME/Qt -name Qt6Config.cmake | head -n 1 | xargs dirname)
+
+    # Déduire QT_ROOT proprement
+    - export QT_ROOT=$(dirname $(dirname $Qt6_DIR))
+
+    # Setup environnement
     - export PATH="$QT_ROOT/bin:$PATH"
     - export CMAKE_PREFIX_PATH="$QT_ROOT/lib/cmake"
+
+    # Debug utile
+    - echo "QT_ROOT=$QT_ROOT"
+    - echo "Qt6_DIR=$Qt6_DIR"
 
   script:
     - cmake -S . -B build -G Ninja
@@ -40,14 +51,18 @@ build:
 doc:
   stage: doc
   image: ubuntu:24.04
+
   before_script:
     - apt update
     - apt install -y doxygen graphviz
+
   script:
     - doxygen docs/Doxyfile
     - mv docs/html public
+
   artifacts:
     paths:
       - public
+
   only:
     - master
