@@ -16,8 +16,10 @@
 
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include "active_contour_worker.hpp"
 #include "application_settings_types.hpp"
+#endif
 
 #include <QImage>
 #include <QObject>

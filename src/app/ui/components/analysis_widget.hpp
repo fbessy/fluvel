@@ -3,10 +3,12 @@
 
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include "color.hpp"
 #include "color_selector_widget.hpp"
 #include "image_viewer_listener.hpp"
 #include "shape.hpp"
+#endif
 
 #include <QImage>
 #include <QString>

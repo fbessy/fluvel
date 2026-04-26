@@ -3,11 +3,13 @@
 
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include "application_settings_types.hpp"
 #include "contour_point_item.hpp"
 #include "frame_data.hpp"
 #include "image_viewer_listener.hpp"
 #include "overlay_text_item.hpp"
+#endif
 
 #include <QElapsedTimer>
 #include <QGraphicsBlurEffect>

@@ -3,7 +3,9 @@
 
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include "application_settings_types.hpp"
+#endif
 
 #include <QCheckBox>
 #include <QComboBox>
