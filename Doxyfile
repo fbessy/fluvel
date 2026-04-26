@@ -7,6 +7,9 @@ HTML_EXTRA_FILES = docs/images/fluvel.svg
 INPUT                  = src README.md
 RECURSIVE              = YES
 
+INCLUDE_PATH = src
+EXCLUDE_PATTERNS = */build/* */.qt/* */moc_*
+
 OUTPUT_DIRECTORY       = docs
 HTML_OUTPUT = html
 CREATE_SUBDIRS         = NO
@@ -41,6 +44,9 @@ CALLER_GRAPH           = YES
 
 DOT_IMAGE_FORMAT       = svg
 INTERACTIVE_SVG        = YES
+
+DOT_MULTI_TARGETS      = YES
+UML_LOOK               = YES
 
 DOT_GRAPH_MAX_NODES    = 50
 
