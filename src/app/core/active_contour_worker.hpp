@@ -3,11 +3,13 @@
 
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include "active_contour.hpp"
 #include "application_settings_types.hpp"
 #include "contour_diagnostics.hpp"
 #include "elapsed_timer.hpp"
 #include "image_owner.hpp"
+#endif
 
 #include <QImage>
 #include <QMutex>

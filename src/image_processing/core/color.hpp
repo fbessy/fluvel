@@ -6,11 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <compare>
-
-#ifndef Q_MOC_RUN
 #include <concepts>
-#endif
-
 #include <cstdint>
 #include <type_traits>
 
