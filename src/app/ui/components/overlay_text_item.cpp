@@ -37,7 +37,7 @@ void OverlayTextItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     // Texte
     painter->setPen(Qt::white);
-    painter->drawText(boundingRect().adjusted(8, 6, -8, -6), alignment_, text_);
+    painter->drawText(boundingRect().adjusted(8, 6, -8, -6), static_cast<int>(alignment_), text_);
 }
 
 void OverlayTextItem::setAlignment(Qt::Alignment align)
