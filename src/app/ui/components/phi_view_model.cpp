@@ -216,13 +216,25 @@ void PhiViewModel::composeView()
         QPainter p(&outputImg);
         p.setRenderHint(QPainter::Antialiasing, false);
 
+        // --- 1. contour sombre (outline) ---
+        QColor darkColor(0, 0, 0, 180); // noir semi-transparent
+        QPen darkPen(darkColor, 4);     // plus épais
+        darkPen.setStyle(Qt::SolidLine);
+        p.setPen(darkPen);
+        p.setBrush(Qt::NoBrush);
+
+        if (overlayShape_.type == ShapeType::Rectangle)
+            p.drawRect(overlayShape_.boundingBox);
+        else
+            p.drawEllipse(overlayShape_.boundingBox);
+
+        // --- 2. contour clair (au dessus) ---
         QColor overlayColor = kInColor.lighter(120);
         overlayColor.setAlpha(160);
 
-        QPen pen(overlayColor, 2);
-        pen.setStyle(Qt::DashLine);
-        p.setPen(pen);
-        p.setBrush(Qt::NoBrush);
+        QPen lightPen(overlayColor, 2); // plus fin
+        lightPen.setStyle(Qt::SolidLine);
+        p.setPen(lightPen);
 
         if (overlayShape_.type == ShapeType::Rectangle)
             p.drawRect(overlayShape_.boundingBox);
