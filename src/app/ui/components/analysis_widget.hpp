@@ -6,9 +6,10 @@
 #ifndef Q_MOC_RUN
 #include "color.hpp"
 #include "color_selector_widget.hpp"
+#endif
+
 #include "image_viewer_listener.hpp"
 #include "shape.hpp"
-#endif
 
 #include <QImage>
 #include <QString>
