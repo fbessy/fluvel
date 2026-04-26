@@ -66,8 +66,6 @@ ImageWindow::ImageWindow(QWidget* parent)
 
 void ImageWindow::setupUi()
 {
-    updateWindowTitle();
-
     QSettings settings;
 
     if (settings.contains("ui_geometry/image_window"))
@@ -357,6 +355,9 @@ void ImageWindow::applyInitialSettings()
 
     const auto& config = ApplicationSettings::instance().imageSettings();
 
+    currentDownscale_ = config.compute.downscale;
+    updateWindowTitle();
+
     imageViewer_->applyDownscaleConfig(config.compute.downscale);
     imageViewer_->applyDisplayConfig(config.display);
 
@@ -405,8 +406,8 @@ void ImageWindow::setupConnections()
             &ImageViewerWidget::clearContour);
 
     // to refresh the image window title
-    connect(imageController_, &ImageController::displayedImageReady, this,
-            &ImageWindow::onDisplayedImageReady);
+    connect(imageController_, &ImageController::inputImageReady, this,
+            &ImageWindow::onInputImageReady);
 
     // ---  View -> Controller for display stats ---
 
@@ -435,6 +436,10 @@ void ImageWindow::setupConnections()
                     conf.compute.downscale.downscaleEnabled || conf.compute.processing.hasActiveProcessing();
 
                 displayBar_->updatePipelineAvailability(hasPreprocessing);
+
+                currentDownscale_ = conf.compute.downscale;
+
+                updateWindowTitle();
             });
 }
 
@@ -658,18 +663,6 @@ void ImageWindow::closeEvent(QCloseEvent* event)
     QApplication::quit();
 }
 
-void ImageWindow::onDisplayedImageReady(const QImage& displayed)
-{
-    imageSize_ = displayed.size();
-    channels_ = displayed.depth() / 8;
-
-    if (channels_ > 3)
-        channels_ = 3; // because this application processes only 3 channels
-                       // even there are 4 channels, for example.
-
-    updateWindowTitle();
-}
-
 void ImageWindow::onFileOpened(const QString& path)
 {
     if (path.isEmpty())
@@ -687,18 +680,56 @@ void ImageWindow::onFileOpened(const QString& path)
     statusBar()->showMessage(path);
 }
 
+void ImageWindow::onInputImageReady(const QImage& input)
+{
+    inputSize_ = input.size();
+
+    channels_ = input.depth() / 8;
+
+    if (channels_ > 3)
+        channels_ = 3; // because this application processes only 3 channels
+                       // even there are 4 channels, for example.
+
+    updateWindowTitle();
+}
+
 void ImageWindow::updateWindowTitle()
 {
     QString title = "Fluvel";
 
-    if (!fileName_.isEmpty() && imageSize_.isValid() && channels_ > 0)
+    if (!inputSize_.isValid())
     {
-        const QString colorText = (channels_ == 1) ? "Gray" : "RGB";
-
-        const QString sizeStr = QString("%1×%2").arg(imageSize_.width()).arg(imageSize_.height());
-
-        title += QString(" — %1 - %2 - %3").arg(fileName_, sizeStr, colorText);
+        title += " — Image";
+        setWindowTitle(title);
+        return;
     }
+
+    // --- Size ---
+    title += QString(" — %1 x %2").arg(inputSize_.width()).arg(inputSize_.height());
+
+    // --- Downscale ---
+    const auto& downscale = currentDownscale_;
+    if (downscale.downscaleEnabled && downscale.downscaleFactor > 1)
+    {
+        title += QString(" (/%1)").arg(downscale.downscaleFactor);
+    }
+
+    // --- Channels ---
+    QString mode;
+    switch (channels_)
+    {
+        case 1:
+            mode = "Gray";
+            break;
+        case 3:
+            mode = "RGB";
+            break;
+        default:
+            mode = QString("%1ch").arg(channels_);
+            break;
+    }
+
+    title += QString(" — %1").arg(mode);
 
     setWindowTitle(title);
 }

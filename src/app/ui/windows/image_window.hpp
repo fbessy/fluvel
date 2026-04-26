@@ -88,7 +88,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    void onDisplayedImageReady(const QImage& displayed);
+    void onInputImageReady(const QImage& input);
     void onFileOpened(const QString& path);
     void onStateChanged(fluvel_app::WorkerState state);
     void onCameraWindowShown();
@@ -176,8 +176,9 @@ private:
     // --- Current image state ---
     QString fileName_;
     QString fullPath_;
-    QSize imageSize_;
+    QSize inputSize_;
     int channels_{0};
+    DownscaleParams currentDownscale_;
 
     QString lastDirectoryUsed_;
 };
