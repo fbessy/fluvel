@@ -703,7 +703,7 @@ void ImageWindow::updateWindowTitle()
 
     if (!inputSize_.isValid())
     {
-        title += " — Image";
+        title += tr(" — Image");
         setWindowTitle(title);
         return;
     }
@@ -712,10 +712,9 @@ void ImageWindow::updateWindowTitle()
     title += QString(" — %1 x %2").arg(inputSize_.width()).arg(inputSize_.height());
 
     // --- Downscale ---
-    const auto& downscale = currentDownscale_;
-    if (downscale.downscaleEnabled && downscale.downscaleFactor > 1)
+    if (currentDownscale_.downscaleEnabled && currentDownscale_.downscaleFactor > 1)
     {
-        title += QString(" (/%1)").arg(downscale.downscaleFactor);
+        title += QString(" (/%1)").arg(currentDownscale_.downscaleFactor);
     }
 
     // --- Channels ---
@@ -723,17 +722,17 @@ void ImageWindow::updateWindowTitle()
     switch (channels_)
     {
         case 1:
-            mode = "Gray";
+            mode = tr("Gray");
             break;
         case 3:
-            mode = "RGB";
+            mode = "RGB"; // pas besoin de tr()
             break;
         default:
             mode = QString("%1ch").arg(channels_);
             break;
     }
 
-    title += QString(" — %1").arg(mode);
+    title += " — " + mode;
 
     setWindowTitle(title);
 }
