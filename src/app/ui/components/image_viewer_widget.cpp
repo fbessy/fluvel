@@ -919,6 +919,18 @@ void ImageViewerWidget::setText(const QString& text)
         infoOverlay_->setText(text);
 }
 
+void ImageViewerWidget::setOverlayAlignment(Qt::Alignment align)
+{
+    if (infoOverlay_)
+        infoOverlay_->setAlignment(align);
+}
+
+void ImageViewerWidget::setOverlayMinWidth(qreal minW)
+{
+    if (infoOverlay_)
+        infoOverlay_->setMinWidth(minW);
+}
+
 void ImageViewerWidget::showPlaceholder(bool showEffect)
 {
     assert(blur_);

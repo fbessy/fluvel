@@ -134,6 +134,25 @@ public:
     void setText(const QString& text);
 
     /**
+     * @brief Sets the alignment of the overlay text.
+     *      * Controls how the text is positioned inside the overlay bounding box.
+     * Typical values include:
+     * - Qt::AlignCenter | Qt::AlignVCenter (HUD / video mode)
+     * - Qt::AlignLeft   | Qt::AlignTop     (debug / image mode)
+     *      * @param align Qt alignment flags (combination of Qt::AlignmentFlag).
+     */
+    void setOverlayAlignment(Qt::Alignment align);
+
+    /**
+     * @brief Sets the minimum width of the overlay background.
+     *      * If set to 0, the overlay width adapts dynamically to the text content.
+     * If greater than 0, the width is clamped to at least this value,
+     * ensuring a stable layout.
+     *      * @param minW Minimum width in pixels.
+     */
+    void setOverlayMinWidth(qreal minW);
+
+    /**
      * @brief Shows or hides a placeholder effect.
      */
     void showPlaceholder(bool showEffect);

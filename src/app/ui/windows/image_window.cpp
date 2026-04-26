@@ -163,6 +163,10 @@ void ImageWindow::setupUi()
     imageViewer_ = new ImageViewerWidget(config.display, config.compute.downscale, central);
     imageViewer_->setMaxDisplayFps(60.0);
 
+    constexpr qreal kDebugOverlayMinWidth = 160.0;
+    imageViewer_->setOverlayMinWidth(kDebugOverlayMinWidth);
+    imageViewer_->setOverlayAlignment(Qt::AlignLeft | Qt::AlignTop);
+
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());

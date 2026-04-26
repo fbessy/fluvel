@@ -37,8 +37,19 @@ void OverlayTextItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     // Texte
     painter->setPen(Qt::white);
-    painter->drawText(boundingRect().adjusted(8, 6, -8, -6), Qt::AlignCenter | Qt::AlignVCenter,
-                      text_);
+    painter->drawText(boundingRect().adjusted(8, 6, -8, -6), alignment_, text_);
+}
+
+void OverlayTextItem::setAlignment(Qt::Alignment align)
+{
+    alignment_ = align;
+    update(); // redraw
+}
+
+void OverlayTextItem::setMinWidth(qreal w)
+{
+    minWidth_ = w;
+    update();
 }
 
 QRectF OverlayTextItem::boundingRect() const
@@ -60,7 +71,10 @@ void OverlayTextItem::setText(const QString& text)
 
     prepareGeometryChange();
 
-    rect_ = QRectF(0, 0, textRect.width() + 2 * padding_, textRect.height() + 2 * padding_);
+    qreal width = textRect.width() + 2 * padding_;
+    qreal height = textRect.height() + 2 * padding_;
+
+    rect_ = QRectF(0, 0, std::max(width, minWidth_), height);
 
     update();
 }

@@ -230,7 +230,7 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
     if (diag.stoppingStatus != fluvel_ip::StoppingStatus::None)
         s += QString("Reason: %1\n").arg(fluvel_ip::toString(diag.stoppingStatus));
     else
-        s += QString("Reason:               \n");
+        s += QString("Reason: \n");
 
     if (!diag.meanInside.values().empty())
     {
@@ -239,9 +239,9 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
         s += QString("Mean out: %1\n").arg(formatChannels(diag.meanOutside));
     }
 
-    s += QString("Hausdorff q: %1 %\n").arg(diag.hausdorffQuantile, 0, 'g', 3);
+    s += QString("Hausdorff q: %1 %\n").arg(diag.hausdorffQuantile, 0, 'f', 2);
 
-    s += QString("Centroid dist: %1 %\n").arg(diag.relativeCentroidDistance, 0, 'g', 3);
+    s += QString("Centroid dist: %1 %\n").arg(diag.relativeCentroidDistance, 0, 'f', 2);
 
     s += QString("Elapsed: %1 s\n").arg(diag.elapsedSec, 0, 'f', 2);
 
