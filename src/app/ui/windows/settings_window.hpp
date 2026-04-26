@@ -85,7 +85,7 @@ signals:
     /**
      * @brief Emitted when the configuration is accepted.
      */
-    void imageSessionSettingsAccepted(const fluvel_app::ImageSessionSettings& config);
+    void imageComputeSettingsAccepted(const fluvel_app::ImageComputeConfig& config);
 
     /**
      * @brief Emitted when initialization mode is toggled.
@@ -242,10 +242,8 @@ private:
     /////////       Model              /////
     ///////////////////////////////////////
 
-    ImageSessionSettings committedConfig_;
-
-    DownscaleParams editedDownscaleParams_;
-    fluvel_ip::ProcessingParams editedProcessingParams_;
+    ImageComputeConfig committedConfig_;
+    ImageComputeConfig editedConfig_;
 };
 
 } // namespace fluvel_app

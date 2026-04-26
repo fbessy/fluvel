@@ -61,7 +61,7 @@ class ImageSettingsController : public QObject
     Q_OBJECT
 
 public:
-    ImageSettingsController(const ImageSessionSettings& session, QObject* parent);
+    ImageSettingsController(const ImageComputeConfig& config, QObject* parent);
 
     /**
      * @brief Set visibility of the settings view.

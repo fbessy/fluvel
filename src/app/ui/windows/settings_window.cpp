@@ -33,9 +33,8 @@ namespace fluvel_app
 
 SettingsWindow::SettingsWindow(const ImageSessionSettings& config, QWidget* parent)
     : QDialog(parent)
-    , committedConfig_(config)
-    , editedDownscaleParams_(config.compute.downscale)
-    , editedProcessingParams_(config.compute.processing)
+    , committedConfig_(config.compute)
+    , editedConfig_(config.compute)
 {
     setWindowTitle(tr("Image session settings"));
 
@@ -114,7 +113,7 @@ SettingsWindow::SettingsWindow(const ImageSessionSettings& config, QWidget* pare
     // Controller
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    imageSettingsController_ = new ImageSettingsController(committedConfig_, this);
+    imageSettingsController_ = new ImageSettingsController(editedConfig_, this);
 
     updateUIFromConfig();
     setupConnections();
@@ -122,7 +121,7 @@ SettingsWindow::SettingsWindow(const ImageSessionSettings& config, QWidget* pare
 
 void SettingsWindow::setupUiAlgoTab()
 {
-    algoWidget_ = new AlgoSettingsWidget(committedConfig_.compute.contourConfig, this);
+    algoWidget_ = new AlgoSettingsWidget(editedConfig_.contourConfig, this);
 
     QVBoxLayout* algoLayout = new QVBoxLayout;
     algoLayout->addWidget(algoWidget_);
@@ -574,7 +573,7 @@ void SettingsWindow::setupConnections()
     connect(downscalePage_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedDownscaleParams_.downscaleEnabled = checked;
+                editedConfig_.downscale.downscaleEnabled = checked;
                 notifyConfigEdited();
 
                 onUiShapeChanged();
@@ -586,7 +585,7 @@ void SettingsWindow::setupConnections()
                 if (index < 0)
                     return;
 
-                editedDownscaleParams_.downscaleFactor =
+                editedConfig_.downscale.downscaleFactor =
                     downscaleFactorCb_->itemData(index).toInt();
                 notifyConfigEdited();
 
@@ -596,91 +595,91 @@ void SettingsWindow::setupConnections()
     connect(processPage_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.processingEnabled = checked;
+                editedConfig_.processing.processingEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(gaussianNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.gaussianNoiseEnabled = checked;
+                editedConfig_.processing.gaussianNoiseEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(gaussianNoiseStdSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.noiseStdDev = static_cast<float>(v);
+                editedConfig_.processing.noiseStdDev = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(impulsiveNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.saltNoiseEnabled = checked;
+                editedConfig_.processing.saltNoiseEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(impulsiveNoisePercentSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.saltNoiseProbability = static_cast<float>(v) / 100.f;
+                editedConfig_.processing.saltNoiseProbability = static_cast<float>(v) / 100.f;
                 notifyConfigEdited();
             });
 
     connect(speckleNoiseGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.speckleNoiseEnabled = checked;
+                editedConfig_.processing.speckleNoiseEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(speckleNoiseStdSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.speckleNoiseStdDev = static_cast<float>(v);
+                editedConfig_.processing.speckleNoiseStdDev = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(meanGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.meanFilterEnabled = checked;
+                editedConfig_.processing.meanFilterEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(meanKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.meanKernelSize = v;
+                editedConfig_.processing.meanKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(medianGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.medianFilterEnabled = checked;
+                editedConfig_.processing.medianFilterEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(medianKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.medianKernelSize = v;
+                editedConfig_.processing.medianKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(anisoGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.anisotropicDiffusionEnabled = checked;
+                editedConfig_.processing.anisotropicDiffusionEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(anisoExpConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.conductionFunction =
+                editedConfig_.processing.conductionFunction =
                     fluvel_ip::filter::ConductionFunction::Exponential;
                 notifyConfigEdited();
             });
@@ -688,7 +687,7 @@ void SettingsWindow::setupConnections()
     connect(anisoReciprocalConductionRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.conductionFunction =
+                editedConfig_.processing.conductionFunction =
                     fluvel_ip::filter::ConductionFunction::Rational;
                 notifyConfigEdited();
             });
@@ -696,77 +695,77 @@ void SettingsWindow::setupConnections()
     connect(iterationFilterSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.maxIterations = v;
+                editedConfig_.processing.maxIterations = v;
                 notifyConfigEdited();
             });
 
     connect(lambdaSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.lambda = static_cast<float>(v);
+                editedConfig_.processing.lambda = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(kappaSpin_, &QDoubleSpinBox::valueChanged, this,
             [this](double v)
             {
-                editedProcessingParams_.kappa = static_cast<float>(v);
+                editedConfig_.processing.kappa = static_cast<float>(v);
                 notifyConfigEdited();
             });
 
     connect(openGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.openingEnabled = checked;
+                editedConfig_.processing.openingEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(openKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.openingKernelSize = v;
+                editedConfig_.processing.openingKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(closeGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.closingEnabled = checked;
+                editedConfig_.processing.closingEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(closeKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.closingKernelSize = v;
+                editedConfig_.processing.closingKernelSize = v;
                 notifyConfigEdited();
             });
 
     connect(tophatGroupbox_, &QGroupBox::clicked, this,
             [this](bool checked)
             {
-                editedProcessingParams_.topHatEnabled = checked;
+                editedConfig_.processing.topHatEnabled = checked;
                 notifyConfigEdited();
             });
 
     connect(whitetophatRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.useWhiteTopHat = true;
+                editedConfig_.processing.useWhiteTopHat = true;
                 notifyConfigEdited();
             });
 
     connect(blacktophatRadio_, &QRadioButton::clicked, this,
             [this]()
             {
-                editedProcessingParams_.useWhiteTopHat = false;
+                editedConfig_.processing.useWhiteTopHat = false;
                 notifyConfigEdited();
             });
 
     connect(tophatKernelSizeSpin_, &QSpinBox::valueChanged, this,
             [this](int v)
             {
-                editedProcessingParams_.topHatKernelSize = v;
+                editedConfig_.processing.topHatKernelSize = v;
                 notifyConfigEdited();
             });
 
@@ -861,62 +860,17 @@ UiShapeInfo SettingsWindow::getUiShapeAt(QPoint position) const
 
 void SettingsWindow::accept()
 {
-    auto& ds_config = committedConfig_.compute.downscale;
-
-    ds_config.downscaleEnabled = downscalePage_->isChecked();
-    ds_config.downscaleFactor = downscaleFactorCb_->currentData().toInt();
-
-    auto& filt_config = committedConfig_.compute.processing;
-
-    filt_config.processingEnabled = processPage_->isChecked();
-    filt_config.gaussianNoiseEnabled = gaussianNoiseGroupbox_->isChecked();
-    filt_config.noiseStdDev = float(gaussianNoiseStdSpin_->value());
-    filt_config.saltNoiseEnabled = impulsiveNoiseGroupbox_->isChecked();
-    filt_config.saltNoiseProbability = float(impulsiveNoisePercentSpin_->value()) / 100.f;
-    filt_config.speckleNoiseEnabled = speckleNoiseGroupbox_->isChecked();
-    filt_config.speckleNoiseStdDev = float(speckleNoiseStdSpin_->value());
-    filt_config.medianFilterEnabled = medianGroupbox_->isChecked();
-    filt_config.medianKernelSize = medianKernelSizeSpin_->value();
-
-    filt_config.meanFilterEnabled = meanGroupbox_->isChecked();
-    filt_config.meanKernelSize = meanKernelSizeSpin_->value();
-
-    filt_config.anisotropicDiffusionEnabled = anisoGroupbox_->isChecked();
-    filt_config.maxIterations = iterationFilterSpin_->value();
-    filt_config.lambda = float(lambdaSpin_->value());
-    filt_config.kappa = float(kappaSpin_->value());
-    if (anisoExpConductionRadio_->isChecked())
-    {
-        filt_config.conductionFunction = fluvel_ip::filter::ConductionFunction::Exponential;
-    }
-    else if (anisoReciprocalConductionRadio_->isChecked())
-    {
-        filt_config.conductionFunction = fluvel_ip::filter::ConductionFunction::Rational;
-    }
-
-    filt_config.openingEnabled = openGroupbox_->isChecked();
-    filt_config.openingKernelSize = openKernelSizeSpin_->value();
-    filt_config.closingEnabled = closeGroupbox_->isChecked();
-    filt_config.closingKernelSize = closeKernelSizeSpin_->value();
-    filt_config.topHatEnabled = tophatGroupbox_->isChecked();
-    filt_config.useWhiteTopHat = whitetophatRadio_->isChecked();
-    filt_config.topHatKernelSize = tophatKernelSizeSpin_->value();
-
-#ifdef FLUVEL_DEBUG
-    qDebug() << __FILE__ << ":" << __LINE__ << __func__
-             << "phi:" << image_debug::describeImage(committedConfig_.compute.initialPhi);
-#endif
-
-    committedConfig_.compute.initialPhi = imageSettingsController_->commit();
-
-#ifdef FLUVEL_DEBUG
-    qDebug() << __FILE__ << ":" << __LINE__ << __func__
-             << "phi:" << image_debug::describeImage(committedConfig_.compute.initialPhi);
-#endif
-
+    // 1. commit algo widget dans edited
     algoWidget_->accept();
 
-    emit imageSessionSettingsAccepted(committedConfig_);
+    // 2. récupérer phi dans edited
+    editedConfig_.initialPhi = imageSettingsController_->commit();
+
+    // 3. COPY final
+    committedConfig_ = editedConfig_;
+
+    // 4. emit
+    emit imageComputeSettingsAccepted(committedConfig_);
 
     QDialog::accept();
 }
@@ -925,7 +879,7 @@ void SettingsWindow::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
 
-    const auto& ds_config = committedConfig_.compute.downscale;
+    const auto& ds_config = editedConfig_.downscale;
 
     downscalePage_->setChecked(ds_config.downscaleEnabled);
 
@@ -933,7 +887,7 @@ void SettingsWindow::updateUIFromConfig()
     if (index >= 0)
         downscaleFactorCb_->setCurrentIndex(index);
 
-    const auto& config_filter = committedConfig_.compute.processing;
+    const auto& config_filter = editedConfig_.processing;
 
     processPage_->setChecked(config_filter.processingEnabled);
     gaussianNoiseGroupbox_->setChecked(config_filter.gaussianNoiseEnabled);
@@ -980,14 +934,12 @@ void SettingsWindow::updateUIFromConfig()
 
     algoWidget_->reject();
 
-    editedDownscaleParams_ = committedConfig_.compute.downscale;
-    editedProcessingParams_ = committedConfig_.compute.processing;
-
     notifyConfigEdited();
 }
 
 void SettingsWindow::reject()
 {
+    editedConfig_ = committedConfig_;
     updateUIFromConfig();
 
     QDialog::reject();
@@ -995,86 +947,8 @@ void SettingsWindow::reject()
 
 void SettingsWindow::restoreDefaults()
 {
-    ///////////////////////////////////
-    //          Algorithm            //
-    ///////////////////////////////////
-    /*
-        connectivity_cb->setCurrentIndex( int(fluvel_ip::Connectivity::Four) );
-
-        Na_spin->setValue( 30 );
-        lambda_in_spin->setValue( 1 );
-        lambda_out_spin->setValue( 1 );
-
-        color_space_cb->setCurrentIndex( int(fluvel_ip::ColorSpaceOption::RGB) );
-
-        alpha_spin->setValue( 1 );
-        beta_spin->setValue( 1 );
-        gamma_spin->setValue( 1 );
-
-        downscale_factor_cb->setCurrentIndex( 1 );
-        //has_temporal_smoothing_cb->setChecked( true );
-        //cycles_nbr_sb->setValue( 3 );
-
-        internalspeed_groupbox->setChecked( true );
-        Ns_spin->setValue( 3 );
-        disk_radius_spin->setValue( 2 );*/
-
-    ///////////////////////////////////
-    //        Preprocessing          //
-    ///////////////////////////////////
-
-    processPage_->setChecked(false);
-
-    gaussianNoiseGroupbox_->setChecked(false);
-    gaussianNoiseStdSpin_->setValue(20.0);
-
-    impulsiveNoiseGroupbox_->setChecked(false);
-    impulsiveNoisePercentSpin_->setValue(0.05);
-
-    speckleNoiseGroupbox_->setChecked(false);
-    speckleNoiseStdSpin_->setValue(0.16);
-
-    medianGroupbox_->setChecked(false);
-    medianKernelSizeSpin_->setValue(5);
-
-    meanGroupbox_->setChecked(false);
-    meanKernelSizeSpin_->setValue(5);
-
-    anisoGroupbox_->setChecked(false);
-    anisoExpConductionRadio_->setChecked(true);
-    anisoReciprocalConductionRadio_->setChecked(false);
-    iterationFilterSpin_->setValue(10);
-    lambdaSpin_->setValue(1.0 / 7.0);
-    kappaSpin_->setValue(30.0);
-
-    openGroupbox_->setChecked(false);
-    openKernelSizeSpin_->setValue(5);
-
-    closeGroupbox_->setChecked(false);
-    closeKernelSizeSpin_->setValue(5);
-
-    tophatGroupbox_->setChecked(false);
-    whitetophatRadio_->setChecked(true);
-    tophatKernelSizeSpin_->setValue(5);
-
-    ///////////////////////////////////
-    //       Initialization          //
-    ///////////////////////////////////
-
-    ellipseRadio_->setChecked(true);
-
-    // 65% width and 65% height by default
-    widthShapeSpin_->setValue(65);
-    heightShapeSpin_->setValue(65);
-
-    // centered by default
-    abscissaSpin_->setValue(0);
-    ordinateSpin_->setValue(0);
-
-    editedDownscaleParams_ = committedConfig_.compute.downscale;
-    editedProcessingParams_ = committedConfig_.compute.processing;
-
-    notifyConfigEdited();
+    editedConfig_ = {};
+    updateUIFromConfig();
 }
 
 void SettingsWindow::onAddShape()
@@ -1141,8 +1015,8 @@ void SettingsWindow::closeEvent(QCloseEvent* event)
 void SettingsWindow::notifyConfigEdited()
 {
     if (imageSettingsController_)
-        imageSettingsController_->updateEditedConfig(editedDownscaleParams_,
-                                                     editedProcessingParams_);
+        imageSettingsController_->updateEditedConfig(editedConfig_.downscale,
+                                                     editedConfig_.processing);
 }
 
 void SettingsWindow::onPreviewShapeAt(QPoint position)

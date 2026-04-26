@@ -383,8 +383,8 @@ void CameraWindow::bindUiToApplicationSettings()
             &ApplicationSettings::setVideoDisplayConfig);
 
     // commit settings
-    connect(cameraSettingsWindow_, &CameraSettingsWindow::videoSessionSettingsAccepted, &app,
-            &ApplicationSettings::setVideoSessionSettings);
+    connect(cameraSettingsWindow_, &CameraSettingsWindow::videoComputeSettingsAccepted, &app,
+            &ApplicationSettings::setVideoComputeSettings);
 }
 
 void CameraWindow::updateDeviceList(const QList<QCameraDevice>& devices)

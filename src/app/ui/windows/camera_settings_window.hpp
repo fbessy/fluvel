@@ -53,7 +53,7 @@ signals:
      * @brief Emitted when the configuration is accepted.
      *      * @param config Updated video session configuration.
      */
-    void videoSessionSettingsAccepted(const fluvel_app::VideoSessionSettings& config);
+    void videoComputeSettingsAccepted(const fluvel_app::VideoComputeConfig& config);
 
 protected:
     /**
@@ -98,7 +98,8 @@ private:
     QDialogButtonBox* dialogButtons_ = nullptr;
 
     // --- Model ---
-    VideoSessionSettings config_;
+    VideoComputeConfig committedConfig_; // original
+    VideoComputeConfig editedConfig_;    // UI en cours
 };
 
 } // namespace fluvel_app

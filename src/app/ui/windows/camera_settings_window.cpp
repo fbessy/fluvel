@@ -21,7 +21,8 @@ namespace fluvel_app
 
 CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, QWidget* parent)
     : QDialog(parent)
-    , config_(config)
+    , committedConfig_(config.compute)
+    , editedConfig_(config.compute)
 {
     setWindowTitle(tr("Camera session settings"));
 
@@ -63,7 +64,7 @@ CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, Q
     auto* preprocessGb = new QGroupBox;
     preprocessGb->setLayout(preprocessLayout);
 
-    algoWidget_ = new AlgoSettingsWidget(config_.compute.contourConfig, this);
+    algoWidget_ = new AlgoSettingsWidget(editedConfig_.contourConfig, this);
 
     auto* algoLayout = new QVBoxLayout;
     algoLayout->addWidget(algoWidget_);
@@ -107,14 +108,15 @@ void CameraSettingsWindow::setupDownscaleGroup()
 
 void CameraSettingsWindow::accept()
 {
-    config_.compute.downscale.downscaleEnabled = downscaleGb_->isChecked();
-    config_.compute.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
-    config_.compute.spatialFilteringEnabled = spatialCb_->isChecked();
-    config_.compute.temporalFilteringEnabled = temporalCb_->isChecked();
+    editedConfig_.downscale.downscaleEnabled = downscaleGb_->isChecked();
+    editedConfig_.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
+    editedConfig_.spatialFilteringEnabled = spatialCb_->isChecked();
+    editedConfig_.temporalFilteringEnabled = temporalCb_->isChecked();
 
     algoWidget_->accept();
 
-    emit videoSessionSettingsAccepted(config_);
+    committedConfig_ = editedConfig_;
+    emit videoComputeSettingsAccepted(committedConfig_);
 
     QDialog::accept();
 }
@@ -123,20 +125,21 @@ void CameraSettingsWindow::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
 
-    downscaleGb_->setChecked(config_.compute.downscale.downscaleEnabled);
+    downscaleGb_->setChecked(editedConfig_.downscale.downscaleEnabled);
 
-    int index = downscaleFactorCb_->findData(config_.compute.downscale.downscaleFactor);
+    int index = downscaleFactorCb_->findData(editedConfig_.downscale.downscaleFactor);
     if (index >= 0)
         downscaleFactorCb_->setCurrentIndex(index);
 
-    spatialCb_->setChecked(config_.compute.spatialFilteringEnabled);
-    temporalCb_->setChecked(config_.compute.temporalFilteringEnabled);
+    spatialCb_->setChecked(editedConfig_.spatialFilteringEnabled);
+    temporalCb_->setChecked(editedConfig_.temporalFilteringEnabled);
 
     algoWidget_->reject();
 }
 
 void CameraSettingsWindow::reject()
 {
+    editedConfig_ = committedConfig_;
     updateUIFromConfig();
 
     QDialog::reject();
@@ -144,8 +147,8 @@ void CameraSettingsWindow::reject()
 
 void CameraSettingsWindow::restoreToDefaults()
 {
-    // config_ = CamSessionConfig::defaults();
-    updateUIFromConfig();
+    editedConfig_ = {};   // reset avec defaults structs
+    updateUIFromConfig(); // resync UI
 }
 
 void CameraSettingsWindow::closeEvent(QCloseEvent* event)

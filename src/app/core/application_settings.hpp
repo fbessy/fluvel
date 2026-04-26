@@ -92,12 +92,12 @@ public:
     /**
      * @brief Update full image session settings.
      */
-    void setImageSessionSettings(const ImageSessionSettings& config);
+    void setImageComputeSettings(const ImageComputeConfig& config);
 
     /**
      * @brief Update full video session settings.
      */
-    void setVideoSessionSettings(const VideoSessionSettings& config);
+    void setVideoComputeSettings(const VideoComputeConfig& config);
 
     /**
      * @brief Update full video session settings.

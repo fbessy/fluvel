@@ -13,8 +13,20 @@
 namespace fluvel_app
 {
 
+// phi colors (Lout and Lin)
 const QColor kOutColor(64, 0, 255);
 const QColor kInColor(0, 230, 118);
+
+// phi (Lout and Lin colors) in interactive mode
+const QColor kInteractiveOuterColor(32, 0, 128);
+const QColor kInteractiveInnerColor(0, 115, 59);
+
+// overlay colors (user interaction)
+const QColor kOverlayMainColor{kInColor};
+const QColor kOverlayOutlineColor{kOutColor};
+
+constexpr int kOverlayMainWidth{2};
+constexpr int kOverlayOutlineWidth{4};
 
 PhiViewModel::PhiViewModel(PhiEditor* editor, fluvel_ip::Connectivity connectivity, QObject* parent)
     : QObject(parent)
@@ -178,8 +190,8 @@ void PhiViewModel::updatePhiFromLists()
 
     Q_ASSERT(displayedPhi_.format() == QImage::Format_RGB32);
 
-    const QRgb outColor = (interactiveMode_ ? QColor(32, 0, 128) : kOutColor).rgb();
-    const QRgb inColor = (interactiveMode_ ? QColor(0, 115, 59) : kInColor).rgb();
+    const QRgb outColor = (interactiveMode_ ? kInteractiveOuterColor : kOutColor).rgb();
+    const QRgb inColor = (interactiveMode_ ? kInteractiveInnerColor : kInColor).rgb();
 
     const int width = displayedPhi_.width();
     const int height = displayedPhi_.height();
@@ -215,31 +227,29 @@ void PhiViewModel::composeView()
     {
         QPainter p(&outputImg);
         p.setRenderHint(QPainter::Antialiasing, false);
-
-        // --- 1. contour sombre (outline) ---
-        QColor darkColor(0, 0, 0, 180); // noir semi-transparent
-        QPen darkPen(darkColor, 4);     // plus épais
-        darkPen.setStyle(Qt::SolidLine);
-        p.setPen(darkPen);
         p.setBrush(Qt::NoBrush);
 
-        if (overlayShape_.type == ShapeType::Rectangle)
-            p.drawRect(overlayShape_.boundingBox);
-        else
-            p.drawEllipse(overlayShape_.boundingBox);
+        auto drawShape = [&](QPainter& painter)
+        {
+            if (overlayShape_.type == ShapeType::Rectangle)
+                painter.drawRect(overlayShape_.boundingBox);
+            else
+                painter.drawEllipse(overlayShape_.boundingBox);
+        };
 
-        // --- 2. contour clair (au dessus) ---
-        QColor overlayColor = kInColor.lighter(120);
-        overlayColor.setAlpha(160);
+        // --- outline (dessous) ---
+        {
+            QPen pen(kOverlayOutlineColor, kOverlayOutlineWidth);
+            p.setPen(pen);
+            drawShape(p);
+        }
 
-        QPen lightPen(overlayColor, 2); // plus fin
-        lightPen.setStyle(Qt::SolidLine);
-        p.setPen(lightPen);
-
-        if (overlayShape_.type == ShapeType::Rectangle)
-            p.drawRect(overlayShape_.boundingBox);
-        else
-            p.drawEllipse(overlayShape_.boundingBox);
+        // --- main (dessus) ---
+        {
+            QPen pen(kOverlayMainColor, kOverlayMainWidth);
+            p.setPen(pen);
+            drawShape(p);
+        }
     }
 
     emit viewChanged(outputImg);

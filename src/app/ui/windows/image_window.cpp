@@ -478,8 +478,8 @@ void ImageWindow::bindUiToApplicationSettings()
 {
     const auto& config = ApplicationSettings::instance();
 
-    connect(settingsWindow_, &SettingsWindow::imageSessionSettingsAccepted, &config,
-            &ApplicationSettings::setImageSessionSettings);
+    connect(settingsWindow_, &SettingsWindow::imageComputeSettingsAccepted, &config,
+            &ApplicationSettings::setImageComputeSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &config,
             &ApplicationSettings::setImageDisplayConfig);
