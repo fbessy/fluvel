@@ -26,7 +26,7 @@ build:
     # Installer Qt seulement si absent
     - |
       if [ ! -d "$HOME/Qt/$QT_VERSION" ]; then
-        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64
+        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 -O $HOME/Qt
       fi
 
     - export QT_ROOT="$HOME/Qt/$QT_VERSION/linux_gcc_64"
