@@ -27,10 +27,16 @@ enum class ConductionFunction
     Rational     ///< 1 / (1 + (∇I/kappa)^2), smoother transition.
 };
 
+/**
+ * @brief Parameters controlling anisotropic diffusion.
+ *
+ * This structure groups all parameters used by the Perona-Malik model.
+ * Default values provide a stable and commonly used configuration.
+ */
 struct AnisoParams
 {
     //!< Default conduction model.
-    static constexpr ConductionFunction kDefaultConduction = {ConductionFunction::Exponential};
+    static constexpr ConductionFunction kDefaultConduction{ConductionFunction::Exponential};
 
     //!< Default number of iterations.
     static constexpr int kDefaultIterations{10};
@@ -62,10 +68,7 @@ struct AnisoParams
  *
  * @param input Input image view.
  * @param output Output image owner (may be reused).
- * @param iterations Number of iterations.
- * @param lambda Time step controlling diffusion speed (stability parameter).
- * @param kappa Conduction coefficient controlling edge sensitivity.
- * @param conduction Conduction function model.
+ * @param params Anisotropic diffusion parameters.
  *
  * @note Recommended for pipelines where memory reuse is important.
  */
@@ -79,10 +82,7 @@ void anisotropicDiffusion(const ImageView& input, ImageOwner& output,
  * using a conduction function driven by local gradients.
  *
  * @param input Input image view (grayscale or multi-channel).
- * @param iterations Number of diffusion iterations.
- * @param lambda Time step (stability parameter).
- * @param kappa Conduction coefficient controlling edge sensitivity.
- * @param conduction Conduction function model.
+ * @param params Anisotropic diffusion parameters.
  *
  * @return A new ImageOwner containing the filtered image.
  *
@@ -102,7 +102,7 @@ ImageOwner anisotropicDiffusion(const ImageView& input, const AnisoParams& param
  * @code
  * AnisotropicDiffusion diff;
  * diff.reset(input);
- * diff.apply(10, 1.0/7.0, 30.0, ConductionFunction::Exponential);
+ * diff.apply({}); // default parameters
  * auto result = diff.outputView();
  * @endcode
  *
@@ -124,15 +124,9 @@ public:
 
     /**
      * @brief Runs anisotropic diffusion iterations.
-     *
-     * Applies the diffusion process using the internal buffers initialized by reset().
-     *
-     * @param iterations Number of iterations.
-     * @param lambda Time step controlling diffusion speed.
-     * @param kappa Conduction coefficient controlling edge sensitivity.
-     * @param conduction Conduction function model.
-     *
-     * @note This function does not perform memory allocation.
+     *      * Applies the diffusion process using the internal buffers initialized by reset().
+     *      * @param params Anisotropic diffusion parameters.
+     *      * @note This function does not perform memory allocation.
      */
     void apply(const AnisoParams& params = AnisoParams{});
 
