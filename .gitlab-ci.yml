@@ -1,6 +1,7 @@
 stages:
   - build
   - doc
+  - pages
 
 variables:
   QT_VERSION: "6.7.2"
@@ -59,4 +60,19 @@ doc:
       - public
 
   only:
-    - master
+    - $CI_DEFAULT_BRANCH
+
+pages:
+  stage: pages
+  dependencies:
+    - doc
+
+  script:
+    - echo "Deploying GitLab Pages"
+
+  artifacts:
+    paths:
+      - public
+
+  only:
+    - $CI_DEFAULT_BRANCH
