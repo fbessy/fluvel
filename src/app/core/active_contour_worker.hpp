@@ -14,9 +14,7 @@
 #include <QObject>
 #include <QTimer>
 
-#ifndef Q_MOC_RUN
 #include <chrono>
-#endif
 
 namespace fluvel_app
 {
