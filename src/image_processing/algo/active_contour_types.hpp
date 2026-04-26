@@ -67,135 +67,71 @@ enum class SwitchDirection
 };
 
 /**
- * @brief Configuration parameters for the active contour algorithm.
+ * @brief Parameters controlling the active contour evolution.
  *
- * This structure defines all tunable parameters controlling the contour evolution,
- * including iteration limits, smoothing behavior, and failure handling.
+ * This structure defines all parameters used during the evolution process,
+ * including data-driven iterations (Cycle 1) and optional smoothing (Cycle 2).
  *
- * All values are normalized to valid ranges after construction or assignment.
+ * Default values are provided via in-class member initialization.
+ * Instances can safely be value-initialized using {}.
+ *
+ * @note All parameters are expected to be valid when used.
+ *       Validation should be handled by the caller (UI, config system, etc.).
  */
 struct ActiveContourParams
 {
-    static constexpr bool kDefaultIsCycle2{true}; //!< Default: enable smoothing cycle.
-    static constexpr int kDefaultDiskRadius{2};   //!< Default smoothing radius.
-    static constexpr int kDefaultNa{30};          //!< Default max iterations for Cycle1.
-    static constexpr int kDefaultNs{3};           //!< Default max iterations for Cycle2.
-    static constexpr FailureHandlingMode kDefaultFailureMode{
-        FailureHandlingMode::StopOnFailure}; //!< Default failure handling mode.
+    /// Default: enable smoothing phase (Cycle 2).
+    static constexpr bool kDefaultCycle2Enabled{true};
+
+    /// Default smoothing disk radius.
+    static constexpr int kDefaultDiskRadius{2};
+
+    /// Default maximum iterations for Cycle 1 (data-driven evolution).
+    static constexpr int kDefaultNa{30};
+
+    /// Default maximum iterations for Cycle 2 (smoothing phase).
+    static constexpr int kDefaultNs{3};
+
+    /// Default failure handling strategy.
+    static constexpr FailureHandlingMode kDefaultFailureMode{FailureHandlingMode::StopOnFailure};
 
     /**
      * @brief Enables smoothing evolution (Cycle 2).
      *
-     * When true, the contour performs an additional smoothing phase using
-     * the internal speed (Fint).
+     * When true, the contour performs an additional smoothing phase
+     * using the internal speed (Fint).
      */
-    bool cycle2Enabled;
+    bool cycle2Enabled{kDefaultCycle2Enabled};
 
     /**
      * @brief Disk radius used for contour smoothing.
      *
      * Must be >= 1. Larger values produce stronger smoothing.
      */
-    int diskRadius;
+    int diskRadius{kDefaultDiskRadius};
 
     /**
-     * @brief Maximum number of iterations for Cycle1 (data-driven evolution).
+     * @brief Maximum number of iterations for Cycle 1.
      *
+     * Controls the data-driven evolution phase.
      * Must be >= 1.
      */
-    int Na;
+    int Na{kDefaultNa};
 
     /**
-     * @brief Maximum number of iterations for Cycle2 (smoothing phase).
+     * @brief Maximum number of iterations for Cycle 2.
      *
+     * Controls the smoothing phase.
      * Must be >= 1.
      */
-    int Ns;
+    int Ns{kDefaultNs};
 
     /**
      * @brief Defines how failures are handled during execution.
      */
-    FailureHandlingMode failureMode;
+    FailureHandlingMode failureMode{kDefaultFailureMode};
 
-    /**
-     * @brief Normalizes parameter values to valid ranges.
-     *
-     * Ensures that all parameters satisfy minimal constraints:
-     * - diskRadius >= 1
-     * - Na >= 1
-     * - Ns >= 1
-     */
-    void normalize()
-    {
-        if (diskRadius < 1)
-            diskRadius = 1;
-
-        if (Na < 1)
-            Na = 1;
-
-        if (Ns < 1)
-            Ns = 1;
-    }
-
-    /**
-     * @brief Default constructor.
-     *
-     * Initializes parameters with default values and normalizes them.
-     */
-    ActiveContourParams()
-        : cycle2Enabled(kDefaultIsCycle2)
-        , diskRadius(kDefaultDiskRadius)
-        , Na(kDefaultNa)
-        , Ns(kDefaultNs)
-        , failureMode(kDefaultFailureMode)
-    {
-        this->normalize();
-    }
-
-    /**
-     * @brief Copy constructor.
-     *
-     * Copies all parameters and normalizes them.
-     *
-     * @param copied Source parameters.
-     */
-    ActiveContourParams(const ActiveContourParams& copied)
-        : cycle2Enabled(copied.cycle2Enabled)
-        , diskRadius(copied.diskRadius)
-        , Na(copied.Na)
-        , Ns(copied.Ns)
-        , failureMode(copied.failureMode)
-    {
-        this->normalize();
-    }
-
-    /**
-     * @brief Copy assignment operator.
-     *
-     * Assigns all parameters and normalizes them.
-     *
-     * @param rhs Source parameters.
-     * @return Reference to this instance.
-     */
-    ActiveContourParams& operator=(const ActiveContourParams& rhs)
-    {
-        this->cycle2Enabled = rhs.cycle2Enabled;
-        this->diskRadius = rhs.diskRadius;
-        this->Na = rhs.Na;
-        this->Ns = rhs.Ns;
-        this->failureMode = rhs.failureMode;
-
-        this->normalize();
-
-        return *this;
-    }
-
-    /**
-     * @brief Default comparison operator (C++20).
-     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
-     * by comparing members in declaration order.
-     *      * @note Requires <compare>.
-     */
+    /// Default comparison operator (C++20).
     auto operator<=>(const ActiveContourParams&) const = default;
 };
 

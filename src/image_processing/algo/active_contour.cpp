@@ -27,6 +27,13 @@ ActiveContour::ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedM
     , state_(PhaseState::Cycle1)
     , ed_(cd_)
 {
+    assert(params_.diskRadius >= 1);
+    assert(params_.Na >= 1);
+
+    // Only relevant if smoothing is enabled
+    if (params_.cycle2Enabled)
+        assert(params_.Ns >= 1);
+
     if (cd_.empty())
     {
         ed_.stoppingStatus = StoppingStatus::EmptyListFailure;

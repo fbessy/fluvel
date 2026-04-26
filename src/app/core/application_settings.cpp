@@ -460,7 +460,7 @@ void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoCon
     algoConfig.contourParams.cycle2Enabled =
         settings
             .value("algo/cycle2_smoothing_enabled",
-                   fluvel_ip::ActiveContourParams::kDefaultIsCycle2)
+                   fluvel_ip::ActiveContourParams::kDefaultCycle2Enabled)
             .toBool();
     algoConfig.contourParams.Ns =
         settings.value("algo/cycle2_iterations", fluvel_ip::ActiveContourParams::kDefaultNs)
