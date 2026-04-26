@@ -18,9 +18,11 @@
 
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include "application_settings_types.hpp"
 #include "phi_editor.hpp"
 #include "phi_view_model.hpp"
+#endif
 
 #include <QObject>
 
