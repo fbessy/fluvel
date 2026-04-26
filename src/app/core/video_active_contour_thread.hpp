@@ -17,12 +17,14 @@
 
 #pragma once
 
+#ifndef Q_MOC_RUN
 #include "active_contour.hpp"
 #include "application_settings_types.hpp"
 #include "frame_data.hpp"
 #include "image_view.hpp"
 #include "mean_filter_3x3.hpp"
 #include "temporal_mean.hpp"
+#endif
 
 #include <QVideoFrame>
 #include <QThread>
