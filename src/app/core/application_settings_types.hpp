@@ -220,6 +220,12 @@ struct VideoComputeConfig
     bool temporalFilteringEnabled = kDefaultTemporalFilteringEnabled;
 
     ActiveContourConfig contourConfig{};
+
+    VideoComputeConfig()
+    {
+        // Video mode: prefer robustness over strict failure stopping
+        contourConfig.contourParams.failureMode = fluvel_ip::FailureHandlingMode::RecoverOnFailure;
+    }
 };
 
 /**
