@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="fluvel.svg" width="200">
+  <img src="docs/images/fluvel.svg" width="200">
 </p>
 
 Active contour (level-set) image processing engine written in modern C++.
