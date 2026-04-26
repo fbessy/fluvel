@@ -67,7 +67,10 @@ if((ANDROID OR IOS) AND NOT FLUVEL_UI_DESKTOP)
 endif()
 
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
-qt_policy(SET QTP0002 NEW)
+
+if (COMMAND qt_policy)
+    qt_policy(SET QTP0002 NEW)
+endif()
 
 add_subdirectory(src/image_processing)
 add_subdirectory(src/app)
