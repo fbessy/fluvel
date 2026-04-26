@@ -16,8 +16,9 @@
 
 #pragma once
 
-#ifndef Q_MOC_RUN
 #include "active_contour_worker.hpp"
+
+#ifndef Q_MOC_RUN
 #include "application_settings_types.hpp"
 #endif
 

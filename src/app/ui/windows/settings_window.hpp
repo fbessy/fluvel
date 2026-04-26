@@ -5,8 +5,9 @@
 
 #ifndef Q_MOC_RUN
 #include "application_settings_types.hpp"
-#include "image_settings_controller.hpp"
 #endif
+
+#include "image_settings_controller.hpp"
 
 #include <QDialog>
 #include <QImage>

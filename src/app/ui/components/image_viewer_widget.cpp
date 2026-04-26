@@ -2,7 +2,6 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "image_viewer_widget.hpp"
-#include "application_settings_types.hpp"
 #include "color_adapters.hpp"
 #include "drag_drop_behavior.hpp"
 #include "frame_clock.hpp"

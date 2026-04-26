@@ -4,7 +4,6 @@
 #include "display_settings_widget.hpp"
 #include "color_adapters.hpp"
 #include "color_selector_widget.hpp"
-#include "application_settings_types.hpp"
 
 #include <QColorDialog>
 #include <QGroupBox>
