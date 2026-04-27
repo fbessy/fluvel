@@ -82,7 +82,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     hundredthSp_->setSingleStep(1);
     hundredthSp_->setMinimum(0);
     hundredthSp_->setMaximum(100);
-    hundredthSp_->setSuffix(tr(" %"));
+    hundredthSp_->setSuffix(" %");
     hundredthSp_->setValue(90);
     QFormLayout* hundredth_layout = new QFormLayout;
     hundredth_layout->addRow("hundredth =", hundredthSp_);

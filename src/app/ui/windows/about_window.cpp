@@ -76,131 +76,6 @@ static QString buildFingerprint()
     return hash.toHex().left(16).toUpper();
 }
 
-QString buildTechnicalSection()
-{
-    const auto readFormatsRaw = QImageReader::supportedImageFormats();
-
-    QStringList readFormats;
-    readFormats.reserve(readFormatsRaw.size());
-
-    for (const auto& f : readFormatsRaw)
-        readFormats << QString::fromLatin1(f).toUpper();
-
-    const auto writeFormatsRaw = QImageWriter::supportedImageFormats();
-
-    QStringList writeFormats;
-    writeFormats.reserve(writeFormatsRaw.size());
-
-    for (const auto& f : writeFormatsRaw)
-        writeFormats << QString::fromLatin1(f).toUpper();
-
-    readFormats.sort();
-    writeFormats.sort();
-
-    QSettings s;
-    QFileInfo info(s.fileName());
-    QString configDir = info.dir().absolutePath();
-
-    QString html;
-
-    // =========================
-    // Title
-    // =========================
-
-    html += "<div style='font-size:14pt; font-weight:bold; margin-bottom:12px;'>"
-            "Technical information"
-            "</div>";
-
-    // =========================
-    // Application
-    // =========================
-
-    html += "<div style='font-size:12pt; font-weight:bold; margin-top:8px;'>"
-            "Application"
-            "</div>";
-
-    html += "<div style='margin-left:12px;'>";
-
-    html += "<div style='margin-bottom:6px;'>"
-            "<b>Version:</b> " FLUVEL_VERSION "</div>";
-
-    html += "<div style='margin-bottom:4px;'><b>Configuration directory</b></div>";
-    html += "<div style='font-family:monospace; margin-bottom:8px;'>" + configDir + "</div>";
-
-    html += "<div style='margin-bottom:4px;'><b>Image formats</b></div>";
-
-    html += "<div style='margin-left:12px; font-size:9pt; color:#444; margin-bottom:6px;'>"
-            "Image format support is provided by Qt image format plugins.<br>"
-            "Available formats depend on the Qt installation and platform."
-            "</div>";
-
-    html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word;'>";
-    html += "<b>Read :</b> " + readFormats.join(", ") + "<br>";
-    html += "<b>Write:</b> " + writeFormats.join(", ");
-    html += "</div>";
-
-    html += "</div>"; // end Application block
-
-    // =========================
-    // Environment
-    // =========================
-
-    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
-            "Environment"
-            "</div>";
-
-    html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>" +
-            runtimeInfo() +
-            "<br>"
-            "Qt (runtime): " +
-            QString(qVersion()) + "</div>";
-
-    // =========================
-    // Package
-    // =========================
-
-    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
-            "Package"
-            "</div>";
-
-    html += "<div style='margin-left:12px; font-family:monospace;'>"
-            "Type: " +
-            packageType() + "</div>";
-
-    // =========================
-    // Build
-    // =========================
-
-    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
-            "Build"
-            "</div>";
-
-    html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>"
-            "Git commit: " FLUVEL_GIT_COMMIT "<br>"
-            "Build type: " FLUVEL_BUILD_TYPE "<br>"
-            "Qt (build): " +
-            QString(QT_VERSION_STR) +
-            "<br>"
-            "Compiler: " +
-            compilerInfo() +
-            "<br>"
-            "CMake: " FLUVEL_CMAKE_VERSION +
-            "</div>";
-
-    // =========================
-    // Fingerprint
-    // =========================
-
-    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>"
-            "Build fingerprint"
-            "</div>";
-
-    html +=
-        "<div style='margin-left:12px; font-family:monospace;'>" + buildFingerprint() + "</div>";
-
-    return html;
-}
-
 } // namespace
 
 AboutWindow::AboutWindow(QWidget* parent)
@@ -261,10 +136,10 @@ AboutWindow::AboutWindow(QWidget* parent)
     years_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
                                          Qt::LinksAccessibleByKeyboard);
 
-    QPushButton* webpage = new QPushButton(tr("Web page"));
+    QPushButton* webpage = new QPushButton(tr("Home page"));
     webpage->setAutoDefault(false);
 
-    connect(webpage, &QPushButton::clicked, this, &AboutWindow::openWebPage);
+    connect(webpage, &QPushButton::clicked, this, &AboutWindow::openHomePage);
 
     QPushButton* license = new QPushButton(tr("License"));
     license->setAutoDefault(false);
@@ -484,9 +359,118 @@ AboutWindow::AboutWindow(QWidget* parent)
     this->setLayout(layout_this);
 }
 
-void AboutWindow::openWebPage()
+void AboutWindow::openHomePage()
 {
     QDesktopServices::openUrl(QUrl(kProjectUrl, QUrl::TolerantMode));
+}
+
+QString AboutWindow::buildTechnicalSection()
+{
+    const auto readFormatsRaw = QImageReader::supportedImageFormats();
+    QStringList readFormats;
+    readFormats.reserve(readFormatsRaw.size());
+
+    for (const auto& f : readFormatsRaw)
+        readFormats << QString::fromLatin1(f).toUpper();
+
+    const auto writeFormatsRaw = QImageWriter::supportedImageFormats();
+    QStringList writeFormats;
+    writeFormats.reserve(writeFormatsRaw.size());
+
+    for (const auto& f : writeFormatsRaw)
+        writeFormats << QString::fromLatin1(f).toUpper();
+
+    readFormats.sort();
+    writeFormats.sort();
+
+    QSettings s;
+    QFileInfo info(s.fileName());
+    QString configDir = info.dir().absolutePath();
+
+    QString html;
+
+    // =========================
+    // Title
+    // =========================
+
+    html += "<div style='font-size:14pt; font-weight:bold; margin-bottom:12px;'>" +
+            tr("Technical information") + "</div>";
+
+    // =========================
+    // Application
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:8px;'>" + tr("Application") +
+            "</div>";
+
+    html += "<div style='margin-left:12px;'>";
+
+    html += "<div style='margin-bottom:6px;'>"
+            "<b>" +
+            tr("Version") + ":</b> " FLUVEL_VERSION "</div>";
+
+    html += "<div style='margin-bottom:4px;'><b>" + tr("Configuration directory") + "</b></div>";
+
+    html += "<div style='font-family:monospace; margin-bottom:8px;'>" + configDir + "</div>";
+
+    html += "<div style='margin-bottom:4px;'><b>" + tr("Image formats") + "</b></div>";
+
+    html += "<div style='margin-left:12px; font-size:9pt; color:#444; margin-bottom:6px;'>";
+    html += tr("Image format support is provided by Qt image format plugins.") + "<br>";
+    html += tr("Available formats depend on the Qt installation and platform.");
+    html += "</div>";
+
+    html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word;'>";
+    html += "<b>" + tr("Read") + " :</b> " + readFormats.join(", ") + "<br>";
+    html += "<b>" + tr("Write") + ":</b> " + writeFormats.join(", ");
+    html += "</div>";
+
+    html += "</div>"; // end Application block
+
+    // =========================
+    // Environment
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>" + tr("Environment") +
+            "</div>";
+
+    html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>" +
+            runtimeInfo() + "<br>" + tr("Qt (runtime)") + ": " + QString(qVersion()) + "</div>";
+
+    // =========================
+    // Package
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>" + tr("Package") +
+            "</div>";
+
+    html += "<div style='margin-left:12px; font-family:monospace;'>" + tr("Type") + ": " +
+            packageType() + "</div>";
+
+    // =========================
+    // Build
+    // =========================
+
+    html +=
+        "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>" + tr("Build") + "</div>";
+
+    html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>" +
+            tr("Git commit") + ": " + FLUVEL_GIT_COMMIT + "<br>" + tr("Build type") + ": " +
+            FLUVEL_BUILD_TYPE + "<br>" + tr("Qt (build)") + ": " + QString(QT_VERSION_STR) +
+            "<br>" + tr("Compiler") + ": " + compilerInfo() + "<br>" + tr("CMake") + ": " +
+            FLUVEL_CMAKE_VERSION + "</div>";
+
+    // =========================
+    // Fingerprint
+    // =========================
+
+    html += "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>" +
+            tr("Build fingerprint") + "</div>";
+
+    html +=
+        "<div style='margin-left:12px; font-family:monospace;'>" + buildFingerprint() + "</div>";
+
+    return html;
 }
 
 void AboutWindow::closeEvent(QCloseEvent* event)

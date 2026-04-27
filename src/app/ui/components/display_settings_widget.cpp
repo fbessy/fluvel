@@ -79,7 +79,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     display_overlay_cb_ = new QCheckBox(tr("Algorithm Overlay"));
     display_overlay_cb_->setChecked(config_.algorithmOverlayEnabled);
 
-    auto* title = new QLabel("View");
+    auto* title = new QLabel(tr("View"));
     title->setStyleSheet("font-weight: bold; font-size: 14px;");
 
     QVBoxLayout* widget_layout = new QVBoxLayout;

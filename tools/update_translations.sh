@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # update_translations.sh
+# Update TS files and generate QM files
 
 set -e
 
@@ -9,15 +10,30 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+echo "📁 Project root: $ROOT_DIR"
+
 # =========================
-# Qt tools path
+# Find Qt tools
 # =========================
-QT_BIN="$HOME/Qt/6.10.2/gcc_64/bin"
+LUPDATE=$(command -v lupdate || true)
+LRELEASE=$(command -v lrelease || true)
+
+if [ -z "$LUPDATE" ] || [ -z "$LRELEASE" ]; then
+    echo "❌ Qt tools not found in PATH"
+    echo "👉 You can fix it with:"
+    echo "   export PATH=\$HOME/Qt/6.10.2/gcc_64/bin:\$PATH"
+    exit 1
+fi
 
 # =========================
 # Source directories
 # =========================
 SRC_DIRS=("src/app" "src/image_processing")
+
+SRC_PATHS=()
+for dir in "${SRC_DIRS[@]}"; do
+    SRC_PATHS+=("$ROOT_DIR/$dir")
+done
 
 # =========================
 # Translation directory
@@ -26,26 +42,34 @@ TS_DIR="$ROOT_DIR/translations"
 mkdir -p "$TS_DIR"
 
 # =========================
-# Build source paths
+# Languages (edit here)
 # =========================
-SRC_PATHS=()
-for dir in "${SRC_DIRS[@]}"; do
-    SRC_PATHS+=("$ROOT_DIR/$dir")
+TS_FILES=(
+    "fluvel_fr.ts"
+    # "fluvel_en.ts"
+    # "fluvel_es.ts"
+)
+
+# =========================
+# Process translations
+# =========================
+for ts in "${TS_FILES[@]}"; do
+    ts_path="$TS_DIR/$ts"
+    qm_path="${ts_path%.ts}.qm"
+
+    # Create if missing
+    if [ ! -f "$ts_path" ]; then
+        echo "🆕 Creating $ts"
+        "$LUPDATE" "${SRC_PATHS[@]}" -ts "$ts_path"
+    fi
+
+    # Update
+    echo "🔄 Updating $ts"
+    "$LUPDATE" "${SRC_PATHS[@]}" -no-obsolete -ts "$ts_path"
+
+    # Compile
+    echo "⚙️  Compiling $(basename "$qm_path")"
+    "$LRELEASE" "$ts_path"
 done
 
-# =========================
-# Process .ts files
-# =========================
-for ts_file in "$TS_DIR"/*.ts; do
-    [ -e "$ts_file" ] || continue
-
-    qm_file="${ts_file%.ts}.qm"
-
-    echo "➡️  Updating $ts_file"
-    "$QT_BIN/lupdate" "${SRC_PATHS[@]}" -ts "$ts_file"
-
-    echo "➡️  Compiling $qm_file"
-    "$QT_BIN/lrelease" "$ts_file"
-done
-
-echo "✅ All translations updated"
+echo "✅ Translations updated successfully"

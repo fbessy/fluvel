@@ -748,7 +748,7 @@ void ImageWindow::saveDisplayed()
     QString selectedFilter;
     QString fileName = QFileDialog::getSaveFileName(
         this, tr("Save displayed image"), lastDirectoryUsed_ + "/" + baseName,
-        tr("PNG (*.png);;JPG (*.jpg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm)"),
+        "PNG (*.png);;JPG (*.jpg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm)",
         &selectedFilter);
 
     if (fileName.isEmpty())

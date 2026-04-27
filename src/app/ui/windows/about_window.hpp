@@ -35,7 +35,8 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    void openWebPage();
+    void openHomePage();
+    QString buildTechnicalSection();
 
     QDialog* licenseWindow_ = nullptr;
 };

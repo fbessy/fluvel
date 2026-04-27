@@ -103,7 +103,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     noiseSp_->setSingleStep(1);
     noiseSp_->setMinimum(0);
     noiseSp_->setMaximum(100);
-    noiseSp_->setSuffix(tr(" %"));
+    noiseSp_->setSuffix(" %");
     noiseSp_->setValue(0);
 
     noiseGroup_ = new QGroupBox(tr("Noise"));
@@ -232,9 +232,9 @@ void AnalysisWidget::createList()
 
     QString list_str;
     if (idThis_ == 1)
-        list_str = tr("List 1 length = ");
+        list_str = tr("L1 size: ");
     else if (idThis_ == 2)
-        list_str = tr("List 2 length = ");
+        list_str = tr("L2 size: ");
 
     textListLength_->setText(color_str + list_str + size_str);
 
