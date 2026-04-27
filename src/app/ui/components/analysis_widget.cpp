@@ -40,12 +40,12 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     textListLength_->setAlignment(Qt::AlignCenter);
     if (idThis_ == 1)
     {
-        textListLength_->setText("<font color=red>" + tr("List 1 length = ") +
+        textListLength_->setText("<font color=red>" + tr("List 1 size: ") +
                                  QString::number(shape_.points().size()));
     }
     else if (idThis_ == 2)
     {
-        textListLength_->setText("<font color=red>" + tr("List 2 length = ") +
+        textListLength_->setText("<font color=red>" + tr("List 2 size: ") +
                                  QString::number(shape_.points().size()));
     }
 
@@ -232,9 +232,9 @@ void AnalysisWidget::createList()
 
     QString list_str;
     if (idThis_ == 1)
-        list_str = tr("L1 size: ");
+        list_str = tr("List 1 size: ");
     else if (idThis_ == 2)
-        list_str = tr("L2 size: ");
+        list_str = tr("List 2 size: ");
 
     textListLength_->setText(color_str + list_str + size_str);
 
