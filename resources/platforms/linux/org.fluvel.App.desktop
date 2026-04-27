@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Fluvel
 Name[fr]=Fluvel
-GenericName=Image segmentation application
-GenericName[fr]=Application de segmentation d'images
+GenericName=Real-time computer vision and image analysis for research
+GenericName[fr]=Vision par ordinateur et analyse d’images en temps réel pour la recherche
 Comment=Explore image segmentation with interactive and real-time visualization
 Comment[fr]=Explorer la segmentation d'images avec visualisation interactive et en temps réel
 Exec=fluvel
