@@ -265,16 +265,14 @@ AboutWindow::AboutWindow(QWidget* parent)
     author_label->setWordWrap(true);
 
     author_label->setText(
-        tr("<p><b>Author</b></p>"
+        tr("<p><b>Fabien Bessy</b></p>"
 
-           "<p>Fabien Bessy</p>"
-
-           "<p>Originally developed in 2010 within the Pattern Recognition and "
+           "<p>This project was originally developed in 2010 within the Pattern Recognition and "
            "Image Analysis research team, Laboratory of Computer Science (LIFAT), "
            "François Rabelais University, Tours, "
            "as part of the MSc in Medical Imaging.</p>"
 
-           "<p>The project has been modernized and extended in 2024–2026.</p>"
+           "<p>It has been modernized and extended in 2024–2026.</p>"
 
            "<p>Contact: "
            "<a href='mailto:fabien.bessy@gmail.com'>fabien.bessy@gmail.com</a></p>"));

@@ -12,40 +12,40 @@
 <context>
     <name>fluvel_app::AboutWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="86"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="88"/>
         <source>About Fluvel</source>
         <translation>À propos de Fluvel</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="121"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="123"/>
         <source>Version </source>
         <translation>Version </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="139"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="141"/>
         <source>Home page</source>
         <translation>Page d’accueil</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="144"/>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="174"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="146"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="176"/>
         <source>License</source>
         <translation>Licence</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="216"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="218"/>
         <source>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.&lt;/p&gt;&lt;p&gt;The software integrates real-time image processing, video stream handling, image pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.&lt;/p&gt;&lt;p&gt;It provides an interactive environment for testing and analyzing discrete level-set implementations in both static images and dynamic video scenarios.&lt;/p&gt;&lt;p&gt;Fluvel focuses on performance, reproducibility, and clarity, making it suitable for research, teaching, and experimental validation.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; est une application de segmentation d’images orientée recherche, conçue pour permettre des expérimentations rapides et efficaces avec des méthodes de contours actifs de type level-set.&lt;/p&gt;&lt;p&gt;Le logiciel intègre du traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement d’image ainsi que des métriques d’évaluation quantitative telles que la distance de Hausdorff pour l’analyse de segmentation.&lt;/p&gt;&lt;p&gt;Il offre un environnement interactif pour tester et analyser des implémentations discrètes de level-set, aussi bien sur des images statiques que dans des scénarios vidéo dynamiques.&lt;/p&gt;&lt;p&gt;Fluvel met l’accent sur les performances, la reproductibilité et la clarté, ce qui le rend adapté à la recherche, à l’enseignement et à la validation expérimentale.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="243"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="245"/>
         <source>&lt;p&gt;&lt;b&gt;Scientific Background&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel integrates several fundamental methods in image segmentation, including discrete level-set approximation (Shi &amp; Karl, 2008), region-based active contours (Chan &amp; Vese, 2001), anisotropic diffusion filtering (Perona &amp; Malik, 1990), and quantitative evaluation using the Hausdorff distance.&lt;/p&gt;&lt;p&gt;These methods provide a balance between computational efficiency, topological flexibility, and rigorous segmentation assessment.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="266"/>
-        <source>&lt;p&gt;&lt;b&gt;Author&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fabien Bessy&lt;/p&gt;&lt;p&gt;Originally developed in 2010 within the Pattern Recognition and Image Analysis research team, Laboratory of Computer Science (LIFAT), François Rabelais University, Tours, as part of the MSc in Medical Imaging.&lt;/p&gt;&lt;p&gt;The project has been modernized and extended in 2024–2026.&lt;/p&gt;&lt;p&gt;Contact: &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Auteur&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fabien Bessy&lt;/p&gt;&lt;p&gt;Développé initialement en 2010 au sein de l’équipe de recherche en reconnaissance des formes et analyse d’images, au Laboratoire d’informatique (LIFAT), Université François-Rabelais de Tours, dans le cadre du Master en imagerie médicale.&lt;/p&gt;&lt;p&gt;Le projet a été modernisé et étendu entre 2024 et 2026.&lt;/p&gt;&lt;p&gt;Contact : &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</translation>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="268"/>
+        <source>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;This project was originally developed in 2010 within the Pattern Recognition and Image Analysis research team, Laboratory of Computer Science (LIFAT), François Rabelais University, Tours, as part of the MSc in Medical Imaging.&lt;/p&gt;&lt;p&gt;It has been modernized and extended in 2024–2026.&lt;/p&gt;&lt;p&gt;Contact: &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Ce projet a été initialement développé en 2010 au sein de l’équipe de recherche en reconnaissance des formes et analyse d’images, au Laboratoire d’informatique (LIFAT), Université François-Rabelais de Tours, dans le cadre du Master en imagerie médicale.&lt;/p&gt;&lt;p&gt;Il a été modernisé et étendu entre 2024 et 2026.&lt;/p&gt;&lt;p&gt;Contact : &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_window.cpp" line="300"/>
