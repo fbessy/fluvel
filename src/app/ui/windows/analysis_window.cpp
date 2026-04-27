@@ -49,7 +49,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     lists_select_layout->addWidget(widget1_);
     lists_select_layout->addWidget(widget2_);
 
-    computeButton_ = new QPushButton(tr("compute the Hausdorff distance"));
+    computeButton_ = new QPushButton(tr("Compute the Hausdorff distance"));
     computeButton_->setEnabled(false);
 
     QVBoxLayout* input_layout = new QVBoxLayout;

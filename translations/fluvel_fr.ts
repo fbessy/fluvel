@@ -326,8 +326,8 @@
     </message>
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="52"/>
-        <source>compute the Hausdorff distance</source>
-        <translation>calculer la distance de Hausdorff</translation>
+        <source>Compute the Hausdorff distance</source>
+        <translation>Calculer la distance de Hausdorff</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="70"/>
@@ -363,7 +363,7 @@
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="103"/>
         <source>Hausdorff quantile measure</source>
-        <translation>Mesure du quantile de la distance de Hausdorff =</translation>
+        <translation>Mesure du quantile de la distance de Hausdorff</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="107"/>
