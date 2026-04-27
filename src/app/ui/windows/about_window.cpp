@@ -15,6 +15,8 @@
 #include <QTabWidget>
 #include <QTextEdit>
 
+#include <QtGlobal>
+
 namespace fluvel_app
 {
 
