@@ -6,11 +6,11 @@
   "command": "fluvel",
 
   "finish-args": [
-  "--share=ipc",
-  "--socket=wayland",
-  "--socket=fallback-x11",
-  "--device=dri",
-  "--device=all"
+    "--share=ipc",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--device=dri",
+    "--device=all"
   ],
 
   "modules": [
@@ -20,7 +20,7 @@
       "sources": [
         {
           "type": "dir",
-          "path": "."
+          "path": "../.."
         }
       ]
     }
