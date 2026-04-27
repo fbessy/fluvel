@@ -196,9 +196,9 @@
         <translation>8-connexe (Moore)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="29"/>
-        <source>Defines the pixel neighborhood used for connectivity (4-connected or 8-connected).</source>
-        <translation>Définit le voisinage utilisé pour la connectivité des pixels (4-connexe ou 8-connexe).</translation>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="28"/>
+        <source>Defines the neighborhood used for contour connectivity (4-connected or 8-connected).</source>
+        <translation>Définit le voisinage utilisé pour la connectivité du contour (4-connexe ou 8-connexe).</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="32"/>

@@ -25,8 +25,8 @@ AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* par
     connectivityCb_->addItem(tr("8-connected (Moore)"),
                              QVariant::fromValue(fluvel_ip::Connectivity::Eight));
 
-    connectivityCb_->setToolTip(
-        tr("Defines the pixel neighborhood used for connectivity (4-connected or 8-connected)."));
+    connectivityCb_->setToolTip(tr("Defines the neighborhood used for contour connectivity "
+                                   "(4-connected or 8-connected)."));
 
     QFormLayout* connect_layout = new QFormLayout;
     connect_layout->addRow(tr("Connectivity :"), connectivityCb_);
