@@ -196,63 +196,73 @@
         <translation>8-connexe (Moore)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="31"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="29"/>
+        <source>Defines the pixel neighborhood used for connectivity (4-connected or 8-connected).</source>
+        <translation>Définit le voisinage utilisé pour la connectivité des pixels (4-connexe ou 8-connexe).</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="32"/>
+        <source>Connectivity :</source>
+        <translation>Connectivité :</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="34"/>
         <source>Cycle 1 – Data-driven evolution</source>
         <translation>Cycle 1 – Évolution guidée par les données</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="37"/>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="122"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="40"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="125"/>
         <source> iterations</source>
         <translation> itérations</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="38"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="41"/>
         <source>Number of iterations of the data-driven evolution (Cycle 1).</source>
         <translation>Nombre d’itérations pour l’évolution guidée par les données (Cycle 1).</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="46"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="49"/>
         <source>weight of the outside homogeneity criterion</source>
         <translation>Poids du critère d’homogénéité extérieure</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="52"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="55"/>
         <source>weight of the inside homogeneity criterion</source>
         <translation>Poids du critère d’homogénéité intérieure</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="65"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="68"/>
         <source>Color space</source>
         <translation>Espace colorimétrique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="95"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="98"/>
         <source>1st component weight =</source>
         <translation>Poids de la 1ʳᵉ composante =</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="96"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="99"/>
         <source>2nd component weight =</source>
         <translation>Poids de la 2e composante =</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="97"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="100"/>
         <source>3rd component weight =</source>
         <translation>Poids de la 3e composante =</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="114"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="117"/>
         <source>Cycle 2 - Internal smoothing</source>
         <translation>Cycle 2 – Lissage interne</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="123"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="126"/>
         <source>Number of internal smoothing iterations (Cycle 2).</source>
         <translation>Nombre d’itérations pour le lissage interne (Cycle 2).</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="129"/>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="132"/>
         <source>Radius of the disk-shaped neighborhood used for the majority vote during internal smoothing.</source>
         <translation>Rayon du voisinage en forme de disque utilisé pour le vote majoritaire lors du lissage interne.</translation>
     </message>
