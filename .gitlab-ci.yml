@@ -53,15 +53,14 @@ flatpak:
     - apt install -y flatpak flatpak-builder
     - flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
+    # 🔥 IMPORTANT : installer runtime + sdk
+    - flatpak install -y flathub org.kde.Platform//6.9
+    - flatpak install -y flathub org.kde.Sdk//6.9
+
   script:
-    # Build
     - flatpak-builder --force-clean build-flatpak packaging/flatpak/fluvel.json
-
-    # Create local repo
     - flatpak build-export repo build-flatpak
-
-    # Create bundle
-    - flatpak build-bundle repo fluvel-v1.0.flatpak org.fluvel.App
+    - flatpak build-bundle repo fluvel.flatpak org.fluvel.App
 
   artifacts:
     paths:
