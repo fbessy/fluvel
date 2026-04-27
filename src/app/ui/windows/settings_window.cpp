@@ -23,10 +23,6 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-#ifdef FLUVEL_DEBUG
-#include "image_debug.hpp"
-#endif
-
 namespace fluvel_app
 {
 
@@ -325,7 +321,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     gaussianNoiseStdSpin_->setSingleStep(5.0);
     gaussianNoiseStdSpin_->setMinimum(0.0);
     gaussianNoiseStdSpin_->setMaximum(80.0);
-    gaussianNoiseStdSpin_->setToolTip(tr("standard deviation"));
+    gaussianNoiseStdSpin_->setToolTip(tr("Standard deviation."));
 
     QFormLayout* gaussian_noise_layout = new QFormLayout;
     gaussian_noise_layout->addRow("σ =", gaussianNoiseStdSpin_);
@@ -340,7 +336,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     impulsiveNoisePercentSpin_->setSingleStep(1.0);
     impulsiveNoisePercentSpin_->setRange(0.0, 100.0);
     impulsiveNoisePercentSpin_->setSuffix(" %");
-    impulsiveNoisePercentSpin_->setToolTip(tr("impulsional noise probability for each pixel"));
+    impulsiveNoisePercentSpin_->setToolTip(
+        tr("Density or probability of impulse noise per pixel."));
 
     QFormLayout* impulsiveNoiseLayout = new QFormLayout;
     impulsiveNoiseLayout->addRow(tr("d ="), impulsiveNoisePercentSpin_);
@@ -354,7 +351,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     speckleNoiseStdSpin_ = new QDoubleSpinBox;
     speckleNoiseStdSpin_->setSingleStep(0.01);
     speckleNoiseStdSpin_->setRange(0.0, 2.0);
-    speckleNoiseStdSpin_->setToolTip(tr("standard deviation"));
+    speckleNoiseStdSpin_->setToolTip(tr("Standard deviation."));
 
     QFormLayout* speckleNoiseLayout = new QFormLayout;
     speckleNoiseLayout->addRow("σ =", speckleNoiseStdSpin_);
@@ -430,8 +427,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     openKernelSizeSpin_->setSingleStep(2);
     openKernelSizeSpin_->setMinimum(3);
     openKernelSizeSpin_->setMaximum(499);
-    openKernelSizeSpin_->setToolTip(tr("the structuring element shape is a square and its "
-                                       "origin is the center of the square"));
+    openKernelSizeSpin_->setToolTip(
+        tr("The structuring element is a square centered at its origin."));
 
     QFormLayout* openLayout = new QFormLayout;
     openLayout->addRow(tr("SE size ="), openKernelSizeSpin_);
@@ -443,8 +440,8 @@ void SettingsWindow::setupUiPreprocessingTab()
     closeKernelSizeSpin_->setSingleStep(2);
     closeKernelSizeSpin_->setMinimum(3);
     closeKernelSizeSpin_->setMaximum(499);
-    closeKernelSizeSpin_->setToolTip(tr("the structuring element shape is a square and its "
-                                        "origin is the center of the square"));
+    closeKernelSizeSpin_->setToolTip(
+        tr("The structuring element is a square centered at its origin."));
 
     QFormLayout* closeLayout = new QFormLayout;
     closeLayout->addRow(tr("SE size ="), closeKernelSizeSpin_);
@@ -455,15 +452,15 @@ void SettingsWindow::setupUiPreprocessingTab()
     tophatGroupbox_->setCheckable(true);
     tophatGroupbox_->setChecked(false);
     whitetophatRadio_ = new QRadioButton(tr("white top-hat"));
-    whitetophatRadio_->setToolTip(tr("difference between the input image the opened"));
+    whitetophatRadio_->setToolTip(tr("Difference between the input image and the opened result."));
     blacktophatRadio_ = new QRadioButton(tr("black top-hat"));
-    blacktophatRadio_->setToolTip(tr("difference between the closed and the input image"));
+    blacktophatRadio_->setToolTip(tr("Difference between the closed result and the input image."));
     tophatKernelSizeSpin_ = new KernelSizeSpinBox;
     tophatKernelSizeSpin_->setSingleStep(2);
     tophatKernelSizeSpin_->setMinimum(3);
     tophatKernelSizeSpin_->setMaximum(499);
-    tophatKernelSizeSpin_->setToolTip(tr("the structuring element shape is a square and its "
-                                         "origin is the center of the square"));
+    tophatKernelSizeSpin_->setToolTip(
+        tr("The structuring element is a square centered at its origin."));
 
     QFormLayout* tophatLayout = new QFormLayout;
     tophatLayout->addRow(" ", whitetophatRadio_);

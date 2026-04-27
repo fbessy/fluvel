@@ -19,11 +19,11 @@ AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* par
 {
     connectivityCb_ = new QComboBox;
 
-    connectivityCb_->addItem("4-connected (Von Neumann)",
-                              QVariant::fromValue(fluvel_ip::Connectivity::Four));
+    connectivityCb_->addItem(tr("4-connected (Von Neumann)"),
+                             QVariant::fromValue(fluvel_ip::Connectivity::Four));
 
-    connectivityCb_->addItem("8-connected (Moore)",
-                              QVariant::fromValue(fluvel_ip::Connectivity::Eight));
+    connectivityCb_->addItem(tr("8-connected (Moore)"),
+                             QVariant::fromValue(fluvel_ip::Connectivity::Eight));
 
     QFormLayout* connect_layout = new QFormLayout;
     connect_layout->addRow("Connectivity :", connectivityCb_);

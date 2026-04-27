@@ -206,7 +206,7 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
         const auto& values = v.values();
 
         if (values.empty())
-            return QString("n/a");
+            return QString(tr("n/a"));
 
         if (values.size() == 1)
             return QString::number(values[0]);
@@ -224,28 +224,28 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
 
     QString s;
 
-    s += QString("Step: %1\n").arg(diag.stepCount);
-    s += QString("State: %1\n").arg(fluvel_ip::toString(diag.state));
+    s += QString(tr("Step: %1\n")).arg(diag.stepCount);
+    s += QString(tr("State: %1\n")).arg(fluvel_ip::toString(diag.state));
 
     if (diag.stoppingStatus != fluvel_ip::StoppingStatus::None)
-        s += QString("Reason: %1\n").arg(fluvel_ip::toString(diag.stoppingStatus));
+        s += QString(tr("Reason: %1\n")).arg(fluvel_ip::toString(diag.stoppingStatus));
     else
-        s += QString("Reason: \n");
+        s += QString(tr("Reason: \n"));
 
     if (!diag.meanInside.values().empty())
     {
-        s += QString("Mean in: %1\n").arg(formatChannels(diag.meanInside));
+        s += QString(tr("Mean in: %1\n")).arg(formatChannels(diag.meanInside));
 
-        s += QString("Mean out: %1\n").arg(formatChannels(diag.meanOutside));
+        s += QString(tr("Mean out: %1\n")).arg(formatChannels(diag.meanOutside));
     }
 
-    s += QString("Hausdorff q: %1 %\n").arg(diag.hausdorffQuantile, 0, 'f', 2);
+    s += QString(tr("Hausdorff q: %1 %\n")).arg(diag.hausdorffQuantile, 0, 'f', 2);
 
-    s += QString("Centroid dist: %1 %\n").arg(diag.relativeCentroidDistance, 0, 'f', 2);
+    s += QString(tr("Centroid dist: %1 %\n")).arg(diag.relativeCentroidDistance, 0, 'f', 2);
 
-    s += QString("Elapsed: %1 s\n").arg(diag.elapsedSec, 0, 'f', 2);
+    s += QString(tr("Elapsed: %1 s\n")).arg(diag.elapsedSec, 0, 'f', 2);
 
-    s += QString("Contour: %1 pts").arg(diag.contourSize);
+    s += QString(tr("Contour: %1 pts")).arg(diag.contourSize);
 
     emit textDiagnosticsUpdated(s);
 }

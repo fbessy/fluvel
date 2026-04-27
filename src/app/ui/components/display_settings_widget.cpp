@@ -76,7 +76,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     rendering_layout->addWidget(smooth_cb_);
     rendering_gb->setLayout(rendering_layout);
 
-    display_overlay_cb_ = new QCheckBox(tr("Algorithm Overlay"));
+    display_overlay_cb_ = new QCheckBox(tr("Overlay"));
     display_overlay_cb_->setChecked(config_.algorithmOverlayEnabled);
 
     auto* title = new QLabel(tr("View"));
