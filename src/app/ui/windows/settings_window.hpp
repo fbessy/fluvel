@@ -242,8 +242,8 @@ private:
     /////////       Model              /////
     ///////////////////////////////////////
 
-    ImageComputeConfig committedConfig_;
-    ImageComputeConfig editedConfig_;
+    ImageComputeConfig committedConfig_{};
+    ImageComputeConfig editedConfig_{};
 };
 
 } // namespace fluvel_app

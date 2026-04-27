@@ -159,10 +159,10 @@ private:
     std::unique_ptr<PhiViewModel> phiViewModel_;
 
     /// Editable downscale parameters.
-    DownscaleParams editedDownscaleParams_;
+    DownscaleParams editedDownscaleParams_{};
 
     /// Editable processing parameters.
-    fluvel_ip::ProcessingParams editedProcessingParams_;
+    fluvel_ip::ProcessingParams editedProcessingParams_{};
 
     /// Original input image.
     QImage input_;

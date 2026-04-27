@@ -125,7 +125,7 @@ private:
     static constexpr std::chrono::milliseconds kTimeSliceMs{20};
 
     /// Current algorithm configuration.
-    VideoComputeConfig config_;
+    VideoComputeConfig config_{};
 
     /// Current display mode.
     ImageDisplayMode displayMode_;

@@ -209,7 +209,7 @@ private:
 
     bool initialShown_{false};
 
-    ImageComputeConfig config_;
+    ImageComputeConfig config_{};
 
     fluvel_ip::ContourDiagnostics diag_;
     fluvel_ip::ElapsedTimer measurementTimer_;

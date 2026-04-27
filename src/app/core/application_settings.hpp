@@ -176,10 +176,10 @@ private:
     bool saveInitialPhi();
 
     /// Current image session settings.
-    ImageSessionSettings imageSettings_;
+    ImageSessionSettings imageSettings_{};
 
     /// Current video session settings.
-    VideoSessionSettings videoSettings_;
+    VideoSessionSettings videoSettings_{};
 
     /// Current application language.
     Language appLanguage_;

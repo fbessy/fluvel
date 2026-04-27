@@ -283,8 +283,8 @@ private:
     QGraphicsPixmapItem* pixmapItem_ = nullptr;
     QImage lastDisplayedImage_;
 
-    DisplayConfig displayConfig_;
-    DownscaleParams downscaleConfig_;
+    DisplayConfig displayConfig_{};
+    DownscaleParams downscaleConfig_{};
 
     ContourPointsItem* outerContour_ = nullptr;
     ContourPointsItem* innerContour_ = nullptr;

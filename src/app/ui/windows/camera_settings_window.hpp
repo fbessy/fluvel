@@ -98,8 +98,8 @@ private:
     QDialogButtonBox* dialogButtons_ = nullptr;
 
     // --- Model ---
-    VideoComputeConfig committedConfig_; // original
-    VideoComputeConfig editedConfig_;    // UI en cours
+    VideoComputeConfig committedConfig_{}; // original
+    VideoComputeConfig editedConfig_{};    // UI en cours
 };
 
 } // namespace fluvel_app

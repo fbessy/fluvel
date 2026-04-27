@@ -82,7 +82,7 @@ private:
 
     QCheckBox* display_overlay_cb_;
 
-    DisplayConfig config_;
+    DisplayConfig config_{};
 };
 
 } // namespace fluvel_app

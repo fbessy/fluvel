@@ -178,7 +178,7 @@ private:
     QString fullPath_;
     QSize inputSize_;
     int channels_{0};
-    DownscaleParams currentDownscale_;
+    DownscaleParams currentDownscale_{};
 
     QString lastDirectoryUsed_;
 };

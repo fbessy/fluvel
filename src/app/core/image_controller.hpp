@@ -145,10 +145,10 @@ private:
     QImage processedImage_;
 
     /// Display configuration.
-    DisplayConfig displayConfig_;
+    DisplayConfig displayConfig_{};
 
     /// Processing configuration.
-    ImageComputeConfig computeConfig_;
+    ImageComputeConfig computeConfig_{};
 
     /// Active contour processing worker.
     ActiveContourWorker activeContourWorker_;
