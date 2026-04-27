@@ -1,5 +1,6 @@
 stages:
   - build
+  - package
   - doc
   - pages
 
@@ -43,6 +44,29 @@ build:
     - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR
     - cmake --build build
 
+flatpak:
+  stage: package
+  image: ubuntu:24.04
+
+  before_script:
+    - apt update
+    - apt install -y flatpak flatpak-builder
+    - flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+  script:
+    # Build
+    - flatpak-builder --force-clean build-flatpak packaging/flatpak/fluvel.json
+
+    # Create local repo
+    - flatpak build-export repo build-flatpak
+
+    # Create bundle
+    - flatpak build-bundle repo fluvel-v1.0.flatpak org.fluvel.App
+
+  artifacts:
+    paths:
+      - fluvel.flatpak
+
 doc:
   stage: doc
   image: ubuntu:24.04
@@ -76,3 +100,4 @@ pages:
 
   only:
     - master
+
