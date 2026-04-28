@@ -131,14 +131,12 @@ appimage:
     - rsync -a "$QT_ROOT/plugins/" qt-plugins/ --exclude "imageformats/libqtiff.so*"
     - export QT_PLUGIN_PATH="$CI_PROJECT_DIR/qt-plugins"
 
+    - export APPIMAGE_EXTRACT_AND_RUN=1
+    - export LINUXDEPLOY_PLUGIN_PATH="$CI_PROJECT_DIR/tools"
+    - chmod +x tools/*.AppImage
+
     # Build AppImage
-    - ./tools/linuxdeploy-x86_64.AppImage \
-        --appdir AppDir \
-        --executable AppDir/usr/bin/fluvel \
-        --desktop-file AppDir/fluvel.desktop \
-        --icon-file AppDir/fluvel.png \
-        --plugin qt \
-        --output appimage
+    - ./tools/linuxdeploy-x86_64.AppImage --appdir AppDir --executable AppDir/usr/bin/fluvel --desktop-file AppDir/fluvel.desktop --icon-file AppDir/fluvel.png --plugin qt --output appimage
 
     - mv *.AppImage fluvel-${APP_VERSION}-x86_64.AppImage
 
