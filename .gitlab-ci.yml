@@ -129,10 +129,13 @@ appimage:
     # Filter Qt plugins (no TIFF)
     - mkdir -p qt-plugins
     - rsync -a "$QT_ROOT/plugins/" qt-plugins/ --exclude "imageformats/libqtiff.so*"
-    - export QT_PLUGIN_PATH="$CI_PROJECT_DIR/qt-plugins"
 
+    - export QT_PLUGIN_PATH="$CI_PROJECT_DIR/qt-plugins"
     - export APPIMAGE_EXTRACT_AND_RUN=1
     - export LINUXDEPLOY_PLUGIN_PATH="$CI_PROJECT_DIR/tools"
+
+    - export LD_LIBRARY_PATH="$QT_ROOT/lib:$LD_LIBRARY_PATH"
+
     - chmod +x tools/*.AppImage
 
     # Build AppImage
