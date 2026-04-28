@@ -82,7 +82,7 @@ appimage:
 
   before_script:
     - apt update
-    - apt install -y wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libpulse0 libdbus-1-3
+    - apt install -y wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libxkbcommon-x11-0 libpulse0 libdbus-1-3
     - pip install aqtinstall --break-system-packages
 
     # Install Qt (cache partagé avec build)
