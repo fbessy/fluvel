@@ -21,7 +21,7 @@ LRELEASE=$(command -v lrelease || true)
 if [ -z "$LUPDATE" ] || [ -z "$LRELEASE" ]; then
     echo "❌ Qt tools not found in PATH"
     echo "👉 You can fix it with:"
-    echo "   export PATH=\$HOME/Qt/6.10.2/gcc_64/bin:\$PATH"
+    echo "   export PATH=\$HOME/Qt/6.11.0/gcc_64/bin:\$PATH"
     exit 1
 fi
 
