@@ -7,6 +7,7 @@ stages:
 variables:
   QT_VERSION: "6.9.1"
   QT_ARCH: "gcc_64"
+  APP_VERSION: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
 
 
 build:
@@ -60,13 +61,91 @@ flatpak:
     - flatpak install -y flathub org.kde.Sdk//6.9
 
   script:
+
+    - echo "Version = ${APP_VERSION}"
+
     - flatpak-builder --force-clean build-flatpak packaging/flatpak/fluvel.json
     - flatpak build-export repo build-flatpak
-    - flatpak build-bundle repo fluvel.flatpak org.fluvel.App
+    - flatpak build-bundle repo fluvel-${APP_VERSION}-x86_64.flatpak org.fluvel.App
 
   artifacts:
     paths:
       - fluvel.flatpak
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "release"'
+
+
+appimage:
+  stage: package
+  image: ubuntu:24.04
+
+  before_script:
+    - apt update
+    - apt install -y python3-pip cmake ninja-build build-essential wget file rsync
+
+    - pip install aqtinstall --break-system-packages
+
+    # Install Qt (cache partagé avec build)
+    - |
+      if [ ! -d "$HOME/Qt/$QT_VERSION/$QT_ARCH" ]; then
+        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 \
+          -O $HOME/Qt \
+          -m qtmultimedia
+      fi
+
+    # Qt env
+    - export QT_ROOT="$HOME/Qt/$QT_VERSION/$QT_ARCH"
+    - export PATH="$QT_ROOT/bin:$PATH"
+    - export Qt6_DIR="$QT_ROOT/lib/cmake/Qt6"
+    - export CMAKE_PREFIX_PATH="$QT_ROOT/lib/cmake"
+
+    # linuxdeploy
+    - mkdir -p tools
+    - wget -O tools/linuxdeploy-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+    - wget -O tools/linuxdeploy-plugin-qt-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+    - chmod +x tools/*.AppImage
+
+  script:
+
+    - echo "Version = ${APP_VERSION}"
+
+    # Clean env (important pour éviter mélange Qt)
+    - unset LD_LIBRARY_PATH
+    - unset QT_PLUGIN_PATH
+    - unset QML2_IMPORT_PATH
+
+    # Build
+    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build
+
+    # Install into AppDir
+    - mkdir -p AppDir
+    - cmake --install build --prefix AppDir/usr
+
+    # Desktop + icon
+    - cp packaging/appimage/fluvel.desktop AppDir/
+    - cp packaging/appimage/fluvel.png AppDir/
+
+    # Filter Qt plugins (no TIFF)
+    - mkdir -p qt-plugins
+    - rsync -a "$QT_ROOT/plugins/" qt-plugins/ --exclude "imageformats/libqtiff.so*"
+    - export QT_PLUGIN_PATH="$CI_PROJECT_DIR/qt-plugins"
+
+    # Build AppImage
+    - ./tools/linuxdeploy-x86_64.AppImage \
+        --appdir AppDir \
+        --executable AppDir/usr/bin/fluvel \
+        --desktop-file AppDir/fluvel.desktop \
+        --icon-file AppDir/fluvel.png \
+        --plugin qt \
+        --output appimage
+
+    - mv *.AppImage fluvel-${APP_VERSION}-x86_64.AppImage
+
+  artifacts:
+    paths:
+      - ./*.AppImage
 
   rules:
     - if: '$CI_COMMIT_BRANCH == "release"'
