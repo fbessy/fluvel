@@ -8,6 +8,7 @@ variables:
   QT_VERSION: "6.9.1"
   QT_ARCH: "gcc_64"
 
+
 build:
   stage: build
   image: ubuntu:24.04
@@ -44,6 +45,7 @@ build:
     - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release
     - cmake --build build
 
+
 flatpak:
   stage: package
   image: ubuntu:24.04
@@ -66,6 +68,10 @@ flatpak:
     paths:
       - fluvel.flatpak
 
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "release"'
+
+
 doc:
   stage: doc
   image: ubuntu:24.04
@@ -81,9 +87,9 @@ doc:
   artifacts:
     paths:
       - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "release"'
 
-  only:
-    - master
 
 pages:
   stage: pages
@@ -97,6 +103,6 @@ pages:
     paths:
       - public
 
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "release"'
 
