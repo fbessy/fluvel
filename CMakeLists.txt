@@ -60,6 +60,17 @@ set(FLUVEL_TRANSLATIONS_DIR
     ${FLUVEL_ROOT_DIR}/translations
 )
 
+set(FLUVEL_PACKAGING_DIR
+    ${FLUVEL_ROOT_DIR}/packaging
+)
+
+set(FLUVEL_INSTALL_BINDIR bin)
+set(FLUVEL_INSTALL_LIBDIR lib)
+set(FLUVEL_INSTALL_DATADIR share)
+
+set(FLUVEL_INSTALL_DESKTOPDIR ${FLUVEL_INSTALL_DATADIR}/applications)
+set(FLUVEL_INSTALL_ICONDIR ${FLUVEL_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
+
 set(QT_COMPONENTS
     Core Gui Multimedia MultimediaWidgets Widgets LinguistTools
 )

@@ -13,12 +13,12 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 SRC="$ROOT_DIR/resources/icons/app/fluvel.svg"
 
 ICON_DIR="$ROOT_DIR/resources/icons/app"
-PLATFORM_DIR="$ROOT_DIR/resources/platforms"
+PACKAGING_DIR="$ROOT_DIR/packaging"
 
-WIN_DIR="$PLATFORM_DIR/windows"
-MAC_DIR="$PLATFORM_DIR/macos"
-LINUX_DIR="$PLATFORM_DIR/linux"
-ANDROID_RES="$PLATFORM_DIR/android/res"
+WIN_DIR="$PACKAGING_DIR/windows"
+MAC_DIR="$PACKAGING_DIR/macos"
+LINUX_DIR="$PACKAGING_DIR/linux"
+ANDROID_RES="$PACKAGING_DIR/android/res"
 
 TMP="$ROOT_DIR/.icon_tmp"
 
@@ -102,7 +102,7 @@ png2icns "$MAC_DIR/Fluvel.icns" \
 # =========================
 echo "Generating Flatpak/Linux icon..."
 
-cp "$SRC" "$LINUX_DIR/org.fluvel.Fluvel.svg"
+cp "$SRC" "$LINUX_DIR/org.fluvel.App.svg"
 
 # =========================
 # Android

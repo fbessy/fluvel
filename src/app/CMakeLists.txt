@@ -177,7 +177,7 @@ if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE Fluvel.icns)
 
     set(app_icon_macos
-        ${FLUVEL_RESOURCES_DIR}/resources/platforms/macos/Fluvel.icns
+        ${FLUVEL_PACKAGING_DIR}/macos/Fluvel.icns
     )
 
     set_source_files_properties(${app_icon_macos} PROPERTIES
@@ -192,7 +192,7 @@ if(APPLE)
 
 elseif(WIN32)
     set(app_icon_resource_windows
-        ${FLUVEL_RESOURCES_DIR}/resources/platforms/windows/fluvel.rc
+        ${FLUVEL_PACKAGING_DIR}/windows/fluvel.rc
     )
 
     target_sources(${target_name} PRIVATE
@@ -277,7 +277,7 @@ qt_add_resources(${target_name} app_resources
 
 if(APPLE AND NOT IOS)
     set_target_properties(${target_name} PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST "${FLUVEL_RESOURCES_DIR}/platforms/macos/Info.plist.in"
+        MACOSX_BUNDLE_INFO_PLIST "${FLUVEL_PACKAGING_DIR}/macos/Info.plist.in"
     )
 endif()
 
@@ -388,7 +388,7 @@ add_compile_definitions(
 
 if(ANDROID)
     set_target_properties(${target_name} PROPERTIES
-        QT_ANDROID_PACKAGE_SOURCE_DIR ${FLUVEL_RESOURCES_DIR}/platforms/android
+        QT_ANDROID_PACKAGE_SOURCE_DIR ${FLUVEL_PACKAGING_DIR}/android
         #QT_ANDROID_APP_NAME ${target_name}
         #QT_ANDROID_APP_LIB_NAME ${target_name}
         #QT_ANDROID_PACKAGE_NAME "org.fluvel.app"
@@ -408,11 +408,13 @@ endif()
 
 
 if(UNIX AND NOT APPLE AND NOT ANDROID)
-    install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.desktop
-            DESTINATION share/applications)
+    install(FILES
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.desktop
+        DESTINATION ${FLUVEL_INSTALL_DESKTOPDIR})
 
-    install(FILES ${CMAKE_SOURCE_DIR}/resources/platforms/linux/org.fluvel.App.svg
-            DESTINATION share/icons/hicolor/scalable/apps)
+    install(FILES
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.svg
+        DESTINATION ${FLUVEL_INSTALL_ICONDIR})
 endif()
 
 # target_compile_features(my_target PUBLIC cxx_std_23) au lieu de global dans le fichier projet

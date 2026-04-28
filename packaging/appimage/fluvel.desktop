@@ -1,0 +1,19 @@
+[Desktop Entry]
+Categories=Graphics;Science;
+Comment[fr_FR]=Explorer la segmentation d'images avec visualisation interactive et en temps réel
+Comment=Explorer la segmentation d'images avec visualisation interactive et en temps réel
+Exec=fluvel
+GenericName[fr_FR]=Vision par ordinateur et analyse d’images en temps réel pour la recherche
+GenericName=Vision par ordinateur et analyse d’images en temps réel pour la recherche
+Icon=fluvel
+MimeType=
+Name[fr_FR]=Fluvel
+Name=Fluvel
+Path=
+StartupNotify=true
+StartupWMClass=fluvel
+Terminal=false
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=
