@@ -19,27 +19,14 @@ check_version:
   script:
     - echo "Checking version consistency..."
 
-    # Vérification format du tag
-    - |
-      if [[ ! "$CI_COMMIT_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        echo "ERROR: Invalid tag format (expected vX.Y.Z)"
-        exit 1
-      fi
-
-    # extraire version depuis CMakeLists.txt
     - VERSION_IN_CODE=$(grep -oP 'project\(.*VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
-
-    # enlever le "v" du tag (ex: v1.0.0 → 1.0.0)
     - TAG_VERSION=${CI_COMMIT_TAG#v}
 
     - echo "CMake version: $VERSION_IN_CODE"
     - echo "Tag version: $TAG_VERSION"
 
-    - |
-      if [ "$VERSION_IN_CODE" != "$TAG_VERSION" ]; then
-        echo "ERROR: Version mismatch!"
-        exit 1
-      fi
+    - if [[ ! "$CI_COMMIT_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then echo "Invalid tag format"; exit 1; fi
+    - if [ "$VERSION_IN_CODE" != "$TAG_VERSION" ]; then echo "ERROR: Version mismatch!"; exit 1; fi
 
   rules:
     - if: '$CI_COMMIT_TAG'
