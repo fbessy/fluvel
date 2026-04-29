@@ -9,7 +9,6 @@ stages:
 variables:
   QT_VERSION: "6.9.1"
   QT_ARCH: "gcc_64"
-  APP_VERSION: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
 
 
 check_version:
@@ -100,8 +99,9 @@ flatpak:
     - flatpak install -y flathub org.kde.Sdk//6.9
 
   script:
-
-    - echo "Version = ${APP_VERSION}"
+    - APP_VERSION=${CI_COMMIT_TAG#v}
+    - APP_VERSION=${APP_VERSION:-$CI_COMMIT_SHORT_SHA}
+    - echo "Version = $APP_VERSION"
 
     - sed -i "s/__CI_COMMIT__/$CI_COMMIT_SHORT_SHA/g" packaging/flatpak/fluvel.json
 
@@ -160,7 +160,9 @@ appimage:
     - chmod +x tools/*.AppImage
 
   script:
-    - echo "Version = ${APP_VERSION}"
+    - APP_VERSION=${CI_COMMIT_TAG#v}
+    - APP_VERSION=${APP_VERSION:-$CI_COMMIT_SHORT_SHA}
+    - echo "Version = $APP_VERSION"
 
     # Clean env (important pour éviter mélange Qt)
     - unset LD_LIBRARY_PATH
@@ -168,7 +170,7 @@ appimage:
     - unset QML2_IMPORT_PATH
 
     # Build
-    - cmake --fresh -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF -DFLUVEL_GIT_COMMIT=$CI_COMMIT_SHORT_SHA -DFLUVEL_BUILD_ORIGIN="GitLab Runner"
+    - cmake --fresh -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF -DFLUVEL_GIT_COMMIT=$CI_COMMIT_SHORT_SHA -DFLUVEL_BUILD_ORIGIN="GitLab CI"
     - cmake --build build
 
     # Install into AppDir
