@@ -368,22 +368,38 @@ target_link_libraries(${target_name} PRIVATE
 )
 
 
+# fallback si CI ne fournit pas le commit
+if(NOT FLUVEL_GIT_COMMIT)
+    execute_process(
+        COMMAND git rev-parse --short HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE FLUVEL_GIT_COMMIT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
 
-execute_process(
-    COMMAND git rev-parse --short HEAD
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE FLUVEL_GIT_COMMIT
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+if(NOT FLUVEL_GIT_COMMIT)
+    set(FLUVEL_GIT_COMMIT "unknown")
+endif()
+
+message(STATUS "Commit: ${FLUVEL_GIT_COMMIT}")
+
+add_definitions(-DFLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}")
 
 string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+
+# --- Build origin (CI / Local / fallback) ---
+if(NOT FLUVEL_BUILD_ORIGIN)
+    set(FLUVEL_BUILD_ORIGIN "Local")
+endif()
 
 add_compile_definitions(
     FLUVEL_VERSION="${PROJECT_VERSION}"
     FLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}"
     FLUVEL_BUILD_TIMESTAMP="${FLUVEL_BUILD_TIMESTAMP}"
     FLUVEL_CMAKE_VERSION="${CMAKE_VERSION}"
-    FLUVEL_BUILD_TYPE="${CMAKE_BUILD_TYPE}"
+    FLUVEL_BUILD_ORIGIN="${FLUVEL_BUILD_ORIGIN}"
 )
 
 if(ANDROID)

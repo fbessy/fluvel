@@ -25,18 +25,29 @@ namespace
 
 constexpr auto kProjectUrl = "https://fabienip.gitlab.io/fluvel/";
 
-static QString packageType()
+QString buildType =
+#ifdef QT_DEBUG
+    "Debug";
+#else
+    "Release";
+#endif
+
+QString packageType()
 {
 #ifdef FLUVEL_PACKAGE_TYPE
     return QString(FLUVEL_PACKAGE_TYPE);
 #else
     if (qEnvironmentVariableIsSet("FLATPAK_ID"))
         return "Flatpak";
+
+    if (qEnvironmentVariableIsSet("APPIMAGE"))
+        return "AppImage";
+
     return "Native";
 #endif
 }
 
-static QString runtimeInfo()
+QString runtimeInfo()
 {
     QString info;
     info += QSysInfo::prettyProductName() + "\n";
@@ -44,7 +55,7 @@ static QString runtimeInfo()
     return info;
 }
 
-static QString compilerInfo()
+QString compilerInfo()
 {
 #if defined(__clang__)
     return QString("Clang %1.%2.%3")
@@ -60,13 +71,13 @@ static QString compilerInfo()
 #endif
 }
 
-static QString buildFingerprint()
+QString buildFingerprint()
 {
     QString data;
 
     data += "Version:" FLUVEL_VERSION "\n";
     data += "Git:" FLUVEL_GIT_COMMIT "\n";
-    data += "BuildType:" FLUVEL_BUILD_TYPE "\n";
+    data += QString("BuildType:%1\n").arg(buildType);
     data += "Qt:" + QString(qVersion()) + "\n";
     data += "Compiler:" + QString(__VERSION__) + "\n";
     data += "CMake:" FLUVEL_CMAKE_VERSION "\n";
@@ -456,9 +467,9 @@ QString AboutWindow::buildTechnicalSection()
 
     html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>" +
             tr("Git commit") + ": " + FLUVEL_GIT_COMMIT + "<br>" + tr("Build type") + ": " +
-            FLUVEL_BUILD_TYPE + "<br>" + tr("Qt (build)") + ": " + QString(QT_VERSION_STR) +
-            "<br>" + tr("Compiler") + ": " + compilerInfo() + "<br>" + tr("CMake") + ": " +
-            FLUVEL_CMAKE_VERSION + "</div>";
+            buildType + "<br>" + tr("Build origin") + ": " + FLUVEL_BUILD_ORIGIN + "<br>" +
+            tr("Qt (build)") + ": " + QString(QT_VERSION_STR) + "<br>" + tr("Compiler") + ": " +
+            compilerInfo() + "<br>" + tr("CMake") + ": " + FLUVEL_CMAKE_VERSION + "</div>";
 
     // =========================
     // Fingerprint

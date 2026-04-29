@@ -17,6 +17,11 @@
     {
       "name": "fluvel",
       "buildsystem": "cmake-ninja",
+      "config-opts": [
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DFLUVEL_BUILD_ORIGIN=GitLab Runner",
+        "-DFLUVEL_GIT_COMMIT=__CI_COMMIT__"
+      ],
       "sources": [
         {
           "type": "dir",

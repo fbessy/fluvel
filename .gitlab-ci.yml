@@ -1,4 +1,5 @@
 stages:
+  - verify
   - build
   - package
   - doc
@@ -10,6 +11,38 @@ variables:
   QT_ARCH: "gcc_64"
   APP_VERSION: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
 
+
+check_version:
+  stage: verify
+  image: ubuntu:24.04
+
+  script:
+    - echo "Checking version consistency..."
+
+    # Vérification format du tag
+    - |
+      if [[ ! "$CI_COMMIT_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "ERROR: Invalid tag format (expected vX.Y.Z)"
+        exit 1
+      fi
+
+    # extraire version depuis CMakeLists.txt
+    - VERSION_IN_CODE=$(grep -oP 'project\(.*VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
+
+    # enlever le "v" du tag (ex: v1.0.0 → 1.0.0)
+    - TAG_VERSION=${CI_COMMIT_TAG#v}
+
+    - echo "CMake version: $VERSION_IN_CODE"
+    - echo "Tag version: $TAG_VERSION"
+
+    - |
+      if [ "$VERSION_IN_CODE" != "$TAG_VERSION" ]; then
+        echo "ERROR: Version mismatch!"
+        exit 1
+      fi
+
+  rules:
+    - if: '$CI_COMMIT_TAG'
 
 
 build:
@@ -48,7 +81,7 @@ build:
     - echo "Qt6_DIR=$Qt6_DIR"
 
   script:
-    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF
+    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF -DFLUVEL_GIT_COMMIT=$CI_COMMIT_SHORT_SHA -DFLUVEL_BUILD_ORIGIN="GitLab CI"
     - cmake --build build
 
   after_script:
@@ -80,6 +113,8 @@ flatpak:
 
     - echo "Version = ${APP_VERSION}"
 
+    - sed -i "s/__CI_COMMIT__/$CI_COMMIT_SHORT_SHA/g" packaging/flatpak/fluvel.json
+
     - flatpak-builder --force-clean build-flatpak packaging/flatpak/fluvel.json
     - flatpak build-export repo build-flatpak
     - flatpak build-bundle repo fluvel-${APP_VERSION}-x86_64.flatpak org.fluvel.App
@@ -107,19 +142,9 @@ appimage:
     key: "qt-${QT_VERSION}-${QT_ARCH}"
     paths:
       - $HOME/Qt
-      - $HOME/.ccache
 
   before_script:
     - apt update
-
-    - apt install -y ccache
-
-    - export CC="gcc"
-    - export CXX="g++"
-    - export CMAKE_CXX_COMPILER_LAUNCHER=ccache
-    - export CMAKE_C_COMPILER_LAUNCHER=ccache
-    - export CCACHE_DIR="$HOME/.ccache"
-    - export CCACHE_MAXSIZE=500M
 
     - apt install -y file wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libxkbcommon-x11-0 libxcb1 libxcb-util1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-image0 libxcb-xinerama0 libxcb-shape0 libxcb-randr0 libxrandr2 libpulse0 libdbus-1-3 libx11-6 libxext6 libxrender1 libxi6 libxfixes3 libxcomposite1 libxcursor1 libxdamage1 libxtst6 libsm6 libice6 libfontconfig1 libfreetype6 libegl1 libwayland-client0
     - pip install aqtinstall --break-system-packages
@@ -153,7 +178,7 @@ appimage:
     - unset QML2_IMPORT_PATH
 
     # Build
-    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF
+    - cmake --fresh -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF -DFLUVEL_GIT_COMMIT=$CI_COMMIT_SHORT_SHA -DFLUVEL_BUILD_ORIGIN="GitLab Runner"
     - cmake --build build
 
     # Install into AppDir
