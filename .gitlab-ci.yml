@@ -4,10 +4,12 @@ stages:
   - doc
   - pages
 
+
 variables:
   QT_VERSION: "6.9.1"
   QT_ARCH: "gcc_64"
   APP_VERSION: "${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}"
+
 
 
 build:
@@ -15,13 +17,19 @@ build:
   image: ubuntu:24.04
 
   cache:
-    key: qt-cache
+    key: "qt-${QT_VERSION}-${QT_ARCH}"
     paths:
       - $HOME/Qt
+      - $HOME/.ccache
 
   before_script:
     - apt update
-    - apt install -y python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglib2.0-0 libxkbcommon0 libpulse0 libdbus-1-3 libglu1-mesa
+    - apt install -y ccache python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglib2.0-0 libxkbcommon0 libpulse0 libdbus-1-3 libglu1-mesa
+
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
+    - export CCACHE_DIR="$HOME/.ccache"
+    - export CCACHE_MAXSIZE=500M
 
     - pip install aqtinstall --break-system-packages
 
@@ -46,6 +54,17 @@ build:
     - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release
     - cmake --build build
 
+  after_script:
+      - ccache --show-stats
+
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "release" && $CI_COMMIT_TAG == null'
+      changes:
+        - src/**/*
+        - resources/**/*
+        - CMakeLists.txt
+        - .gitlab-ci.yml
+
 
 flatpak:
   stage: package
@@ -55,6 +74,8 @@ flatpak:
     - apt update
     - apt install -y flatpak flatpak-builder
     - flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+    - flatpak install -y flathub org.freedesktop.Sdk.Extension.ccache
 
     # 🔥 IMPORTANT : installer runtime + sdk
     - flatpak install -y flathub org.kde.Platform//6.9
@@ -70,19 +91,40 @@ flatpak:
 
   artifacts:
     paths:
-      - fluvel.flatpak
+      - "*.flatpak"
 
   rules:
+    - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH == "release"'
+      changes:
+        - src/**/*
+        - resources/**/*
+        - packaging/flatpak/**/*
+        - CMakeLists.txt
+        - .gitlab-ci.yml
 
 
 appimage:
   stage: package
   image: ubuntu:24.04
 
+  cache:
+    key: "qt-${QT_VERSION}-${QT_ARCH}"
+    paths:
+      - $HOME/Qt
+      - $HOME/.ccache
+
   before_script:
     - apt update
-    - apt install -y wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libxkbcommon-x11-0 libxcb1 libxcb-util1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-image0 libxcb-xinerama0 libxcb-shape0 libxcb-randr0 libxrandr2 libpulse0 libdbus-1-3
+
+    - apt install -y ccache
+
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
+    - export CCACHE_DIR="$HOME/.ccache"
+    - export CCACHE_MAXSIZE=500M
+
+    - apt install -y wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libxkbcommon-x11-0 libxcb1 libxcb-util1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-image0 libxcb-xinerama0 libxcb-shape0 libxcb-randr0 libxrandr2 libpulse0 libdbus-1-3 libx11-6 libxext6 libxrender1 libxi6 libxfixes3 libxcomposite1 libxcursor1 libxdamage1 libxtst6 libsm6 libice6 libfontconfig1 libfreetype6 libegl1 libwayland-client0
     - pip install aqtinstall --break-system-packages
 
     # Install Qt (cache partagé avec build)
@@ -148,12 +190,31 @@ appimage:
       - ./*.AppImage
 
   rules:
+    - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH == "release"'
+      changes:
+        - src/**/*
+        - resources/**/*
+        - packaging/appimage/**/*
+        - CMakeLists.txt
+        - .gitlab-ci.yml
 
+
+.doc_rules: &doc_rules
+  rules:
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == "release"'
+      changes:
+        - src/**/*
+        - docs/images/**/*
+        - Doxyfile
+        - README.md
+        - .gitlab-ci.yml
 
 doc:
   stage: doc
   image: ubuntu:24.04
+  <<: *doc_rules
 
   before_script:
     - apt update
@@ -166,14 +227,13 @@ doc:
   artifacts:
     paths:
       - public
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "release"'
 
 
 pages:
   stage: pages
   dependencies:
     - doc
+  <<: *doc_rules
 
   script:
     - echo "Deploying GitLab Pages"
@@ -181,7 +241,4 @@ pages:
   artifacts:
     paths:
       - public
-
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "release"'
 
