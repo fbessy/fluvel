@@ -121,7 +121,7 @@ appimage:
     - export CCACHE_DIR="$HOME/.ccache"
     - export CCACHE_MAXSIZE=500M
 
-    - apt install -y wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libxkbcommon-x11-0 libxcb1 libxcb-util1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-image0 libxcb-xinerama0 libxcb-shape0 libxcb-randr0 libxrandr2 libpulse0 libdbus-1-3 libx11-6 libxext6 libxrender1 libxi6 libxfixes3 libxcomposite1 libxcursor1 libxdamage1 libxtst6 libsm6 libice6 libfontconfig1 libfreetype6 libegl1 libwayland-client0
+    - apt install -y file wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libxkbcommon-x11-0 libxcb1 libxcb-util1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-image0 libxcb-xinerama0 libxcb-shape0 libxcb-randr0 libxrandr2 libpulse0 libdbus-1-3 libx11-6 libxext6 libxrender1 libxi6 libxfixes3 libxcomposite1 libxcursor1 libxdamage1 libxtst6 libsm6 libice6 libfontconfig1 libfreetype6 libegl1 libwayland-client0
     - pip install aqtinstall --break-system-packages
 
     # Install Qt (cache partagé avec build)
