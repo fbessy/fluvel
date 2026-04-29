@@ -22,8 +22,8 @@ check_version:
     - TAG_VERSION=${CI_COMMIT_TAG#v}
     - echo "CMake version: $VERSION_IN_CODE"
     - echo "Tag version: $TAG_VERSION"
-    - "if [[ ! \"$CI_COMMIT_TAG\" =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+$ ]]; then echo \"Invalid tag format\"; exit 1; fi"
-    - "if [ \"$VERSION_IN_CODE\" != \"$TAG_VERSION\" ]; then echo \"ERROR: Version mismatch!\"; exit 1; fi"
+    - if ! echo "$CI_COMMIT_TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then echo "ERROR: Invalid tag format"; exit 1; fi
+    - if [ "$VERSION_IN_CODE" != "$TAG_VERSION" ]; then echo "ERROR: Version mismatch!"; exit 1; fi
 
   rules:
     - if: '$CI_COMMIT_TAG'
