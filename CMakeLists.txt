@@ -14,7 +14,14 @@ option(ENABLE_ASAN "Enable Sanitizers" OFF)
 option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
 
 if(ENABLE_UNITY_BUILD)
-    set(CMAKE_UNITY_BUILD ON)
+    set(CMAKE_UNITY_BUILD OFF)
+endif()
+
+find_program(CCACHE_PROGRAM ccache)
+if(CCACHE_PROGRAM)
+    message(STATUS "ccache found: ${CCACHE_PROGRAM}")
+    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
 endif()
 
 if(ENABLE_ASAN)

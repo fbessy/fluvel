@@ -51,7 +51,7 @@ build:
     - echo "Qt6_DIR=$Qt6_DIR"
 
   script:
-    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release
+    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF
     - cmake --build build
 
   after_script:
@@ -117,8 +117,10 @@ appimage:
 
     - apt install -y ccache
 
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
+    - export CC="gcc"
+    - export CXX="g++"
+    - export CMAKE_CXX_COMPILER_LAUNCHER=ccache
+    - export CMAKE_C_COMPILER_LAUNCHER=ccache
     - export CCACHE_DIR="$HOME/.ccache"
     - export CCACHE_MAXSIZE=500M
 
@@ -155,7 +157,9 @@ appimage:
     - unset QML2_IMPORT_PATH
 
     # Build
-    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release
+
+script:
+    - cmake -S . -B build -G Ninja -DQt6_DIR=$Qt6_DIR -DCMAKE_BUILD_TYPE=Release -DCMAKE_UNITY_BUILD=OFF
     - cmake --build build
 
     # Install into AppDir
