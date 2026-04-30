@@ -66,15 +66,14 @@ jobs:
 
       - name: Resolve app path
         run: |
-          if [ -d "build/Fluvel.app" ]; then
-            APP_PATH="build/Fluvel.app"
-          elif [ -d "build/Release/Fluvel.app" ]; then
-            APP_PATH="build/Release/Fluvel.app"
-          else
+          APP_PATH=$(find build -name "Fluvel.app" -type d | head -n 1)
+
+          if [ -z "$APP_PATH" ]; then
             echo "❌ Fluvel.app not found"
-            ls -R build
+            find build -name "*.app"
             exit 1
           fi
+
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
           echo "Using $APP_PATH"
 
@@ -88,7 +87,14 @@ jobs:
       # Deploy Qt
       - name: Deploy Qt
         run: |
-          "${{ env.Qt6_DIR }}/../../../bin/macdeployqt" "${{ env.APP_PATH }}" -verbose=2
+          "${{ env.Qt6_DIR }}/bin/macdeployqt" "${{ env.APP_PATH }}" -verbose=2
+
+      - name: Check macdeployqt
+        run: |
+          if [ ! -x "${{ env.Qt6_DIR }}/bin/macdeployqt" ]; then
+            echo "❌ macdeployqt not found"
+            exit 1
+          fi
 
       - name: Create DMG
         run: |

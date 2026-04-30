@@ -63,7 +63,12 @@ jobs:
       - name: Deploy Qt
         shell: pwsh
         run: |
-          & "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" --release build\src\app\Release\Fluvel.exe
+          & "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" --release Qt6_DIR/bin/windeployqt.exe
+
+      - name: Check deployed files
+        shell: pwsh
+        run: |
+          dir build\src\app\Release
 
       - name: Check deployed files
         run: dir build\src\app\Release
