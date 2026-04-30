@@ -14,7 +14,7 @@ WizardStyle=modern
 SetupIconFile=packaging\windows\Fluvel.ico
 
 ; 🔥 Licence dynamique selon langue
-LicenseFile={code:GetLicenseFile}
+LicenseFile=packaging\windows\Licence_CeCILL_V2.1-en.txt
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -43,10 +43,18 @@ Filename: "{app}\Fluvel.exe"; Description: "Launch Fluvel"; Flags: nowait postin
 
 [Code]
 
-function GetLicenseFile(Param: String): String;
+procedure CurPageChanged(CurPageID: Integer);
+var
+  LicensePath: String;
 begin
-  if ActiveLanguage = 'french' then
-    Result := ExpandConstant('{src}\packaging\windows\Licence_CeCILL_V2.1-fr.txt')
-  else
-    Result := ExpandConstant('{src}\packaging\windows\Licence_CeCILL_V2.1-en.txt');
+  if CurPageID = wpLicense then
+  begin
+    if ActiveLanguage = 'french' then
+      LicensePath := ExpandConstant('{src}\packaging\windows\Licence_CeCILL_V2.1-fr.txt')
+    else
+      LicensePath := ExpandConstant('{src}\packaging\windows\Licence_CeCILL_V2.1-en.txt');
+
+    if FileExists(LicensePath) then
+      WizardForm.LicenseMemo.Lines.LoadFromFile(LicensePath);
+  end;
 end;
