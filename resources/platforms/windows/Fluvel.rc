@@ -1,4 +1,4 @@
-IDI_ICON1 ICON "fluvel.ico"
+IDI_ICON1 ICON "Fluvel.ico"
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION 1,0,0,0
@@ -9,7 +9,7 @@ VS_VERSION_INFO VERSIONINFO
 #else
  FILEFLAGS 0x0L
 #endif
- FILEOS 0x4L
+ FILEOS 0x40004L
  FILETYPE 0x1L
  FILESUBTYPE 0x0L
 BEGIN
@@ -17,10 +17,12 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
+            VALUE "CompanyName", "Fluvel\0"
             VALUE "FileDescription", "Fluvel Application\0"
             VALUE "FileVersion", "1.0.0.0\0"
             VALUE "ProductName", "Fluvel\0"
             VALUE "ProductVersion", "1.0.0.0\0"
+            VALUE "OriginalFilename", "Fluvel.exe\0"
         END
     END
     BLOCK "VarFileInfo"

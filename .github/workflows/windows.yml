@@ -104,9 +104,17 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup -y
 
+      - name: Check installer script
+        shell: pwsh
+        run: |
+          if (!(Test-Path "packaging/windows/installer.iss")) {
+            Write-Error "installer.iss not found"
+            exit 1
+          }
+
       # Build installer
       - name: Build installer
-        run: iscc installer.iss
+        run: iscc packaging/windows/installer.iss
 
       # Check installer output
       - name: Check installer output
