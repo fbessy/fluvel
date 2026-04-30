@@ -1,0 +1,68 @@
+name: Fluvel macOS Release
+
+on:
+  push:
+    branches: [release]
+    tags: ['v*']
+
+jobs:
+  macos:
+    runs-on: macos-latest
+
+    steps:
+      # Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Compute version (tag ou commit)
+      - name: Compute version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION = $VERSION"
+
+      # Setup Qt
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.6.0'
+          host: 'mac'
+          target: 'desktop'
+
+      # Configure
+      - name: Configure
+        run: >
+          cmake -B build -S .
+          -DCMAKE_BUILD_TYPE=Release
+          -DFLUVEL_GIT_COMMIT=${{ github.sha }}
+          -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
+          -DFLUVEL_VERSION=${{ env.VERSION }}
+
+      # Build
+      - name: Build
+        run: cmake --build build --config Release
+
+      # Deploy Qt
+      - name: Deploy Qt
+        run: |
+          macdeployqt build/Fluvel.app
+
+      # Create DMG
+      - name: Create DMG
+        run: |
+          mkdir dmg
+          cp -R build/Fluvel.app dmg/
+          hdiutil create Fluvel-${VERSION}-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
+
+      # Upload artifacts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fluvel-macos-${{ env.VERSION }}
+          path: |
+            Fluvel-${{ env.VERSION }}-macos.dmg

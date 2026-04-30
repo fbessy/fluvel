@@ -158,6 +158,10 @@ qt_add_executable(${target_name}
     ${app_src}
     resources.qrc)
 
+set_target_properties(${target_name} PROPERTIES
+    OUTPUT_NAME "Fluvel"
+)
+
 #if(ANDROID)
     # qt_add_qml_module(${target_name}
     #     URI fluvel
@@ -188,6 +192,7 @@ if(APPLE)
 
     set_target_properties(${target_name} PROPERTIES
         MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_BUNDLE_NAME "Fluvel"
     )
 
 elseif(WIN32)
@@ -276,9 +281,19 @@ qt_add_resources(${target_name} app_resources
 )
 
 if(APPLE AND NOT IOS)
-    set_target_properties(${target_name} PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST "${FLUVEL_PACKAGING_DIR}/macos/Info.plist.in"
+
+    configure_file(
+        ${FLUVEL_PACKAGING_DIR}/macos/Info.plist.in
+        ${CMAKE_BINARY_DIR}/Info.plist
+        @ONLY
     )
+
+    set_target_properties(${target_name} PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_BINARY_DIR}/Info.plist"
+    )
+
+    message(STATUS "Using plist: ${CMAKE_BINARY_DIR}/Info.plist")
+
 endif()
 
 target_include_directories(${target_name} PRIVATE
@@ -369,7 +384,7 @@ target_link_libraries(${target_name} PRIVATE
 
 
 # fallback si CI ne fournit pas le commit
-if(NOT FLUVEL_GIT_COMMIT)
+if(NOT DEFINED FLUVEL_GIT_COMMIT OR FLUVEL_GIT_COMMIT STREQUAL "")
     execute_process(
         COMMAND git rev-parse --short HEAD
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -385,8 +400,6 @@ endif()
 
 message(STATUS "Commit: ${FLUVEL_GIT_COMMIT}")
 
-add_definitions(-DFLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}")
-
 string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
 
 # --- Build origin (CI / Local / fallback) ---
@@ -394,7 +407,7 @@ if(NOT FLUVEL_BUILD_ORIGIN)
     set(FLUVEL_BUILD_ORIGIN "Local")
 endif()
 
-add_compile_definitions(
+target_compile_definitions(${target_name} PRIVATE
     FLUVEL_VERSION="${PROJECT_VERSION}"
     FLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}"
     FLUVEL_BUILD_TIMESTAMP="${FLUVEL_BUILD_TIMESTAMP}"

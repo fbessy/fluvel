@@ -2,19 +2,33 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
+
         <key>CFBundleName</key>
         <string>Fluvel</string>
 
         <key>CFBundleDisplayName</key>
         <string>Fluvel</string>
 
+        <key>CFBundleIdentifier</key>
+        <string>org.fluvel.app</string>
+
+        <key>CFBundleExecutable</key>
+        <string>Fluvel</string>
+
         <key>CFBundleVersion</key>
-        <string>1.0</string>
+        <string>@FLUVEL_VERSION@</string>
 
         <key>CFBundleShortVersionString</key>
-        <string>1.0</string>
+        <string>@FLUVEL_VERSION@</string>
+
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+
+        <key>LSMinimumSystemVersion</key>
+        <string>11.0</string>
 
         <key>NSCameraUsageDescription</key>
         <string>Fluvel requires access to the camera for real-time image segmentation.</string>
+
     </dict>
 </plist>
