@@ -49,11 +49,20 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      - name: Check build dir
+        run: |
+          echo "=== build ==="
+          ls build || true
+          echo "=== build/src ==="
+          ls build/src || true
+          echo "=== build/src/app ==="
+          ls build/src/app || true
+
       - name: Check app
         run: ls build
 
       - name: Debug app tree
-        run: ls -R build | head -50
+        run: find build -maxdepth 3
 
       - name: Resolve app path
         run: |

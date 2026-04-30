@@ -39,6 +39,9 @@ jobs:
       - name: Add Qt to PATH
         run: echo "${{ env.Qt6_DIR }}/../../../bin" >> $env:GITHUB_PATH
 
+      - name: Clean build dir
+        run: Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
+
       # Configure (comme GitLab)
       - name: Configure
         run: >
@@ -58,8 +61,9 @@ jobs:
 
       # Deploy Qt
       - name: Deploy Qt
+        shell: pwsh
         run: |
-          "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" --release build\src\app\Release\Fluvel.exe
+          & "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" --release build\src\app\Release\Fluvel.exe
 
       - name: Check deployed files
         run: dir build\src\app\Release
