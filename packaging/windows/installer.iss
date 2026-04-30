@@ -21,7 +21,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"
 
 [Files]
-Source: "build\src\app\Release\*"; DestDir: "{app}"; Flags: recursesubdirs
+Source: "..\..\build\src\app\Release\*"; DestDir: "{app}"; Flags: recursesubdirs
 
 [Icons]
 Name: "{group}\Fluvel"; Filename: "{app}\Fluvel.exe"
