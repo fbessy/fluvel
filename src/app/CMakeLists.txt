@@ -416,23 +416,37 @@ target_compile_definitions(${target_name} PRIVATE
 )
 
 if(ANDROID)
+
+    # --- Android packaging ---
     set_target_properties(${target_name} PROPERTIES
         QT_ANDROID_PACKAGE_SOURCE_DIR ${FLUVEL_PACKAGING_DIR}/android
-        #QT_ANDROID_APP_NAME ${target_name}
-        #QT_ANDROID_APP_LIB_NAME ${target_name}
-        #QT_ANDROID_PACKAGE_NAME "org.fluvel.app"
-        #QT_ANDROID_APP_LIB_NAME fluvel
-        #QT_ANDROID_GUI TRUE
-        #QT_ANDROID_DEPLOYMENT_SETTINGS_FILE
-        #${CMAKE_CURRENT_BINARY_DIR}/android-${target_name}-deployment-settings.json
-        #OUTPUT_NAME "fluvel"
+
+        # --- Options possibles ---
+        # QT_ANDROID_APP_NAME ${target_name}
+        # QT_ANDROID_APP_LIB_NAME ${target_name}
+        # QT_ANDROID_PACKAGE_NAME "org.fluvel.app"
+        # QT_ANDROID_GUI TRUE
+        # QT_ANDROID_DEPLOYMENT_SETTINGS_FILE
+        # ${CMAKE_CURRENT_BINARY_DIR}/android-${target_name}-deployment-settings.json
+        # OUTPUT_NAME "fluvel"
     )
+
+elseif(APPLE)
+
+    # --- macOS bundle install ---
+    install(TARGETS ${target_name}
+        BUNDLE DESTINATION .
+    )
+
 else()
+
+    # --- Linux / Windows install ---
     install(TARGETS ${target_name}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
     )
+
 endif()
 
 

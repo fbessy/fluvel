@@ -54,18 +54,20 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Check exe
-        run: dir build\Release
+        run: dir build\src\app\Release
 
       # Deploy Qt
       - name: Deploy Qt
         run: |
-          "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" build\Release\Fluvel.exe
+          "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" build\src\app\Release\Fluvel.exe
 
       # ZIP (comme AppImage naming)
       - name: Zip package
         shell: pwsh
         run: |
-          Compress-Archive -Path build\Release\* -DestinationPath Fluvel-${{ env.VERSION }}-win64.zip
+          mkdir package
+          Copy-Item -Recurse build\src\app\Release\* package\
+          Compress-Archive -Path package\* -DestinationPath Fluvel-${{ env.VERSION }}-win64.zip
 
       # Install Inno Setup
       - name: Install Inno Setup
