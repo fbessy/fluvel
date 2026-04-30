@@ -58,9 +58,6 @@ jobs:
           echo "=== build/src/app ==="
           ls build/src/app || true
 
-      - name: Check app
-        run: ls build
-
       - name: Debug app tree
         run: find build -maxdepth 3
 
@@ -79,7 +76,7 @@ jobs:
 
       - name: Check macdeployqt
         run: |
-          if [ ! -x "${{ env.Qt6_DIR }}/../../../bin/macdeployqt" ]; then
+          if [ ! -x "${{ env.Qt6_DIR }}/bin/macdeployqt" ]; then
             echo "❌ macdeployqt not found"
             exit 1
           fi
@@ -87,14 +84,11 @@ jobs:
       # Deploy Qt
       - name: Deploy Qt
         run: |
-          "${{ env.Qt6_DIR }}/bin/macdeployqt" "${{ env.APP_PATH }}" -verbose=2
+          "${{ env.Qt6_DIR }}/bin/macdeployqt" "${{ env.APP_PATH }}" -verbose=2 -codesign=off
 
-      - name: Check macdeployqt
+      - name: Check Qt bin
         run: |
-          if [ ! -x "${{ env.Qt6_DIR }}/bin/macdeployqt" ]; then
-            echo "❌ macdeployqt not found"
-            exit 1
-          fi
+          ls "${{ env.Qt6_DIR }}/bin"
 
       - name: Create DMG
         run: |

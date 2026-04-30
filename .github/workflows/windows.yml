@@ -36,13 +36,13 @@ jobs:
           arch: 'win64_msvc2022_64'
           modules: 'qtmultimedia'
 
-      - name: Add Qt to PATH
-        run: echo "${{ env.Qt6_DIR }}/../../../bin" >> $env:GITHUB_PATH
-
+      # Clean build dir
       - name: Clean build dir
-        run: Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
 
-      # Configure (comme GitLab)
+      # Configure
       - name: Configure
         run: >
           cmake -B build -S .
@@ -56,24 +56,42 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      # Check exe exists
       - name: Check exe
-        run: dir build\src\app\Release
+        shell: pwsh
+        run: |
+          dir build\src\app\Release
+          if (!(Test-Path "build\src\app\Release\Fluvel.exe")) {
+            Write-Error "Fluvel.exe not found!"
+            exit 1
+          }
+
+      # Check windeployqt exists
+      - name: Check windeployqt
+        shell: pwsh
+        run: |
+          if (!(Test-Path "${{ env.Qt6_DIR }}/bin/windeployqt.exe")) {
+            Write-Error "windeployqt not found"
+            exit 1
+          }
 
       # Deploy Qt
       - name: Deploy Qt
         shell: pwsh
         run: |
-          & "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" --release Qt6_DIR/bin/windeployqt.exe
+          & "${{ env.Qt6_DIR }}/bin/windeployqt.exe" --release build\src\app\Release\Fluvel.exe
 
+      # Check deployed files
       - name: Check deployed files
         shell: pwsh
         run: |
           dir build\src\app\Release
+          if (!(Test-Path "build\src\app\Release\platforms\qwindows.dll")) {
+            Write-Error "Missing Qt platform plugin!"
+            exit 1
+          }
 
-      - name: Check deployed files
-        run: dir build\src\app\Release
-
-      # ZIP (comme AppImage naming)
+      # ZIP package
       - name: Zip package
         shell: pwsh
         run: |
@@ -90,10 +108,13 @@ jobs:
       - name: Build installer
         run: iscc installer.iss
 
+      # Check installer output
       - name: Check installer output
-        run: dir Output
+        shell: pwsh
+        run: |
+          dir Output
 
-      # Rename installer avec version
+      # Rename installer
       - name: Rename installer
         shell: pwsh
         run: |
