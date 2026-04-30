@@ -34,16 +34,17 @@ jobs:
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2019_64'
+          modules: 'qtmultimedia'
 
-      # Add Qt to PATH
       - name: Add Qt to PATH
-        run: echo "${{ env.Qt6_DIR }}\bin" >> $env:GITHUB_PATH
+        run: echo "${{ env.Qt6_DIR }}/../../../bin" >> $env:GITHUB_PATH
 
       # Configure (comme GitLab)
       - name: Configure
         run: >
           cmake -B build -S .
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
           -DFLUVEL_GIT_COMMIT=${{ github.sha }}
           -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
           -DFLUVEL_VERSION=${{ env.VERSION }}
@@ -52,14 +53,19 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      - name: Check exe
+        run: dir build\Release
+
       # Deploy Qt
       - name: Deploy Qt
-        run: windeployqt build\Release\Fluvel.exe
+        run: |
+          "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" build\Release\Fluvel.exe
 
       # ZIP (comme AppImage naming)
       - name: Zip package
+        shell: pwsh
         run: |
-          powershell Compress-Archive -Path build\Release\* -DestinationPath Fluvel-${{ env.VERSION }}-win64.zip
+          Compress-Archive -Path build\Release\* -DestinationPath Fluvel-${{ env.VERSION }}-win64.zip
 
       # Install Inno Setup
       - name: Install Inno Setup
@@ -69,10 +75,14 @@ jobs:
       - name: Build installer
         run: iscc installer.iss
 
+      - name: Check installer output
+        run: dir Output
+
       # Rename installer avec version
       - name: Rename installer
+        shell: pwsh
         run: |
-          ren Output\FluvelSetup.exe Fluvel-${{ env.VERSION }}-setup.exe
+          Rename-Item -Path Output\FluvelSetup.exe -NewName Fluvel-${{ env.VERSION }}-setup.exe
 
       # Upload artifacts
       - name: Upload artifacts

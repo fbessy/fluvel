@@ -33,12 +33,14 @@ jobs:
           version: '6.6.0'
           host: 'mac'
           target: 'desktop'
+          modules: 'qtmultimedia'
 
       # Configure
       - name: Configure
         run: >
           cmake -B build -S .
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
           -DFLUVEL_GIT_COMMIT=${{ github.sha }}
           -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
           -DFLUVEL_VERSION=${{ env.VERSION }}
@@ -47,17 +49,45 @@ jobs:
       - name: Build
         run: cmake --build build --config Release
 
+      - name: Check app
+        run: ls build
+
+      - name: Debug app tree
+        run: ls -R build | head -50
+
+      - name: Resolve app path
+        run: |
+          if [ -d "build/Fluvel.app" ]; then
+            APP_PATH="build/Fluvel.app"
+          elif [ -d "build/Release/Fluvel.app" ]; then
+            APP_PATH="build/Release/Fluvel.app"
+          else
+            echo "❌ Fluvel.app not found"
+            ls -R build
+            exit 1
+          fi
+          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+          echo "Using $APP_PATH"
+
+      - name: Check macdeployqt
+        run: |
+          if [ ! -x "${{ env.Qt6_DIR }}/../../../bin/macdeployqt" ]; then
+            echo "❌ macdeployqt not found"
+            exit 1
+          fi
+
       # Deploy Qt
       - name: Deploy Qt
         run: |
-          macdeployqt build/Fluvel.app
+          "${{ env.Qt6_DIR }}/../../../bin/macdeployqt" "${{ env.APP_PATH }}" -verbose=2
 
-      # Create DMG
       - name: Create DMG
         run: |
+          rm -rf dmg
           mkdir dmg
-          cp -R build/Fluvel.app dmg/
-          hdiutil create Fluvel-${VERSION}-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
+          cp -R "${{ env.APP_PATH }}" dmg/
+          ln -s /Applications dmg/Applications
+          hdiutil create Fluvel-${{ env.VERSION }}-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
 
       # Upload artifacts
       - name: Upload artifacts
