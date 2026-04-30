@@ -197,7 +197,7 @@ if(APPLE)
 
 elseif(WIN32)
     set(app_icon_resource_windows
-        ${FLUVEL_PACKAGING_DIR}/windows/fluvel.rc
+        ${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.rc
     )
 
     target_sources(${target_name} PRIVATE
