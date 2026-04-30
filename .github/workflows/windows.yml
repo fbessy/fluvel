@@ -59,12 +59,16 @@ jobs:
       # Deploy Qt
       - name: Deploy Qt
         run: |
-          "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" build\src\app\Release\Fluvel.exe
+          "${{ env.Qt6_DIR }}/../../../bin/windeployqt.exe" --release build\src\app\Release\Fluvel.exe
+
+      - name: Check deployed files
+        run: dir build\src\app\Release
 
       # ZIP (comme AppImage naming)
       - name: Zip package
         shell: pwsh
         run: |
+          Remove-Item -Recurse -Force package -ErrorAction SilentlyContinue
           mkdir package
           Copy-Item -Recurse build\src\app\Release\* package\
           Compress-Archive -Path package\* -DestinationPath Fluvel-${{ env.VERSION }}-win64.zip
