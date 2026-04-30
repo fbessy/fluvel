@@ -284,15 +284,15 @@ if(APPLE AND NOT IOS)
 
     configure_file(
         ${FLUVEL_PACKAGING_DIR}/macos/Info.plist.in
-        ${CMAKE_BINARY_DIR}/Info.plist
+        ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
         @ONLY
     )
 
     set_target_properties(${target_name} PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_BINARY_DIR}/Info.plist"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
     )
 
-    message(STATUS "Using plist: ${CMAKE_BINARY_DIR}/Info.plist")
+    message(STATUS "Using plist: ${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
 
 endif()
 
