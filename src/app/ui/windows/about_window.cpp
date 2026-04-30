@@ -65,7 +65,7 @@ QString compilerInfo()
 #elif defined(__GNUC__)
     return QString("GCC %1.%2.%3").arg(__GNUC__).arg(__GNUC_MINOR__).arg(__GNUC_PATCHLEVEL__);
 #elif defined(_MSC_VER)
-    return QString("MSVC %1").arg(_MSC_VER);
+    return QString("MSVC %1 (%2)").arg(_MSC_VER).arg(_MSC_FULL_VER);
 #else
     return "Unknown compiler";
 #endif
@@ -79,10 +79,11 @@ QString buildFingerprint()
     data += "Git:" FLUVEL_GIT_COMMIT "\n";
     data += QString("BuildType:%1\n").arg(buildType);
     data += "Qt:" + QString(qVersion()) + "\n";
-    data += "Compiler:" + QString(__VERSION__) + "\n";
+    data += "Compiler:" + compilerInfo() + "\n";
     data += "CMake:" FLUVEL_CMAKE_VERSION "\n";
     data += "Package:" + packageType() + "\n";
     data += "Runtime:" + runtimeInfo() + "\n";
+    data += "OS:" + QSysInfo::prettyProductName() + "\n";
 
     QByteArray hash = QCryptographicHash::hash(data.toUtf8(), QCryptographicHash::Sha256);
 
