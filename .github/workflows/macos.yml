@@ -93,6 +93,11 @@ jobs:
       - name: Create DMG
         run: |
           rm -rf dmg
+          rm -f Fluvel-*.dmg
+
+          # cleanup volumes
+          hdiutil detach /Volumes/Fluvel -quiet || true
+
           mkdir dmg
           cp -R "${{ env.APP_PATH }}" dmg/
           ln -s /Applications dmg/Applications
