@@ -37,7 +37,7 @@
       "buildsystem": "simple",
       "build-commands": [
         "install -Dm644 packaging/linux/org.fluvel.App.desktop /app/share/applications/org.fluvel.App.desktop",
-        "install -Dm644 packaging/flatpak/org.fluvel.App.metainfo.xml /app/share/metainfo/org.fluvel.App.metainfo.xml",
+        "install -Dm644 metainfo.ci.xml /app/share/metainfo/org.fluvel.App.metainfo.xml",
         "install -Dm644 packaging/linux/org.fluvel.App.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.App.svg"
       ],
       "sources": [

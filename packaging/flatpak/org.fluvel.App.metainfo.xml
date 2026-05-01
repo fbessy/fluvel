@@ -2,15 +2,11 @@
 <component type="desktop-application">
   <id>org.fluvel.App</id>
 
-  <name>
-    <value xml:lang="en">Fluvel</value>
-    <value xml:lang="fr">Fluvel</value>
-  </name>
+  <name>Fluvel</name>
+  <name xml:lang="fr">Fluvel</name>
 
-  <summary>
-    <value xml:lang="en">Real-time computer vision and image analysis for research</value>
-    <value xml:lang="fr">Vision par ordinateur et analyse d’image en temps réel pour la recherche</value>
-  </summary>
+  <summary>Real-time computer vision and image analysis for research</summary>
+  <summary xml:lang="fr">Vision par ordinateur et analyse d’image en temps réel pour la recherche</summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>CECILL-2.1</project_license>
