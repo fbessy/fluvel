@@ -103,21 +103,25 @@ flatpak:
 
       echo "Version = $APP_VERSION"
 
+      PROJECT_ROOT=$(git rev-parse --show-toplevel)
+
+      echo "PROJECT_ROOT=$PROJECT_ROOT"
+
       APP_DATE=$(date +%Y-%m-%d)
 
-      # copie + injection
+      cp packaging/flatpak/fluvel.json fluvel.ci.json
       cp packaging/flatpak/org.fluvel.App.metainfo.xml metainfo.ci.xml
+
+      ESCAPED_ROOT=$(printf '%s\n' "$PROJECT_ROOT" | sed 's/[\/&]/\\&/g')
+      sed -i "s|__SOURCE_ROOT__|$ESCAPED_ROOT|g" fluvel.ci.json
+
+      sed -i "s/__CI_COMMIT__/$CI_COMMIT_SHORT_SHA/g" fluvel.ci.json
+      sed -i "s/__APP_VERSION__/$APP_VERSION/g" fluvel.ci.json
 
       sed -i "s/__APP_VERSION__/$APP_VERSION/g" metainfo.ci.xml
       sed -i "s/__APP_DATE__/$APP_DATE/g" metainfo.ci.xml
 
-      # debug utile (optionnel)
-      echo "===== FINAL METAINFO ====="
-      cat metainfo.ci.xml
-
-      # build avec le fichier modifié
-      flatpak-builder --force-clean build-flatpak packaging/flatpak/fluvel.json
-
+      flatpak-builder --force-clean build-flatpak fluvel.ci.json
       flatpak build-export repo build-flatpak
       flatpak build-bundle repo fluvel-${APP_VERSION}-x86_64.flatpak org.fluvel.App
 
@@ -132,6 +136,7 @@ flatpak:
         - src/**/*
         - resources/**/*
         - packaging/flatpak/**/*
+        - packaging/linux/**/*
         - CMakeLists.txt
         - .gitlab-ci.yml
 
