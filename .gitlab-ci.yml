@@ -304,6 +304,9 @@ github_pages:
       git clone https://${GITHUB_TOKEN}@github.com/fbessy/fluvel.git gh-pages
       cd gh-pages
 
+      git config user.name "GitLab CI"
+      git config user.email "ci@fluvel.local"
+
       git checkout gh-pages || git checkout -b gh-pages
 
       # Copier le site
@@ -312,7 +315,7 @@ github_pages:
 
       git add .
       git commit -m "Update RC $APP_VERSION" || echo "Nothing to commit"
-      git push
+      git push --set-upstream origin gh-pages
 
   rules:
     - if: '$CI_COMMIT_TAG'
