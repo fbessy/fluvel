@@ -16,21 +16,21 @@
   <project_license>CECILL-2.1</project_license>
 
   <description>
-
-    <p xml:lang="en">
+    <p>
       Fluvel is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.
     </p>
-    <p xml:lang="en">
+    <p>
       It provides real-time image processing, video stream support, pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.
     </p>
+  </description>
 
-    <p xml:lang="fr">
+  <description xml:lang="fr">
+    <p>
       Fluvel est une application de segmentation d’image orientée recherche, conçue pour des expérimentations rapides et efficaces avec des méthodes de contours actifs basées sur les ensembles de niveaux.
     </p>
-    <p xml:lang="fr">
+    <p>
       Elle propose un traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement ainsi que des métriques d’évaluation quantitatives telles que la distance de Hausdorff pour l’analyse de segmentation.
     </p>
-
   </description>
 
   <launchable type="desktop-id">org.fluvel.App.desktop</launchable>
