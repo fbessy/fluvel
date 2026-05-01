@@ -20,7 +20,7 @@
       "buildsystem": "cmake-ninja",
       "config-opts": [
         "-DCMAKE_BUILD_TYPE=Release",
-        "-DFLUVEL_BUILD_ORIGIN=GitLab Runner",
+        "-DFLUVEL_BUILD_ORIGIN=__BUILD_ORIGIN__",
         "-DFLUVEL_GIT_COMMIT=__CI_COMMIT__",
         "-DFLUVEL_BUILD_VERSION=__APP_VERSION__"
       ],

@@ -117,6 +117,7 @@ flatpak:
 
       sed -i "s/__CI_COMMIT__/$CI_COMMIT_SHORT_SHA/g" fluvel.ci.json
       sed -i "s/__APP_VERSION__/$APP_VERSION/g" fluvel.ci.json
+      sed -i "s/__BUILD_ORIGIN__/$BUILD_ORIGIN/g" fluvel.ci.json
 
       sed -i "s/__APP_VERSION__/$APP_VERSION/g" metainfo.ci.xml
       sed -i "s/__APP_DATE__/$APP_DATE/g" metainfo.ci.xml
