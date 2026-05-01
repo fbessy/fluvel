@@ -1,0 +1,8 @@
+{
+  "version": "dev-887a689e",
+  "appimage": "fluvel-dev-887a689e-x86_64.AppImage",
+  "flatpak": "fluvel-dev-887a689e-x86_64.flatpak",
+  "windows": "",
+  "macos": "",
+  "checksums": "f357bb443934acf31470ab700f700e3c23a364879104f292fa84a48d6bca9366  fluvel-dev-887a689e-x86_64.AppImage\n5480160eedd6d5e37412e97189810a5f77bbf437ff06fee2772fcd61024b49e6  fluvel-dev-887a689e-x86_64.flatpak"
+}
