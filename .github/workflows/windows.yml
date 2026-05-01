@@ -50,6 +50,7 @@ jobs:
         run: >
           cmake -B build -S .
           -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_UNITY_BUILD=OFF
           -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
           -DFLUVEL_GIT_COMMIT=${{ github.sha }}
           -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
