@@ -108,8 +108,11 @@ flatpak:
       sed -i "s/__CI_COMMIT__/$CI_COMMIT_SHORT_SHA/g" fluvel.ci.json
       sed -i "s/__APP_VERSION__/$APP_VERSION/g" fluvel.ci.json
 
+      echo "===== FINAL JSON ====="
+      cat fluvel.ci.json
+
       # build flatpak
-      flatpak-builder --force-clean build-flatpak packaging/flatpak/fluvel.json
+      flatpak-builder --force-clean build-flatpak fluvel.ci.json
       flatpak build-export repo build-flatpak
       flatpak build-bundle repo fluvel-${APP_VERSION}-x86_64.flatpak org.fluvel.App
 
