@@ -25,6 +25,23 @@ namespace
 
 constexpr auto kProjectUrl = "https://fabienip.gitlab.io/fluvel/";
 
+QString buildVersionString()
+{
+    QString version = FLUVEL_VERSION;
+
+#ifdef FLUVEL_BUILD_VERSION
+    QString buildVersion = FLUVEL_BUILD_VERSION;
+
+    // évite doublon si tag = version
+    if (buildVersion != version)
+    {
+        version += QString(" (%1)").arg(buildVersion);
+    }
+#endif
+
+    return version;
+}
+
 QString buildType =
 #ifdef QT_DEBUG
     "Debug";
@@ -132,7 +149,16 @@ AboutWindow::AboutWindow(QWidget* parent)
     font2.setPointSize(12);
     version_label->setFont(font2);
 
-    const QString verStr = QString(tr("Version ")) + QString(FLUVEL_VERSION);
+    QString shortVersion = FLUVEL_VERSION;
+
+#ifdef FLUVEL_BUILD_VERSION
+    if (QString(FLUVEL_BUILD_VERSION).startsWith("dev-"))
+    {
+        shortVersion += "-dev";
+    }
+#endif
+
+    const QString verStr = QString(tr("Version ")) + shortVersion;
 
     version_label->setText(verStr);
     version_label->setAlignment(Qt::AlignCenter);
@@ -419,7 +445,7 @@ QString AboutWindow::buildTechnicalSection()
 
     html += "<div style='margin-bottom:6px;'>"
             "<b>" +
-            tr("Version") + ":</b> " FLUVEL_VERSION "</div>";
+            tr("Version") + ":</b> " + buildVersionString() + "</div>";
 
     html += "<div style='margin-bottom:4px;'><b>" + tr("Configuration directory") + "</b></div>";
 

@@ -24,7 +24,7 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
-            VERSION="${GITHUB_SHA::7}"
+            VERSION="dev-${GITHUB_SHA::7}"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "VERSION = $VERSION"
@@ -53,7 +53,7 @@ jobs:
           -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
           -DFLUVEL_GIT_COMMIT=${{ github.sha }}
           -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
-          -DFLUVEL_VERSION=${{ env.VERSION }}
+          -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
 
       # Build
       - name: Build
@@ -127,7 +127,13 @@ jobs:
       - name: Rename installer
         shell: pwsh
         run: |
-          Get-ChildItem packaging\windows\Output\*.exe | Rename-Item -NewName "Fluvel-${{ env.VERSION }}-setup.exe"
+          $exe = Get-ChildItem packaging\windows\Output\*.exe | Select-Object -First 1
+          Rename-Item $exe.FullName "Fluvel-${{ env.VERSION }}-setup.exe"
+
+      - name: Move installer to root
+        shell: pwsh
+        run: |
+          Copy-Item packaging\windows\Output\Fluvel-${{ env.VERSION }}-setup.exe .
 
       # Upload artifacts
       - name: Upload artifacts
@@ -136,4 +142,4 @@ jobs:
           name: fluvel-windows-${{ env.VERSION }}
           path: |
             Fluvel-${{ env.VERSION }}-win64.zip
-            packaging\windows\Output\Fluvel-${{ env.VERSION }}-setup.exe
+            Fluvel-${{ env.VERSION }}-setup.exe

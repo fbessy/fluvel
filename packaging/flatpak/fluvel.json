@@ -20,7 +20,8 @@
       "config-opts": [
         "-DCMAKE_BUILD_TYPE=Release",
         "-DFLUVEL_BUILD_ORIGIN=GitLab Runner",
-        "-DFLUVEL_GIT_COMMIT=__CI_COMMIT__"
+        "-DFLUVEL_GIT_COMMIT=__CI_COMMIT__",
+        "-DFLUVEL_BUILD_VERSION=__APP_VERSION__"
       ],
       "sources": [
         {

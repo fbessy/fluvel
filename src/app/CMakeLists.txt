@@ -400,9 +400,19 @@ endif()
 
 message(STATUS "Commit: ${FLUVEL_GIT_COMMIT}")
 
-string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+# --- Build version fallback (local dev) ---
+if(NOT DEFINED FLUVEL_BUILD_VERSION OR FLUVEL_BUILD_VERSION STREQUAL "")
+    if(FLUVEL_GIT_COMMIT AND NOT FLUVEL_GIT_COMMIT STREQUAL "unknown")
+        set(FLUVEL_BUILD_VERSION "dev-${FLUVEL_GIT_COMMIT}")
+    endif()
+endif()
 
-# --- Build origin (CI / Local / fallback) ---
+# --- Timestamp (safe) ---
+if(NOT FLUVEL_BUILD_TIMESTAMP)
+    string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+endif()
+
+# --- Build origin ---
 if(NOT FLUVEL_BUILD_ORIGIN)
     set(FLUVEL_BUILD_ORIGIN "Local")
 endif()
@@ -414,6 +424,13 @@ target_compile_definitions(${target_name} PRIVATE
     FLUVEL_CMAKE_VERSION="${CMAKE_VERSION}"
     FLUVEL_BUILD_ORIGIN="${FLUVEL_BUILD_ORIGIN}"
 )
+
+# --- Build version (CI/dev) ---
+if(DEFINED FLUVEL_BUILD_VERSION AND NOT FLUVEL_BUILD_VERSION STREQUAL "")
+    target_compile_definitions(${target_name} PRIVATE
+        FLUVEL_BUILD_VERSION="${FLUVEL_BUILD_VERSION}"
+    )
+endif()
 
 if(ANDROID)
 

@@ -21,7 +21,7 @@ jobs:
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
-            VERSION="${GITHUB_SHA::7}"
+            VERSION="dev-${GITHUB_SHA::7}"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "VERSION = $VERSION"
@@ -43,7 +43,7 @@ jobs:
           -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
           -DFLUVEL_GIT_COMMIT=${{ github.sha }}
           -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
-          -DFLUVEL_VERSION=${{ env.VERSION }}
+          -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
 
       # Build
       - name: Build
