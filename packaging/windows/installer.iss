@@ -1,6 +1,8 @@
+#define MyAppVersion "0.0.0"
+
 [Setup]
 AppName=Fluvel
-AppVersion=1.0.0
+AppVersion={#MyAppVersion}
 AppPublisher=Fluvel
 DefaultDirName={autopf}\Fluvel
 DefaultGroupName=Fluvel

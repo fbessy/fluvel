@@ -114,19 +114,17 @@ jobs:
 
       # Build installer
       - name: Build installer
-        run: iscc packaging/windows/installer.iss
+        run: iscc /DMyAppVersion=${{ env.VERSION }} packaging/windows/installer.iss
 
       # Check installer output
       - name: Check installer output
-        shell: pwsh
-        run: |
-          dir Output
+        run: dir packaging\windows\Output
 
       # Rename installer
       - name: Rename installer
         shell: pwsh
         run: |
-          Rename-Item -Path Output\FluvelSetup.exe -NewName Fluvel-${{ env.VERSION }}-setup.exe
+          Get-ChildItem packaging\windows\Output\*.exe | Rename-Item -NewName "Fluvel-${{ env.VERSION }}-setup.exe"
 
       # Upload artifacts
       - name: Upload artifacts
@@ -135,4 +133,4 @@ jobs:
           name: fluvel-windows-${{ env.VERSION }}
           path: |
             Fluvel-${{ env.VERSION }}-win64.zip
-            Output\Fluvel-${{ env.VERSION }}-setup.exe
+            packaging\windows\Output\Fluvel-${{ env.VERSION }}-setup.exe
