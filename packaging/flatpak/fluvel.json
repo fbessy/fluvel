@@ -14,6 +14,7 @@
   ],
 
   "modules": [
+
     {
       "name": "fluvel",
       "buildsystem": "cmake-ninja",
@@ -26,9 +27,27 @@
       "sources": [
         {
           "type": "dir",
-          "path": "../.."
+          "path": "."
+        }
+      ]
+    },
+
+    {
+      "name": "fluvel-metadata",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -Dm644 packaging/linux/fluvel.desktop /app/share/applications/org.fluvel.App.desktop",
+        "install -Dm644 packaging/flatpak/org.fluvel.App.metainfo.xml /app/share/metainfo/org.fluvel.App.metainfo.xml",
+        "install -Dm644 packaging/linux/org.fluvel.App.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.App.svg",
+        "install -Dm644 packaging/linux/fluvel.png /app/share/icons/hicolor/256x256/apps/org.fluvel.App.png"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
         }
       ]
     }
+
   ]
 }
