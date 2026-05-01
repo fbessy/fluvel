@@ -1,19 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>org.fluvel.App</id>
-  <name>Fluvel</name>
-  <summary>Real-time computer vision and image analysis for research</summary>
+
+  <name>
+    <value xml:lang="en">Fluvel</value>
+    <value xml:lang="fr">Fluvel</value>
+  </name>
+
+  <summary>
+    <value xml:lang="en">Real-time computer vision and image analysis for research</value>
+    <value xml:lang="fr">Vision par ordinateur et analyse d’image en temps réel pour la recherche</value>
+  </summary>
 
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>CECILL-2.1</project_license>
 
   <description>
-    <p>
+
+    <p xml:lang="en">
       Fluvel is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.
     </p>
-    <p>
+    <p xml:lang="en">
       It provides real-time image processing, video stream support, pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.
     </p>
+
+    <p xml:lang="fr">
+      Fluvel est une application de segmentation d’image orientée recherche, conçue pour des expérimentations rapides et efficaces avec des méthodes de contours actifs basées sur les ensembles de niveaux.
+    </p>
+    <p xml:lang="fr">
+      Elle propose un traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement ainsi que des métriques d’évaluation quantitatives telles que la distance de Hausdorff pour l’analyse de segmentation.
+    </p>
+
   </description>
 
   <launchable type="desktop-id">org.fluvel.App.desktop</launchable>
@@ -21,5 +38,9 @@
   <developer_name>Fabien Bessy</developer_name>
 
   <url type="homepage">https://github.com/fbessy/fluvel</url>
+
+  <releases>
+    <release version="__APP_VERSION__" date="__APP_DATE__"/>
+  </releases>
 
 </component>

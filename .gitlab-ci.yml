@@ -103,16 +103,21 @@ flatpak:
 
       echo "Version = $APP_VERSION"
 
-      cp packaging/flatpak/fluvel.json fluvel.ci.json
+      APP_DATE=$(date +%Y-%m-%d)
 
-      sed -i "s/__CI_COMMIT__/$CI_COMMIT_SHORT_SHA/g" fluvel.ci.json
-      sed -i "s/__APP_VERSION__/$APP_VERSION/g" fluvel.ci.json
+      # copie + injection
+      cp packaging/flatpak/org.fluvel.App.metainfo.xml metainfo.ci.xml
 
-      echo "===== FINAL JSON ====="
-      cat fluvel.ci.json
+      sed -i "s/__APP_VERSION__/$APP_VERSION/g" metainfo.ci.xml
+      sed -i "s/__APP_DATE__/$APP_DATE/g" metainfo.ci.xml
 
-      # build flatpak
-      flatpak-builder --force-clean build-flatpak fluvel.ci.json
+      # debug utile (optionnel)
+      echo "===== FINAL METAINFO ====="
+      cat metainfo.ci.xml
+
+      # build avec le fichier modifié
+      flatpak-builder --force-clean build-flatpak packaging/flatpak/fluvel.json
+
       flatpak build-export repo build-flatpak
       flatpak build-bundle repo fluvel-${APP_VERSION}-x86_64.flatpak org.fluvel.App
 
