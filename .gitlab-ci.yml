@@ -255,15 +255,13 @@ github_pages:
   stage: package
   image: ubuntu:24.04
 
-  needs:
-    - job: flatpak
-      optional: true
-    - job: appimage
-      optional: true
+  dependencies:
+    - flatpak
+    - appimage
 
   before_script:
     - apt update
-    - apt install -y git
+    - apt install -y git gh
 
   script:
     - |
@@ -275,41 +273,26 @@ github_pages:
 
       echo "Version = $APP_VERSION"
 
-      # Checksums (si artefacts dispo)
-      sha256sum *.AppImage *.flatpak > checksums.txt || echo "no artifacts"
+      # Auth GitHub
+      echo "$GITHUB_RELEASE_TOKEN" | gh auth login --with-token
 
-      # JSON
-      cat > latest.json <<EOF
-      {
-        "version": "$APP_VERSION",
+      # Créer la release si elle n'existe pas
+      gh release view latest || gh release create latest \
+        -t "Latest Development Build" \
+        -n "Auto release" \
+        --prerelease
 
-        "win_installer": "https://github.com/fbessy/fluvel/release/latest/download/Fluvel-win64-installer.exe",
-        "win_portable": "https://github.com/fbessy/fluvel/release/latest/download/Fluvel-win64-portable.zip",
+      ls -R
 
-        "flatpak": "https://gitlab.com/FabienIP/fluvel/-/jobs/artifacts/${CI_COMMIT_SHA}/raw/Fluvel-${APP_VERSION}-x86_64.flatpak?job=flatpak",
-        "appimage": "https://gitlab.com/FabienIP/fluvel/-/jobs/artifacts/${CI_COMMIT_SHA}/raw/Fluvel-${APP_VERSION}-x86_64.AppImage?job=appimage",
+      ls -lh *.AppImage *.flatpak || echo "No Linux artifacts"
 
-        "macos": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg",
+      # Renommer fichiers Linux en noms FIXES
+      mv Fluvel-${APP_VERSION}-x86_64.AppImage Fluvel-linux.AppImage || true
+      mv Fluvel-${APP_VERSION}-x86_64.flatpak Fluvel-linux.flatpak || true
 
-        "checksums": "$(cat checksums.txt 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g')"
-      }
-      EOF
-
-      # Push GitHub
-      git clone https://oauth2:${GITHUB_TOKEN}@github.com/fbessy/fluvel.git gh-pages
-      cd gh-pages
-
-      git config user.name "GitLab CI"
-      git config user.email "ci@fluvel.local"
-
-      git checkout gh-pages || git checkout -b gh-pages
-
-      cp -r ../web/* .
-      cp ../latest.json .
-
-      git add .
-      git commit -m "Update RC $APP_VERSION" || true
-      git push --set-upstream origin gh-pages
+      # Upload vers GitHub
+      gh release upload latest Fluvel-linux.AppImage --clobber || true
+      gh release upload latest Fluvel-linux.flatpak --clobber || true
 
   rules:
     - if: '$CI_COMMIT_TAG'
