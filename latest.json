@@ -1,6 +1,6 @@
 {
   "version": "latest",
-  "date": "2026-05-02T23:14:51Z",
+  "date": "2026-05-02T23:47:45Z",
 
   "win_installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
   "win_portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip",
