@@ -167,16 +167,22 @@ jobs:
       - name: Debug files
         run: ls -R
 
-      # 🔥 Supprime ancienne release + tag
-      - name: Delete old release
-        uses: dev-drprasad/delete-tag-and-release@v1
-        with:
-          tag_name: latest
+      # 🔥 Nettoyage ciblé (Windows + macOS uniquement)
+      - name: Remove old Windows/macOS assets
+        run: |
+          gh release view latest --json assets -q '.assets[].name' | while read asset; do
+            if [[ "$asset" == *win64* ]] || [[ "$asset" == *macos* ]]; then
+              echo "Deleting $asset"
+              gh release delete-asset latest "$asset" -y
+            else
+              echo "Keeping $asset"
+            fi
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🚀 Recrée proprement
-      - name: Create release
+      # 🚀 Upload propre
+      - name: Create/Update release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
@@ -187,5 +193,6 @@ jobs:
             windows/Fluvel-win64-installer.exe
             macos/Fluvel-macos.dmg
           fail_on_unmatched_files: true
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
