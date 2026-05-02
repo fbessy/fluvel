@@ -269,9 +269,9 @@ github_pages:
   image: ubuntu:24.04
 
   needs:
-    - flatpak
+    - job: flatpak
       optional: true
-    - appimage
+    - job: appimage
       optional: true
 
   before_script:
