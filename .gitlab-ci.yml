@@ -270,7 +270,9 @@ github_pages:
 
   needs:
     - flatpak
+      optional: true
     - appimage
+      optional: true
 
   before_script:
     - apt update
