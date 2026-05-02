@@ -133,13 +133,6 @@ flatpak:
   rules:
     - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH == "release"'
-      changes:
-        - src/**/*
-        - resources/**/*
-        - packaging/flatpak/**/*
-        - packaging/linux/**/*
-        - CMakeLists.txt
-        - .gitlab-ci.yml
 
 appimage:
   stage: package
@@ -216,12 +209,6 @@ appimage:
   rules:
     - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH == "release"'
-      changes:
-        - src/**/*
-        - resources/**/*
-        - packaging/appimage/**/*
-        - CMakeLists.txt
-        - .gitlab-ci.yml
 
 .doc_rules: &doc_rules
   rules:
