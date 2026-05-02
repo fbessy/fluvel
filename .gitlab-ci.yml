@@ -273,6 +273,8 @@ github_pages:
 
       echo "Version = $APP_VERSION"
 
+      unset GITHUB_TOKEN
+
       # Auth GitHub
       echo "$GITHUB_RELEASE_TOKEN" | gh auth login --with-token
 
