@@ -1,23 +1,78 @@
-release:
-  needs: [windows, macos]
-  runs-on: ubuntu-latest
+name: Fluvel Release
 
-  steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
+on:
+  push:
+    branches: [release]
 
-    - name: List files (debug)
-      run: ls -R
+jobs:
 
-    - name: Create/Update latest release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: latest
-        name: Latest Dev Build
-        prerelease: true
-        files: |
-          **/Fluvel-win64-installer.exe
-          **/Fluvel-win64-portable.zip
-          **/Fluvel-macos.dmg
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Windows (placeholder)
+        run: echo "TODO: replace with your real Windows build"
+
+      # 👉 IMPORTANT : remplace par ton vrai build plus tard
+      # ici on simule pour test
+      - name: Create dummy artifacts
+        run: |
+          echo "test" > Fluvel-win64-installer.exe
+          echo "test" > Fluvel-win64-portable.zip
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            Fluvel-win64-installer.exe
+            Fluvel-win64-portable.zip
+
+
+  macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build macOS (placeholder)
+        run: echo "TODO: replace with your real macOS build"
+
+      - name: Create dummy artifact
+        run: |
+          echo "test" > Fluvel-macos.dmg
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: Fluvel-macos.dmg
+
+
+  release:
+    needs: [windows, macos]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Show files (debug)
+        run: ls -R
+
+      - name: Create/Update latest release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Development Build
+          prerelease: true
+          files: |
+            **/Fluvel-win64-installer.exe
+            **/Fluvel-win64-portable.zip
+            **/Fluvel-macos.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
