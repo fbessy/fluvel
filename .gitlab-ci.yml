@@ -289,19 +289,24 @@ github_pages:
       # Génération JSON
       sha256sum *.AppImage *.flatpak > checksums.txt
 
+      APPIMAGE_URL="https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-${APP_VERSION}-x86_64.AppImage?job=appimage"
+      FLATPAK_URL="https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-${APP_VERSION}-x86_64.flatpak?job=flatpak"
+      WINDOWS_URL=""
+      MACOS_URL=""
+
       cat > latest.json <<EOF
       {
         "version": "$APP_VERSION",
-        "appimage": "fluvel-${APP_VERSION}-x86_64.AppImage",
-        "flatpak": "fluvel-${APP_VERSION}-x86_64.flatpak",
-        "windows": "",
-        "macos": "",
+        "appimage": "$APPIMAGE_URL",
+        "flatpak": "$FLATPAK_URL",
+        "windows": "$WINDOWS_URL",
+        "macos": "$MACOS_URL",
         "checksums": "$(cat checksums.txt | sed ':a;N;$!ba;s/\n/\\n/g')"
       }
       EOF
 
       # Clone GitHub
-      git clone https://${GITHUB_TOKEN}@github.com/fbessy/fluvel.git gh-pages
+      git clone https://oauth2:${GITHUB_TOKEN}@github.com/fbessy/fluvel.git gh-pages
       cd gh-pages
 
       git config user.name "GitLab CI"
