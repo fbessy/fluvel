@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Fluvel Downloads</title>
+
 <style>
 body {
   font-family: Arial;
@@ -10,59 +11,122 @@ body {
   margin: auto;
   padding: 20px;
 }
+
 h1 { color: #333; }
+
 .section {
   border: 1px solid #ddd;
   padding: 15px;
   margin: 15px 0;
   border-radius: 8px;
 }
+
+.platform {
+  margin-top: 20px;
+}
+
+.platform h3 {
+  margin-bottom: 5px;
+}
+
 a.button {
   display: inline-block;
   padding: 10px 15px;
-  margin: 5px;
+  margin: 5px 5px 5px 0;
   background: #007acc;
   color: white;
   text-decoration: none;
   border-radius: 5px;
 }
+
 pre {
   background: #f5f5f5;
   padding: 10px;
+  overflow-x: auto;
 }
 </style>
+
 </head>
 <body>
 
 <h1>Fluvel Downloads</h1>
 
 <div class="section">
-<h2>Latest Release Candidate</h2>
+  <h2>Latest Release Candidate</h2>
 
-<p><b>Version:</b> <span id="version">loading...</span></p>
+  <p><b>Version:</b> <span id="version">loading...</span></p>
 
-<h3>Downloads</h3>
+  <!-- WINDOWS -->
+  <div class="platform" id="platform_windows">
+    <h3>🪟 Windows</h3>
+    <a id="win_installer" class="button">Installer (.exe)</a>
+    <a id="win_portable" class="button">Portable (.zip)</a>
+  </div>
 
-<a id="appimage" class="button">AppImage</a>
-<a id="flatpak" class="button">Flatpak</a>
-<a id="windows" class="button">Windows</a>
-<a id="macos" class="button">macOS</a>
+  <!-- LINUX -->
+  <div class="platform" id="platform_linux">
+    <h3>🐧 Linux</h3>
+    <a id="flatpak" class="button">Flatpak (recommended)</a>
+    <a id="appimage" class="button">AppImage</a>
+  </div>
 
-<h3>Checksums</h3>
-<pre id="checksums">loading...</pre>
+  <!-- MACOS -->
+  <div class="platform" id="platform_macos">
+    <h3>🍎 macOS</h3>
+    <a id="macos" class="button">DMG</a>
+  </div>
+
+  <h3>Checksums</h3>
+  <pre id="checksums">loading...</pre>
 
 </div>
 
 <script>
+function setLink(id, url) {
+  const el = document.getElementById(id);
+  if (!url || url === "") {
+    el.style.display = "none";
+    return false;
+  }
+  el.href = url;
+  return true;
+}
+
+function hidePlatformIfEmpty(platformId, linkIds) {
+  const hasVisible = linkIds.some(id => {
+    const el = document.getElementById(id);
+    return el && el.style.display !== "none";
+  });
+
+  if (!hasVisible) {
+    document.getElementById(platformId).style.display = "none";
+  }
+}
+
 fetch("latest.json")
 .then(r => r.json())
 .then(data => {
+
   document.getElementById("version").innerText = data.version;
-  document.getElementById("appimage").href = data.appimage;
-  document.getElementById("flatpak").href = data.flatpak;
-  document.getElementById("windows").href = data.windows;
-  document.getElementById("macos").href = data.macos;
-  document.getElementById("checksums").innerText = data.checksums;
+
+  // Windows
+  setLink("win_installer", data.win_installer);
+  setLink("win_portable", data.win_portable);
+
+  // Linux
+  setLink("flatpak", data.flatpak);
+  setLink("appimage", data.appimage);
+
+  // macOS
+  setLink("macos", data.macos);
+
+  // Hide empty platforms
+  hidePlatformIfEmpty("platform_windows", ["win_installer", "win_portable"]);
+  hidePlatformIfEmpty("platform_linux", ["flatpak", "appimage"]);
+  hidePlatformIfEmpty("platform_macos", ["macos"]);
+
+  // Checksums
+  document.getElementById("checksums").innerText = data.checksums || "N/A";
 });
 </script>
 

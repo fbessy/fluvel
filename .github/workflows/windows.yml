@@ -101,13 +101,32 @@ jobs:
         run: |
           Remove-Item -Recurse -Force package -ErrorAction SilentlyContinue
           mkdir package
-          Copy-Item -Recurse build\src\app\Release\* package\
-          Compress-Archive -Path package\* -DestinationPath Fluvel-${{ env.VERSION }}-win64.zip
+
+          # Nettoyage des anciens zip éventuels
+          Remove-Item build\src\app\Release\*.zip -ErrorAction SilentlyContinue
+
+          # Copier fichiers essentiels
+          Copy-Item build\src\app\Release\Fluvel.exe package\
+
+          # Copier DLL si présentes
+          Get-ChildItem build\src\app\Release\*.dll -ErrorAction SilentlyContinue |
+            Copy-Item -Destination package\
+
+          # Copier plugins Qt
+          Copy-Item -Recurse build\src\app\Release\platforms package\ -ErrorAction SilentlyContinue
+          Copy-Item -Recurse build\src\app\Release\styles package\ -ErrorAction SilentlyContinue
+
+          # README utilisateur (optionnel mais propre)
+          Set-Content package\README.txt "Run Fluvel.exe to start the application."
+
+          # Création archive portable
+          Compress-Archive -Path package\* -DestinationPath Fluvel-${{ env.VERSION }}-win64-portable.zip
 
       # Install Inno Setup
       - name: Install Inno Setup
         run: choco install innosetup -y
 
+      # Vérifier script installer
       - name: Check installer script
         shell: pwsh
         run: |
@@ -120,21 +139,29 @@ jobs:
       - name: Build installer
         run: iscc /DMyAppVersion=${{ env.VERSION }} packaging/windows/installer.iss
 
-      # Check installer output
+      # Vérifier output installer
       - name: Check installer output
-        run: dir packaging\windows\Output
+        shell: pwsh
+        run: |
+          dir packaging\windows\Output
+          $exe = Get-ChildItem packaging\windows\Output\*.exe | Select-Object -First 1
+          if (!$exe) {
+            Write-Error "Installer not found!"
+            exit 1
+          }
 
-      # Rename installer
+      # Rename installer proprement
       - name: Rename installer
         shell: pwsh
         run: |
           $exe = Get-ChildItem packaging\windows\Output\*.exe | Select-Object -First 1
-          Rename-Item $exe.FullName "Fluvel-${{ env.VERSION }}-setup.exe"
+          Rename-Item $exe.FullName "Fluvel-${{ env.VERSION }}-win64-installer.exe"
 
+      # Copier installer à la racine
       - name: Move installer to root
         shell: pwsh
         run: |
-          Copy-Item packaging\windows\Output\Fluvel-${{ env.VERSION }}-setup.exe .
+          Copy-Item packaging\windows\Output\Fluvel-${{ env.VERSION }}-win64-installer.exe .
 
       # Upload artifacts
       - name: Upload artifacts
@@ -142,5 +169,5 @@ jobs:
         with:
           name: fluvel-windows-${{ env.VERSION }}
           path: |
-            Fluvel-${{ env.VERSION }}-win64.zip
-            Fluvel-${{ env.VERSION }}-setup.exe
+            Fluvel-${{ env.VERSION }}-win64-portable.zip
+            Fluvel-${{ env.VERSION }}-win64-installer.exe

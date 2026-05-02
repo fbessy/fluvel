@@ -96,12 +96,14 @@ jobs:
           rm -rf dmg
           rm -f Fluvel-*.dmg
 
-          # cleanup volumes
+          # cleanup volumes (robuste)
           hdiutil detach /Volumes/Fluvel -quiet || true
+          sleep 2
 
-          mkdir dmg
+          mkdir -p dmg
           cp -R "${{ env.APP_PATH }}" dmg/
           ln -s /Applications dmg/Applications
+
           hdiutil create Fluvel-${{ env.VERSION }}-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
 
       # Upload artifacts
