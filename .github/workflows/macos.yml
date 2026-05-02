@@ -104,7 +104,7 @@ jobs:
           cp -R "${{ env.APP_PATH }}" dmg/
           ln -s /Applications dmg/Applications
 
-          hdiutil create Fluvel-${{ env.VERSION }}-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
+          hdiutil create Fluvel-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
 
       # Upload artifacts
       - name: Upload artifacts
@@ -112,4 +112,4 @@ jobs:
         with:
           name: fluvel-macos-${{ env.VERSION }}
           path: |
-            Fluvel-${{ env.VERSION }}-macos.dmg
+            Fluvel-macos.dmg

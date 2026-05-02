@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Fluvel Downloads</title>
 
 <style>
 body {
@@ -12,7 +11,25 @@ body {
   padding: 20px;
 }
 
-h1 { color: #333; }
+.title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  color: #333;
+}
+
+.title img {
+  width: 42px;
+  height: 42px;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.2));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.title img:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.35));
+}
 
 .section {
   border: 1px solid #ddd;
@@ -47,12 +64,16 @@ pre {
 </style>
 
 </head>
+
 <body>
 
-<h1>Fluvel Downloads</h1>
+<h1 class="title">
+  <img src="fluvel.svg" alt="Fluvel logo">
+  <span>Fluvel Downloads</span>
+</h1>
 
 <div class="section">
-  <h2>Latest Release Candidate</h2>
+  <h2>Latest Release</h2>
 
   <p><b>Version:</b> <span id="version">loading...</span></p>
 

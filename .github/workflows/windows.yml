@@ -120,7 +120,7 @@ jobs:
           Set-Content package\README.txt "Run Fluvel.exe to start the application."
 
           # Création archive portable
-          Compress-Archive -Path package\* -DestinationPath Fluvel-${{ env.VERSION }}-win64-portable.zip
+          Compress-Archive -Path package\* -DestinationPath Fluvel-win64-portable.zip
 
       # Install Inno Setup
       - name: Install Inno Setup
@@ -155,13 +155,13 @@ jobs:
         shell: pwsh
         run: |
           $exe = Get-ChildItem packaging\windows\Output\*.exe | Select-Object -First 1
-          Rename-Item $exe.FullName "Fluvel-${{ env.VERSION }}-win64-installer.exe"
+          Rename-Item $exe.FullName "Fluvel-win64-installer.exe"
 
       # Copier installer à la racine
       - name: Move installer to root
         shell: pwsh
         run: |
-          Copy-Item packaging\windows\Output\Fluvel-${{ env.VERSION }}-win64-installer.exe .
+          Copy-Item packaging\windows\Output\Fluvel-win64-installer.exe .
 
       # Upload artifacts
       - name: Upload artifacts
@@ -169,5 +169,5 @@ jobs:
         with:
           name: fluvel-windows-${{ env.VERSION }}
           path: |
-            Fluvel-${{ env.VERSION }}-win64-portable.zip
-            Fluvel-${{ env.VERSION }}-win64-installer.exe
+            Fluvel-win64-portable.zip
+            Fluvel-win64-installer.exe

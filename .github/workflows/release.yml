@@ -1,0 +1,23 @@
+release:
+  needs: [windows, macos]
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+
+    - name: List files (debug)
+      run: ls -R
+
+    - name: Create/Update latest release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: Latest Dev Build
+        prerelease: true
+        files: |
+          **/Fluvel-win64-installer.exe
+          **/Fluvel-win64-portable.zip
+          **/Fluvel-macos.dmg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
