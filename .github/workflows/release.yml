@@ -22,6 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Clean (important)
+      - name: Clean
+        shell: pwsh
+        run: |
+          Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Force package -ErrorAction SilentlyContinue
+
       - name: Compute version
         shell: bash
         run: |
@@ -133,6 +140,7 @@ jobs:
 
       - name: Create DMG
         run: |
+          rm -rf dmg
           mkdir dmg
           cp -R "${{ env.APP_PATH }}" dmg/
           ln -s /Applications dmg/Applications
@@ -156,15 +164,28 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
+      - name: Debug files
+        run: ls -R
+
+      # 🔥 Supprime ancienne release + tag
+      - name: Delete old release
+        uses: :contentReference[oaicite:0]{index=0}@v1
+        with:
+          tag_name: latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 🚀 Recrée proprement
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: :contentReference[oaicite:1]{index=1}@v2
         with:
           tag_name: latest
           name: Latest Development Build
           prerelease: true
           files: |
-            **/*.exe
-            **/*.zip
-            **/*.dmg
+            windows/Fluvel-win64-portable.zip
+            windows/Fluvel-win64-installer.exe
+            macos/Fluvel-macos.dmg
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
