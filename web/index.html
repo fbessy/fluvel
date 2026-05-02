@@ -134,7 +134,23 @@ fetch("latest.json")
   .then(data => {
 
     document.getElementById("version").innerText = data.version || "N/A";
-    document.getElementById("date").innerText = data.date || "N/A";
+
+    if (data.date) {
+      const d = new Date(data.date);
+
+      document.getElementById("date").innerText =
+        d.toLocaleString("en-GB", {
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "UTC"
+        }) + " UTC";
+    } else {
+      document.getElementById("date").innerText = "N/A";
+    }
 
     setLink("win_installer", data.win_installer);
     setLink("win_portable", data.win_portable);
