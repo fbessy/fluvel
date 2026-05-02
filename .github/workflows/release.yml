@@ -1,50 +1,139 @@
 name: Fluvel Release
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [release]
+    tags: ['v*']
 
 jobs:
 
+  # =========================
+  # WINDOWS BUILD
+  # =========================
   windows:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build Windows (placeholder)
-        run: echo "TODO: replace with your real Windows build"
-
-      # 👉 IMPORTANT : remplace par ton vrai build plus tard
-      # ici on simule pour test
-      - name: Create dummy artifacts
+      - name: Compute version
+        shell: bash
         run: |
-          echo "test" > Fluvel-win64-installer.exe
-          echo "test" > Fluvel-win64-portable.zip
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.8.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          modules: 'qtmultimedia'
+
+      - name: Configure
+        run: >
+          cmake -B build -S .
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
+          -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Deploy Qt
+        shell: pwsh
+        run: |
+          & "${{ env.Qt6_DIR }}/bin/windeployqt.exe" --release build\src\app\Release\Fluvel.exe
+
+      - name: Package
+        shell: pwsh
+        run: |
+          mkdir package
+          Copy-Item build\src\app\Release\Fluvel.exe package\
+          Copy-Item build\src\app\Release\*.dll package\ -ErrorAction SilentlyContinue
+          Copy-Item -Recurse build\src\app\Release\platforms package\
+          Compress-Archive -Path package\* -DestinationPath Fluvel-win64-portable.zip
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build installer
+        run: iscc /DMyAppVersion=${{ env.VERSION }} packaging/windows/installer.iss
+
+      - name: Rename installer
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem packaging\windows\Output\*.exe | Select-Object -First 1
+          Rename-Item $exe.FullName "Fluvel-win64-installer.exe"
+          Copy-Item packaging\windows\Output\Fluvel-win64-installer.exe .
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows
           path: |
-            Fluvel-win64-installer.exe
             Fluvel-win64-portable.zip
+            Fluvel-win64-installer.exe
 
 
+  # =========================
+  # MACOS BUILD
+  # =========================
   macos:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build macOS (placeholder)
-        run: echo "TODO: replace with your real macOS build"
-
-      - name: Create dummy artifact
+      - name: Compute version
         run: |
-          echo "test" > Fluvel-macos.dmg
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Setup Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.8.2'
+          host: 'mac'
+          target: 'desktop'
+          modules: 'qtmultimedia'
+
+      - name: Configure
+        run: >
+          cmake -B build -S .
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Find app
+        run: |
+          APP_PATH=$(find build -name "Fluvel.app" -type d | head -n 1)
+          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+
+      - name: Deploy Qt
+        run: |
+          "${{ env.Qt6_DIR }}/bin/macdeployqt" "${{ env.APP_PATH }}" -codesign=off
+
+      - name: Create DMG
+        run: |
+          mkdir dmg
+          cp -R "${{ env.APP_PATH }}" dmg/
+          ln -s /Applications dmg/Applications
+          hdiutil create Fluvel-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -53,6 +142,9 @@ jobs:
           path: Fluvel-macos.dmg
 
 
+  # =========================
+  # RELEASE
+  # =========================
   release:
     needs: [windows, macos]
     runs-on: ubuntu-latest
@@ -61,18 +153,15 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
-      - name: Show files (debug)
-        run: ls -R
-
-      - name: Create/Update latest release
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
           name: Latest Development Build
           prerelease: true
           files: |
-            **/Fluvel-win64-installer.exe
-            **/Fluvel-win64-portable.zip
-            **/Fluvel-macos.dmg
+            **/*.exe
+            **/*.zip
+            **/*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
