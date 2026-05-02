@@ -169,6 +169,7 @@ jobs:
 
       # 🔥 Nettoyage ciblé (Windows + macOS uniquement)
       - name: Remove old Windows/macOS assets
+        continue-on-error: true
         run: |
           gh release view latest --json assets -q '.assets[].name' | while read asset; do
             if [[ "$asset" == *win64* ]] || [[ "$asset" == *macos* ]]; then
@@ -181,8 +182,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🚀 Upload propre
-      - name: Create/Update release
+      # 🚀 Create OR update release (sans overwrite)
+      - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
@@ -193,6 +194,5 @@ jobs:
             windows/Fluvel-win64-installer.exe
             macos/Fluvel-macos.dmg
           fail_on_unmatched_files: true
-          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
