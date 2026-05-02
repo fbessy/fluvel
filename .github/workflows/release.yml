@@ -161,7 +161,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 🔥 OBLIGATOIRE pour gh CLI
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -186,26 +185,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🧠 S'assurer que la release existe
+      # 🧠 Crée la release si elle n'existe pas
       - name: Ensure release exists
         run: |
-          gh release view latest || gh release create latest -t "Latest Development Build" -n "Auto release"
+          gh release view latest || gh release create latest -t "Latest Development Build" -n "Auto release" --prerelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🚀 Upload propre
-      - name: Create or update release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: latest
-          name: Latest Development Build
-          prerelease: true
-          files: |
-            windows/Fluvel-win64-portable.zip
-            windows/Fluvel-win64-installer.exe
-            macos/Fluvel-macos.dmg
-          overwrite_files: true
-          fail_on_unmatched_files: true
-          draft: false
+      # 🚀 Upload direct (sans softprops)
+      - name: Upload assets
+        run: |
+          gh release upload latest windows/Fluvel-win64-portable.zip --clobber
+          gh release upload latest windows/Fluvel-win64-installer.exe --clobber
+          gh release upload latest macos/Fluvel-macos.dmg --clobber
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
