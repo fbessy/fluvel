@@ -286,14 +286,17 @@ github_pages:
 
       echo "Version = $APP_VERSION"
 
-      # Génération JSON
-      sha256sum *.AppImage *.flatpak > checksums.txt
-
+      # URLs
       APPIMAGE_URL="https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-${APP_VERSION}-x86_64.AppImage?job=appimage"
       FLATPAK_URL="https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-${APP_VERSION}-x86_64.flatpak?job=flatpak"
+
       WINDOWS_URL=""
       MACOS_URL=""
 
+      # Checksums (si artefacts dispo)
+      sha256sum *.AppImage *.flatpak > checksums.txt || echo "no artifacts"
+
+      # JSON
       cat > latest.json <<EOF
       {
         "version": "$APP_VERSION",
@@ -301,11 +304,11 @@ github_pages:
         "flatpak": "$FLATPAK_URL",
         "windows": "$WINDOWS_URL",
         "macos": "$MACOS_URL",
-        "checksums": "$(cat checksums.txt | sed ':a;N;$!ba;s/\n/\\n/g')"
+        "checksums": "$(cat checksums.txt 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g')"
       }
       EOF
 
-      # Clone GitHub
+      # Push GitHub
       git clone https://oauth2:${GITHUB_TOKEN}@github.com/fbessy/fluvel.git gh-pages
       cd gh-pages
 
@@ -314,12 +317,11 @@ github_pages:
 
       git checkout gh-pages || git checkout -b gh-pages
 
-      # Copier le site
       cp -r ../web/* .
       cp ../latest.json .
 
       git add .
-      git commit -m "Update RC $APP_VERSION" || echo "Nothing to commit"
+      git commit -m "Update RC $APP_VERSION" || true
       git push --set-upstream origin gh-pages
 
   rules:
