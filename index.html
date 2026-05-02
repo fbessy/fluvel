@@ -76,6 +76,7 @@ pre {
   <h2>Latest Build</h2>
 
   <p><b>Version:</b> <span id="version">loading...</span></p>
+  <p><b>Build date (UTC):</b> <span id="date">loading...</span></p>
 
   <!-- WINDOWS -->
   <div class="platform" id="platform_windows">
@@ -110,6 +111,7 @@ function setLink(id, url) {
     return false;
   }
   el.href = url;
+  el.target = "_blank";
   return true;
 }
 
@@ -125,30 +127,34 @@ function hidePlatformIfEmpty(platformId, linkIds) {
 }
 
 fetch("latest.json")
-.then(r => r.json())
-.then(data => {
+  .then(r => {
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  })
+  .then(data => {
 
-  document.getElementById("version").innerText = data.version;
+    document.getElementById("version").innerText = data.version || "N/A";
+    document.getElementById("date").innerText = data.date || "N/A";
 
-  // Windows
-  setLink("win_installer", data.win_installer);
-  setLink("win_portable", data.win_portable);
+    setLink("win_installer", data.win_installer);
+    setLink("win_portable", data.win_portable);
 
-  // Linux
-  setLink("flatpak", data.flatpak);
-  setLink("appimage", data.appimage);
+    setLink("flatpak", data.flatpak);
+    setLink("appimage", data.appimage);
 
-  // macOS
-  setLink("macos", data.macos);
+    setLink("macos", data.macos);
 
-  // Hide empty platforms
-  hidePlatformIfEmpty("platform_windows", ["win_installer", "win_portable"]);
-  hidePlatformIfEmpty("platform_linux", ["flatpak", "appimage"]);
-  hidePlatformIfEmpty("platform_macos", ["macos"]);
+    hidePlatformIfEmpty("platform_windows", ["win_installer", "win_portable"]);
+    hidePlatformIfEmpty("platform_linux", ["flatpak", "appimage"]);
+    hidePlatformIfEmpty("platform_macos", ["macos"]);
 
-  // Checksums
-  document.getElementById("checksums").innerText = data.checksums || "N/A";
-});
+    document.getElementById("checksums").innerText = data.checksums || "N/A";
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById("version").innerText = "Error loading data";
+    document.getElementById("date").innerText = "-";
+  });
 </script>
 
 </body>
