@@ -182,7 +182,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🚀 Create OR update release (sans overwrite)
+      # 🧠 S'assurer que la release existe (évite les bugs GitHub)
+      - name: Ensure release exists
+        run: |
+          gh release view latest || gh release create latest -t "Latest Development Build" -n "Auto release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 🚀 Upload propre (create ou update)
       - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
@@ -193,6 +200,8 @@ jobs:
             windows/Fluvel-win64-portable.zip
             windows/Fluvel-win64-installer.exe
             macos/Fluvel-macos.dmg
+          overwrite_files: true
           fail_on_unmatched_files: true
+          draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
