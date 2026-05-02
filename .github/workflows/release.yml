@@ -49,11 +49,15 @@ jobs:
           modules: 'qtmultimedia'
 
       - name: Configure
-        run: >
-          cmake -B build -S .
-          -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
-          -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
+        shell: bash
+        run: |
+          cmake -B build -S . \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_UNITY_BUILD=OFF \
+            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
+            -DFLUVEL_GIT_COMMIT=${{ github.sha }} \
+            -DFLUVEL_BUILD_ORIGIN="GitHub Actions" \
+            -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
 
       - name: Build
         run: cmake --build build --config Release
@@ -122,9 +126,13 @@ jobs:
 
       - name: Configure
         run: >
-          cmake -B build -S .
-          -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
+          cmake -B build -S . \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_UNITY_BUILD=OFF \
+            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
+            -DFLUVEL_GIT_COMMIT=${{ github.sha }} \
+            -DFLUVEL_BUILD_ORIGIN="GitHub Actions" \
+            -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
 
       - name: Build
         run: cmake --build build --config Release
@@ -164,8 +172,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: windows
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos
+          path: macos
 
       - name: Debug files
         run: ls -R
