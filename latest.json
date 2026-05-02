@@ -1,8 +1,8 @@
 {
-  "version": "dev-488cdd42",
-  "appimage": "https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-dev-488cdd42-x86_64.AppImage?job=appimage",
-  "flatpak": "https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-dev-488cdd42-x86_64.flatpak?job=flatpak",
+  "version": "dev-20831d6e",
+  "appimage": "https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-dev-20831d6e-x86_64.AppImage?job=appimage",
+  "flatpak": "https://gitlab.com/fbessy/fluvel/-/jobs/artifacts/release/raw/fluvel-dev-20831d6e-x86_64.flatpak?job=flatpak",
   "windows": "",
   "macos": "",
-  "checksums": "edcbcd07508600452d878e636f6054147fa6639ed3085f1017eb2fdc5eba398e  fluvel-dev-488cdd42-x86_64.AppImage\n3b87fc26c1f2c3be38afa69d73034cf29635b6629ef1661c3d2d66a9de41254b  fluvel-dev-488cdd42-x86_64.flatpak"
+  "checksums": "8bb3e43bc92714a87636c1508e8557347edb67acfc4238d04762b15952449cc5  fluvel-dev-20831d6e-x86_64.AppImage\n28c21c4c6cf3d5b44250684cc78f057a4881b1ab423cb3545febae484283fd72  fluvel-dev-20831d6e-x86_64.flatpak"
 }
