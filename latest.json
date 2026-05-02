@@ -1,8 +1,13 @@
 {
-  "version": "dev-27236f7f",
-  "appimage": "https://gitlab.com/FabienIP/fluvel/-/jobs/artifacts/release/raw/fluvel-dev-27236f7f-x86_64.AppImage?job=appimage",
-  "flatpak": "https://gitlab.com/FabienIP/fluvel/-/jobs/artifacts/release/raw/fluvel-dev-27236f7f-x86_64.flatpak?job=flatpak",
-  "windows": "",
-  "macos": "",
-  "checksums": "3dfa9f6485aa0a1e7df6a3ea371313d705cf839457771c61d6b5a565d45fe4c8  fluvel-dev-27236f7f-x86_64.AppImage\n84f8964bf4fcf9cfecb409e28a94fbc165fd5e98852bb620db304eed2b586d41  fluvel-dev-27236f7f-x86_64.flatpak"
+  "version": "dev-df79a9dc",
+
+  "win_installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-dev-df79a9dc-win64-installer.exe",
+  "win_portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-dev-df79a9dc-win64-portable.zip",
+
+  "flatpak": "https://gitlab.com/FabienIP/fluvel/-/jobs/artifacts/release/raw/Fluvel-dev-df79a9dc.flatpak?job=flatpak",
+  "appimage": "https://gitlab.com/FabienIP/fluvel/-/jobs/artifacts/release/raw/Fluvel-dev-df79a9dc-x86_64.AppImage?job=appimage",
+
+  "macos": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-dev-df79a9dc-macos.dmg",
+
+  "checksums": "9a9e8767236d1da1c1457c79e1f0163d574b38a10dad504a78bffcafe5ca989b  Fluvel-dev-df79a9dc-x86_64.AppImage\ndf05a2c88f4b312d98679928d771e84d6b01515e145161c15b9850c738fd389f  Fluvel-dev-df79a9dc-x86_64.flatpak"
 }
