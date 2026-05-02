@@ -161,6 +161,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 🔥 OBLIGATOIRE pour gh CLI
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
@@ -182,14 +186,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🧠 S'assurer que la release existe (évite les bugs GitHub)
+      # 🧠 S'assurer que la release existe
       - name: Ensure release exists
         run: |
           gh release view latest || gh release create latest -t "Latest Development Build" -n "Auto release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 🚀 Upload propre (create ou update)
+      # 🚀 Upload propre
       - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
