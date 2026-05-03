@@ -255,9 +255,11 @@ github_pages:
   stage: package
   image: ubuntu:24.04
 
-  dependencies:
-    - flatpak
-    - appimage
+  needs:
+    - job: flatpak
+      artifacts: true
+    - job: appimage
+      artifacts: true
 
   before_script:
     - apt update
