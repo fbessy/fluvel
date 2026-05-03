@@ -242,11 +242,7 @@ jobs:
           CHECKSUMS=$(sha256sum windows/* macos/* 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g' || true)
 
           echo "VERSION=$VERSION"
-          echo "FILES:"
-          ls -lh windows macos
-
-          echo "CHECKSUMS:"
-          echo "$CHECKSUMS"
+          echo "CHECKSUMS=$CHECKSUMS"
 
           cat > latest.json <<EOF
           {
@@ -262,6 +258,11 @@ jobs:
 
             "macos": {
               "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
+            },
+
+            "linux": {
+              "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
+              "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
             },
 
             "checksums": "$CHECKSUMS"

@@ -283,13 +283,12 @@ github_pages:
 
       gh auth status
 
-      # 🔥 ne pas créer la release ici
+      # ne pas créer la release ici
       gh release view latest
 
       echo "FILES BEFORE:"
       ls -lh
 
-      # 🔧 FIX rename robuste
       APPIMAGE_FILE=$(ls *.AppImage 2>/dev/null | head -n 1)
       FLATPAK_FILE=$(ls *.flatpak 2>/dev/null | head -n 1)
 
@@ -305,59 +304,6 @@ github_pages:
       # 🚀 upload Linux
       test -f Fluvel-linux.AppImage && gh release upload latest Fluvel-linux.AppImage --clobber
       test -f Fluvel-linux.flatpak && gh release upload latest Fluvel-linux.flatpak --clobber
-
-      # =========================
-      # 🔥 UPDATE latest.json
-      # =========================
-
-      echo "Fetching latest.json..."
-
-      # ⚠️ fallback si le fichier n'existe pas encore
-      curl -sf https://fbessy.github.io/fluvel/latest.json -o latest.json || echo '{}' > latest.json
-
-      echo "JSON BEFORE:"
-      cat latest.json
-
-      # 👉 ajouter Linux SANS écraser le reste
-      jq '. + {
-        "linux": {
-          "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-          "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
-        }
-      }' latest.json > tmp.json && mv tmp.json latest.json
-
-      # 👉 checksums Linux (robuste)
-      echo "Generating checksums..."
-
-      CHECKSUMS=$(sha256sum Fluvel-linux.AppImage Fluvel-linux.flatpak 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g')
-
-      if [ -n "$CHECKSUMS" ]; then
-        echo "Checksums OK"
-        jq '. + { "checksums": "'$CHECKSUMS'" }' latest.json > tmp.json && mv tmp.json latest.json
-      else
-        echo "⚠️ No checksums generated"
-      fi
-
-      echo "JSON AFTER:"
-      cat latest.json
-
-      # =========================
-      # 🚀 PUSH GitHub Pages
-      # =========================
-
-      git clone https://oauth2:${GITHUB_RELEASE_TOKEN}@github.com/fbessy/fluvel.git gh-pages
-      cd gh-pages
-
-      git checkout gh-pages || git checkout -b gh-pages
-
-      cp ../latest.json .
-
-      git config user.name "GitLab CI"
-      git config user.email "ci@fluvel.local"
-
-      git add latest.json
-      git commit -m "Update Linux artifacts" || true
-      git push
 
   rules:
     - if: '$CI_COMMIT_TAG'
