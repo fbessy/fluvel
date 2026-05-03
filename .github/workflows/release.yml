@@ -198,7 +198,6 @@ jobs:
           gh release create latest \
             -t "Latest Development Build" \
             -n "Auto release" \
-            --prerelease \
             --target ${{ github.sha }}
 
       - name: Remove old Windows/macOS assets
