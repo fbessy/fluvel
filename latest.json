@@ -1,8 +1,8 @@
 {
   "version": "",
   "branch": "release",
-  "commit": "7ec874cf",
-  "date": "2026-05-03T09:43:54Z",
+  "commit": "160c8d8d",
+  "date": "2026-05-03T09:52:41Z",
 
   "windows": {
     "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
