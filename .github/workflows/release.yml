@@ -198,20 +198,34 @@ jobs:
             -n "Auto release" \
             --target ${{ github.sha }}
 
-      - name: Remove old Windows/macOS assets
-        continue-on-error: true
-        run: |
-          gh release view latest --json assets -q '.assets[].name' | while read asset; do
-            if [[ "$asset" == *win64* ]] || [[ "$asset" == *macos* ]]; then
-              gh release delete-asset latest "$asset" -y
-            fi
-          done
-
       - name: Upload assets
         run: |
           gh release upload latest windows/Fluvel-win64-portable.zip --clobber
           gh release upload latest windows/Fluvel-win64-installer.exe --clobber
           gh release upload latest macos/Fluvel-macos.dmg --clobber
+
+      - name: Wait for Linux assets
+        run: |
+          echo "Waiting for Linux artifacts..."
+
+          for i in {1..30}; do
+            ASSETS=$(gh release view latest --json assets -q '.assets[].name' || true)
+
+            echo "Current assets:"
+            echo "$ASSETS"
+
+            if echo "$ASSETS" | grep -q "Fluvel-linux.AppImage" && \
+              echo "$ASSETS" | grep -q "Fluvel-linux.flatpak"; then
+              echo "Linux artifacts found ✔"
+              exit 0
+            fi
+
+            echo "Not ready yet... retry in 10s"
+            sleep 10
+          done
+
+          echo "❌ Timeout waiting for Linux artifacts"
+          exit 1
 
       - name: Generate latest.json
         run: |
