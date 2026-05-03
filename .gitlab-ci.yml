@@ -263,7 +263,7 @@ github_pages:
 
   before_script:
     - apt update
-    - apt install -y git gh
+    - apt install -y git gh jq
 
   script:
     - |
@@ -302,9 +302,53 @@ github_pages:
       echo "FILES AFTER:"
       ls -lh
 
-      # 🚀 upload
+      # 🚀 upload Linux
       test -f Fluvel-linux.AppImage && gh release upload latest Fluvel-linux.AppImage --clobber
       test -f Fluvel-linux.flatpak && gh release upload latest Fluvel-linux.flatpak --clobber
+
+      # =========================
+      # 🔥 UPDATE latest.json
+      # =========================
+
+      echo "Fetching latest.json..."
+      curl -s https://fbessy.github.io/fluvel/latest.json > latest.json
+
+      echo "JSON BEFORE:"
+      cat latest.json
+
+      # 👉 ajouter Linux
+      jq '.linux = {
+        "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
+        "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+      }' latest.json > tmp.json && mv tmp.json latest.json
+
+      # 👉 checksums Linux (optionnel mais utile)
+      CHECKSUMS=$(sha256sum Fluvel-linux.AppImage Fluvel-linux.flatpak 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g')
+
+      if [ -n "$CHECKSUMS" ]; then
+        jq '.checksums = "'$CHECKSUMS'"' latest.json > tmp.json && mv tmp.json latest.json
+      fi
+
+      echo "JSON AFTER:"
+      cat latest.json
+
+      # =========================
+      # 🚀 PUSH GitHub Pages
+      # =========================
+
+      git clone https://oauth2:${GITHUB_RELEASE_TOKEN}@github.com/fbessy/fluvel.git gh-pages
+      cd gh-pages
+
+      git checkout gh-pages || git checkout -b gh-pages
+
+      cp ../latest.json .
+
+      git config user.name "GitLab CI"
+      git config user.email "ci@fluvel.local"
+
+      git add latest.json
+      git commit -m "Update Linux artifacts" || true
+      git push
 
   rules:
     - if: '$CI_COMMIT_TAG'

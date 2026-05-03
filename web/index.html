@@ -61,6 +61,12 @@ pre {
   padding: 10px;
   overflow-x: auto;
 }
+
+code {
+  background: #eee;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
 </style>
 
 </head>
@@ -76,23 +82,22 @@ pre {
   <h2>Latest Build</h2>
 
   <p><b>Version:</b> <span id="version">loading...</span></p>
+  <p><b>Branch:</b> <span id="branch">loading...</span></p>
+  <p><b>Commit:</b> <code id="commit">loading...</code></p>
   <p><b>Build date (UTC):</b> <span id="date">loading...</span></p>
 
-  <!-- WINDOWS -->
   <div class="platform" id="platform_windows">
     <h3>🪟 Windows</h3>
     <a id="win_installer" class="button">Installer (.exe)</a>
     <a id="win_portable" class="button">Portable (.zip)</a>
   </div>
 
-  <!-- LINUX -->
   <div class="platform" id="platform_linux">
     <h3>🐧 Linux</h3>
     <a id="flatpak" class="button">Flatpak (recommended)</a>
     <a id="appimage" class="button">AppImage</a>
   </div>
 
-  <!-- MACOS -->
   <div class="platform" id="platform_macos">
     <h3>🍎 macOS</h3>
     <a id="macos" class="button">DMG</a>
@@ -134,10 +139,11 @@ fetch("latest.json")
   .then(data => {
 
     document.getElementById("version").innerText = data.version || "N/A";
+    document.getElementById("branch").innerText = data.branch || "N/A";
+    document.getElementById("commit").innerText = data.commit || "N/A";
 
     if (data.date) {
       const d = new Date(data.date);
-
       document.getElementById("date").innerText =
         d.toLocaleString("en-GB", {
           year: "numeric",
@@ -152,19 +158,21 @@ fetch("latest.json")
       document.getElementById("date").innerText = "N/A";
     }
 
-    setLink("win_installer", data.win_installer);
-    setLink("win_portable", data.win_portable);
+    setLink("win_installer", data.windows?.installer);
+    setLink("win_portable", data.windows?.portable);
 
-    setLink("flatpak", data.flatpak);
-    setLink("appimage", data.appimage);
+    setLink("flatpak", data.linux?.flatpak);
+    setLink("appimage", data.linux?.appimage);
 
-    setLink("macos", data.macos);
+    setLink("macos", data.macos?.dmg);
 
     hidePlatformIfEmpty("platform_windows", ["win_installer", "win_portable"]);
     hidePlatformIfEmpty("platform_linux", ["flatpak", "appimage"]);
     hidePlatformIfEmpty("platform_macos", ["macos"]);
 
-    document.getElementById("checksums").innerText = data.checksums || "N/A";
+    document.getElementById("checksums").innerText =
+      data.checksums || "No checksums available";
+
   })
   .catch(err => {
     console.error(err);

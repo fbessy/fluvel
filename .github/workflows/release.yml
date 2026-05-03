@@ -217,17 +217,32 @@ jobs:
 
       - name: Generate latest.json
         run: |
+          VERSION="${{ env.VERSION }}"
+          COMMIT_SHORT=${GITHUB_SHA::8}
+          BRANCH_NAME=${GITHUB_REF_NAME}
           BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          CHECKSUMS=$(sha256sum \
+            windows/Fluvel-win64-portable.zip \
+            windows/Fluvel-win64-installer.exe \
+            macos/Fluvel-macos.dmg \
+            2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g')
 
           cat > latest.json <<EOF
           {
-            "version": "latest",
+            "version": "$VERSION",
+            "branch": "$BRANCH_NAME",
+            "commit": "$COMMIT_SHORT",
             "date": "$BUILD_DATE",
-            "win_installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
-            "win_portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip",
-            "macos": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg",
-            "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-            "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+
+            "windows": {
+              "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
+              "portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip"
+            },
+
+            "macos": {
+              "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
+            }
           }
           EOF
 
