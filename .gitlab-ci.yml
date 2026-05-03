@@ -263,7 +263,7 @@ github_pages:
 
   before_script:
     - apt update
-    - apt install -y git gh jq
+    - apt install -y git gh jq curl
 
   script:
     - |
