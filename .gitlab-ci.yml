@@ -311,22 +311,31 @@ github_pages:
       # =========================
 
       echo "Fetching latest.json..."
-      curl -s https://fbessy.github.io/fluvel/latest.json > latest.json
+
+      # ⚠️ fallback si le fichier n'existe pas encore
+      curl -sf https://fbessy.github.io/fluvel/latest.json -o latest.json || echo '{}' > latest.json
 
       echo "JSON BEFORE:"
       cat latest.json
 
-      # 👉 ajouter Linux
-      jq '.linux = {
-        "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-        "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+      # 👉 ajouter Linux SANS écraser le reste
+      jq '. + {
+        "linux": {
+          "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
+          "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+        }
       }' latest.json > tmp.json && mv tmp.json latest.json
 
-      # 👉 checksums Linux (optionnel mais utile)
+      # 👉 checksums Linux (robuste)
+      echo "Generating checksums..."
+
       CHECKSUMS=$(sha256sum Fluvel-linux.AppImage Fluvel-linux.flatpak 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g')
 
       if [ -n "$CHECKSUMS" ]; then
-        jq '.checksums = "'$CHECKSUMS'"' latest.json > tmp.json && mv tmp.json latest.json
+        echo "Checksums OK"
+        jq '. + { "checksums": "'$CHECKSUMS'" }' latest.json > tmp.json && mv tmp.json latest.json
+      else
+        echo "⚠️ No checksums generated"
       fi
 
       echo "JSON AFTER:"
