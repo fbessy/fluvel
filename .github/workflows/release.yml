@@ -169,7 +169,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-        GH_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - uses: actions/checkout@v4
@@ -184,26 +184,37 @@ jobs:
           name: macos
           path: macos
 
-      - name: Install gh (safe)
+      - name: Install gh
         run: |
           command -v gh || (apt update && apt install -y gh)
 
       - name: Debug files
         run: ls -R
 
+      # =========================
+      # CREATE RELEASE
+      # =========================
       - name: Ensure release exists
         run: |
-          gh release view latest || gh release create latest \
+          gh release delete latest -y || true
+
+          gh release create latest \
             -t "Latest Development Build" \
             -n "Auto release" \
             --target ${{ github.sha }}
 
+      # =========================
+      # UPLOAD WINDOWS + MACOS
+      # =========================
       - name: Upload assets
         run: |
           gh release upload latest windows/Fluvel-win64-portable.zip --clobber
           gh release upload latest windows/Fluvel-win64-installer.exe --clobber
           gh release upload latest macos/Fluvel-macos.dmg --clobber
 
+      # =========================
+      # WAIT FOR LINUX
+      # =========================
       - name: Wait for Linux assets
         run: |
           echo "Waiting for Linux artifacts..."
@@ -211,7 +222,6 @@ jobs:
           for i in {1..30}; do
             ASSETS=$(gh release view latest --json assets -q '.assets[].name' || true)
 
-            echo "Current assets:"
             echo "$ASSETS"
 
             if echo "$ASSETS" | grep -q "Fluvel-linux.AppImage" && \
@@ -227,22 +237,42 @@ jobs:
           echo "❌ Timeout waiting for Linux artifacts"
           exit 1
 
+      # =========================
+      # DOWNLOAD LINUX FOR CHECKSUMS
+      # =========================
+      - name: Download Linux assets
+        run: |
+          gh release download latest -p "Fluvel-linux.*"
+
+          echo "FILES DOWNLOADED:"
+          ls -lh
+
+          LINUX_SUMS=$(sha256sum Fluvel-linux.AppImage Fluvel-linux.flatpak | sed ':a;N;$!ba;s/\n/\\n/g')
+          echo "LINUX_SUMS=$LINUX_SUMS" >> $GITHUB_ENV
+
+      # =========================
+      # GENERATE JSON
+      # =========================
       - name: Generate latest.json
         run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          else
-            VERSION="dev-${GITHUB_SHA::7}"
+          VERSION="dev-${GITHUB_SHA::7}"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF##*/v}"
           fi
 
           COMMIT_SHORT=${GITHUB_SHA::8}
           BRANCH_NAME=${GITHUB_REF_NAME}
           BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-          CHECKSUMS=$(sha256sum windows/* macos/* 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g' || true)
+          BASE_SUMS=$(sha256sum windows/* macos/* 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g' || true)
+
+          ALL_CHECKSUMS="$BASE_SUMS"
+          if [ -n "$LINUX_SUMS" ]; then
+            ALL_CHECKSUMS="$ALL_CHECKSUMS\n$LINUX_SUMS"
+          fi
 
           echo "VERSION=$VERSION"
-          echo "CHECKSUMS=$CHECKSUMS"
+          echo "CHECKSUMS=$ALL_CHECKSUMS"
 
           cat > latest.json <<EOF
           {
@@ -265,10 +295,13 @@ jobs:
               "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
             },
 
-            "checksums": "$CHECKSUMS"
+            "checksums": "$ALL_CHECKSUMS"
           }
           EOF
 
+      # =========================
+      # DEPLOY GITHUB PAGES
+      # =========================
       - name: Deploy GitHub Pages
         run: |
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/fbessy/fluvel.git gh-pages
@@ -286,5 +319,5 @@ jobs:
           git pull origin gh-pages || true
 
           git add .
-          git commit -m "Update latest" || true
+          git commit -m "Update latest build" || true
           git push
