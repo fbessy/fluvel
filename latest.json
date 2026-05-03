@@ -1,9 +1,15 @@
 {
-  "version": "latest",
-  "date": "2026-05-03T08:44:43Z",
-  "win_installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
-  "win_portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip",
-  "macos": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg",
-  "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-  "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+  "version": "",
+  "branch": "release",
+  "commit": "7ec874cf",
+  "date": "2026-05-03T09:43:54Z",
+
+  "windows": {
+    "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
+    "portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip"
+  },
+
+  "macos": {
+    "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
+  }
 }
