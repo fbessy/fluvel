@@ -193,10 +193,13 @@ jobs:
 
       - name: Ensure release exists
         run: |
-          gh release view latest || gh release create latest \
+          gh release delete latest -y || true
+
+          gh release create latest \
             -t "Latest Development Build" \
             -n "Auto release" \
-            --prerelease
+            --prerelease \
+            --target ${{ github.sha }}
 
       - name: Remove old Windows/macOS assets
         continue-on-error: true

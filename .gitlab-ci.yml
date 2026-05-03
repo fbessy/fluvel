@@ -277,36 +277,21 @@ github_pages:
 
       echo "Version = $APP_VERSION"
 
-      # install gh
-      apt update && apt install -y gh
-
-      # FIX 1: éviter conflit
       unset GITHUB_TOKEN
-
-      # FIX 2: auth propre
       echo "$GITHUB_RELEASE_TOKEN" | gh auth login --with-token
-
-      # FIX 3: forcer le repo GitHub
       export GH_REPO=fbessy/fluvel
 
-      # vérifier auth
       gh auth status
 
-      # créer release si besoin
-      gh release view latest || gh release create latest \
-        --title "Latest Development Build" \
-        --notes "Auto release" \
-        --prerelease
+      # 🔥 NE PAS créer la release ici
+      gh release view latest
 
-      # debug fichiers
       echo "FILES:"
       ls -lh
 
-      # rename (ignore si pas là)
       mv Fluvel-${APP_VERSION}-x86_64.AppImage Fluvel-linux.AppImage 2>/dev/null || true
       mv Fluvel-${APP_VERSION}-x86_64.flatpak Fluvel-linux.flatpak 2>/dev/null || true
 
-      # upload (échoue si fichier absent)
       test -f Fluvel-linux.AppImage && gh release upload latest Fluvel-linux.AppImage --clobber
       test -f Fluvel-linux.flatpak && gh release upload latest Fluvel-linux.flatpak --clobber
 
