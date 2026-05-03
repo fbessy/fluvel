@@ -193,9 +193,7 @@ jobs:
 
       - name: Ensure release exists
         run: |
-          gh release delete latest -y || true
-
-          gh release create latest \
+          gh release view latest || gh release create latest \
             -t "Latest Development Build" \
             -n "Auto release" \
             --target ${{ github.sha }}
@@ -217,16 +215,24 @@ jobs:
 
       - name: Generate latest.json
         run: |
-          VERSION="${{ env.VERSION }}"
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+
           COMMIT_SHORT=${GITHUB_SHA::8}
           BRANCH_NAME=${GITHUB_REF_NAME}
           BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-          CHECKSUMS=$(sha256sum \
-            windows/Fluvel-win64-portable.zip \
-            windows/Fluvel-win64-installer.exe \
-            macos/Fluvel-macos.dmg \
-            2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g')
+          CHECKSUMS=$(sha256sum windows/* macos/* 2>/dev/null | sed ':a;N;$!ba;s/\n/\\n/g' || true)
+
+          echo "VERSION=$VERSION"
+          echo "FILES:"
+          ls -lh windows macos
+
+          echo "CHECKSUMS:"
+          echo "$CHECKSUMS"
 
           cat > latest.json <<EOF
           {
@@ -242,7 +248,9 @@ jobs:
 
             "macos": {
               "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
-            }
+            },
+
+            "checksums": "$CHECKSUMS"
           }
           EOF
 
