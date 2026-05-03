@@ -299,11 +299,12 @@ github_pages:
         --prerelease
 
       # debug fichiers
-      ls -R
+      echo "FILES:"
+      ls -lh
 
       # rename (ignore si pas là)
-      mv Fluvel-${APP_VERSION}-x86_64.AppImage Fluvel-linux.AppImage || true
-      mv Fluvel-${APP_VERSION}-x86_64.flatpak Fluvel-linux.flatpak || true
+      mv Fluvel-${APP_VERSION}-x86_64.AppImage Fluvel-linux.AppImage 2>/dev/null || true
+      mv Fluvel-${APP_VERSION}-x86_64.flatpak Fluvel-linux.flatpak 2>/dev/null || true
 
       # upload (échoue si fichier absent)
       test -f Fluvel-linux.AppImage && gh release upload latest Fluvel-linux.AppImage --clobber
