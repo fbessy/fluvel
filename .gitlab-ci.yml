@@ -319,6 +319,8 @@ github_pages:
     - |
       set -e
 
+      echo "=== VERSION ==="
+
       if [ -n "$CI_COMMIT_TAG" ]; then
         APP_VERSION=${CI_COMMIT_TAG#v}
       else
@@ -327,33 +329,27 @@ github_pages:
 
       echo "Version = $APP_VERSION"
 
+      echo "=== AUTH ==="
+
       unset GITHUB_TOKEN
       echo "$GITHUB_RELEASE_TOKEN" | gh auth login --with-token
       export GH_REPO=fbessy/fluvel
 
       gh auth status
 
-      # ne pas créer la release ici
+      echo "=== CHECK RELEASE ==="
       gh release view latest
 
-      echo "FILES BEFORE:"
+      echo "=== FILES ==="
       ls -lh
 
-      APPIMAGE_FILE=$(ls *.AppImage 2>/dev/null | head -n 1)
-      FLATPAK_FILE=$(ls *.flatpak 2>/dev/null | head -n 1)
+      [ -f Fluvel-linux.AppImage ] || { echo "❌ Missing AppImage"; exit 1; }
+      [ -f Fluvel-linux.flatpak ] || { echo "❌ Missing Flatpak"; exit 1; }
 
-      echo "Detected AppImage: $APPIMAGE_FILE"
-      echo "Detected Flatpak: $FLATPAK_FILE"
+      echo "=== UPLOAD ==="
 
-      [ -n "$APPIMAGE_FILE" ] && mv "$APPIMAGE_FILE" Fluvel-linux.AppImage
-      [ -n "$FLATPAK_FILE" ] && mv "$FLATPAK_FILE" Fluvel-linux.flatpak
-
-      echo "FILES AFTER:"
-      ls -lh
-
-      # 🚀 upload Linux
-      test -f Fluvel-linux.AppImage && gh release upload latest Fluvel-linux.AppImage --clobber
-      test -f Fluvel-linux.flatpak && gh release upload latest Fluvel-linux.flatpak --clobber
+      gh release upload latest Fluvel-linux.AppImage --clobber
+      gh release upload latest Fluvel-linux.flatpak --clobber
 
   rules:
     - if: '$CI_COMMIT_TAG'
