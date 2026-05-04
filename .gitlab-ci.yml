@@ -1,5 +1,6 @@
 stages:
   - verify
+  - docker
   - build
   - package
   - doc
@@ -28,37 +29,42 @@ check_version:
   rules:
     - if: '$CI_COMMIT_TAG'
 
+docker-build:
+  stage: docker
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+    # pull si existe (sinon ignore)
+    - docker pull $CI_REGISTRY_IMAGE/qt-builder || true
+
+    # build avec cache
+    - docker build \
+        --cache-from $CI_REGISTRY_IMAGE/qt-builder \
+        -t $CI_REGISTRY_IMAGE/qt-builder \
+        -f docker/qt-builder/Dockerfile .
+
+    - docker push $CI_REGISTRY_IMAGE/qt-builder
+
 build:
   stage: build
-  image: ubuntu:24.04
+  image: $CI_REGISTRY_IMAGE/qt-builder
 
   cache:
-    key: "qt-${QT_VERSION}-${QT_ARCH}"
+    key: build-cache
     paths:
-      - $HOME/Qt
-      - $HOME/.ccache
+      - .ccache
 
   before_script:
-    - apt update
-    - apt install -y ccache python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglib2.0-0 libxkbcommon0 libpulse0 libdbus-1-3 libglu1-mesa
-    - export CCACHE_DIR="$HOME/.ccache"
-    - export CCACHE_MAXSIZE=500M
-    - pip install aqtinstall --break-system-packages
-
-    - |
-      if [ ! -d "$HOME/Qt/$QT_VERSION/$QT_ARCH" ]; then
-        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 \
-          -O $HOME/Qt \
-          -m qtmultimedia
-      fi
-
-    - export QT_ROOT="$HOME/Qt/$QT_VERSION/$QT_ARCH"
-    - export Qt6_DIR="$QT_ROOT/lib/cmake/Qt6"
-    - export PATH="$QT_ROOT/bin:$PATH"
-    - export CMAKE_PREFIX_PATH="$QT_ROOT/lib/cmake"
-
-    - echo "QT_ROOT=$QT_ROOT"
-    - echo "Qt6_DIR=$Qt6_DIR"
+    - export CCACHE_DIR="$CI_PROJECT_DIR/.ccache"
+    - export CC="ccache gcc"
+    - export CXX="ccache g++"
 
   script:
     - |
@@ -71,22 +77,17 @@ build:
       echo "Version = $APP_VERSION"
 
       BUILD_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
-      echo "BUILD_TIMESTAMP=$BUILD_TIMESTAMP"
 
       cmake --fresh -S . -B build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_UNITY_BUILD=OFF \
         -DQt6_DIR=$Qt6_DIR \
-        \
         -DFLUVEL_BUILD_VERSION=$APP_VERSION \
         -DFLUVEL_GIT_COMMIT=$CI_COMMIT_SHORT_SHA \
         -DFLUVEL_BUILD_TIMESTAMP="$BUILD_TIMESTAMP" \
         -DFLUVEL_BUILD_ORIGIN="GitLab CI"
 
       cmake --build build
-
-  after_script:
-    - ccache --show-stats
 
   rules:
     - if: '$CI_COMMIT_BRANCH != "release" && $CI_COMMIT_TAG == null'
@@ -98,7 +99,9 @@ build:
 
 flatpak:
   stage: package
-  image: ubuntu:24.04
+  image: $CI_REGISTRY_IMAGE/qt-builder
+
+  cache: {}
 
   before_script:
     - apt update
@@ -109,9 +112,6 @@ flatpak:
 
   script:
     - |
-      # =========================
-      # VERSION
-      # =========================
       if [ -n "$CI_COMMIT_TAG" ]; then
         APP_VERSION=${CI_COMMIT_TAG#v}
       else
@@ -120,53 +120,32 @@ flatpak:
 
       echo "Version = $APP_VERSION"
 
-      # =========================
-      # PATHS
-      # =========================
       PROJECT_ROOT=$(git rev-parse --show-toplevel)
-      echo "PROJECT_ROOT=$PROJECT_ROOT"
 
-      # =========================
-      # TIMESTAMPS
-      # =========================
       BUILD_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S" | sed 's/[\/&]/\\&/g')
       APP_DATE=$(date +%Y-%m-%d)
 
-      echo "BUILD_TIMESTAMP=$BUILD_TIMESTAMP"
-
-      # =========================
-      # PREPARE FILES
-      # =========================
       cp packaging/flatpak/fluvel.json fluvel.ci.json
       cp packaging/flatpak/org.fluvel.App.metainfo.xml metainfo.ci.xml
 
-      # =========================
-      # REPLACE VARIABLES (JSON)
-      # =========================
       ESCAPED_ROOT=$(printf '%s\n' "$PROJECT_ROOT" | sed 's/[\/&]/\\&/g')
 
       sed -i "s|__SOURCE_ROOT__|$ESCAPED_ROOT|g" fluvel.ci.json
       sed -i "s/__APP_VERSION__/$APP_VERSION/g" fluvel.ci.json
       sed -i "s/__CI_COMMIT__/$CI_COMMIT_SHORT_SHA/g" fluvel.ci.json
       sed -i "s/__BUILD_TIMESTAMP__/$BUILD_TIMESTAMP/g" fluvel.ci.json
-      sed -i "s/__BUILD_ORIGIN__/$BUILD_ORIGIN/g" fluvel.ci.json
+      sed -i "s/__BUILD_ORIGIN__/GitLab CI/g" fluvel.ci.json
 
-      # =========================
-      # REPLACE VARIABLES (METAINFO)
-      # =========================
       sed -i "s/__APP_VERSION__/$APP_VERSION/g" metainfo.ci.xml
       sed -i "s/__APP_DATE__/$APP_DATE/g" metainfo.ci.xml
 
-      # =========================
-      # BUILD FLATPAK
-      # =========================
       flatpak-builder --force-clean build-flatpak fluvel.ci.json
       flatpak build-export repo build-flatpak
-      flatpak build-bundle repo Fluvel-${APP_VERSION}-x86_64.flatpak org.fluvel.App
+      flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.App
 
   artifacts:
     paths:
-      - "*.flatpak"
+      - Fluvel-linux.flatpak
 
   rules:
     - if: '$CI_COMMIT_TAG'
@@ -174,34 +153,9 @@ flatpak:
 
 appimage:
   stage: package
-  image: ubuntu:24.04
+  image: $CI_REGISTRY_IMAGE/qt-builder
 
-  cache:
-    key: "qt-${QT_VERSION}-${QT_ARCH}"
-    paths:
-      - $HOME/Qt
-
-  before_script:
-    - apt update
-    - apt install -y file wget curl rsync python3-pip cmake ninja-build build-essential clang libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev libglib2.0-0 libxkbcommon0 libxkbcommon-x11-0 libxcb1 libxcb-util1 libxcb-cursor0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-image0 libxcb-xinerama0 libxcb-shape0 libxcb-randr0 libxrandr2 libpulse0 libdbus-1-3 libx11-6 libxext6 libxrender1 libxi6 libxfixes3 libxcomposite1 libxcursor1 libxdamage1 libxtst6 libsm6 libice6 libfontconfig1 libfreetype6 libegl1 libwayland-client0
-    - pip install aqtinstall --break-system-packages
-
-    - |
-      if [ ! -d "$HOME/Qt/$QT_VERSION/$QT_ARCH" ]; then
-        python3 -m aqt install-qt linux desktop $QT_VERSION linux_gcc_64 \
-          -O $HOME/Qt \
-          -m qtmultimedia
-      fi
-
-    - export QT_ROOT="$HOME/Qt/$QT_VERSION/$QT_ARCH"
-    - export PATH="$QT_ROOT/bin:$PATH"
-    - export Qt6_DIR="$QT_ROOT/lib/cmake/Qt6"
-    - export CMAKE_PREFIX_PATH="$QT_ROOT/lib/cmake"
-
-    - mkdir -p tools
-    - wget -O tools/linuxdeploy-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-    - wget -O tools/linuxdeploy-plugin-qt-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-    - chmod +x tools/*.AppImage
+  cache: {}
 
   script:
     - |
@@ -243,18 +197,20 @@ appimage:
 
       export QT_PLUGIN_PATH="$CI_PROJECT_DIR/qt-plugins"
       export APPIMAGE_EXTRACT_AND_RUN=1
-      export LINUXDEPLOY_PLUGIN_PATH="$CI_PROJECT_DIR/tools"
-      export LD_LIBRARY_PATH="$QT_ROOT/lib:$LD_LIBRARY_PATH"
 
-      chmod +x tools/*.AppImage
+      /opt/tools/linuxdeploy \
+        --appdir AppDir \
+        --executable AppDir/usr/bin/Fluvel \
+        --desktop-file AppDir/fluvel.desktop \
+        --icon-file AppDir/fluvel.png \
+        --plugin qt \
+        --output appimage
 
-      ./tools/linuxdeploy-x86_64.AppImage --appdir AppDir --executable AppDir/usr/bin/Fluvel --desktop-file AppDir/fluvel.desktop --icon-file AppDir/fluvel.png --plugin qt --output appimage
-
-      mv *.AppImage Fluvel-${APP_VERSION}-x86_64.AppImage
+      mv *.AppImage Fluvel-linux.AppImage
 
   artifacts:
     paths:
-      - ./*.AppImage
+      - Fluvel-linux.AppImage
 
   rules:
     - if: '$CI_COMMIT_TAG'
