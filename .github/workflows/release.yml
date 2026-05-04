@@ -228,7 +228,10 @@ jobs:
         run: |
           echo "Waiting for Linux artifacts..."
 
-          for i in {1..30}; do
+          for i in {1..45}; do
+
+            echo "Attempt $i / 45"
+
             ASSETS=$(gh release view latest --json assets -q '.assets[].name' || true)
 
             echo "$ASSETS"
@@ -239,8 +242,8 @@ jobs:
               exit 0
             fi
 
-            echo "Not ready yet... retry in 10s"
-            sleep 10
+            echo "Not ready yet... retry in 20s"
+            sleep 20
           done
 
           echo "❌ Timeout waiting for Linux artifacts"
