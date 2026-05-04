@@ -228,9 +228,9 @@ jobs:
         run: |
           echo "Waiting for Linux artifacts..."
 
-          for i in {1..45}; do
+          for i in {1..90}; do
 
-            echo "Attempt $i / 45"
+            echo "Attempt $i / 90"
 
             ASSETS=$(gh release view latest --json assets -q '.assets[].name' || true)
 
