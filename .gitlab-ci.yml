@@ -40,9 +40,20 @@ docker-build:
 
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE/qt-builder || true
-    - docker build --cache-from $CI_REGISTRY_IMAGE/qt-builder -t $CI_REGISTRY_IMAGE/qt-builder -f docker/qt-builder/Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/qt-builder
+
+    # cache précédent
+    - docker pull $CI_REGISTRY_IMAGE/qt-builder:latest || true
+
+    # build optimisé
+    - |
+      docker build \
+        --cache-from $CI_REGISTRY_IMAGE/qt-builder:latest \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        -t $CI_REGISTRY_IMAGE/qt-builder:latest \
+        -f docker/qt-builder/Dockerfile \
+        .
+
+    - docker push $CI_REGISTRY_IMAGE/qt-builder:latest
 
 build:
   stage: build
@@ -188,6 +199,7 @@ appimage:
       rsync -a "$QT_ROOT/plugins/" qt-plugins/ --exclude "imageformats/libqtiff.so*"
 
       export QT_PLUGIN_PATH="$CI_PROJECT_DIR/qt-plugins"
+      export LD_LIBRARY_PATH="$QT_ROOT/lib:$LD_LIBRARY_PATH"
       export APPIMAGE_EXTRACT_AND_RUN=1
 
       /opt/tools/linuxdeploy \
