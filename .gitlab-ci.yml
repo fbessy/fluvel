@@ -38,19 +38,19 @@ docker-build:
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
 
-  script:
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+script:
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
-    # pull si existe (sinon ignore)
-    - docker pull $CI_REGISTRY_IMAGE/qt-builder || true
+  - docker pull $CI_REGISTRY_IMAGE/qt-builder || true
 
-    # build avec cache
-    - docker build \
-        --cache-from $CI_REGISTRY_IMAGE/qt-builder \
-        -t $CI_REGISTRY_IMAGE/qt-builder \
-        -f docker/qt-builder/Dockerfile .
+  - |
+    docker build \
+      --cache-from $CI_REGISTRY_IMAGE/qt-builder \
+      -t $CI_REGISTRY_IMAGE/qt-builder \
+      -f docker/qt-builder/Dockerfile \
+      .
 
-    - docker push $CI_REGISTRY_IMAGE/qt-builder
+  - docker push $CI_REGISTRY_IMAGE/qt-builder
 
 build:
   stage: build
