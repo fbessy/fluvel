@@ -12,178 +12,183 @@
 <context>
     <name>fluvel_app::AboutWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="99"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="141"/>
         <source>About Fluvel</source>
         <translation>À propos de Fluvel</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="134"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="185"/>
         <source>Version </source>
         <translation>Version </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="203"/>
         <source>Home page</source>
         <translation>Page d’accueil</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="157"/>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="187"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="208"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="238"/>
         <source>License</source>
         <translation>Licence</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="229"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="280"/>
         <source>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.&lt;/p&gt;&lt;p&gt;The software integrates real-time image processing, video stream handling, image pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.&lt;/p&gt;&lt;p&gt;It provides an interactive environment for testing and analyzing discrete level-set implementations in both static images and dynamic video scenarios.&lt;/p&gt;&lt;p&gt;Fluvel focuses on performance, reproducibility, and clarity, making it suitable for research, teaching, and experimental validation.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; est une application de segmentation d’images orientée recherche, conçue pour permettre des expérimentations rapides et efficaces avec des méthodes de contours actifs de type level-set.&lt;/p&gt;&lt;p&gt;Le logiciel intègre du traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement d’image ainsi que des métriques d’évaluation quantitative telles que la distance de Hausdorff pour l’analyse de segmentation.&lt;/p&gt;&lt;p&gt;Il offre un environnement interactif pour tester et analyser des implémentations discrètes de level-set, aussi bien sur des images statiques que dans des scénarios vidéo dynamiques.&lt;/p&gt;&lt;p&gt;Fluvel met l’accent sur les performances, la reproductibilité et la clarté, ce qui le rend adapté à la recherche, à l’enseignement et à la validation expérimentale.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="256"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="307"/>
         <source>&lt;p&gt;&lt;b&gt;Scientific Background&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel integrates several fundamental methods in image segmentation, including discrete level-set approximation (Shi &amp; Karl, 2008), region-based active contours (Chan &amp; Vese, 2001), anisotropic diffusion filtering (Perona &amp; Malik, 1990), and quantitative evaluation using the Hausdorff distance.&lt;/p&gt;&lt;p&gt;These methods provide a balance between computational efficiency, topological flexibility, and rigorous segmentation assessment.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="279"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="330"/>
         <source>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;This project was originally developed in 2010 within the Pattern Recognition and Image Analysis research team, Laboratory of Computer Science (LIFAT), François Rabelais University, Tours, as part of the MSc in Medical Imaging.&lt;/p&gt;&lt;p&gt;It has been modernized and extended in 2024–2026.&lt;/p&gt;&lt;p&gt;Contact: &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Ce projet a été initialement développé en 2010 au sein de l’équipe de recherche en reconnaissance des formes et analyse d’images, au Laboratoire d’informatique (LIFAT), Université François-Rabelais de Tours, dans le cadre du Master en imagerie médicale.&lt;/p&gt;&lt;p&gt;Il a été modernisé et étendu entre 2024 et 2026.&lt;/p&gt;&lt;p&gt;Contact : &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="311"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="362"/>
         <source>&lt;p&gt;&lt;b&gt;Support Fluvel&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel is developed and maintained as an independent research-oriented project.&lt;/p&gt;&lt;p&gt;If you find the software useful for research, teaching, or experimentation, you may support its continued development through a voluntary donation.&lt;/p&gt;&lt;p&gt;Your support helps sustain long-term maintenance, improvements, and future extensions of the project.&lt;/p&gt;&lt;p&gt;&lt;i&gt;No features are restricted. Donations are entirely optional.&lt;/i&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Soutenir Fluvel&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel est développé et maintenu comme un projet indépendant orienté recherche.&lt;/p&gt;&lt;p&gt;Si vous trouvez ce logiciel utile pour la recherche, l’enseignement ou l’expérimentation, vous pouvez soutenir son développement par un don volontaire.&lt;/p&gt;&lt;p&gt;Votre soutien contribue à assurer la maintenance à long terme, les améliorations et les évolutions futures du projet.&lt;/p&gt;&lt;p&gt;&lt;i&gt;Aucune fonctionnalité n’est restreinte. Les dons sont entièrement facultatifs.&lt;/i&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="325"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="376"/>
         <source>Donate via PayPal</source>
         <translation>Faire un don via PayPal</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="355"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="406"/>
         <source>Overview</source>
         <translation>Aperçu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="356"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="407"/>
         <source>Scientific</source>
         <translation>Scientifique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="357"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="408"/>
         <source>Author</source>
         <translation>Auteur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="358"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="409"/>
         <source>Technical</source>
         <translation>Technique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="359"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="410"/>
         <source>Support</source>
         <translation>Soutien</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="408"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="459"/>
         <source>Technical information</source>
         <translation>Informations techniques</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="414"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="465"/>
         <source>Application</source>
         <translation>Application</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="421"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="472"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="423"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="474"/>
         <source>Configuration directory</source>
         <translation>Répertoire de configuration</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="427"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="478"/>
         <source>Image formats</source>
         <translation>Formats d’image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="430"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="481"/>
         <source>Image format support is provided by Qt image format plugins.</source>
         <translation>La prise en charge des formats d’image est assurée par les plugins de formats d’image Qt.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="431"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="482"/>
         <source>Available formats depend on the Qt installation and platform.</source>
         <translation>Les formats disponibles dépendent de l’installation de Qt et de la plateforme.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="435"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="486"/>
         <source>Read</source>
         <translation>Lecture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="436"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="487"/>
         <source>Write</source>
         <translation>Écriture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="445"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="496"/>
         <source>Environment</source>
         <translation>Environnement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="449"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="500"/>
         <source>Qt (runtime)</source>
         <translation>Qt (version d’exécution)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="455"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="506"/>
         <source>Package</source>
         <translation>Paquet</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="458"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="509"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="466"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="517"/>
         <source>Build</source>
         <translation>Build</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="469"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="527"/>
         <source>Git commit</source>
         <translation>Git commit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="469"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="528"/>
         <source>Build type</source>
         <translation>Type de build</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="470"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="529"/>
         <source>Build origin</source>
         <translation>Environnement de compilation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="471"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="530"/>
+        <source>Build date (UTC)</source>
+        <translation>Date de build (UTC)</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="531"/>
         <source>Qt (build)</source>
         <translation>Qt (version de build)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="471"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="532"/>
         <source>Compiler</source>
         <translation>Compilateur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="472"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="533"/>
         <source>CMake</source>
         <translation>CMake</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="479"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="544"/>
         <source>Build fingerprint</source>
         <translation>Empreinte de build</translation>
     </message>

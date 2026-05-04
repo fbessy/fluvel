@@ -5,15 +5,18 @@
 #include "application_settings.hpp"
 
 #include <QCryptographicHash>
+#include <QDateTime>
 #include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QImageWriter>
 #include <QLabel>
+#include <QLocale>
 #include <QPushButton>
 #include <QSettings>
 #include <QTabWidget>
 #include <QTextEdit>
+#include <QTimeZone>
 
 #include <QtGlobal>
 
@@ -86,6 +89,27 @@ QString compilerInfo()
 #else
     return "Unknown compiler";
 #endif
+}
+
+#include <QDateTime>
+#include <QLocale>
+#include <QTimeZone>
+
+QString formattedBuildDate()
+{
+    QString raw = FLUVEL_BUILD_TIMESTAMP;
+
+    QDateTime dt = QDateTime::fromString(raw, "yyyy-MM-dd HH:mm:ss");
+
+    if (!dt.isValid())
+        return "Invalid date";
+
+    // 👉 on force UTC
+    dt.setTimeZone(QTimeZone::utc());
+
+    // 👉 format fixe en-GB
+    return QLocale(QLocale::English, QLocale::UnitedKingdom)
+        .toString(dt, "dd MMM yyyy, HH:mm:ss 'UTC'");
 }
 
 QString buildFingerprint()
@@ -492,11 +516,25 @@ QString AboutWindow::buildTechnicalSection()
     html +=
         "<div style='font-size:12pt; font-weight:bold; margin-top:14px;'>" + tr("Build") + "</div>";
 
-    html += "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>" +
-            tr("Git commit") + ": " + FLUVEL_GIT_COMMIT + "<br>" + tr("Build type") + ": " +
-            buildType + "<br>" + tr("Build origin") + ": " + FLUVEL_BUILD_ORIGIN + "<br>" +
-            tr("Qt (build)") + ": " + QString(QT_VERSION_STR) + "<br>" + tr("Compiler") + ": " +
-            compilerInfo() + "<br>" + tr("CMake") + ": " + FLUVEL_CMAKE_VERSION + "</div>";
+    auto addLine = [&](const QString& label, const QString& value)
+    {
+        return label + ": " + value + "<br>";
+    };
+
+    QString htmlBlock =
+        "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>";
+
+    htmlBlock += addLine(tr("Git commit"), FLUVEL_GIT_COMMIT);
+    htmlBlock += addLine(tr("Build type"), buildType);
+    htmlBlock += addLine(tr("Build origin"), FLUVEL_BUILD_ORIGIN);
+    htmlBlock += addLine(tr("Build date (UTC)"), formattedBuildDate());
+    htmlBlock += addLine(tr("Qt (build)"), QString(QT_VERSION_STR));
+    htmlBlock += addLine(tr("Compiler"), compilerInfo());
+    htmlBlock += addLine(tr("CMake"), FLUVEL_CMAKE_VERSION);
+
+    htmlBlock += "</div>";
+
+    html += htmlBlock;
 
     // =========================
     // Fingerprint

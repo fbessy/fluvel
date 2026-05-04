@@ -21,9 +21,10 @@
       "config-opts": [
         "-DCMAKE_BUILD_TYPE=Release",
         "-DCMAKE_UNITY_BUILD=OFF",
-        "-DFLUVEL_BUILD_ORIGIN=__BUILD_ORIGIN__",
+        "-DFLUVEL_BUILD_VERSION=__APP_VERSION__",
         "-DFLUVEL_GIT_COMMIT=__CI_COMMIT__",
-        "-DFLUVEL_BUILD_VERSION=__APP_VERSION__"
+        "-DFLUVEL_BUILD_TIMESTAMP=__BUILD_TIMESTAMP__",
+        "-DFLUVEL_BUILD_ORIGIN=__BUILD_ORIGIN__"
       ],
       "sources": [
         {

@@ -51,13 +51,18 @@ jobs:
       - name: Configure
         shell: bash
         run: |
+          BUILD_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
+
           cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_UNITY_BUILD=OFF \
             -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
+            \
+            -DFLUVEL_BUILD_VERSION=${{ env.VERSION }} \
             -DFLUVEL_GIT_COMMIT=${{ github.sha }} \
-            -DFLUVEL_BUILD_ORIGIN="GitHub Actions" \
-            -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
+            -DFLUVEL_BUILD_TIMESTAMP="$BUILD_TIMESTAMP" \
+            -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
+
 
       - name: Build
         run: cmake --build build --config Release
@@ -126,13 +131,17 @@ jobs:
 
       - name: Configure
         run: >
+          BUILD_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
+
           cmake -B build -S . \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_UNITY_BUILD=OFF \
             -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
+            \
+            -DFLUVEL_BUILD_VERSION=${{ env.VERSION }} \
             -DFLUVEL_GIT_COMMIT=${{ github.sha }} \
-            -DFLUVEL_BUILD_ORIGIN="GitHub Actions" \
-            -DFLUVEL_BUILD_VERSION=${{ env.VERSION }}
+            -DFLUVEL_BUILD_TIMESTAMP="$BUILD_TIMESTAMP" \
+            -DFLUVEL_BUILD_ORIGIN="GitHub Actions"
 
       - name: Build
         run: cmake --build build --config Release
