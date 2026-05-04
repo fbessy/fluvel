@@ -4,7 +4,7 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # =========================
-# SYSTEM DEPENDENCIES
+# SYSTEM + FLATPAK
 # =========================
 RUN apt update && apt install -y \
     build-essential \
@@ -18,6 +18,8 @@ RUN apt update && apt install -y \
     rsync \
     python3 \
     python3-pip \
+    flatpak \
+    flatpak-builder \
     libgl1-mesa-dev \
     libglu1-mesa-dev \
     libglib2.0-0 \
@@ -51,7 +53,10 @@ RUN apt update && apt install -y \
     libfreetype6 \
     libegl1 \
     libwayland-client0 \
-    && apt clean
+    && flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo \
+    && flatpak install -y flathub org.kde.Platform//6.9 \
+    && flatpak install -y flathub org.kde.Sdk//6.9 \
+    && rm -rf /var/lib/apt/lists/*
 
 # =========================
 # PYTHON + AQT
@@ -77,9 +82,9 @@ ENV Qt6_DIR="${QT_ROOT}/lib/cmake/Qt6"
 # LINUXDEPLOY
 # =========================
 RUN mkdir -p /opt/tools && \
-    wget -O /opt/tools/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage && \
+    wget -O /opt/tools/linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage && \
     wget -O /opt/tools/linuxdeploy-plugin-qt https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage && \
-    chmod +x /opt/tools/*
+    chmod +x /opt/tools/*.AppImage
 
 ENV LINUXDEPLOY_PLUGIN_PATH=/opt/tools
 

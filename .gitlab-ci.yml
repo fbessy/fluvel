@@ -106,13 +106,6 @@ flatpak:
 
   cache: {}
 
-  before_script:
-    - apt update
-    - apt install -y flatpak flatpak-builder
-    - flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-    - flatpak install -y flathub org.kde.Platform//6.9
-    - flatpak install -y flathub org.kde.Sdk//6.9
-
   script:
     - |
       if [ -n "$CI_COMMIT_TAG" ]; then
@@ -181,7 +174,6 @@ appimage:
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_UNITY_BUILD=OFF \
         -DQt6_DIR=$Qt6_DIR \
-        \
         -DFLUVEL_BUILD_VERSION=$APP_VERSION \
         -DFLUVEL_GIT_COMMIT=$CI_COMMIT_SHORT_SHA \
         -DFLUVEL_BUILD_TIMESTAMP="$BUILD_TIMESTAMP" \
@@ -195,14 +187,16 @@ appimage:
       cp packaging/appimage/fluvel.desktop AppDir/
       cp packaging/appimage/fluvel.png AppDir/
 
-      mkdir -p qt-plugins
-      rsync -a "$QT_ROOT/plugins/" qt-plugins/ --exclude "imageformats/libqtiff.so*"
-
-      export QT_PLUGIN_PATH="$CI_PROJECT_DIR/qt-plugins"
+      # 🔥 IMPORTANT
+      export QT_PLUGIN_PATH="$QT_ROOT/plugins"
       export LD_LIBRARY_PATH="$QT_ROOT/lib:$LD_LIBRARY_PATH"
       export APPIMAGE_EXTRACT_AND_RUN=1
 
-      /opt/tools/linuxdeploy \
+      # ⚠️ retirer libqtiff (comme avant)
+      rm -f $QT_ROOT/plugins/imageformats/libqtiff.so*
+
+      # 🚀 build AppImage
+      /opt/tools/linuxdeploy.AppImage \
         --appdir AppDir \
         --executable AppDir/usr/bin/Fluvel \
         --desktop-file AppDir/fluvel.desktop \
