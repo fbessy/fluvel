@@ -214,24 +214,20 @@ jobs:
           name: macos
           path: Fluvel-macos.dmg
 
-docker-build:
-  needs: docker-build
-  runs-on: ubuntu-latest
+  docker-build:
+    runs-on: ubuntu-latest
 
-  steps:
-    - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-    - name: Login to GHCR
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Build Docker image
-      run: |
-        docker build \
-          -t ghcr.io/${{ github.repository }}/qt-builder:latest \
-          -f docker/qt-builder/Dockerfile .
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}/qt-builder:latest -f docker/qt-builder/Dockerfile .
 
-    - name: Push Docker image
-      run: docker push ghcr.io/${{ github.repository }}/qt-builder:latest
+      - name: Push Docker image
+        run: docker push ghcr.io/${{ github.repository }}/qt-builder:latest
 
   # =========================
   # Linux Flatpak BUILD
@@ -310,6 +306,7 @@ docker-build:
   # Linux AppImage BUILD
   # =========================
   linux-appimage:
+    needs: docker-build
     runs-on: ubuntu-latest
 
     if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'release'
