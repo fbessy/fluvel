@@ -155,8 +155,7 @@ set(app_src
 )
 
 qt_add_executable(${target_name}
-    ${app_src}
-    resources.qrc)
+    ${app_src})
 
 set_target_properties(${target_name} PROPERTIES
     OUTPUT_NAME "Fluvel"
