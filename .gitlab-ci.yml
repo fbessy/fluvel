@@ -34,6 +34,9 @@ docker-build:
     - echo "=== PUSH ==="
     - docker push $IMAGE
 
+    - echo "=== CLEANUP ==="
+    - docker system prune -af || true
+
     - echo "=== DONE ==="
 
   rules:
