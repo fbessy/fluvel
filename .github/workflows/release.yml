@@ -215,26 +215,48 @@ jobs:
           name: macos
           path: Fluvel-macos.dmg
 
-  docker-build:
+  docker-image:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to GHCR
+      - name: Detect Docker changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docker:
+              - 'docker/qt-builder/**'
+
+      - name: Login
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/qt-builder:latest -f docker/qt-builder/Dockerfile .
+      - name: Ensure image
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2
 
-      - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository }}/qt-builder:latest
+          EXISTS=false
+          if docker manifest inspect $IMAGE > /dev/null 2>&1; then
+            EXISTS=true
+          fi
+
+          echo "Image exists: $EXISTS"
+          echo "Docker changed: ${{ steps.changes.outputs.docker }}"
+
+          if [ "$EXISTS" = "false" ] || [ "${{ steps.changes.outputs.docker }}" = "true" ]; then
+            echo "Building image..."
+            docker build -t $IMAGE -f docker/qt-builder/Dockerfile .
+            docker push $IMAGE
+          else
+            echo "Skipping build"
+          fi
 
   # =========================
   # Linux Flatpak BUILD
   # =========================
   linux-flatpak:
-    needs: docker-build
+    needs: docker-image
     runs-on: ubuntu-latest
 
     if: github.ref_type == 'tag' || github.ref_name == 'release'
@@ -256,18 +278,15 @@ jobs:
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Ensure Docker image
-        run: |
-          docker pull ghcr.io/${{ github.repository }}/qt-builder:latest || \
-          docker build -t ghcr.io/${{ github.repository }}/qt-builder:latest \
-            -f docker/qt-builder/Dockerfile .
+      - name: Pull Docker image
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2
 
       # 📦 Build Flatpak dans Docker
       - name: Build Flatpak
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:latest \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2 \
             bash -c "
               cd /workspace
               git config --global --add safe.directory /workspace
@@ -292,7 +311,9 @@ jobs:
               sed -i \"s/__APP_VERSION__/$APP_VERSION/g\" metainfo.ci.xml
               sed -i \"s/__APP_DATE__/\$APP_DATE/g\" metainfo.ci.xml
 
-              flatpak-builder --force-clean --disable-sandbox build-flatpak fluvel.ci.json
+              mkdir -p repo
+
+              flatpak-builder --repo=repo --force-clean build-flatpak fluvel.ci.json
               flatpak build-export repo build-flatpak
               flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.App
             "
@@ -307,7 +328,7 @@ jobs:
   # Linux AppImage BUILD
   # =========================
   linux-appimage:
-    needs: docker-build
+    needs: docker-image
     runs-on: ubuntu-latest
 
     if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'release'
@@ -329,18 +350,15 @@ jobs:
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Ensure Docker image
-        run: |
-          docker pull ghcr.io/${{ github.repository }}/qt-builder:latest || \
-          docker build -t ghcr.io/${{ github.repository }}/qt-builder:latest \
-            -f docker/qt-builder/Dockerfile .
+      - name: Pull Docker image
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2
 
       # 📦 Build AppImage dans Docker
       - name: Build AppImage
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:latest \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2 \
             bash -c "
               cd /workspace
 
