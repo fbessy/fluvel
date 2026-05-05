@@ -1,10 +1,17 @@
 # syntax=docker/dockerfile:1
+
 FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # =========================
-# SYSTEM + FLATPAK
+# BUILD ARGS (cache control)
+# =========================
+ARG QT_VERSION=6.9.1
+ARG LINUXDEPLOY_VERSION=1-alpha
+
+# =========================
+# SYSTEM DEPENDENCIES (stable layer)
 # =========================
 RUN apt update && apt install -y \
     build-essential \
@@ -53,20 +60,23 @@ RUN apt update && apt install -y \
     libfreetype6 \
     libegl1 \
     libwayland-client0 \
-    && flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo \
-    && flatpak install -y flathub org.kde.Platform//6.9 \
-    && flatpak install -y flathub org.kde.Sdk//6.9 \
     && rm -rf /var/lib/apt/lists/*
+
+# =========================
+# FLATPAK (separate cache layer)
+# =========================
+RUN flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
+    flatpak install -y flathub org.kde.Platform//6.9 && \
+    flatpak install -y flathub org.kde.Sdk//6.9
 
 # =========================
 # PYTHON + AQT
 # =========================
-RUN pip install aqtinstall --break-system-packages
+RUN pip install --no-cache-dir aqtinstall --break-system-packages
 
 # =========================
-# INSTALL QT (CACHÉ DANS L’IMAGE)
+# INSTALL QT (heavy layer → must be stable)
 # =========================
-ENV QT_VERSION=6.9.1
 ENV QT_DIR=/opt/Qt
 
 RUN python3 -m aqt install-qt linux desktop ${QT_VERSION} linux_gcc_64 \
@@ -79,13 +89,16 @@ ENV CMAKE_PREFIX_PATH="${QT_ROOT}/lib/cmake"
 ENV Qt6_DIR="${QT_ROOT}/lib/cmake/Qt6"
 
 # =========================
-# LINUXDEPLOY
+# LINUXDEPLOY (stable cache)
 # =========================
 RUN mkdir -p /opt/tools && \
-    wget -O /opt/tools/linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage && \
-    wget -O /opt/tools/linuxdeploy-plugin-qt https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage && \
-    chmod +x /opt/tools/*.AppImage
+    wget -O /opt/tools/linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VERSION}/linuxdeploy-x86_64.AppImage && \
+    wget -O /opt/tools/linuxdeploy-plugin-qt https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${LINUXDEPLOY_VERSION}/linuxdeploy-plugin-qt-x86_64.AppImage && \
+    chmod +x /opt/tools/*
 
 ENV LINUXDEPLOY_PLUGIN_PATH=/opt/tools
 
+# =========================
+# WORKDIR
+# =========================
 WORKDIR /workspace
