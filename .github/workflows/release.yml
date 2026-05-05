@@ -76,6 +76,12 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Cache Qt
+        uses: actions/cache@v4
+        with:
+          path: C:/Users/runneradmin/Qt
+          key: qt-windows-6.8.2
+
       - name: Setup Qt
         uses: jurplel/install-qt-action@v3
         with:
@@ -102,21 +108,23 @@ jobs:
 
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release --parallel
 
       - name: Deploy Qt
         shell: pwsh
         run: |
-          & "${{ env.Qt6_DIR }}/bin/windeployqt.exe" --release build\src\app\Release\Fluvel.exe
+          & "${{ env.Qt6_DIR }}/bin/windeployqt.exe" `
+            --release `
+            --no-translations `
+            --no-system-d3d-compiler `
+            build\src\app\Release\Fluvel.exe
 
       - name: Package
         shell: pwsh
         run: |
-          mkdir package
-          Copy-Item build\src\app\Release\Fluvel.exe package\
-          Copy-Item build\src\app\Release\*.dll package\ -ErrorAction SilentlyContinue
-          Copy-Item -Recurse build\src\app\Release\platforms package\
-          Compress-Archive -Path package\* -DestinationPath Fluvel-win64-portable.zip
+            mkdir package
+            Copy-Item build\src\app\Release\Fluvel.exe package\
+            tar -a -c -f Fluvel-win64-portable.zip -C package
 
       - name: Install Inno Setup
         run: choco install innosetup -y
@@ -206,10 +214,30 @@ jobs:
           name: macos
           path: Fluvel-macos.dmg
 
+docker-build:
+  needs: docker-build
+  runs-on: ubuntu-latest
+
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Login to GHCR
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build Docker image
+      run: |
+        docker build \
+          -t ghcr.io/${{ github.repository }}/qt-builder:latest \
+          -f docker/qt-builder/Dockerfile .
+
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository }}/qt-builder:latest
+
   # =========================
   # Linux Flatpak BUILD
   # =========================
   linux-flatpak:
+    needs: docker-build
     runs-on: ubuntu-latest
 
     if: github.ref_type == 'tag' || github.ref_name == 'release'
@@ -227,6 +255,9 @@ jobs:
           fi
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Ensure Docker image
         run: |
@@ -264,7 +295,7 @@ jobs:
               sed -i \"s/__APP_VERSION__/$APP_VERSION/g\" metainfo.ci.xml
               sed -i \"s/__APP_DATE__/\$APP_DATE/g\" metainfo.ci.xml
 
-              flatpak-builder --force-clean build-flatpak fluvel.ci.json
+              flatpak-builder --force-clean -disable-sandbox build-flatpak fluvel.ci.json
               flatpak build-export repo build-flatpak
               flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.App
             "
@@ -296,6 +327,9 @@ jobs:
           fi
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Ensure Docker image
         run: |
