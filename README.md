@@ -115,6 +115,7 @@ Visualization and UI components are separated from the core algorithmic logic.
 cmake -S . -B build
 cmake --build build
 ./build/Fluvel
+```
 
 ---
 

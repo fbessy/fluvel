@@ -2,7 +2,7 @@ PROJECT_NAME           = "Fluvel"
 PROJECT_BRIEF          = "Active contour image processing engine"
 
 IMAGE_PATH = docs/images
-HTML_EXTRA_FILES = docs/images/fluvel.svg
+HTML_EXTRA_FILES = docs/images
 
 INPUT                  = src README.md
 RECURSIVE              = YES
