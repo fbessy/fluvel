@@ -30,9 +30,11 @@ docker-build:
     - export DOCKER_BUILDKIT=1
 
     # ⚠️ volontairement SANS cache pour stabilité
-    - docker build \
+    - |
+      docker build \
         -t $IMAGE \
         -f docker/qt-builder/Dockerfile \
+        .
         .
 
     - echo "Pushing Docker image..."
