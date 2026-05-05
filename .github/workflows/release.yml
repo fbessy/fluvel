@@ -292,7 +292,7 @@ jobs:
               sed -i \"s/__APP_VERSION__/$APP_VERSION/g\" metainfo.ci.xml
               sed -i \"s/__APP_DATE__/\$APP_DATE/g\" metainfo.ci.xml
 
-              flatpak-builder --force-clean -disable-sandbox build-flatpak fluvel.ci.json
+              flatpak-builder --force-clean --disable-sandbox build-flatpak fluvel.ci.json
               flatpak build-export repo build-flatpak
               flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.App
             "
