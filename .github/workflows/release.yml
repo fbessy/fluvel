@@ -206,77 +206,6 @@ jobs:
           name: macos
           path: Fluvel-macos.dmg
 
-  docker-build:
-    runs-on: ubuntu-latest
-
-    env:
-      DOCKER_BUILDKIT: 1
-
-    outputs:
-      should_build: ${{ steps.check.outputs.should_build }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      # 🔍 1. Check si Dockerfile a changé
-      - name: Check Dockerfile changes
-        id: changes
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            docker:
-              - 'docker/qt-builder/**'
-
-      # 🔐 login GHCR
-      - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      # 🔍 2. Check si image existe
-      - name: Check if image exists
-        id: image
-        run: |
-          if docker manifest inspect ghcr.io/${{ github.repository }}/qt-builder:latest > /dev/null 2>&1; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      # 🧠 3. Décision
-      - name: Decide build
-        id: check
-        run: |
-          if [[ "${{ steps.changes.outputs.docker }}" == "true" || "${{ steps.image.outputs.exists }}" == "false" ]]; then
-            echo "should_build=true" >> $GITHUB_OUTPUT
-          else
-            echo "should_build=false" >> $GITHUB_OUTPUT
-          fi
-
-      # 📦 Pull cache (optionnel)
-      - name: Pull cache
-        if: steps.check.outputs.should_build == 'true'
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:latest || true
-
-      # 🏗️ Build
-      - name: Build Docker image
-        if: steps.check.outputs.should_build == 'true'
-        run: |
-          docker build \
-            --cache-from ghcr.io/${{ github.repository }}/qt-builder:latest \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            -t ghcr.io/${{ github.repository }}/qt-builder:latest \
-            -f docker/qt-builder/Dockerfile \
-            .
-
-      # 🚀 Push
-      - name: Push Docker image
-        if: steps.check.outputs.should_build == 'true'
-        run: docker push ghcr.io/${{ github.repository }}/qt-builder:latest
-
-      # 💤 Skip message
-      - name: Skip build
-        if: steps.check.outputs.should_build == 'false'
-        run: echo "Docker image is up-to-date, skipping build ✔"
-
   # =========================
   # Linux Flatpak BUILD
   # =========================
@@ -313,7 +242,7 @@ jobs:
             ghcr.io/${{ github.repository }}/qt-builder:latest \
             bash -c "
               cd /workspace
-
+              git config --global --add safe.directory /workspace
               echo \"Version = $APP_VERSION\"
 
               PROJECT_ROOT=\$(git rev-parse --show-toplevel)
