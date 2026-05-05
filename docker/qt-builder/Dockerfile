@@ -8,7 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # BUILD ARGS (cache control)
 # =========================
 ARG QT_VERSION=6.9.1
-ARG LINUXDEPLOY_VERSION=1-alpha
+ARG LINUXDEPLOY_VERSION=continuous
 
 # =========================
 # SYSTEM DEPENDENCIES (stable layer)
