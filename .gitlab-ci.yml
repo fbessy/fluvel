@@ -35,6 +35,9 @@ docker-build:
 
     - docker push $CI_REGISTRY_IMAGE/qt-builder:latest
 
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "release" && $CI_COMMIT_TAG == null'
+
 build:
   stage: build
   image: $CI_REGISTRY_IMAGE/qt-builder
@@ -123,7 +126,7 @@ pages:
 
 
 trigger_github:
-  stage: package
+  stage: pages
   image: ubuntu:24.04
 
   script:
