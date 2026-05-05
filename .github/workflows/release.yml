@@ -1,5 +1,9 @@
 name: Fluvel Release
 
+concurrency:
+  group: fluvel-release-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   packages: write
