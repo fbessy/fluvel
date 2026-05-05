@@ -5,6 +5,10 @@
 <h1 align="center">Fluvel</h1>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/license-CeCILL--2.1-blue">
+</p>
+
+<p align="center">
   Real-time image segmentation and active contour experimentation platform
 </p>
 
@@ -30,6 +34,13 @@ https://fbessy.github.io/fluvel/
 ## 📚 Documentation
 
 👉 https://fabienip.gitlab.io/fluvel/
+
+The online documentation corresponds to the latest development version  
+and is generated automatically from the source code.
+
+Documentation is versioned and tied to specific commits for reproducibility.
+
+You can also generate the documentation locally using Doxygen.
 
 ---
 
@@ -104,3 +115,18 @@ Visualization and UI components are separated from the core algorithmic logic.
 cmake -S . -B build
 cmake --build build
 ./build/Fluvel
+
+---
+
+## 📜 License
+
+This project is licensed under the CeCILL 2.1 license (CEA CNRS INRIA).
+
+CeCILL is a French free software license, compatible with the GNU GPL,  
+and commonly used in research and academic software.
+
+It guarantees freedom to use, modify, and redistribute the software,  
+while preserving these freedoms in derivative works.
+
+See the LICENSE file included in this repository for full details:  
+https://cecill.info/licences/Licence_CeCILL_V2.1-en.html

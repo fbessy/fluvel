@@ -21,26 +21,20 @@ docker-build:
     DOCKER_TLS_CERTDIR: "/certs"
 
   script:
-    - echo "Login to GitLab registry"
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - set -e
+    - set -x
+
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
 
     - IMAGE="$CI_REGISTRY_IMAGE/qt-builder:qt6.9.1"
 
-    - echo "Building Docker image..."
-    - export DOCKER_BUILDKIT=1
+    - echo "=== BUILD ==="
+    - docker build -t $IMAGE -f docker/qt-builder/Dockerfile .
 
-    # ⚠️ volontairement SANS cache pour stabilité
-    - |
-      docker build \
-        -t $IMAGE \
-        -f docker/qt-builder/Dockerfile \
-        .
-        .
-
-    - echo "Pushing Docker image..."
+    - echo "=== PUSH ==="
     - docker push $IMAGE
 
-    - echo "Docker build done"
+    - echo "=== DONE ==="
 
   rules:
     - if: '$CI_COMMIT_BRANCH != "release" && $CI_COMMIT_TAG == null'
