@@ -126,7 +126,7 @@ pages:
 
 
 trigger_github:
-  stage: pages
+  stage: package
   image: ubuntu:24.04
 
   script:

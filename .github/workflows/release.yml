@@ -15,6 +15,7 @@ on:
   repository_dispatch:
     types: [fluvel-release]
 
+
 jobs:
   check-version:
     runs-on: ubuntu-latest
