@@ -288,10 +288,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 🐳 build ton image (ou pull si déjà faite)
-      - name: Pull Docker
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:latest || true
-
       # 🧠 Compute version
       - name: Compute version
         run: |
@@ -303,12 +299,18 @@ jobs:
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      - name: Ensure Docker image
+        run: |
+          docker pull ghcr.io/${{ github.repository }}/qt-builder:latest || \
+          docker build -t ghcr.io/${{ github.repository }}/qt-builder:latest \
+            -f docker/qt-builder/Dockerfile .
+
       # 📦 Build Flatpak dans Docker
       - name: Build Flatpak
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            qt-builder \
+            ghcr.io/${{ github.repository }}/qt-builder:latest \
             bash -c "
               cd /workspace
 
@@ -355,9 +357,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pull Docker
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:latest || true
-
       # 🧠 Compute version
       - name: Compute version
         run: |
@@ -369,12 +368,18 @@ jobs:
           echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
           echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
+      - name: Ensure Docker image
+        run: |
+          docker pull ghcr.io/${{ github.repository }}/qt-builder:latest || \
+          docker build -t ghcr.io/${{ github.repository }}/qt-builder:latest \
+            -f docker/qt-builder/Dockerfile .
+
       # 📦 Build AppImage dans Docker
       - name: Build AppImage
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            qt-builder \
+            ghcr.io/${{ github.repository }}/qt-builder:latest \
             bash -c "
               cd /workspace
 
@@ -434,7 +439,7 @@ jobs:
   # RELEASE
   # =========================
   release:
-    needs: [windows, macos, linux-appimage, linux-flatpak]
+    needs: [windows, macos, linux-appimage, linux-flatpak, check-version]
     runs-on: ubuntu-latest
 
     env:
