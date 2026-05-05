@@ -285,9 +285,7 @@ jobs:
       - name: Build Flatpak
         run: |
           docker run --rm \
-            --device /dev/fuse \
-            --cap-add SYS_ADMIN \
-            --security-opt apparmor=unconfined \
+            --privileged \
             -v ${{ github.workspace }}:/workspace \
             ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2 \
             bash -c "
