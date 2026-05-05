@@ -66,7 +66,7 @@ docker-build:
 
 build:
   stage: build
-  image: $CI_REGISTRY_IMAGE/qt-builder
+  image: $CI_REGISTRY_IMAGE/qt-builder:qt6.9.1
   needs: ["docker-build"]
 
   cache:
