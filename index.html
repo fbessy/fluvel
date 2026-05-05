@@ -22,13 +22,11 @@ body {
 .title img {
   width: 42px;
   height: 42px;
-  filter: drop-shadow(0 0 2px rgba(0,0,0,0.2));
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: transform 0.2s ease;
 }
 
 .title img:hover {
   transform: scale(1.08);
-  filter: drop-shadow(0 0 4px rgba(0,0,0,0.35));
 }
 
 .section {
@@ -42,9 +40,30 @@ body {
   margin-top: 20px;
 }
 
-.platform h3 {
-  margin-bottom: 5px;
+/* ===== HIGHLIGHT ===== */
+
+.platform.highlight {
+  border: 2px solid #4a2cff;
+  padding: 10px;
+  border-radius: 8px;
+  background: #f6f4ff;
 }
+
+.platform.highlight h3 {
+  color: #4a2cff;
+}
+
+/* badge */
+.badge {
+  font-size: 12px;
+  margin-left: 8px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #4a2cff;
+  color: white;
+}
+
+/* ===== BUTTON ===== */
 
 a.button {
   display: inline-block;
@@ -56,16 +75,58 @@ a.button {
   border-radius: 5px;
 }
 
-pre {
-  background: #f5f5f5;
-  padding: 10px;
-  overflow-x: auto;
-}
-
 code {
   background: #eee;
   padding: 2px 6px;
   border-radius: 4px;
+}
+
+/* ===== CHECKSUM ===== */
+
+.copy-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-family: monospace;
+}
+
+.copy-btn {
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.copy-btn:hover {
+  background: #e0e0e0;
+}
+
+.copy-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: #555;
+}
+
+/* ===== TOAST ===== */
+
+.copy-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #333;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s ease;
+}
+
+.copy-toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 </style>
 
@@ -74,7 +135,7 @@ code {
 <body>
 
 <h1 class="title">
-  <img src="fluvel.svg" alt="Fluvel logo">
+  <img src="fluvel.svg">
   <span>Fluvel Downloads</span>
 </h1>
 
@@ -94,7 +155,7 @@ code {
 
   <div class="platform" id="platform_linux">
     <h3>🐧 Linux</h3>
-    <a id="flatpak" class="button">Flatpak (recommended)</a>
+    <a id="flatpak" class="button">Flatpak</a>
     <a id="appimage" class="button">AppImage</a>
   </div>
 
@@ -104,14 +165,64 @@ code {
   </div>
 
   <h3>Checksums (SHA-256)</h3>
-  <pre id="checksums">loading...</pre>
+  <div id="checksums">loading...</div>
 
 </div>
 
+<div id="copy-toast" class="copy-toast">Copied!</div>
+
 <script>
+
+// ===== ICON =====
+function copyIcon() {
+  return `
+  <svg viewBox="0 0 16 16">
+    <path d="M4 1h7a2 2 0 0 1 2 2v7h-1V3a1 1 0 0 0-1-1H4V1z"/>
+    <path d="M2 4a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z"/>
+  </svg>`;
+}
+
+// ===== TOAST =====
+const toast = document.getElementById("copy-toast");
+
+function showToast() {
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 1200);
+}
+
+// ===== OS DETECTION =====
+function detectOS() {
+  const ua = navigator.userAgent.toLowerCase();
+
+  if (ua.includes("win")) return "windows";
+  if (ua.includes("mac")) return "macos";
+  if (ua.includes("linux")) return "linux";
+
+  return null; // important → pas de fallback
+}
+
+// ===== HIGHLIGHT =====
+function highlightPlatform() {
+  const os = detectOS();
+  if (!os) return; // 👉 rien si non reconnu
+
+  const section = document.getElementById("platform_" + os);
+  if (!section) return;
+
+  section.classList.add("highlight");
+
+  // badge
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.innerText = "Recommended";
+
+  section.querySelector("h3").appendChild(badge);
+}
+
+// ===== LINKS =====
 function setLink(id, url) {
   const el = document.getElementById(id);
-  if (!url || url === "") {
+  if (!url) {
     el.style.display = "none";
     return false;
   }
@@ -120,6 +231,7 @@ function setLink(id, url) {
   return true;
 }
 
+// ===== PLATFORM VISIBILITY =====
 function hidePlatformIfEmpty(platformId, linkIds) {
   const hasVisible = linkIds.some(id => {
     const el = document.getElementById(id);
@@ -131,11 +243,9 @@ function hidePlatformIfEmpty(platformId, linkIds) {
   }
 }
 
+// ===== LOAD JSON =====
 fetch("latest.json")
-  .then(r => {
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
-  })
+  .then(r => r.json())
   .then(data => {
 
     document.getElementById("version").innerText = data.version || "N/A";
@@ -154,31 +264,60 @@ fetch("latest.json")
           second: "2-digit",
           timeZone: "UTC"
         }) + " UTC";
-    } else {
-      document.getElementById("date").innerText = "N/A";
     }
 
     setLink("win_installer", data.windows?.installer);
     setLink("win_portable", data.windows?.portable);
-
     setLink("flatpak", data.linux?.flatpak);
     setLink("appimage", data.linux?.appimage);
-
     setLink("macos", data.macos?.dmg);
 
     hidePlatformIfEmpty("platform_windows", ["win_installer", "win_portable"]);
     hidePlatformIfEmpty("platform_linux", ["flatpak", "appimage"]);
     hidePlatformIfEmpty("platform_macos", ["macos"]);
 
-    document.getElementById("checksums").innerText =
-      data.checksums || "No checksums available";
+    // ===== CHECKSUMS =====
+    const container = document.getElementById("checksums");
+    container.innerHTML = "";
 
-  })
-  .catch(err => {
-    console.error(err);
-    document.getElementById("version").innerText = "Error loading data";
-    document.getElementById("date").innerText = "-";
+    if (!data.checksums) {
+      container.innerText = "No checksums available";
+    } else {
+      const lines = data.checksums.split("\n");
+
+      lines.forEach(line => {
+        if (!line.trim()) return;
+
+        const parts = line.trim().split(/\s+/);
+        const hash = parts[0];
+
+        const div = document.createElement("div");
+        div.className = "copy-line";
+
+        const btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.innerHTML = copyIcon();
+        btn.title = "Copy hash";
+
+        btn.onclick = () => {
+          navigator.clipboard.writeText(hash);
+          showToast();
+        };
+
+        const text = document.createElement("span");
+        text.innerText = line;
+
+        div.appendChild(btn);
+        div.appendChild(text);
+        container.appendChild(div);
+      });
+    }
+
+    // 🔥 IMPORTANT → après tout
+    highlightPlatform();
+
   });
+
 </script>
 
 </body>
