@@ -1,6 +1,7 @@
 stages:
   - docker
   - build
+  - package
   - doc
   - pages
 
