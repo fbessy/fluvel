@@ -122,9 +122,9 @@ jobs:
       - name: Package
         shell: pwsh
         run: |
-            mkdir package
-            Copy-Item build\src\app\Release\Fluvel.exe package\
-            tar -a -c -f Fluvel-win64-portable.zip -C package
+          mkdir package
+          Copy-Item build\src\app\Release\Fluvel.exe package\ -ErrorAction Stop
+          tar -a -c -f Fluvel-win64-portable.zip -C package .
 
       - name: Install Inno Setup
         run: choco install innosetup -y
