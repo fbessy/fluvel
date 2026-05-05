@@ -246,8 +246,16 @@ jobs:
 
           if [ "$EXISTS" = "false" ] || [ "${{ steps.changes.outputs.docker }}" = "true" ]; then
             echo "Building image..."
-            docker build -t $IMAGE -f docker/qt-builder/Dockerfile .
-            docker push $IMAGE
+
+            docker buildx create --use
+
+            docker buildx build \
+              --cache-from=type=registry,ref=$IMAGE \
+              --cache-to=type=registry,ref=$IMAGE,mode=max \
+              -t $IMAGE \
+              -f docker/qt-builder/Dockerfile \
+              --push \
+              .
           else
             echo "Skipping build"
           fi
@@ -458,12 +466,15 @@ jobs:
       # =========================
       # CREATE RELEASE
       # =========================
-      - name: Ensure release exists
+      - name: Create or update release
         run: |
-          gh release view latest || gh release create latest \
+          gh release delete latest -y || true
+
+          gh release create latest \
             -t "Latest Development Build" \
             -n "Auto release" \
-            --target ${{ github.sha }}
+            --target ${{ github.sha }} \
+            --latest
 
       # =========================
       # UPLOAD WINDOWS + MACOS
