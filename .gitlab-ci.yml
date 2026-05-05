@@ -42,8 +42,17 @@ docker-build:
 
       if [ "$EXISTS" = "false" ] || [ "$CHANGED" = "true" ]; then
         echo "Building Docker image..."
-        docker build -t $IMAGE -f docker/qt-builder/Dockerfile .
+
+        export DOCKER_BUILDKIT=1
+        docker build \
+          --cache-from $IMAGE \
+          --build-arg BUILDKIT_INLINE_CACHE=1 \
+          -t $IMAGE \
+          -f docker/qt-builder/Dockerfile \
+          .
+
         docker push $IMAGE
+
       else
         echo "Skipping Docker build"
       fi

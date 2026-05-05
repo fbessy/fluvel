@@ -468,28 +468,32 @@ jobs:
         run: ls -R
 
       # =========================
-      # CREATE RELEASE
+      # CREATE OR UPDATE RELEASE
       # =========================
-      - name: Create or update release
+      - name: Ensure release exists and is published
         run: |
-          gh release delete latest -y || true
-
-          gh release create latest \
+          # créer si n'existe pas
+          gh release view latest || gh release create latest \
             -t "Latest Development Build" \
             -n "Auto release" \
             --target ${{ github.sha }} \
             --latest
 
+          # 🔥 garantir que ce n'est PAS un draft
+          gh release edit latest --draft=false
+
       # =========================
-      # UPLOAD WINDOWS + MACOS
+      # UPLOAD ASSETS (ATOMIC)
       # =========================
       - name: Upload assets
         run: |
-          gh release upload latest windows/Fluvel-win64-portable.zip --clobber
-          gh release upload latest windows/Fluvel-win64-installer.exe --clobber
-          gh release upload latest macos/Fluvel-macos.dmg --clobber
-          gh release upload latest linux/Fluvel-linux.AppImage --clobber
-          gh release upload latest linux/Fluvel-linux.flatpak --clobber
+          gh release upload latest \
+            windows/Fluvel-win64-portable.zip \
+            windows/Fluvel-win64-installer.exe \
+            macos/Fluvel-macos.dmg \
+            linux/Fluvel-linux.AppImage \
+            linux/Fluvel-linux.flatpak \
+            --clobber
 
       - name: Compute version
         run: |
