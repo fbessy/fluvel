@@ -17,6 +17,7 @@ RUN apt update && apt install -y \
     build-essential \
     cmake \
     ninja-build \
+    ccache \
     clang \
     git \
     curl \
@@ -87,6 +88,9 @@ ENV QT_ROOT=${QT_DIR}/${QT_VERSION}/gcc_64
 ENV PATH="${QT_ROOT}/bin:${PATH}"
 ENV CMAKE_PREFIX_PATH="${QT_ROOT}/lib/cmake"
 ENV Qt6_DIR="${QT_ROOT}/lib/cmake/Qt6"
+
+ENV PATH="/usr/lib/ccache:${PATH}"
+ENV CCACHE_MAXSIZE=1G
 
 # =========================
 # LINUXDEPLOY (stable cache)

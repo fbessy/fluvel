@@ -76,8 +76,11 @@ build:
 
   before_script:
     - export CCACHE_DIR="$CI_PROJECT_DIR/.ccache"
-    - export CC="ccache gcc"
-    - export CXX="ccache g++"
+
+    # 🔍 DEBUG (temporaire)
+    - which g++
+    - g++ --version
+    - ccache -s
 
   script:
     - |
