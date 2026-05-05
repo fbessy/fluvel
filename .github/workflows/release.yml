@@ -7,14 +7,9 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
-  # to avoid duplicate build
-  #push:
-    #branches: [release]
-    #tags: ['v*']
-  workflow_dispatch:
-  repository_dispatch:
-    types: [fluvel-release]
-
+  push:
+    branches: [release]
+    tags: ['v*']
 
 jobs:
   check-version:
