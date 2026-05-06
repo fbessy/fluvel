@@ -41,6 +41,32 @@ QString buildImageFilter();
 QString supportedImageExtensions();
 
 /**
+ * @brief Builds a QFileDialog filter string for writable image formats.
+ *
+ * The supported formats are queried dynamically from Qt image writer plugins
+ * using QImageWriter::supportedImageFormats().
+ *
+ * Example:
+ * "PNG (*.png);;JPG (*.jpg);;BMP (*.bmp)"
+ *
+ * @return A QFileDialog-compatible filter string containing writable image formats.
+ */
+QString buildWritableImageFilter();
+
+/**
+ * @brief Extracts the default file extension from a QFileDialog filter string.
+ *
+ * Example:
+ * "PNG (*.png)" -> "png"
+ *
+ * @param selectedFilter Selected QFileDialog filter string.
+ *
+ * @return The extracted extension without the leading dot,
+ *         or an empty string if no extension could be detected.
+ */
+QString defaultExtensionFromFilter(const QString& selectedFilter);
+
+/**
  * @brief Check whether a file is a supported image.
  *
  * @param path File path to test.

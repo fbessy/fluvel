@@ -3,6 +3,9 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QImageReader>
+#include <QImageWriter>
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
 #include <QStringList>
 
 namespace fluvel_app::file_utils
@@ -37,6 +40,36 @@ QString supportedImageExtensions()
     patterns.sort();
 
     return patterns.join(' ');
+}
+
+QString buildWritableImageFilter()
+{
+    QStringList filters;
+
+    const auto formats = QImageWriter::supportedImageFormats();
+
+    for (const QByteArray& format : formats)
+    {
+        const QString ext = QString::fromLatin1(format).toLower();
+
+        filters << QString("%1 (*.%2)").arg(ext.toUpper(), ext);
+    }
+
+    filters.sort();
+
+    return filters.join(";;");
+}
+
+QString defaultExtensionFromFilter(const QString& selectedFilter)
+{
+    QRegularExpression re(R"(\*\.(\w+))");
+
+    QRegularExpressionMatch match = re.match(selectedFilter);
+
+    if (match.hasMatch())
+        return match.captured(1);
+
+    return {};
 }
 
 bool isSupportedImage(const QString& path)

@@ -748,40 +748,33 @@ void ImageWindow::updateWindowTitle()
 void ImageWindow::saveDisplayed()
 {
     QImage displayed = imageViewer_->renderToImage();
+
     if (displayed.isNull())
         return;
 
     QString baseName = fileName_.isEmpty() ? "displayed" : QFileInfo(fileName_).baseName();
 
     QString selectedFilter;
+
     QString fileName = QFileDialog::getSaveFileName(
         this, tr("Save displayed image"), lastDirectoryUsed_ + "/" + baseName,
-        "PNG (*.png);;JPG (*.jpg);;BMP (*.bmp);;PPM (*.ppm);;XBM (*.xbm);;XPM (*.xpm)",
-        &selectedFilter);
+        file_utils::buildWritableImageFilter(), &selectedFilter);
 
     if (fileName.isEmpty())
-        return; // Cancel
-
-    // déduire l’extension à partir du filtre
-    QString extension;
-    if (selectedFilter.contains("*.png"))
-        extension = "png";
-    else if (selectedFilter.contains("*.jpg"))
-        extension = "jpg";
-    else if (selectedFilter.contains("*.bmp"))
-        extension = "bmp";
-    else if (selectedFilter.contains("*.ppm"))
-        extension = "ppm";
-    else if (selectedFilter.contains("*.xbm"))
-        extension = "xbm";
-    else if (selectedFilter.contains("*.xpm"))
-        extension = "xpm";
+        return;
 
     QFileInfo fi(fileName);
+
     if (fi.suffix().isEmpty())
-        fileName += "." + extension;
+    {
+        const QString extension = file_utils::defaultExtensionFromFilter(selectedFilter);
+
+        if (!extension.isEmpty())
+            fileName += "." + extension;
+    }
 
     fileName = file_utils::makeUniqueFileName(fileName);
+
     displayed.save(fileName);
 }
 
