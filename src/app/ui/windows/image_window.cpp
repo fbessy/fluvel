@@ -191,6 +191,8 @@ void ImageWindow::setupUi()
     vLayout->addLayout(contentLayout);
 
     setCentralWidget(central);
+
+    setStatusBar(new QStatusBar(this));
 }
 
 void ImageWindow::setupActions()
@@ -209,6 +211,7 @@ void ImageWindow::setupActions()
     imageSessionAct_->setCheckable(true);
     imageSessionAct_->setChecked(true);
     imageSessionAct_->setEnabled(true);
+    imageSessionAct_->setStatusTip(tr("Switch to the image session."));
 
     cameraSessionAct_ = new QAction(tr("Came&ra"), this);
     cameraSessionAct_->setShortcut(tr("Ctrl+R"));
@@ -221,6 +224,7 @@ void ImageWindow::setupActions()
     cameraSessionAct_->setCheckable(true);
     cameraSessionAct_->setChecked(false);
     cameraSessionAct_->setEnabled(false);
+    cameraSessionAct_->setStatusTip(tr("Open the camera session."));
 
     quitAct_ = new QAction(tr("&Quit"), this);
     quitAct_->setShortcut(QKeySequence::Quit);
@@ -233,8 +237,7 @@ void ImageWindow::setupActions()
     openAct_ = new QAction(tr("&Open..."), this);
     openAct_->setShortcut(QKeySequence::Open);
     openAct_->setStatusTip(
-        tr("Open an image file (*.png, *.bmp, *.jpg, *.jpeg, *.tiff, *.tif, *.gif, *.pbm, "
-           "*.pgm, *.ppm, *.svg, *.svgz, *.mng, *.xbm, *.xpm)."));
+        tr("Supported image formats: %1").arg(file_utils::supportedImageExtensions()));
 
     QIcon openIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpen, QStyle::SP_DirOpenIcon,
                                   ":/icons/toolbar/document-open-symbolic.svg");
@@ -242,7 +245,7 @@ void ImageWindow::setupActions()
     openAct_->setIcon(openIcon);
 
     clearAct_ = new QAction(tr("Clear list"), this);
-    clearAct_->setStatusTip(tr("Clean the recent files list."));
+    clearAct_->setStatusTip(tr("Clear the recent files list."));
 
     QIcon deleteIcon = il::loadIcon(QIcon::ThemeIcon::EditClear, QStyle::SP_LineEditClearButton,
                                     ":/icons/toolbar/edit-clear-history.svg");
@@ -283,7 +286,7 @@ void ImageWindow::setupActions()
     settingsAct_->setIcon(settingsIcon_);
 
     aboutAct_ = new QAction(tr("&About"), this);
-    aboutAct_->setStatusTip(tr("Information, license and home page."));
+    aboutAct_->setStatusTip(tr("Application information, license and home page."));
 
     QIcon aboutIcon = il::loadIcon(QIcon::ThemeIcon::HelpAbout, QStyle::SP_MessageBoxInformation,
                                    ":/icons/toolbar/help-about-symbolic.svg");
@@ -681,7 +684,7 @@ void ImageWindow::onFileOpened(const QString& path)
 
     updateWindowTitle();
 
-    statusBar()->showMessage(path);
+    statusBar()->showMessage(tr("Opened image: %1").arg(path));
 }
 
 void ImageWindow::onInputImageReady(const QImage& input)

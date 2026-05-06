@@ -23,6 +23,22 @@ QString buildImageFilter()
     return QObject::tr("Image Files (%1)").arg(patterns.join(' '));
 }
 
+QString supportedImageExtensions()
+{
+    QStringList patterns;
+
+    const auto formats = QImageReader::supportedImageFormats();
+
+    for (const QByteArray& format : formats)
+    {
+        patterns << "*." + QString::fromLatin1(format);
+    }
+
+    patterns.sort();
+
+    return patterns.join(' ');
+}
+
 bool isSupportedImage(const QString& path)
 {
     QImageReader reader(path);

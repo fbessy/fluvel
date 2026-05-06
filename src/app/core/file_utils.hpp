@@ -28,6 +28,19 @@ namespace fluvel_app::file_utils
 QString buildImageFilter();
 
 /**
+ * @brief Builds a string containing all supported image file extensions.
+ *
+ * The returned extensions are queried dynamically from Qt image plugins
+ * using QImageReader::supportedImageFormats().
+ *
+ * Example:
+ * "*.bmp *.jpg *.png *.tif"
+ *
+ * @return Space-separated list of supported image file extensions.
+ */
+QString supportedImageExtensions();
+
+/**
  * @brief Check whether a file is a supported image.
  *
  * @param path File path to test.
