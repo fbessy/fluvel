@@ -13,7 +13,7 @@
         <source>(0000, 0000)
 R: 888  G: 888  B: 888</source>
         <translation>(0000, 0000)
-R: 888  G: 888  B: 888</translation>
+R : 888  G : 888  B : 888</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="21"/>
@@ -34,7 +34,7 @@ Intensité :%3</translation>
         <source>(%1, %2)
 R:%3  G:%4  B:%5</source>
         <translation>(%1, %2)
-R:%3  G:%4  B:%5</translation>
+R: %3  G: %4  B: %5</translation>
     </message>
 </context>
 <context>
@@ -240,8 +240,8 @@ R:%3  G:%4  B:%5</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="32"/>
-        <source>Connectivity :</source>
-        <translation>Connectivité :</translation>
+        <source>Connectivity: </source>
+        <translation>Connectivité : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="34"/>
@@ -323,11 +323,6 @@ R:%3  G:%4  B:%5</translation>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="95"/>
-        <source>Color :</source>
-        <translation>Couleur :</translation>
-    </message>
-    <message>
         <location filename="../src/app/ui/components/analysis_widget.cpp" line="97"/>
         <source>Color</source>
         <translation>Couleur</translation>
@@ -345,6 +340,11 @@ R:%3  G:%4  B:%5</translation>
         <translation>Taille liste 2 : </translation>
     </message>
     <message>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="95"/>
+        <source>Color: </source>
+        <translation>Couleur : </translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/components/analysis_widget.cpp" line="109"/>
         <source>Noise</source>
         <translation>Bruit</translation>
@@ -352,7 +352,7 @@ R:%3  G:%4  B:%5</translation>
     <message>
         <location filename="../src/app/ui/components/analysis_widget.cpp" line="114"/>
         <source>Amount:</source>
-        <translation>Intensité:</translation>
+        <translation>Intensité :</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/analysis_widget.cpp" line="169"/>
@@ -367,7 +367,7 @@ R:%3  G:%4  B:%5</translation>
     <message>
         <location filename="../src/app/ui/components/analysis_widget.cpp" line="185"/>
         <source>Opening error - Fluvel</source>
-        <translation>Erreur d’ouverture – Fluvel</translation>
+        <translation>Erreur d’ouverture - Fluvel</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/analysis_widget.cpp" line="186"/>
@@ -379,7 +379,7 @@ R:%3  G:%4  B:%5</translation>
     <name>fluvel_app::AnalysisWindow</name>
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="30"/>
-        <source>Analysis : input</source>
+        <source>Analysis: input</source>
         <translation>Analyse : entrée</translation>
     </message>
     <message>
@@ -443,14 +443,14 @@ R:%3  G:%4  B:%5</translation>
         <translation>Temps</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="215"/>
-        <source>Computation time: %1 s</source>
-        <translation>Temps de calcul: %1 s</translation>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="155"/>
+        <source>Analysis: result</source>
+        <translation>Analyse : résultat</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="155"/>
-        <source>Analysis : result</source>
-        <translation>Analyse : résultat</translation>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="215"/>
+        <source>Computation time: %1 s</source>
+        <translation>Temps de calcul : %1 s</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="186"/>
@@ -761,14 +761,14 @@ Le flux de la caméra est peut-être interrompu.</translation>
         <location filename="../src/app/core/image_controller.cpp" line="227"/>
         <source>Step: %1
 </source>
-        <translation>Étape: %1
+        <translation>Étape : %1
 </translation>
     </message>
     <message>
         <location filename="../src/app/core/image_controller.cpp" line="228"/>
         <source>State: %1
 </source>
-        <translation>État: %1
+        <translation>État : %1
 </translation>
     </message>
     <message>
@@ -782,7 +782,7 @@ Le flux de la caméra est peut-être interrompu.</translation>
         <location filename="../src/app/core/image_controller.cpp" line="233"/>
         <source>Reason: 
 </source>
-        <translation>Motif: 
+        <translation>Motif : 
 </translation>
     </message>
     <message>
@@ -803,27 +803,27 @@ Le flux de la caméra est peut-être interrompu.</translation>
         <location filename="../src/app/core/image_controller.cpp" line="242"/>
         <source>Hausdorff q: %1 %
 </source>
-        <translation>Hausdorff q: %1 %
+        <translation>Hausdorff q : %1 %
 </translation>
     </message>
     <message>
         <location filename="../src/app/core/image_controller.cpp" line="244"/>
         <source>Centroid dist: %1 %
 </source>
-        <translation>Dist. centroid: %1 %
+        <translation>Dist. centroid : %1 %
 </translation>
     </message>
     <message>
         <location filename="../src/app/core/image_controller.cpp" line="246"/>
         <source>Elapsed: %1 s
 </source>
-        <translation>Durée: %1 s
+        <translation>Durée : %1 s
 </translation>
     </message>
     <message>
         <location filename="../src/app/core/image_controller.cpp" line="248"/>
         <source>Contour: %1 pts</source>
-        <translation>Contour: %1 pts</translation>
+        <translation>Contour : %1 pts</translation>
     </message>
 </context>
 <context>

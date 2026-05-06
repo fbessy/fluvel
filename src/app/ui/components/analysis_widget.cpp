@@ -92,7 +92,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     colorSelector_ = new ColorSelectorWidget(this, initialColor);
 
     QFormLayout* form = new QFormLayout;
-    form->addRow(tr("Color :"), colorSelector_);
+    form->addRow(tr("Color: "), colorSelector_);
 
     QGroupBox* color_group = new QGroupBox(tr("Color") + " " + QString::number(idThis_));
     color_group->setLayout(form);

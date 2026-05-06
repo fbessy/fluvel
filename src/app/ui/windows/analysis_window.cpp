@@ -27,7 +27,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
     QSettings settings;
 
-    setWindowTitle(tr("Analysis : input"));
+    setWindowTitle(tr("Analysis: input"));
 
     if (settings.contains("ui_geometry/analysis_window"))
     {
@@ -152,7 +152,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     setLayout(input_layout);
 
     resultPopup_ = new QDialog(this);
-    resultPopup_->setWindowTitle(tr("Analysis : result"));
+    resultPopup_->setWindowTitle(tr("Analysis: result"));
     resultPopup_->setLayout(result_layout);
 }
 

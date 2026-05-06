@@ -29,7 +29,7 @@ AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* par
                                    "(4-connected or 8-connected)."));
 
     QFormLayout* connect_layout = new QFormLayout;
-    connect_layout->addRow(tr("Connectivity :"), connectivityCb_);
+    connect_layout->addRow(tr("Connectivity: "), connectivityCb_);
 
     QGroupBox* externalspeed_groupbox = new QGroupBox(tr("Cycle 1 – Data-driven evolution"));
 
