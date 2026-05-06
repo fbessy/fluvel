@@ -260,34 +260,59 @@ R : %3  G : %4  B : %5</translation>
         <translation>Nombre d’itérations pour l’évolution guidée par les données (Cycle 1).</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="43"/>
+        <source>Na: </source>
+        <translation>Na : </translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="49"/>
-        <source>weight of the outside homogeneity criterion</source>
-        <translation>Poids du critère d’homogénéité extérieure</translation>
+        <source>Weight of the outside homogeneity criterion.</source>
+        <translation>Poids du critère d’homogénéité extérieur.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="55"/>
-        <source>weight of the inside homogeneity criterion</source>
-        <translation>Poids du critère d’homogénéité intérieure</translation>
+        <source>Weight of the inside homogeneity criterion.</source>
+        <translation>Poids du critère d’homogénéité intérieur.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="59"/>
+        <source>λout: </source>
+        <translation>λout : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="60"/>
+        <source>λin: </source>
+        <translation>λin : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="98"/>
+        <source>1st component weight: </source>
+        <translation>Poids de la 1ʳᵉ composante : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="99"/>
+        <source>2nd component weight: </source>
+        <translation>Poids de la 2ᵉ composante : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="100"/>
+        <source>3rd component weight: </source>
+        <translation>Poids de la 3ᵉ composante : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="136"/>
+        <source>Ns: </source>
+        <translation>Ns : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="137"/>
+        <source>Radius: </source>
+        <translation>Rayon : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="68"/>
         <source>Color space</source>
         <translation>Espace colorimétrique</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="98"/>
-        <source>1st component weight =</source>
-        <translation>Poids de la 1ʳᵉ composante =</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="99"/>
-        <source>2nd component weight =</source>
-        <translation>Poids de la 2e composante =</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="100"/>
-        <source>3rd component weight =</source>
-        <translation>Poids de la 3e composante =</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/algo_settings_widget.cpp" line="117"/>
@@ -308,51 +333,51 @@ R : %3  G : %4  B : %5</translation>
 <context>
     <name>fluvel_app::AnalysisWidget</name>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="55"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="42"/>
         <source>Title - Size</source>
         <translation>Titre - Taille</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="73"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="60"/>
         <source>Open image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="79"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="66"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="97"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="84"/>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="43"/>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="235"/>
-        <source>List 1 size: </source>
-        <translation>Taille liste 1 : </translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="48"/>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="237"/>
-        <source>List 2 size: </source>
-        <translation>Taille liste 2 : </translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="95"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="82"/>
         <source>Color: </source>
         <translation>Couleur : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="109"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="96"/>
         <source>Noise</source>
         <translation>Bruit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="114"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="101"/>
         <source>Amount:</source>
         <translation>Intensité :</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="110"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="235"/>
+        <source>Shape 1 size: %1 pts</source>
+        <translation>Taille de la forme 1 : %1 pts</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="115"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="239"/>
+        <source>Shape 2 size: %1 pts</source>
+        <translation>Taille de la forme 2 : %1 pts</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/analysis_widget.cpp" line="169"/>
@@ -378,111 +403,141 @@ R : %3  G : %4  B : %5</translation>
 <context>
     <name>fluvel_app::AnalysisWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="30"/>
-        <source>Analysis: input</source>
-        <translation>Analyse : entrée</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="52"/>
-        <source>Compute the Hausdorff distance</source>
-        <translation>Calculer la distance de Hausdorff</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="70"/>
-        <source>Hausdorff distance = </source>
-        <translation>Distance de Hausdorff = </translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="75"/>
-        <source>Hausdorff quantile = </source>
-        <translation>Quantile de Hausdorff = </translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="82"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="85"/>
         <source>Hausdorff measure</source>
         <translation>Métriques de Hausdorff</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="98"/>
-        <source>Hausdorff ratio = </source>
-        <translation>rapport de Hausdorff = </translation>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="95"/>
+        <source>Percentile: </source>
+        <translation>Percentile : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="103"/>
-        <source>Hausdorff quantile ratio = </source>
-        <translation>rapport du quantile de la distance de Hausdorff = </translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="111"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="118"/>
         <source>Hausdorff quantile measure</source>
         <translation>Mesure du quantile de la distance de Hausdorff</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="115"/>
-        <source>distance between centroids = </source>
-        <translation>distance entre les centroïdes = </translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="120"/>
-        <source>ratio between centroids = </source>
-        <translation>rapport entre les centroïdes = </translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="127"/>
-        <source>Shapes gap</source>
-        <translation>Écart entre les formes</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="131"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="140"/>
         <source>Computation time: -- s</source>
-        <translation>Temps de calcul: -- s</translation>
+        <translation>Temps de calcul : -- s</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="136"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="145"/>
         <source>Time</source>
         <translation>Temps</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="155"/>
-        <source>Analysis: result</source>
-        <translation>Analyse : résultat</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="215"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="224"/>
         <source>Computation time: %1 s</source>
         <translation>Temps de calcul : %1 s</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="186"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="195"/>
         <source>Hausdorff distance: %1 px</source>
         <translation>Distance de Hausdorff : %1 px</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="189"/>
-        <source>Hausdorff ratio: %1 %</source>
-        <translation>Rapport de Hausdorff : %1 %</translation>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="30"/>
+        <source>Analysis: Input</source>
+        <translation>Analyse : entrée</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="196"/>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="228"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="52"/>
+        <source>Compute Hausdorff Distance</source>
+        <translation>Calculer la distance de Hausdorff</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="70"/>
+        <source>Hausdorff distance: </source>
+        <translation>Distance de Hausdorff : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="73"/>
+        <source>Maximum of the minimum distances between the two shapes.</source>
+        <translation>Maximum des distances minimales entre les deux formes.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="76"/>
+        <source>Normalized Hausdorff distance: </source>
+        <translation>Distance de Hausdorff normalisée : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="80"/>
+        <source>Hausdorff distance normalized by the largest image diagonal.</source>
+        <translation>Distance de Hausdorff normalisée par la plus grande diagonale de l’image.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="101"/>
+        <source>Hausdorff quantile: </source>
+        <translation>Quantile de Hausdorff : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="105"/>
+        <source>Uses a percentile of the minimum distances instead of the maximum minimum distance.</source>
+        <translation>Utilise un percentile des distances minimales au lieu de la distance minimale maximale.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="108"/>
+        <source>Normalized Hausdorff quantile: </source>
+        <translation>Quantile de Hausdorff normalisé : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="127"/>
+        <source>Normalized distance between centroids: </source>
+        <translation>Distance normalisée entre les centroïdes : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="129"/>
+        <source>Distance between centroids normalized by the largest image diagonal.</source>
+        <translation>Distance entre les centroïdes normalisée par la plus grande diagonale de l’image.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="136"/>
+        <source>Shape distances</source>
+        <translation>Distances entre formes</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="164"/>
+        <source>Analysis: Results</source>
+        <translation>Analyse : résultats</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="198"/>
+        <source>Normalized Hausdorff distance: %1 %</source>
+        <translation>Distance de Hausdorff normalisée : %1 %</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="208"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="240"/>
+        <source>Normalized Hausdorff quantile: %1 %</source>
+        <translation>Quantile de Hausdorff normalisé : %1 %</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="215"/>
+        <source>Distance between centroids: %1 px</source>
+        <translation>Distance entre les centroïdes : %1 px</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="218"/>
+        <source>Normalized distance between centroids: %1 %</source>
+        <translation>Distance normalisée entre les centroïdes : %1 %</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="112"/>
+        <source>Quantile-based Hausdorff distance normalized by the largest image diagonal.</source>
+        <translation>Distance de Hausdorff basée sur un quantile et normalisée par la plus grande diagonale de l’image.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="122"/>
+        <source>Distance between centroids: </source>
+        <translation>Distance entre les centroïdes :</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="205"/>
+        <location filename="../src/app/ui/windows/analysis_window.cpp" line="237"/>
         <source>Hausdorff quantile: %1 px</source>
         <translation>Quantile de Hausdorff : %1 px</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="199"/>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="231"/>
-        <source>Hausdorff quantile ratio: %1 %</source>
-        <translation>Rapport du quantile de Hausdorff : %1 %</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="206"/>
-        <source>Centroids distance: %1 px</source>
-        <translation>Distance des centroïdes : %1 px</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/analysis_window.cpp" line="209"/>
-        <source>Centroids ratio: %1 %</source>
-        <translation>Rapport des centroïdes : %1 %</translation>
     </message>
 </context>
 <context>
@@ -536,21 +591,21 @@ Contour : %7 pts</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="104"/>
-        <source>Factor:</source>
-        <translation>Facteur :</translation>
+        <source>Factor: </source>
+        <translation>Facteur : </translation>
     </message>
 </context>
 <context>
     <name>fluvel_app::CameraWindow</name>
     <message>
         <location filename="../src/app/ui/windows/camera_window.cpp" line="77"/>
-        <source>Device:</source>
-        <translation>Périphérique :</translation>
+        <source>Device: </source>
+        <translation>Périphérique : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/camera_window.cpp" line="89"/>
-        <source>Format:</source>
-        <translation>Format:</translation>
+        <source>Format: </source>
+        <translation>Format : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/camera_window.cpp" line="109"/>
@@ -697,12 +752,12 @@ Le flux de la caméra est peut-être interrompu.</translation>
     <message>
         <location filename="../src/app/ui/components/display_settings_widget.cpp" line="27"/>
         <source>Source</source>
-        <translation>d’origine</translation>
+        <translation>d’Origine</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/display_settings_widget.cpp" line="28"/>
         <source>Preprocessed</source>
-        <translation>prétraitée</translation>
+        <translation>Prétraitée</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/display_settings_widget.cpp" line="46"/>
@@ -1146,20 +1201,20 @@ Fichier → Ouvrir</translation>
         <translation>Forme</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="137"/>
-        <source>rectangle</source>
-        <translation>rectangle</translation>
-    </message>
-    <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="138"/>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="140"/>
         <source>Middle mouse button: toggle rectangle / ellipse</source>
         <translation>Bouton central de la souris : basculer entre rectangle et ellipse</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="137"/>
+        <source>Rectangle</source>
+        <translation>Rectangle</translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="139"/>
-        <source>ellipse</source>
-        <translation>ellipse</translation>
+        <source>Ellipse</source>
+        <translation>Ellipse</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="152"/>
@@ -1179,13 +1234,13 @@ Fichier → Ouvrir</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="163"/>
-        <source>width =</source>
-        <translation>largeur =</translation>
+        <source>Width: </source>
+        <translation>Largeur : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="183"/>
-        <source>height =</source>
-        <translation>hauteur =</translation>
+        <source>Height: </source>
+        <translation>Hauteur : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="204"/>
@@ -1233,11 +1288,6 @@ Fichier → Ouvrir</translation>
         <translation>Effacer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="295"/>
-        <source>Factor:</source>
-        <translation>Facteur:</translation>
-    </message>
-    <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="315"/>
         <source>Gaussian Noise</source>
         <translation>Bruit gaussien</translation>
@@ -1254,9 +1304,40 @@ Fichier → Ouvrir</translation>
         <translation>Écart-type.</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="327"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="357"/>
+        <source>σ: </source>
+        <translation>σ : </translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="340"/>
         <source>Density or probability of impulse noise per pixel.</source>
         <translation>Densité ou probabilité de bruit impulsionnel par pixel.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="343"/>
+        <source>d: </source>
+        <translation>d : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="454"/>
+        <source>White top-hat</source>
+        <translation>Top-hat blanc</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="456"/>
+        <source>Black top-hat</source>
+        <translation>Top-hat noir</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="416"/>
+        <source>λ: </source>
+        <translation>λ : </translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="417"/>
+        <source>κ: </source>
+        <translation>κ : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="431"/>
@@ -1266,19 +1347,26 @@ Fichier → Ouvrir</translation>
         <translation>L&apos;élément structurant est un carré centré sur son origine.</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="434"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="447"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="468"/>
+        <source>SE size: </source>
+        <translation>Taille de l&apos;ES : </translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="329"/>
         <source>Impulsive Noise</source>
         <translation>Bruit impulsionnel</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="295"/>
+        <source>Factor: </source>
+        <translation>Facteur : </translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="331"/>
         <source>Random pixel corruption. Grayscale: salt &amp; pepper (black or white pixels). Color: each channel can be independently corrupted.</source>
         <translation>Corruption aléatoire des pixels. Niveaux de gris : sel et poivre (pixels noirs ou blancs). Couleur : chaque canal peut être corrompu indépendamment.</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="343"/>
-        <source>d =</source>
-        <translation>d =</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="345"/>
@@ -1298,8 +1386,8 @@ Fichier → Ouvrir</translation>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="380"/>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="394"/>
-        <source>kernel size =</source>
-        <translation>taille du noyau =</translation>
+        <source>Kernel size: </source>
+        <translation>Taille du noyau : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="384"/>
@@ -1313,30 +1401,23 @@ Fichier → Ouvrir</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="415"/>
-        <source>iterations =</source>
-        <translation>itérations =</translation>
+        <source>Iterations: </source>
+        <translation>Itérations : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="418"/>
-        <source>function 1 :</source>
-        <translation>fonction 1 :</translation>
+        <source>Function 1: </source>
+        <translation>Fonction 1 : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="419"/>
-        <source>function 2 :</source>
-        <translation>fonction 2 :</translation>
+        <source>Function 2: </source>
+        <translation>Fonction 2 : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="423"/>
         <source>Opening</source>
         <translation>Ouverture</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="434"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="447"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="468"/>
-        <source>SE size =</source>
-        <translation>taille de l&apos;ES =</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="436"/>
@@ -1349,19 +1430,9 @@ Fichier → Ouvrir</translation>
         <translation>Transformation top-hat</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="454"/>
-        <source>white top-hat</source>
-        <translation>top-hat blanc</translation>
-    </message>
-    <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="455"/>
         <source>Difference between the input image and the opened result.</source>
         <translation>Différence entre l&apos;image d&apos;origine et le résultat de l&apos;ouverture.</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="456"/>
-        <source>black top-hat</source>
-        <translation>top-hat noir</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="457"/>
@@ -1395,8 +1466,8 @@ Fichier → Ouvrir</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="525"/>
-        <source>time = </source>
-        <translation>temps = </translation>
+        <source>Time: </source>
+        <translation>Temps : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="526"/>

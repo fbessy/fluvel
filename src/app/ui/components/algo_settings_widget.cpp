@@ -40,24 +40,24 @@ AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* par
     naSpin_->setSuffix(tr(" iterations"));
     naSpin_->setToolTip(tr("Number of iterations of the data-driven evolution (Cycle 1)."));
     QFormLayout* Na_layout = new QFormLayout;
-    Na_layout->addRow("Na =", naSpin_);
+    Na_layout->addRow(tr("Na: "), naSpin_);
 
     lambdaOutSpin_ = new QSpinBox;
     lambdaOutSpin_->setSingleStep(1);
     lambdaOutSpin_->setMinimum(1);
     lambdaOutSpin_->setMaximum(100000);
-    lambdaOutSpin_->setToolTip(tr("weight of the outside homogeneity criterion"));
+    lambdaOutSpin_->setToolTip(tr("Weight of the outside homogeneity criterion."));
 
     lambdaInSpin_ = new QSpinBox;
     lambdaInSpin_->setSingleStep(1);
     lambdaInSpin_->setMinimum(1);
     lambdaInSpin_->setMaximum(100000);
-    lambdaInSpin_->setToolTip(tr("weight of the inside homogeneity criterion"));
+    lambdaInSpin_->setToolTip(tr("Weight of the inside homogeneity criterion."));
 
     QFormLayout* lambda_layout = new QFormLayout;
 
-    lambda_layout->addRow("λout =", lambdaOutSpin_);
-    lambda_layout->addRow("λin =", lambdaInSpin_);
+    lambda_layout->addRow(tr("λout: "), lambdaOutSpin_);
+    lambda_layout->addRow(tr("λin: "), lambdaInSpin_);
 
     QVBoxLayout* chanvese_layout = new QVBoxLayout;
     chanvese_layout->addLayout(lambda_layout);
@@ -95,9 +95,9 @@ AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* par
     gammaSpin_->setMaximum(100000);
 
     QFormLayout* color_weights_layout = new QFormLayout;
-    color_weights_layout->addRow(tr("1st component weight ="), alphaSpin_);
-    color_weights_layout->addRow(tr("2nd component weight ="), betaSpin_);
-    color_weights_layout->addRow(tr("3rd component weight ="), gammaSpin_);
+    color_weights_layout->addRow(tr("1st component weight: "), alphaSpin_);
+    color_weights_layout->addRow(tr("2nd component weight: "), betaSpin_);
+    color_weights_layout->addRow(tr("3rd component weight: "), gammaSpin_);
 
     QVBoxLayout* vcolor_layout = new QVBoxLayout;
     vcolor_layout->addWidget(colorSpaceCb_);
@@ -133,8 +133,8 @@ AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* par
                                      "majority vote during internal smoothing."));
 
     QFormLayout* internalspeed_layout = new QFormLayout;
-    internalspeed_layout->addRow("Ns =", nsSpin_);
-    internalspeed_layout->addRow("R =", diskRadiusSpin_);
+    internalspeed_layout->addRow(tr("Ns: "), nsSpin_);
+    internalspeed_layout->addRow(tr("Radius: "), diskRadiusSpin_);
 
     internalspeedGroupbox_->setLayout(internalspeed_layout);
 

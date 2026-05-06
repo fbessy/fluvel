@@ -134,9 +134,9 @@ void SettingsWindow::setupUiInitTab()
     QGroupBox* shape_groupbox = new QGroupBox(tr("Shape"));
     shape_groupbox->setFlat(true);
 
-    rectangleRadio_ = new QRadioButton(tr("rectangle"));
+    rectangleRadio_ = new QRadioButton(tr("Rectangle"));
     rectangleRadio_->setToolTip(tr("Middle mouse button: toggle rectangle / ellipse"));
-    ellipseRadio_ = new QRadioButton(tr("ellipse"));
+    ellipseRadio_ = new QRadioButton(tr("Ellipse"));
     ellipseRadio_->setToolTip(tr("Middle mouse button: toggle rectangle / ellipse"));
 
     rectangleRadio_->setChecked(false);
@@ -160,7 +160,7 @@ void SettingsWindow::setupUiInitTab()
     widthShapeSpin_->setValue(65);
 
     QFormLayout* width_spin_layout = new QFormLayout;
-    width_spin_layout->addRow(tr("width ="), widthShapeSpin_);
+    width_spin_layout->addRow(tr("Width: "), widthShapeSpin_);
 
     widthSlider_ = new QSlider(Qt::Horizontal, this);
 
@@ -180,7 +180,7 @@ void SettingsWindow::setupUiInitTab()
     heightShapeSpin_->setValue(65);
 
     QFormLayout* height_spin_layout = new QFormLayout;
-    height_spin_layout->addRow(tr("height ="), heightShapeSpin_);
+    height_spin_layout->addRow(tr("Height: "), heightShapeSpin_);
 
     heightSlider_ = new QSlider(Qt::Horizontal, this);
 
@@ -292,7 +292,7 @@ void SettingsWindow::setupUiDownscaleTab()
     downscaleFactorCb_->addItem("2", 2);
     downscaleFactorCb_->addItem("4", 4);
 
-    auto* label = new QLabel(tr("Factor:"));
+    auto* label = new QLabel(tr("Factor: "));
 
     auto* hbox = new QHBoxLayout;
     hbox->addWidget(label);
@@ -324,7 +324,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     gaussianNoiseStdSpin_->setToolTip(tr("Standard deviation."));
 
     QFormLayout* gaussian_noise_layout = new QFormLayout;
-    gaussian_noise_layout->addRow("σ =", gaussianNoiseStdSpin_);
+    gaussian_noise_layout->addRow(tr("σ: "), gaussianNoiseStdSpin_);
 
     impulsiveNoiseGroupbox_ = new QGroupBox(tr("Impulsive Noise"));
     impulsiveNoiseGroupbox_->setToolTip(
@@ -340,7 +340,7 @@ void SettingsWindow::setupUiPreprocessingTab()
         tr("Density or probability of impulse noise per pixel."));
 
     QFormLayout* impulsiveNoiseLayout = new QFormLayout;
-    impulsiveNoiseLayout->addRow(tr("d ="), impulsiveNoisePercentSpin_);
+    impulsiveNoiseLayout->addRow(tr("d: "), impulsiveNoisePercentSpin_);
 
     speckleNoiseGroupbox_ = new QGroupBox(tr("Speckle Noise"));
     speckleNoiseGroupbox_->setToolTip(
@@ -354,7 +354,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     speckleNoiseStdSpin_->setToolTip(tr("Standard deviation."));
 
     QFormLayout* speckleNoiseLayout = new QFormLayout;
-    speckleNoiseLayout->addRow("σ =", speckleNoiseStdSpin_);
+    speckleNoiseLayout->addRow(tr("σ: "), speckleNoiseStdSpin_);
 
     gaussianNoiseGroupbox_->setLayout(gaussian_noise_layout);
     impulsiveNoiseGroupbox_->setLayout(impulsiveNoiseLayout);
@@ -377,7 +377,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     meanKernelSizeSpin_->setMaximum(499);
 
     QFormLayout* meanLayout = new QFormLayout;
-    meanLayout->addRow(tr("kernel size ="), meanKernelSizeSpin_);
+    meanLayout->addRow(tr("Kernel size: "), meanKernelSizeSpin_);
 
     ////////////////////////////////////////////
 
@@ -391,7 +391,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     // klength_median_spin->setSuffix("²");
 
     QFormLayout* medianLayout = new QFormLayout;
-    medianLayout->addRow(tr("kernel size ="), medianKernelSizeSpin_);
+    medianLayout->addRow(tr("Kernel size: "), medianKernelSizeSpin_);
 
     anisoGroupbox_ = new QGroupBox(tr("Perona-Malik anisotropic diffusion"));
     anisoGroupbox_->setCheckable(true);
@@ -412,11 +412,11 @@ void SettingsWindow::setupUiPreprocessingTab()
     kappaSpin_->setMaximum(10000.0);
 
     QFormLayout* anisoLayout = new QFormLayout;
-    anisoLayout->addRow(tr("iterations ="), iterationFilterSpin_);
-    anisoLayout->addRow("λ =", lambdaSpin_);
-    anisoLayout->addRow("κ =", kappaSpin_);
-    anisoLayout->addRow(tr("function 1 :"), anisoExpConductionRadio_);
-    anisoLayout->addRow(tr("function 2 :"), anisoReciprocalConductionRadio_);
+    anisoLayout->addRow(tr("Iterations: "), iterationFilterSpin_);
+    anisoLayout->addRow(tr("λ: "), lambdaSpin_);
+    anisoLayout->addRow(tr("κ: "), kappaSpin_);
+    anisoLayout->addRow(tr("Function 1: "), anisoExpConductionRadio_);
+    anisoLayout->addRow(tr("Function 2: "), anisoReciprocalConductionRadio_);
 
     ////////////////////////////////////////////
 
@@ -431,7 +431,7 @@ void SettingsWindow::setupUiPreprocessingTab()
         tr("The structuring element is a square centered at its origin."));
 
     QFormLayout* openLayout = new QFormLayout;
-    openLayout->addRow(tr("SE size ="), openKernelSizeSpin_);
+    openLayout->addRow(tr("SE size: "), openKernelSizeSpin_);
 
     closeGroupbox_ = new QGroupBox(tr("Closing"));
     closeGroupbox_->setCheckable(true);
@@ -444,16 +444,16 @@ void SettingsWindow::setupUiPreprocessingTab()
         tr("The structuring element is a square centered at its origin."));
 
     QFormLayout* closeLayout = new QFormLayout;
-    closeLayout->addRow(tr("SE size ="), closeKernelSizeSpin_);
+    closeLayout->addRow(tr("SE size: "), closeKernelSizeSpin_);
 
     ////////////////////////////////////////////
 
     tophatGroupbox_ = new QGroupBox(tr("Top-hat transform"));
     tophatGroupbox_->setCheckable(true);
     tophatGroupbox_->setChecked(false);
-    whitetophatRadio_ = new QRadioButton(tr("white top-hat"));
+    whitetophatRadio_ = new QRadioButton(tr("White top-hat"));
     whitetophatRadio_->setToolTip(tr("Difference between the input image and the opened result."));
-    blacktophatRadio_ = new QRadioButton(tr("black top-hat"));
+    blacktophatRadio_ = new QRadioButton(tr("Black top-hat"));
     blacktophatRadio_->setToolTip(tr("Difference between the closed result and the input image."));
     tophatKernelSizeSpin_ = new KernelSizeSpinBox;
     tophatKernelSizeSpin_->setSingleStep(2);
@@ -465,7 +465,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     QFormLayout* tophatLayout = new QFormLayout;
     tophatLayout->addRow(" ", whitetophatRadio_);
     tophatLayout->addRow(" ", blacktophatRadio_);
-    tophatLayout->addRow(tr("SE size ="), tophatKernelSizeSpin_);
+    tophatLayout->addRow(tr("SE size: "), tophatKernelSizeSpin_);
 
     meanGroupbox_->setLayout(meanLayout);
 
@@ -522,7 +522,7 @@ void SettingsWindow::setupUiPreprocessingTab()
     processPage_->setChecked(false);
 
     timeFilt_ = new QLabel(this);
-    timeFilt_->setText(tr("time = "));
+    timeFilt_->setText(tr("Time: "));
     QGroupBox* timeFiltGroupbox = new QGroupBox(tr("Processing time"));
     QVBoxLayout* elapsedFiltLayout = new QVBoxLayout;
     elapsedFiltLayout->addWidget(timeFilt_);

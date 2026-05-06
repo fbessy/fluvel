@@ -59,14 +59,14 @@ private:
 
     fluvel_ip::PointSet intersection_;
 
-    QDialog* resultPopup_ = nullptr;
+    QDialog* resultsPopup_ = nullptr;
     QLabel* hausdorffLabel_ = nullptr;
-    QSpinBox* hundredthSp_ = nullptr;
+    QSpinBox* percentileSp_ = nullptr;
     QLabel* quantileLabel_ = nullptr;
-    QLabel* hausdorffRatioLabel_ = nullptr;
-    QLabel* quantileRatioLabel_ = nullptr;
+    QLabel* normalizedHausdorffLabel_ = nullptr;
+    QLabel* normalizedQuantileLabel_ = nullptr;
     QLabel* centroidsDistLabel_ = nullptr;
-    QLabel* centroidsRatioLabel_ = nullptr;
+    QLabel* normalizedCentroidsDistLabel_ = nullptr;
     QLabel* timeLabel_ = nullptr;
 
     std::unique_ptr<fluvel_ip::HausdorffDistance> hd_;

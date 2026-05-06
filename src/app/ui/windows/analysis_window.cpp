@@ -27,7 +27,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
     QSettings settings;
 
-    setWindowTitle(tr("Analysis: input"));
+    setWindowTitle(tr("Analysis: Input"));
 
     if (settings.contains("ui_geometry/analysis_window"))
     {
@@ -49,7 +49,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     lists_select_layout->addWidget(widget1_);
     lists_select_layout->addWidget(widget2_);
 
-    computeButton_ = new QPushButton(tr("Compute the Hausdorff distance"));
+    computeButton_ = new QPushButton(tr("Compute Hausdorff Distance"));
     computeButton_->setEnabled(false);
 
     QVBoxLayout* input_layout = new QVBoxLayout;
@@ -67,81 +67,90 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     ///////////////////////////////////////
 
     hausdorffLabel_ = new QLabel(this);
-    hausdorffLabel_->setText(tr("Hausdorff distance = "));
+    hausdorffLabel_->setText(tr("Hausdorff distance: "));
     hausdorffLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     hausdorffLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    hausdorffLabel_->setToolTip(tr("Maximum of the minimum distances between the two shapes."));
 
-    hausdorffRatioLabel_ = new QLabel(this);
-    hausdorffRatioLabel_->setText(tr("Hausdorff quantile = "));
-    hausdorffRatioLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    hausdorffRatioLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    normalizedHausdorffLabel_ = new QLabel(this);
+    normalizedHausdorffLabel_->setText(tr("Normalized Hausdorff distance: "));
+    normalizedHausdorffLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    normalizedHausdorffLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    normalizedHausdorffLabel_->setToolTip(
+        tr("Hausdorff distance normalized by the largest image diagonal."));
 
-    QVBoxLayout* hausdorff_layout = new QVBoxLayout;
-    hausdorff_layout->addWidget(hausdorffLabel_);
-    hausdorff_layout->addWidget(hausdorffRatioLabel_);
-    QGroupBox* hausdorff_group = new QGroupBox(tr("Hausdorff measure"));
-    hausdorff_group->setLayout(hausdorff_layout);
+    QVBoxLayout* hausdorffLayout = new QVBoxLayout;
+    hausdorffLayout->addWidget(hausdorffLabel_);
+    hausdorffLayout->addWidget(normalizedHausdorffLabel_);
+    QGroupBox* hausdorffGroup = new QGroupBox(tr("Hausdorff measure"));
+    hausdorffGroup->setLayout(hausdorffLayout);
 
-    hundredthSp_ = new QSpinBox;
-    hundredthSp_->setSingleStep(1);
-    hundredthSp_->setMinimum(0);
-    hundredthSp_->setMaximum(100);
-    hundredthSp_->setSuffix(" %");
-    hundredthSp_->setValue(90);
-    QFormLayout* hundredth_layout = new QFormLayout;
-    hundredth_layout->addRow("hundredth =", hundredthSp_);
+    percentileSp_ = new QSpinBox;
+    percentileSp_->setSingleStep(1);
+    percentileSp_->setMinimum(0);
+    percentileSp_->setMaximum(100);
+    percentileSp_->setSuffix(" %");
+    percentileSp_->setValue(90);
+    QFormLayout* percentileLayout = new QFormLayout;
+    percentileLayout->addRow(tr("Percentile: "), percentileSp_);
 
-    connect(hundredthSp_, QOverload<int>::of(&QSpinBox::valueChanged), this,
+    connect(percentileSp_, QOverload<int>::of(&QSpinBox::valueChanged), this,
             &AnalysisWindow::refreshQuantile);
 
     quantileLabel_ = new QLabel(this);
-    quantileLabel_->setText(tr("Hausdorff ratio = "));
+    quantileLabel_->setText(tr("Hausdorff quantile: "));
     quantileLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     quantileLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    quantileLabel_->setToolTip(
+        tr("Uses a percentile of the minimum distances instead of the maximum minimum distance."));
 
-    quantileRatioLabel_ = new QLabel(this);
-    quantileRatioLabel_->setText(tr("Hausdorff quantile ratio = "));
-    quantileRatioLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    quantileRatioLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    normalizedQuantileLabel_ = new QLabel(this);
+    normalizedQuantileLabel_->setText(tr("Normalized Hausdorff quantile: "));
+    normalizedQuantileLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    normalizedQuantileLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    normalizedQuantileLabel_->setToolTip(
+        tr("Quantile-based Hausdorff distance normalized by the largest image diagonal."));
 
-    QVBoxLayout* quantile_layout = new QVBoxLayout;
-    quantile_layout->addLayout(hundredth_layout);
-    quantile_layout->addWidget(quantileLabel_);
-    quantile_layout->addWidget(quantileRatioLabel_);
-    QGroupBox* quantile_group = new QGroupBox(tr("Hausdorff quantile measure"));
-    quantile_group->setLayout(quantile_layout);
+    QVBoxLayout* quantileLayout = new QVBoxLayout;
+    quantileLayout->addLayout(percentileLayout);
+    quantileLayout->addWidget(quantileLabel_);
+    quantileLayout->addWidget(normalizedQuantileLabel_);
+    QGroupBox* quantileGroup = new QGroupBox(tr("Hausdorff quantile measure"));
+    quantileGroup->setLayout(quantileLayout);
 
     centroidsDistLabel_ = new QLabel(this);
-    centroidsDistLabel_->setText(tr("distance between centroids = "));
+    centroidsDistLabel_->setText(tr("Distance between centroids: "));
     centroidsDistLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     centroidsDistLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    centroidsRatioLabel_ = new QLabel(this);
-    centroidsRatioLabel_->setText(tr("ratio between centroids = "));
-    centroidsRatioLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    centroidsRatioLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    normalizedCentroidsDistLabel_ = new QLabel(this);
+    normalizedCentroidsDistLabel_->setText(tr("Normalized distance between centroids: "));
+    normalizedCentroidsDistLabel_->setToolTip(
+        tr("Distance between centroids normalized by the largest image diagonal."));
+    normalizedCentroidsDistLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    normalizedCentroidsDistLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    QVBoxLayout* centroids_layout = new QVBoxLayout;
-    centroids_layout->addWidget(centroidsDistLabel_);
-    centroids_layout->addWidget(centroidsRatioLabel_);
-    QGroupBox* centroids_group = new QGroupBox(tr("Shapes gap"));
-    centroids_group->setLayout(centroids_layout);
+    QVBoxLayout* centroidsLayout = new QVBoxLayout;
+    centroidsLayout->addWidget(centroidsDistLabel_);
+    centroidsLayout->addWidget(normalizedCentroidsDistLabel_);
+    QGroupBox* centroidsGroup = new QGroupBox(tr("Shape distances"));
+    centroidsGroup->setLayout(centroidsLayout);
 
     timeLabel_ = new QLabel(this);
     timeLabel_->setText(tr("Computation time: -- s"));
     timeLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     timeLabel_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    QVBoxLayout* time_layout = new QVBoxLayout;
-    time_layout->addWidget(timeLabel_);
-    QGroupBox* time_group = new QGroupBox(tr("Time"));
-    time_group->setLayout(time_layout);
+    QVBoxLayout* timeLayout = new QVBoxLayout;
+    timeLayout->addWidget(timeLabel_);
+    QGroupBox* timeGroup = new QGroupBox(tr("Time"));
+    timeGroup->setLayout(timeLayout);
 
-    QVBoxLayout* result_layout = new QVBoxLayout;
-    result_layout->addWidget(hausdorff_group);
-    result_layout->addWidget(quantile_group);
-    result_layout->addWidget(centroids_group);
-    result_layout->addWidget(time_group);
-    result_layout->addStretch(1);
+    QVBoxLayout* resultsLayout = new QVBoxLayout;
+    resultsLayout->addWidget(hausdorffGroup);
+    resultsLayout->addWidget(quantileGroup);
+    resultsLayout->addWidget(centroidsGroup);
+    resultsLayout->addWidget(timeGroup);
+    resultsLayout->addStretch(1);
 
     ///////////////////////////////////////
     ///////////////////////////////////////
@@ -151,9 +160,9 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
     setLayout(input_layout);
 
-    resultPopup_ = new QDialog(this);
-    resultPopup_->setWindowTitle(tr("Analysis: result"));
-    resultPopup_->setLayout(result_layout);
+    resultsPopup_ = new QDialog(this);
+    resultsPopup_->setWindowTitle(tr("Analysis: Results"));
+    resultsPopup_->setLayout(resultsLayout);
 }
 
 void AnalysisWindow::computeHd()
@@ -167,7 +176,7 @@ void AnalysisWindow::computeHd()
     const double elapsed = timer.elapsedSec();
 
     const float hausdorffDist = hd_->distance();
-    const float hausdorffQuantile = hd_->hausdorffQuantile(hundredthSp_->value());
+    const float hausdorffQuantile = hd_->hausdorffQuantile(percentileSp_->value());
     const float centroidsGap = hd_->centroidsDistance();
 
     factor_ = 100.f / fluvel_ip::Shape::gridDiagonal(
@@ -185,8 +194,8 @@ void AnalysisWindow::computeHd()
     hausdorffLabel_->setText(
         tr("Hausdorff distance: %1 px").arg(QString::number(hausdorffDist, 'f', 2)));
 
-    hausdorffRatioLabel_->setText(
-        tr("Hausdorff ratio: %1 %").arg(QString::number(hdRatio, 'f', 2)));
+    normalizedHausdorffLabel_->setText(
+        tr("Normalized Hausdorff distance: %1 %").arg(QString::number(hdRatio, 'f', 2)));
 
     // =========================
     // Quantile
@@ -195,18 +204,18 @@ void AnalysisWindow::computeHd()
     quantileLabel_->setText(
         tr("Hausdorff quantile: %1 px").arg(QString::number(hausdorffQuantile, 'f', 2)));
 
-    quantileRatioLabel_->setText(
-        tr("Hausdorff quantile ratio: %1 %").arg(QString::number(quantileRatio, 'f', 2)));
+    normalizedQuantileLabel_->setText(
+        tr("Normalized Hausdorff quantile: %1 %").arg(QString::number(quantileRatio, 'f', 2)));
 
     // =========================
     // Centroids
     // =========================
 
     centroidsDistLabel_->setText(
-        tr("Centroids distance: %1 px").arg(QString::number(centroidsGap, 'f', 2)));
+        tr("Distance between centroids: %1 px").arg(QString::number(centroidsGap, 'f', 2)));
 
-    centroidsRatioLabel_->setText(
-        tr("Centroids ratio: %1 %").arg(QString::number(gapRatio, 'f', 2)));
+    normalizedCentroidsDistLabel_->setText(
+        tr("Normalized distance between centroids: %1 %").arg(QString::number(gapRatio, 'f', 2)));
 
     // =========================
     // Time
@@ -214,7 +223,7 @@ void AnalysisWindow::computeHd()
 
     timeLabel_->setText(tr("Computation time: %1 s").arg(QString::number(elapsed, 'f', 2)));
 
-    resultPopup_->show();
+    resultsPopup_->show();
 }
 
 void AnalysisWindow::refreshQuantile(int hundredth)
@@ -227,8 +236,8 @@ void AnalysisWindow::refreshQuantile(int hundredth)
         quantileLabel_->setText(
             tr("Hausdorff quantile: %1 px").arg(QString::number(hausdorffQuantile, 'f', 2)));
 
-        quantileRatioLabel_->setText(
-            tr("Hausdorff quantile ratio: %1 %").arg(QString::number(quantileRatio, 'f', 2)));
+        normalizedQuantileLabel_->setText(
+            tr("Normalized Hausdorff quantile: %1 %").arg(QString::number(quantileRatio, 'f', 2)));
     }
 }
 

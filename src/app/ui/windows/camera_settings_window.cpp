@@ -101,7 +101,7 @@ void CameraSettingsWindow::setupDownscaleGroup()
     downscaleFactorCb_->addItem("4", 4);
 
     auto* fl = new QFormLayout;
-    fl->addRow(tr("Factor:"), downscaleFactorCb_);
+    fl->addRow(tr("Factor: "), downscaleFactorCb_);
 
     downscaleGb_->setLayout(fl);
 }

@@ -74,7 +74,7 @@ void CameraWindow::createUi()
 
     central_ = new QWidget(this);
 
-    deviceLabel_ = new QLabel(tr("Device:"));
+    deviceLabel_ = new QLabel(tr("Device: "));
     deviceSelector_ = new QComboBox(this);
 
     // Adjust width to contents (needed when items have icons)
@@ -86,7 +86,7 @@ void CameraWindow::createUi()
     deviceIdleIcon_ = createEmptyIcon(kCameraIconSize);
     deviceErrorIcon_ = createErrorCameraIcon();
 
-    formatLabel_ = new QLabel(tr("Format:"));
+    formatLabel_ = new QLabel(tr("Format: "));
     formatSelector_ = new QComboBox(this);
     formatSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     static constexpr int kFormatIconSize{16};

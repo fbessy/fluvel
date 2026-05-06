@@ -36,19 +36,6 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     QSettings settings;
 
-    textListLength_ = new QLabel(this);
-    textListLength_->setAlignment(Qt::AlignCenter);
-    if (idThis_ == 1)
-    {
-        textListLength_->setText("<font color=red>" + tr("List 1 size: ") +
-                                 QString::number(shape_.points().size()));
-    }
-    else if (idThis_ == 2)
-    {
-        textListLength_->setText("<font color=red>" + tr("List 2 size: ") +
-                                 QString::number(shape_.points().size()));
-    }
-
     /////////////////////////////////////////////////////////////////////////////////
 
     nameLabel_ = new QLabel(this);
@@ -115,11 +102,24 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     noiseGroup_->setLayout(noiseLayout);
 
+    textListLength_ = new QLabel(this);
+    textListLength_->setAlignment(Qt::AlignCenter);
+    if (idThis_ == 1)
+    {
+        textListLength_->setText("<font color=red>" +
+                                 tr("Shape 1 size: %1 pts").arg(shape_.points().size()));
+    }
+    else if (idThis_ == 2)
+    {
+        textListLength_->setText("<font color=red>" +
+                                 tr("Shape 2 size: %1 pts").arg(shape_.points().size()));
+    }
+
     QVBoxLayout* this_layout = new QVBoxLayout;
-    this_layout->addWidget(textListLength_);
     this_layout->addWidget(img_group);
     this_layout->addWidget(color_group);
     this_layout->addWidget(noiseGroup_);
+    this_layout->addWidget(textListLength_);
 
     setLayout(this_layout);
 
@@ -230,13 +230,14 @@ void AnalysisWidget::createList()
     else
         color_str = "<font color=green>";
 
-    QString list_str;
     if (idThis_ == 1)
-        list_str = tr("List 1 size: ");
+    {
+        textListLength_->setText(color_str + tr("Shape 1 size: %1 pts").arg(size_str));
+    }
     else if (idThis_ == 2)
-        list_str = tr("List 2 size: ");
-
-    textListLength_->setText(color_str + list_str + size_str);
+    {
+        textListLength_->setText(color_str + tr("Shape 2 size: %1 pts").arg(size_str));
+    }
 
     emit listChanged();
 }
