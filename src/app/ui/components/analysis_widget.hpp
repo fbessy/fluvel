@@ -135,7 +135,6 @@ private:
     fluvel_ip::Shape shape_;
 
     QString lastDirectoryUsed_;
-    QStringList nameFilters_;
 
     static int countThis;
     int idThis_;

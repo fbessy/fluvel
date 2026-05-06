@@ -7,6 +7,7 @@
 #include "color_adapters.hpp"
 #include "color_picker_behavior.hpp"
 #include "drag_drop_behavior.hpp"
+#include "file_utils.hpp"
 #include "image_viewer_widget.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
@@ -125,16 +126,6 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     lastDirectoryUsed_ = settings.value("history/last_directory", QDir().homePath()).toString();
 
-    nameFilters_ << "*.bmp"
-                 //<< "*.dcm"
-                 << "*.gif"
-                 << "*.jpg" << "*.jpeg" << "*.mng"
-                 << "*.pbm" << "*.png" << "*.pgm"
-                 << "*.ppm" << "*.svg" << "*.svgz"
-                 << "*.tiff" << "*.tif" << "*.xbm" << "*.xpm";
-
-    nameFilters_.removeDuplicates();
-
     connect(openButton_, &QPushButton::clicked, this, &AnalysisWidget::openFilename);
 
     connect(colorSelector_, &ColorSelectorWidget::colorSelected, this,
@@ -165,9 +156,9 @@ void AnalysisWidget::onColorSelected(const QColor& c)
 
 void AnalysisWidget::openFilename()
 {
-    absoluteName_ = QFileDialog::getOpenFileName(
-        this, tr("Open File") + " " + QString::number(idThis_), lastDirectoryUsed_,
-        tr("Image Files (%1)").arg(nameFilters_.join(" ")));
+    absoluteName_ =
+        QFileDialog::getOpenFileName(this, tr("Open File") + " " + QString::number(idThis_),
+                                     lastDirectoryUsed_, file_utils::buildImageFilter());
     openImage();
 }
 
