@@ -26,7 +26,7 @@ BUILD_TYPE="Debug"
 
 if [ "$USE_CLANG" = "1" ]; then
     BUILD_DIR="build-asan-clang"
-    COMPILER_FLAGS="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+    COMPILER_FLAGS="-DCMAKE_CXX_COMPILER=clang++"
     COMPILER_NAME="Clang"
 else
     BUILD_DIR="build-asan"
