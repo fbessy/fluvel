@@ -8,6 +8,34 @@
         <source>Image Files (%1)</source>
         <translation>Fichiers image (%1)</translation>
     </message>
+    <message>
+        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="16"/>
+        <source>(0000, 0000)
+R: 888  G: 888  B: 888</source>
+        <translation>(0000, 0000)
+R: 888  G: 888  B: 888</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="21"/>
+        <source>(0000, 0000)
+Gray: 888</source>
+        <translation>(0000, 0000)
+Intensité : 888</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="63"/>
+        <source>(%1, %2)
+Gray:%3</source>
+        <translation>(%1, %2)
+Intensité :%3</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="69"/>
+        <source>(%1, %2)
+R:%3  G:%4  B:%5</source>
+        <translation>(%1, %2)
+R:%3  G:%4  B:%5</translation>
+    </message>
 </context>
 <context>
     <name>fluvel_app::AboutWindow</name>
@@ -814,25 +842,25 @@ Fichier → Ouvrir</translation>
     <name>fluvel_app::ImageWindow</name>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="89"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="797"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="802"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="90"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="798"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="803"/>
         <source>Run the active contour.</source>
         <translation>Lancer le contour actif.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="93"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="810"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="815"/>
         <source>Resume</source>
         <translation>Reprendre</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="94"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="811"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="816"/>
         <source>Resume the active contour execution.</source>
         <translation>Reprendre l’exécution du contour actif.</translation>
     </message>
@@ -1002,42 +1030,42 @@ Fichier → Ouvrir</translation>
         <translation>Aucune caméra disponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="706"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="711"/>
         <source> — Image</source>
         <translation> — Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="725"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="730"/>
         <source>Gray</source>
         <translation>Niveaux de gris</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="750"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="755"/>
         <source>Save displayed image</source>
         <translation>Enregistrer l’image affichée</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="791"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="796"/>
         <source>Restart</source>
         <translation>Redémarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="792"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="797"/>
         <source>Restart the active contour from its initial state.</source>
         <translation>Redémarrer le contour actif depuis son état initial.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="804"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="809"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="805"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="810"/>
         <source>Suspend execution and display the current state.</source>
         <translation>Mettre en pause et afficher l’état actuel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="828"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="833"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>

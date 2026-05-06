@@ -5,21 +5,20 @@
 
 #include <QFontMetrics>
 #include <QGraphicsScene>
+#include <QObject>
 #include <QPainter>
 
 namespace fluvel_app
 {
 
-const QString& maxText()
+QString maxText()
 {
-    static const QString value = "(0000, 0000)\n R:888  G:888  B:888";
-    return value;
+    return QObject::tr("(0000, 0000)\nR: 888  G: 888  B: 888");
 }
 
-const QString& maxGrayText()
+QString maxGrayText()
 {
-    static const QString value = "(0000, 0000)\n Gray:888";
-    return value;
+    return QObject::tr("(0000, 0000)\nGray: 888");
 }
 
 PixelInfoOverlay::PixelInfoOverlay(QGraphicsScene* scene)
@@ -46,7 +45,7 @@ PixelInfoOverlay::PixelInfoOverlay(QGraphicsScene* scene)
 
 void PixelInfoOverlay::calc_bounding(const QString& maxStr)
 {
-    QFontMetrics fm(QFont{});
+    QFontMetrics fm(font_);
 
     QRect textRect =
         fm.boundingRect(QRect(0, 0, 1000, 1000), Qt::AlignLeft | Qt::TextWordWrap, maxStr);
@@ -61,13 +60,13 @@ void PixelInfoOverlay::updateInfo(const QPoint& pixel, const QRgb& color, bool i
     {
         calc_bounding(maxGrayText());
 
-        text_ = QString("(%1, %2)\n Gray:%3").arg(pixel.x()).arg(pixel.y()).arg(qRed(color));
+        text_ = QObject::tr("(%1, %2)\nGray:%3").arg(pixel.x()).arg(pixel.y()).arg(qRed(color));
     }
     else
     {
         calc_bounding(maxText());
 
-        text_ = QString("(%1, %2)\n R:%3  G:%4  B:%5")
+        text_ = QObject::tr("(%1, %2)\nR:%3  G:%4  B:%5")
                     .arg(pixel.x())
                     .arg(pixel.y())
                     .arg(qRed(color))
