@@ -25,16 +25,16 @@ Intensité : 888</translation>
     <message>
         <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="63"/>
         <source>(%1, %2)
-Gray:%3</source>
+Gray: %3</source>
         <translation>(%1, %2)
-Intensité :%3</translation>
+Intensité : %3</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="69"/>
         <source>(%1, %2)
-R:%3  G:%4  B:%5</source>
+R: %3  G: %4  B: %5</source>
         <translation>(%1, %2)
-R: %3  G: %4  B: %5</translation>
+R : %3  G : %4  B : %5</translation>
     </message>
 </context>
 <context>
@@ -691,7 +691,7 @@ Le flux de la caméra est peut-être interrompu.</translation>
     <name>fluvel_app::DisplaySettingsWidget</name>
     <message>
         <location filename="../src/app/ui/components/display_settings_widget.cpp" line="26"/>
-        <source>Image :</source>
+        <source>Image:</source>
         <translation>Image :</translation>
     </message>
     <message>
@@ -727,7 +727,7 @@ Le flux de la caméra est peut-être interrompu.</translation>
     <message>
         <location filename="../src/app/ui/components/display_settings_widget.cpp" line="73"/>
         <source>Rendering:</source>
-        <translation>Rendu:</translation>
+        <translation>Rendu :</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/display_settings_widget.cpp" line="79"/>

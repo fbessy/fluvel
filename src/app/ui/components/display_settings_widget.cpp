@@ -23,7 +23,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-    pipeline_displayed_gb_ = new QGroupBox(tr("Image :"));
+    pipeline_displayed_gb_ = new QGroupBox(tr("Image:"));
     source_rb_ = new QRadioButton(tr("Source"));
     preprocessed_rb_ = new QRadioButton(tr("Preprocessed"));
     source_rb_->setChecked(config_.displayMode == ImageDisplayMode::Source);

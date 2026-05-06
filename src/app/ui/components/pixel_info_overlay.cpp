@@ -60,13 +60,13 @@ void PixelInfoOverlay::updateInfo(const QPoint& pixel, const QRgb& color, bool i
     {
         calc_bounding(maxGrayText());
 
-        text_ = QObject::tr("(%1, %2)\nGray:%3").arg(pixel.x()).arg(pixel.y()).arg(qRed(color));
+        text_ = QObject::tr("(%1, %2)\nGray: %3").arg(pixel.x()).arg(pixel.y()).arg(qRed(color));
     }
     else
     {
         calc_bounding(maxText());
 
-        text_ = QObject::tr("(%1, %2)\nR:%3  G:%4  B:%5")
+        text_ = QObject::tr("(%1, %2)\nR: %3  G: %4  B: %5")
                     .arg(pixel.x())
                     .arg(pixel.y())
                     .arg(qRed(color))
