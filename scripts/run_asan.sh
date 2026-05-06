@@ -21,7 +21,7 @@ USE_CLANG=1
 # USE_GCC=1
 
 # Exécutable (relatif au build dir)
-EXECUTABLE_PATH="src/app/fluvel"
+EXECUTABLE_PATH="src/app/Fluvel"
 
 LSAN_SUPP_FILE="${SCRIPT_DIR}/lsan.supp"
 

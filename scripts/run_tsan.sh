@@ -17,7 +17,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 USE_CLANG=1
 
 # 👉 Exécutable (comme ASAN)
-EXECUTABLE_PATH="src/app/fluvel"
+EXECUTABLE_PATH="src/app/Fluvel"
 
 # 👉 Mode (optionnel)
 # MODE="FAST"

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # -------- Config --------
-APP_NAME="fluvel"
+APP_NAME="Fluvel"
 INSTALL_PREFIX="/usr"
 
 # -------- Paths --------
