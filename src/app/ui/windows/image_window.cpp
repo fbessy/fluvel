@@ -699,7 +699,12 @@ void ImageWindow::onInputImageReady(const QImage& input)
 
 void ImageWindow::updateWindowTitle()
 {
-    QString title = "Fluvel";
+    QString title;
+
+    if (fileName_.isEmpty())
+        title = QString("Fluvel");
+    else
+        title = fileName_;
 
     if (!inputSize_.isValid())
     {
@@ -725,7 +730,7 @@ void ImageWindow::updateWindowTitle()
             mode = tr("Gray");
             break;
         case 3:
-            mode = "RGB"; // pas besoin de tr()
+            mode = "RGB"; // tr() not needed
             break;
         default:
             mode = QString("%1ch").arg(channels_);
