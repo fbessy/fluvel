@@ -1,9 +1,0 @@
-# Qt noise (threads internes)
-race:libQt6Core.so
-race:libQt6DBus.so
-
-# Event system Qt
-race:QMetaCallEvent
-
-# Threads Qt internes
-race:QThread
