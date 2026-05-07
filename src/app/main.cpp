@@ -3,6 +3,10 @@
 
 #include <QtGlobal>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 // clang-format off
 #if defined(Q_OS_ANDROID)
     #if defined(FLUVEL_UI_DESKTOP)
@@ -21,6 +25,7 @@
 
 #include <QApplication>
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QLibraryInfo>
 #include <QTranslator>
 
@@ -33,9 +38,15 @@ int main(int argc, char* argv[])
     QApplication::setQuitOnLastWindowClosed(false);
 #endif
 
+#ifdef Q_OS_WIN
+    SetCurrentProcessExplicitAppUserModelID(L"org.fluvel.app");
+#endif
+
     QCoreApplication::setOrganizationName("fluvel");
     QCoreApplication::setOrganizationDomain("fluvel.org");
     QCoreApplication::setApplicationName("fluvel");
+
+    QGuiApplication::setApplicationDisplayName("Fluvel");
 
     fluvel_app::FrameClock::init();
 

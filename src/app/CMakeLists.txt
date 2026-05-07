@@ -195,17 +195,29 @@ if(APPLE)
     )
 
 elseif(WIN32)
-    set(app_icon_resource_windows
-        ${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.rc
+
+    set(app_icon_resource_windows_in
+        ${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.rc.in
+    )
+
+    set(FLUVEL_VERSION ${PROJECT_VERSION})
+
+    string(REPLACE "." "," FLUVEL_VERSION_COMMA "${PROJECT_VERSION},0")
+
+    configure_file(
+        ${app_icon_resource_windows_in}
+        ${CMAKE_CURRENT_BINARY_DIR}/Fluvel.rc
+        @ONLY
     )
 
     target_sources(${target_name} PRIVATE
-        ${app_icon_resource_windows}
+        ${CMAKE_CURRENT_BINARY_DIR}/Fluvel.rc
     )
 
     set_target_properties(${target_name} PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
+
 endif()
 
 # --- TS ---

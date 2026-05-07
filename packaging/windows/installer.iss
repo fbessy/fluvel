@@ -1,9 +1,17 @@
-#define MyAppVersion "0.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "dev"
+#endif
 
 [Setup]
 AppName=Fluvel
 AppVersion={#MyAppVersion}
 AppPublisher=Fluvel
+
+VersionInfoVersion={#MyAppVersion}
+VersionInfoCompany=Fluvel
+VersionInfoDescription=Fluvel Installer
+VersionInfoCopyright=Copyright (C) 2010-2026 Fabien Bessy
+
 DefaultDirName={autopf}\Fluvel
 DefaultGroupName=Fluvel
 OutputDir=Output

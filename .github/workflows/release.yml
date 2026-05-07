@@ -120,6 +120,7 @@ jobs:
         run: |
           & "${{ env.Qt6_DIR }}/bin/windeployqt.exe" `
             --release `
+            --compiler-runtime `
             --no-translations `
             --no-system-d3d-compiler `
             build\src\app\Release\Fluvel.exe
@@ -127,15 +128,24 @@ jobs:
       - name: Package
         shell: pwsh
         run: |
-          mkdir package
-          Copy-Item build\src\app\Release\Fluvel.exe package\ -ErrorAction Stop
-          tar -a -c -f Fluvel-win64-portable.zip -C package .
+          Remove-Item -Recurse -Force package -ErrorAction SilentlyContinue
+
+          New-Item -ItemType Directory package | Out-Null
+
+          Copy-Item build\src\app\Release\* package\ -Recurse
+
+          Compress-Archive `
+            -Path package\* `
+            -DestinationPath Fluvel-win64-portable.zip `
+            -Force
 
       - name: Install Inno Setup
         run: choco install innosetup -y
 
       - name: Build installer
-        run: iscc /DMyAppVersion=${{ env.VERSION }} packaging/windows/installer.iss
+        shell: pwsh
+        run: |
+          iscc "/DMyAppVersion=$env:VERSION" packaging/windows/installer.iss
 
       - name: Rename installer
         shell: pwsh
@@ -551,7 +561,7 @@ jobs:
           cd gh-pages
 
           git fetch origin gh-pages || true
-          git checkout gh-pages || git checkout -b gh-pages
+          git checkout gh-pages || git checkout -b gh-pages origin/gh-pages
 
           cp -r ../web/* .
           cp ../latest.json .
@@ -559,8 +569,6 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-          git pull origin gh-pages || true
-
           git add .
           git commit -m "Update latest build" || true
-          git push
+          git push origin gh-pages
