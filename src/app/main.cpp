@@ -28,6 +28,7 @@
 #include <QCoreApplication>
 #include <QGuiApplication>
 #include <QLibraryInfo>
+#include <QStyle>
 #include <QTranslator>
 
 int main(int argc, char* argv[])
@@ -37,6 +38,16 @@ int main(int argc, char* argv[])
 #else
     QApplication app(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
+#endif
+
+#ifdef Q_OS_LINUX
+    if (qEnvironmentVariableIsSet("APPIMAGE"))
+    {
+        const QString style = QApplication::style()->objectName().toLower();
+
+        if (style.isEmpty() || style == "windows")
+            QApplication::setStyle("Fusion");
+    }
 #endif
 
 #ifdef Q_OS_WIN
