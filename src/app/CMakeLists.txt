@@ -204,6 +204,10 @@ elseif(WIN32)
 
     string(REPLACE "." "," FLUVEL_VERSION_COMMA "${PROJECT_VERSION},0")
 
+    set(FLUVEL_ICON_PATH
+        "${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.ico"
+    )
+
     configure_file(
         ${app_icon_resource_windows_in}
         ${CMAKE_CURRENT_BINARY_DIR}/Fluvel.rc
