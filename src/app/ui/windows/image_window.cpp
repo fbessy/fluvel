@@ -705,19 +705,18 @@ void ImageWindow::updateWindowTitle()
     QString title;
 
     if (fileName_.isEmpty())
-        title = QString("Fluvel");
+        title += tr("Image");
     else
         title = fileName_;
 
     if (!inputSize_.isValid())
     {
-        title += tr(" — Image");
         setWindowTitle(title);
         return;
     }
 
     // --- Size ---
-    title += QString(" — %1 x %2").arg(inputSize_.width()).arg(inputSize_.height());
+    title += QString(" - %1 x %2").arg(inputSize_.width()).arg(inputSize_.height());
 
     // --- Downscale ---
     if (currentDownscale_.downscaleEnabled && currentDownscale_.downscaleFactor > 1)
@@ -740,7 +739,7 @@ void ImageWindow::updateWindowTitle()
             break;
     }
 
-    title += " — " + mode;
+    title += " - " + mode;
 
     setWindowTitle(title);
 }

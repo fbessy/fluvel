@@ -717,8 +717,7 @@ void CameraWindow::onStreamingStarted(const StreamingInfo& info)
 
     refreshUi();
 
-    deviceTitleStr_ =
-        QString("Fluvel — %1 - %2").arg(info.description, formatToString(activeFormat_));
+    deviceTitleStr_ = QString("%1 - %2").arg(info.description, formatToString(activeFormat_));
 
     updateWindowTitle();
 
@@ -1047,7 +1046,7 @@ void CameraWindow::updateWindowTitle()
     }
     else
     {
-        setWindowTitle(tr("Fluvel — Camera"));
+        setWindowTitle(tr("Camera"));
     }
 }
 
