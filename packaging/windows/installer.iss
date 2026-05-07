@@ -2,12 +2,16 @@
   #define MyAppVersion "dev"
 #endif
 
+#ifndef MyVersionInfo
+  #define MyVersionInfo "1.0.0.0"
+#endif
+
 [Setup]
 AppName=Fluvel
 AppVersion={#MyAppVersion}
 AppPublisher=Fluvel
 
-VersionInfoVersion={#MyAppVersion}
+VersionInfoVersion={#MyVersionInfo}
 VersionInfoCompany=Fluvel
 VersionInfoDescription=Fluvel Installer
 VersionInfoCopyright=Copyright (C) 2010-2026 Fabien Bessy

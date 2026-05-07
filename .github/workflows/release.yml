@@ -142,10 +142,21 @@ jobs:
       - name: Install Inno Setup
         run: choco install innosetup -y
 
+      - name: Read project version
+        shell: bash
+        run: |
+          PROJECT_VERSION=$(grep -Eo 'project\(.*VERSION[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt | \
+                            grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+
+          echo "PROJECT_VERSION=$PROJECT_VERSION" >> $GITHUB_ENV
+
       - name: Build installer
         shell: pwsh
         run: |
-          iscc "/DMyAppVersion=$env:VERSION" packaging/windows/installer.iss
+          iscc `
+            "/DMyAppVersion=$env:VERSION" `
+            "/DMyVersionInfo=$env:PROJECT_VERSION.0" `
+            packaging/windows/installer.iss
 
       - name: Rename installer
         shell: pwsh
