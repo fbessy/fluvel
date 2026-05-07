@@ -837,10 +837,15 @@ void ImageWindow::showWarningMessage(const QString& msg)
     box->setWindowTitle(tr("Warning"));
     box->setText(msg);
     box->setIcon(QMessageBox::Warning);
-    box->setStandardButtons(QMessageBox::NoButton);
-    box->setModal(false);
 
-    QObject::connect(box, &QMessageBox::finished, box, &QMessageBox::deleteLater);
+    box->setStandardButtons(QMessageBox::Ok);
+
+    // cacher le bouton
+    if (auto* okButton = box->button(QMessageBox::Ok))
+        okButton->hide();
+
+    box->setModal(false);
+    box->setAttribute(Qt::WA_DeleteOnClose);
 
     box->show();
 
