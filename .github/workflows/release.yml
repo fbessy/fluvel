@@ -440,6 +440,7 @@ jobs:
                 --output appimage
 
               mv *.AppImage Fluvel-linux.AppImage
+              chmod +x Fluvel-linux.AppImage
             "
 
       # 📤 Upload artifact
