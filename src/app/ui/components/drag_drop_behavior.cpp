@@ -45,7 +45,11 @@ bool DragDropBehavior::drop(ImageViewerWidget& view, QDropEvent* e)
 
     const QString path = urls.first().toLocalFile();
 
-    view.notifyImageDropped(path);
+    QTimer::singleShot(0, &view,
+                       [path, &view]()
+                       {
+                           view.notifyImageDropped(path);
+                       });
 
     e->acceptProposedAction();
     return true;
