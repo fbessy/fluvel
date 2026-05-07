@@ -117,6 +117,7 @@ private:
     void clearRecentFiles();
 
     void showErrorMessage(const QString& msg);
+    void showWarningMessage(const QString& msg);
 
     void updateCameraAction(bool available);
     void onStartCameraActionTriggered();

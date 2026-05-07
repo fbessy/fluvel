@@ -42,6 +42,19 @@ QString supportedImageExtensions()
     return patterns.join(' ');
 }
 
+QString normalizeImageFormat(QString format)
+{
+    format = format.toLower();
+
+    if (format == "jpeg")
+        return "jpg";
+
+    if (format == "tiff")
+        return "tif";
+
+    return format;
+}
+
 QString buildWritableImageFilter()
 {
     QStringList filters;

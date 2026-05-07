@@ -91,6 +91,9 @@ signals:
     /// Emitted when an error occurs (e.g. failed image load).
     void errorOccurred(const QString& msg);
 
+    /// Emitted when a warning occurs.
+    void warningOccurred(const QString& msg);
+
     /// Emitted when an image is successfully opened.
     void imageOpened(const QString& path);
 

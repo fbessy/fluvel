@@ -5,6 +5,7 @@
 #include "contour_adapters.hpp"
 #include "file_utils.hpp"
 
+#include <QFileInfo>
 #include <QImageReader>
 
 #ifdef FLUVEL_DEBUG
@@ -45,7 +46,19 @@ void ImageController::loadImage(const QString& path)
     }
 
     QImageReader reader(path);
+
+    const QString extension = file_utils::normalizeImageFormat(QFileInfo(path).suffix());
+    const QString detected = file_utils::normalizeImageFormat(QString::fromLatin1(reader.format()));
+
     QImage img = reader.read();
+
+    if (!extension.isEmpty() && extension != detected)
+    {
+        const QString warningStr = tr("Image file extension differs from detected format: .%1 → %2")
+                                       .arg(extension, detected);
+
+        emit warningOccurred(warningStr);
+    }
 
     if (img.isNull())
     {

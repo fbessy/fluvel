@@ -41,6 +41,23 @@ QString buildImageFilter();
 QString supportedImageExtensions();
 
 /**
+ * @brief Normalize an image format name.
+ *
+ * Converts image format aliases to a canonical representation
+ * in order to simplify format comparisons.
+ *
+ * Examples:
+ * - "jpeg" -> "jpg"
+ * - "tiff" -> "tif"
+ *
+ * The comparison is case-insensitive.
+ *
+ * @param format Image format name or file extension.
+ * @return Normalized image format string.
+ */
+QString normalizeImageFormat(QString format);
+
+/**
  * @brief Builds a QFileDialog filter string for writable image formats.
  *
  * The supported formats are queried dynamically from Qt image writer plugins

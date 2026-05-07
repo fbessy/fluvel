@@ -431,9 +431,11 @@ void ImageWindow::setupConnections()
     // to retrieve worker events and refresh the buttons states (start/restart, pause/resume)
     connect(imageController_, &ImageController::stateChanged, this, &ImageWindow::onStateChanged);
 
-    // to show an error message when a file format error occured.
+    // to show an error message or a warning when a file format error/warning occured.
     connect(imageController_, &ImageController::errorOccurred, this,
             &ImageWindow::showErrorMessage);
+    connect(imageController_, &ImageController::warningOccurred, this,
+            &ImageWindow::showWarningMessage);
 
     // refresh widget in function of settings
     connect(&ApplicationSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
@@ -826,6 +828,23 @@ void ImageWindow::onCameraWindowClosed()
 void ImageWindow::showErrorMessage(const QString& msg)
 {
     QMessageBox::warning(this, tr("Error"), msg);
+}
+
+void ImageWindow::showWarningMessage(const QString& msg)
+{
+    auto* box = new QMessageBox(this);
+
+    box->setWindowTitle(tr("Warning"));
+    box->setText(msg);
+    box->setIcon(QMessageBox::Warning);
+    box->setStandardButtons(QMessageBox::NoButton);
+    box->setModal(false);
+
+    QObject::connect(box, &QMessageBox::finished, box, &QMessageBox::deleteLater);
+
+    box->show();
+
+    QTimer::singleShot(5000, box, &QMessageBox::accept);
 }
 
 void ImageWindow::showEvent(QShowEvent* event)
