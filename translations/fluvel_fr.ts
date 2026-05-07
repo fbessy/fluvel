@@ -1186,7 +1186,7 @@ Fichier → Ouvrir</translation>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="34"/>
         <source>Image session settings</source>
-        <translation>Paramètres de session d’image</translation>
+        <translation>Paramètres de la session image</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_window.cpp" line="72"/>
