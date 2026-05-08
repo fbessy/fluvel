@@ -177,7 +177,7 @@ jobs:
 
       - name: Generate commit info
         run: |
-          echo "${GITHUB_SHA}" > commit-windows.txt
+          Set-Content -Path commit-windows.txt -Value $env:GITHUB_SHA -NoNewline
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -556,12 +556,15 @@ jobs:
           cat linux/commit-linux-flatpak.txt
 
           UNIQUE_COMMITS=$(
-            cat \
+            for file in \
               windows/commit-windows.txt \
               macos/commit-macos.txt \
               linux/commit-linux-appimage.txt \
-              linux/commit-linux-flatpak.txt \
-            | sort -u | wc -l
+              linux/commit-linux-flatpak.txt
+            do
+              tr -d '\r\n' < "$file"
+              echo
+            done | sort -u | wc -l
           )
 
           if [ "$UNIQUE_COMMITS" -ne 1 ]; then
@@ -575,7 +578,7 @@ jobs:
             linux/commit-linux-appimage.txt \
             linux/commit-linux-flatpak.txt
           do
-            CURRENT_COMMIT=$(cat "$file")
+            CURRENT_COMMIT=$(tr -d '\r\n' < "$file")
 
             if [ "$CURRENT_COMMIT" != "$EXPECTED_COMMIT" ]; then
               echo "ERROR: Workflow/artifact commit mismatch in $file"
