@@ -153,25 +153,25 @@ AboutWindow::AboutWindow(QWidget* parent)
     //////         Left Part        ///////
     ///////////////////////////////////////
 
-    QLabel* icon_label = new QLabel;
-    QIcon fluvel_icon(":/icons/app/fluvel.svg");
-    icon_label->setPixmap(fluvel_icon.pixmap(48 * 3, 48 * 3));
-    icon_label->setAlignment(Qt::AlignCenter);
+    QLabel* iconLabel = new QLabel;
+    QIcon fluvelIcon(":/icons/app/fluvel.svg");
+    iconLabel->setPixmap(fluvelIcon.pixmap(48 * 3, 48 * 3));
+    iconLabel->setAlignment(Qt::AlignCenter);
 
-    QLabel* name_label = new QLabel;
-    name_label->setText("<b>Fluvel</b>");
+    QLabel* nameLabel = new QLabel;
+    nameLabel->setText("<b>Fluvel</b>");
     QFont font1;
     font1.setPointSize(22);
     font1.setBold(true);
-    name_label->setFont(font1);
-    name_label->setAlignment(Qt::AlignCenter);
-    name_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                        Qt::LinksAccessibleByKeyboard);
+    nameLabel->setFont(font1);
+    nameLabel->setAlignment(Qt::AlignCenter);
+    nameLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                       Qt::LinksAccessibleByKeyboard);
 
-    QLabel* version_label = new QLabel;
+    QLabel* versionLabel = new QLabel;
     QFont font2;
     font2.setPointSize(12);
-    version_label->setFont(font2);
+    versionLabel->setFont(font2);
 
     QString shortVersion = FLUVEL_VERSION;
 
@@ -184,26 +184,26 @@ AboutWindow::AboutWindow(QWidget* parent)
 
     const QString verStr = QString(tr("Version ")) + shortVersion;
 
-    version_label->setText(verStr);
-    version_label->setAlignment(Qt::AlignCenter);
-    version_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                           Qt::LinksAccessibleByKeyboard);
+    versionLabel->setText(verStr);
+    versionLabel->setAlignment(Qt::AlignCenter);
+    versionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                          Qt::LinksAccessibleByKeyboard);
 
-    QLabel* years_label = new QLabel;
+    QLabel* yearsLabel = new QLabel;
     QFont font3;
     font3.setPointSize(9);
-    years_label->setFont(font3);
-    years_label->setText("© 2010–2015, 2024–2026"
-                         "\nFabien Bessy"
-                         "\nLicensed under CeCILL v2.1");
-    years_label->setAlignment(Qt::AlignCenter);
-    years_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                         Qt::LinksAccessibleByKeyboard);
+    yearsLabel->setFont(font3);
+    yearsLabel->setText("© 2010–2015, 2024–2026"
+                        "\nFabien Bessy"
+                        "\nLicensed under CeCILL v2.1");
+    yearsLabel->setAlignment(Qt::AlignCenter);
+    yearsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                        Qt::LinksAccessibleByKeyboard);
 
-    QPushButton* webpage = new QPushButton(tr("Home page"));
-    webpage->setAutoDefault(false);
+    QPushButton* homePage = new QPushButton(tr("Home page"));
+    homePage->setAutoDefault(false);
 
-    connect(webpage, &QPushButton::clicked, this, &AboutWindow::openHomePage);
+    connect(homePage, &QPushButton::clicked, this, &AboutWindow::openHomePage);
 
     QPushButton* license = new QPushButton(tr("License"));
     license->setAutoDefault(false);
@@ -213,30 +213,30 @@ AboutWindow::AboutWindow(QWidget* parent)
     const auto& config = ApplicationSettings::instance();
     const auto language = config.appLanguage();
 
-    QString txt_file;
+    QString txtFile;
     if (language == Language::French || (language == Language::System && locale == "fr"))
     {
-        txt_file = QString(":/licenses/Licence_CeCILL_V2.1-fr.txt");
+        txtFile = QString(":/licenses/Licence_CeCILL_V2.1-fr.txt");
     }
     else
     {
-        txt_file = QString(":/licenses/Licence_CeCILL_V2.1-en.txt");
+        txtFile = QString(":/licenses/Licence_CeCILL_V2.1-en.txt");
     }
 
-    QFile file(txt_file);
-    QTextEdit* license_textedit = new QTextEdit;
+    QFile file(txtFile);
+    QTextEdit* licenseTextedit = new QTextEdit;
 
     if (file.open(QIODevice::ReadOnly))
-        license_textedit->setText(QString::fromUtf8(file.readAll()));
+        licenseTextedit->setText(QString::fromUtf8(file.readAll()));
 
-    license_textedit->setReadOnly(true);
+    licenseTextedit->setReadOnly(true);
 
-    QHBoxLayout* layout_license = new QHBoxLayout;
-    layout_license->addWidget(license_textedit);
+    QHBoxLayout* layoutLicense = new QHBoxLayout;
+    layoutLicense->addWidget(licenseTextedit);
 
     licenseWindow_ = new QDialog(this);
     licenseWindow_->setWindowTitle(tr("License"));
-    licenseWindow_->setLayout(layout_license);
+    licenseWindow_->setLayout(layoutLicense);
 
     if (settings.contains("ui_geometry/license_window"))
     {
@@ -250,15 +250,15 @@ AboutWindow::AboutWindow(QWidget* parent)
 
     connect(license, &QPushButton::clicked, licenseWindow_, &QDialog::show);
 
-    QVBoxLayout* left_layout = new QVBoxLayout;
-    left_layout->addWidget(icon_label);
-    left_layout->addWidget(name_label);
-    left_layout->addWidget(version_label);
-    left_layout->addWidget(years_label);
-    left_layout->addSpacing(10);
-    left_layout->addWidget(webpage);
-    left_layout->addWidget(license);
-    left_layout->addStretch(1);
+    QVBoxLayout* leftLayout = new QVBoxLayout;
+    leftLayout->addWidget(iconLabel);
+    leftLayout->addWidget(nameLabel);
+    leftLayout->addWidget(versionLabel);
+    leftLayout->addWidget(yearsLabel);
+    leftLayout->addSpacing(10);
+    leftLayout->addWidget(homePage);
+    leftLayout->addWidget(license);
+    leftLayout->addStretch(1);
 
     ///////////////////////////////////////
     ///////////////////////////////////////
@@ -268,15 +268,15 @@ AboutWindow::AboutWindow(QWidget* parent)
     //////         Right Part        //////
     ///////////////////////////////////////
 
-    QLabel* overview_label = new QLabel;
-    overview_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    overview_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                            Qt::LinksAccessibleByKeyboard);
+    QLabel* overviewLabel = new QLabel;
+    overviewLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    overviewLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                           Qt::LinksAccessibleByKeyboard);
 
-    overview_label->setOpenExternalLinks(true);
-    overview_label->setWordWrap(true);
+    overviewLabel->setOpenExternalLinks(true);
+    overviewLabel->setWordWrap(true);
 
-    overview_label->setText(
+    overviewLabel->setText(
         tr("<p><b>Fluvel</b> is a research-oriented image segmentation application "
            "designed for fast and efficient experimentation with level-set active contour "
            "methods.</p>"
@@ -292,18 +292,18 @@ AboutWindow::AboutWindow(QWidget* parent)
            "<p>Fluvel focuses on performance, reproducibility, and clarity, "
            "making it suitable for research, teaching, and experimental validation.</p>"));
 
-    QVBoxLayout* overview_layout = new QVBoxLayout;
-    overview_layout->addWidget(overview_label);
+    QVBoxLayout* overviewLayout = new QVBoxLayout;
+    overviewLayout->addWidget(overviewLabel);
 
-    QLabel* scientific_label = new QLabel;
-    scientific_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    scientific_label->setTextInteractionFlags(
+    QLabel* scientificLabel = new QLabel;
+    scientificLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    scientificLabel->setTextInteractionFlags(
         Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
 
-    scientific_label->setOpenExternalLinks(true);
-    scientific_label->setWordWrap(true);
+    scientificLabel->setOpenExternalLinks(true);
+    scientificLabel->setWordWrap(true);
 
-    scientific_label->setText(
+    scientificLabel->setText(
         tr("<p><b>Scientific Background</b></p>"
 
            "<p>Fluvel integrates several fundamental methods in image segmentation, "
@@ -315,18 +315,18 @@ AboutWindow::AboutWindow(QWidget* parent)
            "<p>These methods provide a balance between computational efficiency, "
            "topological flexibility, and rigorous segmentation assessment.</p>"));
 
-    QVBoxLayout* scientific_layout = new QVBoxLayout;
-    scientific_layout->addWidget(scientific_label);
+    QVBoxLayout* scientificLayout = new QVBoxLayout;
+    scientificLayout->addWidget(scientificLabel);
 
-    QLabel* author_label = new QLabel;
-    author_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    author_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                          Qt::LinksAccessibleByKeyboard);
+    QLabel* authorLabel = new QLabel;
+    authorLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    authorLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                         Qt::LinksAccessibleByKeyboard);
 
-    author_label->setOpenExternalLinks(true);
-    author_label->setWordWrap(true);
+    authorLabel->setOpenExternalLinks(true);
+    authorLabel->setWordWrap(true);
 
-    author_label->setText(
+    authorLabel->setText(
         tr("<p><b>Fabien Bessy</b></p>"
 
            "<p>This project was originally developed in 2010 within the Pattern Recognition and "
@@ -339,26 +339,26 @@ AboutWindow::AboutWindow(QWidget* parent)
            "<p>Contact: "
            "<a href='mailto:fabien.bessy@gmail.com'>fabien.bessy@gmail.com</a></p>"));
 
-    QVBoxLayout* author_layout = new QVBoxLayout;
-    author_layout->addWidget(author_label);
+    QVBoxLayout* authorLayout = new QVBoxLayout;
+    authorLayout->addWidget(authorLabel);
 
-    QTextEdit* tech_text = new QTextEdit;
-    tech_text->setReadOnly(true);
-    tech_text->setWordWrapMode(QTextOption::WordWrap);
-    tech_text->setHtml(buildTechnicalSection());
+    QTextEdit* techText = new QTextEdit;
+    techText->setReadOnly(true);
+    techText->setWordWrapMode(QTextOption::WordWrap);
+    techText->setHtml(buildTechnicalSection());
 
-    QVBoxLayout* tech_layout = new QVBoxLayout;
-    tech_layout->addWidget(tech_text);
+    QVBoxLayout* techLayout = new QVBoxLayout;
+    techLayout->addWidget(techText);
 
-    QLabel* support_label = new QLabel;
-    support_label->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    support_label->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                           Qt::LinksAccessibleByKeyboard);
+    QLabel* supportLabel = new QLabel;
+    supportLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
+    supportLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
+                                          Qt::LinksAccessibleByKeyboard);
 
-    support_label->setOpenExternalLinks(true);
-    support_label->setWordWrap(true);
+    supportLabel->setOpenExternalLinks(true);
+    supportLabel->setWordWrap(true);
 
-    support_label->setText(
+    supportLabel->setText(
         tr("<p><b>Support Fluvel</b></p>"
 
            "<p>Fluvel is developed and maintained as an independent "
@@ -384,23 +384,23 @@ AboutWindow::AboutWindow(QWidget* parent)
                     QUrl("https://www.paypal.me/fabienbessy", QUrl::TolerantMode));
             });
 
-    QVBoxLayout* support_layout = new QVBoxLayout;
-    support_layout->addStretch();
-    support_layout->addWidget(support_label);
-    support_layout->addSpacing(16);
-    support_layout->addWidget(donate);
-    support_layout->addStretch();
+    QVBoxLayout* supportLayout = new QVBoxLayout;
+    supportLayout->addStretch();
+    supportLayout->addWidget(supportLabel);
+    supportLayout->addSpacing(16);
+    supportLayout->addWidget(donate);
+    supportLayout->addStretch();
 
     QWidget* page1 = new QWidget;
     QWidget* page2 = new QWidget;
     QWidget* page3 = new QWidget;
     QWidget* page4 = new QWidget;
     QWidget* page5 = new QWidget;
-    page1->setLayout(overview_layout);
-    page2->setLayout(scientific_layout);
-    page3->setLayout(author_layout);
-    page4->setLayout(tech_layout);
-    page5->setLayout(support_layout);
+    page1->setLayout(overviewLayout);
+    page2->setLayout(scientificLayout);
+    page3->setLayout(authorLayout);
+    page4->setLayout(techLayout);
+    page5->setLayout(supportLayout);
 
     QTabWidget* tabs = new QTabWidget;
     tabs->addTab(page1, tr("Overview"));
@@ -414,7 +414,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     ///////////////////////////////////////
 
     QHBoxLayout* layout_this = new QHBoxLayout;
-    layout_this->addLayout(left_layout);
+    layout_this->addLayout(leftLayout);
     layout_this->addWidget(tabs);
     layout_this->setSizeConstraint(QLayout::SetMinimumSize);
 
