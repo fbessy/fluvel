@@ -96,10 +96,10 @@ void CameraWindow::createUi()
     formatAvailableIcon_ = createEmptyIcon(kFormatIconSize);
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
-                              ":/icons/toolbar/media-playback-start-symbolic.svg");
+                              ":/icons/media/media-playback-start-symbolic.svg");
 
     stopIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop, QStyle::SP_MediaStop,
-                             ":/icons/toolbar/media-playback-stop-symbolic.svg");
+                             ":/icons/media/media-playback-stop-symbolic.svg");
 
     toggleStreamingButton_ = new QPushButton;
 
@@ -110,7 +110,7 @@ void CameraWindow::createUi()
     settingsButton_->setFlat(true);
     settingsButton_->setFocusPolicy(Qt::NoFocus);
 
-    settingsIcon_ = il::loadIcon("configure", ":/icons/toolbar/configure-symbolic.svg");
+    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
 
     settingsButton_->setIcon(settingsIcon_);
 
@@ -148,7 +148,7 @@ QIcon CameraWindow::createEmptyIcon(int size)
 
 QIcon CameraWindow::createActiveFormatIcon()
 {
-    return il::loadIcon("emblem-default", ":/icons/toolbar/check-symbolic.svg");
+    return il::loadIcon("emblem-default", ":/icons/status/check-symbolic.svg");
 }
 
 QIcon CameraWindow::createErrorCameraIcon()

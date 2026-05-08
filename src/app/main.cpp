@@ -89,17 +89,17 @@ int main(int argc, char* argv[])
     if (translator_fluvel.load(QString(":/i18n/fluvel_%1.qm").arg(locale)))
         app.installTranslator(&translator_fluvel);
 
+#ifndef Q_OS_ANDROID
     // Icône (desktop uniquement utile, mais safe partout)
     QIcon appIcon;
-    appIcon.addFile(":/icons/fluvel_16.png", QSize(16, 16));
-    appIcon.addFile(":/icons/fluvel_22.png", QSize(22, 22));
-    appIcon.addFile(":/icons/fluvel_32.png", QSize(32, 32));
-    appIcon.addFile(":/icons/fluvel_48.png", QSize(48, 48));
-    appIcon.addFile(":/icons/fluvel_64.png", QSize(64, 64));
-    appIcon.addFile(":/icons/fluvel_128.png", QSize(128, 128));
-    appIcon.addFile(":/icons/fluvel_256.png", QSize(256, 256));
+    appIcon.addFile(":/icons/app/fluvel-16.png", QSize(16, 16));
+    appIcon.addFile(":/icons/app/fluvel-22.png", QSize(22, 22));
+    appIcon.addFile(":/icons/app/fluvel-32.png", QSize(32, 32));
+    appIcon.addFile(":/icons/app/fluvel-48.png", QSize(48, 48));
+    appIcon.addFile(":/icons/app/fluvel-64.png", QSize(64, 64));
+    appIcon.addFile(":/icons/app/fluvel-128.png", QSize(128, 128));
+    appIcon.addFile(":/icons/app/fluvel-256.png", QSize(256, 256));
 
-#ifndef Q_OS_ANDROID
     QApplication::setWindowIcon(appIcon);
 #endif
 

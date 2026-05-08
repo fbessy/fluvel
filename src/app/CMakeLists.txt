@@ -257,26 +257,34 @@ set(APP_RESOURCES
     ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-256.png
 
 
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/application-exit-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/right_panel_off.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/right_panel_on.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/camera-web-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/check-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/configure-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-open-recent-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-open-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/document-save-as-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/edit-clear-history.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/go-next-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/help-about-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/measure-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playback-pause-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playback-start-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playback-stop-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-playlist-repeat-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/media-seek-forward-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/preferences-desktop-locale-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/toolbar/view-preview-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/image-session-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/camera-web-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/application-exit-symbolic.svg
+
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/edit-clear-history.svg
+
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/measure-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/settings-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/language-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/help-about-symbolic.svg
+
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/go-next-symbolic.svg
+
+
+    ${FLUVEL_RESOURCES_DIR}/icons/file/document-open-recent-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/file/document-open-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/file/document-save-as-symbolic.svg
+
+    ${FLUVEL_RESOURCES_DIR}/icons/media/media-playback-pause-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/media/media-playback-start-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/media/media-playback-stop-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/media/media-playlist-repeat-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/media/media-seek-forward-symbolic.svg
+
+    ${FLUVEL_RESOURCES_DIR}/icons/view/sidebar-right-hide.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/view/sidebar-right-show.svg
+
+    ${FLUVEL_RESOURCES_DIR}/icons/status/check-symbolic.svg
 
     ${FLUVEL_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-en.txt
     ${FLUVEL_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-fr.txt

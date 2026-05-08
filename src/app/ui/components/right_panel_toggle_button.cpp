@@ -8,8 +8,8 @@ namespace fluvel_app
 
 RightPanelToggleButton::RightPanelToggleButton(QWidget* parent)
     : QPushButton(parent)
-    , iconOn_(":/icons/toolbar/right_panel_on.svg")
-    , iconOff_(":/icons/toolbar/right_panel_off.svg")
+    , iconOn_(":/icons/view/sidebar-right-show.svg")
+    , iconOff_(":/icons/view/sidebar-right-hide.svg")
 {
     setCheckable(true);
     setChecked(true);

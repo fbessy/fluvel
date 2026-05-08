@@ -78,13 +78,13 @@ void ImageWindow::setupUi()
     }
 
     startResumeIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
-                                    ":/icons/toolbar/media-playback-start-symbolic.svg");
+                                    ":/icons/media/media-playback-start-symbolic.svg");
 
     restartIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaylistRepeat, QStyle::SP_BrowserReload,
-                                ":/icons/toolbar/media-playlist-repeat-symbolic.svg");
+                                ":/icons/media/media-playlist-repeat-symbolic.svg");
 
     pauseIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause, QStyle::SP_MediaPause,
-                              ":/icons/toolbar/media-playback-pause-symbolic.svg");
+                              ":/icons/media/media-playback-pause-symbolic.svg");
 
     restartButton_ = new QPushButton(tr("Start"));
     restartButton_->setToolTip(tr("Run the active contour."));
@@ -98,7 +98,7 @@ void ImageWindow::setupUi()
     stepButton_->setToolTip(tr("Advance the active contour by one iteration."));
 
     QIcon stepIcon = il::loadIcon(QIcon::ThemeIcon::GoNext, QStyle::SP_ArrowRight,
-                                  ":/icons/toolbar/go-next-symbolic.svg");
+                                  ":/icons/actions/go-next-symbolic.svg");
 
     stepButton_->setIcon(stepIcon);
 
@@ -111,7 +111,7 @@ void ImageWindow::setupUi()
 
     QIcon convergeIcon =
         il::loadIcon(QIcon::ThemeIcon::MediaSeekForward, QStyle::SP_MediaSeekForward,
-                     ":/icons/toolbar/media-seek-forward-symbolic.svg");
+                     ":/icons/media/media-seek-forward-symbolic.svg");
 
     convergeButton_->setIcon(convergeIcon);
 
@@ -127,7 +127,7 @@ void ImageWindow::setupUi()
     settingsButton_->setFlat(true);
     settingsButton_->setFocusPolicy(Qt::NoFocus);
 
-    settingsIcon_ = il::loadIcon("configure", ":/icons/toolbar/configure-symbolic.svg");
+    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
 
     settingsButton_->setIcon(settingsIcon_);
 
@@ -205,7 +205,7 @@ void ImageWindow::setupActions()
     imageSessionAct_->setShortcut(tr("Ctrl+I"));
 
     QIcon imageIcon =
-        il::loadIcon("image-x-generic-symbolic", ":/icons/toolbar/view-preview-symbolic.svg");
+        il::loadIcon("image-x-generic-symbolic", ":/icons/actions/image-session-symbolic.svg");
 
     imageSessionAct_->setIcon(imageIcon);
     imageSessionAct_->setCheckable(true);
@@ -217,7 +217,7 @@ void ImageWindow::setupActions()
     cameraSessionAct_->setShortcut(tr("Ctrl+R"));
 
     QIcon cameraIcon =
-        il::loadIcon(QIcon::ThemeIcon::CameraWeb, ":/icons/toolbar/camera-web-symbolic.svg");
+        il::loadIcon(QIcon::ThemeIcon::CameraWeb, ":/icons/actions/camera-web-symbolic.svg");
 
     cameraSessionAct_->setIcon(cameraIcon);
 
@@ -230,7 +230,7 @@ void ImageWindow::setupActions()
     quitAct_->setShortcut(QKeySequence::Quit);
 
     QIcon quitIcon = il::loadIcon(QIcon::ThemeIcon::ApplicationExit, QStyle::SP_TitleBarCloseButton,
-                                  ":/icons/toolbar/application-exit-symbolic.svg");
+                                  ":/icons/actions/application-exit-symbolic.svg");
 
     quitAct_->setIcon(quitIcon);
 
@@ -240,7 +240,7 @@ void ImageWindow::setupActions()
         tr("Supported image formats: %1").arg(file_utils::supportedImageExtensions()));
 
     QIcon openIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpen, QStyle::SP_DirOpenIcon,
-                                  ":/icons/toolbar/document-open-symbolic.svg");
+                                  ":/icons/file/document-open-symbolic.svg");
 
     openAct_->setIcon(openIcon);
 
@@ -248,7 +248,7 @@ void ImageWindow::setupActions()
     clearAct_->setStatusTip(tr("Clear the recent files list."));
 
     QIcon deleteIcon = il::loadIcon(QIcon::ThemeIcon::EditClear, QStyle::SP_LineEditClearButton,
-                                    ":/icons/toolbar/edit-clear-history.svg");
+                                    ":/icons/actions/edit-clear-history.svg");
 
     clearAct_->setIcon(deleteIcon);
 
@@ -257,12 +257,12 @@ void ImageWindow::setupActions()
     saveAct_->setStatusTip(tr("Save the displayed image."));
 
     QIcon saveIcon = il::loadIcon(QIcon::ThemeIcon::DocumentSaveAs, QStyle::SP_DialogSaveButton,
-                                  ":/icons/toolbar/document-save-as-symbolic.svg");
+                                  ":/icons/file/document-save-as-symbolic.svg");
 
     saveAct_->setIcon(saveIcon);
 
     QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent, QStyle::SP_DirOpenIcon,
-                                    ":/icons/toolbar/document-open-recent-symbolic.svg");
+                                    ":/icons/file/document-open-recent-symbolic.svg");
 
     for (auto& act : recentFileActs_)
     {
@@ -276,7 +276,7 @@ void ImageWindow::setupActions()
     analysisAct_->setStatusTip(tr("Compute the Hausdorff distance."));
     analysisAct_->setShortcut(tr("Ctrl+A"));
 
-    analysisAct_->setIcon(QIcon(":/icons/toolbar/measure-symbolic.svg"));
+    analysisAct_->setIcon(QIcon(":/icons/actions/measure-symbolic.svg"));
 
     settingsAct_ = new QAction(tr("&Settings"), this);
     settingsAct_->setShortcut(QKeySequence::Preferences);
@@ -289,15 +289,15 @@ void ImageWindow::setupActions()
     aboutAct_->setStatusTip(tr("Application information, license and home page."));
 
     QIcon aboutIcon = il::loadIcon(QIcon::ThemeIcon::HelpAbout, QStyle::SP_MessageBoxInformation,
-                                   ":/icons/toolbar/help-about-symbolic.svg");
+                                   ":/icons/actions/help-about-symbolic.svg");
 
     aboutAct_->setIcon(aboutIcon);
 
     languageAct_ = new QAction(tr("&Language"), this);
     languageAct_->setStatusTip(tr("Choose the application language."));
 
-    QIcon languageIcon = il::loadIcon("preferences-desktop-locale",
-                                      ":/icons/toolbar/preferences-desktop-locale.svg");
+    QIcon languageIcon =
+        il::loadIcon("preferences-desktop-locale", ":/icons/actions/language-symbolic.svg");
 
     languageAct_->setIcon(languageIcon);
 }
