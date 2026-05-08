@@ -532,6 +532,9 @@ jobs:
           name: linux-flatpak
           path: linux
 
+      - name: Debug files
+        run: ls -R
+
       - name: Verify commit consistency
         run: |
           EXPECTED_COMMIT="${GITHUB_SHA}"
@@ -605,12 +608,99 @@ jobs:
           sha256sum -c Fluvel-linux.flatpak.sha256
           cd ..
 
+      - name: Compute version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Collect checksums
+        run: |
+          BASE_SUMS=$(cat \
+            windows/*.sha256 \
+            macos/*.sha256 \
+            linux/*.sha256)
+
+          JSON_SUMS=$(printf '%s' "$BASE_SUMS" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+
+          echo "ALL_CHECKSUMS=$JSON_SUMS" >> $GITHUB_ENV
+
+      - name: Generate RELEASE_INFO.txt
+        run: |
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          cat > RELEASE_INFO.txt <<EOF
+          Fluvel Release Information
+          ==========================
+
+          Version : $VERSION
+          Branch  : ${GITHUB_REF_NAME}
+          Commit  : ${GITHUB_SHA}
+          Date    : $BUILD_DATE
+
+          Artifacts
+          =========
+
+          Fluvel-win64-installer.exe
+          Fluvel-win64-portable.zip
+          Fluvel-macos.dmg
+          Fluvel-linux.AppImage
+          Fluvel-linux.flatpak
+
+          Checksums
+          =========
+
+          $(cat windows/*.sha256)
+          $(cat macos/*.sha256)
+          $(cat linux/*.sha256)
+
+          EOF
+
+      - name: Generate latest.json
+        run: |
+          COMMIT_SHORT=${GITHUB_SHA::8}
+          BRANCH_NAME=${GITHUB_REF_NAME}
+          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          cat > latest.json <<EOF
+          {
+            "version": "$VERSION",
+            "branch": "$BRANCH_NAME",
+            "commit": "$COMMIT_SHORT",
+            "date": "$BUILD_DATE",
+
+            "windows": {
+              "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
+              "portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip"
+            },
+
+            "macos": {
+              "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
+            },
+
+            "linux": {
+              "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
+              "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+            },
+
+            "checksums": $ALL_CHECKSUMS
+          }
+          EOF
+
+      - name: Update latest tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          git tag -f latest ${{ github.sha }}
+          git push origin latest --force
+
       - name: Install gh
         run: |
           command -v gh || (apt update && apt install -y gh)
-
-      - name: Debug files
-        run: ls -R
 
       # =========================
       # CREATE OR UPDATE RELEASE
@@ -648,58 +738,8 @@ jobs:
             macos/Fluvel-macos.dmg \
             linux/Fluvel-linux.AppImage \
             linux/Fluvel-linux.flatpak \
+            RELEASE_INFO.txt \
             --clobber
-
-      - name: Compute version
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          else
-            VERSION="dev-${GITHUB_SHA::7}"
-          fi
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Collect checksums
-        run: |
-          BASE_SUMS=$(cat \
-            windows/*.sha256 \
-            macos/*.sha256 \
-            linux/*.sha256)
-
-          JSON_SUMS=$(printf '%s' "$BASE_SUMS" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
-
-          echo "ALL_CHECKSUMS=$JSON_SUMS" >> $GITHUB_ENV
-
-      - name: Generate latest.json
-        run: |
-          COMMIT_SHORT=${GITHUB_SHA::8}
-          BRANCH_NAME=${GITHUB_REF_NAME}
-          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-          cat > latest.json <<EOF
-          {
-            "version": "$VERSION",
-            "branch": "$BRANCH_NAME",
-            "commit": "$COMMIT_SHORT",
-            "date": "$BUILD_DATE",
-
-            "windows": {
-              "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
-              "portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip"
-            },
-
-            "macos": {
-              "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
-            },
-
-            "linux": {
-              "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-              "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
-            },
-
-            "checksums": $ALL_CHECKSUMS
-          }
-          EOF
 
       # =========================
       # DEPLOY GITHUB PAGES
