@@ -534,15 +534,24 @@ jobs:
 
       - name: Verify commit consistency
         run: |
+          EXPECTED_COMMIT="${GITHUB_SHA}"
+
+          echo "Expected workflow commit:"
+          echo "$EXPECTED_COMMIT"
+
+          echo ""
           echo "Windows:"
           cat windows/commit-windows.txt
 
+          echo ""
           echo "macOS:"
           cat macos/commit-macos.txt
 
+          echo ""
           echo "Linux AppImage:"
           cat linux/commit-linux-appimage.txt
 
+          echo ""
           echo "Linux Flatpak:"
           cat linux/commit-linux-flatpak.txt
 
@@ -560,6 +569,21 @@ jobs:
             exit 1
           fi
 
+          for file in \
+            windows/commit-windows.txt \
+            macos/commit-macos.txt \
+            linux/commit-linux-appimage.txt \
+            linux/commit-linux-flatpak.txt
+          do
+            CURRENT_COMMIT=$(cat "$file")
+
+            if [ "$CURRENT_COMMIT" != "$EXPECTED_COMMIT" ]; then
+              echo "ERROR: Workflow/artifact commit mismatch in $file"
+              exit 1
+            fi
+          done
+
+          echo ""
           echo "Commit consistency verified ✔"
 
       - name: Verify checksums
