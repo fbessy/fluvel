@@ -630,7 +630,7 @@ jobs:
 
       - name: Generate RELEASE_INFO.txt
         run: |
-          BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          BUILD_DATE=$(date -u +"%d %B %Y at %H:%M:%S UTC")
 
           cat > RELEASE_INFO.txt <<EOF
           Fluvel Release Information
@@ -656,6 +656,10 @@ jobs:
           $(cat windows/*.sha256)
           $(cat macos/*.sha256)
           $(cat linux/*.sha256)
+
+          --
+
+          Generated automatically by the Fluvel release workflow.
 
           EOF
 
