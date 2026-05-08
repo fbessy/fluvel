@@ -77,13 +77,13 @@ void ImageWindow::setupUi()
         resize(900, 600);
     }
 
-    startResumeIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
+    startResumeIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                                     ":/icons/media/media-playback-start-symbolic.svg");
 
-    restartIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaylistRepeat, QStyle::SP_BrowserReload,
+    restartIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaylistRepeat,
                                 ":/icons/media/media-playlist-repeat-symbolic.svg");
 
-    pauseIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause, QStyle::SP_MediaPause,
+    pauseIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause,
                               ":/icons/media/media-playback-pause-symbolic.svg");
 
     restartButton_ = new QPushButton(tr("Start"));
@@ -97,8 +97,7 @@ void ImageWindow::setupUi()
     stepButton_ = new QPushButton(tr("Step"));
     stepButton_->setToolTip(tr("Advance the active contour by one iteration."));
 
-    QIcon stepIcon = il::loadIcon(QIcon::ThemeIcon::GoNext, QStyle::SP_ArrowRight,
-                                  ":/icons/actions/go-next-symbolic.svg");
+    QIcon stepIcon = il::loadIcon(QIcon::ThemeIcon::GoNext, ":/icons/actions/go-next-symbolic.svg");
 
     stepButton_->setIcon(stepIcon);
 
@@ -109,9 +108,8 @@ void ImageWindow::setupUi()
     convergeButton_ = new QPushButton(tr("Converge"));
     convergeButton_->setToolTip(tr("Run until completion without displaying intermediate steps."));
 
-    QIcon convergeIcon =
-        il::loadIcon(QIcon::ThemeIcon::MediaSeekForward, QStyle::SP_MediaSeekForward,
-                     ":/icons/media/media-seek-forward-symbolic.svg");
+    QIcon convergeIcon = il::loadIcon(QIcon::ThemeIcon::MediaSeekForward,
+                                      ":/icons/media/media-seek-forward-symbolic.svg");
 
     convergeButton_->setIcon(convergeIcon);
 
@@ -229,7 +227,7 @@ void ImageWindow::setupActions()
     quitAct_ = new QAction(tr("&Quit"), this);
     quitAct_->setShortcut(QKeySequence::Quit);
 
-    QIcon quitIcon = il::loadIcon(QIcon::ThemeIcon::ApplicationExit, QStyle::SP_TitleBarCloseButton,
+    QIcon quitIcon = il::loadIcon(QIcon::ThemeIcon::ApplicationExit,
                                   ":/icons/actions/application-exit-symbolic.svg");
 
     quitAct_->setIcon(quitIcon);
@@ -239,16 +237,16 @@ void ImageWindow::setupActions()
     openAct_->setStatusTip(
         tr("Supported image formats: %1").arg(file_utils::supportedImageExtensions()));
 
-    QIcon openIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpen, QStyle::SP_DirOpenIcon,
-                                  ":/icons/file/document-open-symbolic.svg");
+    QIcon openIcon =
+        il::loadIcon(QIcon::ThemeIcon::DocumentOpen, ":/icons/file/document-open-symbolic.svg");
 
     openAct_->setIcon(openIcon);
 
     clearAct_ = new QAction(tr("Clear list"), this);
     clearAct_->setStatusTip(tr("Clear the recent files list."));
 
-    QIcon deleteIcon = il::loadIcon(QIcon::ThemeIcon::EditClear, QStyle::SP_LineEditClearButton,
-                                    ":/icons/actions/edit-clear-history.svg");
+    QIcon deleteIcon =
+        il::loadIcon(QIcon::ThemeIcon::EditClear, ":/icons/actions/edit-clear-history.svg");
 
     clearAct_->setIcon(deleteIcon);
 
@@ -256,12 +254,12 @@ void ImageWindow::setupActions()
     saveAct_->setShortcut(QKeySequence::Save);
     saveAct_->setStatusTip(tr("Save the displayed image."));
 
-    QIcon saveIcon = il::loadIcon(QIcon::ThemeIcon::DocumentSaveAs, QStyle::SP_DialogSaveButton,
+    QIcon saveIcon = il::loadIcon(QIcon::ThemeIcon::DocumentSaveAs,
                                   ":/icons/file/document-save-as-symbolic.svg");
 
     saveAct_->setIcon(saveIcon);
 
-    QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent, QStyle::SP_DirOpenIcon,
+    QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent,
                                     ":/icons/file/document-open-recent-symbolic.svg");
 
     for (auto& act : recentFileActs_)
@@ -288,8 +286,8 @@ void ImageWindow::setupActions()
     aboutAct_ = new QAction(tr("&About"), this);
     aboutAct_->setStatusTip(tr("Application information, license and home page."));
 
-    QIcon aboutIcon = il::loadIcon(QIcon::ThemeIcon::HelpAbout, QStyle::SP_MessageBoxInformation,
-                                   ":/icons/actions/help-about-symbolic.svg");
+    QIcon aboutIcon =
+        il::loadIcon(QIcon::ThemeIcon::HelpAbout, ":/icons/actions/help-about-symbolic.svg");
 
     aboutAct_->setIcon(aboutIcon);
 

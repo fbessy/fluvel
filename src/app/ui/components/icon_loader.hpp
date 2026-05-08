@@ -12,45 +12,51 @@ namespace fluvel_app
 /**
  * @brief Icon loading utilities with fallback support.
  *
- * These functions attempt to load an icon from multiple sources:
- * - system theme (by name or enum)
- * - Qt standard icons
- * - fallback resource path
+ * These functions attempt to load icons from:
+ * - the current system icon theme
+ * - embedded fallback resources
  *
  * The first available icon is returned.
  *
- * @note The fallback is typically a resource path (e.g. ":/icons/...").
+ * @note Fallback icons are typically Qt resource paths
+ *       (e.g. ":/icons/...").
  */
 namespace il
 {
 
 /**
  * @name Icon loading
- * @brief Load icons from theme, standard Qt icons, or fallback resources.
+ * @brief Load icons from the system theme with embedded fallback resources.
  * @{
  */
 
 /**
- * @brief Loads an icon using theme, standard or fallback sources.
+ * @brief Loads an icon from the current icon theme using a theme name.
  *
  * The loading order is:
- * 1. Theme icon (by name or enum)
- * 2. Qt standard icon (if provided)
- * 3. Fallback path
+ * 1. Symbolic theme icon
+ * 2. Regular theme icon
+ * 3. Embedded fallback resource
  *
- * @param themeName Name of the theme icon (optional).
- * @param iconEnum Theme icon enum (optional).
- * @param standardName Qt standard icon (optional).
- * @param fallback Fallback icon path.
+ * @param themeName Theme icon name.
+ * @param fallback Fallback icon resource path.
  *
- * @return Loaded icon (never null if fallback is valid).
+ * @return Loaded icon.
  */
-
-QIcon loadIcon(const QString& themeName, QStyle::StandardPixmap standardName,
-               const QString& fallback);
-QIcon loadIcon(QIcon::ThemeIcon iconEnum, QStyle::StandardPixmap standardName,
-               const QString& fallback);
 QIcon loadIcon(const QString& themeName, const QString& fallback);
+
+/**
+ * @brief Loads an icon from the current icon theme using a Qt theme enum.
+ *
+ * The loading order is:
+ * 1. Theme icon
+ * 2. Embedded fallback resource
+ *
+ * @param iconEnum Qt theme icon enum.
+ * @param fallback Fallback icon resource path.
+ *
+ * @return Loaded icon.
+ */
 QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback);
 
 /** @} */

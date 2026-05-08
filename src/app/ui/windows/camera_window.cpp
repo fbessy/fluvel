@@ -95,10 +95,10 @@ void CameraWindow::createUi()
     formatActiveIcon_ = createActiveFormatIcon();
     formatAvailableIcon_ = createEmptyIcon(kFormatIconSize);
 
-    startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart, QStyle::SP_MediaPlay,
+    startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                               ":/icons/media/media-playback-start-symbolic.svg");
 
-    stopIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop, QStyle::SP_MediaStop,
+    stopIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop,
                              ":/icons/media/media-playback-stop-symbolic.svg");
 
     toggleStreamingButton_ = new QPushButton;
