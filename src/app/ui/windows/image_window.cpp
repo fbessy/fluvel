@@ -834,9 +834,9 @@ void ImageWindow::showWarningMessage(const QString& msg)
 {
     auto* box = new QMessageBox(this);
 
-    box->setWindowTitle(tr("Warning"));
+    box->setWindowTitle(tr("Information"));
     box->setText(msg);
-    box->setIcon(QMessageBox::Warning);
+    box->setIcon(QMessageBox::Information);
 
     box->setStandardButtons(QMessageBox::Ok);
 

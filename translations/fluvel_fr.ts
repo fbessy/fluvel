@@ -4,7 +4,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/app/core/file_utils.cpp" line="23"/>
+        <location filename="../src/app/core/file_utils.cpp" line="26"/>
         <source>Image Files (%1)</source>
         <translation>Fichiers image (%1)</translation>
     </message>
@@ -333,69 +333,64 @@ R : %3  G : %4  B : %5</translation>
 <context>
     <name>fluvel_app::AnalysisWidget</name>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="42"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="43"/>
         <source>Title - Size</source>
         <translation>Titre - Taille</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="60"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="61"/>
         <source>Open image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="66"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="67"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="84"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="85"/>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="82"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="83"/>
         <source>Color: </source>
         <translation>Couleur : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="96"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="97"/>
         <source>Noise</source>
         <translation>Bruit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="101"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="102"/>
         <source>Amount:</source>
         <translation>Intensité :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="110"/>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="235"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="111"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="226"/>
         <source>Shape 1 size: %1 pts</source>
         <translation>Taille de la forme 1 : %1 pts</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="115"/>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="239"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="116"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="230"/>
         <source>Shape 2 size: %1 pts</source>
         <translation>Taille de la forme 2 : %1 pts</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="169"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="160"/>
         <source>Open File</source>
         <translation>Ouvrir un fichier</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="170"/>
-        <source>Image Files (%1)</source>
-        <translation>Fichiers image (%1)</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="185"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="176"/>
         <source>Opening error - Fluvel</source>
         <translation>Erreur d’ouverture - Fluvel</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="186"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="177"/>
         <source>Cannot load %1.</source>
         <translation>Impossible de charger %1.</translation>
     </message>
@@ -618,68 +613,68 @@ Contour : %7 pts</translation>
         <translation>Format recommandé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="763"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="762"/>
         <source>Camera error</source>
         <translation>Erreur de caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="779"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="778"/>
         <source>Camera startup failed</source>
         <translation>Échec du démarrage de la caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="780"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="779"/>
         <source>The camera did not produce a valid frame within %1 seconds.
 The device may be busy or not responding.</source>
         <translation>La caméra n’a produit aucune image valide dans un délai de %1 secondes.
 Le périphérique est peut-être occupé ou ne répond pas.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="797"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="796"/>
         <source>Camera stream lost</source>
         <translation>Flux de la caméra perdu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="798"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="797"/>
         <source>No valid frame received for %1 seconds.
 The camera stream may have stalled.</source>
         <translation>Aucune image valide reçue pendant %1 secondes.
 Le flux de la caméra est peut-être interrompu.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="812"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="811"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="813"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="812"/>
         <source>Start camera streaming.</source>
         <translation>Démarrer le flux de la caméra.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="822"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="821"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="823"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="822"/>
         <source>Stop camera streaming.</source>
         <translation>Arrêter le flux de la caméra.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="828"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="827"/>
         <source>Switch</source>
         <translation>Changer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="829"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="828"/>
         <source>Switch to selected camera.</source>
         <translation>Passer à la caméra sélectionnée.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="1050"/>
-        <source>Fluvel — Camera</source>
-        <translation>Fluvel — Camera</translation>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="1049"/>
+        <source>Camera</source>
+        <translation>Caméra</translation>
     </message>
 </context>
 <context>
@@ -798,85 +793,90 @@ Le flux de la caméra est peut-être interrompu.</translation>
 <context>
     <name>fluvel_app::ImageController</name>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="43"/>
+        <location filename="../src/app/core/image_controller.cpp" line="44"/>
         <source>Unsupported image format.</source>
         <translation>Format d’image non pris en charge.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="52"/>
+        <location filename="../src/app/core/image_controller.cpp" line="57"/>
+        <source>Image file extension differs from detected format: .%1 → %2</source>
+        <translation>L’extension du fichier image diffère du format détecté : .%1 → %2</translation>
+    </message>
+    <message>
+        <location filename="../src/app/core/image_controller.cpp" line="65"/>
         <source>Failed to load image.</source>
         <translation>Impossible de charger l’image.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="209"/>
+        <location filename="../src/app/core/image_controller.cpp" line="222"/>
         <source>n/a</source>
         <translation>n/a</translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="227"/>
+        <location filename="../src/app/core/image_controller.cpp" line="240"/>
         <source>Step: %1
 </source>
         <translation>Étape : %1
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="228"/>
+        <location filename="../src/app/core/image_controller.cpp" line="241"/>
         <source>State: %1
 </source>
         <translation>État : %1
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="231"/>
+        <location filename="../src/app/core/image_controller.cpp" line="244"/>
         <source>Reason: %1
 </source>
         <translation>Motif: %1
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="233"/>
+        <location filename="../src/app/core/image_controller.cpp" line="246"/>
         <source>Reason: 
 </source>
         <translation>Motif : 
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="237"/>
+        <location filename="../src/app/core/image_controller.cpp" line="250"/>
         <source>Mean in: %1
 </source>
         <translation>Moy. int. : %1
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="239"/>
+        <location filename="../src/app/core/image_controller.cpp" line="252"/>
         <source>Mean out: %1
 </source>
         <translation>Moy. ext. : %1
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="242"/>
+        <location filename="../src/app/core/image_controller.cpp" line="255"/>
         <source>Hausdorff q: %1 %
 </source>
         <translation>Hausdorff q : %1 %
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="244"/>
+        <location filename="../src/app/core/image_controller.cpp" line="257"/>
         <source>Centroid dist: %1 %
 </source>
         <translation>Dist. centroid : %1 %
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="246"/>
+        <location filename="../src/app/core/image_controller.cpp" line="259"/>
         <source>Elapsed: %1 s
 </source>
         <translation>Durée : %1 s
 </translation>
     </message>
     <message>
-        <location filename="../src/app/core/image_controller.cpp" line="248"/>
+        <location filename="../src/app/core/image_controller.cpp" line="261"/>
         <source>Contour: %1 pts</source>
         <translation>Contour : %1 pts</translation>
     </message>
@@ -897,25 +897,25 @@ Fichier → Ouvrir</translation>
     <name>fluvel_app::ImageWindow</name>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="89"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="805"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="799"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="90"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="806"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="800"/>
         <source>Run the active contour.</source>
         <translation>Lancer le contour actif.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="93"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="818"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="812"/>
         <source>Resume</source>
         <translation>Reprendre</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="94"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="819"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="813"/>
         <source>Resume the active contour execution.</source>
         <translation>Reprendre l’exécution du contour actif.</translation>
     </message>
@@ -1030,6 +1030,11 @@ Fichier → Ouvrir</translation>
         <translation>&amp;À propos</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="710"/>
+        <source>Image</source>
+        <translation>Image</translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="240"/>
         <source>Supported image formats: %1</source>
         <translation>Formats d’image pris en charge : %1</translation>
@@ -1075,67 +1080,63 @@ Fichier → Ouvrir</translation>
         <translation>Ai&amp;de</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="512"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="514"/>
         <source>Open Image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="607"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="609"/>
         <source>&amp;%1</source>
         <translation>&amp;%1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="644"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="646"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="837"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="644"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="646"/>
         <source>No camera available.</source>
         <translation>Aucune caméra disponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="687"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="689"/>
         <source>Opened image: %1</source>
         <translation>Image ouverte : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="714"/>
-        <source> — Image</source>
-        <translation> — Image</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="733"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="734"/>
         <source>Gray</source>
         <translation>Niveaux de gris</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="758"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="761"/>
         <source>Save displayed image</source>
         <translation>Enregistrer l’image affichée</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="799"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="793"/>
         <source>Restart</source>
         <translation>Redémarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="800"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="794"/>
         <source>Restart the active contour from its initial state.</source>
         <translation>Redémarrer le contour actif depuis son état initial.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="812"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="806"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="813"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="807"/>
         <source>Suspend execution and display the current state.</source>
         <translation>Mettre en pause et afficher l’état actuel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="836"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="830"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
