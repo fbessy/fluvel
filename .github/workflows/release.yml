@@ -591,13 +591,19 @@ jobs:
 
       - name: Verify checksums
         run: |
-          sha256sum -c windows/Fluvel-win64-portable.zip.sha256
-          sha256sum -c windows/Fluvel-win64-installer.exe.sha256
+          cd windows
+          sha256sum -c Fluvel-win64-portable.zip.sha256
+          sha256sum -c Fluvel-win64-installer.exe.sha256
+          cd ..
 
-          sha256sum -c macos/Fluvel-macos.dmg.sha256
+          cd macos
+          sha256sum -c Fluvel-macos.dmg.sha256
+          cd ..
 
-          sha256sum -c linux/Fluvel-linux.AppImage.sha256
-          sha256sum -c linux/Fluvel-linux.flatpak.sha256
+          cd linux
+          sha256sum -c Fluvel-linux.AppImage.sha256
+          sha256sum -c Fluvel-linux.flatpak.sha256
+          cd ..
 
       - name: Install gh
         run: |
