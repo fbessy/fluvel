@@ -494,15 +494,25 @@ jobs:
       # =========================
       - name: Ensure release exists and is published
         run: |
-          # créer si n'existe pas
-          gh release view latest || gh release create latest \
-            -t "Latest Development Build" \
-            -n "Auto release" \
-            --target ${{ github.sha }} \
-            --latest
+          if gh release view latest >/dev/null 2>&1; then
+            echo "Release exists"
 
-          # 🔥 garantir que ce n'est PAS un draft
-          gh release edit latest --draft=false
+            gh release edit latest \
+              --draft=false \
+              --latest
+
+          else
+            echo "Creating release"
+
+            gh release create latest \
+              --title "Latest Development Build" \
+              --notes "Auto release" \
+              --target "${{ github.sha }}" \
+              --latest \
+              --draft=false
+          fi
+
+          gh release view latest --json isDraft,url
 
       # =========================
       # UPLOAD ASSETS (ATOMIC)
