@@ -897,25 +897,25 @@ Fichier → Ouvrir</translation>
     <name>fluvel_app::ImageWindow</name>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="89"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="799"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="797"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="90"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="800"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="798"/>
         <source>Run the active contour.</source>
         <translation>Lancer le contour actif.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="93"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="812"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="810"/>
         <source>Resume</source>
         <translation>Reprendre</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="94"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="813"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="811"/>
         <source>Resume the active contour execution.</source>
         <translation>Reprendre l’exécution du contour actif.</translation>
     </message>
@@ -930,213 +930,213 @@ Fichier → Ouvrir</translation>
         <translation>Avancer le contour actif d’une itération.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="109"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="108"/>
         <source>Converge</source>
         <translation>Convergence</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="110"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="109"/>
         <source>Run until completion without displaying intermediate steps.</source>
         <translation>Aller jusqu’à la fin sans afficher les étapes intermédiaires.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="126"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="124"/>
         <source>Image session settings</source>
         <translation>Paramètres de session d’image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="204"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="202"/>
         <source>&amp;Image</source>
         <translation>&amp;Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="205"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="203"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="214"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="212"/>
         <source>Switch to the image session.</source>
         <translation>Basculer vers la session image.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="216"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="214"/>
         <source>Came&amp;ra</source>
         <translation>Came&amp;ra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="217"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="215"/>
         <source>Ctrl+R</source>
         <translation>Ctrl+R</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="227"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="225"/>
         <source>Open the camera session.</source>
         <translation>Ouvrir la session caméra.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="229"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="227"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="237"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="235"/>
         <source>&amp;Open...</source>
         <translation>&amp;Ouvrir...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="247"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="245"/>
         <source>Clear list</source>
         <translation>Effacer la liste</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="255"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="253"/>
         <source>&amp;Save...</source>
         <translation>&amp;Enregistrer...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="257"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="255"/>
         <source>Save the displayed image.</source>
         <translation>Enregistrer l’image affichée.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="275"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="273"/>
         <source>&amp;Analysis</source>
         <translation>&amp;Analyse</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="276"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="274"/>
         <source>Compute the Hausdorff distance.</source>
         <translation>Calculer la distance de Hausdorff.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="277"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="275"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="281"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="279"/>
         <source>&amp;Settings</source>
         <translation>&amp;Paramètres</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="283"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="281"/>
         <source>Image preprocessing and active contour initialization.</source>
         <translation>Prétraitement de l’image et initialisation du contour actif.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="288"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="286"/>
         <source>&amp;About</source>
         <translation>&amp;À propos</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="710"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="708"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="240"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="238"/>
         <source>Supported image formats: %1</source>
         <translation>Formats d’image pris en charge : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="248"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="246"/>
         <source>Clear the recent files list.</source>
         <translation>Effacer la liste des fichiers récents.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="289"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="287"/>
         <source>Application information, license and home page.</source>
         <translation>Informations sur l’application, licence et page d’accueil.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="296"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="294"/>
         <source>&amp;Language</source>
         <translation>&amp;Langue</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="297"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="295"/>
         <source>Choose the application language.</source>
         <translation>Choisir la langue de l’application.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="307"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="305"/>
         <source>&amp;Session</source>
         <translation>&amp;Session</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="313"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="311"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="328"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="326"/>
         <source>&amp;Segmentation</source>
         <translation>&amp;Segmentation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="332"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="330"/>
         <source>&amp;Help</source>
         <translation>Ai&amp;de</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="514"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="512"/>
         <source>Open Image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="609"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="607"/>
         <source>&amp;%1</source>
         <translation>&amp;%1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="646"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="837"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="644"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="835"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="646"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="644"/>
         <source>No camera available.</source>
         <translation>Aucune caméra disponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="689"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="687"/>
         <source>Opened image: %1</source>
         <translation>Image ouverte : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="734"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="732"/>
         <source>Gray</source>
         <translation>Niveaux de gris</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="761"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="759"/>
         <source>Save displayed image</source>
         <translation>Enregistrer l’image affichée</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="793"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="791"/>
         <source>Restart</source>
         <translation>Redémarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="794"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="792"/>
         <source>Restart the active contour from its initial state.</source>
         <translation>Redémarrer le contour actif depuis son état initial.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="806"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="804"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="807"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="805"/>
         <source>Suspend execution and display the current state.</source>
         <translation>Mettre en pause et afficher l’état actuel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="830"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="828"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
