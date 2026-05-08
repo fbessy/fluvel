@@ -659,15 +659,16 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Compute checksums
+      - name: Collect checksums
         run: |
           BASE_SUMS=$(cat \
             windows/*.sha256 \
             macos/*.sha256 \
-            linux/*.sha256 \
-            | sed ':a;N;$!ba;s/\n/\\n/g')
+            linux/*.sha256)
 
-          echo "ALL_CHECKSUMS=$BASE_SUMS" >> $GITHUB_ENV
+          JSON_SUMS=$(printf '%s' "$BASE_SUMS" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+
+          echo "ALL_CHECKSUMS=$JSON_SUMS" >> $GITHUB_ENV
 
       - name: Generate latest.json
         run: |
@@ -696,7 +697,7 @@ jobs:
               "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
             },
 
-            "checksums": "$ALL_CHECKSUMS"
+            "checksums": $ALL_CHECKSUMS
           }
           EOF
 
