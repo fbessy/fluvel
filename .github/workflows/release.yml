@@ -165,13 +165,30 @@ jobs:
           Rename-Item $exe.FullName "Fluvel-win64-installer.exe"
           Copy-Item packaging\windows\Output\Fluvel-win64-installer.exe .
 
+      - name: Generate checksum
+        run: |
+          Get-FileHash Fluvel-win64-portable.zip -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  Fluvel-win64-portable.zip" } |
+            Out-File Fluvel-win64-portable.zip.sha256 -Encoding ascii
+
+          Get-FileHash Fluvel-win64-installer.exe -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  Fluvel-win64-installer.exe" } |
+            Out-File Fluvel-win64-installer.exe.sha256 -Encoding ascii
+
+      - name: Generate commit info
+        run: |
+          echo "${GITHUB_SHA}" > commit-windows.txt
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: windows
           path: |
             Fluvel-win64-portable.zip
+            Fluvel-win64-portable.zip.sha256
             Fluvel-win64-installer.exe
+            Fluvel-win64-installer.exe.sha256
+            commit-windows.txt
 
 
   # =========================
@@ -234,11 +251,22 @@ jobs:
           ln -s /Applications dmg/Applications
           hdiutil create Fluvel-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
 
+      - name: Generate checksum
+        run: |
+          shasum -a 256 Fluvel-macos.dmg > Fluvel-macos.dmg.sha256
+
+      - name: Generate commit info
+        run: |
+          echo "${GITHUB_SHA}" > commit-macos.txt
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: Fluvel-macos.dmg
+          path: |
+            Fluvel-macos.dmg
+            Fluvel-macos.dmg.sha256
+            commit-macos.txt
 
   docker-image:
     runs-on: ubuntu-latest
@@ -352,11 +380,22 @@ jobs:
               flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.App
             "
 
+      - name: Generate checksum
+        run: |
+          sha256sum Fluvel-linux.flatpak > Fluvel-linux.flatpak.sha256
+
+      - name: Generate commit info
+        run: |
+          echo "${GITHUB_SHA}" > commit-linux-flatpak.txt
+
       # 📤 Upload artifact
       - uses: actions/upload-artifact@v4
         with:
           name: linux-flatpak
-          path: Fluvel-linux.flatpak
+          path: |
+            Fluvel-linux.flatpak
+            Fluvel-linux.flatpak.sha256
+            commit-linux-flatpak.txt
 
   # =========================
   # Linux AppImage BUILD
@@ -443,11 +482,22 @@ jobs:
               chmod +x Fluvel-linux.AppImage
             "
 
+      - name: Generate checksum
+        run: |
+          sha256sum Fluvel-linux.AppImage > Fluvel-linux.AppImage.sha256
+
+      - name: Generate commit info
+        run: |
+          echo "${GITHUB_SHA}" > commit-linux-appimage.txt
+
       # 📤 Upload artifact
       - uses: actions/upload-artifact@v4
         with:
           name: linux-appimage
-          path: Fluvel-linux.AppImage
+          path: |
+            Fluvel-linux.AppImage
+            Fluvel-linux.AppImage.sha256
+            commit-linux-appimage.txt
 
   # =========================
   # RELEASE
@@ -481,6 +531,46 @@ jobs:
         with:
           name: linux-flatpak
           path: linux
+
+      - name: Verify commit consistency
+        run: |
+          echo "Windows:"
+          cat windows/commit-windows.txt
+
+          echo "macOS:"
+          cat macos/commit-macos.txt
+
+          echo "Linux AppImage:"
+          cat linux/commit-linux-appimage.txt
+
+          echo "Linux Flatpak:"
+          cat linux/commit-linux-flatpak.txt
+
+          UNIQUE_COMMITS=$(
+            cat \
+              windows/commit-windows.txt \
+              macos/commit-macos.txt \
+              linux/commit-linux-appimage.txt \
+              linux/commit-linux-flatpak.txt \
+            | sort -u | wc -l
+          )
+
+          if [ "$UNIQUE_COMMITS" -ne 1 ]; then
+            echo "ERROR: Commit mismatch between artifacts"
+            exit 1
+          fi
+
+          echo "Commit consistency verified ✔"
+
+      - name: Verify checksums
+        run: |
+          sha256sum -c windows/Fluvel-win64-portable.zip.sha256
+          sha256sum -c windows/Fluvel-win64-installer.exe.sha256
+
+          sha256sum -c macos/Fluvel-macos.dmg.sha256
+
+          sha256sum -c linux/Fluvel-linux.AppImage.sha256
+          sha256sum -c linux/Fluvel-linux.flatpak.sha256
 
       - name: Install gh
         run: |
@@ -538,8 +628,11 @@ jobs:
 
       - name: Compute checksums
         run: |
-          BASE_SUMS=$(sha256sum windows/* macos/* linux/* 2>/dev/null | \
-            sed ':a;N;$!ba;s/\n/\\n/g' || true)
+          BASE_SUMS=$(cat \
+            windows/*.sha256 \
+            macos/*.sha256 \
+            linux/*.sha256 \
+            | sed ':a;N;$!ba;s/\n/\\n/g')
 
           echo "ALL_CHECKSUMS=$BASE_SUMS" >> $GITHUB_ENV
 
