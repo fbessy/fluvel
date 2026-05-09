@@ -1,0 +1,147 @@
+name: Fluvel Stable
+
+concurrency:
+  group: fluvel-stable
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+
+  validate-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify release notes exist
+        run: |
+          set -e
+
+          NOTES_FILE="release-notes/${GITHUB_REF_NAME}.md"
+
+          if [ ! -f "$NOTES_FILE" ]; then
+            echo "ERROR: Missing release notes file"
+            echo "Expected: $NOTES_FILE"
+            exit 1
+          fi
+
+          if [ ! -s "$NOTES_FILE" ]; then
+            echo "ERROR: Release notes file is empty"
+            echo "File: $NOTES_FILE"
+            exit 1
+          fi
+
+          echo "Release notes check passed ✔"
+
+      - name: Verify tag commit belongs to release branch
+        run: |
+          set -e
+
+          git fetch origin release
+
+          if ! git branch -r --contains "${GITHUB_SHA}" | grep -q "origin/release"; then
+            echo "ERROR: Stable releases must be tagged from the release branch"
+            exit 1
+          fi
+
+          echo "Release branch check passed ✔"
+
+      - name: Check version consistency
+        run: |
+          set -e
+
+          echo "Checking version consistency..."
+
+          VERSION_IN_CODE=$(grep -Eo 'project\(.*VERSION[[:space:]]+[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt | \
+                            grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
+
+          TAG_VERSION=${GITHUB_REF_NAME#v}
+
+          echo "CMake version: $VERSION_IN_CODE"
+          echo "Tag version: $TAG_VERSION"
+
+          if ! [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: Invalid tag format"
+            exit 1
+          fi
+
+          if [[ "$VERSION_IN_CODE" != "$TAG_VERSION" ]]; then
+            echo "ERROR: Version mismatch!"
+            exit 1
+          fi
+
+          echo "Version check passed ✔"
+
+  desktop:
+    needs: validate-release
+    uses: ./.github/workflows/build-desktop.yml
+    secrets: inherit
+
+  linux:
+    needs: validate-release
+    uses: ./.github/workflows/build-linux.yml
+    secrets: inherit
+
+  prepare:
+    needs: [desktop, linux]
+    uses: ./.github/workflows/prepare-release.yml
+    secrets: inherit
+
+  publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: windows
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos
+          path: macos
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-appimage
+          path: linux
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-flatpak
+          path: linux
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: prepared-release
+          path: prepared
+
+      - name: Install gh
+        run: |
+          command -v gh || (apt update && apt install -y gh)
+
+      - name: Create stable release
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            windows/Fluvel-win64-portable.zip \
+            windows/Fluvel-win64-installer.exe \
+            macos/Fluvel-macos.dmg \
+            linux/Fluvel-linux.AppImage \
+            linux/Fluvel-linux.flatpak \
+            prepared/BUILD_INFO.txt \
+            --title "Fluvel ${GITHUB_REF_NAME#v}" \
+            --notes-file "release-notes/${GITHUB_REF_NAME}.md"

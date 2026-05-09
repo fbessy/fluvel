@@ -1,0 +1,126 @@
+name: Prepare Release
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: windows
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos
+          path: macos
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-appimage
+          path: linux
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-flatpak
+          path: linux
+
+      - name: Debug files
+        run: ls -R
+
+      - name: Verify commit consistency
+        run: .github/scripts/verify-commits.sh
+
+      - name: Verify checksums
+        run: |
+          set -e
+
+          cd windows
+          sha256sum -c Fluvel-win64-portable.zip.sha256
+          sha256sum -c Fluvel-win64-installer.exe.sha256
+          cd ..
+
+          cd macos
+          sha256sum -c Fluvel-macos.dmg.sha256
+          cd ..
+
+          cd linux
+          sha256sum -c Fluvel-linux.AppImage.sha256
+          sha256sum -c Fluvel-linux.flatpak.sha256
+          cd ..
+
+      - name: Compute version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Collect checksums
+        run: |
+          BASE_SUMS=$(cat \
+            windows/*.sha256 \
+            macos/*.sha256 \
+            linux/*.sha256)
+
+          JSON_SUMS=$(printf '%s' "$BASE_SUMS" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
+
+          echo "ALL_CHECKSUMS=$JSON_SUMS" >> $GITHUB_ENV
+
+      - name: Generate BUILD_INFO.txt
+        run: |
+          BUILD_DATE=$(date -u +"%d %B %Y at %H:%M:%S UTC")
+
+          cat > BUILD_INFO.txt <<EOF
+          Fluvel Build Information
+          ==========================
+
+          Version : $VERSION
+          Branch  : ${GITHUB_REF_NAME}
+          Commit  : ${GITHUB_SHA}
+          Date    : $BUILD_DATE
+
+          Artifacts
+          =========
+
+          Fluvel-win64-installer.exe
+          Fluvel-win64-portable.zip
+          Fluvel-macos.dmg
+          Fluvel-linux.AppImage
+          Fluvel-linux.flatpak
+
+          Checksums
+          =========
+
+          $(cat windows/*.sha256)
+          $(cat macos/*.sha256)
+          $(cat linux/*.sha256)
+
+          --
+
+          Generated automatically by the Fluvel release workflow.
+
+          EOF
+
+      - name: Generate latest.json
+        run: .github/scripts/generate-latest-json.sh
+
+
+      - name: Upload prepared artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: prepared-release
+          path: |
+            latest.json
+            BUILD_INFO.txt

@@ -1,0 +1,137 @@
+name: Fluvel Latest
+
+concurrency:
+  group: fluvel-latest
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  push:
+    branches: [release]
+
+jobs:
+
+  desktop:
+    uses: ./.github/workflows/build-desktop.yml
+    secrets: inherit
+
+  linux:
+    uses: ./.github/workflows/build-linux.yml
+    secrets: inherit
+
+  prepare:
+    needs: [desktop, linux]
+    uses: ./.github/workflows/prepare-release.yml
+    secrets: inherit
+
+  publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows
+          path: windows
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos
+          path: macos
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-appimage
+          path: linux
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-flatpak
+          path: linux
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: prepared-release
+          path: prepared
+
+      - name: Update latest tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          git tag -f latest ${{ github.sha }}
+          git push origin latest --force
+
+      - name: Install gh
+        run: |
+          command -v gh || (apt update && apt install -y gh)
+
+      # =========================
+      # CREATE OR UPDATE RELEASE
+      # =========================
+      - name: Ensure release exists and is published
+        run: |
+          if gh release view latest >/dev/null 2>&1; then
+            echo "Release exists"
+
+            gh release edit latest \
+              --draft=false \
+              --latest
+
+          else
+            echo "Creating release"
+
+            gh release create latest \
+              --title "Latest Development Build" \
+              --notes "Auto release" \
+              --target "${{ github.sha }}" \
+              --latest \
+              --draft=false
+          fi
+
+          gh release view latest --json isDraft,url
+
+      # =========================
+      # UPLOAD ASSETS (ATOMIC)
+      # =========================
+      - name: Upload assets
+        run: |
+          gh release upload latest \
+            windows/Fluvel-win64-portable.zip \
+            windows/Fluvel-win64-installer.exe \
+            macos/Fluvel-macos.dmg \
+            linux/Fluvel-linux.AppImage \
+            linux/Fluvel-linux.flatpak \
+            prepared/BUILD_INFO.txt \
+            --clobber
+
+      # =========================
+      # DEPLOY GITHUB PAGES
+      # =========================
+      - name: Deploy GitHub Pages
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/fbessy/fluvel.git gh-pages
+          cd gh-pages
+
+          git fetch origin gh-pages || true
+          git checkout gh-pages || git checkout -b gh-pages
+
+          cp -r ../web/* .
+          cp ../prepared/latest.json .
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          git pull origin gh-pages || true
+
+          git add .
+          git commit -m "Update latest build" || true
+          git push

@@ -1,0 +1,242 @@
+name: Linux Build (Flatpak + AppImage)
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  packages: write
+
+
+jobs:
+
+  docker-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Docker changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docker:
+              - 'docker/qt-builder/**'
+
+      - name: Login
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Ensure image
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2
+
+          EXISTS=false
+          if docker manifest inspect $IMAGE > /dev/null 2>&1; then
+            EXISTS=true
+          fi
+
+          echo "Image exists: $EXISTS"
+          echo "Docker changed: ${{ steps.changes.outputs.docker }}"
+
+          if [ "$EXISTS" = "false" ] || [ "${{ steps.changes.outputs.docker }}" = "true" ]; then
+            echo "Building image..."
+
+            docker buildx create --use
+
+            docker buildx build \
+              --cache-from=type=registry,ref=$IMAGE \
+              --cache-to=type=registry,ref=$IMAGE,mode=max \
+              -t $IMAGE \
+              -f docker/qt-builder/Dockerfile \
+              --push \
+              .
+          else
+            echo "Skipping build"
+          fi
+
+  # =========================
+  # Linux Flatpak BUILD
+  # =========================
+  linux-flatpak:
+    needs: docker-image
+    runs-on: ubuntu-latest
+
+    if: github.ref_type == 'tag' || github.ref_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 🧠 Compute version
+      - name: Compute version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull Docker image
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2
+
+      # 📦 Build Flatpak dans Docker
+      - name: Build Flatpak
+        run: |
+          docker run --rm \
+            --privileged \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2 \
+            bash -c "
+              cd /workspace
+              git config --global --add safe.directory /workspace
+              echo \"Version = $APP_VERSION\"
+
+              PROJECT_ROOT=\$(git rev-parse --show-toplevel)
+
+              BUILD_TIMESTAMP=\$(date -u +\"%Y-%m-%d %H:%M:%S\" | sed 's/[\/&]/\\\\&/g')
+              APP_DATE=\$(date +%Y-%m-%d)
+
+              cp packaging/flatpak/fluvel.json fluvel.ci.json
+              cp packaging/flatpak/org.fluvel.App.metainfo.xml metainfo.ci.xml
+
+              ESCAPED_ROOT=\$(printf '%s\n' \"\$PROJECT_ROOT\" | sed 's/[\/&]/\\\\&/g')
+
+              sed -i \"s|__SOURCE_ROOT__|\$ESCAPED_ROOT|g\" fluvel.ci.json
+              sed -i \"s/__APP_VERSION__/$APP_VERSION/g\" fluvel.ci.json
+              sed -i \"s/__CI_COMMIT__/$COMMIT_SHORT/g\" fluvel.ci.json
+              sed -i \"s/__BUILD_TIMESTAMP__/\$BUILD_TIMESTAMP/g\" fluvel.ci.json
+              sed -i \"s/__BUILD_ORIGIN__/GitHub Actions/g\" fluvel.ci.json
+
+              sed -i \"s/__APP_VERSION__/$APP_VERSION/g\" metainfo.ci.xml
+              sed -i \"s/__APP_DATE__/\$APP_DATE/g\" metainfo.ci.xml
+
+              mkdir -p repo
+
+              flatpak-builder --repo=repo --force-clean build-flatpak fluvel.ci.json
+              flatpak build-export repo build-flatpak
+              flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.App
+            "
+
+      - name: Generate checksum
+        run: |
+          sha256sum Fluvel-linux.flatpak > Fluvel-linux.flatpak.sha256
+
+      - name: Generate commit info
+        run: |
+          echo "${GITHUB_SHA}" > commit-linux-flatpak.txt
+
+      # 📤 Upload artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-flatpak
+          path: |
+            Fluvel-linux.flatpak
+            Fluvel-linux.flatpak.sha256
+            commit-linux-flatpak.txt
+
+  # =========================
+  # Linux AppImage BUILD
+  # =========================
+  linux-appimage:
+    needs: docker-image
+    runs-on: ubuntu-latest
+
+    if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 🧠 Compute version
+      - name: Compute version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull Docker image
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2
+
+      # 📦 Build AppImage dans Docker
+      - name: Build AppImage
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.8.2 \
+            bash -c "
+              cd /workspace
+
+              echo \"Version = $APP_VERSION\"
+
+              unset LD_LIBRARY_PATH
+              unset QT_PLUGIN_PATH
+              unset QML2_IMPORT_PATH
+
+              BUILD_TIMESTAMP=\$(date -u +\"%Y-%m-%d %H:%M:%S\")
+
+              cmake --fresh -S . -B build -G Ninja \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_UNITY_BUILD=OFF \
+                -DQt6_DIR=\$Qt6_DIR \
+                -DFLUVEL_BUILD_VERSION=$APP_VERSION \
+                -DFLUVEL_GIT_COMMIT=$COMMIT_SHORT \
+                -DFLUVEL_BUILD_TIMESTAMP=\"\$BUILD_TIMESTAMP\" \
+                -DFLUVEL_BUILD_ORIGIN=\"GitHub Actions\"
+
+              cmake --build build
+
+              mkdir -p AppDir
+              cmake --install build --prefix AppDir/usr
+
+              cp packaging/appimage/fluvel.desktop AppDir/
+              cp packaging/appimage/fluvel.png AppDir/
+
+              export QT_PLUGIN_PATH=\$QT_ROOT/plugins
+              export LD_LIBRARY_PATH=\$QT_ROOT/lib:\$LD_LIBRARY_PATH
+              export APPIMAGE_EXTRACT_AND_RUN=1
+
+              # ⚠️ retirer libqtiff
+              cp -r \$QT_ROOT/plugins qt-plugins
+              rm -f qt-plugins/imageformats/libqtiff.so*
+
+              export QT_PLUGIN_PATH=/workspace/qt-plugins
+
+              /opt/tools/linuxdeploy.AppImage \
+                --appdir AppDir \
+                --executable AppDir/usr/bin/Fluvel \
+                --desktop-file AppDir/fluvel.desktop \
+                --icon-file AppDir/fluvel.png \
+                --plugin qt \
+                --output appimage
+
+              mv *.AppImage Fluvel-linux.AppImage
+              chmod +x Fluvel-linux.AppImage
+            "
+
+      - name: Generate checksum
+        run: |
+          sha256sum Fluvel-linux.AppImage > Fluvel-linux.AppImage.sha256
+
+      - name: Generate commit info
+        run: |
+          echo "${GITHUB_SHA}" > commit-linux-appimage.txt
+
+      # 📤 Upload artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-appimage
+          path: |
+            Fluvel-linux.AppImage
+            Fluvel-linux.AppImage.sha256
+            commit-linux-appimage.txt
