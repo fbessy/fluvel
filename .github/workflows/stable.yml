@@ -19,6 +19,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Verify tag commit belongs to release branch
+        run: |
+          set -e
+
+          git fetch origin release
+
+          if ! git branch -r --contains "${GITHUB_SHA}" | grep -q "origin/release"; then
+            echo "ERROR: Stable releases must be tagged from the release branch"
+            exit 1
+          fi
+
+          echo "Release branch check passed ✔"
+
       - name: Verify release notes exist
         run: |
           set -e
@@ -38,19 +51,6 @@ jobs:
           fi
 
           echo "Release notes check passed ✔"
-
-      - name: Verify tag commit belongs to release branch
-        run: |
-          set -e
-
-          git fetch origin release
-
-          if ! git branch -r --contains "${GITHUB_SHA}" | grep -q "origin/release"; then
-            echo "ERROR: Stable releases must be tagged from the release branch"
-            exit 1
-          fi
-
-          echo "Release branch check passed ✔"
 
       - name: Check version consistency
         run: |
