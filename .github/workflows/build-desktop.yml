@@ -1,4 +1,4 @@
-name: Desktop Build (Windows + MacOS)
+name: Desktop Build (Windows + macOS)
 
 on:
   workflow_call:
