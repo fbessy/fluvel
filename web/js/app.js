@@ -1,18 +1,17 @@
 // ===== ICON =====
 function copyIcon() {
   return `
-  <svg viewBox="0 0 16 16">
-  <path d="M4 1h7a2 2 0 0 1 2 2v7h-1V3a1 1 0 0 0-1-1H4V1z"/>
-  <path d="M2 4a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4z"/>
+  <svg viewBox="0 0 24 24">
+    <path d="M8 1h12a2 2 0 0 1 2 2v12h-2V3H8V1zm-3 4h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 2v14h11V7H5z"/>
   </svg>`;
 }
 
-// ===== TOAST =====
-const toast = document.getElementById("copy-toast");
-
-function showToast() {
-  toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 1200);
+// ===== CHECK ICON =====
+function checkIcon() {
+  return `
+  <svg viewBox="0 0 24 24">
+    <path d="M9.2 16.2 4.8 11.8l-1.4 1.4 5.8 5.8 11-11-1.4-1.4z"/>
+  </svg>`;
 }
 
 // ===== OS DETECTION =====
@@ -50,17 +49,11 @@ function setLink(id, url) {
 
   if (!url) {
     el.style.display = "none";
-    return false;
+    return;
   }
 
-  el.href = "#";
-
-  el.onclick = (e) => {
-    e.preventDefault();
-    window.open(url, "_blank");
-  };
-
-  return true;
+  el.href = url;
+  el.target = "_blank";
 }
 
 // ===== PLATFORM VISIBILITY =====
@@ -122,26 +115,52 @@ fetch("latest.json")
         if (!line.trim()) return;
 
         const parts = line.trim().split(/\s+/);
-        const hash = parts[0];
+
+        const hash = parts.shift();
+        const filename = parts.join(" ");
 
         const div = document.createElement("div");
         div.className = "copy-line";
 
+        const hashText = document.createElement("span");
+        hashText.className = "checksum-hash";
+        hashText.innerText = hash;
+
+        const fileText = document.createElement("span");
+        fileText.className = "checksum-file";
+        fileText.innerText = filename;
+
         const btn = document.createElement("button");
         btn.className = "copy-btn";
         btn.innerHTML = copyIcon();
-        btn.title = "Copy hash";
 
-        btn.onclick = () => {
-          navigator.clipboard.writeText(hash);
-          showToast();
+        btn.onclick = async () => {
+
+          try {
+
+            await navigator.clipboard.writeText(hash);
+
+            const oldIcon = btn.innerHTML;
+
+            btn.innerHTML = checkIcon();
+            btn.classList.add("copied");
+
+            setTimeout(() => {
+              btn.innerHTML = oldIcon;
+              btn.classList.remove("copied");
+            }, 1000);
+
+          } catch (err) {
+
+            console.error("Copy failed:", err);
+
+          }
         };
 
-        const text = document.createElement("span");
-        text.innerText = line;
-
+        div.appendChild(hashText);
         div.appendChild(btn);
-        div.appendChild(text);
+        div.appendChild(fileText);
+
         container.appendChild(div);
       });
     }

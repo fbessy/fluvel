@@ -178,6 +178,25 @@ code {
   content: "−";
 }
 
+.checksum-hash {
+  font-family: monospace;
+
+  background: #ececf1;
+
+  padding: 2px 6px;
+  border-radius: 6px;
+
+  font-size: 12px;
+  color: #555;
+}
+
+.checksum-file {
+  margin-left: 14px;
+
+  font-size: 12px;
+  color: #666;
+}
+
 .copy-line {
   display: flex;
   align-items: center;
@@ -232,24 +251,12 @@ code {
   fill: #555;
 }
 
-/* ===== TOAST ===== */
-
-.copy-toast {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #333;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.2s ease;
+.copy-btn.copied {
+  border-color: #4fc98a;
 }
 
-.copy-toast.show {
-  opacity: 1;
-  transform: translateY(0);
+.copy-btn.copied svg {
+  fill: #4fc98a;
 }
 
 .meta {
