@@ -1,0 +1,383 @@
+:root {
+  /* ===== FLUVEL BRANDING ===== */
+
+  --fluvel-accent: #4f56e5;
+  --fluvel-accent-hover: #4249d8;
+  --fluvel-accent-soft: #eceeff;
+
+  /* ===== AWESOME OVERRIDES ===== */
+
+  --primary-color: var(--fluvel-accent);
+  --primary-dark-color: var(--fluvel-accent-hover);
+
+  --page-background-color: #f5f5f7;
+  --page-foreground-color: #1d1d1f;
+
+  --header-background: rgba(255, 255, 255, 0.85);
+  --header-foreground: #1d1d1f;
+
+  --sidebar-background: #ffffff;
+  --sidebar-foreground: #444;
+
+  --toc-background: #ffffff;
+
+  --fragment-background: #f8f8fa;
+  --fragment-foreground: #222;
+
+  --table-head-background: var(--fluvel-accent-soft);
+  --table-head-foreground: var(--fluvel-accent);
+
+  --link-color: var(--fluvel-accent);
+  --link-hover-color: var(--fluvel-accent-hover);
+
+  --border-radius-large: 18px;
+  --border-radius-medium: 12px;
+  --border-radius-small: 8px;
+}
+
+/* ===== GLOBAL ===== */
+
+html,
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Inter,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+html {
+  font-size: 115%;
+}
+
+body {
+  line-height: 1.65;
+}
+
+/* ===== MAIN CONTENT ===== */
+
+.contents {
+  background: white;
+
+  border: 1px solid #e8e8ee;
+  border-radius: var(--border-radius-large);
+
+  padding: 32px;
+
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.03);
+
+  margin-top: 20px;
+}
+
+/* ===== HEADER ===== */
+
+#top {
+  backdrop-filter: blur(10px);
+
+  border-bottom: 1px solid #e8e8ee;
+
+  box-shadow: none;
+}
+
+/* ===== SIDEBAR ===== */
+
+#side-nav {
+  border-right: 1px solid #ececf1;
+}
+
+/* ===== LINKS ===== */
+
+a {
+  transition:
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+a:hover {
+  opacity: 0.9;
+}
+
+/* ===== CODE BLOCKS ===== */
+
+.fragment {
+  border-radius: var(--border-radius-medium);
+
+  border: 1px solid #ececf1;
+
+  padding: 14px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* ===== INLINE CODE ===== */
+
+code {
+  background: #f1f2f6;
+
+  border-radius: 6px;
+
+  padding:
+    2px 6px;
+}
+
+/* ===== TABLES ===== */
+
+table.doxtable {
+  border-collapse: separate;
+
+  border-spacing: 0;
+
+  overflow: hidden;
+
+  border-radius: var(--border-radius-medium);
+
+  border: 1px solid #e8e8ee;
+}
+
+table.doxtable th {
+  font-weight: 600;
+}
+
+table.doxtable td,
+table.doxtable th {
+  padding: 12px;
+}
+
+/* ===== SEARCH ===== */
+
+#MSearchBox {
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+/* ===== NAVIGATION TWEAKS ===== */
+
+.tablist a {
+  border-radius: 10px !important;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.tablist a:hover {
+  background: var(--fluvel-accent-soft) !important;
+}
+
+/* ===== HEADINGS ===== */
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.02em;
+}
+
+/* ===== MEMBER DECLARATIONS ===== */
+
+.memitem,
+.memproto {
+  border-radius: var(--border-radius-medium);
+
+  border: 1px solid #ececf1;
+
+  overflow: hidden;
+}
+
+/* ===== MOBILE ===== */
+
+@media screen and (max-width: 900px) {
+  .contents {
+    padding: 20px;
+
+    border-radius: 14px;
+  }
+}
+
+/* ===== SIDEBAR ACTIVE / FOCUS ===== */
+
+/* Hide useless Doxygen resize separator */
+
+#splitbar,
+.ui-resizable-e,
+.side-nav-resizable {
+  width: 0 !important;
+
+  background: transparent !important;
+
+  border: none !important;
+}
+
+#side-nav {
+  border-right: none !important;
+}
+
+#side-nav a:focus,
+#side-nav a:active,
+#side-nav a.current {
+  background:
+    rgba(107, 111, 207, 0.10) !important;
+
+  border-radius: 8px;
+}
+
+#side-nav a:focus {
+  outline: none;
+}
+
+/* ===== REMOVE UGLY SEPARATORS ===== */
+
+hr,
+.memSeparator,
+.separator {
+  display: none !important;
+}
+
+.memitem {
+  background: white;
+
+  border: 1px solid #ececf1 !important;
+
+  border-radius: 14px;
+
+  padding: 18px;
+
+  margin-bottom: 24px;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* ===== TEXT SELECTION ===== */
+
+::selection {
+  background: rgba(107, 111, 207, 0.28);
+
+  color: #111;
+}
+
+::-moz-selection {
+  background: rgba(107, 111, 207, 0.28);
+
+  color: #111;
+}
+
+/* ===== NOTE / WARNING BLOCKS ===== */
+
+dl.note,
+dl.warning,
+dl.attention {
+  border: none !important;
+
+  border-left: 4px solid var(--fluvel-accent);
+
+  background: #f7f7fc;
+
+  border-radius: 12px;
+
+  padding: 14px 18px;
+
+  margin: 18px 0;
+}
+
+/* ===== TITLES ===== */
+
+dl.note,
+dl.warning,
+dl.attention {
+  background:
+    rgba(107, 111, 207, 0.08);
+
+  border: 1px solid rgba(107, 111, 207, 0.12);
+
+  border-radius: 14px;
+}
+
+/* ===== SECTION HEADERS ===== */
+
+.groupheader {
+  border: none !important;
+
+  background: transparent !important;
+
+  padding:
+    8px 0 14px 0;
+
+  margin-top: 32px;
+
+  color: var(--fluvel-accent);
+
+  font-weight: 700;
+}
+
+.contents h1,
+.contents h2,
+.contents h3 {
+  padding-right: 0 !important;
+}
+
+/* ===== REMOVE TOP BORDER ===== */
+
+#titlearea,
+#top,
+.header {
+  border: none !important;
+
+  box-shadow: none !important;
+}
+
+/* ===== REMOVE DOUBLE VERTICAL BORDER ===== */
+
+.contents {
+  border-left: none !important;
+}
+
+#side-nav {
+  border-right: none !important;
+}
+
+/* ===== CLEAN SECTION HEADERS ===== */
+
+.groupheader,
+.memtitle,
+.memproto,
+.memdoc {
+  background: transparent !important;
+
+  background-image: none !important;
+
+  border: none !important;
+
+  box-shadow: none !important;
+}
+
+.groupheader::before,
+.memtitle::before {
+  display: none !important;
+}
+
+h2.memtitle::before,
+h2.memtitle::after {
+  display: none !important;
+}
+
+/* ===== REMOVE DOXYGEN FOOTER ===== */
+
+.footer {
+  display: none !important;
+}
+
+/* Hide ugly resize arrows */
+
+/* Hide old Doxygen sync button */
+
+#nav-sync {
+  display: none !important;
+}
