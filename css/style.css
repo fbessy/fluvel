@@ -131,6 +131,15 @@ code {
   color: #555;
 }
 
+.release-channel {
+  margin-top: 28px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: var(--fluvel-accent);
+}
+
 /* ===== CHECKSUM ===== */
 
 .checksums-section {
@@ -139,13 +148,34 @@ code {
 
 .checksums-section summary {
   cursor: pointer;
+
+  font-size: 15px;
   font-weight: 600;
+
+  color: #333;
+
+  list-style: none;
 
   user-select: none;
 }
 
 .checksums-section summary:hover {
   color: var(--fluvel-accent);
+}
+
+.checksums-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.checksums-section summary::before {
+  content: "+";
+  margin-right: 8px;
+
+  color: var(--fluvel-accent);
+}
+
+.checksums-section[open] summary::before {
+  content: "−";
 }
 
 .copy-line {
@@ -160,11 +190,17 @@ code {
 }
 
 .copy-line span {
-  font-family: monospace;
-  background: #f3f3f5;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
 
-  padding: 4px 8px;
-  border-radius: 6px;
+  padding: 2px 4px;
+
+  border-radius: 4px;
 
   overflow-x: auto;
 }
