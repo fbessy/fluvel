@@ -1,0 +1,22 @@
+{
+  "version": "dev-44b3d39",
+  "branch": "release",
+  "commit": "44b3d39",
+  "date": "2099-12-25T08:52:37Z",
+
+  "windows": {
+    "installer": "https://example.com/fluvel-setup.exe",
+    "portable": "https://example.com/fluvel-portable.zip"
+  },
+
+  "linux": {
+    "flatpak": "https://example.com/fluvel.flatpak",
+    "appimage": "https://example.com/fluvel.AppImage"
+  },
+
+  "macos": {
+    "dmg": "https://example.com/fluvel.dmg"
+  },
+
+  "checksums": "8f3c4f8c5b9d7e2a7c4d8f6e2a9b4f1a3e7d9c6b2a1f5d4c8e7b9a1d3f6c2 fluvel-linux.AppImage\n7b2f4d8c1e9a6f3c5d7e2a1b4c9f8d6e3a7b1c5d9e2f4a6c8b3d7e1f5a9c2 fluvel-setup.exe\n3c8f1d7a5b9e2f4c6d1a7b3e9f5c2d8a4b6e1f7c9d3a5b2e8f4c6d1a7b9e3 fluvel-macos.dmg"
+}
