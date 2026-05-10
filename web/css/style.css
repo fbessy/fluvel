@@ -133,19 +133,42 @@ code {
 
 /* ===== CHECKSUM ===== */
 
+.checksums-section {
+  margin-top: 35px;
+}
+
 .copy-line {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 10px;
+
+  margin-bottom: 10px;
+
+  font-size: 13px;
+  color: #555;
+}
+
+.copy-line span {
   font-family: monospace;
+  background: #f3f3f5;
+
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  overflow-x: auto;
 }
 
 .copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border: 1px solid #ccc;
   background: #f5f5f5;
   cursor: pointer;
+
   padding: 4px;
+
   border-radius: 4px;
 }
 
@@ -156,6 +179,9 @@ code {
 .copy-btn svg {
   width: 16px;
   height: 16px;
+
+  display: block;
+
   fill: #555;
 }
 

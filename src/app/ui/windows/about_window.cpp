@@ -26,7 +26,7 @@ namespace fluvel_app
 namespace
 {
 
-constexpr auto kProjectUrl = "https://github.com/fbessy/fluvel";
+constexpr auto kProjectUrl = "https://fbessy.github.io/fluvel/";
 
 QString buildVersionString()
 {

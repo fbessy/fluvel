@@ -47,12 +47,19 @@ function highlightPlatform() {
 // ===== LINKS =====
 function setLink(id, url) {
   const el = document.getElementById(id);
+
   if (!url) {
     el.style.display = "none";
     return false;
   }
-  el.href = url;
-  el.target = "_blank";
+
+  el.href = "#";
+
+  el.onclick = (e) => {
+    e.preventDefault();
+    window.open(url, "_blank");
+  };
+
   return true;
 }
 
