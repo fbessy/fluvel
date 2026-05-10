@@ -137,6 +137,17 @@ code {
   margin-top: 35px;
 }
 
+.checksums-section summary {
+  cursor: pointer;
+  font-weight: 600;
+
+  user-select: none;
+}
+
+.checksums-section summary:hover {
+  color: var(--fluvel-accent);
+}
+
 .copy-line {
   display: flex;
   align-items: center;
