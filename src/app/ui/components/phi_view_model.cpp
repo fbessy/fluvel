@@ -14,12 +14,12 @@ namespace fluvel_app
 {
 
 // phi colors (Lout and Lin)
-const QColor kOutColor(64, 0, 255);
-const QColor kInColor(0, 230, 118);
+const QColor kOutColor{64, 0, 255};
+const QColor kInColor{0, 230, 118};
 
 // phi (Lout and Lin colors) in interactive mode
-const QColor kInteractiveOuterColor(32, 0, 128);
-const QColor kInteractiveInnerColor(0, 115, 59);
+const QColor kInteractiveOuterColor{32, 0, 128};
+const QColor kInteractiveInnerColor{0, 115, 59};
 
 // overlay colors (user interaction)
 const QColor kOverlayMainColor{kInColor};

@@ -1,28 +1,75 @@
 #!/usr/bin/env bash
 
-set -e
+set -Eeuo pipefail
 
-# Root du projet
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+SPHINX_SOURCE="$PROJECT_ROOT/docs/sphinx/source"
+SPHINX_BUILD="$PROJECT_ROOT/docs/sphinx/build"
+
+DOXYGEN_XML_DIR="$PROJECT_ROOT/docs/xml"
 
 cd "$PROJECT_ROOT"
 
-OUTPUT_DIR="docs/html"
+echo "🧹 Cleaning previous build..."
 
-echo "🧹 Cleaning previous documentation..."
+rm -rf "$SPHINX_BUILD"
+rm -rf "$PROJECT_ROOT/docs/xml"
 
-# Sécurité : éviter rm sur chemin vide
-if [[ -n "$OUTPUT_DIR" && -d "$OUTPUT_DIR" ]]; then
-    rm -rf "$OUTPUT_DIR"
+echo "📦 Preparing Sphinx assets..."
+
+mkdir -p "$SPHINX_SOURCE/_static"
+
+if [ -d "$PROJECT_ROOT/docs/images" ]; then
+    cp -r "$PROJECT_ROOT/docs/images/"* \
+          "$SPHINX_SOURCE/_static/" || true
 fi
 
-echo "📘 Generating Doxygen documentation..."
+echo "📝 Preparing README for Sphinx..."
 
-doxygen Doxyfile
+cp "$PROJECT_ROOT/README.md" \
+   "$SPHINX_SOURCE/README.md"
 
-echo "🌐 Opening documentation..."
+sed -i \
+'s|docs/images/|_static/|g' \
+"$SPHINX_SOURCE/README.md"
 
-xdg-open docs/html/index.html > /dev/null 2>&1 || true
+echo "🐍 Activating Python virtual environment..."
 
-echo "✅ Done"
+source "$PROJECT_ROOT/.venv/bin/activate"
+
+echo "📚 Checking Python dependencies..."
+
+python -m pip install --quiet --upgrade pip
+
+python -m pip install \
+    sphinx==7.4.7 \
+    pydata-sphinx-theme==0.15.4 \
+    breathe==4.36.0 \
+    myst-parser==3.0.1 \
+    sphinx-design==0.6.1 \
+    docutils==0.21.2
+
+echo "📘 Generating Doxygen XML..."
+
+doxygen "$PROJECT_ROOT/docs/doxygen/Doxyfile"
+
+if [ ! -d "$DOXYGEN_XML_DIR" ]; then
+    echo "❌ Doxygen XML output not found."
+    exit 1
+fi
+
+echo "🌐 Building Sphinx documentation..."
+
+sphinx-build \
+    -E \
+    -a \
+    -b html \
+    "$SPHINX_SOURCE" \
+    "$SPHINX_BUILD"
+
+echo "🚀 Opening documentation..."
+
+xdg-open "$SPHINX_BUILD/index.html" > /dev/null 2>&1 || true
+
+echo "✅ Documentation build completed successfully."

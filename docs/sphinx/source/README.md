@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="fluvel.svg" width="200">
+  <img src="_static/fluvel.svg" width="200">
 </p>
 
 <h1 align="center">Fluvel</h1>
@@ -55,9 +55,11 @@ You can also generate the documentation locally using Doxygen.
 
 ---
 
+<!--
 ## 📸 Screenshot
 
 ![Fluvel UI](web/images/screenshot.png)
+-->
 
 ---
 

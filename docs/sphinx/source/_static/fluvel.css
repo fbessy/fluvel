@@ -1,0 +1,212 @@
+/* ========================================================= */
+/* FLUVEL THEME                                               */
+/* Minimal PyData customization                               */
+/* ========================================================= */
+
+/* ========================================================= */
+/* LIGHT MODE                                                 */
+/* ========================================================= */
+
+html[data-theme="light"] {
+  /* ===== FLUVEL PALETTE ===== */
+
+  --fluvel-primary: #5f52d9;
+  --fluvel-primary-soft: #8d84e8;
+
+  --fluvel-secondary: #34c759;
+
+  /* ===== MAIN COLORS ===== */
+
+  --pst-color-primary:
+  var(--fluvel-primary);
+
+  --pst-color-secondary:
+  var(--fluvel-primary-soft);
+
+  --pst-color-accent:
+  var(--fluvel-primary);
+
+  /* ===== LINKS ===== */
+
+  --pst-color-link:
+  var(--fluvel-primary);
+
+  --pst-color-link-hover:
+  var(--fluvel-primary-soft);
+
+  /* ===== SEMANTIC COLORS ===== */
+
+  --pst-color-info:
+  var(--fluvel-primary);
+
+  --pst-color-warning:
+  var(--fluvel-primary);
+
+  --pst-color-danger:
+  var(--fluvel-primary);
+
+  --pst-color-attention:
+  var(--fluvel-primary);
+
+  --pst-color-success:
+  var(--fluvel-secondary);
+
+  /* ===== BACKGROUNDS ===== */
+
+  --pst-color-warning-bg:
+  rgba(95, 82, 217, 0.10);
+
+  --pst-color-attention-bg:
+  rgba(95, 82, 217, 0.10);
+
+  --pst-color-target:
+  rgba(95, 82, 217, 0.16);
+
+  --pst-color-table-row-hover-bg:
+  rgba(95, 82, 217, 0.06);
+
+  /* ===== INLINE CODE ===== */
+
+  --pst-color-inline-code:
+  var(--fluvel-primary);
+
+  /* ===== ACTIVE NAVIGATION ===== */
+
+  --pst-color-active-navigation:
+  var(--fluvel-primary);
+}
+
+/* ========================================================= */
+/* DARK MODE                                                  */
+/* ========================================================= */
+
+html[data-theme="dark"] {
+  /* ===== FLUVEL PALETTE ===== */
+
+  --fluvel-primary: #9f8cff;
+  --fluvel-primary-soft: #c2b5ff;
+
+  --fluvel-secondary: #46f0a9;
+
+  /* ===== MAIN COLORS ===== */
+
+  --pst-color-primary:
+  var(--fluvel-primary);
+
+  --pst-color-secondary:
+  var(--fluvel-primary-soft);
+
+  --pst-color-accent:
+  var(--fluvel-primary);
+
+  /* ===== LINKS ===== */
+
+  --pst-color-link:
+  var(--fluvel-primary);
+
+  --pst-color-link-hover:
+  var(--fluvel-primary-soft);
+
+  /* ===== SEMANTIC COLORS ===== */
+
+  --pst-color-info:
+  var(--fluvel-primary);
+
+  --pst-color-warning:
+  var(--fluvel-primary);
+
+  --pst-color-danger:
+  var(--fluvel-primary);
+
+  --pst-color-attention:
+  var(--fluvel-primary);
+
+  --pst-color-success:
+  var(--fluvel-secondary);
+
+  /* ===== BACKGROUNDS ===== */
+
+  --pst-color-warning-bg:
+  rgba(159, 140, 255, 0.16);
+
+  --pst-color-attention-bg:
+  rgba(159, 140, 255, 0.16);
+
+  --pst-color-target:
+  rgba(159, 140, 255, 0.20);
+
+  --pst-color-table-row-hover-bg:
+  rgba(159, 140, 255, 0.08);
+
+  /* ===== INLINE CODE ===== */
+
+  --pst-color-inline-code:
+  var(--fluvel-primary);
+
+  /* ===== ACTIVE NAVIGATION ===== */
+
+  --pst-color-active-navigation:
+  var(--fluvel-primary);
+}
+
+/* ========================================================= */
+/* TYPOGRAPHY                                                 */
+/* ========================================================= */
+
+html {
+  font-size: 115%;
+}
+
+body {
+  font-family:
+  -apple-system,
+  BlinkMacSystemFont,
+  "Segoe UI",
+  Inter,
+  sans-serif;
+
+  line-height: 1.65;
+}
+
+/* ========================================================= */
+/* HEADINGS                                                   */
+/* ========================================================= */
+
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.02em;
+}
+
+/* ========================================================= */
+/* CONTENT                                                    */
+/* ========================================================= */
+
+.bd-main .bd-content .bd-article-container {
+  padding-top: 1.5rem;
+}
+
+/* ========================================================= */
+/* CODE BLOCKS                                                */
+/* ========================================================= */
+
+pre,
+.highlight,
+.admonition,
+dl.cpp {
+  border-radius: 14px;
+}
+
+/* ========================================================= */
+/* TEXT SELECTION                                             */
+/* ========================================================= */
+
+::selection {
+  background:
+  rgba(52, 199, 89, 0.22);
+}
+
+.bd-content img[src$=".svg"] {
+  background: transparent !important;
+}

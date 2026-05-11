@@ -55,9 +55,11 @@ You can also generate the documentation locally using Doxygen.
 
 ---
 
+<!--
 ## 📸 Screenshot
 
 ![Fluvel UI](web/images/screenshot.png)
+-->
 
 ---
 
