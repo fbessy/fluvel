@@ -5,6 +5,7 @@ stages:
 # =========================
 # DOCUMENTATION
 # =========================
+
 .doc_rules: &doc_rules
   rules:
     - if: '$CI_COMMIT_TAG'
@@ -13,16 +14,89 @@ stages:
 doc:
   stage: doc
   image: ubuntu:24.04
+
   <<: *doc_rules
 
   before_script:
     - apt update -y
-    - apt install -y doxygen graphviz
+
+    - apt install -y
+        python3
+        python3-pip
+        python3-venv
+        doxygen
+        graphviz
 
   script:
-    - doxygen Doxyfile
-    - mkdir -p public
-    - mv docs/html/* public/
+
+    # -------------------------
+    # Python virtual environment
+    # -------------------------
+
+    - python3 -m venv .venv
+
+    - source .venv/bin/activate
+
+    # -------------------------
+    # Python dependencies
+    # -------------------------
+
+    - pip install --upgrade pip
+
+    - pip install
+        sphinx==7.4.7
+        pydata-sphinx-theme==0.15.4
+        breathe==4.36.0
+        myst-parser==3.0.1
+        sphinx-design==0.6.1
+        docutils==0.21.2
+
+    # -------------------------
+    # Clean previous build
+    # -------------------------
+
+    - rm -rf docs/sphinx/build
+    - rm -rf docs/xml
+
+    # -------------------------
+    # Prepare assets
+    # -------------------------
+
+    - mkdir -p docs/sphinx/source/_static
+
+    - |
+      if [ -d docs/images ]; then
+        cp -r docs/images/* docs/sphinx/source/_static/ || true
+      fi
+
+    # -------------------------
+    # Prepare README
+    # -------------------------
+
+    - cp README.md docs/sphinx/source/README.md
+
+    - |
+      sed -i \
+      's|docs/images/|_static/|g' \
+      docs/sphinx/source/README.md
+
+    # -------------------------
+    # Generate Doxygen XML/HTML
+    # -------------------------
+
+    - doxygen docs/doxygen/Doxyfile
+
+    # -------------------------
+    # Build Sphinx HTML
+    # -------------------------
+
+    - |
+      sphinx-build \
+        -E \
+        -a \
+        -b html \
+        docs/sphinx/source \
+        public
 
   artifacts:
     paths:
@@ -31,10 +105,13 @@ doc:
 # =========================
 # GITLAB PAGES
 # =========================
+
 pages:
   stage: pages
+
   dependencies:
     - doc
+
   <<: *doc_rules
 
   script:
