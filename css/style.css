@@ -318,3 +318,13 @@ code {
   font-size: 13px;
   color: #888;
 }
+
+::selection {
+  background: #34c75938;
+  color: inherit;
+}
+
+::-moz-selection {
+  background: #34c75938;
+  color: #111;
+}
