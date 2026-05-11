@@ -1,4 +1,4 @@
-<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
 
 <defs>
 
@@ -8,8 +8,8 @@
 </linearGradient>
 
 <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#5cf5b0"/>
-    <stop offset="100%" stop-color="#3be694"/>
+    <stop offset="0%" stop-color="#57e6a8"/>
+    <stop offset="100%" stop-color="#34c759"/>
 </linearGradient>
 
 <!-- pixel violet -->
@@ -29,7 +29,8 @@
 </defs>
 
 <!-- F pixel -->
-<g transform="translate(6,0)">
+<g transform="scale(21.3333333333)">
+    <g transform="translate(6,0)">
 
 <!-- ligne 1 -->
 <use href="#pv" x="0" y="0"></use>
@@ -75,6 +76,7 @@
 <use href="#pv" x="0" y="42"></use>
 <use href="#pv" x="6" y="42"></use>
 
+</g>
 </g>
 
 </svg>

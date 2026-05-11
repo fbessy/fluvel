@@ -8,8 +8,8 @@
 </linearGradient>
 
 <linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#5cf5b0"/>
-    <stop offset="100%" stop-color="#3be694"/>
+    <stop offset="0%" stop-color="#57e6a8"/>
+    <stop offset="100%" stop-color="#34c759"/>
 </linearGradient>
 
 <!-- pixel violet -->

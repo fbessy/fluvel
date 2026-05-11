@@ -381,3 +381,49 @@ h2.memtitle::after {
 #nav-sync {
   display: none !important;
 }
+
+
+
+
+
+
+
+
+
+
+#side-nav {
+  background: white !important;
+
+  border-radius: 18px;
+
+  margin: 14px;
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.05);
+
+  border: 1px solid #ececf1;
+
+  overflow: hidden;
+}
+
+#nav-tree {
+  padding: 10px;
+}
+
+#side-nav {
+  top: 12px !important;
+  bottom: 12px !important;
+  left: 12px !important;
+}
+
+
+
+::selection {
+  background: #34c75938;
+  color: inherit;
+}
+
+::-moz-selection {
+  background: #34c75938;
+  color: #111;
+}

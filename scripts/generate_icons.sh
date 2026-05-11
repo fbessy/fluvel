@@ -20,6 +20,9 @@ MAC_DIR="$PACKAGING_DIR/macos"
 LINUX_DIR="$PACKAGING_DIR/linux"
 ANDROID_RES="$PACKAGING_DIR/android/res"
 
+DOC_DIR="$ROOT_DIR/docs/images"
+PAGE_DIR="$ROOT_DIR/web"
+
 TMP="$ROOT_DIR/.icon_tmp"
 
 # =========================
@@ -110,6 +113,8 @@ magick "$TMP/master.png" \
     -define icon:auto-resize=256,128,64,48,32,16 \
     "$WIN_DIR/Fluvel.ico"
 
+cp "$WIN_DIR/Fluvel.ico" "$ROOT_DIR/resources/platforms/windows/Fluvel.ico"
+
 # =========================
 # macOS ICNS
 # =========================
@@ -146,6 +151,15 @@ rsvg-convert -w 72  -h 72  "$SRC" > "$ANDROID_RES/mipmap-hdpi/fluvel.png"
 rsvg-convert -w 96  -h 96  "$SRC" > "$ANDROID_RES/mipmap-xhdpi/fluvel.png"
 rsvg-convert -w 144 -h 144 "$SRC" > "$ANDROID_RES/mipmap-xxhdpi/fluvel.png"
 rsvg-convert -w 192 -h 192 "$SRC" > "$ANDROID_RES/mipmap-xxxhdpi/fluvel.png"
+
+# =======================================
+# Icon for homage page and documentation
+# =======================================
+cp "$SRC" \
+   "$DOC_DIR/fluvel.svg"
+
+cp "$SRC" \
+   "$PAGE_DIR/fluvel.svg"
 
 # =========================
 # Cleanup
