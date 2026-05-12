@@ -11,6 +11,9 @@ copyright = '2026, Fabien Bessy'
 author = 'Fabien Bessy'
 release = '0.1'
 
+html_show_sphinx = False
+html_show_copyright = False
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
