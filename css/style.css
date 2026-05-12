@@ -1,7 +1,11 @@
 :root {
-  --fluvel-accent: #6b6fcf;
-  --fluvel-accent-hover: #7a7fe0;
-  --fluvel-accent-soft: #f4f5ff;
+  --fluvel-primary: #6b6fcf;
+  --fluvel-primary-soft: #7a7fe0;
+
+  --fluvel-secondary: #4fc98a;
+  --fluvel-secondary-soft: #34c75938;
+
+  --fluvel-soft: #f4f5ff;
 }
 
 .title img {
@@ -68,14 +72,14 @@ body {
 /* ===== HIGHLIGHT ===== */
 
 .platform.highlight {
-  border: 2px solid var(--fluvel-accent);
+  border: 2px solid var(--fluvel-primary);
   padding: 10px;
   border-radius: 8px;
-  background: var(--fluvel-accent-soft);
+  background: var(--fluvel-soft);
 }
 
 .platform.highlight h3 {
-  color: var(--fluvel-accent);
+  color: var(--fluvel-primary);
 }
 
 .platform-title {
@@ -96,7 +100,7 @@ body {
   margin-left: 8px;
   padding: 2px 6px;
   border-radius: 4px;
-  background: var(--fluvel-accent);
+  background: var(--fluvel-primary);
   color: white;
 }
 
@@ -106,7 +110,7 @@ a.button {
   display: inline-block;
   padding: 10px 15px;
   margin: 5px 5px 5px 0;
-  background: var(--fluvel-accent);
+  background: var(--fluvel-primary);
   color: white;
   text-decoration: none;
   border-radius: 10px;
@@ -120,7 +124,7 @@ a.button {
 a.button:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(74, 44, 255, 0.25);
-  background: var(--fluvel-accent-hover);
+  background: var(--fluvel-primary-soft);
 }
 
 code {
@@ -137,7 +141,7 @@ code {
   font-size: 13px;
   font-weight: 600;
 
-  color: var(--fluvel-accent);
+  color: var(--fluvel-primary);
 }
 
 /* ===== CHECKSUM ===== */
@@ -160,7 +164,7 @@ code {
 }
 
 .checksums-section summary:hover {
-  color: var(--fluvel-accent);
+  color: var(--fluvel-primary);
 }
 
 .checksums-section summary::-webkit-details-marker {
@@ -171,7 +175,7 @@ code {
   content: "+";
   margin-right: 8px;
 
-  color: var(--fluvel-accent);
+  color: var(--fluvel-primary);
 }
 
 .checksums-section[open] summary::before {
@@ -252,11 +256,11 @@ code {
 }
 
 .copy-btn.copied {
-  border-color: #4fc98a;
+  border-color: var(--fluvel-secondary);
 }
 
 .copy-btn.copied svg {
-  fill: #4fc98a;
+  fill: var(--fluvel-secondary);
 }
 
 .meta {
@@ -296,7 +300,7 @@ code {
 }
 
 .about-links a {
-  color: var(--fluvel-accent);
+  color: var(--fluvel-primary);
   text-decoration: none;
   font-weight: 600;
 
@@ -306,7 +310,7 @@ code {
 }
 
 .about-links a:hover {
-  color: var(--fluvel-accent-hover);
+  color: var(--fluvel-primary-soft);
   text-decoration: underline;
 }
 
@@ -320,11 +324,11 @@ code {
 }
 
 ::selection {
-  background: #34c75938;
+  background: var(--fluvel-secondary-soft);
   color: inherit;
 }
 
 ::-moz-selection {
-  background: #34c75938;
+  background: var(--fluvel-secondary-soft);
   color: #111;
 }

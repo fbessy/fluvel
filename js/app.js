@@ -10,7 +10,11 @@ function copyIcon() {
 function checkIcon() {
   return `
   <svg viewBox="0 0 24 24">
-    <path d="M9.2 16.2 4.8 11.8l-1.4 1.4 5.8 5.8 11-11-1.4-1.4z"/>
+    <path
+      d="M9.2 16.2 4.8 11.8l-1.4 1.4 5.8 5.8 11-11-1.4-1.4z"
+      transform="scale(1.08)"
+      transform-origin="center"
+    />
   </svg>`;
 }
 
