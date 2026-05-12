@@ -55,8 +55,8 @@ doc:
     # Clean previous build
     # -------------------------
 
-    - rm -rf docs/sphinx/build
     - rm -rf docs/xml
+    - rm -rf public
 
     # -------------------------
     # Prepare assets
