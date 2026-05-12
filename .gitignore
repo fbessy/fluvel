@@ -78,9 +78,11 @@ Thumbs.db
 *.swp
 *.swo
 
-# Doxygen generated files
+# Doxygen/Sphinx generated files
 docs/html/
+docs/xml/
 docs/latex/
+docs/sphinx/build/
 
 # AddressSanitizer log files
 tools/asan_log.*
