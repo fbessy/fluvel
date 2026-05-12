@@ -1,6 +1,7 @@
 /* ========================================================= */
 /* FLUVEL THEME                                               */
-/* Minimal PyData customization                               */
+/* Minimal Modern PyData customization                        */
+/* Inspired by Fluvel download page                           */
 /* ========================================================= */
 
 /* ========================================================= */
@@ -8,72 +9,130 @@
 /* ========================================================= */
 
 html[data-theme="light"] {
+
   /* ===== FLUVEL PALETTE ===== */
 
-  --fluvel-primary: #5f52d9;
-  --fluvel-primary-soft: #8d84e8;
+  --fluvel-primary:
+    #6b6fcf;
 
-  --fluvel-secondary: #34c759;
+  --fluvel-primary-soft:
+    #7a7fe0;
+
+  --fluvel-secondary:
+    #4fc98a;
+
+  --fluvel-secondary-soft:
+    #34c75938;
 
   /* ===== MAIN COLORS ===== */
 
   --pst-color-primary:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-secondary:
-  var(--fluvel-primary-soft);
+    var(--fluvel-primary-soft);
 
   --pst-color-accent:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   /* ===== LINKS ===== */
 
   --pst-color-link:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-link-hover:
-  var(--fluvel-primary-soft);
+    var(--fluvel-primary-soft);
+
+  /* ===== TEXT ===== */
+
+  --pst-color-text-base:
+    #1d1d1f;
+
+  --pst-color-text-muted:
+    #5c5c66;
+
+  /* ===== BACKGROUNDS ===== */
+
+  --pst-color-background:
+    #f5f5f7;
+
+  --pst-color-surface:
+    #ffffff;
+
+  /* ===== BORDERS ===== */
+
+  --pst-color-border:
+    #e5e5e5;
 
   /* ===== SEMANTIC COLORS ===== */
 
   --pst-color-info:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-warning:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-danger:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-attention:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-success:
-  var(--fluvel-secondary);
+    var(--fluvel-secondary);
 
-  /* ===== BACKGROUNDS ===== */
+  /* ===== SEMANTIC BACKGROUNDS ===== */
 
   --pst-color-warning-bg:
-  rgba(95, 82, 217, 0.10);
+    rgba(107, 111, 207, 0.10);
 
   --pst-color-attention-bg:
-  rgba(95, 82, 217, 0.10);
+    rgba(107, 111, 207, 0.10);
 
   --pst-color-target:
-  rgba(95, 82, 217, 0.16);
+    rgba(107, 111, 207, 0.16);
 
   --pst-color-table-row-hover-bg:
-  rgba(95, 82, 217, 0.06);
+    rgba(107, 111, 207, 0.06);
 
   /* ===== INLINE CODE ===== */
 
   --pst-color-inline-code:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
+
+  --pst-color-inline-code-links:
+    var(--fluvel-primary);
 
   /* ===== ACTIVE NAVIGATION ===== */
 
   --pst-color-active-navigation:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
+
+  --pst-color-navbar-link:
+    var(--fluvel-primary);
+
+  --pst-color-navbar-link-hover:
+    var(--fluvel-primary-soft);
+
+  /* ===== BOOTSTRAP OVERRIDES ===== */
+
+  --bs-primary:
+    var(--fluvel-primary);
+
+  --bs-secondary:
+    var(--fluvel-primary);
+
+  --bs-link-color:
+    var(--fluvel-primary);
+
+  --bs-link-hover-color:
+    var(--fluvel-primary-soft);
+
+  --bs-emphasis-color:
+    var(--pst-color-text-base);
+
+  --bs-primary-rgb:
+    107, 111, 207;
 }
 
 /* ========================================================= */
@@ -81,72 +140,81 @@ html[data-theme="light"] {
 /* ========================================================= */
 
 html[data-theme="dark"] {
-  /* ===== FLUVEL PALETTE ===== */
 
-  --fluvel-primary: #9f8cff;
-  --fluvel-primary-soft: #c2b5ff;
+  --fluvel-primary:
+    #9f8cff;
 
-  --fluvel-secondary: #46f0a9;
+  --fluvel-primary-soft:
+    #c2b5ff;
 
-  /* ===== MAIN COLORS ===== */
+  --fluvel-secondary:
+    #46f0a9;
+
+  --fluvel-secondary-soft:
+    rgba(70, 240, 169, 0.18);
 
   --pst-color-primary:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-secondary:
-  var(--fluvel-primary-soft);
+    var(--fluvel-primary-soft);
 
   --pst-color-accent:
-  var(--fluvel-primary);
-
-  /* ===== LINKS ===== */
+    var(--fluvel-primary);
 
   --pst-color-link:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
   --pst-color-link-hover:
-  var(--fluvel-primary-soft);
+    var(--fluvel-primary-soft);
 
-  /* ===== SEMANTIC COLORS ===== */
+  --pst-color-text-base:
+    #f5f5f7;
 
-  --pst-color-info:
-  var(--fluvel-primary);
+  --pst-color-text-muted:
+    #b8b8c2;
 
-  --pst-color-warning:
-  var(--fluvel-primary);
+  --pst-color-background:
+    #111114;
 
-  --pst-color-danger:
-  var(--fluvel-primary);
+  --pst-color-surface:
+    #18181c;
 
-  --pst-color-attention:
-  var(--fluvel-primary);
-
-  --pst-color-success:
-  var(--fluvel-secondary);
-
-  /* ===== BACKGROUNDS ===== */
-
-  --pst-color-warning-bg:
-  rgba(159, 140, 255, 0.16);
-
-  --pst-color-attention-bg:
-  rgba(159, 140, 255, 0.16);
-
-  --pst-color-target:
-  rgba(159, 140, 255, 0.20);
-
-  --pst-color-table-row-hover-bg:
-  rgba(159, 140, 255, 0.08);
-
-  /* ===== INLINE CODE ===== */
+  --pst-color-border:
+    rgba(255, 255, 255, 0.06);
 
   --pst-color-inline-code:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
 
-  /* ===== ACTIVE NAVIGATION ===== */
+  --pst-color-inline-code-links:
+    var(--fluvel-primary);
 
   --pst-color-active-navigation:
-  var(--fluvel-primary);
+    var(--fluvel-primary);
+
+  --pst-color-navbar-link:
+    var(--fluvel-primary);
+
+  --pst-color-navbar-link-hover:
+    var(--fluvel-primary-soft);
+
+  --bs-primary:
+    var(--fluvel-primary);
+
+  --bs-secondary:
+    var(--fluvel-primary);
+
+  --bs-link-color:
+    var(--fluvel-primary);
+
+  --bs-link-hover-color:
+    var(--fluvel-primary-soft);
+
+  --bs-emphasis-color:
+    var(--pst-color-text-base);
+
+  --bs-primary-rgb:
+    159, 140, 255;
 }
 
 /* ========================================================= */
@@ -154,18 +222,26 @@ html[data-theme="dark"] {
 /* ========================================================= */
 
 html {
-  font-size: 115%;
+
+  font-size:
+    115%;
 }
 
 body {
-  font-family:
-  -apple-system,
-  BlinkMacSystemFont,
-  "Segoe UI",
-  Inter,
-  sans-serif;
 
-  line-height: 1.65;
+  font-family:
+    Arial,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Inter,
+    sans-serif;
+
+  line-height:
+    1.65;
+
+  background:
+    var(--pst-color-background);
 }
 
 /* ========================================================= */
@@ -176,37 +252,313 @@ h1,
 h2,
 h3,
 h4 {
-  letter-spacing: -0.02em;
+
+  letter-spacing:
+    -0.02em;
 }
 
 /* ========================================================= */
-/* CONTENT                                                    */
+/* GLOBAL SURFACE                                             */
 /* ========================================================= */
 
-.bd-main .bd-content .bd-article-container {
-  padding-top: 1.5rem;
+.bd-page,
+.bd-container,
+.bd-main,
+.bd-content,
+.bd-content .bd-article-container {
+
+  background:
+    transparent;
 }
 
 /* ========================================================= */
-/* CODE BLOCKS                                                */
+/* HEADER                                                     */
+/* ========================================================= */
+
+.bd-header {
+
+  background:
+    rgba(255, 255, 255, 0.82) !important;
+
+  border-bottom:
+    1px solid #e5e5e5;
+
+  backdrop-filter:
+    blur(10px);
+
+  box-shadow:
+    none !important;
+}
+
+html[data-theme="dark"] .bd-header {
+
+  background:
+    rgba(24, 24, 28, 0.92) !important;
+
+  border-bottom:
+    1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ========================================================= */
+/* HEADER LINKS                                               */
+/* ========================================================= */
+
+.bd-header a,
+.navbar-nav a {
+
+  color:
+    var(--fluvel-primary) !important;
+}
+
+/* ========================================================= */
+/* SEARCH BAR                                                 */
+/* ========================================================= */
+
+.bd-search .form-control {
+
+  background:
+    #ffffff;
+
+  border:
+    1px solid #e5e5e5;
+
+  border-radius:
+    12px;
+
+  box-shadow:
+    none;
+}
+
+.bd-search .form-control:focus {
+
+  border-color:
+    var(--fluvel-primary);
+
+  box-shadow:
+    0 0 0 3px rgba(107, 111, 207, 0.10);
+}
+
+html[data-theme="dark"] .bd-search .form-control {
+
+  background:
+    #1e1e22;
+
+  border:
+    1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ========================================================= */
+/* ARTICLE                                                    */
+/* ========================================================= */
+
+article.bd-article {
+
+  background:
+    transparent;
+
+  border:
+    none;
+
+  border-radius:
+    0;
+
+  padding:
+    2.75rem;
+
+  margin-bottom:
+    2rem;
+
+  box-shadow:
+    none;
+}
+
+/* ========================================================= */
+/* SIDEBARS                                                   */
+/* ========================================================= */
+
+.bd-sidebar-primary,
+.bd-sidebar-secondary {
+
+  background:
+    transparent;
+
+  border:
+    none;
+
+  box-shadow:
+    none;
+}
+
+html[data-theme="dark"] .bd-sidebar-primary,
+html[data-theme="dark"] .bd-sidebar-secondary {
+
+  background:
+    transparent;
+
+  border:
+    none;
+}
+
+/* ========================================================= */
+/* CODE / API / ADMONITIONS                                  */
 /* ========================================================= */
 
 pre,
-.highlight,
+.highlight {
+
+  background:
+    #ececf1;
+
+  border:
+    none;
+
+  border-radius:
+    12px;
+
+  box-shadow:
+    none;
+}
+
+html[data-theme="dark"] pre,
+html[data-theme="dark"] .highlight {
+
+  background:
+    rgba(255, 255, 255, 0.04);
+}
+
 .admonition,
 dl.cpp {
-  border-radius: 14px;
+
+  background:
+    transparent;
+
+  border:
+    none;
+
+  box-shadow:
+    none;
 }
 
 /* ========================================================= */
-/* TEXT SELECTION                                             */
+/* FLAT NAMESPACE BLOCKS                                     */
+/* ========================================================= */
+
+dl.cpp.namespace {
+
+  background:
+    transparent !important;
+
+  border:
+    none !important;
+
+  border-radius:
+    0 !important;
+
+  box-shadow:
+    none !important;
+
+  padding:
+    0 !important;
+}
+
+/* ========================================================= */
+/* TABLES                                                     */
+/* ========================================================= */
+
+table {
+
+  background:
+    transparent;
+
+  border-radius:
+    12px;
+
+  overflow:
+    hidden;
+}
+
+/* ========================================================= */
+/* NAVIGATION LINKS                                           */
+/* ========================================================= */
+
+.bd-sidebar a,
+.bd-toc-nav a,
+.reference.internal {
+
+  color:
+    var(--pst-color-link) !important;
+}
+
+.bd-sidebar a:hover,
+.bd-toc-nav a:hover,
+.reference.internal:hover {
+
+  color:
+    var(--pst-color-link-hover) !important;
+}
+
+/* ========================================================= */
+/* ACTIVE LINKS                                               */
+/* ========================================================= */
+
+.reference.internal.current,
+.current>.reference.internal,
+.active>.reference.internal {
+
+  color:
+    var(--fluvel-primary) !important;
+}
+
+/* ========================================================= */
+/* REMOVE REMAINING TEAL                                      */
+/* ========================================================= */
+
+.text-primary,
+.sd-text-primary {
+
+  color:
+    var(--fluvel-primary) !important;
+}
+
+.bg-primary,
+.sd-bg-primary,
+.btn-primary {
+
+  background-color:
+    var(--fluvel-primary) !important;
+
+  border-color:
+    var(--fluvel-primary) !important;
+}
+
+/* ========================================================= */
+/* SVG                                                        */
+/* ========================================================= */
+
+.bd-content img[src$=".svg"] {
+
+  background:
+    transparent !important;
+}
+
+/* ========================================================= */
+/* SELECTION                                                  */
 /* ========================================================= */
 
 ::selection {
+
   background:
-  rgba(52, 199, 89, 0.22);
+    var(--fluvel-secondary-soft);
+
+  color:
+    inherit;
 }
 
-.bd-content img[src$=".svg"] {
-  background: transparent !important;
+::-moz-selection {
+
+  background:
+    var(--fluvel-secondary-soft);
+
+  color:
+    inherit;
 }
