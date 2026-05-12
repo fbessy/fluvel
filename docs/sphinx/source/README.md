@@ -59,10 +59,9 @@ You can also generate the documentation locally using Doxygen.
 ## 📸 Screenshot
 
 ![Fluvel UI](web/images/screenshot.png)
--->
 
 ---
-
+-->
 ## 🧠 Overview
 
 Fluvel implements region-based active contour algorithms operating on  
