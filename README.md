@@ -1,80 +1,79 @@
 <p align="center">
-  <img src="docs/images/fluvel.svg" width="200">
+  <img src="docs/images/fluvel.svg" width="96">
 </p>
 
-<h1 align="center">Fluvel</h1>
+<h1 align="center" style="color:#6b6fcf;">
+  Fluvel
+</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/license-CeCILL--2.1-blue">
+  <strong>
+    Real-time image segmentation and active contour experimentation platform
+  </strong>
 </p>
 
 <p align="center">
-  Real-time image segmentation and active contour experimentation platform
+  Modern C++ framework for active contour algorithms,
+  real-time visualization and reproducible experimentation.
+</p>
+
+<p align="center">
+
+  <img src="https://img.shields.io/badge/license-CeCILL--2.1-6b6fcf">
+
+  <img src="https://img.shields.io/badge/C%2B%2B-20-6b6fcf">
+
+  <img src="https://img.shields.io/badge/Qt-6-4fc98a">
+
 </p>
 
 ---
 
-Fluvel is a research-oriented image segmentation application based on  
-region-based active contour (level-set) methods.
+## 🚀 Downloads
 
-It provides a modern C++ engine for fast experimentation, real-time visualization,  
-and reproducible algorithm evaluation.
+Latest builds and packages for all supported platforms:
 
-The project is currently under active development.
-
----
-
-## 🚀 Get Fluvel
-
-👉 **Latest builds (all platforms):**  
 https://fbessy.github.io/fluvel/
 
 ---
 
 ## 📚 Documentation
 
-👉 https://fabienip.gitlab.io/fluvel/
+https://fabienip.gitlab.io/fluvel/
 
-The online documentation corresponds to the latest development version  
-and is generated automatically from the source code.
+The online documentation is generated automatically from the source code
+and follows the latest development version.
 
-Documentation is versioned and tied to specific commits for reproducibility.
-
-You can also generate the documentation locally using Doxygen.
+Documentation is versioned and tied to specific commits
+for reproducibility and long-term experimentation.
 
 ---
 
 ## ✨ Features
 
-- Region-based active contour evolution  
-- Real-time image processing  
-- Video stream support  
-- Modular architecture for feature extensions  
-- Qt-based visualization interface  
-- Reproducible builds (CMake, Flatpak, AppImage)  
+- Region-based active contour evolution
+- Real-time image processing
+- Video stream support
+- Modular architecture for feature extensions
+- Qt-based visualization interface
+- Reproducible builds (CMake, Flatpak, AppImage)
 
 ---
 
-<!--
-## 📸 Screenshot
-
-![Fluvel UI](web/images/screenshot.png)
-
----
--->
 ## 🧠 Overview
 
-Fluvel implements region-based active contour algorithms operating on  
-row-major image buffers.
+Fluvel is a research-oriented image segmentation platform
+focused on region-based active contour methods.
 
-The project focuses on:
+The project emphasizes:
 
-- A clear and maintainable implementation of active contour models  
-- A modern C++ architecture  
-- Separation between processing engine and visualization layer  
-- Reusability as a standalone library  
+- Modern C++ architecture
+- Real-time experimentation
+- Separation between processing engine and UI
+- Reusable image processing components
+- Reproducible scientific workflows
 
-The processing core does not depend on Qt.  
+The processing core does not depend on Qt.
 Qt is used only for visualization and interaction.
 
 ---
@@ -83,20 +82,15 @@ Qt is used only for visualization and interaction.
 
 The project is organized into:
 
-- `src/` — Core engine and application code  
-- `docs/` — Documentation configuration (Doxygen)  
-- `CMakeLists.txt` — Build configuration  
-- `packaging/` — Packaging (Flatpak, AppImage, etc.)  
+- `src/` — Core engine and application code
+- `docs/` — Documentation configuration
+- `packaging/` — Flatpak, AppImage and distribution files
+- `CMakeLists.txt` — Build configuration
 
-The image processing engine operates on contiguous memory buffers.  
-Visualization and UI components are separated from the core algorithmic logic.
+Main modules:
 
----
-
-## 📦 Modules
-
-- **fluvel_app** — Application layer (UI and orchestration)  
-- **fluvel_ip** — Image processing engine (algorithms and data processing)  
+- **fluvel_app** — UI and orchestration
+- **fluvel_ip** — Image processing engine
 
 ---
 
@@ -104,11 +98,9 @@ Visualization and UI components are separated from the core algorithmic logic.
 
 ### Requirements
 
-- CMake ≥ 3.x  
-- Clang (recommended)  
-- Qt6 (for UI build)  
-
----
+- CMake ≥ 3.x
+- Clang (recommended)
+- Qt6 (for UI build)
 
 ### Build with CMake
 
@@ -122,13 +114,10 @@ cmake --build build
 
 ## 📜 License
 
-This project is licensed under the CeCILL 2.1 license (CEA CNRS INRIA).
+Fluvel is licensed under the CeCILL 2.1 license
+(CEA · CNRS · INRIA).
 
-CeCILL is a French free software license, compatible with the GNU GPL,  
-and commonly used in research and academic software.
+CeCILL is a French free software license compatible with the GNU GPL,
+widely used in research and academic software.
 
-It guarantees freedom to use, modify, and redistribute the software,  
-while preserving these freedoms in derivative works.
-
-See the LICENSE file included in this repository for full details:  
 https://cecill.info/licences/Licence_CeCILL_V2.1-en.html
