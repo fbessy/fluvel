@@ -29,23 +29,45 @@
 
 ---
 
+# Demo
+
+## Real-time tracking
+
+<video src="media/phone_tracking.webm"
+       controls
+       muted
+       width="900">
+</video>
+
+[Open video directly](media/phone_tracking.webm)
+
+## MRI contour evolution
+
+<video src="media/mri_segmentation.webm"
+       controls
+       muted
+       width="900">
+</video>
+
+[Open video directly](media/mri_segmentation.webm)
+
 ## 🚀 Downloads
 
 Latest builds and packages for all supported platforms:
 
-https://fbessy.github.io/fluvel/
+[Download page](https://fbessy.github.io/fluvel/)
 
 ---
 
 ## 📚 Documentation
-
-https://fabienip.gitlab.io/fluvel/
 
 The online documentation is generated automatically from the source code
 and follows the latest development version.
 
 Documentation is versioned and tied to specific commits
 for reproducibility and long-term experimentation.
+
+[Documentation site](https://fabienip.gitlab.io/fluvel/)
 
 ---
 
@@ -120,4 +142,4 @@ Fluvel is licensed under the CeCILL 2.1 license
 CeCILL is a French free software license compatible with the GNU GPL,
 widely used in research and academic software.
 
-https://cecill.info/licences/Licence_CeCILL_V2.1-en.html
+[CeCILL 2.1 License](https://cecill.info/licences/Licence_CeCILL_V2.1-en.html)
