@@ -158,8 +158,14 @@ rsvg-convert -w 192 -h 192 "$SRC" > "$ANDROID_RES/mipmap-xxxhdpi/fluvel.png"
 cp "$SRC" \
    "$DOC_DIR/fluvel.svg"
 
+cp "$WIN_DIR/Fluvel.ico" \
+   "$DOC_DIR/favicon.ico"
+
 cp "$SRC" \
    "$PAGE_DIR/fluvel.svg"
+
+cp "$WIN_DIR/Fluvel.ico" \
+   "$PAGE_DIR/favicon.ico"
 
 # =========================
 # Cleanup
