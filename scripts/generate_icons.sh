@@ -20,7 +20,7 @@ MAC_DIR="$PACKAGING_DIR/macos"
 LINUX_DIR="$PACKAGING_DIR/linux"
 ANDROID_RES="$PACKAGING_DIR/android/res"
 
-DOC_DIR="$ROOT_DIR/docs/images"
+DOC_DIR="$ROOT_DIR/docs/sphinx/source/_static"
 PAGE_DIR="$ROOT_DIR/web"
 
 TMP="$ROOT_DIR/.icon_tmp"

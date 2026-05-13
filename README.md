@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/fluvel.svg" width="96">
+  <img src="assets/logo/fluvel.svg" width="96">
 </p>
 
 <h1 align="center" style="color:#6b6fcf;">
@@ -33,23 +33,23 @@
 
 ## Real-time tracking
 
-<video src="media/phone_tracking.webm"
+<video src="assets/videos/phone_tracking.webm"
        controls
        muted
        width="900">
 </video>
 
-[Open video directly](media/phone_tracking.webm)
+[Open video directly](assets/videos/phone_tracking.webm)
 
 ## MRI contour evolution
 
-<video src="media/mri_segmentation.webm"
+<video src="assets/videos/mri_segmentation.webm"
        controls
        muted
        width="900">
 </video>
 
-[Open video directly](media/mri_segmentation.webm)
+[Open video directly](assets/videos/mri_segmentation.webm)
 
 ## 🚀 Downloads
 

@@ -78,14 +78,25 @@ Thumbs.db
 *.swp
 *.swo
 
+# AddressSanitizer log files
+scripts/asan_log.*
+
+secure/
+*.keystore
+
 # Doxygen/Sphinx generated files
 docs/html/
 docs/xml/
 docs/latex/
 docs/sphinx/build/
 
-# AddressSanitizer log files
-tools/asan_log.*
+# Generated automatically by documentation build scripts
+# from the repository root README.md
+docs/sphinx/source/README.md
 
-secure/
-*.keystore
+# Generated automatically from assets/videos
+web/media/
+
+# Local packaging/build artifacts
+tools/
+dist/
