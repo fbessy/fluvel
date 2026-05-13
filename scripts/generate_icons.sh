@@ -10,7 +10,7 @@ ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 # =========================
 # Paths
 # =========================
-SRC="$ROOT_DIR/resources/icons/app/fluvel.svg"
+SRC="$ROOT_DIR/assets/logo/fluvel.svg"
 
 ICON_DIR="$ROOT_DIR/resources/icons/app"
 PACKAGING_DIR="$ROOT_DIR/packaging"
@@ -68,6 +68,13 @@ mkdir -p "$ANDROID_RES/mipmap-xxhdpi"
 mkdir -p "$ANDROID_RES/mipmap-xxxhdpi"
 
 mkdir -p "$TMP"
+
+# =========================
+# Runtime SVG icon for application UI
+# (About window, image window, camera window)
+# =========================
+cp "$SRC" \
+   "$ICON_DIR/fluvel.svg"
 
 # =========================
 # Master PNG
@@ -152,9 +159,9 @@ rsvg-convert -w 96  -h 96  "$SRC" > "$ANDROID_RES/mipmap-xhdpi/fluvel.png"
 rsvg-convert -w 144 -h 144 "$SRC" > "$ANDROID_RES/mipmap-xxhdpi/fluvel.png"
 rsvg-convert -w 192 -h 192 "$SRC" > "$ANDROID_RES/mipmap-xxxhdpi/fluvel.png"
 
-# =======================================
-# Icon for homage page and documentation
-# =======================================
+# =========================
+# Web / Documentation assets
+# =========================
 cp "$SRC" \
    "$DOC_DIR/fluvel.svg"
 
@@ -166,6 +173,11 @@ cp "$SRC" \
 
 cp "$WIN_DIR/Fluvel.ico" \
    "$PAGE_DIR/favicon.ico"
+
+mkdir -p "$PAGE_DIR/media"
+
+cp "$ROOT_DIR/assets/videos/"*.webm \
+   "$PAGE_DIR/media/"
 
 # =========================
 # Cleanup

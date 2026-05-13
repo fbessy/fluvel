@@ -128,7 +128,10 @@ jobs:
           git checkout gh-pages || git checkout -b gh-pages
 
           cp -r ../web/* .
-          cp -r ../media ./media
+
+          rm -rf media
+          cp -r ../assets/videos ./media
+
           cp ../prepared/latest.json .
 
           git config user.name "GitHub Actions"
