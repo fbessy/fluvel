@@ -20,12 +20,14 @@
 
 .hero-title {
   font-size: 42px;
-  font-weight: bold;
+  font-weight: 700;
+  color: #766bd2;
+  letter-spacing: -0.02em;
 }
 
 .hero-subtitle {
   font-size: 16px;
-  color: #666;
+  color: #61656d;
   margin-top: 4px;
 }
 
