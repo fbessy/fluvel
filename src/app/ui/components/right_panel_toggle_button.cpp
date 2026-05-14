@@ -2,14 +2,15 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "right_panel_toggle_button.hpp"
+#include "icon_loader.hpp"
 
 namespace fluvel_app
 {
 
 RightPanelToggleButton::RightPanelToggleButton(QWidget* parent)
     : QPushButton(parent)
-    , iconOn_(":/icons/view/sidebar-right-show.svg")
-    , iconOff_(":/icons/view/sidebar-right-hide.svg")
+    , iconOn_(il::loadIcon(":/icons/view/sidebar-right-show.svg"))
+    , iconOff_(il::loadIcon(":/icons/view/sidebar-right-hide.svg"))
 {
     setCheckable(true);
     setChecked(true);

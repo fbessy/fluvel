@@ -3,6 +3,12 @@
 
 #include "icon_loader.hpp"
 #include <QApplication>
+#include <QBuffer>
+#include <QFile>
+#include <QPainter>
+#include <QPalette>
+#include <QPixmap>
+#include <QRegularExpression>
 
 // to check fallbacks icons
 // #define FLUVEL_FORCE_EMBEDDED_ICONS
@@ -13,6 +19,36 @@ namespace fluvel_app
 // icon loader namespace for function outside a class
 namespace il
 {
+
+static bool isDarkMode()
+{
+    return qApp->palette().color(QPalette::Window).lightness() < 128;
+}
+
+static QIcon loadSvgWithPalette(const QString& path)
+{
+    QFile file(path);
+
+    if (!file.open(QIODevice::ReadOnly))
+        return QIcon(path);
+
+    QString svg = QString::fromUtf8(file.readAll());
+
+    QColor color = qApp->palette().color(QPalette::WindowText);
+
+    if (isDarkMode())
+        color = color.lighter(110);
+
+    svg.replace(QRegularExpression(R"(color\s*:\s*#[0-9a-fA-F]+)"), "color:" + color.name());
+
+    QByteArray data = svg.toUtf8();
+
+    QPixmap pixmap;
+
+    pixmap.loadFromData(data, "SVG");
+
+    return QIcon(pixmap);
+}
 
 QIcon loadIcon(const QString& themeName, const QString& fallback)
 {
@@ -30,7 +66,7 @@ QIcon loadIcon(const QString& themeName, const QString& fallback)
 
 #endif
 
-    return QIcon(fallback);
+    return loadSvgWithPalette(fallback);
 }
 
 QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback)
@@ -45,7 +81,12 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback)
 
 #endif
 
-    return QIcon(fallback);
+    return loadSvgWithPalette(fallback);
+}
+
+QIcon loadIcon(const QString& svgResourceName)
+{
+    return loadSvgWithPalette(svgResourceName);
 }
 
 } // namespace il

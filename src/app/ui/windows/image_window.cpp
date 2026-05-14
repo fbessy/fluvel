@@ -274,7 +274,8 @@ void ImageWindow::setupActions()
     analysisAct_->setStatusTip(tr("Compute the Hausdorff distance."));
     analysisAct_->setShortcut(tr("Ctrl+A"));
 
-    analysisAct_->setIcon(QIcon(":/icons/actions/measure-symbolic.svg"));
+    QIcon measureIcon = il::loadIcon(":/icons/actions/measure-symbolic.svg");
+    analysisAct_->setIcon(measureIcon);
 
     settingsAct_ = new QAction(tr("&Settings"), this);
     settingsAct_->setShortcut(QKeySequence::Preferences);
