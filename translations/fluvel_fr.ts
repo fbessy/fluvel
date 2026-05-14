@@ -45,178 +45,183 @@ R : %3  G : %4  B : %5</translation>
         <translation>À propos de Fluvel</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="185"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="179"/>
         <source>Version </source>
         <translation>Version </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="203"/>
-        <source>Home page</source>
-        <translation>Page d’accueil</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="208"/>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="238"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="197"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="223"/>
         <source>License</source>
         <translation>Licence</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="280"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="251"/>
+        <source>Documentation</source>
+        <translation>Documentation</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="252"/>
+        <source>Home</source>
+        <translation>Accueil</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="282"/>
         <source>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.&lt;/p&gt;&lt;p&gt;The software integrates real-time image processing, video stream handling, image pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.&lt;/p&gt;&lt;p&gt;It provides an interactive environment for testing and analyzing discrete level-set implementations in both static images and dynamic video scenarios.&lt;/p&gt;&lt;p&gt;Fluvel focuses on performance, reproducibility, and clarity, making it suitable for research, teaching, and experimental validation.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; est une application de segmentation d’images orientée recherche, conçue pour permettre des expérimentations rapides et efficaces avec des méthodes de contours actifs de type level-set.&lt;/p&gt;&lt;p&gt;Le logiciel intègre du traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement d’image ainsi que des métriques d’évaluation quantitative telles que la distance de Hausdorff pour l’analyse de segmentation.&lt;/p&gt;&lt;p&gt;Il offre un environnement interactif pour tester et analyser des implémentations discrètes de level-set, aussi bien sur des images statiques que dans des scénarios vidéo dynamiques.&lt;/p&gt;&lt;p&gt;Fluvel met l’accent sur les performances, la reproductibilité et la clarté, ce qui le rend adapté à la recherche, à l’enseignement et à la validation expérimentale.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="307"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="309"/>
         <source>&lt;p&gt;&lt;b&gt;Scientific Background&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel integrates several fundamental methods in image segmentation, including discrete level-set approximation (Shi &amp; Karl, 2008), region-based active contours (Chan &amp; Vese, 2001), anisotropic diffusion filtering (Perona &amp; Malik, 1990), and quantitative evaluation using the Hausdorff distance.&lt;/p&gt;&lt;p&gt;These methods provide a balance between computational efficiency, topological flexibility, and rigorous segmentation assessment.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="330"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="332"/>
         <source>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;This project was originally developed in 2010 within the Pattern Recognition and Image Analysis research team, Laboratory of Computer Science (LIFAT), François Rabelais University, Tours, as part of the MSc in Medical Imaging.&lt;/p&gt;&lt;p&gt;It has been modernized and extended in 2024–2026.&lt;/p&gt;&lt;p&gt;Contact: &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Ce projet a été initialement développé en 2010 au sein de l’équipe de recherche en reconnaissance des formes et analyse d’images, au Laboratoire d’informatique (LIFAT), Université François-Rabelais de Tours, dans le cadre du Master en imagerie médicale.&lt;/p&gt;&lt;p&gt;Il a été modernisé et étendu entre 2024 et 2026.&lt;/p&gt;&lt;p&gt;Contact : &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="362"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="364"/>
         <source>&lt;p&gt;&lt;b&gt;Support Fluvel&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel is developed and maintained as an independent research-oriented project.&lt;/p&gt;&lt;p&gt;If you find the software useful for research, teaching, or experimentation, you may support its continued development through a voluntary donation.&lt;/p&gt;&lt;p&gt;Your support helps sustain long-term maintenance, improvements, and future extensions of the project.&lt;/p&gt;&lt;p&gt;&lt;i&gt;No features are restricted. Donations are entirely optional.&lt;/i&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Soutenir Fluvel&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel est développé et maintenu comme un projet indépendant orienté recherche.&lt;/p&gt;&lt;p&gt;Si vous trouvez ce logiciel utile pour la recherche, l’enseignement ou l’expérimentation, vous pouvez soutenir son développement par un don volontaire.&lt;/p&gt;&lt;p&gt;Votre soutien contribue à assurer la maintenance à long terme, les améliorations et les évolutions futures du projet.&lt;/p&gt;&lt;p&gt;&lt;i&gt;Aucune fonctionnalité n’est restreinte. Les dons sont entièrement facultatifs.&lt;/i&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="376"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="378"/>
         <source>Donate via PayPal</source>
         <translation>Faire un don via PayPal</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="406"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="408"/>
         <source>Overview</source>
         <translation>Aperçu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="407"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="409"/>
         <source>Scientific</source>
         <translation>Scientifique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="408"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="410"/>
         <source>Author</source>
         <translation>Auteur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="409"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="411"/>
         <source>Technical</source>
         <translation>Technique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="410"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="412"/>
         <source>Support</source>
         <translation>Soutien</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="459"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="461"/>
         <source>Technical information</source>
         <translation>Informations techniques</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="465"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="467"/>
         <source>Application</source>
         <translation>Application</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="472"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="474"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="474"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="476"/>
         <source>Configuration directory</source>
         <translation>Répertoire de configuration</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="478"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="480"/>
         <source>Image formats</source>
         <translation>Formats d’image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="481"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="483"/>
         <source>Image format support is provided by Qt image format plugins.</source>
         <translation>La prise en charge des formats d’image est assurée par les plugins de formats d’image Qt.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="482"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="484"/>
         <source>Available formats depend on the Qt installation and platform.</source>
         <translation>Les formats disponibles dépendent de l’installation de Qt et de la plateforme.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="486"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="488"/>
         <source>Read</source>
         <translation>Lecture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="487"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="489"/>
         <source>Write</source>
         <translation>Écriture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="496"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="498"/>
         <source>Environment</source>
         <translation>Environnement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="500"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="502"/>
         <source>Qt (runtime)</source>
         <translation>Qt (version d’exécution)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="506"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="508"/>
         <source>Package</source>
         <translation>Paquet</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="509"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="511"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="517"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="519"/>
         <source>Build</source>
         <translation>Build</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="527"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="529"/>
         <source>Git commit</source>
         <translation>Git commit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="528"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="530"/>
         <source>Build type</source>
         <translation>Type de build</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="529"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="531"/>
         <source>Build origin</source>
         <translation>Environnement de compilation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="530"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="532"/>
         <source>Build date (UTC)</source>
         <translation>Date de build (UTC)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="531"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="533"/>
         <source>Qt (build)</source>
         <translation>Qt (version de build)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="532"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="534"/>
         <source>Compiler</source>
         <translation>Compilateur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="533"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="535"/>
         <source>CMake</source>
         <translation>CMake</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="544"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="546"/>
         <source>Build fingerprint</source>
         <translation>Empreinte de build</translation>
     </message>
@@ -555,37 +560,37 @@ Contour : %7 pts</translation>
 <context>
     <name>fluvel_app::CameraSettingsWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="27"/>
+        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="28"/>
         <source>Camera session settings</source>
         <translation>Paramètres de la session caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="55"/>
+        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="71"/>
         <source>Spatial Smoothing (3×3)</source>
         <translation>Lissage spatial (3×3)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="56"/>
+        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="72"/>
         <source>Motion-Adaptive Smoothing</source>
         <translation>Lissage adaptatif au mouvement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="75"/>
+        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="91"/>
         <source>Preprocess</source>
         <translation>Prétraitement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="76"/>
+        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="92"/>
         <source>Algorithm</source>
         <translation>Algorithme</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="96"/>
+        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="112"/>
         <source>Downscale</source>
         <translation>Réduction d’échelle</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="104"/>
+        <location filename="../src/app/ui/windows/camera_settings_window.cpp" line="120"/>
         <source>Factor: </source>
         <translation>Facteur : </translation>
     </message>
@@ -1144,27 +1149,27 @@ Fichier → Ouvrir</translation>
 <context>
     <name>fluvel_app::LanguageWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/language_window.cpp" line="20"/>
+        <location filename="../src/app/ui/windows/language_window.cpp" line="21"/>
         <source>Language</source>
         <translation>Langue</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/language_window.cpp" line="32"/>
+        <location filename="../src/app/ui/windows/language_window.cpp" line="33"/>
         <source>System (%1)</source>
         <translation>Système (%1)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/language_window.cpp" line="34"/>
+        <location filename="../src/app/ui/windows/language_window.cpp" line="35"/>
         <source>English</source>
         <translation>Anglais</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/language_window.cpp" line="36"/>
+        <location filename="../src/app/ui/windows/language_window.cpp" line="37"/>
         <source>French</source>
         <translation>Français</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/language_window.cpp" line="59"/>
+        <location filename="../src/app/ui/windows/language_window.cpp" line="75"/>
         <source>The change will take effect after restarting the application.</source>
         <translation>Le changement sera appliqué après le redémarrage de l’application.</translation>
     </message>
@@ -1185,313 +1190,313 @@ Fichier → Ouvrir</translation>
 <context>
     <name>fluvel_app::SettingsWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="34"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="35"/>
         <source>Image session settings</source>
         <translation>Paramètres de la session image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="72"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="288"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="88"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="304"/>
         <source>Downscale</source>
         <translation>Réduction d’échelle</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="73"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="520"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="89"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="536"/>
         <source>Processing</source>
         <translation>Traitement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="74"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="90"/>
         <source>Initialization</source>
         <translation>Initialisation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="75"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="91"/>
         <source>Algorithm</source>
         <translation>Algorithme</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="134"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="150"/>
         <source>Shape</source>
         <translation>Forme</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="138"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="140"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="154"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="156"/>
         <source>Middle mouse button: toggle rectangle / ellipse</source>
         <translation>Bouton central de la souris : basculer entre rectangle et ellipse</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="137"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="153"/>
         <source>Rectangle</source>
         <translation>Rectangle</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="139"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="155"/>
         <source>Ellipse</source>
         <translation>Ellipse</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="168"/>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="153"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="169"/>
         <source>Ctrl + mouse wheel in the image to resize the shape</source>
         <translation>Ctrl + molette de la souris dans l’image pour redimensionner la forme</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="159"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="211"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="175"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="227"/>
         <source> % image width</source>
         <translation> % de la largeur de l’image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="163"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="179"/>
         <source>Width: </source>
         <translation>Largeur : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="183"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="199"/>
         <source>Height: </source>
         <translation>Hauteur : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="204"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="220"/>
         <source>Position (x,y)</source>
         <translation>Position (x,y)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="205"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="221"/>
         <source>Move the cursor in the image to set the position</source>
         <translation>Déplacer le curseur dans l’image pour définir la position</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="231"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="247"/>
         <source> % image height</source>
         <translation> % de la hauteur de l’image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="256"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="272"/>
         <source>Active contour modification</source>
         <translation>Modification du contour actif</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="259"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="275"/>
         <source>Add</source>
         <translation>Ajouter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="260"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="276"/>
         <source>Left mouse button in the image: add the shape</source>
         <translation>Bouton gauche de la souris dans l’image : ajouter la forme</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="262"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="278"/>
         <source>Subtract</source>
         <translation>Soustraire</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="263"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="279"/>
         <source>Right mouse button in the image: remove the shape</source>
         <translation>Bouton droit de la souris dans l’image : supprimer la forme</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="265"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="281"/>
         <source>Clear</source>
         <translation>Effacer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="315"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="331"/>
         <source>Gaussian Noise</source>
         <translation>Bruit gaussien</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="317"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="333"/>
         <source>Additive Gaussian (white) noise applied independently to each pixel.</source>
         <translation>Bruit gaussien additif (blanc) appliqué indépendamment à chaque pixel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="324"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="354"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="340"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="370"/>
         <source>Standard deviation.</source>
         <translation>Écart-type.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="327"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="357"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="343"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="373"/>
         <source>σ: </source>
         <translation>σ : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="340"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="356"/>
         <source>Density or probability of impulse noise per pixel.</source>
         <translation>Densité ou probabilité de bruit impulsionnel par pixel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="343"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="359"/>
         <source>d: </source>
         <translation>d : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="454"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="470"/>
         <source>White top-hat</source>
         <translation>Top-hat blanc</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="456"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="472"/>
         <source>Black top-hat</source>
         <translation>Top-hat noir</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="416"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="432"/>
         <source>λ: </source>
         <translation>λ : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="417"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="433"/>
         <source>κ: </source>
         <translation>κ : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="431"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="444"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="463"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="447"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="460"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="479"/>
         <source>The structuring element is a square centered at its origin.</source>
         <translation>L&apos;élément structurant est un carré centré sur son origine.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="434"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="447"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="468"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="450"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="463"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="484"/>
         <source>SE size: </source>
         <translation>Taille de l&apos;ES : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="329"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="345"/>
         <source>Impulsive Noise</source>
         <translation>Bruit impulsionnel</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="295"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="311"/>
         <source>Factor: </source>
         <translation>Facteur : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="331"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="347"/>
         <source>Random pixel corruption. Grayscale: salt &amp; pepper (black or white pixels). Color: each channel can be independently corrupted.</source>
         <translation>Corruption aléatoire des pixels. Niveaux de gris : sel et poivre (pixels noirs ou blancs). Couleur : chaque canal peut être corrompu indépendamment.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="345"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="361"/>
         <source>Speckle Noise</source>
         <translation>Bruit speckle</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="347"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="363"/>
         <source>Multiplicative noise applied to pixel intensities. Based on a gamma distribution (commonly used to model speckle in imaging systems).</source>
         <translation>Bruit multiplicatif appliqué aux intensités des pixels. Basé sur une distribution gamma (couramment utilisée pour modéliser le bruit de speckle dans les systèmes d’imagerie).</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="371"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="387"/>
         <source>Mean filter</source>
         <translation>Filtre moyenneur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="380"/>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="394"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="396"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="410"/>
         <source>Kernel size: </source>
         <translation>Taille du noyau : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="384"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="400"/>
         <source>Median filter</source>
         <translation>Filtre médian</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="396"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="412"/>
         <source>Perona-Malik anisotropic diffusion</source>
         <translation>Diffusion anisotrope de Perona–Malik</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="415"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="431"/>
         <source>Iterations: </source>
         <translation>Itérations : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="418"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="434"/>
         <source>Function 1: </source>
         <translation>Fonction 1 : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="419"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="435"/>
         <source>Function 2: </source>
         <translation>Fonction 2 : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="423"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="439"/>
         <source>Opening</source>
         <translation>Ouverture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="436"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="452"/>
         <source>Closing</source>
         <translation>Fermeture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="451"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="467"/>
         <source>Top-hat transform</source>
         <translation>Transformation top-hat</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="455"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="471"/>
         <source>Difference between the input image and the opened result.</source>
         <translation>Différence entre l&apos;image d&apos;origine et le résultat de l&apos;ouverture.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="457"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="473"/>
         <source>Difference between the closed result and the input image.</source>
         <translation>Différence entre le résultat de la fermeture et l&apos;image d&apos;origine.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="513"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="529"/>
         <source>Linear</source>
         <translation>Linéaire</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="514"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="530"/>
         <source>Edge preserving</source>
         <translation>Préservation contour</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="515"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="531"/>
         <source>Math morpho</source>
         <translation>Morpho math</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="517"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="533"/>
         <source>Noise generators</source>
         <translation>Bruit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="518"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="534"/>
         <source>Filters</source>
         <translation>Filtres</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="525"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="541"/>
         <source>Time: </source>
         <translation>Temps : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="526"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="542"/>
         <source>Processing time</source>
         <translation>Temps de calcul</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_window.cpp" line="778"/>
+        <location filename="../src/app/ui/windows/settings_window.cpp" line="794"/>
         <source>%1 s</source>
         <translation>%1 s</translation>
     </message>

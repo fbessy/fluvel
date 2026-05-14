@@ -141,13 +141,9 @@ AboutWindow::AboutWindow(QWidget* parent)
     setWindowTitle(tr("About Fluvel"));
 
     if (settings.contains("ui_geometry/about_window"))
-    {
         restoreGeometry(settings.value("ui_geometry/about_window").toByteArray());
-    }
     else
-    {
         resize(700, 400);
-    }
 
     ///////////////////////////////////////
     //////         Left Part        ///////
@@ -177,9 +173,7 @@ AboutWindow::AboutWindow(QWidget* parent)
 
 #ifdef FLUVEL_BUILD_VERSION
     if (QString(FLUVEL_BUILD_VERSION).startsWith("dev-"))
-    {
         shortVersion += "-dev";
-    }
 #endif
 
     const QString verStr = QString(tr("Version ")) + shortVersion;
@@ -200,11 +194,6 @@ AboutWindow::AboutWindow(QWidget* parent)
     yearsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
                                         Qt::LinksAccessibleByKeyboard);
 
-    QPushButton* homePage = new QPushButton(tr("Home page"));
-    homePage->setAutoDefault(false);
-
-    connect(homePage, &QPushButton::clicked, this, &AboutWindow::openHomePage);
-
     QPushButton* license = new QPushButton(tr("License"));
     license->setAutoDefault(false);
 
@@ -215,13 +204,9 @@ AboutWindow::AboutWindow(QWidget* parent)
 
     QString txtFile;
     if (language == Language::French || (language == Language::System && locale == "fr"))
-    {
         txtFile = QString(":/licenses/Licence_CeCILL_V2.1-fr.txt");
-    }
     else
-    {
         txtFile = QString(":/licenses/Licence_CeCILL_V2.1-en.txt");
-    }
 
     QFile file(txtFile);
     QTextEdit* licenseTextedit = new QTextEdit;
@@ -256,8 +241,25 @@ AboutWindow::AboutWindow(QWidget* parent)
     leftLayout->addWidget(versionLabel);
     leftLayout->addWidget(yearsLabel);
     leftLayout->addSpacing(10);
-    leftLayout->addWidget(homePage);
     leftLayout->addWidget(license);
+
+    QLabel* linksLabel = new QLabel;
+
+    linksLabel->setText(QString("<a href='https://fabienip.gitlab.io/fluvel/'>%1</a><br>"
+                                "<a href='https://github.com/fbessy/fluvel/'>GitHub</a><br>"
+                                "<a href='https://fbessy.github.io/fluvel/'>%2</a>")
+                            .arg(tr("Documentation"))
+                            .arg(tr("Home")));
+
+    linksLabel->setOpenExternalLinks(true);
+
+    linksLabel->setAlignment(Qt::AlignCenter);
+
+    linksLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
+
+    leftLayout->addSpacing(6);
+    leftLayout->addWidget(linksLabel);
+
     leftLayout->addStretch(1);
 
     ///////////////////////////////////////
@@ -421,7 +423,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     this->setLayout(layout_this);
 }
 
-void AboutWindow::openHomePage()
+void AboutWindow::openHomepage()
 {
     QDesktopServices::openUrl(QUrl(kProjectUrl, QUrl::TolerantMode));
 }
