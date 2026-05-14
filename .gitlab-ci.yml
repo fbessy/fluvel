@@ -59,20 +59,10 @@ doc:
     - rm -rf public
 
     # -------------------------
-    # Prepare README + videos + logo
+    # Prepare README
     # -------------------------
 
     - cp README.md docs/sphinx/source/README.md
-
-    - |
-      sed -i \
-      's|assets/videos/|../../../assets/videos/|g' \
-      docs/sphinx/source/README.md
-
-    - |
-      sed -i \
-      's|assets/logo/|../../../assets/logo/|g' \
-      docs/sphinx/source/README.md
 
     # -------------------------
     # Generate Doxygen XML/HTML
@@ -91,6 +81,12 @@ doc:
         -b html \
         docs/sphinx/source \
         public
+
+    - mkdir -p public/assets/videos
+    - cp assets/videos/*.webm public/assets/videos/
+
+    - mkdir -p public/assets/logo
+    - cp assets/logo/fluvel.svg public/assets/logo/
 
   artifacts:
     paths:
