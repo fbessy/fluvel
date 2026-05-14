@@ -62,6 +62,8 @@ doc:
     # Prepare README + videos + logo
     # -------------------------
 
+    - cp README.md docs/sphinx/source/README.md
+
     - |
       sed -i \
       's|assets/videos/|../../../assets/videos/|g' \
