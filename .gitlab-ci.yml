@@ -59,25 +59,17 @@ doc:
     - rm -rf public
 
     # -------------------------
-    # Prepare assets
+    # Prepare README + videos + logo
     # -------------------------
-
-    - mkdir -p docs/sphinx/source/_static
-
-    - |
-      if [ -d docs/images ]; then
-        cp -r docs/images/* docs/sphinx/source/_static/ || true
-      fi
-
-    # -------------------------
-    # Prepare README
-    # -------------------------
-
-    - cp README.md docs/sphinx/source/README.md
 
     - |
       sed -i \
-      's|docs/images/|_static/|g' \
+      's|assets/videos/|../../../assets/videos/|g' \
+      docs/sphinx/source/README.md
+
+    - |
+      sed -i \
+      's|assets/logo/|../../../assets/logo/|g' \
       docs/sphinx/source/README.md
 
     # -------------------------
