@@ -562,3 +562,37 @@ table {
   color:
     inherit;
 }
+
+/* ========================================================= */
+/* TOOLTIPS                                                   */
+/* ========================================================= */
+
+.tooltip-inner {
+
+  background:
+    var(--pst-color-surface);
+
+  color:
+    var(--pst-color-text-base);
+
+  border:
+    1px solid var(--pst-color-border);
+
+  border-radius:
+    10px;
+}
+
+.tooltip .tooltip-arrow::before {
+
+  border-top-color:
+    var(--pst-color-surface) !important;
+
+  border-bottom-color:
+    var(--pst-color-surface) !important;
+
+  border-left-color:
+    var(--pst-color-surface) !important;
+
+  border-right-color:
+    var(--pst-color-surface) !important;
+}
