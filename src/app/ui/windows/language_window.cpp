@@ -4,6 +4,7 @@
 #include "language_window.hpp"
 #include "application_settings.hpp"
 
+#include <QAbstractButton>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QLabel>
@@ -47,6 +48,21 @@ LanguageWindow::LanguageWindow(QWidget* parent)
     buttons->addButton(QDialogButtonBox::Ok);
     buttons->addButton(QDialogButtonBox::Cancel);
     buttons->setCenterButtons(true);
+
+#ifdef Q_OS_LINUX
+
+    // AppImage may use inconsistent platform dialog icons.
+    // Use text-only dialog buttons for a cleaner cross-platform UI.
+
+    if (qEnvironmentVariableIsSet("APPIMAGE"))
+    {
+        for (QAbstractButton* button : buttons->buttons())
+        {
+            button->setIcon(QIcon());
+        }
+    }
+
+#endif
 
     connect(buttons, &QDialogButtonBox::accepted, this, &LanguageWindow::accept);
 

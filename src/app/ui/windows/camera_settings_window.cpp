@@ -4,6 +4,7 @@
 #include "camera_settings_window.hpp"
 #include "algo_settings_widget.hpp"
 
+#include <QAbstractButton>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
@@ -41,6 +42,21 @@ CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, Q
     dialogButtons_->addButton(QDialogButtonBox::Ok);
     dialogButtons_->addButton(QDialogButtonBox::Cancel);
     dialogButtons_->addButton(QDialogButtonBox::RestoreDefaults);
+
+#ifdef Q_OS_LINUX
+
+    // AppImage may use inconsistent platform dialog icons.
+    // Use text-only dialog buttons for a cleaner cross-platform UI.
+
+    if (qEnvironmentVariableIsSet("APPIMAGE"))
+    {
+        for (QAbstractButton* button : dialogButtons_->buttons())
+        {
+            button->setIcon(QIcon());
+        }
+    }
+
+#endif
 
     tabs_ = new QTabWidget(this);
 

@@ -9,6 +9,7 @@
 #include "interaction_set.hpp"
 #include "kernel_size_spinbox.hpp"
 
+#include <QAbstractButton>
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
@@ -52,6 +53,21 @@ SettingsWindow::SettingsWindow(const ImageSessionSettings& config, QWidget* pare
     dialogButtons_->addButton(QDialogButtonBox::Ok);
     dialogButtons_->addButton(QDialogButtonBox::Cancel);
     dialogButtons_->addButton(QDialogButtonBox::RestoreDefaults);
+
+#ifdef Q_OS_LINUX
+
+    // AppImage may use inconsistent platform dialog icons.
+    // Use text-only dialog buttons for a cleaner cross-platform UI.
+
+    if (qEnvironmentVariableIsSet("APPIMAGE"))
+    {
+        for (QAbstractButton* button : dialogButtons_->buttons())
+        {
+            button->setIcon(QIcon());
+        }
+    }
+
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Tabs
