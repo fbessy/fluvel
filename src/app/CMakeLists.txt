@@ -158,6 +158,9 @@ qt_add_executable(${target_name}
     ${app_src})
 
 set_target_properties(${target_name} PROPERTIES
+    AUTOMOC ON
+    AUTORCC ON
+    AUTOUIC ON
     OUTPUT_NAME "Fluvel"
 )
 
