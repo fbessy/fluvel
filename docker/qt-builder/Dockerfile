@@ -82,7 +82,7 @@ ENV QT_DIR=/opt/Qt
 
 RUN python3 -m aqt install-qt linux desktop ${QT_VERSION} linux_gcc_64 \
     -O ${QT_DIR} \
-    -m qtmultimedia qtsvg
+    -m qtmultimedia
 
 ENV QT_ROOT=${QT_DIR}/${QT_VERSION}/gcc_64
 ENV PATH="${QT_ROOT}/bin:${PATH}"

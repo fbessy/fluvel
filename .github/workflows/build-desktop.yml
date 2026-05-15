@@ -47,7 +47,7 @@ jobs:
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2022_64'
-          modules: 'qtmultimedia qtsvg'
+          modules: 'qtmultimedia'
 
       - name: Configure
         shell: bash
@@ -168,7 +168,7 @@ jobs:
           version: '6.8.2'
           host: 'mac'
           target: 'desktop'
-          modules: 'qtmultimedia qtsvg'
+          modules: 'qtmultimedia'
 
       - name: Configure
         run: >
