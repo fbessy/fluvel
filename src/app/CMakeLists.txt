@@ -394,6 +394,7 @@ set(APP_QT_LIBS
     Qt6::Multimedia
     Qt6::MultimediaWidgets
     Qt6::Widgets
+    Qt6::Svg
 )
 
 if(ANDROID AND NOT FLUVEL_UI_DESKTOP)

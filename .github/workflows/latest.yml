@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
+      docker: ${{ steps.filter.outputs.docker }}
       build: ${{ steps.filter.outputs.build }}
       web: ${{ steps.filter.outputs.web }}
 
@@ -28,17 +29,22 @@ jobs:
         id: filter
         with:
           filters: |
+
+            docker:
+              - 'docker/**'
+              - '.github/workflows/build-linux.yml'
+
             build:
               - 'src/**'
               - 'resources/**'
               - 'packaging/**'
               - 'CMakeLists.txt'
-              - '.github/**'
+              - '.github/workflows/build-desktop.yml'
+              - '.github/workflows/build-linux.yml'
 
             web:
               - 'web/**'
               - 'assets/**'
-              - '.github/**'
 
   desktop:
     needs: changes
@@ -50,7 +56,9 @@ jobs:
 
   linux:
     needs: changes
-    if: needs.changes.outputs.build == 'true'
+    if: |
+      needs.changes.outputs.build == 'true' ||
+      needs.changes.outputs.docker == 'true'
 
     uses: ./.github/workflows/build-linux.yml
     secrets: inherit
@@ -58,12 +66,21 @@ jobs:
 
   prepare:
     needs: [desktop, linux]
+
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure')
+
     uses: ./.github/workflows/prepare-release.yml
     secrets: inherit
 
 
   release:
     needs: [prepare]
+
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure')
 
     runs-on: ubuntu-latest
 

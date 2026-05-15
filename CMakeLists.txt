@@ -75,7 +75,7 @@ set(FLUVEL_INSTALL_DESKTOPDIR ${FLUVEL_INSTALL_DATADIR}/applications)
 set(FLUVEL_INSTALL_ICONDIR ${FLUVEL_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 
 set(QT_COMPONENTS
-    Core Gui Multimedia MultimediaWidgets Widgets LinguistTools
+    Core Gui Multimedia MultimediaWidgets Widgets Svg LinguistTools
 )
 
 if((ANDROID OR IOS) AND NOT FLUVEL_UI_DESKTOP)

@@ -9,6 +9,7 @@
 #include <QPalette>
 #include <QPixmap>
 #include <QRegularExpression>
+#include <QSvgRenderer>
 
 // to check fallbacks icons
 // #define FLUVEL_FORCE_EMBEDDED_ICONS
@@ -43,11 +44,22 @@ static QIcon loadSvgWithPalette(const QString& path)
 
     QByteArray data = svg.toUtf8();
 
-    QPixmap pixmap;
+    QIcon icon;
 
-    pixmap.loadFromData(data, "SVG");
+    for (int size : {16, 22, 24, 32})
+    {
+        QPixmap pixmap(size, size);
+        pixmap.fill(Qt::transparent);
 
-    return QIcon(pixmap);
+        QSvgRenderer renderer(data);
+
+        QPainter painter(&pixmap);
+        renderer.render(&painter);
+
+        icon.addPixmap(pixmap);
+    }
+
+    return icon;
 }
 
 QIcon loadIcon(const QString& themeName, const QString& fallback)
