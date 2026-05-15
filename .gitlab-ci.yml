@@ -15,6 +15,7 @@ stages:
         - assets/**/*
         - src/**/*
         - README.md
+        - .gitlab-ci.yml
 
 doc:
   stage: doc

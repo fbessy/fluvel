@@ -33,11 +33,12 @@ jobs:
               - 'resources/**'
               - 'packaging/**'
               - 'CMakeLists.txt'
-              - '.github/workflows/**'
+              - '.github/**'
 
             web:
               - 'web/**'
               - 'assets/**'
+              - '.github/**'
 
   desktop:
     needs: changes
@@ -194,6 +195,8 @@ jobs:
 
           if [ "${{ needs.changes.outputs.build }}" = "true" ]; then
             cp ../prepared/latest.json .
+          else
+            echo "Keeping existing latest.json"
           fi
 
           git config user.name "GitHub Actions"
