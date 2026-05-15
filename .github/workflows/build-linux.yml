@@ -31,7 +31,7 @@ jobs:
 
       - name: Ensure image
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1
+          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
           CACHE_IMAGE=${IMAGE}-cache
 
           EXISTS=false
@@ -83,7 +83,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
 
       # 📦 Build Flatpak dans Docker
       - name: Build Flatpak
@@ -91,7 +91,7 @@ jobs:
           docker run --rm \
             --privileged \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1 \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2 \
             bash -c "
               cd /workspace
               git config --global --add safe.directory /workspace
@@ -167,14 +167,14 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
 
       # 📦 Build AppImage dans Docker
       - name: Build AppImage
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1 \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2 \
             bash -c "
               cd /workspace
 
