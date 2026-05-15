@@ -36,6 +36,7 @@ jobs:
               - 'CMakeLists.txt'
               - '.github/workflows/build-desktop.yml'
               - '.github/workflows/build-linux.yml'
+              - '.github/workflows/latest.yml'
 
             web:
               - 'web/**'
