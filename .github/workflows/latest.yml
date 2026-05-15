@@ -13,21 +13,57 @@ on:
 
 jobs:
 
+  changes:
+    runs-on: ubuntu-latest
+
+    outputs:
+      build: ${{ steps.filter.outputs.build }}
+      web: ${{ steps.filter.outputs.web }}
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            build:
+              - 'src/**'
+              - 'resources/**'
+              - 'packaging/**'
+              - 'CMakeLists.txt'
+              - '.github/workflows/**'
+
+            web:
+              - 'web/**'
+              - 'assets/**'
+
   desktop:
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
+
     uses: ./.github/workflows/build-desktop.yml
     secrets: inherit
 
+
   linux:
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
+
     uses: ./.github/workflows/build-linux.yml
     secrets: inherit
+
 
   prepare:
     needs: [desktop, linux]
     uses: ./.github/workflows/prepare-release.yml
     secrets: inherit
 
-  publish:
-    needs: prepare
+
+  release:
+    needs: [prepare]
+
     runs-on: ubuntu-latest
 
     permissions:
@@ -116,11 +152,35 @@ jobs:
             prepared/BUILD_INFO.txt \
             --clobber
 
+  deploy:
+    needs: [changes, prepare]
+    if: |
+      needs.changes.outputs.build == 'true' ||
+      needs.changes.outputs.web == 'true'
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      # =========================
+      # DOWNLOAD RELEASE METADATA
+      # =========================
+
+      - uses: actions/download-artifact@v4
+        if: needs.changes.outputs.build == 'true'
+        with:
+          name: prepared-release
+          path: prepared
+
       # =========================
       # DEPLOY GITHUB PAGES
       # =========================
+
       - name: Deploy GitHub Pages
         run: |
+
           git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/fbessy/fluvel.git gh-pages
           cd gh-pages
 
@@ -132,7 +192,9 @@ jobs:
           rm -rf media
           cp -r ../assets/videos ./media
 
-          cp ../prepared/latest.json .
+          if [ "${{ needs.changes.outputs.build }}" = "true" ]; then
+            cp ../prepared/latest.json .
+          fi
 
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
