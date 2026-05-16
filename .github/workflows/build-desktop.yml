@@ -148,7 +148,7 @@ jobs:
   # MACOS BUILD
   # =========================
   macos:
-    runs-on: macos-15
+    runs-on: macos-26
 
     steps:
       - uses: actions/checkout@v4
@@ -165,7 +165,7 @@ jobs:
       - name: Setup Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.8.2'
+          version: '6.9.2'
           host: 'mac'
           target: 'desktop'
           modules: 'qtmultimedia'
