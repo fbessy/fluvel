@@ -180,6 +180,10 @@ set_target_properties(${target_name} PROPERTIES
 #endif()
 
 if(APPLE)
+    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
+    endif()
+
     set(MACOSX_BUNDLE_ICON_FILE Fluvel.icns)
 
     set(app_icon_macos
