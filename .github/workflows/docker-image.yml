@@ -1,0 +1,73 @@
+name: Docker Image
+
+on:
+  workflow_call:
+
+  schedule:
+    # Every month on day 3 at 05:17 UTC
+    - cron: '17 5 3 * *'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  docker-image:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Docker changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docker:
+              - 'docker/qt-builder/**'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+          docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Ensure image
+        run: |
+          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
+          CACHE_IMAGE=${IMAGE}-cache
+
+          EXISTS=false
+          FORCE_REBUILD=false
+
+          if docker manifest inspect $IMAGE > /dev/null 2>&1; then
+            EXISTS=true
+          fi
+
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            FORCE_REBUILD=true
+          fi
+
+          echo "Image exists: $EXISTS"
+          echo "Docker changed: ${{ steps.changes.outputs.docker }}"
+          echo "Force rebuild: $FORCE_REBUILD"
+
+          if [ "$EXISTS" = "false" ] || \
+             [ "${{ steps.changes.outputs.docker }}" = "true" ] || \
+             [ "$FORCE_REBUILD" = "true" ]; then
+
+            echo "Building image..."
+
+            docker buildx build \
+              --cache-from=type=registry,ref=$CACHE_IMAGE \
+              --cache-to=type=registry,ref=$CACHE_IMAGE,mode=max \
+              -t $IMAGE \
+              -f docker/qt-builder/Dockerfile \
+              --push \
+              .
+
+          else
+            echo "Skipping build"
+          fi
