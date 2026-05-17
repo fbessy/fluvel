@@ -100,10 +100,11 @@ fetch("latest.json")
     setLink("win_portable", data.windows?.portable);
     setLink("flatpak", data.linux?.flatpak);
     setLink("appimage", data.linux?.appimage);
+    setLink("deb", data.linux?.deb);
     setLink("macos", data.macos?.dmg);
 
     hidePlatformIfEmpty("platform_windows", ["win_installer", "win_portable"]);
-    hidePlatformIfEmpty("platform_linux", ["flatpak", "appimage"]);
+    hidePlatformIfEmpty("platform_linux", ["flatpak", "appimage", "deb"]);
     hidePlatformIfEmpty("platform_macos", ["macos"]);
 
     // ===== CHECKSUMS =====
