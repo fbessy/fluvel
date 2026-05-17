@@ -12,7 +12,7 @@ jobs:
   # WINDOWS BUILD
   # =========================
   windows:
-    runs-on: windows-2025
+    runs-on: windows-2026
 
     steps:
       - uses: actions/checkout@v4
@@ -54,9 +54,8 @@ jobs:
         run: |
           BUILD_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
 
-          cmake -B build -S . \
+          cmake --fresh -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_UNITY_BUILD=OFF \
             -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
             \
             -DFLUVEL_BUILD_VERSION=${{ env.VERSION }} \
@@ -174,9 +173,8 @@ jobs:
         run: >
           BUILD_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
 
-          cmake -B build -S . \
+          cmake --fresh -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_UNITY_BUILD=OFF \
             -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
             \
             -DFLUVEL_BUILD_VERSION=${{ env.VERSION }} \

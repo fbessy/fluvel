@@ -164,7 +164,7 @@ set_target_properties(${target_name} PROPERTIES
     OUTPUT_NAME "Fluvel"
 )
 
-#if(ANDROID)
+#if(FLUVEL_PLATFORM_ANDROID)
     # qt_add_qml_module(${target_name}
     #     URI fluvel
     #     VERSION 1.0
@@ -179,7 +179,7 @@ set_target_properties(${target_name} PROPERTIES
     # )
 #endif()
 
-if(APPLE)
+if(FLUVEL_PLATFORM_MACOS)
     if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
         set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
     endif()
@@ -201,7 +201,7 @@ if(APPLE)
         MACOSX_BUNDLE_BUNDLE_NAME "Fluvel"
     )
 
-elseif(WIN32)
+elseif(FLUVEL_PLATFORM_WINDOWS)
 
     set(app_icon_resource_windows_in
         ${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.rc.in
@@ -310,7 +310,7 @@ qt_add_resources(${target_name} app_resources
     FILES ${APP_RESOURCES}
 )
 
-if(APPLE AND NOT IOS)
+if(FLUVEL_PLATFORM_MACOS)
 
     configure_file(
         ${FLUVEL_PACKAGING_DIR}/macos/Info.plist.in
@@ -401,7 +401,7 @@ set(APP_QT_LIBS
     Qt6::Svg
 )
 
-if(ANDROID AND NOT FLUVEL_UI_DESKTOP)
+if(FLUVEL_USE_QML)
     list(APPEND APP_QT_LIBS
         Qt6::Qml
         Qt6::Quick
@@ -463,7 +463,7 @@ if(DEFINED FLUVEL_BUILD_VERSION AND NOT FLUVEL_BUILD_VERSION STREQUAL "")
     )
 endif()
 
-if(ANDROID)
+if(FLUVEL_PLATFORM_ANDROID)
 
     # --- Android packaging ---
     set_target_properties(${target_name} PROPERTIES
@@ -479,14 +479,14 @@ if(ANDROID)
         # OUTPUT_NAME "fluvel"
     )
 
-elseif(APPLE)
+elseif(FLUVEL_PLATFORM_MACOS)
 
     # --- macOS bundle install ---
     install(TARGETS ${target_name}
         BUNDLE DESTINATION .
     )
 
-else()
+elseif(FLUVEL_PLATFORM_WINDOWS OR FLUVEL_PLATFORM_LINUX)
 
     # --- Linux / Windows install ---
     install(TARGETS ${target_name}
@@ -498,22 +498,12 @@ else()
 endif()
 
 
-if(UNIX AND NOT APPLE AND NOT ANDROID)
+if(FLUVEL_PLATFORM_LINUX)
     install(FILES
         ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.desktop
-        DESTINATION ${FLUVEL_INSTALL_DESKTOPDIR})
+        DESTINATION ${LINUX_INSTALL_DESKTOPDIR})
 
     install(FILES
         ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.svg
-        DESTINATION ${FLUVEL_INSTALL_ICONDIR})
+        DESTINATION ${LINUX_INSTALL_ICONDIR})
 endif()
-
-# target_compile_features(my_target PUBLIC cxx_std_23) au lieu de global dans le fichier projet
-# définir par projets chaque prérequis
-
-#idem préférer :
-# set_target_properties(my_qt_target PROPERTIES
-#     AUTOMOC ON
-#     AUTOUIC ON
-#     AUTORCC ON
-# )

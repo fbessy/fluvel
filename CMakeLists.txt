@@ -2,52 +2,28 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Fluvel VERSION 1.0.0 LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "C++ compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 
-option(FLUVEL_UI_DESKTOP "Use QWidget UI on Mobile" ON)
-option(ENABLE_UNITY_BUILD "Enable unity build" OFF)
-option(ENABLE_ASAN "Enable Sanitizers" OFF)
-option(ENABLE_TSAN "Enable ThreadSanitizer" OFF)
+# =========================
+# Local development defaults
+# Modify here if needed
+# =========================
 
-if(ENABLE_UNITY_BUILD)
-    set(CMAKE_UNITY_BUILD ON)
-endif()
+set(FLUVEL_LOCAL_DEFAULT_CCACHE OFF)
+set(FLUVEL_LOCAL_DEFAULT_UNITY OFF)
 
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-    message(STATUS "ccache found: ${CCACHE_PROGRAM}")
-    set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
-    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
-endif()
+set(FLUVEL_LOCAL_DEFAULT_ASAN OFF)
+set(FLUVEL_LOCAL_DEFAULT_TSAN OFF)
 
-if(ENABLE_ASAN)
-    message(STATUS "Sanitizers ENABLED")
-
-    add_compile_options(
-        -fsanitize=address,undefined
-        -fno-omit-frame-pointer
-        -fno-sanitize-recover=undefined
-        -g
-    )
-
-    add_link_options(
-        -fsanitize=address,undefined
-    )
-endif()
-
-if(ENABLE_TSAN)
-    message(STATUS "ThreadSanitizer enabled")
-
-    add_compile_options(-fsanitize=thread -g -O1)
-    add_link_options(-fsanitize=thread)
-endif()
-
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+include(cmake/fluvel_platforms.cmake)
+include(cmake/fluvel_build_config.cmake)
+include(cmake/fluvel_qt.cmake)
 
 set(CMAKE_AUTOMOC_VERBOSE ON)
 
@@ -67,26 +43,28 @@ set(FLUVEL_PACKAGING_DIR
     ${FLUVEL_ROOT_DIR}/packaging
 )
 
-set(FLUVEL_INSTALL_BINDIR bin)
-set(FLUVEL_INSTALL_LIBDIR lib)
-set(FLUVEL_INSTALL_DATADIR share)
+# Linux install directories (FHS)
+set(LINUX_INSTALL_BINDIR bin)
+set(LINUX_INSTALL_LIBDIR lib)
+set(LINUX_INSTALL_DATADIR share)
 
-set(FLUVEL_INSTALL_DESKTOPDIR ${FLUVEL_INSTALL_DATADIR}/applications)
-set(FLUVEL_INSTALL_ICONDIR ${FLUVEL_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
+set(LINUX_INSTALL_DESKTOPDIR
+    ${LINUX_INSTALL_DATADIR}/applications)
 
-set(QT_COMPONENTS
-    Core Gui Multimedia MultimediaWidgets Widgets Svg LinguistTools
-)
+set(LINUX_INSTALL_ICONDIR
+    ${LINUX_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 
-if((ANDROID OR IOS) AND NOT FLUVEL_UI_DESKTOP)
-    list(APPEND QT_COMPONENTS Qml Quick)
-endif()
+# =========================
+# Experimental UI options
+# =========================
 
-find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
+option(FLUVEL_USE_QML
+       "Enable experimental QML UI"
+       OFF)
 
-if (COMMAND qt_policy)
-    qt_policy(SET QTP0002 NEW)
-endif()
+option(FLUVEL_UI_DESKTOP
+       "Use QWidget UI on Mobile"
+       ON)
 
 add_subdirectory(src/image_processing)
 add_subdirectory(src/app)
