@@ -173,7 +173,7 @@ jobs:
 
               /opt/tools/linuxdeploy.AppImage \
                 --appdir AppDir \
-                --executable AppDir/usr/bin/Fluvel \
+                --executable AppDir/usr/bin/fluvel \
                 --desktop-file AppDir/fluvel.desktop \
                 --icon-file AppDir/fluvel.png \
                 --plugin qt \
