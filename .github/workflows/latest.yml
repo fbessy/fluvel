@@ -1,13 +1,14 @@
 name: Fluvel Latest
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: fluvel-latest
   cancel-in-progress: true
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 on:
+  workflow_dispatch:
   push:
     branches: [release]
 
@@ -17,8 +18,8 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      build: ${{ steps.filter.outputs.build }}
-      web: ${{ steps.filter.outputs.web }}
+      build: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.build }}
+      web: ${{ github.event_name == 'workflow_dispatch' || steps.filter.outputs.web }}
 
     steps:
 
