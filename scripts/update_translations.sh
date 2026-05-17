@@ -2,7 +2,7 @@
 # update_translations.sh
 # Update TS files and generate QM files
 
-set -e
+set -euo pipefail
 
 # =========================
 # Resolve project root

@@ -3,6 +3,7 @@ set -euo pipefail
 
 # -------- Config --------
 APP_NAME="Fluvel"
+APP_EXECUTABLE="fluvel"
 INSTALL_PREFIX="/usr"
 
 # -------- Paths --------
@@ -105,7 +106,7 @@ echo "===> Building AppImage with linuxdeploy"
 
 "$LINUXDEPLOY" \
   --appdir "$APPDIR" \
-  --executable "$APPDIR/usr/bin/$APP_NAME" \
+  --executable "$APPDIR/usr/bin/$APP_EXECUTABLE" \
   --desktop-file "$APPDIR/fluvel.desktop" \
   --icon-file "$APPDIR/fluvel.png" \
   --plugin qt \

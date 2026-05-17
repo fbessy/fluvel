@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -17,7 +17,7 @@ cmake -S "${PROJECT_ROOT}" \
       -DCMAKE_PREFIX_PATH="$HOME/Qt/6.11.0/gcc_64"
 
 # --- Build ---
-cmake --build "${PROJECT_ROOT}/${BUILD_DIR}" -j
+cmake --build "${PROJECT_ROOT}/${BUILD_DIR}" -j$(nproc)
 
 # --- Package ---
 cd "${PROJECT_ROOT}/${BUILD_DIR}"

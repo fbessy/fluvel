@@ -155,11 +155,17 @@ set(app_src
 qt_add_executable(${FLUVEL_TARGET_NAME}
     ${app_src})
 
+if(FLUVEL_PLATFORM_LINUX)
+    set(FLUVEL_OUTPUT_NAME "fluvel")
+else()
+    set(FLUVEL_OUTPUT_NAME "Fluvel")
+endif()
+
 set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
     AUTOMOC ON
     AUTORCC ON
     AUTOUIC ON
-    OUTPUT_NAME "Fluvel"
+    OUTPUT_NAME ${FLUVEL_OUTPUT_NAME}
 )
 
 #if(FLUVEL_PLATFORM_ANDROID)

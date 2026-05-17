@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 #######################################
 # PATHS ROBUSTES
@@ -21,7 +21,7 @@ USE_CLANG=1
 # USE_GCC=1
 
 # Exécutable (relatif au build dir)
-EXECUTABLE_PATH="src/app/Fluvel"
+EXECUTABLE_PATH="src/app/fluvel"
 
 LSAN_SUPP_FILE="${SCRIPT_DIR}/lsan.supp"
 

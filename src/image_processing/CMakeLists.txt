@@ -96,19 +96,3 @@ target_include_directories(${TARGET_NAME} PUBLIC
     ${CORE_DIR}
     ${ALGO_DIR}
 )
-
-# image_processing/
-#   include/fluvel/image_processing/   <-- API publique
-#   core/                              <-- interne
-#   algo/                              <-- interne
-# Et côté CMake :
-
-# cmake
-# Copier le code
-# target_include_directories(${TARGET_NAME}
-#     PUBLIC
-#         ${IP_DIR}/include
-#     PRIVATE
-#         ${CORE_DIR}
-#         ${ALGO_DIR}
-# )

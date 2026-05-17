@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 #######################################
 # PATHS ROBUSTES
@@ -17,7 +17,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 USE_CLANG=1
 
 # 👉 Exécutable (comme ASAN)
-EXECUTABLE_PATH="src/app/Fluvel"
+EXECUTABLE_PATH="src/app/fluvel"
 
 # 👉 Mode (optionnel)
 # MODE="FAST"
