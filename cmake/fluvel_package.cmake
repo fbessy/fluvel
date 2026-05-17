@@ -29,7 +29,14 @@ if(FLUVEL_PLATFORM_LINUX)
 
     set(CPACK_GENERATOR "DEB")
 
-    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS
+        "libqt6core6,
+         libqt6gui6,
+         libqt6widgets6,
+         libqt6multimedia6,
+         libqt6svg6,
+         qt6-image-formats-plugins"
+    )
 
     # Linux install directories (FHS)
     set(LINUX_INSTALL_BINDIR bin)

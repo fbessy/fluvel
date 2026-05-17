@@ -34,6 +34,7 @@ jobs:
               - 'src/**'
               - 'resources/**'
               - 'packaging/**'
+              - 'cmake/**'
               - 'CMakeLists.txt'
               - '.github/workflows/build-desktop.yml'
               - '.github/workflows/build-linux.yml'
