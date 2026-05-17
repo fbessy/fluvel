@@ -1,5 +1,3 @@
-set(target_name fluvel)
-
 set(APP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(UI_WIN_DIR ${APP_DIR}/ui/windows)
@@ -154,10 +152,10 @@ set(app_src
     ${INTEROP_DIR}/contour_adapters.hpp
 )
 
-qt_add_executable(${target_name}
+qt_add_executable(${FLUVEL_TARGET_NAME}
     ${app_src})
 
-set_target_properties(${target_name} PROPERTIES
+set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
     AUTOMOC ON
     AUTORCC ON
     AUTOUIC ON
@@ -165,71 +163,19 @@ set_target_properties(${target_name} PROPERTIES
 )
 
 #if(FLUVEL_PLATFORM_ANDROID)
-    # qt_add_qml_module(${target_name}
+    # qt_add_qml_module(${FLUVEL_TARGET_NAME}
     #     URI fluvel
     #     VERSION 1.0
     #     QML_FILES
     #         qml/Main.qml
     # )
-    # qt_add_resources(${target_name} "qml"
+    # qt_add_resources(${FLUVEL_TARGET_NAME} "qml"
     #     PREFIX "/"
     #     FILES
     #         qml/Main.qml
     #         qml/lenna.bmp
     # )
 #endif()
-
-if(FLUVEL_PLATFORM_MACOS)
-    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
-    endif()
-
-    set(MACOSX_BUNDLE_ICON_FILE Fluvel.icns)
-
-    set(app_icon_macos
-        ${FLUVEL_PACKAGING_DIR}/macos/Fluvel.icns
-    )
-
-    set_source_files_properties(${app_icon_macos} PROPERTIES
-        MACOSX_PACKAGE_LOCATION "Resources"
-    )
-
-    target_sources(${target_name} PRIVATE ${app_icon_macos})
-
-    set_target_properties(${target_name} PROPERTIES
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_BUNDLE_NAME "Fluvel"
-    )
-
-elseif(FLUVEL_PLATFORM_WINDOWS)
-
-    set(app_icon_resource_windows_in
-        ${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.rc.in
-    )
-
-    set(FLUVEL_VERSION ${PROJECT_VERSION})
-
-    string(REPLACE "." "," FLUVEL_VERSION_COMMA "${PROJECT_VERSION},0")
-
-    set(FLUVEL_ICON_PATH
-        "${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.ico"
-    )
-
-    configure_file(
-        ${app_icon_resource_windows_in}
-        ${CMAKE_CURRENT_BINARY_DIR}/Fluvel.rc
-        @ONLY
-    )
-
-    target_sources(${target_name} PRIVATE
-        ${CMAKE_CURRENT_BINARY_DIR}/Fluvel.rc
-    )
-
-    set_target_properties(${target_name} PROPERTIES
-        WIN32_EXECUTABLE TRUE
-    )
-
-endif()
 
 # --- TS ---
 file(GLOB TS_FILES
@@ -248,7 +194,7 @@ foreach(qm ${QM_FILES})
 endforeach()
 
 # --- Resources ---
-qt_add_resources(${target_name} fluvel_translations
+qt_add_resources(${FLUVEL_TARGET_NAME} fluvel_translations
     PREFIX "/i18n"
     FILES ${QM_FILES}
 )
@@ -305,28 +251,12 @@ foreach(res ${APP_RESOURCES})
     )
 endforeach()
 
-qt_add_resources(${target_name} app_resources
+qt_add_resources(${FLUVEL_TARGET_NAME} app_resources
     PREFIX "/"
     FILES ${APP_RESOURCES}
 )
 
-if(FLUVEL_PLATFORM_MACOS)
-
-    configure_file(
-        ${FLUVEL_PACKAGING_DIR}/macos/Info.plist.in
-        ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
-        @ONLY
-    )
-
-    set_target_properties(${target_name} PROPERTIES
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
-    )
-
-    message(STATUS "Using plist: ${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
-
-endif()
-
-target_include_directories(${target_name} PRIVATE
+target_include_directories(${FLUVEL_TARGET_NAME} PRIVATE
     ${CORE_DIR}
     ${UI_COMP_DIR}
     ${UI_WIN_DIR}
@@ -334,24 +264,24 @@ target_include_directories(${target_name} PRIVATE
 )
 
 if(OpenCV_FOUND)
-    target_compile_definitions(${target_name} PRIVATE FLUVEL_USE_OPENCV)
+    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_USE_OPENCV)
 endif()
 
 if(Qt6_FOUND)
-    target_compile_definitions(${target_name} PRIVATE FLUVEL_USE_QT)
+    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_USE_QT)
 endif()
 
 
 if(ENABLE_ASAN)
-    target_compile_definitions(${target_name} PRIVATE FLUVEL_ASAN)
+    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_ASAN)
 else()
-    target_compile_definitions(${target_name} PRIVATE
+    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:FLUVEL_DEBUG>
     )
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(${target_name} PRIVATE
+    target_compile_options(${FLUVEL_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:
             -O0
             -g
@@ -380,7 +310,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         >
     )
 elseif (MSVC)
-    target_compile_options(${target_name} PRIVATE
+    target_compile_options(${FLUVEL_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:/Od /Zi>
         $<$<CONFIG:Release>:/O2>
         $<$<CONFIG:RelWithDebInfo>:/O2 /Zi>
@@ -389,7 +319,7 @@ elseif (MSVC)
 endif()
 
 if(FLUVEL_UI_DESKTOP)
-    target_compile_definitions(${target_name} PRIVATE FLUVEL_UI_DESKTOP)
+    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_UI_DESKTOP)
 endif()
 
 set(APP_QT_LIBS
@@ -408,102 +338,9 @@ if(FLUVEL_USE_QML)
     )
 endif()
 
-target_link_libraries(${target_name} PRIVATE
+target_link_libraries(${FLUVEL_TARGET_NAME} PRIVATE
     ${APP_QT_LIBS}
     fluvel::image_processing
 )
 
-
-# fallback si CI ne fournit pas le commit
-if(NOT DEFINED FLUVEL_GIT_COMMIT OR FLUVEL_GIT_COMMIT STREQUAL "")
-    execute_process(
-        COMMAND git rev-parse --short HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE FLUVEL_GIT_COMMIT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-    )
-endif()
-
-if(NOT FLUVEL_GIT_COMMIT)
-    set(FLUVEL_GIT_COMMIT "unknown")
-endif()
-
-message(STATUS "Commit: ${FLUVEL_GIT_COMMIT}")
-
-# --- Build version fallback (local dev) ---
-if(NOT DEFINED FLUVEL_BUILD_VERSION OR FLUVEL_BUILD_VERSION STREQUAL "")
-    if(FLUVEL_GIT_COMMIT AND NOT FLUVEL_GIT_COMMIT STREQUAL "unknown")
-        set(FLUVEL_BUILD_VERSION "dev-${FLUVEL_GIT_COMMIT}")
-    endif()
-endif()
-
-# --- Timestamp (safe) ---
-if(NOT FLUVEL_BUILD_TIMESTAMP)
-    string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
-endif()
-
-# --- Build origin ---
-if(NOT FLUVEL_BUILD_ORIGIN)
-    set(FLUVEL_BUILD_ORIGIN "Local")
-endif()
-
-target_compile_definitions(${target_name} PRIVATE
-    FLUVEL_VERSION="${PROJECT_VERSION}"
-    FLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}"
-    FLUVEL_BUILD_TIMESTAMP="${FLUVEL_BUILD_TIMESTAMP}"
-    FLUVEL_CMAKE_VERSION="${CMAKE_VERSION}"
-    FLUVEL_BUILD_ORIGIN="${FLUVEL_BUILD_ORIGIN}"
-)
-
-# --- Build version (CI/dev) ---
-if(DEFINED FLUVEL_BUILD_VERSION AND NOT FLUVEL_BUILD_VERSION STREQUAL "")
-    target_compile_definitions(${target_name} PRIVATE
-        FLUVEL_BUILD_VERSION="${FLUVEL_BUILD_VERSION}"
-    )
-endif()
-
-if(FLUVEL_PLATFORM_ANDROID)
-
-    # --- Android packaging ---
-    set_target_properties(${target_name} PROPERTIES
-        QT_ANDROID_PACKAGE_SOURCE_DIR ${FLUVEL_PACKAGING_DIR}/android
-
-        # --- Options possibles ---
-        # QT_ANDROID_APP_NAME ${target_name}
-        # QT_ANDROID_APP_LIB_NAME ${target_name}
-        # QT_ANDROID_PACKAGE_NAME "org.fluvel.app"
-        # QT_ANDROID_GUI TRUE
-        # QT_ANDROID_DEPLOYMENT_SETTINGS_FILE
-        # ${CMAKE_CURRENT_BINARY_DIR}/android-${target_name}-deployment-settings.json
-        # OUTPUT_NAME "fluvel"
-    )
-
-elseif(FLUVEL_PLATFORM_MACOS)
-
-    # --- macOS bundle install ---
-    install(TARGETS ${target_name}
-        BUNDLE DESTINATION .
-    )
-
-elseif(FLUVEL_PLATFORM_WINDOWS OR FLUVEL_PLATFORM_LINUX)
-
-    # --- Linux / Windows install ---
-    install(TARGETS ${target_name}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-    )
-
-endif()
-
-
-if(FLUVEL_PLATFORM_LINUX)
-    install(FILES
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.desktop
-        DESTINATION ${LINUX_INSTALL_DESKTOPDIR})
-
-    install(FILES
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.svg
-        DESTINATION ${LINUX_INSTALL_ICONDIR})
-endif()
+include(${FLUVEL_ROOT_DIR}/cmake/fluvel_build_info.cmake)

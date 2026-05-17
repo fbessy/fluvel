@@ -60,7 +60,7 @@ jobs:
               APP_DATE=\$(date +%Y-%m-%d)
 
               cp packaging/flatpak/fluvel.json fluvel.ci.json
-              cp packaging/flatpak/org.fluvel.App.metainfo.xml metainfo.ci.xml
+              cp packaging/linux/org.fluvel.App.metainfo.xml.in metainfo.ci.xml
 
               ESCAPED_ROOT=\$(printf '%s\n' \"\$PROJECT_ROOT\" | sed 's/[\/&]/\\\\&/g')
 
@@ -70,8 +70,8 @@ jobs:
               sed -i \"s/__BUILD_TIMESTAMP__/\$BUILD_TIMESTAMP/g\" fluvel.ci.json
               sed -i \"s/__BUILD_ORIGIN__/GitHub Actions/g\" fluvel.ci.json
 
-              sed -i \"s/__APP_VERSION__/$APP_VERSION/g\" metainfo.ci.xml
-              sed -i \"s/__APP_DATE__/\$APP_DATE/g\" metainfo.ci.xml
+              sed -i "s/@PROJECT_VERSION@/$APP_VERSION/g" metainfo.ci.xml
+              sed -i "s/@FLUVEL_RELEASE_DATE@/$APP_DATE/g" metainfo.ci.xml
 
               mkdir -p repo
 
@@ -199,3 +199,89 @@ jobs:
             Fluvel-linux.AppImage
             Fluvel-linux.AppImage.sha256
             commit-linux-appimage.txt
+
+
+  # =========================
+  # Linux DEB BUILD
+  # =========================
+  linux-deb:
+    needs: prepare-docker
+
+    runs-on: ubuntu-24.04
+
+    if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'release'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 🧠 Compute version
+      - name: Compute version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="dev-${GITHUB_SHA::7}"
+          fi
+
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Pull Docker image
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
+
+      # 📦 Build DEB dans Docker
+      - name: Build DEB
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2 \
+            bash -c "
+              cd /workspace
+
+              echo \"Version = $APP_VERSION\"
+
+              unset LD_LIBRARY_PATH
+              unset QT_PLUGIN_PATH
+              unset QML2_IMPORT_PATH
+
+              BUILD_TIMESTAMP=\$(date -u +\"%Y-%m-%d %H:%M:%S\")
+
+              cmake --fresh -S . -B build-deb -G Ninja \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DQt6_DIR=\$Qt6_DIR \
+                \
+                -DFLUVEL_BUILD_VERSION=$APP_VERSION \
+                -DFLUVEL_GIT_COMMIT=$COMMIT_SHORT \
+                -DFLUVEL_BUILD_TIMESTAMP=\"\$BUILD_TIMESTAMP\" \
+                -DFLUVEL_BUILD_ORIGIN=\"GitHub Actions\"
+
+              cmake --build build-deb
+
+              cd build-deb
+
+              cpack
+            "
+
+      - name: Rename DEB
+        run: |
+          mv build-deb/*.deb Fluvel-linux.deb
+
+      - name: Generate checksum
+        run: |
+          sha256sum Fluvel-linux.deb > Fluvel-linux.deb.sha256
+
+      - name: Generate commit info
+        run: |
+          echo "${GITHUB_SHA}" > commit-linux-deb.txt
+
+      # 📤 Upload artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-deb
+          path: |
+            Fluvel-linux.deb
+            Fluvel-linux.deb.sha256
+            commit-linux-deb.txt

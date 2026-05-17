@@ -34,6 +34,11 @@ jobs:
           name: linux-flatpak
           path: linux
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-deb
+          path: linux
+
       - name: Debug files
         run: ls -R
 
@@ -56,6 +61,7 @@ jobs:
           cd linux
           sha256sum -c Fluvel-linux.AppImage.sha256
           sha256sum -c Fluvel-linux.flatpak.sha256
+          sha256sum -c Fluvel-linux.deb.sha256
           cd ..
 
       - name: Compute version
@@ -99,6 +105,7 @@ jobs:
           Fluvel-macos.dmg
           Fluvel-linux.AppImage
           Fluvel-linux.flatpak
+          Fluvel-linux.deb
 
           Checksums
           =========

@@ -43,16 +43,7 @@ set(FLUVEL_PACKAGING_DIR
     ${FLUVEL_ROOT_DIR}/packaging
 )
 
-# Linux install directories (FHS)
-set(LINUX_INSTALL_BINDIR bin)
-set(LINUX_INSTALL_LIBDIR lib)
-set(LINUX_INSTALL_DATADIR share)
-
-set(LINUX_INSTALL_DESKTOPDIR
-    ${LINUX_INSTALL_DATADIR}/applications)
-
-set(LINUX_INSTALL_ICONDIR
-    ${LINUX_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
+set(FLUVEL_TARGET_NAME fluvel)
 
 # =========================
 # Experimental UI options
@@ -69,4 +60,4 @@ option(FLUVEL_UI_DESKTOP
 add_subdirectory(src/image_processing)
 add_subdirectory(src/app)
 
-include(CPack)
+include(cmake/fluvel_package.cmake)

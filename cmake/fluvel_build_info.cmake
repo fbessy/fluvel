@@ -1,0 +1,48 @@
+# Fallback if CI does not provide the commit hash
+if(NOT DEFINED FLUVEL_GIT_COMMIT OR FLUVEL_GIT_COMMIT STREQUAL "")
+    execute_process(
+        COMMAND git rev-parse --short HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE FLUVEL_GIT_COMMIT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+endif()
+
+if(NOT FLUVEL_GIT_COMMIT)
+    set(FLUVEL_GIT_COMMIT "unknown")
+endif()
+
+message(STATUS "Commit: ${FLUVEL_GIT_COMMIT}")
+
+# --- Build version fallback (local dev) ---
+if(NOT DEFINED FLUVEL_BUILD_VERSION OR FLUVEL_BUILD_VERSION STREQUAL "")
+    if(FLUVEL_GIT_COMMIT AND NOT FLUVEL_GIT_COMMIT STREQUAL "unknown")
+        set(FLUVEL_BUILD_VERSION "dev-${FLUVEL_GIT_COMMIT}")
+    endif()
+endif()
+
+# --- Timestamp (safe) ---
+if(NOT FLUVEL_BUILD_TIMESTAMP)
+    string(TIMESTAMP FLUVEL_BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
+endif()
+
+# --- Build origin ---
+if(NOT FLUVEL_BUILD_ORIGIN)
+    set(FLUVEL_BUILD_ORIGIN "Local")
+endif()
+
+target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
+    FLUVEL_VERSION="${PROJECT_VERSION}"
+    FLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}"
+    FLUVEL_BUILD_TIMESTAMP="${FLUVEL_BUILD_TIMESTAMP}"
+    FLUVEL_CMAKE_VERSION="${CMAKE_VERSION}"
+    FLUVEL_BUILD_ORIGIN="${FLUVEL_BUILD_ORIGIN}"
+)
+
+# --- Build version (CI/dev) ---
+if(DEFINED FLUVEL_BUILD_VERSION AND NOT FLUVEL_BUILD_VERSION STREQUAL "")
+    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
+        FLUVEL_BUILD_VERSION="${FLUVEL_BUILD_VERSION}"
+    )
+endif()
