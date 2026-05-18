@@ -103,6 +103,13 @@ if(FLUVEL_PLATFORM_WINDOWS)
         "${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.ico"
     )
 
+    if(DEFINED FLUVEL_GIT_COMMIT)
+        string(SUBSTRING "${FLUVEL_GIT_COMMIT}" 0 7
+               FLUVEL_GIT_COMMIT_SHORT)
+    else()
+        set(FLUVEL_GIT_COMMIT_SHORT "unknown")
+    endif()
+
     file(TO_CMAKE_PATH "${FLUVEL_ICON_PATH}" FLUVEL_ICON_PATH)
 
     configure_file(
