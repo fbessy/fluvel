@@ -40,7 +40,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
 
       # 📦 Build Flatpak dans Docker
       - name: Build Flatpak
@@ -48,7 +48,7 @@ jobs:
           docker run --rm \
             --privileged \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2 \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2 \
             bash -c "
               cd /workspace
               git config --global --add safe.directory /workspace
@@ -125,14 +125,14 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
 
       # 📦 Build AppImage dans Docker
       - name: Build AppImage
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2 \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2 \
             bash -c "
               cd /workspace
 
@@ -230,14 +230,14 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
 
       # 📦 Build DEB dans Docker
       - name: Build DEB
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2 \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2 \
             bash -c "
               cd /workspace
 

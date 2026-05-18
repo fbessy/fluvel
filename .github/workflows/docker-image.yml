@@ -36,7 +36,7 @@ jobs:
 
       - name: Ensure image
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.9.1-v2
+          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
           CACHE_IMAGE=${IMAGE}-cache
 
           EXISTS=false
