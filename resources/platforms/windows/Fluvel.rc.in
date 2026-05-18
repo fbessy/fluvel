@@ -20,12 +20,15 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "Fluvel\0"
-            VALUE "FileDescription", "Fluvel Application\0"
-            VALUE "FileVersion", "@FLUVEL_VERSION@\0"
-            VALUE "ProductName", "Fluvel\0"
-            VALUE "ProductVersion", "@FLUVEL_VERSION@\0"
-            VALUE "OriginalFilename", "Fluvel.exe\0"
+            VALUE "CompanyName", "Fabien Bessy"
+            VALUE "FileDescription", "Fluvel Application"
+            VALUE "FileVersion", "@FLUVEL_VERSION@"
+            VALUE "ProductName", "Fluvel"
+            VALUE "ProductVersion", "@FLUVEL_VERSION@"
+            VALUE "OriginalFilename", "Fluvel.exe"
+            VALUE "InternalName", "Fluvel"
+            VALUE "LegalCopyright", "Copyright (C) 2010-2026 Fabien Bessy"
+            VALUE "Comments", "Licensed under CeCILL v2.1"
         END
     END
 

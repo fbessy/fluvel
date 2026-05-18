@@ -103,6 +103,8 @@ if(FLUVEL_PLATFORM_WINDOWS)
         "${FLUVEL_RESOURCES_DIR}/platforms/windows/Fluvel.ico"
     )
 
+    file(TO_CMAKE_PATH "${FLUVEL_ICON_PATH}" FLUVEL_ICON_PATH)
+
     configure_file(
         ${app_icon_resource_windows_in}
         ${CMAKE_CURRENT_BINARY_DIR}/Fluvel.rc
