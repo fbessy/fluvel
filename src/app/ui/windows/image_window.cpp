@@ -860,7 +860,7 @@ void ImageWindow::showEvent(QShowEvent* event)
     QTimer::singleShot(0, this,
                        [this]()
                        {
-                           setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
+                           setWindowIcon(il::appIcon());
                        });
 
     QMainWindow::showEvent(event);

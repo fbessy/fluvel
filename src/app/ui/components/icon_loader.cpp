@@ -62,6 +62,33 @@ static QIcon loadSvgWithPalette(const QString& path)
     return icon;
 }
 
+const QIcon& appIcon()
+{
+    static QIcon icon(":/icons/app/fluvel.svg");
+    return icon;
+}
+
+QIcon desktopAppIcon()
+{
+    QIcon icon;
+
+    icon.addFile(":/icons/app/fluvel-16.png", QSize(16, 16));
+
+    icon.addFile(":/icons/app/fluvel-22.png", QSize(22, 22));
+
+    icon.addFile(":/icons/app/fluvel-32.png", QSize(32, 32));
+
+    icon.addFile(":/icons/app/fluvel-48.png", QSize(48, 48));
+
+    icon.addFile(":/icons/app/fluvel-64.png", QSize(64, 64));
+
+    icon.addFile(":/icons/app/fluvel-128.png", QSize(128, 128));
+
+    icon.addFile(":/icons/app/fluvel-256.png", QSize(256, 256));
+
+    return icon;
+}
+
 QIcon loadIcon(const QString& themeName, const QString& fallback)
 {
 #ifndef FLUVEL_FORCE_EMBEDDED_ICONS

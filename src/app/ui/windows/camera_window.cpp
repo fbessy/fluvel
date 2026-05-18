@@ -54,7 +54,7 @@ CameraWindow::CameraWindow(QWidget* parent)
 
 void CameraWindow::setupWindow()
 {
-    setWindowIcon(QIcon(":/icons/app/fluvel.svg"));
+    setWindowIcon(il::appIcon());
     updateWindowTitle();
 }
 

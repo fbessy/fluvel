@@ -269,23 +269,6 @@ target_include_directories(${FLUVEL_TARGET_NAME} PRIVATE
     ${INTEROP_DIR}
 )
 
-if(OpenCV_FOUND)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_USE_OPENCV)
-endif()
-
-if(Qt6_FOUND)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_USE_QT)
-endif()
-
-
-if(ENABLE_ASAN)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_ASAN)
-else()
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
-        $<$<CONFIG:Debug>:FLUVEL_DEBUG>
-    )
-endif()
-
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(${FLUVEL_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:
@@ -324,10 +307,6 @@ elseif (MSVC)
     )
 endif()
 
-if(FLUVEL_UI_DESKTOP)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_UI_DESKTOP)
-endif()
-
 set(APP_QT_LIBS
     Qt6::Core
     Qt6::Gui
@@ -349,4 +328,5 @@ target_link_libraries(${FLUVEL_TARGET_NAME} PRIVATE
     fluvel::image_processing
 )
 
+include(${FLUVEL_ROOT_DIR}/cmake/fluvel_compile_definitions.cmake)
 include(${FLUVEL_ROOT_DIR}/cmake/fluvel_build_info.cmake)

@@ -31,6 +31,21 @@ namespace il
  */
 
 /**
+ * @brief Returns the shared Fluvel application icon.
+ *
+ * The icon instance is lazily initialized and reused for the
+ * lifetime of the application.
+ */
+const QIcon& appIcon();
+
+/**
+ * @brief Returns the desktop application icon.
+ *
+ * Provides the multi-resolution icon used for desktop window integration.
+ */
+QIcon desktopAppIcon();
+
+/**
  * @brief Loads an icon from the current icon theme using a theme name.
  *
  * The loading order is:

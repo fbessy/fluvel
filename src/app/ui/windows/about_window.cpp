@@ -3,6 +3,7 @@
 
 #include "about_window.hpp"
 #include "application_settings.hpp"
+#include "icon_loader.hpp"
 
 #include <QCryptographicHash>
 #include <QDateTime>
@@ -150,8 +151,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     ///////////////////////////////////////
 
     QLabel* iconLabel = new QLabel;
-    QIcon fluvelIcon(":/icons/app/fluvel.svg");
-    iconLabel->setPixmap(fluvelIcon.pixmap(48 * 3, 48 * 3));
+    iconLabel->setPixmap(il::appIcon().pixmap(48 * 3, 48 * 3));
     iconLabel->setAlignment(Qt::AlignCenter);
 
     QLabel* nameLabel = new QLabel;

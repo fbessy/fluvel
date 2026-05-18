@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include <QtGlobal>
-
-#ifdef Q_OS_WIN
+#ifdef FLUVEL_PLATFORM_WINDOWS
 #include <shobjidl_core.h>
 #include <windows.h>
 #endif
 
 // clang-format off
-#if defined(Q_OS_ANDROID)
+#if defined(FLUVEL_PLATFORM_MOBILE)
     #if defined(FLUVEL_UI_DESKTOP)
         #include "camera_window.hpp"
     #else
@@ -23,6 +21,7 @@
 
 #include "application_settings.hpp"
 #include "frame_clock.hpp"
+#include "icon_loader.hpp"
 
 #include <QApplication>
 #include <QCoreApplication>
@@ -32,15 +31,15 @@
 
 int main(int argc, char* argv[])
 {
-#if defined(Q_OS_ANDROID) && !defined(FLUVEL_UI_DESKTOP)
+#if defined(FLUVEL_PLATFORM_MOBILE) && !defined(FLUVEL_UI_DESKTOP)
     QGuiApplication app(argc, argv);
 #else
     QApplication app(argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
 #endif
 
-#ifdef Q_OS_WIN
-    SetCurrentProcessExplicitAppUserModelID(L"org.fluvel.app");
+#ifdef FLUVEL_PLATFORM_WINDOWS
+    SetCurrentProcessExplicitAppUserModelID(L"org.fluvel.Fluvel");
 #endif
 
     QCoreApplication::setOrganizationName("fluvel");
@@ -78,21 +77,11 @@ int main(int argc, char* argv[])
     if (translator_fluvel.load(QString(":/i18n/fluvel_%1.qm").arg(locale)))
         app.installTranslator(&translator_fluvel);
 
-#ifndef Q_OS_ANDROID
-    // Icône (desktop uniquement utile, mais safe partout)
-    QIcon appIcon;
-    appIcon.addFile(":/icons/app/fluvel-16.png", QSize(16, 16));
-    appIcon.addFile(":/icons/app/fluvel-22.png", QSize(22, 22));
-    appIcon.addFile(":/icons/app/fluvel-32.png", QSize(32, 32));
-    appIcon.addFile(":/icons/app/fluvel-48.png", QSize(48, 48));
-    appIcon.addFile(":/icons/app/fluvel-64.png", QSize(64, 64));
-    appIcon.addFile(":/icons/app/fluvel-128.png", QSize(128, 128));
-    appIcon.addFile(":/icons/app/fluvel-256.png", QSize(256, 256));
-
-    QApplication::setWindowIcon(appIcon);
+#ifdef FLUVEL_PLATFORM_DESKTOP
+    QApplication::setWindowIcon(fluvel_app::il::desktopAppIcon());
 #endif
 
-#if defined(Q_OS_ANDROID) && !defined(FLUVEL_UI_DESKTOP)
+#if defined(FLUVEL_PLATFORM_MOBILE) && !defined(FLUVEL_UI_DESKTOP)
 
     QQmlApplicationEngine engine;
     engine.load(QUrl("qrc:/qml/Main.qml"));
@@ -111,7 +100,7 @@ int main(int argc, char* argv[])
 
 #else
 
-#if defined(Q_OS_ANDROID)
+#if defined(FLUVEL_PLATFORM_MOBILE)
     auto root = std::make_unique<fluvel_app::CameraWindow>();
 #else
     auto root = std::make_unique<fluvel_app::ImageWindow>();
