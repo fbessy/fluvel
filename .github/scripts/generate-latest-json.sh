@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
 
-set -e
+set -euo pipefail
 
 COMMIT_SHORT=${GITHUB_SHA::8}
 BRANCH_NAME=${GITHUB_REF_NAME}

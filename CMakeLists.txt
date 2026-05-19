@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
+
 cmake_minimum_required(VERSION 3.16)
 
 project(Fluvel VERSION 1.0.0 LANGUAGES CXX)

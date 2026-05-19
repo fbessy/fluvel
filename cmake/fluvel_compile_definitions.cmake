@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
+
 target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
 
     $<$<BOOL:${FLUVEL_PLATFORM_DESKTOP}>:

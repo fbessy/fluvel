@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# update_translations.sh
-# Update TS files and generate QM files
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
 
 set -euo pipefail
 

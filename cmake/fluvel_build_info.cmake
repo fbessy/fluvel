@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
+
 # Fallback if CI does not provide the commit hash
 if(NOT DEFINED FLUVEL_GIT_COMMIT OR FLUVEL_GIT_COMMIT STREQUAL "")
     execute_process(

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
 
-set -e
+set -euo pipefail
 
 EXPECTED_COMMIT="${GITHUB_SHA}"
 

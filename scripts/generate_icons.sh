@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-set -e
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
+
+set -euo pipefail
 
 # =========================
 # Resolve project root

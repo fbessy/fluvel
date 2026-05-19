@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
+
 set(APP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(UI_WIN_DIR ${APP_DIR}/ui/windows)

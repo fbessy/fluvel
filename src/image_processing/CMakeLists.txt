@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
 
 # current image_processing directory
 set(IP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
