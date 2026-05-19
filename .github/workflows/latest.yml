@@ -213,7 +213,9 @@ jobs:
           cp -r ../web/* .
 
           rm -rf media
-          cp -r ../assets/videos ./media
+          rm -rf assets
+
+          cp -r ../assets ./assets
 
           if [ "${{ needs.changes.outputs.build }}" = "true" ]; then
             cp ../prepared/latest.json .

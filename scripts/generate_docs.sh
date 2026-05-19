@@ -17,8 +17,8 @@ cd "$PROJECT_ROOT"
 echo "🧹 Cleaning previous build..."
 
 rm -rf "$SPHINX_BUILD"
-rm -rf "$PROJECT_ROOT/docs/xml"
-rm -rf "$PROJECT_ROOT/docs/html"
+rm -rf "$DOXYGEN_XML_DIR"
+rm -rf "$DOXYGEN_HTML_DIR"
 
 echo "📝 Preparing README for Sphinx..."
 
@@ -26,7 +26,7 @@ cp "$PROJECT_ROOT/README.md" \
    "$SPHINX_SOURCE/README.md"
 
 sed -i \
-'s|assets/videos/|../../../assets/videos/|g' \
+'s|assets/gifs/|../../../assets/gifs/|g' \
 "$SPHINX_SOURCE/README.md"
 
 sed -i \

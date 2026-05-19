@@ -95,7 +95,7 @@ docs/sphinx/build/
 docs/sphinx/source/README.md
 
 # Generated automatically from assets/videos
-web/media/
+web/assets/
 
 # Local packaging/build artifacts
 tools/

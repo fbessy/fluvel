@@ -91,6 +91,9 @@ doc:
         docs/sphinx/source \
         public
 
+    - mkdir -p public/assets/gifs
+    - cp assets/gifs/*.gif public/assets/gifs/
+
     - mkdir -p public/assets/videos
     - cp assets/videos/*.webm public/assets/videos/
 

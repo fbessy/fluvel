@@ -177,10 +177,11 @@ cp "$SRC" \
 cp "$WIN_DIR/Fluvel.ico" \
    "$PAGE_DIR/favicon.ico"
 
-mkdir -p "$PAGE_DIR/media"
+# --- Shared web assets ---
+rm -rf "$PAGE_DIR/assets"
 
-cp "$ROOT_DIR/assets/videos/"*.webm \
-   "$PAGE_DIR/media/"
+cp -r "$ROOT_DIR/assets" \
+      "$PAGE_DIR/assets"
 
 # =========================
 # Cleanup

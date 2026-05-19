@@ -6,7 +6,7 @@ Name=Fluvel
 Name[fr]=Fluvel
 
 GenericName=Computer vision and image analysis
-GenericName[fr_FR]=Vision par ordinateur et analyse d’images
+GenericName[fr]=Vision par ordinateur et analyse d'images
 
 Comment=Explore image segmentation with interactive and real-time visualization
 Comment[fr]=Explorer la segmentation d'images avec visualisation interactive et en temps réel
@@ -15,9 +15,10 @@ Exec=fluvel
 Icon=org.fluvel.Fluvel
 
 Terminal=false
+StartupNotify=false
 StartupWMClass=Fluvel
 
 Categories=Graphics;Science;
 
 Keywords=image;segmentation;computer-vision;research;
-Keywords[fr_FR]=image;segmentation;vision;recherche;
+Keywords[fr]=image;segmentation;vision;recherche;
