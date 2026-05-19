@@ -33,23 +33,27 @@
 
 ## Real-time tracking
 
-<video src="assets/videos/phone_tracking.webm"
-       controls
-       muted
-       width="900">
-</video>
+<p align="center">
+  <img src="assets/gifs/phone_tracking.gif" width="900">
+</p>
 
-[Open video directly](assets/videos/phone_tracking.webm)
+<p align="center">
+  <a href="assets/videos/phone_tracking.webm">
+    Open full video
+  </a>
+</p>
 
 ## MRI contour evolution
 
-<video src="assets/videos/mri_segmentation.webm"
-       controls
-       muted
-       width="900">
-</video>
+<p align="center">
+  <img src="assets/gifs/mri_segmentation.gif" width="900">
+</p>
 
-[Open video directly](assets/videos/mri_segmentation.webm)
+<p align="center">
+  <a href="assets/videos/mri_segmentation.webm">
+    Open full video
+  </a>
+</p>
 
 ## 🚀 Downloads
 

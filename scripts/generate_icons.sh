@@ -141,7 +141,7 @@ png2icns "$MAC_DIR/Fluvel.icns" \
 # =========================
 echo "Generating Flatpak/Linux icon..."
 
-cp "$SRC" "$LINUX_DIR/org.fluvel.App.svg"
+cp "$SRC" "$LINUX_DIR/org.fluvel.Fluvel.svg"
 
 # =========================
 # Linux / AppImage

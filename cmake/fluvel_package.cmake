@@ -30,6 +30,8 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER
 
 if(FLUVEL_PLATFORM_LINUX)
 
+    include(GNUInstallDirs)
+
     set(CPACK_GENERATOR "DEB")
 
     set(CPACK_DEBIAN_PACKAGE_DEPENDS
@@ -42,48 +44,44 @@ if(FLUVEL_PLATFORM_LINUX)
     )
 
     # Linux install directories (FHS)
-    set(LINUX_INSTALL_BINDIR bin)
-    set(LINUX_INSTALL_LIBDIR lib)
-    set(LINUX_INSTALL_DATADIR share)
-
     set(LINUX_INSTALL_DESKTOPDIR
-        ${LINUX_INSTALL_DATADIR}/applications
+        ${CMAKE_INSTALL_DATADIR}/applications
     )
 
     set(LINUX_INSTALL_ICONDIR
-        ${LINUX_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+        ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
     )
 
     # --- Executable ---
     install(TARGETS ${FLUVEL_TARGET_NAME}
-        RUNTIME DESTINATION ${LINUX_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${LINUX_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${LINUX_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
     # --- Desktop entry ---
     install(FILES
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.desktop
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.desktop
         DESTINATION ${LINUX_INSTALL_DESKTOPDIR}
     )
 
     # --- App icon ---
     install(FILES
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.svg
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.svg
         DESTINATION ${LINUX_INSTALL_ICONDIR}
     )
 
     string(TIMESTAMP FLUVEL_RELEASE_DATE "%Y-%m-%d")
 
     configure_file(
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.App.metainfo.xml.in
-        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.App.metainfo.xml
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.metainfo.xml.in
+        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.Fluvel.metainfo.xml
         @ONLY
     )
 
     install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.App.metainfo.xml
-        DESTINATION ${LINUX_INSTALL_DATADIR}/metainfo
+        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.Fluvel.metainfo.xml
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo
     )
 
 endif()

@@ -5,8 +5,8 @@ Type=Application
 Name=Fluvel
 Name[fr_FR]=Fluvel
 
-GenericName=Real-time computer vision and image analysis for research
-GenericName[fr_FR]=Vision par ordinateur et analyse d’images en temps réel pour la recherche
+GenericName=Computer vision and image analysis
+GenericName[fr_FR]=Vision par ordinateur et analyse d’images
 
 Comment=Interactive real-time image segmentation and active contour experimentation
 Comment[fr_FR]=Segmentation d’images interactive en temps réel et expérimentation de contours actifs
@@ -16,6 +16,9 @@ Icon=fluvel
 
 Terminal=false
 StartupNotify=true
-StartupWMClass=fluvel
+StartupWMClass=Fluvel
 
 Categories=Graphics;Science;
+
+Keywords=image;segmentation;computer-vision;research;
+Keywords[fr_FR]=image;segmentation;vision;recherche;

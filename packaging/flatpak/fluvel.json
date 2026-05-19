@@ -1,5 +1,5 @@
 {
-  "id": "org.fluvel.App",
+  "id": "org.fluvel.Fluvel",
   "runtime": "org.kde.Platform",
   "runtime-version": "6.9",
   "sdk": "org.kde.Sdk",
@@ -37,9 +37,9 @@
       "name": "fluvel-metadata",
       "buildsystem": "simple",
       "build-commands": [
-        "install -Dm644 packaging/linux/org.fluvel.App.desktop /app/share/applications/org.fluvel.App.desktop",
-        "install -Dm644 metainfo.ci.xml /app/share/metainfo/org.fluvel.App.metainfo.xml",
-        "install -Dm644 packaging/linux/org.fluvel.App.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.App.svg"
+        "install -Dm644 packaging/linux/org.fluvel.Fluvel.desktop /app/share/applications/org.fluvel.Fluvel.desktop",
+        "install -Dm644 metainfo.ci.xml /app/share/metainfo/org.fluvel.Fluvel.metainfo.xml",
+        "install -Dm644 packaging/linux/org.fluvel.Fluvel.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.Fluvel.svg"
       ],
       "sources": [
         {
