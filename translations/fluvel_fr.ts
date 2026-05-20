@@ -40,7 +40,7 @@ R : %3  G : %4  B : %5</translation>
 <context>
     <name>fluvel_app::AboutWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/about_window.cpp" line="141"/>
+        <location filename="../src/app/ui/windows/about_window.cpp" line="142"/>
         <source>About Fluvel</source>
         <translation>À propos de Fluvel</translation>
     </message>
@@ -338,66 +338,66 @@ R : %3  G : %4  B : %5</translation>
 <context>
     <name>fluvel_app::AnalysisWidget</name>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="43"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="46"/>
         <source>Title - Size</source>
         <translation>Titre - Taille</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="61"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="64"/>
         <source>Open image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="67"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="70"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="85"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="88"/>
         <source>Color</source>
         <translation>Couleur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="83"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="86"/>
         <source>Color: </source>
         <translation>Couleur : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="97"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="100"/>
         <source>Noise</source>
         <translation>Bruit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="102"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="105"/>
         <source>Amount:</source>
         <translation>Intensité :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="111"/>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="226"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="114"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="248"/>
         <source>Shape 1 size: %1 pts</source>
         <translation>Taille de la forme 1 : %1 pts</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="116"/>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="230"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="119"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="252"/>
         <source>Shape 2 size: %1 pts</source>
         <translation>Taille de la forme 2 : %1 pts</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="160"/>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="167"/>
         <source>Open File</source>
         <translation>Ouvrir un fichier</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="176"/>
-        <source>Opening error - Fluvel</source>
-        <translation>Erreur d’ouverture - Fluvel</translation>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="198"/>
+        <source>Cannot Open Image</source>
+        <translation>Impossible d&apos;ouvrir l&apos;image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/analysis_widget.cpp" line="177"/>
-        <source>Cannot load %1.</source>
-        <translation>Impossible de charger %1.</translation>
+        <location filename="../src/app/ui/components/analysis_widget.cpp" line="199"/>
+        <source>Failed to load image: %1</source>
+        <translation>Impossible de charger l’image : %1</translation>
     </message>
 </context>
 <context>
@@ -809,8 +809,8 @@ Le flux de la caméra est peut-être interrompu.</translation>
     </message>
     <message>
         <location filename="../src/app/core/image_controller.cpp" line="65"/>
-        <source>Failed to load image.</source>
-        <translation>Impossible de charger l’image.</translation>
+        <source>Failed to load image: %1</source>
+        <translation>Impossible de charger l’image : %1</translation>
     </message>
     <message>
         <location filename="../src/app/core/image_controller.cpp" line="222"/>
@@ -902,25 +902,25 @@ Fichier → Ouvrir</translation>
     <name>fluvel_app::ImageWindow</name>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="89"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="797"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="826"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="90"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="798"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="827"/>
         <source>Run the active contour.</source>
         <translation>Lancer le contour actif.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="93"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="810"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="839"/>
         <source>Resume</source>
         <translation>Reprendre</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="94"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="811"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="840"/>
         <source>Resume the active contour execution.</source>
         <translation>Reprendre l’exécution du contour actif.</translation>
     </message>
@@ -1000,42 +1000,42 @@ Fichier → Ouvrir</translation>
         <translation>&amp;Enregistrer...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="255"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="256"/>
         <source>Save the displayed image.</source>
         <translation>Enregistrer l’image affichée.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="273"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="274"/>
         <source>&amp;Analysis</source>
         <translation>&amp;Analyse</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="274"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="275"/>
         <source>Compute the Hausdorff distance.</source>
         <translation>Calculer la distance de Hausdorff.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="275"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="276"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="279"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="281"/>
         <source>&amp;Settings</source>
         <translation>&amp;Paramètres</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="281"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="283"/>
         <source>Image preprocessing and active contour initialization.</source>
         <translation>Prétraitement de l’image et initialisation du contour actif.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="286"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="288"/>
         <source>&amp;About</source>
         <translation>&amp;À propos</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="708"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="729"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
@@ -1050,98 +1050,108 @@ Fichier → Ouvrir</translation>
         <translation>Effacer la liste des fichiers récents.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="287"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="289"/>
         <source>Application information, license and home page.</source>
         <translation>Informations sur l’application, licence et page d’accueil.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="294"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="296"/>
         <source>&amp;Language</source>
         <translation>&amp;Langue</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="295"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="297"/>
         <source>Choose the application language.</source>
         <translation>Choisir la langue de l’application.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="305"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="307"/>
         <source>&amp;Session</source>
         <translation>&amp;Session</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="311"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="313"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="326"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="328"/>
         <source>&amp;Segmentation</source>
         <translation>&amp;Segmentation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="330"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="332"/>
         <source>&amp;Help</source>
         <translation>Ai&amp;de</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="512"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="515"/>
         <source>Open Image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="607"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="626"/>
         <source>&amp;%1</source>
         <translation>&amp;%1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="644"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="835"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="663"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="864"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="644"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="663"/>
         <source>No camera available.</source>
         <translation>Aucune caméra disponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="687"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="706"/>
         <source>Opened image: %1</source>
         <translation>Image ouverte : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="732"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="753"/>
         <source>Gray</source>
         <translation>Niveaux de gris</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="759"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="776"/>
+        <source>displayed</source>
+        <translation>affichee</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="781"/>
         <source>Save displayed image</source>
         <translation>Enregistrer l’image affichée</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="791"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="803"/>
+        <source>Failed to save image: %1</source>
+        <translation>Impossible de sauvegarder l’image : %1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="820"/>
         <source>Restart</source>
         <translation>Redémarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="792"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="821"/>
         <source>Restart the active contour from its initial state.</source>
         <translation>Redémarrer le contour actif depuis son état initial.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="804"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="833"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="805"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="834"/>
         <source>Suspend execution and display the current state.</source>
         <translation>Mettre en pause et afficher l’état actuel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="828"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="857"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
@@ -1177,12 +1187,12 @@ Fichier → Ouvrir</translation>
 <context>
     <name>fluvel_app::RightPanelToggleButton</name>
     <message>
-        <location filename="../src/app/ui/components/right_panel_toggle_button.cpp" line="28"/>
+        <location filename="../src/app/ui/components/right_panel_toggle_button.cpp" line="29"/>
         <source>Right panel is visible.</source>
         <translation>Le panneau droit est visible.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/right_panel_toggle_button.cpp" line="28"/>
+        <location filename="../src/app/ui/components/right_panel_toggle_button.cpp" line="29"/>
         <source>Right panel is hidden.</source>
         <translation>Le panneau droit est masqué.</translation>
     </message>
