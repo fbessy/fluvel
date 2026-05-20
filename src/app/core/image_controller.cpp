@@ -62,7 +62,7 @@ void ImageController::loadImage(const QString& path)
 
     if (img.isNull())
     {
-        emit errorOccurred(tr("Failed to load image."));
+        emit errorOccurred(tr("Failed to load image: %1").arg(reader.errorString()));
         return;
     }
 

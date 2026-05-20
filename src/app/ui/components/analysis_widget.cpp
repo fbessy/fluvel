@@ -16,6 +16,7 @@
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QGroupBox>
+#include <QImageReader>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
@@ -188,18 +189,20 @@ void AnalysisWidget::openImage()
 {
     assert(!absoluteName_.isEmpty());
 
-    image_ = QImage(absoluteName_);
-    imageHeight_ = image_.height();
-    imageWidth_ = image_.width();
+    QImageReader reader(absoluteName_);
+
+    image_ = reader.read();
 
     if (image_.isNull())
     {
-        QMessageBox::information(
-            this, tr("Cannot Open Image"),
-            tr("Cannot load %1.").arg(QDir::toNativeSeparators(absoluteName_)));
+        QMessageBox::information(this, tr("Cannot Open Image"),
+                                 tr("Failed to load image: %1").arg(reader.errorString()));
 
         return;
     }
+
+    imageHeight_ = image_.height();
+    imageWidth_ = image_.width();
 
     refresh();
 
