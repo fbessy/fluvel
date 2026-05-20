@@ -18,6 +18,8 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>CECILL-2.1-only</project_license>
 
+  <content_rating type="oars-1.1"/>
+
   <description>
 
     <p>
@@ -31,17 +33,13 @@
       Hausdorff distance for segmentation analysis.
     </p>
 
-  </description>
-
-  <description xml:lang="fr">
-
-    <p>
+    <p xml:lang="fr">
       Fluvel est une application de segmentation d’image orientée recherche,
       conçue pour des expérimentations rapides et efficaces avec des méthodes
       de contours actifs basées sur les ensembles de niveaux.
     </p>
 
-    <p>
+    <p xml:lang="fr">
       Elle propose un traitement d’image en temps réel, la gestion de flux vidéo,
       des outils de prétraitement ainsi que des métriques d’évaluation
       quantitatives telles que la distance de Hausdorff pour l’analyse
@@ -59,12 +57,16 @@
     org.fluvel.Fluvel.desktop
   </launchable>
 
-  <developer_name>
-    Fabien Bessy
-  </developer_name>
+  <developer id="org.fluvel">
+    <name>Fabien Bessy</name>
+  </developer>
 
   <url type="homepage">
     https://fbessy.github.io/fluvel
+  </url>
+
+  <url type="vcs-browser">
+    https://github.com/fbessy/fluvel
   </url>
 
   <releases>
@@ -76,19 +78,19 @@
 
     <screenshot type="default">
       <image>
-        https://fbessy.github.io/fluvel/images/segmentation-start.webp
+        https://fbessy.github.io/fluvel/assets/images/segmentation-start.webp
       </image>
     </screenshot>
 
     <screenshot>
       <image>
-        https://fbessy.github.io/fluvel/images/segmentation-result.webp
+        https://fbessy.github.io/fluvel/assets/images/segmentation-result.webp
       </image>
     </screenshot>
 
     <screenshot>
       <image>
-        https://fbessy.github.io/fluvel/images/settings.webp
+        https://fbessy.github.io/fluvel/assets/images/settings.webp
       </image>
     </screenshot>
 

@@ -43,33 +43,44 @@ if(FLUVEL_PLATFORM_LINUX)
          qt6-image-formats-plugins"
     )
 
+    # =====================================================
     # Linux install directories (FHS)
+    # =====================================================
+
     set(LINUX_INSTALL_DESKTOPDIR
         ${CMAKE_INSTALL_DATADIR}/applications
     )
 
-    set(LINUX_INSTALL_ICONDIR
-        ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+    set(LINUX_INSTALL_METAINFO_DIR
+        ${CMAKE_INSTALL_DATADIR}/metainfo
     )
 
-    # --- Executable ---
+    set(LINUX_INSTALL_ICONS_DIR
+        ${CMAKE_INSTALL_DATADIR}/icons/hicolor
+    )
+
+    # =====================================================
+    # Executable
+    # =====================================================
+
     install(TARGETS ${FLUVEL_TARGET_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 
-    # --- Desktop entry ---
+    # =====================================================
+    # Desktop entry
+    # =====================================================
+
     install(FILES
         ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.desktop
         DESTINATION ${LINUX_INSTALL_DESKTOPDIR}
     )
 
-    # --- App icon ---
-    install(FILES
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.svg
-        DESTINATION ${LINUX_INSTALL_ICONDIR}
-    )
+    # =====================================================
+    # AppStream metadata
+    # =====================================================
 
     string(TIMESTAMP FLUVEL_RELEASE_DATE "%Y-%m-%d")
 
@@ -81,7 +92,50 @@ if(FLUVEL_PLATFORM_LINUX)
 
     install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.Fluvel.metainfo.xml
-        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo
+        DESTINATION ${LINUX_INSTALL_METAINFO_DIR}
+    )
+
+    # =====================================================
+    # Scalable SVG icon
+    # =====================================================
+
+    install(FILES
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.svg
+        DESTINATION ${LINUX_INSTALL_ICONS_DIR}/scalable/apps
+    )
+
+    # =====================================================
+    # PNG icons
+    # =====================================================
+
+    install(FILES
+        ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-32.png
+        DESTINATION ${LINUX_INSTALL_ICONS_DIR}/32x32/apps
+        RENAME org.fluvel.Fluvel.png
+    )
+
+    install(FILES
+        ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-48.png
+        DESTINATION ${LINUX_INSTALL_ICONS_DIR}/48x48/apps
+        RENAME org.fluvel.Fluvel.png
+    )
+
+    install(FILES
+        ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-64.png
+        DESTINATION ${LINUX_INSTALL_ICONS_DIR}/64x64/apps
+        RENAME org.fluvel.Fluvel.png
+    )
+
+    install(FILES
+        ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-128.png
+        DESTINATION ${LINUX_INSTALL_ICONS_DIR}/128x128/apps
+        RENAME org.fluvel.Fluvel.png
+    )
+
+    install(FILES
+        ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-256.png
+        DESTINATION ${LINUX_INSTALL_ICONS_DIR}/256x256/apps
+        RENAME org.fluvel.Fluvel.png
     )
 
 endif()

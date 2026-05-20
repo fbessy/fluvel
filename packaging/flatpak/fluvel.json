@@ -4,7 +4,6 @@
   "runtime-version": "6.9",
   "sdk": "org.kde.Sdk",
   "command": "fluvel",
-
   "finish-args": [
     "--share=ipc",
     "--socket=wayland",
@@ -12,9 +11,7 @@
     "--device=dri",
     "--device=all"
   ],
-
   "modules": [
-
     {
       "name": "fluvel",
       "buildsystem": "cmake-ninja",
@@ -32,14 +29,16 @@
         }
       ]
     },
-
     {
       "name": "fluvel-metadata",
       "buildsystem": "simple",
       "build-commands": [
         "install -Dm644 packaging/linux/org.fluvel.Fluvel.desktop /app/share/applications/org.fluvel.Fluvel.desktop",
         "install -Dm644 metainfo.ci.xml /app/share/metainfo/org.fluvel.Fluvel.metainfo.xml",
-        "install -Dm644 packaging/linux/org.fluvel.Fluvel.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.Fluvel.svg"
+        "install -Dm644 packaging/linux/org.fluvel.Fluvel.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.Fluvel.svg",
+        "install -Dm644 resources/icons/app/fluvel-64.png /app/share/icons/hicolor/64x64/apps/org.fluvel.Fluvel.png",
+        "install -Dm644 resources/icons/app/fluvel-128.png /app/share/icons/hicolor/128x128/apps/org.fluvel.Fluvel.png",
+        "install -Dm644 resources/icons/app/fluvel-256.png /app/share/icons/hicolor/256x256/apps/org.fluvel.Fluvel.png"
       ],
       "sources": [
         {
@@ -48,6 +47,5 @@
         }
       ]
     }
-
   ]
 }
