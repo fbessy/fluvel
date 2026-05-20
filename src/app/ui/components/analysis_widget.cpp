@@ -201,16 +201,13 @@ void AnalysisWidget::openImage()
         return;
     }
 
-    imageHeight_ = image_.height();
-    imageWidth_ = image_.width();
-
     refresh();
 
     QFileInfo fi(absoluteName_);
     QString name = fi.fileName();
 
     QString string_lists_text;
-    string_lists_text = QString::number(imageWidth_) + "×" + QString::number(imageHeight_);
+    string_lists_text = QString::number(image_.width()) + "×" + QString::number(image_.height());
     nameLabel_->setText(name + " - " + string_lists_text);
 }
 
@@ -225,9 +222,9 @@ void AnalysisWidget::createList()
 
     QRgb pix;
 
-    for (int y = 0; y < imageHeight_; ++y)
+    for (int y = 0; y < noiseImage_.height(); ++y)
     {
-        for (int x = 0; x < imageWidth_; ++x)
+        for (int x = 0; x < noiseImage_.width(); ++x)
         {
             pix = noiseImage_.pixel(x, y);
 
@@ -265,7 +262,7 @@ void AnalysisWidget::refreshWithNoise(int noisePercent)
 
     noiseImage_ = image_;
 
-    // 🔥 si désactivé → early return propre
+    // Early return when noise is disabled.
     if (!noiseGroup_->isChecked() || noisePercent == 0)
     {
         imageViewer_->setImage(noiseImage_);
@@ -278,9 +275,9 @@ void AnalysisWidget::refreshWithNoise(int noisePercent)
     QRgb rgb_color =
         QColor(int(selectedColor_.red), int(selectedColor_.green), int(selectedColor_.blue)).rgb();
 
-    for (int y = 0; y < imageHeight_; ++y)
+    for (int y = 0; y < noiseImage_.height(); ++y)
     {
-        for (int x = 0; x < imageWidth_; ++x)
+        for (int x = 0; x < noiseImage_.width(); ++x)
         {
             if (proba_distri(rng_))
                 noiseImage_.setPixel(x, y, rgb_color);

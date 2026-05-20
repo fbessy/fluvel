@@ -56,12 +56,12 @@ public:
 
     [[nodiscard]] int imageWidth() const
     {
-        return imageWidth_;
+        return image_.width();
     }
 
     [[nodiscard]] int imageHeight() const
     {
-        return imageHeight_;
+        return image_.height();
     }
 
     const fluvel_ip::Shape& shape() const
@@ -132,9 +132,6 @@ private:
     QImage noiseImage_;
 
     QImage image_;
-    int imageWidth_{0};
-    int imageHeight_{0};
-
     fluvel_ip::Shape shape_;
 
     QString lastDirectoryUsed_;
