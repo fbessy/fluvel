@@ -100,7 +100,10 @@ private:
     /// Opens a file dialog to select an image.
     void openFilename();
 
-    /// Loads the selected image.
+    /// Opens an image from a drag-and-drop operation.
+    void openDroppedImage(const QString& fileName);
+
+    /// Loads the currently selected image.
     void openImage();
 
     /// Refreshes the analysis.

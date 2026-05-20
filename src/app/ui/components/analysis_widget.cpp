@@ -23,6 +23,8 @@
 #include <QSpinBox>
 #include <QVBoxLayout>
 
+#include <cassert>
+
 namespace fluvel_app
 {
 
@@ -128,6 +130,10 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     connect(openButton_, &QPushButton::clicked, this, &AnalysisWidget::openFilename);
 
+    // When the user drags and drops an image into the analysis viewer.
+    connect(imageViewer_, &ImageViewerWidget::imageDropped, this,
+            &AnalysisWidget::openDroppedImage);
+
     connect(colorSelector_, &ColorSelectorWidget::colorSelected, this,
             &AnalysisWidget::onColorSelected);
 
@@ -156,37 +162,53 @@ void AnalysisWidget::onColorSelected(const QColor& c)
 
 void AnalysisWidget::openFilename()
 {
-    absoluteName_ =
+    const QString fileName =
         QFileDialog::getOpenFileName(this, tr("Open File") + " " + QString::number(idThis_),
                                      lastDirectoryUsed_, file_utils::buildImageFilter());
+
+    if (fileName.isEmpty())
+        return;
+
+    absoluteName_ = fileName;
+
+    openImage();
+}
+
+void AnalysisWidget::openDroppedImage(const QString& fileName)
+{
+    if (fileName.isEmpty())
+        return;
+
+    absoluteName_ = fileName;
+
     openImage();
 }
 
 void AnalysisWidget::openImage()
 {
-    if (!absoluteName_.isEmpty())
+    assert(!absoluteName_.isEmpty());
+
+    image_ = QImage(absoluteName_);
+    imageHeight_ = image_.height();
+    imageWidth_ = image_.width();
+
+    if (image_.isNull())
     {
-        image_ = QImage(absoluteName_);
-        imageHeight_ = image_.height();
-        imageWidth_ = image_.width();
+        QMessageBox::information(
+            this, tr("Cannot Open Image"),
+            tr("Cannot load %1.").arg(QDir::toNativeSeparators(absoluteName_)));
 
-        if (image_.isNull())
-        {
-            QMessageBox::information(
-                this, tr("Opening error - Fluvel"),
-                tr("Cannot load %1.").arg(QDir::toNativeSeparators(absoluteName_)));
-            return;
-        }
-
-        refresh();
-
-        QFileInfo fi(absoluteName_);
-        QString name = fi.fileName();
-
-        QString string_lists_text;
-        string_lists_text = QString::number(imageWidth_) + "×" + QString::number(imageHeight_);
-        nameLabel_->setText(name + " - " + string_lists_text);
+        return;
     }
+
+    refresh();
+
+    QFileInfo fi(absoluteName_);
+    QString name = fi.fileName();
+
+    QString string_lists_text;
+    string_lists_text = QString::number(imageWidth_) + "×" + QString::number(imageHeight_);
+    nameLabel_->setText(name + " - " + string_lists_text);
 }
 
 void AnalysisWidget::refresh()
