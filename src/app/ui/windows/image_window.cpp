@@ -509,11 +509,28 @@ void ImageWindow::setupUserActionsConnections()
     connect(openAct_, &QAction::triggered, this,
             [this]()
             {
-                QString fileName = QFileDialog::getOpenFileName(
-                    this, tr("Open Image"), lastDirectoryUsed_, file_utils::buildImageFilter());
+                QFileDialog dialog(this);
 
-                if (!fileName.isEmpty())
-                    emit fileSelected(fileName);
+                dialog.setWindowTitle(tr("Open Image"));
+                dialog.setDirectory(lastDirectoryUsed_);
+
+                dialog.setNameFilter(file_utils::buildImageFilter());
+                dialog.setFileMode(QFileDialog::ExistingFile);
+
+                if (dialog.exec() != QDialog::Accepted)
+                    return;
+
+                const QStringList files = dialog.selectedFiles();
+
+                if (files.isEmpty())
+                    return;
+
+                const QString fileName = files.first();
+
+                if (fileName.isEmpty())
+                    return;
+
+                emit fileSelected(fileName);
             });
 
     for (auto* act : recentFileActs_)
