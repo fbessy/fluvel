@@ -46,6 +46,10 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationDomain("fluvel.org");
     QCoreApplication::setApplicationName("fluvel");
 
+#ifdef FLUVEL_PLATFORM_DESKTOP
+    QGuiApplication::setDesktopFileName("org.fluvel.Fluvel");
+#endif
+
     QGuiApplication::setApplicationDisplayName("Fluvel");
 
     fluvel_app::FrameClock::init();
