@@ -251,6 +251,7 @@ void ImageWindow::setupActions()
     clearAct_->setIcon(deleteIcon);
 
     saveAct_ = new QAction(tr("&Save..."), this);
+    saveAct_->setEnabled(false);
     saveAct_->setShortcut(QKeySequence::Save);
     saveAct_->setStatusTip(tr("Save the displayed image."));
 
@@ -703,6 +704,8 @@ void ImageWindow::onFileOpened(const QString& path)
     updateWindowTitle();
 
     statusBar()->showMessage(tr("Opened image: %1").arg(path));
+
+    saveAct_->setEnabled(true);
 }
 
 void ImageWindow::onInputImageReady(const QImage& input)
@@ -764,23 +767,24 @@ void ImageWindow::updateWindowTitle()
 
 void ImageWindow::saveDisplayed()
 {
-    QImage displayed = imageViewer_->renderToImage();
+    const QImage displayed = imageViewer_->renderToImage();
 
     if (displayed.isNull())
         return;
 
-    QString baseName = fileName_.isEmpty() ? "displayed" : QFileInfo(fileName_).baseName();
+    const QString baseName =
+        fileName_.isEmpty() ? tr("displayed") : QFileInfo(fileName_).baseName();
 
     QString selectedFilter;
 
     QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save displayed image"), lastDirectoryUsed_ + "/" + baseName,
+        this, tr("Save displayed image"), QDir(lastDirectoryUsed_).filePath(baseName),
         file_utils::buildWritableImageFilter(), &selectedFilter);
 
     if (fileName.isEmpty())
         return;
 
-    QFileInfo fi(fileName);
+    const QFileInfo fi(fileName);
 
     if (fi.suffix().isEmpty())
     {
@@ -793,6 +797,13 @@ void ImageWindow::saveDisplayed()
     fileName = file_utils::makeUniqueFileName(fileName);
 
     displayed.save(fileName);
+
+    if (!displayed.save(fileName))
+    {
+        statusBar()->showMessage(tr("Failed to save image: %1").arg(fileName));
+
+        return;
+    }
 }
 
 void ImageWindow::onStateChanged(fluvel_app::WorkerState state)

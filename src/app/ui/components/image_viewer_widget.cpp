@@ -769,6 +769,9 @@ QImage ImageViewerWidget::renderToImage() const
 {
     assert(scene_);
 
+    if (!hasImage())
+        return QImage();
+
     if (scene_->sceneRect().isEmpty())
         return QImage();
 
