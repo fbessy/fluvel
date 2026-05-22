@@ -543,12 +543,12 @@ R : %3  G : %4  B : %5</translation>
 <context>
     <name>fluvel_app::CameraController</name>
     <message>
-        <location filename="../src/app/core/camera_controller.cpp" line="125"/>
+        <location filename="../src/app/core/camera_controller.cpp" line="129"/>
         <source>Camera not found</source>
         <translation>Caméra introuvable</translation>
     </message>
     <message>
-        <location filename="../src/app/core/camera_controller.cpp" line="260"/>
+        <location filename="../src/app/core/camera_controller.cpp" line="285"/>
         <source>In | Proc | Disp: %1 | %2 | %3 fps
 Lat: %4 ms (proc %5) | Drop: %6 %
 Contour: %7 pts</source>
@@ -609,75 +609,85 @@ Contour : %7 pts</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/camera_window.cpp" line="109"/>
+        <source>Apply</source>
+        <translation>Appliquer</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="110"/>
+        <source>Apply selected camera and format.</source>
+        <translation>Appliquer la caméra et le format choisis.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="118"/>
         <source>Camera session settings</source>
         <translation>Paramètres de la session caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="580"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="610"/>
         <source>Recommended format</source>
         <translation>Format recommandé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="762"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="819"/>
         <source>Camera error</source>
         <translation>Erreur de caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="778"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="835"/>
         <source>Camera startup failed</source>
         <translation>Échec du démarrage de la caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="779"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="836"/>
         <source>The camera did not produce a valid frame within %1 seconds.
 The device may be busy or not responding.</source>
         <translation>La caméra n’a produit aucune image valide dans un délai de %1 secondes.
 Le périphérique est peut-être occupé ou ne répond pas.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="796"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="853"/>
         <source>Camera stream lost</source>
         <translation>Flux de la caméra perdu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="797"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="854"/>
         <source>No valid frame received for %1 seconds.
 The camera stream may have stalled.</source>
         <translation>Aucune image valide reçue pendant %1 secondes.
 Le flux de la caméra est peut-être interrompu.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="811"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="876"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="812"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="877"/>
         <source>Start camera streaming.</source>
         <translation>Démarrer le flux de la caméra.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="821"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="883"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="822"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="884"/>
         <source>Stop camera streaming.</source>
         <translation>Arrêter le flux de la caméra.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="827"/>
-        <source>Switch</source>
-        <translation>Changer</translation>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="890"/>
+        <source>Starting...</source>
+        <translation>Démarrage…</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="828"/>
-        <source>Switch to selected camera.</source>
-        <translation>Passer à la caméra sélectionnée.</translation>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="891"/>
+        <source>Camera startup in progress.</source>
+        <translation>Démarrage de la caméra en cours.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/camera_window.cpp" line="1049"/>
+        <location filename="../src/app/ui/windows/camera_window.cpp" line="1118"/>
         <source>Camera</source>
         <translation>Caméra</translation>
     </message>
