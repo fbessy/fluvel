@@ -47,7 +47,7 @@ if [ "$USE_CLANG" = "1" ]; then
         report_signal_unsafe=0:\
         ignore_noninstrumented_modules=1:\
         history_size=7:\
-        log_path=tsan_log:\
+        log_path=${SCRIPT_DIR}/tsan_log:\
         suppressions=${SCRIPT_DIR}/tsan.supp"
     fi
 

@@ -43,7 +43,7 @@ if [ "$USE_CLANG" = "1" ]; then
         symbolize=1:\
         detect_leaks=1:\
         fast_unwind_on_malloc=1:\
-        log_path=asan_log"
+        log_path=${SCRIPT_DIR}/asan_log"
     else
         export ASAN_OPTIONS="\
         halt_on_error=1:\
@@ -55,7 +55,7 @@ if [ "$USE_CLANG" = "1" ]; then
         fast_unwind_on_malloc=0:\
         malloc_context_size=30:\
         detect_odr_violation=1:\
-        log_path=asan_log"
+        log_path=${SCRIPT_DIR}/asan_log"
     fi
 
     #######################################
@@ -84,7 +84,7 @@ else
     strict_string_checks=1:\
     check_initialization_order=1:\
     detect_stack_use_after_return=1:\
-    log_path=asan_log"
+    log_path=${SCRIPT_DIR}/asan_log"
 fi
 
 #######################################
