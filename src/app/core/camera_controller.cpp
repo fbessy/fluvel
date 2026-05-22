@@ -14,6 +14,8 @@
 #include <QTimer>
 #include <QVideoSink>
 
+#include <cassert>
+
 namespace fluvel_app
 {
 
@@ -67,10 +69,10 @@ void CameraController::start(const QByteArray& deviceId)
 
 void CameraController::start(const QByteArray& deviceId, const QCameraFormat& format)
 {
-    if (state_ != StreamingState::Stopped)
-        stop();
+    assert(startupTimer_);
 
-    state_ = StreamingState::Starting;
+    if (state_ != StreamingState::Stopped || camera_ || videoSink_ || captureSession_)
+        return;
 
     const auto cameras = QMediaDevices::videoInputs();
     bool isFound = false;
@@ -81,11 +83,14 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
         {
             isFound = true;
 
-            camera_ = new QCamera(cam, this);
-            deviceId_ = cam.id();
+            state_ = StreamingState::Starting;
+            emit streamingStarting();
 
+            camera_ = new QCamera(cam, this);
             videoSink_ = new QVideoSink(this);
             captureSession_ = new QMediaCaptureSession(this);
+
+            deviceId_ = cam.id();
 
             // 👉 Application du format choisi (UI)
             if (!format.isNull())
@@ -106,7 +111,6 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
             captureSession_->setVideoSink(videoSink_);
 
             connect(camera_, &QCamera::errorOccurred, this, &CameraController::onCameraError);
-
             connect(videoSink_, &QVideoSink::videoFrameChanged, this,
                     &CameraController::onCapturedFrame);
 
@@ -127,6 +131,8 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
 
 void CameraController::stop()
 {
+    assert(startupTimer_ && watchdogTimer_ && diagnosticsTimer_);
+
     if (state_ == StreamingState::Stopped)
         return;
 
@@ -134,21 +140,38 @@ void CameraController::stop()
     watchdogTimer_->stop();
     diagnosticsTimer_->stop();
 
+    if (videoSink_)
+    {
+        disconnect(videoSink_, &QVideoSink::videoFrameChanged, this,
+                   &CameraController::onCapturedFrame);
+    }
+
     if (camera_)
+    {
+        disconnect(camera_, &QCamera::errorOccurred, this, &CameraController::onCameraError);
         camera_->stop();
+    }
 
     if (captureSession_)
-        captureSession_->deleteLater();
+    {
+        captureSession_->setVideoSink(nullptr);
+        captureSession_->setCamera(nullptr);
+
+        delete captureSession_;
+        captureSession_ = nullptr;
+    }
 
     if (videoSink_)
-        videoSink_->deleteLater();
+    {
+        delete videoSink_;
+        videoSink_ = nullptr;
+    }
 
     if (camera_)
-        camera_->deleteLater();
-
-    camera_ = nullptr;
-    videoSink_ = nullptr;
-    captureSession_ = nullptr;
+    {
+        delete camera_;
+        camera_ = nullptr;
+    }
 
     state_ = StreamingState::Stopped;
     emit streamingStopped();
@@ -156,6 +179,8 @@ void CameraController::stop()
 
 void CameraController::onCapturedFrame(const QVideoFrame& frame)
 {
+    assert(startupTimer_ && watchdogTimer_ && diagnosticsTimer_);
+
 #ifdef FLUVEL_SIMULATE_STARTUP_TIMEOUT
     return;
 #endif
@@ -318,6 +343,11 @@ void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& displa
 bool CameraController::isStreaming() const
 {
     return state_ == StreamingState::Streaming;
+}
+
+StreamingState CameraController::streamingState() const
+{
+    return state_;
 }
 
 QList<QCameraDevice> CameraController::videoInputs() const

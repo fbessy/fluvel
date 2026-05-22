@@ -110,6 +110,11 @@ public:
     bool isStreaming() const;
 
     /**
+     * @brief Check the streaming state.
+     */
+    StreamingState streamingState() const;
+
+    /**
      * @brief List available video input devices.
      */
     QList<QCameraDevice> videoInputs() const;
@@ -134,10 +139,25 @@ signals:
     /// Emitted when available video inputs change.
     void videoInputsChanged(const QList<QCameraDevice>& devices);
 
-    /// Emitted when streaming successfully starts.
+    /**
+     * @brief Emitted when camera startup begins.
+     *      * The controller entered the starting phase and is waiting
+     * for the first valid frame before entering streaming mode.
+     */
+    void streamingStarting();
+
+    /**
+     * @brief Emitted when streaming successfully starts.
+     *      * A valid frame was received and the controller entered
+     * the streaming state.
+     */
     void streamingStarted(const fluvel_app::StreamingInfo& info);
 
-    /// Emitted when streaming stops.
+    /**
+     * @brief Emitted when streaming stops.
+     *      * The controller released the active stream and entered
+     * the stopped state.
+     */
     void streamingStopped();
 
     /// Emitted on camera error.

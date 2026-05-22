@@ -170,14 +170,18 @@ private:
     void updateDeviceList(const QList<QCameraDevice>& devices);
     int computeBestDeviceIndex(const QByteArray& previousSelection, const QByteArray& newlyPlugged);
     void setDeviceControlsEnabled(bool enabled);
+    void refreshActionButtons();
     void updateStreamingButton();
+    void updateApplyButton();
     void refreshUi();
 
     void onToggleStreaming();
+    void onApplySelection();
 
     void onDeviceChanged(int index);
     void refreshFormatListFromSelection();
     void updateFormatList(const QList<QCameraFormat>& formats);
+    bool hasPendingConfiguration() const;
     static QString pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt);
     static QString formatToString(const QCameraFormat& fmt);
     QCameraFormat getSelectedFormat() const;
@@ -192,6 +196,7 @@ private:
     void loadPreferredFormats();
     void savePreferredFormats();
 
+    void onStreamingStarting();
     void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
     void onCameraError(const QByteArray& deviceId, QCamera::Error error,
@@ -218,6 +223,7 @@ private:
     QLabel* formatLabel_ = nullptr;
     QComboBox* formatSelector_ = nullptr;
     QPushButton* toggleStreamingButton_ = nullptr;
+    QPushButton* applyButton_ = nullptr;
     RightPanelToggleButton* rightPanelToggle_ = nullptr;
     QPushButton* settingsButton_ = nullptr;
     QIcon startIcon_;
@@ -243,7 +249,7 @@ private:
     QIcon formatActiveIcon_;
     QIcon formatAvailableIcon_;
 
-    bool switchingInProgress_{false};
+    bool configChangeInProgress_{false};
 
     QHash<QByteArray, QCameraFormat> preferredFormats_;
     QCameraFormat activeFormat_;

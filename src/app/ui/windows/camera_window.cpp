@@ -103,6 +103,15 @@ void CameraWindow::createUi()
 
     toggleStreamingButton_ = new QPushButton;
 
+    applyButton_ = new QPushButton;
+    applyButton_->setVisible(false);
+    applyButton_->setFlat(true);
+    applyButton_->setText(tr("Apply"));
+    applyButton_->setToolTip(tr("Apply selected camera and format."));
+
+    QIcon applyIcon = createActiveFormatIcon();
+    applyButton_->setIcon(applyIcon);
+
     rightPanelToggle_ = new RightPanelToggleButton;
 
     settingsButton_ = new QPushButton;
@@ -148,7 +157,15 @@ QIcon CameraWindow::createEmptyIcon(int size)
 
 QIcon CameraWindow::createActiveFormatIcon()
 {
-    return il::loadIcon("emblem-default", ":/icons/status/check-symbolic.svg");
+    QIcon icon;
+
+#ifndef FLUVEL_PLATFORM_LINUX
+    icon = il::loadIcon("emblem-default", ":/icons/actions/check-symbolic.svg");
+#else
+    icon = il::loadIcon(":/icons/status/check-symbolic.svg");
+#endif
+
+    return icon;
 }
 
 QIcon CameraWindow::createErrorCameraIcon()
@@ -216,6 +233,7 @@ void CameraWindow::setupLayout()
     // Action principale
     controlLayout->addSpacing(12);
     controlLayout->addWidget(toggleStreamingButton_);
+    controlLayout->addWidget(applyButton_);
 
     // Stretch → pousse le reste à droite
     controlLayout->addStretch();
@@ -246,6 +264,8 @@ void CameraWindow::setupConnections()
 
     connect(toggleStreamingButton_, &QPushButton::clicked, this, &CameraWindow::onToggleStreaming);
 
+    connect(applyButton_, &QPushButton::clicked, this, &CameraWindow::onApplySelection);
+
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
@@ -260,6 +280,8 @@ void CameraWindow::setupConnections()
                 if (isUpdatingUi_)
                     return;
 
+                updateApplyButton();
+
                 auto fmt = getSelectedFormat();
                 if (!fmt.isNull() && !selectedDeviceId_.isEmpty())
                 {
@@ -272,6 +294,9 @@ void CameraWindow::setupConnections()
 
     connect(cameraController_, &CameraController::videoInputsChanged, this,
             &CameraWindow::updateDeviceList);
+
+    connect(cameraController_, &CameraController::streamingStarting, this,
+            &CameraWindow::onStreamingStarting);
 
     connect(cameraController_, &CameraController::streamingStarted, this,
             &CameraWindow::onStreamingStarted);
@@ -318,7 +343,7 @@ void CameraWindow::setupConnections()
 
     // refresh button in function of user action
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this,
-            &CameraWindow::updateStreamingButton);
+            &CameraWindow::updateApplyButton);
 
     connect(cameraController_, &CameraController::downscaleChanged, this,
             &CameraWindow::onDownscaleChanged);
@@ -483,25 +508,30 @@ void CameraWindow::onToggleStreaming()
 {
     assert(deviceSelector_ && cameraController_);
 
+    if (configChangeInProgress_)
+        return;
+
     if (deviceSelector_->currentIndex() < 0)
         return;
 
-    QByteArray selected = deviceSelector_->currentData().toByteArray();
+    if (cameraController_->isStreaming())
+        stopCamera();
+    else
+        startCamera();
+}
+
+void CameraWindow::onApplySelection()
+{
+    assert(cameraController_);
+
+    if (configChangeInProgress_)
+        return;
 
     if (!cameraController_->isStreaming())
-    {
-        startCamera();
-    }
-    else if (selected == streamingDeviceId_)
-    {
-        stopCamera();
-    }
-    else
-    {
-        switchingInProgress_ = true;
-        stopCamera();
-        startCamera();
-    }
+        return;
+
+    configChangeInProgress_ = true;
+    stopCamera();
 }
 
 void CameraWindow::onDeviceChanged(int /*index*/)
@@ -610,6 +640,23 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
         formatSelector_->setCurrentIndex(indexToSelect);
 }
 
+bool CameraWindow::hasPendingConfiguration() const
+{
+    if (!cameraController_->isStreaming())
+        return false;
+
+    if (selectedDeviceId_.isEmpty() || streamingDeviceId_.isEmpty())
+        return false;
+
+    const auto selectedFormat = getSelectedFormat();
+
+    if (selectedFormat.isNull() || activeFormat_.isNull())
+        return false;
+
+    return selectedDeviceId_ != streamingDeviceId_ ||
+           !camera_utils::isSameCameraFormat(selectedFormat, activeFormat_);
+}
+
 void CameraWindow::showEvent(QShowEvent* event)
 {
     emit cameraWindowShown();
@@ -664,22 +711,6 @@ void CameraWindow::connectFrameToView()
                                      imageViewer_, &ImageViewerWidget::setImageAndContour);
 }
 
-void CameraWindow::startCamera()
-{
-    assert(deviceSelector_ && cameraController_);
-
-    if (deviceSelector_->currentIndex() < 0)
-        return;
-
-    QByteArray selectedId = deviceSelector_->currentData().toByteArray();
-    if (selectedId.isEmpty())
-        return;
-
-    const auto selectedFormat = getSelectedFormat();
-
-    cameraController_->start(selectedId, selectedFormat);
-}
-
 QCameraFormat CameraWindow::getSelectedFormat() const
 {
     assert(formatSelector_);
@@ -692,11 +723,34 @@ QCameraFormat CameraWindow::getSelectedFormat() const
     return formatSelector_->itemData(index).value<QCameraFormat>();
 }
 
+void CameraWindow::startCamera()
+{
+    assert(deviceSelector_ && cameraController_);
+
+    if (deviceSelector_->currentIndex() < 0)
+        return;
+
+    QByteArray selectedId = deviceSelector_->currentData().toByteArray();
+    if (selectedId.isEmpty())
+        return;
+
+    const auto selectedFormat = getSelectedFormat();
+    if (selectedFormat.isNull())
+        return;
+
+    cameraController_->start(selectedId, selectedFormat);
+}
+
 void CameraWindow::stopCamera()
 {
     assert(cameraController_);
 
     cameraController_->stop();
+}
+
+void CameraWindow::onStreamingStarting()
+{
+    refreshUi();
 }
 
 void CameraWindow::onStreamingStarted(const StreamingInfo& info)
@@ -709,7 +763,7 @@ void CameraWindow::onStreamingStarted(const StreamingInfo& info)
 
     activeFormat_ = info.format;
 
-    if (!switchingInProgress_)
+    if (!configChangeInProgress_)
     {
         imageViewer_->showPlaceholder(false);
         connectFrameToView();
@@ -724,7 +778,7 @@ void CameraWindow::onStreamingStarted(const StreamingInfo& info)
     saveSelectedCameraId();
     savePreferredFormats();
 
-    switchingInProgress_ = false;
+    configChangeInProgress_ = false;
 }
 
 void CameraWindow::onStreamingStopped()
@@ -740,15 +794,18 @@ void CameraWindow::onStreamingStopped()
     streamingDeviceId_.clear();
     activeFormat_ = QCameraFormat();
 
-    if (!switchingInProgress_)
+    if (configChangeInProgress_)
+    {
+        startCamera();
+    }
+    else
     {
         disconnect(frameToViewConnection_);
         imageViewer_->showPlaceholder(true);
 
         refreshUi();
+        updateWindowTitle();
     }
-
-    updateWindowTitle();
 }
 
 void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
@@ -764,9 +821,9 @@ void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
     deviceStreamingStatus_[deviceId] = DeviceStreamingStatus::Error;
 
     // un switch raté devient un stop
-    if (switchingInProgress_)
+    if (configChangeInProgress_)
     {
-        switchingInProgress_ = false;
+        configChangeInProgress_ = false;
         streamingDeviceId_.clear();
     }
 
@@ -802,32 +859,44 @@ void CameraWindow::onStreamingLost(const QByteArray& deviceId, double frameAgeSe
     refreshUi();
 }
 
+void CameraWindow::refreshActionButtons()
+{
+    updateStreamingButton();
+    updateApplyButton();
+}
+
 void CameraWindow::updateStreamingButton()
 {
     assert(cameraController_ && toggleStreamingButton_ && deviceSelector_);
 
-    if (!cameraController_->isStreaming())
+    switch (cameraController_->streamingState())
     {
-        toggleStreamingButton_->setText(tr("Start"));
-        toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
-        toggleStreamingButton_->setIcon(startIcon_);
-        return;
-    }
+        case StreamingState::Stopped:
+            toggleStreamingButton_->setEnabled(true);
+            toggleStreamingButton_->setText(tr("Start"));
+            toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
+            toggleStreamingButton_->setIcon(startIcon_);
+            break;
 
-    QByteArray selected = deviceSelector_->currentData().toByteArray();
+        case StreamingState::Streaming:
+            toggleStreamingButton_->setEnabled(true);
+            toggleStreamingButton_->setText(tr("Stop"));
+            toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
+            toggleStreamingButton_->setIcon(stopIcon_);
+            break;
 
-    if (selected == streamingDeviceId_)
-    {
-        toggleStreamingButton_->setText(tr("Stop"));
-        toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
-        toggleStreamingButton_->setIcon(stopIcon_);
+        case StreamingState::Starting:
+            toggleStreamingButton_->setEnabled(false);
+            toggleStreamingButton_->setText(tr("Starting..."));
+            toggleStreamingButton_->setToolTip(tr("Camera startup in progress."));
+            toggleStreamingButton_->setIcon(QIcon());
+            break;
     }
-    else
-    {
-        toggleStreamingButton_->setText(tr("Switch"));
-        toggleStreamingButton_->setToolTip(tr("Switch to selected camera."));
-        toggleStreamingButton_->setIcon(startIcon_);
-    }
+}
+
+void CameraWindow::updateApplyButton()
+{
+    applyButton_->setVisible(hasPendingConfiguration());
 }
 
 void CameraWindow::refreshUi()
@@ -835,7 +904,7 @@ void CameraWindow::refreshUi()
     assert(cameraController_);
 
     updateDeviceList(cameraController_->videoInputs());
-    updateStreamingButton();
+    refreshActionButtons();
 }
 
 bool CameraWindow::isCameraAvailable() const
