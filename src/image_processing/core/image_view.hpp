@@ -218,29 +218,31 @@ public:
         {
             case ImageFormat::Gray8:
             {
-                float v = row[idx];
+                const float v = row[idx];
                 r = g = b = v;
-                break;
+                return;
             }
+
             case ImageFormat::Rgb24:
             case ImageFormat::Rgba32:
             {
                 r = row[idx + 0];
                 g = row[idx + 1];
                 b = row[idx + 2];
-                break;
+                return;
             }
+
             case ImageFormat::Bgr24:
             case ImageFormat::Bgr32:
             {
                 b = row[idx + 0];
                 g = row[idx + 1];
                 r = row[idx + 2];
-                break;
+                return;
             }
 
             case ImageFormat::Unknown:
-                break;
+                std::unreachable();
         }
 
         std::unreachable();
