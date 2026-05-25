@@ -17,6 +17,8 @@
       "buildsystem": "cmake-ninja",
       "config-opts": [
         "-DCMAKE_BUILD_TYPE=Release",
+        "-DFLUVEL_BUILD_APP=ON",
+        "-DFLUVEL_BUILD_BIND=OFF",
         "-DFLUVEL_BUILD_VERSION=__APP_VERSION__",
         "-DFLUVEL_GIT_COMMIT=__CI_COMMIT__",
         "-DFLUVEL_BUILD_TIMESTAMP=__BUILD_TIMESTAMP__",

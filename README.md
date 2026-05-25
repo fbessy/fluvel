@@ -118,13 +118,18 @@ fluvel/
 │   │   └── interop/               # Application integration and adapters
 │   │
 │   ├── bindings/                  # Language and scripting integrations
-│   │   └── python/                # Experimental Python integration
+│   │   └── python/                # Python bindings
 │   │
-│   └── image_processing/          # Image processing engine
+│   └── image_processing/          # Image processing library
 │       ├── filtering/             # Filtering, denoising and preprocessing
 │       ├── segmentation/          # Active contours and segmentation models
 │       ├── analysis/              # Shape analysis and image metrics
 │       └── core/                  # Shared processing infrastructure
+│
+├── examples/                      # Example applications and usage demos
+│   ├── filtering/                 # Python filtering showcase and experiments
+│   ├── segmentation/              # Segmentation examples (future)
+│   └── bindings/                  # Language integration examples
 │
 ├── resources/                     # Icons and application assets
 ├── translations/                  # Application translations (.ts, .qm)
@@ -147,8 +152,8 @@ fluvel/
 ### Main modules
 
 - **fluvel_app** — User interface and application orchestration
-- **fluvel_ip** — Image processing and segmentation engine
-- **fluvel_bindings** — Experimental scripting and language integrations
+- **fluvel_ip** — Image processing and segmentation library
+- **fluvel_bindings** — Python bindings and scripting integrations
 
 ---
 
@@ -166,16 +171,82 @@ Some components (such as additional UI technologies and language integrations) a
 
 ### Requirements
 
-- CMake ≥ 3.x
-- Clang (recommended)
-- Qt6 (for UI build)
+#### Core library
 
-### Build with CMake
+- CMake ≥ 3.x
+- C++23 compiler (tested with Clang, GCC and MSVC)
+
+#### Desktop application
+
+Additional dependency:
+
+- Qt6
+
+#### Python bindings
+
+Additional dependencies:
+
+- Python ≥ 3.10
+- pybind11
+- NumPy
+
+Optional (examples only):
+
+- OpenCV
+
+---
+
+### Build desktop application
 
 ```bash
-cmake -S . -B build
+cmake -S . -B build \
+    -DFLUVEL_BUILD_APP=ON \
+    -DFLUVEL_BUILD_BIND=OFF
+
 cmake --build build
 ./build/Fluvel
+```
+
+---
+
+### Build Python bindings
+
+```bash
+cmake -S . -B build \
+    -DFLUVEL_BUILD_APP=OFF \
+    -DFLUVEL_BUILD_BIND=ON
+
+cmake --build build
+```
+
+Generated module:
+
+```text
+build/python/fluvel.*
+```
+
+Install runtime dependencies for examples:
+
+```bash
+pip install numpy opencv-python
+```
+
+Example:
+
+```bash
+python examples/filtering/showcase.py
+```
+
+---
+
+### Build everything
+
+```bash
+cmake -S . -B build \
+    -DFLUVEL_BUILD_APP=ON \
+    -DFLUVEL_BUILD_BIND=ON
+
+cmake --build build
 ```
 
 ---

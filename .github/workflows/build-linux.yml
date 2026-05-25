@@ -151,6 +151,9 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Release \
                 -DQt6_DIR=\$Qt6_DIR \
                 \
+                -DFLUVEL_BUILD_APP=ON \
+                -DFLUVEL_BUILD_BIND=OFF \
+                \
                 -DFLUVEL_BUILD_VERSION=$APP_VERSION \
                 -DFLUVEL_GIT_COMMIT=$COMMIT_SHORT \
                 -DFLUVEL_BUILD_TIMESTAMP=\"\$BUILD_TIMESTAMP\" \
@@ -255,6 +258,9 @@ jobs:
               cmake --fresh -S . -B build-deb -G Ninja \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DQt6_DIR=\$Qt6_DIR \
+                \
+                -DFLUVEL_BUILD_APP=ON \
+                -DFLUVEL_BUILD_BIND=OFF \
                 \
                 -DFLUVEL_BUILD_VERSION=$APP_VERSION \
                 -DFLUVEL_GIT_COMMIT=$COMMIT_SHORT \
