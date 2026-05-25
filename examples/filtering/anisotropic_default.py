@@ -10,7 +10,10 @@ EXAMPLES_DIR = Path(__file__).parent.parent
 INPUT_PATH = EXAMPLES_DIR / "resources" / "input.png"
 img = cv2.imread(str(INPUT_PATH))
 
-assert img is not None
+if img is None:
+    raise RuntimeError(
+        f"Cannot load image: {INPUT_PATH}"
+    )
 
 out = fluvel.anisotropic_diffusion(img)
 

@@ -4,6 +4,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include "active_contour_py.hpp"
 #include "filtering_py.hpp"
 #include "noise_py.hpp"
 
@@ -13,4 +14,5 @@ PYBIND11_MODULE(fluvel, m)
 
     bindNoise(m);
     bindFiltering(m);
+    bindActiveContour(m);
 }

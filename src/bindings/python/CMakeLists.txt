@@ -19,8 +19,14 @@ set(python_src
     morpho_py.cpp
     morpho_py.hpp
 
+    active_contour_py.cpp
+    active_contour_py.hpp
+
     ${INTEROP_DIR}/py_array_conversion.cpp
     ${INTEROP_DIR}/py_array_conversion.hpp
+
+    ${INTEROP_DIR}/contour_conversion.cpp
+    ${INTEROP_DIR}/contour_conversion.hpp
 )
 
 pybind11_add_module(
