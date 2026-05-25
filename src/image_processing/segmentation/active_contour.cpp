@@ -477,6 +477,8 @@ void ActiveContour::calculateShapesIntersection()
 
 void ActiveContour::update(const ImageView& image)
 {
+    assert(image.width() == cd_.phi().width() && image.height() == cd_.phi().height());
+
     state_ = PhaseState::Cycle1;
     ed_.resetExecutionState();
 

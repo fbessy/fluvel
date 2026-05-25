@@ -23,7 +23,6 @@ RegionGraySpeedModel::RegionGraySpeedModel(
 void RegionGraySpeedModel::onImageChanged(const ImageView& image, const ContourData& contour)
 {
     assert(image.format() == ImageFormat::Gray8);
-    assert(image.width() == contour.phi().width() && image.height() == contour.phi().height());
 
     initialMeansChecked_ = false;
     status_ = SpeedModelStatus::Ok;
