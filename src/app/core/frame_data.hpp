@@ -22,7 +22,7 @@
 #include <QVideoFrame>
 #include <QtCore/qglobal.h>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -86,4 +86,4 @@ struct FrameTimestamps
     int64_t displayTimestampNs{0}; ///< Display timestamp (ns)
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

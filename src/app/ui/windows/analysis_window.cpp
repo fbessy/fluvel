@@ -16,7 +16,7 @@
 #include <QSettings>
 #include <QSpinBox>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 AnalysisWindow::AnalysisWindow(QWidget* parent)
@@ -296,4 +296,4 @@ void AnalysisWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

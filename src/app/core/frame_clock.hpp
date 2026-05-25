@@ -18,7 +18,7 @@
 #include <chrono>
 #include <cstdint>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -65,4 +65,4 @@ private:
     static inline bool initialized_{false};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

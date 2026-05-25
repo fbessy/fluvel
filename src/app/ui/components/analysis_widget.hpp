@@ -22,7 +22,7 @@ class QLabel;
 class QPushButton;
 class QGroupBox;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class ImageViewerWidget;
@@ -140,4 +140,4 @@ private:
     int idThis_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

@@ -6,7 +6,7 @@
  * @brief Application-level configuration types for Fluvel.
  *
  * This module defines configuration structures used by the application layer
- * (fluvel_app), including display settings, processing parameters, and session
+ * (fluvel), including display settings, processing parameters, and session
  * configurations for both image and video workflows.
  *
  * These types act as a bridge between UI controls and the core processing layer.
@@ -23,7 +23,7 @@
 #include <QImage>
 #include <string_view>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -239,4 +239,4 @@ struct VideoSessionSettings
     DisplayConfig display{};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

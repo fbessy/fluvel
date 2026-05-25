@@ -19,7 +19,7 @@
 
 #include <string>
 
-namespace fluvel_app::qimage_utils
+namespace fluvel::qimage_utils
 {
 
 /**
@@ -55,4 +55,4 @@ QByteArray imageHash(const QImage& image);
  */
 std::string hexHash(const QImage& image);
 
-} // namespace fluvel_app::qimage_utils
+} // namespace fluvel::qimage_utils

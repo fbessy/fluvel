@@ -35,7 +35,7 @@
 #include <atomic>
 #include <chrono>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -86,7 +86,7 @@ signals:
     void frameProcessed(quint64 contourSize);
 
     /// Emitted when a display-ready frame is available.
-    void displayFrameReady(fluvel_app::DisplayFrame displayFrame);
+    void displayFrameReady(fluvel::DisplayFrame displayFrame);
 
 protected:
     /**
@@ -174,4 +174,4 @@ private:
     std::atomic<bool> hasNewFrame_{false};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

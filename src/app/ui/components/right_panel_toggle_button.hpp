@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QWidget>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -47,4 +47,4 @@ private:
     QIcon iconOff_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

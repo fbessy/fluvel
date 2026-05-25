@@ -7,7 +7,7 @@
 #include <QGraphicsObject>
 #include <QPainter>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -101,4 +101,4 @@ private:
     qreal minWidth_{0.0};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

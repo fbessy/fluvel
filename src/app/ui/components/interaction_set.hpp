@@ -16,7 +16,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -160,4 +160,4 @@ private:
     std::vector<std::unique_ptr<ImageViewerBehavior>> behaviors_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

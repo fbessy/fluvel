@@ -13,7 +13,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class ImageViewerWidget;
@@ -110,4 +110,4 @@ public:
     /** @} */
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

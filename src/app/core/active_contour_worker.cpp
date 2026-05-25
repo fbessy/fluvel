@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ActiveContourWorker::ActiveContourWorker()
@@ -395,4 +395,4 @@ void ActiveContourWorker::resetMeasurement()
     isMeasuring_ = false;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

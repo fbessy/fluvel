@@ -9,7 +9,7 @@
 #include "frame_clock.hpp"
 #include "image_adapters.hpp"
 
-namespace fluvel_app
+namespace fluvel
 {
 
 VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
@@ -235,4 +235,4 @@ void VideoActiveContourThread::setDisplayMode(ImageDisplayMode mode)
     displayModeChanged_ = true;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

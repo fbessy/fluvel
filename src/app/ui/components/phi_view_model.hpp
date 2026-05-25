@@ -13,7 +13,7 @@
 
 #include <vector>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 struct Span
@@ -175,4 +175,4 @@ private:
     bool overlayVisible_{false};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

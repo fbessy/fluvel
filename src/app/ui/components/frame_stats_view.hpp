@@ -9,7 +9,7 @@
 #include <QMutex>
 #include <QtGlobal>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -103,4 +103,4 @@ private:
     double latencySumProcMs_{0.0};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

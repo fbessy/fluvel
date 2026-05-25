@@ -11,7 +11,7 @@
 #include <QSignalBlocker>
 #include <QString>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ColorSelectorWidget::ColorSelectorWidget(QWidget* parent, QColor initialColor)
@@ -119,4 +119,4 @@ void ColorSelectorWidget::setSelectedColor(const QColor& color)
     }
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

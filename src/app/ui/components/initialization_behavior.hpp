@@ -12,7 +12,7 @@
 class QMouseEvent;
 class ImageViewerWidget;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -103,4 +103,4 @@ signals:
     void toggleShapeRequested();
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

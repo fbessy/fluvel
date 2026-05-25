@@ -24,7 +24,7 @@
 #include <QImage>
 #include <QRect>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -131,4 +131,4 @@ private:
     QImage committedPhi_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

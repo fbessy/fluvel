@@ -6,7 +6,7 @@
 #include <QCryptographicHash>
 #include <QPainter>
 
-namespace fluvel_app::qimage_utils
+namespace fluvel::qimage_utils
 {
 
 QImage darkenImage(const QImage& image)

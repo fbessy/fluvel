@@ -27,7 +27,7 @@
 #include <QString>
 #include <QVector>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -60,12 +60,12 @@ public:
     /**
      * @brief Update processing configuration.
      */
-    void onImageSettingsChanged(const fluvel_app::ImageSessionSettings& session);
+    void onImageSettingsChanged(const fluvel::ImageSessionSettings& session);
 
     /**
      * @brief Update display configuration.
      */
-    void onImageDisplaySettingsChanged(const fluvel_app::DisplayConfig& display);
+    void onImageDisplaySettingsChanged(const fluvel::DisplayConfig& display);
 
     /**
      * @brief Restart processing from initial state.
@@ -107,7 +107,7 @@ signals:
     void contourUpdated(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
 
     /// Emitted when worker state changes.
-    void stateChanged(fluvel_app::WorkerState state);
+    void stateChanged(fluvel::WorkerState state);
 
     /// Emitted with textual diagnostics information.
     void textDiagnosticsUpdated(QString string);
@@ -124,7 +124,7 @@ private:
                           const fluvel_ip::ExportedContour& innerContour);
 
     /// Handle worker state change.
-    void onStateChanged(fluvel_app::WorkerState state);
+    void onStateChanged(fluvel::WorkerState state);
 
     /// Handle diagnostics update from worker.
     void onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& diag);
@@ -157,4 +157,4 @@ private:
     ActiveContourWorker activeContourWorker_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

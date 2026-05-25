@@ -14,7 +14,7 @@
 // to check fallbacks icons
 // #define FLUVEL_FORCE_EMBEDDED_ICONS
 
-namespace fluvel_app
+namespace fluvel
 {
 
 // icon loader namespace for function outside a class
@@ -130,4 +130,4 @@ QIcon loadIcon(const QString& svgResourceName)
 
 } // namespace il
 
-} // namespace fluvel_app
+} // namespace fluvel

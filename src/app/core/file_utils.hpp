@@ -15,7 +15,7 @@
 
 #include <QString>
 
-namespace fluvel_app::file_utils
+namespace fluvel::file_utils
 {
 
 /**
@@ -109,4 +109,4 @@ QString strippedName(const QString& fullFilename);
  */
 QString makeUniqueFileName(const QString& filePath);
 
-} // namespace fluvel_app::file_utils
+} // namespace fluvel::file_utils

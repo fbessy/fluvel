@@ -11,7 +11,7 @@
 #include "image_debug.hpp"
 #endif
 
-namespace fluvel_app
+namespace fluvel
 {
 
 namespace
@@ -42,13 +42,13 @@ QSettings camSessionSettings()
     return QSettings(dir + "/camera_session.ini", QSettings::IniFormat);
 }
 
-QSettings sessionSettings(fluvel_app::Session session)
+QSettings sessionSettings(fluvel::Session session)
 {
     switch (session)
     {
-        case fluvel_app::Session::Image:
+        case fluvel::Session::Image:
             return imgSessionSettings();
-        case fluvel_app::Session::Camera:
+        case fluvel::Session::Camera:
             return camSessionSettings();
     }
     Q_UNREACHABLE();
@@ -656,4 +656,4 @@ void ApplicationSettings::setAppLanguage(Language language)
     appLanguage_ = language;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

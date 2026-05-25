@@ -12,7 +12,7 @@
 #include <QDebug>
 #endif
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ImageSettingsController::ImageSettingsController(const ImageComputeConfig& config, QObject* parent)
@@ -253,4 +253,4 @@ void ImageSettingsController::setViewVisible(bool v)
     }
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

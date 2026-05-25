@@ -14,7 +14,7 @@
 #include <QCameraFormat>
 #include <cmath>
 
-namespace fluvel_app::camera_utils
+namespace fluvel::camera_utils
 {
 
 /**
@@ -41,4 +41,4 @@ inline bool isSameCameraFormat(const QCameraFormat& a, const QCameraFormat& b)
            std::abs(a.maxFrameRate() - b.maxFrameRate()) < kFpsEpsilon;
 }
 
-} // namespace fluvel_app::camera_utils
+} // namespace fluvel::camera_utils

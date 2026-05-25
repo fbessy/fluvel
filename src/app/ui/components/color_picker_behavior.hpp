@@ -11,7 +11,7 @@ class QMouseEvent;
 class QColor;
 class QPoint;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class ImageViewerWidget;
@@ -72,4 +72,4 @@ private:
     Qt::MouseButton button_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

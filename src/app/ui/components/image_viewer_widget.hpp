@@ -29,7 +29,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class ImageViewerInteraction;
@@ -96,8 +96,8 @@ public:
      *      * These functions update internal rendering behavior without recreating the widget.
      * @{
      */
-    void applyDisplayConfig(const fluvel_app::DisplayConfig& display);
-    void applyDownscaleConfig(const fluvel_app::DownscaleParams& downscale);
+    void applyDisplayConfig(const fluvel::DisplayConfig& display);
+    void applyDownscaleConfig(const fluvel::DownscaleParams& downscale);
     /** @} */
 
     /**
@@ -205,7 +205,7 @@ signals:
     /**
      * @brief Emitted when a frame is displayed.
      */
-    void frameDisplayed(const fluvel_app::FrameTimestamps& ts);
+    void frameDisplayed(const fluvel::FrameTimestamps& ts);
 
     /**
      * @brief Emitted when an image is dropped.
@@ -325,4 +325,4 @@ private:
     const bool useEnhancedDisplayConfig_{false};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

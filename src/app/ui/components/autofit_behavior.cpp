@@ -6,7 +6,7 @@
 
 #include <QMouseEvent>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 AutoFitBehavior::AutoFitBehavior(Qt::MouseButton button)
@@ -26,4 +26,4 @@ bool AutoFitBehavior::mouseRelease(ImageViewerWidget& view, QMouseEvent* event)
     return false;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

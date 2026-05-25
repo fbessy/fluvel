@@ -44,7 +44,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ImageWindow::ImageWindow(QWidget* parent)
@@ -806,7 +806,7 @@ void ImageWindow::saveDisplayed()
     }
 }
 
-void ImageWindow::onStateChanged(fluvel_app::WorkerState state)
+void ImageWindow::onStateChanged(fluvel::WorkerState state)
 {
     bool isEnable = (state != WorkerState::Uninitialized && state != WorkerState::Initializing);
 
@@ -894,4 +894,4 @@ void ImageWindow::showEvent(QShowEvent* event)
     QMainWindow::showEvent(event);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

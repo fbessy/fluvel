@@ -20,7 +20,7 @@
 
 #include <cassert>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ImageViewerWidget::ImageViewerWidget(QWidget* parent)
@@ -996,4 +996,4 @@ bool ImageViewerWidget::isPixelVisible(const QPoint& viewPos) const
     return visibleSceneRect.contains(scenePos);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

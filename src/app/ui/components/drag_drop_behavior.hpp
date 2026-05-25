@@ -11,7 +11,7 @@ class QDragMoveEvent;
 class QDragLeaveEvent;
 class QDropEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -51,4 +51,4 @@ public:
     }
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

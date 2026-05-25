@@ -12,7 +12,7 @@
 #include <QPointF>
 #include <QString>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -103,4 +103,4 @@ private:
     QRectF boundingRect_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

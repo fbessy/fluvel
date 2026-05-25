@@ -9,7 +9,7 @@ class QComboBox;
 class QCloseEvent;
 class QWidget;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -50,4 +50,4 @@ private:
     QComboBox* combo_ = nullptr;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

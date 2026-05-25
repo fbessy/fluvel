@@ -13,7 +13,7 @@ class QComboBox;
 class QSpinBox;
 class QGroupBox;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -91,4 +91,4 @@ private:
     ActiveContourConfig& config_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

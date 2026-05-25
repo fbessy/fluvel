@@ -4,7 +4,7 @@
 #include "right_panel_toggle_button.hpp"
 #include "icon_loader.hpp"
 
-namespace fluvel_app
+namespace fluvel
 {
 
 RightPanelToggleButton::RightPanelToggleButton(QWidget* parent)
@@ -29,4 +29,4 @@ void RightPanelToggleButton::updateAppearance(bool checked)
     setToolTip(checked ? tr("Right panel is visible.") : tr("Right panel is hidden."));
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

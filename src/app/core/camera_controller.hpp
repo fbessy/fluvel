@@ -37,7 +37,7 @@ class QMediaCaptureSession;
 class QVideoSink;
 class QTimer;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -151,7 +151,7 @@ signals:
      *      * A valid frame was received and the controller entered
      * the streaming state.
      */
-    void streamingStarted(const fluvel_app::StreamingInfo& info);
+    void streamingStarted(const fluvel::StreamingInfo& info);
 
     /**
      * @brief Emitted when streaming stops.
@@ -173,10 +173,10 @@ signals:
     void textStatsUpdated(const QString& textStats);
 
     /// Emitted with processed frame and contour overlay.
-    void imageAndContourUpdated(const fluvel_app::UiFrame& uiFrame);
+    void imageAndContourUpdated(const fluvel::UiFrame& uiFrame);
 
     /// Emitted when downscale parameters change.
-    void downscaleChanged(const fluvel_app::DownscaleParams& downscaleParams);
+    void downscaleChanged(const fluvel::DownscaleParams& downscaleParams);
 
 private:
     /// Handle updates in available video inputs.
@@ -256,4 +256,4 @@ private:
 #endif
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

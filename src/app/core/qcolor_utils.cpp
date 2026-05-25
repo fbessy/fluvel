@@ -7,7 +7,7 @@
 #include <QSize>
 #include <QString>
 
-namespace fluvel_app::qcolor_utils
+namespace fluvel::qcolor_utils
 {
 
 QColor desaturateAndDarken(const QColor& original, qreal saturationFactor, qreal valueFactor)

@@ -9,7 +9,7 @@
 #include <QDropEvent>
 #include <QMimeData>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 bool DragDropBehavior::dragEnter(ImageViewerWidget& view, QDragEnterEvent* e)
@@ -55,4 +55,4 @@ bool DragDropBehavior::drop(ImageViewerWidget& view, QDropEvent* e)
     return true;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

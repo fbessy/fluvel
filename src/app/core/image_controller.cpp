@@ -12,7 +12,7 @@
 #include "image_debug.hpp"
 #endif
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ImageController::ImageController(const ImageSessionSettings& session, QObject* parent)
@@ -207,7 +207,7 @@ void ImageController::converge()
     activeContourWorker_.converge();
 }
 
-void ImageController::onStateChanged(fluvel_app::WorkerState state)
+void ImageController::onStateChanged(fluvel::WorkerState state)
 {
     emit stateChanged(state);
 }
@@ -263,4 +263,4 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
     emit textDiagnosticsUpdated(s);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

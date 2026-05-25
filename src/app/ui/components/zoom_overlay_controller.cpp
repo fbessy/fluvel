@@ -7,7 +7,7 @@
 #include <QGraphicsItem>
 #include <QPropertyAnimation>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ZoomOverlayController::ZoomOverlayController(OverlayTextItem* item, QObject* parent)
@@ -74,4 +74,4 @@ void ZoomOverlayController::onFadeFinished()
     anim_ = nullptr;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

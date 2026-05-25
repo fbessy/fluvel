@@ -15,7 +15,7 @@ class QPushButton;
 class QLabel;
 class QSpinBox;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class AnalysisWidget;
@@ -73,4 +73,4 @@ private:
     float factor_{0.f};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

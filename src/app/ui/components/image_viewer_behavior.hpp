@@ -13,7 +13,7 @@
 
 class QMouseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class ImageViewerWidget;
@@ -150,4 +150,4 @@ public:
     /** @} */
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

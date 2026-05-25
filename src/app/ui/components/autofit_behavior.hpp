@@ -7,7 +7,7 @@
 
 class QMouseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -36,4 +36,4 @@ private:
     Qt::MouseButton button_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

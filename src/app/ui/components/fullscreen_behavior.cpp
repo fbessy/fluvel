@@ -6,7 +6,7 @@
 
 #include <QMouseEvent>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 bool FullscreenBehavior::mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* event)
@@ -24,4 +24,4 @@ bool FullscreenBehavior::mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* 
     return false;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

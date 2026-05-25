@@ -19,7 +19,7 @@
 
 #include <iostream>
 
-namespace fluvel_app::image_debug
+namespace fluvel::image_debug
 {
 
 /**
@@ -44,4 +44,4 @@ std::ostream& operator<<(std::ostream& os, const QImage& img);
  */
 QString describeImage(const QImage& img);
 
-} // namespace fluvel_app::image_debug
+} // namespace fluvel::image_debug

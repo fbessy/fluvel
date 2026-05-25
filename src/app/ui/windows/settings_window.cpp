@@ -24,7 +24,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 SettingsWindow::SettingsWindow(const ImageSessionSettings& config, QWidget* parent)
@@ -1105,4 +1105,4 @@ void SettingsWindow::onTabChanged(int index)
     emit initializationModeChanged(index == kInitializationTab);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

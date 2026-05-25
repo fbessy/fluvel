@@ -7,7 +7,7 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class OverlayTextItem;
@@ -88,4 +88,4 @@ private:
     int fadeDurationMs_{250};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

@@ -7,7 +7,7 @@
 
 #include <QMouseEvent>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 InitializationBehavior::InitializationBehavior(QObject* parent)
@@ -72,4 +72,4 @@ bool InitializationBehavior::wheel(ImageViewerWidget& /* view */, QWheelEvent* w
     return true;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

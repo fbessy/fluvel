@@ -27,7 +27,7 @@
 
 #include <QObject>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -109,7 +109,7 @@ public:
     /**
      * @brief Update overlay shape during interactive editing.
      */
-    void onUpdateOverlay(fluvel_app::UiShapeInfo uiShape);
+    void onUpdateOverlay(fluvel::UiShapeInfo uiShape);
 
     /**
      * @brief Update connectivity mode of the contour.
@@ -183,4 +183,4 @@ private:
     bool viewVisible_{false};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

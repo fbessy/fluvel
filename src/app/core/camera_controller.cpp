@@ -16,7 +16,7 @@
 
 #include <cassert>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 CameraController::CameraController(const VideoSessionSettings& session, QObject* parent)
@@ -355,4 +355,4 @@ QList<QCameraDevice> CameraController::videoInputs() const
     return QMediaDevices::videoInputs();
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

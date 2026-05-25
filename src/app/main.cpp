@@ -52,10 +52,10 @@ int main(int argc, char* argv[])
 
     QGuiApplication::setApplicationDisplayName("Fluvel");
 
-    fluvel_app::FrameClock::init();
+    fluvel::FrameClock::init();
 
-    const auto& config = fluvel_app::ApplicationSettings::instance();
-    fluvel_app::Language language = config.appLanguage();
+    const auto& config = fluvel::ApplicationSettings::instance();
+    fluvel::Language language = config.appLanguage();
 
     static QTranslator translator_qt;
     static QTranslator translator_fluvel;
@@ -63,13 +63,13 @@ int main(int argc, char* argv[])
     QString locale;
     switch (language)
     {
-        case fluvel_app::Language::System:
+        case fluvel::Language::System:
             locale = QLocale::system().name().section('_', 0, 0);
             break;
-        case fluvel_app::Language::French:
+        case fluvel::Language::French:
             locale = "fr";
             break;
-        case fluvel_app::Language::English:
+        case fluvel::Language::English:
         default:
             locale = "en";
             break;
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
         app.installTranslator(&translator_fluvel);
 
 #ifdef FLUVEL_PLATFORM_DESKTOP
-    QApplication::setWindowIcon(fluvel_app::il::desktopAppIcon());
+    QApplication::setWindowIcon(fluvel::il::desktopAppIcon());
 #endif
 
 #if defined(FLUVEL_PLATFORM_MOBILE) && !defined(FLUVEL_UI_DESKTOP)
@@ -105,9 +105,9 @@ int main(int argc, char* argv[])
 #else
 
 #if defined(FLUVEL_PLATFORM_MOBILE)
-    auto root = std::make_unique<fluvel_app::CameraWindow>();
+    auto root = std::make_unique<fluvel::CameraWindow>();
 #else
-    auto root = std::make_unique<fluvel_app::ImageWindow>();
+    auto root = std::make_unique<fluvel::ImageWindow>();
 #endif
 
     root->show();

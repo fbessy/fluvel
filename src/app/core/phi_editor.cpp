@@ -7,7 +7,7 @@
 #include <cmath>
 #include <cstddef>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 PhiEditor::PhiEditor(const QImage& phi)
@@ -148,4 +148,4 @@ void PhiEditor::setSize(const QSize& size)
     emit editedPhiChanged();
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

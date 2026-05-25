@@ -21,7 +21,7 @@
 
 #include <QtGlobal>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 namespace
@@ -561,4 +561,4 @@ void AboutWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

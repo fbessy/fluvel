@@ -3,7 +3,7 @@
 
 #include "frame_clock.hpp"
 
-namespace fluvel_app
+namespace fluvel
 {
 
 void FrameClock::init()
@@ -28,4 +28,4 @@ double FrameClock::nowSec()
     return static_cast<double>(nowNs()) * 1e-9;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

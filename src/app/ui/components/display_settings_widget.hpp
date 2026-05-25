@@ -14,7 +14,7 @@
 #include <QRadioButton>
 #include <QWidget>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class ColorSelectorWidget;
@@ -53,7 +53,7 @@ signals:
      * @brief Emitted when the display configuration changes.
      *      * @param config Updated configuration.
      */
-    void displayConfigChanged(const fluvel_app::DisplayConfig& config);
+    void displayConfigChanged(const fluvel::DisplayConfig& config);
 
 public slots:
     /**
@@ -85,4 +85,4 @@ private:
     DisplayConfig config_{};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

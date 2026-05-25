@@ -26,7 +26,7 @@
 
 #include <cassert>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 int AnalysisWidget::countThis = 0;
@@ -309,4 +309,4 @@ void AnalysisWidget::saveSettings() const
     settings.setValue("Analysis/B" + QString::number(idThis_), int(selectedColor_.blue));
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

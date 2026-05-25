@@ -17,7 +17,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, QWidget* parent)
@@ -176,4 +176,4 @@ void CameraSettingsWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

@@ -22,7 +22,7 @@
 #include <QImage>
 #include <QDir>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 //! This structure contains all the configuration of the application.
@@ -113,22 +113,22 @@ signals:
     /**
      * @brief Emitted when image session settings change.
      */
-    void imgSettingsChanged(const fluvel_app::ImageSessionSettings& conf);
+    void imgSettingsChanged(const fluvel::ImageSessionSettings& conf);
 
     /**
      * @brief Emitted when image display settings change.
      */
-    void imgDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
+    void imgDisplaySettingsChanged(const fluvel::DisplayConfig& conf);
 
     /**
      * @brief Emitted when video session settings change.
      */
-    void videoSettingsChanged(const fluvel_app::VideoSessionSettings& conf);
+    void videoSettingsChanged(const fluvel::VideoSessionSettings& conf);
 
     /**
      * @brief Emitted when video display settings change.
      */
-    void videoDisplaySettingsChanged(const fluvel_app::DisplayConfig& conf);
+    void videoDisplaySettingsChanged(const fluvel::DisplayConfig& conf);
 
 private:
     /// Load image session settings from storage.
@@ -185,4 +185,4 @@ private:
     Language appLanguage_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

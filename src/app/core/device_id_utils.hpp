@@ -19,7 +19,7 @@
 #include <QString>
 #include <QUrl>
 
-namespace fluvel_app::device
+namespace fluvel::device
 {
 
 /**
@@ -49,4 +49,4 @@ inline QByteArray decodeDeviceId(const QString& key)
     return QUrl::fromPercentEncoding(key.toUtf8()).toUtf8();
 }
 
-} // namespace fluvel_app::device
+} // namespace fluvel::device

@@ -5,7 +5,7 @@
 
 #include <QSpinBox>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -57,4 +57,4 @@ private:
     QValidator::State previousResult_{QValidator::Acceptable};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

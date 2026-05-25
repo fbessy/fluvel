@@ -6,7 +6,7 @@
 #include <QColor>
 #include <QPoint>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -37,4 +37,4 @@ public:
     virtual void onColorPicked(const QColor& color, const QPoint& imagePos) = 0;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

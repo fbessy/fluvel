@@ -4,7 +4,7 @@
 #include "color_picker_behavior.hpp"
 #include "image_viewer_widget.hpp"
 
-namespace fluvel_app
+namespace fluvel
 {
 
 ColorPickerBehavior::ColorPickerBehavior(Qt::MouseButton button)
@@ -31,4 +31,4 @@ bool ColorPickerBehavior::mousePress(ImageViewerWidget& view, QMouseEvent* e)
     return true;
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

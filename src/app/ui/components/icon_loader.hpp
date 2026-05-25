@@ -6,7 +6,7 @@
 #include <QIcon>
 #include <QStyle>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -94,4 +94,4 @@ QIcon loadIcon(const QString& svgResourceName);
 
 } // namespace il
 
-} // namespace fluvel_app
+} // namespace fluvel

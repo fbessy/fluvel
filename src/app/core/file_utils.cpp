@@ -8,7 +8,7 @@
 #include <QRegularExpressionMatch>
 #include <QStringList>
 
-namespace fluvel_app::file_utils
+namespace fluvel::file_utils
 {
 
 QString buildImageFilter()

@@ -7,7 +7,7 @@
 
 class QMouseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -28,4 +28,4 @@ public:
     bool mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* event) override;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

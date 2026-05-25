@@ -7,7 +7,7 @@
 #include <QPoint>
 #include <QVector>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -71,4 +71,4 @@ private:
     QColor color_ = Qt::red;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

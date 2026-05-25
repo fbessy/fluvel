@@ -10,7 +10,7 @@
 
 #include <cassert>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 AlgoSettingsWidget::AlgoSettingsWidget(ActiveContourConfig& config, QWidget* parent)
@@ -207,4 +207,4 @@ void AlgoSettingsWidget::reject()
     gammaSpin_->setValue(config_.regionParams.weights.c3);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

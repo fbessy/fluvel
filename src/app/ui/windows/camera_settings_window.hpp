@@ -19,7 +19,7 @@ class QComboBox;
 class QCheckBox;
 class QSpinBox;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class AlgoSettingsWidget;
@@ -53,7 +53,7 @@ signals:
      * @brief Emitted when the configuration is accepted.
      *      * @param config Updated video session configuration.
      */
-    void videoComputeSettingsAccepted(const fluvel_app::VideoComputeConfig& config);
+    void videoComputeSettingsAccepted(const fluvel::VideoComputeConfig& config);
 
 protected:
     /**
@@ -102,4 +102,4 @@ private:
     VideoComputeConfig editedConfig_{};    // UI en cours
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

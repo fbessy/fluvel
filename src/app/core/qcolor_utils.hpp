@@ -21,7 +21,7 @@
 class QString;
 class QSize;
 
-namespace fluvel_app::qcolor_utils
+namespace fluvel::qcolor_utils
 {
 
 /**
@@ -50,4 +50,4 @@ QColor desaturateAndDarken(const QColor& original, qreal saturationFactor, qreal
  */
 QIcon colorizeIcon(const QIcon& baseIcon, const QColor& color, const QSize& size);
 
-} // namespace fluvel_app::qcolor_utils
+} // namespace fluvel::qcolor_utils

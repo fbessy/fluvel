@@ -19,7 +19,7 @@
 
 #endif
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -123,7 +123,7 @@ signals:
     /**
      * @brief Emitted when the worker state changes.
      */
-    void stateChanged(fluvel_app::WorkerState state);
+    void stateChanged(fluvel::WorkerState state);
 
     /**
      * @brief Emitted when diagnostics are updated.
@@ -218,4 +218,4 @@ private:
     bool processingDirty_{true};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

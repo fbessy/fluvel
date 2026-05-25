@@ -12,7 +12,7 @@
 #include <QString>
 #include <QVBoxLayout>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 LanguageWindow::LanguageWindow(QWidget* parent)
@@ -117,4 +117,4 @@ void LanguageWindow::closeEvent(QCloseEvent* event)
     QDialog::closeEvent(event);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

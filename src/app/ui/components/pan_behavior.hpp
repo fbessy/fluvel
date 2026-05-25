@@ -10,7 +10,7 @@
 
 class QMouseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -146,4 +146,4 @@ private:
     QPoint lastPos_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

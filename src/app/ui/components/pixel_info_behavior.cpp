@@ -10,7 +10,7 @@
 #include <QGraphicsScene>
 #include <QMouseEvent>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 // ---------------------------------------------------------------------
@@ -116,4 +116,4 @@ void PixelInfoBehavior::cancel()
         overlay_->hideOverlay();
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

@@ -14,7 +14,7 @@
 
 #include <cassert>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidget* parent)
@@ -223,4 +223,4 @@ void DisplaySettingsWidget::animate(bool open)
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

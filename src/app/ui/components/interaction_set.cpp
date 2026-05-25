@@ -8,7 +8,7 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 void InteractionSet::addBehavior(std::unique_ptr<ImageViewerBehavior> behavior)
@@ -176,4 +176,4 @@ void InteractionSet::cancel()
         const_cast<ImageViewerBehavior*>(b)->cancel();
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

@@ -6,7 +6,7 @@
 
 #include <QMouseEvent>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 PanBehavior::PanBehavior(Qt::MouseButton button)
@@ -54,4 +54,4 @@ bool PanBehavior::mouseRelease(ImageViewerWidget&, QMouseEvent* e)
 
     return false;
 }
-} // namespace fluvel_app
+} // namespace fluvel

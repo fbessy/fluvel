@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QPainter>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 QString maxText()
@@ -148,4 +148,4 @@ void PixelInfoOverlay::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
                       text_);
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

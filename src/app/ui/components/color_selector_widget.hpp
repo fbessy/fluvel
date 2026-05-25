@@ -10,7 +10,7 @@ class QComboBox;
 class QPushButton;
 class QString;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -68,4 +68,4 @@ private:
     QPushButton* custom_pb_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

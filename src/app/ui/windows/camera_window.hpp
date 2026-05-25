@@ -24,7 +24,7 @@ class QLabel;
 class QShowEvent;
 class QCloseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 struct StreamingInfo;
@@ -260,4 +260,4 @@ private:
     QString deviceTitleStr_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

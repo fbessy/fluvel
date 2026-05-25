@@ -31,7 +31,7 @@
 #include <QtCore/qpermissions.h>
 #endif
 
-namespace fluvel_app
+namespace fluvel
 {
 
 CameraWindow::CameraWindow(QWidget* parent)
@@ -1119,4 +1119,4 @@ void CameraWindow::updateWindowTitle()
     }
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

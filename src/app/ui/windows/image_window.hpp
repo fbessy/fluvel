@@ -21,7 +21,7 @@ class QPushButton;
 class QShowEvent;
 class QCloseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class CameraWindow;
@@ -90,7 +90,7 @@ protected:
 private:
     void onInputImageReady(const QImage& input);
     void onFileOpened(const QString& path);
-    void onStateChanged(fluvel_app::WorkerState state);
+    void onStateChanged(fluvel::WorkerState state);
     void onCameraWindowShown();
     void onCameraWindowClosed();
 
@@ -184,4 +184,4 @@ private:
     QString lastDirectoryUsed_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

@@ -6,7 +6,7 @@
 
 #include <QDebug>
 
-namespace fluvel_app::image_debug
+namespace fluvel::image_debug
 {
 
 std::ostream& operator<<(std::ostream& os, const QImage& img)
@@ -34,4 +34,4 @@ QString describeImage(const QImage& img)
     return QString("%1x%2 %3").arg(img.width()).arg(img.height()).arg(QString(hex));
 }
 
-} // namespace fluvel_app::image_debug
+} // namespace fluvel::image_debug

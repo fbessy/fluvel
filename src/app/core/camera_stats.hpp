@@ -12,7 +12,7 @@
 
 #pragma once
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -36,4 +36,4 @@ struct CameraStats
     double avgContourSize{0.0}; ///< Average contour size (number of points)
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

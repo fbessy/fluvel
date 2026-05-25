@@ -8,7 +8,7 @@
 class QWidget;
 class QCloseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 /**
@@ -41,4 +41,4 @@ private:
     QDialog* licenseWindow_ = nullptr;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

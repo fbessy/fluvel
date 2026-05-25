@@ -4,7 +4,7 @@
 #include "frame_stats_view.hpp"
 #include <QMutexLocker>
 
-namespace fluvel_app
+namespace fluvel
 {
 
 FrameStatsView::FrameStatsView()
@@ -124,4 +124,4 @@ void FrameStatsView::updateWindowLocked()
     windowTimer_.restart();
 }
 
-} // namespace fluvel_app
+} // namespace fluvel

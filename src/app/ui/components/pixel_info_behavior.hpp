@@ -10,7 +10,7 @@
 
 class QMouseEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 
 class ImageViewerWidget;
@@ -108,4 +108,4 @@ private:
     std::unique_ptr<PixelInfoOverlay> overlay_;
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

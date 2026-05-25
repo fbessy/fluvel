@@ -27,7 +27,7 @@ class QWidget;
 class QCloseEvent;
 class QShowEvent;
 
-namespace fluvel_app
+namespace fluvel
 {
 class ImageViewerWidget;
 class InitializationBehavior;
@@ -85,7 +85,7 @@ signals:
     /**
      * @brief Emitted when the configuration is accepted.
      */
-    void imageComputeSettingsAccepted(const fluvel_app::ImageComputeConfig& config);
+    void imageComputeSettingsAccepted(const fluvel::ImageComputeConfig& config);
 
     /**
      * @brief Emitted when initialization mode is toggled.
@@ -95,7 +95,7 @@ signals:
     /**
      * @brief Requests overlay update in the viewer.
      */
-    void updateOverlay(const fluvel_app::UiShapeInfo& uiShape);
+    void updateOverlay(const fluvel::UiShapeInfo& uiShape);
 
 protected:
     /**
@@ -246,4 +246,4 @@ private:
     ImageComputeConfig editedConfig_{};
 };
 
-} // namespace fluvel_app
+} // namespace fluvel

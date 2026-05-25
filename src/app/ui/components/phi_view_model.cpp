@@ -10,7 +10,7 @@
 #include <QDebug>
 #endif
 
-namespace fluvel_app
+namespace fluvel
 {
 
 // phi colors (Lout and Lin)
@@ -282,4 +282,4 @@ void PhiViewModel::setInteractiveMode(bool enabled)
     composeView();
 }
 
-} // namespace fluvel_app
+} // namespace fluvel
