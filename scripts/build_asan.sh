@@ -55,6 +55,8 @@ cmake -S "${PROJECT_ROOT}" -B "${PROJECT_ROOT}/${BUILD_DIR}" \
   -DENABLE_ASAN=ON \
   -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
   -DCMAKE_PREFIX_PATH="${QT_PATH}" \
+  -DFLUVEL_BUILD_APP=OFF \
+  -DFLUVEL_BUILD_BIND=ON \
   ${COMPILER_FLAGS}
 
 #######################################

@@ -190,6 +190,8 @@ void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, in
 template <bool IsMax>
 void vanHerk(const ImageView& input, ImageOwner& output, int radius)
 {
+    output.ensureLike(input);
+
     assert(output.width() == input.width());
     assert(output.height() == input.height());
     assert(output.format() == input.format());

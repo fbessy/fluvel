@@ -43,6 +43,8 @@ namespace fluvel_ip::filter::morpho
 template <bool IsMax>
 void naiveMorpho(const ImageView& input, ImageOwner& output, int radius)
 {
+    output.ensureLike(input);
+
     assert(output.width() == input.width());
     assert(output.height() == input.height());
     assert(output.format() == input.format());

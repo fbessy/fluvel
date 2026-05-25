@@ -108,17 +108,59 @@ Qt is used only for visualization and interaction.
 
 The project is organized into:
 
-- `src/` — Core engine and application code
-- `docs/` — Documentation configuration
-- `packaging/` — Flatpak, AppImage and distribution files
-- `CMakeLists.txt` — Build configuration
+```text
+fluvel/
+├── src/                           # Source code
+│   ├── app/                       # Desktop/mobile application
+│   │   ├── ui/                    # Windows and reusable UI components
+│   │   ├── qml/                   # Experimental UI layer
+│   │   ├── core/                  # Application logic and orchestration
+│   │   └── interop/               # Application integration and adapters
+│   │
+│   ├── bindings/                  # Language and scripting integrations
+│   │   └── python/                # Experimental Python integration
+│   │
+│   └── image_processing/          # Image processing engine
+│       ├── filtering/             # Filtering, denoising and preprocessing
+│       ├── segmentation/          # Active contours and segmentation models
+│       ├── analysis/              # Shape analysis and image metrics
+│       └── core/                  # Shared processing infrastructure
+│
+├── resources/                     # Icons and application assets
+├── translations/                  # Application translations (.ts, .qm)
+│
+├── scripts/                       # Development, packaging and utility scripts
+│                                  # Includes local testing and maintenance helpers
+│
+├── docs/                          # Generated local documentation (optional)
+├── web/                           # Website and homepage
+│
+├── cmake/                         # Shared CMake modules and configuration
+├── packaging/                     # Flatpak, AppImage and distribution files
+│
+├── .github/                       # CI workflows, releases and automation
+├── .gitlab-ci.yml                 # Online documentation pipeline
+│
+└── CMakeLists.txt                 # Main build configuration
+```
 
-Main modules:
+### Main modules
 
-- **fluvel_app** — UI and orchestration
-- **fluvel_ip** — Image processing engine
+- **fluvel_app** — User interface and application orchestration
+- **fluvel_ip** — Image processing and segmentation engine
+- **fluvel_bindings** — Experimental scripting and language integrations
 
 ---
+
+Fluvel follows a hybrid architecture:
+
+- **Technical organization** for application layers (UI, integration and execution flow)
+- **Functional organization** for image processing modules (filtering, segmentation and analysis)
+
+Build, release and deployment automation are intentionally kept outside the source tree and are handled through repository workflows and helper scripts.
+
+Some components (such as additional UI technologies and language integrations) are experimental and may evolve over time.
+```
 
 ## 🛠️ Build
 

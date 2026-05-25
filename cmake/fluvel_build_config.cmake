@@ -1,6 +1,26 @@
 # SPDX-License-Identifier: CeCILL-2.1
 # Copyright (C) 2010-2026 Fabien Bessy
 
+
+# =========================
+# Build products
+# =========================
+
+option(
+    FLUVEL_BUILD_APP
+    "Build desktop/mobile application"
+    ${FLUVEL_DEFAULT_BUILD_APP}
+)
+
+option(
+    FLUVEL_BUILD_BIND
+    "Build language bindings"
+    ${FLUVEL_DEFAULT_BUILD_BIND}
+)
+
+message(STATUS "Build app      : ${FLUVEL_BUILD_APP}")
+message(STATUS "Build bindings : ${FLUVEL_BUILD_BIND}")
+
 set(FLUVEL_IS_CI FALSE)
 
 if(DEFINED ENV{CI})
@@ -19,29 +39,29 @@ else()
     set(FLUVEL_DEFAULT_TSAN ${FLUVEL_LOCAL_DEFAULT_TSAN})
 endif()
 
-if(NOT DEFINED ENABLE_CCACHE_BUILD)
-    set(ENABLE_CCACHE_BUILD ${FLUVEL_DEFAULT_CCACHE})
-endif()
+option(
+    ENABLE_CCACHE_BUILD
+    "Enable ccache support"
+    ${FLUVEL_DEFAULT_CCACHE}
+)
 
-if(NOT DEFINED ENABLE_UNITY_BUILD)
-    set(ENABLE_UNITY_BUILD ${FLUVEL_DEFAULT_UNITY})
-endif()
+option(
+    ENABLE_UNITY_BUILD
+    "Enable unity build"
+    ${FLUVEL_DEFAULT_UNITY}
+)
 
+option(
+    ENABLE_ASAN
+    "Enable Sanitizers"
+    ${FLUVEL_DEFAULT_ASAN}
+)
 
-if(NOT DEFINED ENABLE_ASAN)
-    set(ENABLE_ASAN ${FLUVEL_DEFAULT_ASAN})
-endif()
-
-if(NOT DEFINED ENABLE_TSAN)
-    set(ENABLE_TSAN ${FLUVEL_DEFAULT_TSAN})
-endif()
-
-
-option(ENABLE_CCACHE_BUILD "Enable ccache support" ${ENABLE_CCACHE_BUILD})
-option(ENABLE_UNITY_BUILD "Enable unity build" ${ENABLE_UNITY_BUILD})
-
-option(ENABLE_ASAN "Enable Sanitizers" ${ENABLE_ASAN})
-option(ENABLE_TSAN "Enable ThreadSanitizer" ${ENABLE_TSAN})
+option(
+    ENABLE_TSAN
+    "Enable ThreadSanitizer"
+    ${FLUVEL_DEFAULT_TSAN}
+)
 
 if(ENABLE_CCACHE_BUILD)
 

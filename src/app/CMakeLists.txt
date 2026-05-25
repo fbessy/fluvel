@@ -155,7 +155,7 @@ set(app_src
     ${INTEROP_DIR}/contour_adapters.hpp
 )
 
-qt_add_executable(${FLUVEL_TARGET_NAME}
+qt_add_executable(${APP_TARGET_NAME}
     ${app_src})
 
 if(FLUVEL_PLATFORM_LINUX)
@@ -164,7 +164,7 @@ else()
     set(FLUVEL_OUTPUT_NAME "Fluvel")
 endif()
 
-set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
+set_target_properties(${APP_TARGET_NAME} PROPERTIES
     AUTOMOC ON
     AUTORCC ON
     AUTOUIC ON
@@ -172,13 +172,13 @@ set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
 )
 
 #if(FLUVEL_PLATFORM_ANDROID)
-    # qt_add_qml_module(${FLUVEL_TARGET_NAME}
+    # qt_add_qml_module(${APP_TARGET_NAME}
     #     URI fluvel
     #     VERSION 1.0
     #     QML_FILES
     #         qml/Main.qml
     # )
-    # qt_add_resources(${FLUVEL_TARGET_NAME} "qml"
+    # qt_add_resources(${APP_TARGET_NAME} "qml"
     #     PREFIX "/"
     #     FILES
     #         qml/Main.qml
@@ -203,7 +203,7 @@ foreach(qm ${QM_FILES})
 endforeach()
 
 # --- Resources ---
-qt_add_resources(${FLUVEL_TARGET_NAME} fluvel_translations
+qt_add_resources(${APP_TARGET_NAME} fluvel_translations
     PREFIX "/i18n"
     FILES ${QM_FILES}
 )
@@ -260,12 +260,12 @@ foreach(res ${APP_RESOURCES})
     )
 endforeach()
 
-qt_add_resources(${FLUVEL_TARGET_NAME} app_resources
+qt_add_resources(${APP_TARGET_NAME} app_resources
     PREFIX "/"
     FILES ${APP_RESOURCES}
 )
 
-target_include_directories(${FLUVEL_TARGET_NAME} PRIVATE
+target_include_directories(${APP_TARGET_NAME} PRIVATE
     ${CORE_DIR}
     ${UI_COMP_DIR}
     ${UI_WIN_DIR}
@@ -273,7 +273,7 @@ target_include_directories(${FLUVEL_TARGET_NAME} PRIVATE
 )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(${FLUVEL_TARGET_NAME} PRIVATE
+    target_compile_options(${APP_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:
             -O0
             -g
@@ -302,7 +302,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         >
     )
 elseif (MSVC)
-    target_compile_options(${FLUVEL_TARGET_NAME} PRIVATE
+    target_compile_options(${APP_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:/Od /Zi>
         $<$<CONFIG:Release>:/O2>
         $<$<CONFIG:RelWithDebInfo>:/O2 /Zi>
@@ -326,7 +326,7 @@ if(FLUVEL_USE_QML)
     )
 endif()
 
-target_link_libraries(${FLUVEL_TARGET_NAME} PRIVATE
+target_link_libraries(${APP_TARGET_NAME} PRIVATE
     ${APP_QT_LIBS}
     fluvel::image_processing
 )

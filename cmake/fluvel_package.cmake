@@ -63,7 +63,7 @@ if(FLUVEL_PLATFORM_LINUX)
     # Executable
     # =====================================================
 
-    install(TARGETS ${FLUVEL_TARGET_NAME}
+    install(TARGETS ${APP_TARGET_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -173,11 +173,11 @@ if(FLUVEL_PLATFORM_WINDOWS)
         @ONLY
     )
 
-    target_sources(${FLUVEL_TARGET_NAME} PRIVATE
+    target_sources(${APP_TARGET_NAME} PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}/Fluvel.rc
     )
 
-    set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
+    set_target_properties(${APP_TARGET_NAME} PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
 
@@ -203,9 +203,9 @@ if(FLUVEL_PLATFORM_MACOS)
         MACOSX_PACKAGE_LOCATION "Resources"
     )
 
-    target_sources(${FLUVEL_TARGET_NAME} PRIVATE ${app_icon_macos})
+    target_sources(${APP_TARGET_NAME} PRIVATE ${app_icon_macos})
 
-    set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
+    set_target_properties(${APP_TARGET_NAME} PROPERTIES
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_BUNDLE_NAME "Fluvel"
     )
@@ -218,13 +218,13 @@ if(FLUVEL_PLATFORM_MACOS)
         @ONLY
     )
 
-    set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
+    set_target_properties(${APP_TARGET_NAME} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
     )
 
     message(STATUS "Using plist: ${CMAKE_CURRENT_BINARY_DIR}/Info.plist")
 
-    install(TARGETS ${FLUVEL_TARGET_NAME}
+    install(TARGETS ${APP_TARGET_NAME}
         BUNDLE DESTINATION .
     )
 
@@ -239,16 +239,16 @@ if(FLUVEL_PLATFORM_ANDROID)
     message(STATUS "Android packaging handled by Qt")
 
     # --- Android packaging ---
-    set_target_properties(${FLUVEL_TARGET_NAME} PROPERTIES
+    set_target_properties(${APP_TARGET_NAME} PROPERTIES
         QT_ANDROID_PACKAGE_SOURCE_DIR ${FLUVEL_PACKAGING_DIR}/android
 
         # --- Options possibles ---
-        # QT_ANDROID_APP_NAME ${FLUVEL_TARGET_NAME}
-        # QT_ANDROID_APP_LIB_NAME ${FLUVEL_TARGET_NAME}
+        # QT_ANDROID_APP_NAME ${APP_TARGET_NAME}
+        # QT_ANDROID_APP_LIB_NAME ${APP_TARGET_NAME}
         # QT_ANDROID_PACKAGE_NAME "org.fluvel.app"
         # QT_ANDROID_GUI TRUE
         # QT_ANDROID_DEPLOYMENT_SETTINGS_FILE
-        # ${CMAKE_CURRENT_BINARY_DIR}/android-${FLUVEL_TARGET_NAME}-deployment-settings.json
+        # ${CMAKE_CURRENT_BINARY_DIR}/android-${APP_TARGET_NAME}-deployment-settings.json
         # OUTPUT_NAME "fluvel"
     )
 

@@ -4,78 +4,82 @@
 # current image_processing directory
 set(IP_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(TARGET_NAME fluvel_image_processing)
-
-set(ALGO_DIR     ${IP_DIR}/algo)
-set(CORE_DIR     ${IP_DIR}/core)
+set(FILTERING_DIR       ${IP_DIR}/filtering)
+set(SEGMENTATION_DIR    ${IP_DIR}/segmentation)
+set(ANALYSIS_DIR        ${IP_DIR}/analysis)
+set(CORE_DIR            ${IP_DIR}/core)
 
 set(ip_src
-    ${ALGO_DIR}/contour_data.cpp
-    ${ALGO_DIR}/contour_data.hpp
 
-    ${ALGO_DIR}/speed_model.hpp
+    ${FILTERING_DIR}/image_pipeline.cpp
+    ${FILTERING_DIR}/image_pipeline.hpp
 
-    ${ALGO_DIR}/active_contour.cpp
-    ${ALGO_DIR}/active_contour.hpp
+    ${FILTERING_DIR}/processing_params.hpp
 
-    ${ALGO_DIR}/contour_types.hpp
-    ${ALGO_DIR}/active_contour_types.hpp
-    ${ALGO_DIR}/speed_model_types.hpp
+    ${FILTERING_DIR}/noise.cpp
+    ${FILTERING_DIR}/noise.hpp
 
-    ${ALGO_DIR}/majority_internal_speed.cpp
-    ${ALGO_DIR}/majority_internal_speed.hpp
+    ${FILTERING_DIR}/mean_filter.cpp
+    ${FILTERING_DIR}/mean_filter.hpp
 
-    ${ALGO_DIR}/region_gray_speed_model.cpp
-    ${ALGO_DIR}/region_gray_speed_model.hpp
+    ${FILTERING_DIR}/mean_filter_3x3.cpp
+    ${FILTERING_DIR}/mean_filter_3x3.hpp
 
-    ${ALGO_DIR}/region_color_speed_model.cpp
-    ${ALGO_DIR}/region_color_speed_model.hpp
+    ${FILTERING_DIR}/mean_filter_sliding.cpp
+    ${FILTERING_DIR}/mean_filter_sliding.hpp
 
-    ${ALGO_DIR}/hausdorff_distance.cpp
-    ${ALGO_DIR}/hausdorff_distance.hpp
+    ${FILTERING_DIR}/median_filter.cpp
+    ${FILTERING_DIR}/median_filter.hpp
 
-    ${ALGO_DIR}/boundary_builder.cpp
-    ${ALGO_DIR}/boundary_builder.hpp
+    ${FILTERING_DIR}/temporal_mean.cpp
+    ${FILTERING_DIR}/temporal_mean.hpp
 
-    ${ALGO_DIR}/shape.cpp
-    ${ALGO_DIR}/shape.hpp
+    ${FILTERING_DIR}/anisotropic_diffusion.cpp
+    ${FILTERING_DIR}/anisotropic_diffusion.hpp
 
-    ${ALGO_DIR}/image_pipeline.cpp
-    ${ALGO_DIR}/image_pipeline.hpp
+    ${FILTERING_DIR}/morpho.cpp
+    ${FILTERING_DIR}/morpho.hpp
 
-    ${ALGO_DIR}/processing_params.hpp
+    ${FILTERING_DIR}/naive_morpho.hpp
+    ${FILTERING_DIR}/van_herk_morpho.hpp
 
-    ${ALGO_DIR}/noise.cpp
-    ${ALGO_DIR}/noise.hpp
+    ${FILTERING_DIR}/pixel_wise.cpp
+    ${FILTERING_DIR}/pixel_wise.hpp
 
-    ${ALGO_DIR}/mean_filter.cpp
-    ${ALGO_DIR}/mean_filter.hpp
 
-    ${ALGO_DIR}/mean_filter_3x3.cpp
-    ${ALGO_DIR}/mean_filter_3x3.hpp
+    ${SEGMENTATION_DIR}/contour_types.hpp
+    ${SEGMENTATION_DIR}/active_contour_types.hpp
+    ${SEGMENTATION_DIR}/speed_model_types.hpp
 
-    ${ALGO_DIR}/mean_filter_sliding.cpp
-    ${ALGO_DIR}/mean_filter_sliding.hpp
+    ${SEGMENTATION_DIR}/boundary_builder.cpp
+    ${SEGMENTATION_DIR}/boundary_builder.hpp
 
-    ${ALGO_DIR}/median_filter.cpp
-    ${ALGO_DIR}/median_filter.hpp
+    ${SEGMENTATION_DIR}/contour_data.cpp
+    ${SEGMENTATION_DIR}/contour_data.hpp
 
-    ${ALGO_DIR}/temporal_mean.cpp
-    ${ALGO_DIR}/temporal_mean.hpp
+    ${SEGMENTATION_DIR}/active_contour.cpp
+    ${SEGMENTATION_DIR}/active_contour.hpp
 
-    ${ALGO_DIR}/anisotropic_diffusion.cpp
-    ${ALGO_DIR}/anisotropic_diffusion.hpp
+    ${SEGMENTATION_DIR}/speed_model.hpp
 
-    ${ALGO_DIR}/morpho.cpp
-    ${ALGO_DIR}/morpho.hpp
+    ${SEGMENTATION_DIR}/majority_internal_speed.cpp
+    ${SEGMENTATION_DIR}/majority_internal_speed.hpp
 
-    ${ALGO_DIR}/naive_morpho.hpp
-    ${ALGO_DIR}/van_herk_morpho.hpp
+    ${SEGMENTATION_DIR}/region_gray_speed_model.cpp
+    ${SEGMENTATION_DIR}/region_gray_speed_model.hpp
 
-    ${ALGO_DIR}/pixel_wise.cpp
-    ${ALGO_DIR}/pixel_wise.hpp
+    ${SEGMENTATION_DIR}/region_color_speed_model.cpp
+    ${SEGMENTATION_DIR}/region_color_speed_model.hpp
 
-    ${ALGO_DIR}/contour_diagnostics.hpp
+    ${SEGMENTATION_DIR}/contour_diagnostics.hpp
+
+
+    ${ANALYSIS_DIR}/shape.cpp
+    ${ANALYSIS_DIR}/shape.hpp
+
+    ${ANALYSIS_DIR}/hausdorff_distance.cpp
+    ${ANALYSIS_DIR}/hausdorff_distance.hpp
+
 
     ${CORE_DIR}/grid2d.hpp
     ${CORE_DIR}/image_format.hpp
@@ -91,10 +95,16 @@ set(ip_src
     ${CORE_DIR}/elapsed_timer.hpp
 )
 
-add_library(${TARGET_NAME} STATIC ${ip_src})
-add_library(fluvel::image_processing ALIAS ${TARGET_NAME})
+add_library(${LIB_TARGET_NAME} STATIC ${ip_src})
+add_library(fluvel::image_processing ALIAS ${LIB_TARGET_NAME})
 
-target_include_directories(${TARGET_NAME} PUBLIC
+set_target_properties(${LIB_TARGET_NAME} PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
+target_include_directories(${LIB_TARGET_NAME} PUBLIC
     ${CORE_DIR}
-    ${ALGO_DIR}
+    ${ANALYSIS_DIR}
+    ${SEGMENTATION_DIR}
+    ${FILTERING_DIR}
 )

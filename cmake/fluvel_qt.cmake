@@ -1,6 +1,10 @@
 # SPDX-License-Identifier: CeCILL-2.1
 # Copyright (C) 2010-2026 Fabien Bessy
 
+if(NOT FLUVEL_BUILD_APP)
+    return()
+endif()
+
 # =========================
 # Qt configuration
 # =========================

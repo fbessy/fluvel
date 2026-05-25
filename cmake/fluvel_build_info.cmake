@@ -35,7 +35,7 @@ if(NOT FLUVEL_BUILD_ORIGIN)
     set(FLUVEL_BUILD_ORIGIN "Local")
 endif()
 
-target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
+target_compile_definitions(${APP_TARGET_NAME} PRIVATE
     FLUVEL_VERSION="${PROJECT_VERSION}"
     FLUVEL_GIT_COMMIT="${FLUVEL_GIT_COMMIT}"
     FLUVEL_BUILD_TIMESTAMP="${FLUVEL_BUILD_TIMESTAMP}"
@@ -45,7 +45,7 @@ target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
 
 # --- Build version (CI/dev) ---
 if(DEFINED FLUVEL_BUILD_VERSION AND NOT FLUVEL_BUILD_VERSION STREQUAL "")
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
         FLUVEL_BUILD_VERSION="${FLUVEL_BUILD_VERSION}"
     )
 endif()

@@ -50,7 +50,7 @@ public:
         : width_(widthPixels)
         , height_(heightPixels)
         , format_(format)
-        , channels_(channelsFromFormat(format))
+        , channels_(channelCount(format))
         , stride_(widthPixels * channels_)
         , data_(static_cast<size_t>(stride_) * static_cast<size_t>(heightPixels))
     {
@@ -107,6 +107,14 @@ public:
 
             std::memcpy(dst, src, rowBytes);
         }
+    }
+
+    /**
+     * @brief Construct an owned image by copying a view.
+     */
+    explicit ImageOwner(const ImageView& img)
+    {
+        copyFrom(img);
     }
 
     /**
@@ -264,27 +272,6 @@ private:
 
     /// Pixel data (row-major).
     std::vector<uint8_t> data_;
-
-    /**
-     * @brief Get number of channels from image format.
-     */
-    static constexpr int channelsFromFormat(ImageFormat fmt) noexcept
-    {
-        switch (fmt)
-        {
-            case ImageFormat::Gray8:
-                return 1;
-            case ImageFormat::Rgb24:
-                return 3;
-            case ImageFormat::Bgr24:
-                return 3;
-            case ImageFormat::Bgr32:
-                return 4;
-            case ImageFormat::Rgba32:
-                return 4;
-        }
-        std::unreachable();
-    }
 };
 
 } // namespace fluvel_ip

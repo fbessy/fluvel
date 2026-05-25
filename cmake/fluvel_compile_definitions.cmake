@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: CeCILL-2.1
 # Copyright (C) 2010-2026 Fabien Bessy
 
-target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
+target_compile_definitions(${APP_TARGET_NAME} PRIVATE
 
     $<$<BOOL:${FLUVEL_PLATFORM_DESKTOP}>:
         FLUVEL_PLATFORM_DESKTOP>
@@ -26,21 +26,21 @@ target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
 )
 
 if(OpenCV_FOUND)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_USE_OPENCV)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_USE_OPENCV)
 endif()
 
 if(Qt6_FOUND)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_USE_QT)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_USE_QT)
 endif()
 
 if(FLUVEL_UI_DESKTOP)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_UI_DESKTOP)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_UI_DESKTOP)
 endif()
 
 if(ENABLE_ASAN)
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE FLUVEL_ASAN)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_ASAN)
 else()
-    target_compile_definitions(${FLUVEL_TARGET_NAME} PRIVATE
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:FLUVEL_DEBUG>
     )
 endif()

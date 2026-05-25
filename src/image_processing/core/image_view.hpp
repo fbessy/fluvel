@@ -51,7 +51,7 @@ public:
         , widthPixels_(widthPixels)
         , heightPixels_(heightPixels)
         , format_(format)
-        , channelsPerPixel_(channelsFromFormat(format))
+        , channelsPerPixel_(channelCount(format))
         , strideBytes_(computeStride(widthPixels_, channelsPerPixel_, strideBytes))
     {
         assert(data != nullptr);
@@ -194,6 +194,9 @@ public:
 
             case ImageFormat::Rgba32:
                 return {p[0], p[1], p[2]};
+
+            case ImageFormat::Unknown:
+                break;
         }
 
         std::unreachable();
@@ -235,7 +238,12 @@ public:
                 r = row[idx + 2];
                 break;
             }
+
+            case ImageFormat::Unknown:
+                break;
         }
+
+        std::unreachable();
     }
 
     /**
@@ -276,28 +284,6 @@ private:
     static int computeStride(int width, int channels, int strideOverride)
     {
         return (strideOverride == 0) ? width * channels : strideOverride;
-    }
-
-    /**
-     * @brief Get number of channels from format.
-     */
-    static constexpr int channelsFromFormat(ImageFormat format) noexcept
-    {
-        switch (format)
-        {
-            case ImageFormat::Gray8:
-                return 1;
-            case ImageFormat::Rgb24:
-                return 3;
-            case ImageFormat::Bgr24:
-                return 3;
-            case ImageFormat::Bgr32:
-                return 4;
-            case ImageFormat::Rgba32:
-                return 4;
-        }
-
-        std::unreachable();
     }
 };
 
