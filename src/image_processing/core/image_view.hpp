@@ -242,7 +242,7 @@ public:
             }
 
             case ImageFormat::Unknown:
-                std::unreachable();
+                break;
         }
 
         std::unreachable();
