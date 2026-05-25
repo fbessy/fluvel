@@ -143,13 +143,13 @@ class ActiveContour
 public:
     /**
      * @brief Constructs an active contour instance.
-     *
      * @param initialContour Initial contour data (copied).
      * @param speedModel External speed model.
-     * @param params Algorithm parameters.
+     * @param params Algorithm parameters (optional).
+     *        Defaults to ActiveContourParams{}.
      */
     ActiveContour(ContourData initialContour, std::unique_ptr<ISpeedModel> speedModel,
-                  const ActiveContourParams& params);
+                  const ActiveContourParams& params = {});
 
     /**
      * @brief Updates the contour with a new input image.
