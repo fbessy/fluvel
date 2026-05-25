@@ -6,6 +6,9 @@
 #include "color.hpp"
 #include <QColor>
 
+namespace fluvel
+{
+
 /**
  * @brief Convert a Fluvel RGB color to a Qt QColor.
  *
@@ -47,3 +50,5 @@ inline fluvel_ip::Rgb_uc toRgb_uc(QRgb pixel)
     return {static_cast<unsigned char>(qRed(pixel)), static_cast<unsigned char>(qGreen(pixel)),
             static_cast<unsigned char>(qBlue(pixel))};
 }
+
+} // namespace fluvel

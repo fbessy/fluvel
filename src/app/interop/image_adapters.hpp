@@ -41,6 +41,9 @@
 #include <opencv2/core.hpp>
 #endif
 
+namespace fluvel
+{
+
 #ifdef FLUVEL_USE_QT
 
 /**
@@ -333,3 +336,5 @@ inline fluvel_ip::ImageView image_view_from_stbi(const unsigned char* data, int 
     }
 }
 #endif
+
+} // namespace fluvel

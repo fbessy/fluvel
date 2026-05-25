@@ -7,6 +7,9 @@
 #include <QPoint>
 #include <QVector>
 
+namespace fluvel
+{
+
 /**
  * @brief Convert a Fluvel contour to a Qt QVector of QPointF.
  *
@@ -35,3 +38,5 @@
 
     return q_contour;
 }
+
+} // namespace fluvel
