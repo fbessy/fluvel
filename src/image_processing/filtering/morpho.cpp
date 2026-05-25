@@ -81,7 +81,7 @@ void topHat(const ImageView& input, ImageOwner& output, int radius)
 
     ImageOwner tmp(input.width(), input.height(), input.format());
     opening(input, tmp, radius);
-    pixelwise::diff(input, tmp.view(), output);
+    pixelwise::subtract(input, tmp.view(), output);
 }
 
 ImageOwner topHat(const ImageView& input, int radius)
@@ -97,7 +97,7 @@ void blackTopHat(const ImageView& input, ImageOwner& output, int radius)
 
     ImageOwner tmp(input.width(), input.height(), input.format());
     closing(input, tmp, radius);
-    pixelwise::diff(tmp.view(), input, output);
+    pixelwise::subtract(tmp.view(), input, output);
 }
 
 ImageOwner blackTopHat(const ImageView& input, int radius)
@@ -117,7 +117,7 @@ void gradient(const ImageView& input, ImageOwner& output, int radius)
     min(input, minImg, radius);
     max(input, maxImg, radius);
 
-    pixelwise::diff(maxImg.view(), minImg.view(), output);
+    pixelwise::subtract(maxImg.view(), minImg.view(), output);
 }
 
 ImageOwner gradient(const ImageView& input, int radius)

@@ -259,6 +259,16 @@ public:
         return at(x, y, 0);
     }
 
+    /**
+     * @brief Check if the layout matches another image view.
+     *
+     * Compares width, height, and format.
+     */
+    bool hasSameLayout(const ImageView& view) const noexcept
+    {
+        return width() == view.width() && height() == view.height() && format() == view.format();
+    }
+
 private:
     /// Pointer to image data (non-owning).
     const uint8_t* data_;

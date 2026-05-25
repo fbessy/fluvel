@@ -6,18 +6,17 @@
 #include <cassert>
 #include <cstdint>
 
-namespace fluvel_ip::filter::pixelwise
+namespace fluvel_ip::pixelwise
 {
 
-void diff(const ImageView& a, const ImageView& b, ImageOwner& out)
+void subtract(const ImageView& a, const ImageView& b, ImageOwner& out)
 {
-    assert(a.width() == b.width());
-    assert(a.height() == b.height());
-    assert(a.format() == b.format());
+    assert(a.hasSameLayout(b));
 
-    assert(out.width() == a.width());
-    assert(out.height() == a.height());
-    assert(out.format() == a.format());
+    if (!a.hasSameLayout(b))
+        return;
+
+    out.ensureLike(a);
 
     const int h = out.height();
     const int rowBytes = out.rowBytes();
@@ -30,10 +29,10 @@ void diff(const ImageView& a, const ImageView& b, ImageOwner& out)
 
         for (int idx = 0; idx < rowBytes; ++idx)
         {
-            int diff = int(pa[idx]) - int(pb[idx]);
+            int diff = static_cast<int>(pa[idx]) - static_cast<int>(pb[idx]);
             dst[idx] = static_cast<uint8_t>(std::max(0, diff));
         }
     }
 }
 
-} // namespace fluvel_ip::filter::pixelwise
+} // namespace fluvel_ip::pixelwise

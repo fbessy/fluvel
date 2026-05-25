@@ -6,14 +6,15 @@
 #include "image_owner.hpp"
 #include "image_view.hpp"
 
-namespace fluvel_ip::filter::pixelwise
+namespace fluvel_ip::pixelwise
 {
 
 /**
- * @brief Compute pixel-wise absolute difference between two images.
+ * @brief Compute pixel-wise saturated difference between two images.
  *
  * For each pixel and channel, computes:
- *   out = |a - b|
+ *
+ *   out = max(0, a - b)
  *
  * Both input images must have identical dimensions and format.
  *
@@ -21,11 +22,11 @@ namespace fluvel_ip::filter::pixelwise
  * @param b Second input image.
  * @param out Output image (must match input layout or be reallocated accordingly).
  *
- * @note This function is commonly used for:
- * - debugging image processing pipelines
- * - visualizing differences between filters
- * - motion detection or change detection
+ * @note Common uses include:
+ * - morphological white top-hat transforms
+ * - morphological gradients
+ * - directional image comparison
  */
-void diff(const ImageView& a, const ImageView& b, ImageOwner& out);
+void subtract(const ImageView& a, const ImageView& b, ImageOwner& out);
 
-} // namespace fluvel_ip::filter::pixelwise
+} // namespace fluvel_ip::pixelwise
