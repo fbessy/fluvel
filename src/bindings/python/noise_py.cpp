@@ -7,6 +7,7 @@
 
 #include "noise.hpp"
 #include "py_array_conversion.hpp"
+#include "py_validation.hpp"
 
 namespace py = pybind11;
 
@@ -134,6 +135,9 @@ void bindNoise(py::module_& m)
 
         [](py::array_t<uint8_t> input, float sigma)
         {
+            validateImage(input);
+            validateSigma(sigma);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::noise::gaussian(img, sigma);
@@ -148,6 +152,9 @@ void bindNoise(py::module_& m)
 
         [](py::array_t<uint8_t> input, float probability)
         {
+            validateImage(input);
+            validateProbability(probability);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::noise::impulsive(img, probability);
@@ -162,6 +169,9 @@ void bindNoise(py::module_& m)
 
         [](py::array_t<uint8_t> input, float sigma)
         {
+            validateImage(input);
+            validateSigma(sigma);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::noise::speckleUniform(img, sigma);
@@ -176,6 +186,9 @@ void bindNoise(py::module_& m)
 
         [](py::array_t<uint8_t> input, float sigma)
         {
+            validateImage(input);
+            validateSigma(sigma);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::noise::speckleGamma(img, sigma);

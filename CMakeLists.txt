@@ -19,7 +19,7 @@ message(STATUS "C++ compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 # =========================
 
 set(FLUVEL_DEFAULT_BUILD_APP ON)
-set(FLUVEL_DEFAULT_BUILD_BIND ON)
+set(FLUVEL_DEFAULT_BUILD_BIND OFF)
 
 # =========================
 # Local development defaults
@@ -42,7 +42,7 @@ option(FLUVEL_BUILD_APP
 
 option(FLUVEL_BUILD_BIND
        "Build language bindings"
-       OFF)
+       ON)
 
 # =========================
 # Experimental UI options

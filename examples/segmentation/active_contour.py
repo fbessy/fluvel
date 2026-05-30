@@ -2,48 +2,45 @@
 # Copyright (C) 2010-2026 Fabien Bessy
 
 from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+import utils
 
 import cv2
 import fluvel
-
 import time
 
-EXAMPLES_DIR = Path(__file__).parent.parent
-INPUT_PATH = EXAMPLES_DIR / "resources" / "input.png"
-img = cv2.imread(str(INPUT_PATH), cv2.IMREAD_UNCHANGED)
 
-if img is None:
-    raise RuntimeError(
-        f"Cannot load image: {INPUT_PATH}"
-    )
+img = utils.load_image("input.png")
+
+phi = utils.load_image("initial_phi.png")
+
+phi2 = utils.load_image("initial_phi2.png")
+
+phi = utils.resize_phi_to_image(img, phi)
+phi2 = utils.resize_phi_to_image(img, phi2)
 
 # Run segmentation
 start = time.time()
 
-result = fluvel.active_contour(img)
+lists0 = fluvel.active_contour(img)
+lists1 = fluvel.active_contour(img, phi)
+lists2 = fluvel.active_contour(img, phi2)
 
 elapsed = time.time() - start
 
 print(f"Segmentation time: {elapsed:.3f}s")
 
 
-# Draw contours
-display = img.copy()
-
-bgr_out = (255, 0, 64)
-bgr_in = (118, 230, 0)
-
-display[
-    result.outer[:, 1],
-    result.outer[:, 0]
-] = bgr_out
-
-display[
-    result.inner[:, 1],
-    result.inner[:, 0]
-] = bgr_in
+display_result0 = utils.draw_contours(img, lists0)
+display_result1 = utils.draw_contours(img, lists1)
+display_result2 = utils.draw_contours(img, lists2)
 
 
-cv2.imshow("Segmentation", display)
+cv2.imshow("Segmentation0", display_result0)
+cv2.imshow("Segmentation1", display_result1)
+cv2.imshow("Segmentation2", display_result2)
 
 cv2.waitKey(0)

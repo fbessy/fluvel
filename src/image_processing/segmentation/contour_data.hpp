@@ -40,15 +40,18 @@ public:
     ContourData(int phiWidth, int phiHeight, Connectivity connectivity = Connectivity::Four);
 
     /**
-     * @brief Construct a contour from a grayscale level-set image.
-     *      * The input image is interpreted as a discrete level-set function.
-     *      * The pixel values are read and fully copied into the internal phi buffer.
-     * The provided ImageView is NOT stored and is only used during construction.
-     *      * This means it is safe to pass temporary or short-lived ImageView instances.
-     *      * @param grayscalePhi Input grayscale image representing the level-set function.
+     * @brief Construct contour data from a binary initialization mask.
+     *      * The input image is interpreted as a binary region map.
+     * Pixel values greater than or equal to 128 are considered inside,
+     * lower values are considered outside.
+     *      * Pixel values are fully copied into the internal phi representation.
+     * The provided ImageView is not stored and is only accessed during
+     * construction, therefore temporary or short-lived ImageView instances
+     * are safe to pass.
+     *      * @param binaryMask Input binary mask used to initialize the contour.
      * @param connectivity Neighborhood connectivity (4 or 8).
      */
-    ContourData(const ImageView& grayscalePhi, Connectivity connectivity = Connectivity::Four);
+    ContourData(const ImageView& binaryMask, Connectivity connectivity = Connectivity::Four);
 
     /**
      * @brief Construct a contour from explicit boundary lists.

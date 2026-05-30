@@ -132,10 +132,10 @@ constexpr ImageFormat formatFromChannelCount(int channels)
             return ImageFormat::Gray8;
 
         case 3:
-            return ImageFormat::Rgb24;
+            return ImageFormat::Bgr24;
 
         case 4:
-            return ImageFormat::Rgba32;
+            return ImageFormat::Bgr32;
 
         default:
             return ImageFormat::Unknown;

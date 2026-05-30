@@ -2,8 +2,8 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "morpho_py.hpp"
+#include "py_validation.hpp"
 
-#include <iostream>
 #include <pybind11/numpy.h>
 
 #include "morpho.hpp"
@@ -195,18 +195,12 @@ void bindMorphology(py::module_& m)
 
         [](py::array_t<uint8_t> input, int radius)
         {
-            std::cout << "before pyArray\n";
+            validateImage(input);
+            validateRadius(radius);
 
             auto img = pyArrayToImageView(input);
 
-            std::cout << img.width() << " " << img.height() << " " << img.channels() << " "
-                      << img.stride() << "\n";
-
-            std::cout << "before morpho\n";
-
             auto out = fluvel_ip::filter::morpho::max(img, radius);
-
-            std::cout << "after morpho\n";
 
             return imageOwnerToPyArray(out);
         },
@@ -218,6 +212,9 @@ void bindMorphology(py::module_& m)
 
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::morpho::min(img, radius);
@@ -232,6 +229,9 @@ void bindMorphology(py::module_& m)
 
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::morpho::opening(img, radius);
@@ -246,6 +246,9 @@ void bindMorphology(py::module_& m)
 
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::morpho::closing(img, radius);
@@ -260,6 +263,9 @@ void bindMorphology(py::module_& m)
 
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::morpho::topHat(img, radius);
@@ -274,6 +280,9 @@ void bindMorphology(py::module_& m)
 
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::morpho::blackTopHat(img, radius);
@@ -288,6 +297,9 @@ void bindMorphology(py::module_& m)
 
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::morpho::gradient(img, radius);

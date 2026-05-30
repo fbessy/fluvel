@@ -22,6 +22,9 @@ set(python_src
     active_contour_py.cpp
     active_contour_py.hpp
 
+    py_validation.cpp
+    py_validation.hpp
+
     ${INTEROP_DIR}/py_array_conversion.cpp
     ${INTEROP_DIR}/py_array_conversion.hpp
 

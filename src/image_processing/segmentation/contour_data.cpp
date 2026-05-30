@@ -33,15 +33,15 @@ ContourData::ContourData(int phiWidth, int phiHeight, Connectivity connectivity)
     assert(isValid());
 }
 
-ContourData::ContourData(const ImageView& grayscalePhi, Connectivity connectivity)
-    : phi_(grayscalePhi.width(), grayscalePhi.height())
+ContourData::ContourData(const ImageView& binaryMask, Connectivity connectivity)
+    : phi_(binaryMask.width(), binaryMask.height())
     , connectivity_(connectivity)
 {
     for (int y = 0; y < phi_.height(); ++y)
     {
         for (int x = 0; x < phi_.width(); ++x)
         {
-            if (grayscalePhi.at(x, y) >= 128u)
+            if (binaryMask.at(x, y) >= 128u)
                 phi_.at(x, y) = PhiValue::InteriorBoundary;
             else
                 phi_.at(x, y) = PhiValue::ExteriorBoundary;

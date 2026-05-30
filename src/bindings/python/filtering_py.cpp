@@ -10,9 +10,35 @@
 #include "median_filter.hpp"
 #include "morpho_py.hpp"
 #include "py_array_conversion.hpp"
+#include "py_validation.hpp"
 
 namespace
 {
+
+constexpr auto kConductionFunctionDoc = R"(
+
+Conduction functions used by anisotropic diffusion.
+
+The conduction function controls how image gradients
+influence diffusion strength.
+
+Attributes
+----------
+Exponential
+    Exponential conduction function:
+
+        exp(-(∇I / kappa)^2)
+
+    Preserves strong edges more aggressively.
+
+Rational
+    Rational conduction function:
+
+        1 / (1 + (∇I / kappa)^2)
+
+    Produces a smoother transition between diffusion regions.
+
+)";
 
 constexpr auto kAnisoParamsDoc = R"(
 Parameters controlling anisotropic diffusion.
@@ -151,6 +177,11 @@ selected automatically.
 
 void bindFiltering(py::module_& m)
 {
+    py::enum_<fluvel_ip::filter::ConductionFunction>(m, "ConductionFunction",
+                                                     kConductionFunctionDoc)
+        .value("Exponential", fluvel_ip::filter::ConductionFunction::Exponential)
+        .value("Rational", fluvel_ip::filter::ConductionFunction::Rational);
+
     py::class_<fluvel_ip::filter::AnisoParams>(m, "AnisoParams", kAnisoParamsDoc)
         .def(py::init<>())
 
@@ -163,6 +194,8 @@ void bindFiltering(py::module_& m)
         "anisotropic_diffusion",
         [](py::array_t<uint8_t> input, const fluvel_ip::filter::AnisoParams& params)
         {
+            validateImage(input);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::anisotropicDiffusion(img, params);
@@ -176,6 +209,9 @@ void bindFiltering(py::module_& m)
         "mean",
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::mean(img, radius);
@@ -189,6 +225,9 @@ void bindFiltering(py::module_& m)
         "median",
         [](py::array_t<uint8_t> input, int radius)
         {
+            validateImage(input);
+            validateRadius(radius);
+
             auto img = pyArrayToImageView(input);
 
             auto out = fluvel_ip::filter::median(img, radius);
