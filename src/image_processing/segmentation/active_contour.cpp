@@ -5,6 +5,7 @@
 #include "active_contour_types.hpp"
 #include "hausdorff_distance.hpp"
 #include "neighborhood.hpp"
+#include "shape_conversion.hpp"
 #include "speed_model.hpp"
 
 #include <cassert>
@@ -429,12 +430,7 @@ void ActiveContour::checkHausdorffStoppingCondition()
     // to handle different images sizes.
     if (stepDelta >= diagonal / 20.f)
     {
-        ed_.l_out_shape.clear();
-
-        for (const auto& point : cd_.outerBoundary())
-            ed_.l_out_shape.pushBack(from_ContourPoint(point));
-
-        ed_.l_out_shape.calculateCentroid();
+        contourToShape(cd_.outerBoundary(), ed_.l_out_shape);
 
         calculateShapesIntersection();
 

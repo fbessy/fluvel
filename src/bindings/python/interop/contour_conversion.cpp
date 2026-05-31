@@ -18,3 +18,31 @@ py::array_t<int> contourToPyArray(const fluvel_ip::Contour& contour)
 
     return out;
 }
+
+fluvel_ip::Shape pyArrayToShape(const py::array_t<int>& contour)
+{
+    auto buffer = contour.request();
+
+    if (buffer.ndim != 2)
+        throw py::value_error("contour must be a 2D array of shape (N, 2)");
+
+    if (buffer.shape[1] != 2)
+        throw py::value_error("contour must have shape (N, 2)");
+
+    const auto nbPoints = static_cast<size_t>(buffer.shape[0]);
+
+    if (nbPoints == 0)
+        throw py::value_error("contour must contain at least one point");
+
+    auto points = contour.unchecked<2>();
+
+    fluvel_ip::Shape shape;
+    shape.reserve(nbPoints);
+
+    for (size_t i = 0; i < nbPoints; ++i)
+        shape.pushBack(points(i, 0), points(i, 1));
+
+    shape.calculateCentroid();
+
+    return shape;
+}

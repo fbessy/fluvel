@@ -7,6 +7,7 @@
 
 #include "active_contour.hpp"
 #include "contour_data.hpp"
+#include "contour_types.hpp"
 #include "region_color_speed_model.hpp"
 #include "region_gray_speed_model.hpp"
 #include "speed_model.hpp"
@@ -17,6 +18,47 @@
 
 namespace
 {
+constexpr auto kConnectivityDoc = R"(
+
+Pixel connectivity used for contour extraction and topology handling.
+
+Defines the neighborhood relationship between pixels in a 2D grid.
+
+Attributes
+----------
+Four
+    4-connected neighborhood.
+
+    Each pixel is connected to its horizontal and vertical neighbors:
+
+        left, right, top, bottom
+
+    This connectivity is commonly used by active contour
+    evolution and provides a more compact contour representation.
+
+Eight
+    8-connected neighborhood.
+
+    Each pixel is connected to its horizontal, vertical,
+    and diagonal neighbors.
+
+    This connectivity produces more connected regions and
+    is often preferred when extracting contours from binary masks.
+
+Examples
+--------
+>>> contours = fluvel.find_contours(
+...     mask,
+...     connectivity=fluvel.Connectivity.Eight
+... )
+
+>>> contours = fluvel.find_contours(
+...     mask,
+...     connectivity=fluvel.Connectivity.Four
+... )
+
+)";
+
 constexpr auto kFailureHandlingModeDoc = R"(
 
 Failure handling strategies used by active contours.
@@ -232,25 +274,32 @@ Examples
 
 )";
 
-constexpr auto kActiveContourResultDoc = R"(
+constexpr auto kContourResultDoc = R"(
 
-Result returned by active_contour().
+Contour extraction result.
 
-Contains the final contour boundaries after convergence.
+Contains the inner and outer contour boundaries.
 
 Attributes
 ----------
 outer : numpy.ndarray
     Exterior contour boundary (Lout).
 
-    Contains the points belonging to the outer boundary of
-    the contour.
+    Contains the points belonging to the outer boundary
+    of the contour.
 
 inner : numpy.ndarray
     Interior contour boundary (Lin).
 
-    Contains the points belonging to the inner boundary of
-    the contour.
+    Contains the points belonging to the inner boundary
+    of the contour.
+
+Notes
+-----
+The contour arrays are returned as NumPy arrays of shape
+(N, 2), where each row contains a point coordinate:
+
+    [x, y]
 
 Examples
 --------
@@ -258,6 +307,11 @@ Examples
 
 >>> outer = result.outer
 >>> inner = result.inner
+
+>>> contours = fluvel.find_contours(mask)
+
+>>> outer = contours.outer
+>>> inner = contours.inner
 
 )";
 
@@ -298,7 +352,7 @@ region_model_params : RegionModelParams, optional
 
 Returns
 -------
-ActiveContourResult
+ContourResult
     Final contour boundaries after convergence.
 
 Examples
@@ -335,7 +389,39 @@ region model depending on the input image format.
 
 )";
 
-struct ActiveContourResult
+constexpr auto kFindContoursDoc = R"(
+
+Extract contour boundaries from a binary mask.
+
+Pixels greater than or equal to 128 are considered foreground.
+
+Supported image layouts:
+
+- Gray8
+- BGR24
+- BGRA32
+
+For multi-channel images, only the first channel is used.
+
+Parameters
+----------
+mask
+    Binary mask image.
+
+Returns
+-------
+ContourResult
+
+Examples
+--------
+>>> contours = fluvel.find_contours(mask)
+
+>>> outer = contours.outer
+>>> inner = contours.inner
+
+)";
+
+struct ContourResult
 {
     py::array outer;
     py::array inner;
@@ -345,6 +431,10 @@ struct ActiveContourResult
 
 void bindActiveContour(py::module_& m)
 {
+    py::enum_<fluvel_ip::Connectivity>(m, "Connectivity", kConnectivityDoc)
+        .value("Four", fluvel_ip::Connectivity::Four)
+        .value("Eight", fluvel_ip::Connectivity::Eight);
+
     py::enum_<fluvel_ip::FailureHandlingMode>(m, "FailureHandlingMode", kFailureHandlingModeDoc)
         .value("StopOnFailure", fluvel_ip::FailureHandlingMode::StopOnFailure)
         .value("RecoverOnFailure", fluvel_ip::FailureHandlingMode::RecoverOnFailure);
@@ -378,15 +468,15 @@ void bindActiveContour(py::module_& m)
 
     py::class_<fluvel_ip::RegionColorParams>(m, "RegionModelParams", kRegionModelParamsDoc)
         .def(py::init<>())
+
         .def_readwrite("lambda_in", &fluvel_ip::RegionColorParams::lambdaIn)
         .def_readwrite("lambda_out", &fluvel_ip::RegionColorParams::lambdaOut)
-
         .def_readwrite("color_space", &fluvel_ip::RegionColorParams::colorSpace)
         .def_readwrite("weights", &fluvel_ip::RegionColorParams::weights);
 
-    py::class_<ActiveContourResult>(m, "ActiveContourResult", kActiveContourResultDoc)
-        .def_readonly("outer", &ActiveContourResult::outer)
-        .def_readonly("inner", &ActiveContourResult::inner);
+    py::class_<ContourResult>(m, "ContourResult", kContourResultDoc)
+        .def_readonly("outer", &ContourResult::outer)
+        .def_readonly("inner", &ContourResult::inner);
 
     m.def(
         "active_contour",
@@ -427,12 +517,30 @@ void bindActiveContour(py::module_& m)
 
             ac.converge();
 
-            return ActiveContourResult{contourToPyArray(ac.outerBoundary()),
+            return ContourResult{contourToPyArray(ac.outerBoundary()),
 
-                                       contourToPyArray(ac.innerBoundary())};
+                                 contourToPyArray(ac.innerBoundary())};
         },
 
         py::arg("image"), py::arg("phi_mask") = py::none(),
         py::arg("active_contour_params") = fluvel_ip::ActiveContourParams{},
         py::arg("region_model_params") = fluvel_ip::RegionColorParams{}, kActiveContourDoc);
+
+    m.def(
+        "find_contours",
+
+        [](py::array_t<uint8_t> mask, fluvel_ip::Connectivity connectivity)
+        {
+            validateImage(mask);
+
+            auto img = pyArrayToImageView(mask);
+
+            fluvel_ip::ContourData cd(img, connectivity);
+
+            return ContourResult{contourToPyArray(cd.outerBoundary()),
+                                 contourToPyArray(cd.innerBoundary())};
+        },
+
+        py::arg("mask"), py::arg("connectivity") = fluvel_ip::Connectivity::Eight,
+        kFindContoursDoc);
 }

@@ -132,7 +132,7 @@ def draw_contours(image, result, bgr_out=(255, 0, 64), bgr_in=(118, 230, 0)):
         Input image (Gray8 or BGR).
 
     result
-        ActiveContourResult.
+        ContourResult.
 
     bgr_out
         Outer contour color.
@@ -156,3 +156,55 @@ def draw_contours(image, result, bgr_out=(255, 0, 64), bgr_in=(118, 230, 0)):
     display[result.inner[:, 1], result.inner[:, 0]] = bgr_in
 
     return display
+
+
+def weizmann_gt_to_mask(gt_image: np.ndarray) -> np.ndarray:
+    """
+    Convert a Weizmann ground-truth image into a binary mask.
+
+    The Weizmann segmentation datasets encode foreground objects using
+    colored overlays on top of the original grayscale image:
+
+    - Red pixels represent a foreground object.
+    - Blue pixels may represent a second foreground object.
+
+    This function extracts all foreground objects and returns a binary
+    mask suitable for Fluvel segmentation and contour analysis.
+
+    Parameters
+    ----------
+    gt_image : numpy.ndarray
+        RGB ground-truth image from the Weizmann segmentation dataset.
+
+    Returns
+    -------
+    numpy.ndarray
+        Binary mask with dtype uint8.
+
+        Foreground pixels are set to 255 and background pixels to 0.
+
+    Notes
+    -----
+    Both red and blue annotations are considered foreground and merged
+    into a single binary mask.
+
+    Examples
+    --------
+    >>> gt = cv2.imread("image_gt.png")
+    >>> gt = cv2.cvtColor(gt, cv2.COLOR_BGR2RGB)
+
+    >>> mask = weizmann_gt_to_mask(gt)
+
+    >>> contours = fluvel.find_contours(mask)
+    """
+    r = gt_image[:, :, 0]
+    g = gt_image[:, :, 1]
+    b = gt_image[:, :, 2]
+
+    red_object = (r > 180) & (g < 120) & (b < 120)
+
+    blue_object = (b > 180) & (r < 120) & (g < 120)
+
+    mask = red_object | blue_object
+
+    return mask.astype(np.uint8) * 255

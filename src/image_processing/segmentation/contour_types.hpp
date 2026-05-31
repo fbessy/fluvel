@@ -244,7 +244,7 @@ using ExportedContour = std::vector<Point2D_i>;
 /**
  * @brief Convert a ContourPoint to a 2D point.
  */
-constexpr inline Point2D_i from_ContourPoint(const ContourPoint& point)
+constexpr inline Point2D_i toPoint2D(const ContourPoint& point)
 {
     return {point.x(), point.y()};
 }

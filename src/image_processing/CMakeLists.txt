@@ -73,6 +73,8 @@ set(ip_src
 
     ${SEGMENTATION_DIR}/contour_diagnostics.hpp
 
+    ${ANALYSIS_DIR}/shape_conversion.cpp
+    ${ANALYSIS_DIR}/shape_conversion.hpp
 
     ${ANALYSIS_DIR}/shape.cpp
     ${ANALYSIS_DIR}/shape.hpp

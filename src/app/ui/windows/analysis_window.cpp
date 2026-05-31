@@ -90,7 +90,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     percentileSp_->setMinimum(0);
     percentileSp_->setMaximum(100);
     percentileSp_->setSuffix(" %");
-    percentileSp_->setValue(90);
+    percentileSp_->setValue(95);
     QFormLayout* percentileLayout = new QFormLayout;
     percentileLayout->addRow(tr("Percentile: "), percentileSp_);
 

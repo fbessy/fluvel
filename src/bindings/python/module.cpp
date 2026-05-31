@@ -6,6 +6,7 @@
 
 #include "active_contour_py.hpp"
 #include "filtering_py.hpp"
+#include "hausdorff_py.hpp"
 #include "noise_py.hpp"
 
 PYBIND11_MODULE(fluvel, m)
@@ -15,4 +16,5 @@ PYBIND11_MODULE(fluvel, m)
     bindNoise(m);
     bindFiltering(m);
     bindActiveContour(m);
+    bindHausdorff(m);
 }
