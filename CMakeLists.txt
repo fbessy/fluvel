@@ -33,18 +33,6 @@ set(FLUVEL_LOCAL_DEFAULT_ASAN OFF)
 set(FLUVEL_LOCAL_DEFAULT_TSAN OFF)
 
 # =========================
-# Build targets
-# =========================
-
-option(FLUVEL_BUILD_APP
-       "Build desktop/mobile application"
-       ON)
-
-option(FLUVEL_BUILD_BIND
-       "Build language bindings"
-       ON)
-
-# =========================
 # Experimental UI options
 # =========================
 
