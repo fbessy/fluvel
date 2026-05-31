@@ -7,4 +7,8 @@
 
 namespace py = pybind11;
 
+/**
+ * @brief Register Hausdorff distance Python bindings.
+ * @param m Python module to populate.
+ */
 void bindHausdorff(py::module_& m);

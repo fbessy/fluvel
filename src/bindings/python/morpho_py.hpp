@@ -7,4 +7,12 @@
 
 namespace py = pybind11;
 
+/**
+ * @brief Register the morphology API in a Python module.
+ *
+ * Adds morphology classes, functions and constants to the provided
+ * Python module.
+ *
+ * @param m Target Python module.
+ */
 void bindMorphology(py::module_& m);

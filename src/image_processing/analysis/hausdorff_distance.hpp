@@ -32,9 +32,9 @@ class HausdorffDistance
 public:
     /**
      * @brief Construct a HausdorffDistance object and compute all distance metrics.
-     *      * The input shapes are copied or moved into the object and remain owned
+     * The input shapes are copied or moved into the object and remain owned
      * by the HausdorffDistance instance for its entire lifetime.
-     *      * @param shapeA First shape.
+     * @param shapeA First shape.
      * @param shapeB Second shape.
      * @param intersectionAB Optional set of points shared by both shapes.
      *        Providing this set can reduce the computation cost by avoiding

@@ -7,4 +7,8 @@
 
 namespace py = pybind11;
 
+/**
+ * @brief Register active contour Python bindings.
+ * @param m Python module to populate.
+ */
 void bindActiveContour(py::module_& m);

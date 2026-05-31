@@ -143,7 +143,8 @@ class ActiveContour
 public:
     /**
      * @brief Constructs an active contour instance.
-     * @param initialContour Initial contour data (copied).
+     * @param initialContour Initial contour data. Copied or moved into
+     *        the active contour instance.
      * @param speedModel External speed model.
      * @param params Algorithm parameters (optional).
      *        Defaults to ActiveContourParams{}.
