@@ -309,7 +309,9 @@ private:
     void computeSpeeds(Contour& boundary, SpeedModel&& model)
     {
         for (auto& point : boundary)
+        {
             model.computeSpeed(point, cd_.phi());
+        }
     }
 
     /**

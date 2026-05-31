@@ -177,7 +177,9 @@ void ContourData::definePhiFromLists()
     phi_.fill(PhiValue::OutsideRegion);
 
     for (const auto& point : outerBoundary_)
+    {
         phi_.at(point.x(), point.y()) = PhiValue::ExteriorBoundary;
+    }
 
     for (const auto& point : innerBoundary_)
     {

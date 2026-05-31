@@ -12,7 +12,9 @@ Shape contourToShape(const Contour& contour)
     shape.reserve(contour.size());
 
     for (const auto& point : contour)
+    {
         shape.pushBack(toPoint2D(point));
+    }
 
     shape.calculateCentroid();
 
@@ -26,7 +28,9 @@ void contourToShape(const Contour& contour, Shape& shape)
     shape.reserve(contour.size());
 
     for (const auto& point : contour)
+    {
         shape.pushBack(toPoint2D(point));
+    }
 
     shape.calculateCentroid();
 }

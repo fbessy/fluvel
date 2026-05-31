@@ -77,7 +77,10 @@ void Mean3x3::horizontalPass(const uint8_t* src, uint8_t* dst, int width, int ch
     if (width == 1)
     {
         for (int c = 0; c < channels; ++c)
+        {
             dst[c] = src[c];
+        }
+
         return;
     }
 

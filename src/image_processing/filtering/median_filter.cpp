@@ -104,7 +104,9 @@ uint8_t Median::findMedian(int targetRank)
 
     // 1. Cumuler jusqu'à currentMedian
     for (int i = 0; i <= currentMedian_; ++i)
+    {
         cumulative += kernelHisto_[i];
+    }
 
     // 2. Ajuster vers le haut
     if (cumulative < targetRank)
@@ -145,7 +147,9 @@ void Median::removeColumn(int colIndex)
     const int base = kHistogramSize * colIndex;
 
     for (int i = 0; i < kHistogramSize; ++i)
+    {
         kernelHisto_[i] -= columnsHisto_[base + i];
+    }
 }
 
 void Median::updateKernel(int addColIndex, int removeColIndex)
@@ -154,7 +158,9 @@ void Median::updateKernel(int addColIndex, int removeColIndex)
     const int remBase = kHistogramSize * removeColIndex;
 
     for (int i = 0; i < kHistogramSize; ++i)
+    {
         kernelHisto_[i] += columnsHisto_[addBase + i] - columnsHisto_[remBase + i];
+    }
 }
 
 void Median::initColumnsHisto(const ImageView& input, int ch, int kernelSize)

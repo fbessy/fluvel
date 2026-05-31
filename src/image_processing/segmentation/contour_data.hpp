@@ -267,9 +267,14 @@ template <typename T>
 bool ContourData::hasDuplicates(const std::vector<T>& v)
 {
     for (std::size_t i = 0; i < v.size(); ++i)
+    {
         for (std::size_t j = i + 1; j < v.size(); ++j)
+        {
             if (v[i] == v[j])
                 return true;
+        }
+    }
+
     return false;
 }
 

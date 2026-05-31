@@ -435,14 +435,18 @@ QString AboutWindow::buildTechnicalSection()
     readFormats.reserve(readFormatsRaw.size());
 
     for (const auto& f : readFormatsRaw)
+    {
         readFormats << QString::fromLatin1(f).toUpper();
+    }
 
     const auto writeFormatsRaw = QImageWriter::supportedImageFormats();
     QStringList writeFormats;
     writeFormats.reserve(writeFormatsRaw.size());
 
     for (const auto& f : writeFormatsRaw)
+    {
         writeFormats << QString::fromLatin1(f).toUpper();
+    }
 
     readFormats.sort();
     writeFormats.sort();

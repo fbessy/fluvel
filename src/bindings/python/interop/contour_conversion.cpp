@@ -40,7 +40,9 @@ fluvel_ip::Shape pyArrayToShape(const py::array_t<int>& contour)
     shape.reserve(nbPoints);
 
     for (size_t i = 0; i < nbPoints; ++i)
+    {
         shape.pushBack(points(i, 0), points(i, 1));
+    }
 
     shape.calculateCentroid();
 

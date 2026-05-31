@@ -112,7 +112,9 @@ void MeanSliding::apply(const ImageView& input, int radius)
         if (channels == 4)
         {
             for (int x = 0; x < width_; ++x)
+            {
                 dst[x * channels + 3] = 255;
+            }
         }
     }
 
@@ -197,7 +199,9 @@ void MeanSliding::apply(const ImageView& input, int radius)
         {
             uint8_t* dst = buffer2_.rowPtr(y);
             for (int x = 0; x < width_; ++x)
+            {
                 dst[x * channels + 3] = 255;
+            }
         }
     }
 
