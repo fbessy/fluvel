@@ -7,6 +7,8 @@
 
 #include <pybind11/numpy.h>
 
+#include <utility>
+
 struct HausdorffMetricsResult
 {
     float distance;
@@ -78,7 +80,7 @@ void bindHausdorff(py::module_& m)
             auto shapeA = pyArrayToShape(contourA);
             auto shapeB = pyArrayToShape(contourB);
 
-            fluvel_ip::HausdorffDistance hd(shapeA, shapeB);
+            fluvel_ip::HausdorffDistance hd(std::move(shapeA), std::move(shapeB));
 
             return HausdorffMetricsResult{hd.distance(), hd.modifiedDistance(),
                                           hd.hausdorffQuantile(quantile), hd.centroidsDistance()};

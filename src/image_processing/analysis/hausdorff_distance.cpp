@@ -19,8 +19,10 @@
 #endif
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <numeric>
+#include <utility>
 
 #include "fluvel_math.hpp"
 
@@ -29,14 +31,9 @@ namespace fluvel_ip
 
 constexpr size_t kInitialArrayAllocSize = 10000u;
 
-//! Constructor. The third parameter is the intersection between shape a and b, i.e.
-//! the points (offsets) in common. It's an optional parameter. It can speed up
-//! the computation (proportionally of the intersection part) in case of the intersection is
-//! easily to compute in constant time ( complexity in 0(1) ), with an image or a matrix.
-HausdorffDistance::HausdorffDistance(const Shape& shapeA, const Shape& shapeB,
-                                     const PointSet* intersectionAB)
-    : shapeA_(shapeA)
-    , shapeB_(shapeB)
+HausdorffDistance::HausdorffDistance(Shape shapeA, Shape shapeB, const PointSet* intersectionAB)
+    : shapeA_(std::move(shapeA))
+    , shapeB_(std::move(shapeB))
     , intersectionAB_(intersectionAB)
 {
     minDistancesFromAToB_.reserve(kInitialArrayAllocSize);
@@ -47,18 +44,18 @@ HausdorffDistance::HausdorffDistance(const Shape& shapeA, const Shape& shapeB,
 
 void HausdorffDistance::compute()
 {
-    if (shapeA_.isValid() && shapeB_.isValid())
-    {
+    if (!shapeA_.isValid() || !shapeB_.isValid())
+        return;
+
 #if defined(RANDOM_SAMPLING) && !defined(NAIVE_ALGO)
-        shapeA_.shufflePoints();
-        shapeB_.shufflePoints();
+    shapeA_.shufflePoints();
+    shapeB_.shufflePoints();
 #endif
 
-        // compute the directed or relative hausdorff distance in the both directions
-        computeDirectedHausdorff(shapeA_, shapeB_, distanceFromAToB_, minDistancesFromAToB_);
+    // compute the directed or relative hausdorff distance in the both directions
+    computeDirectedHausdorff(shapeA_, shapeB_, distanceFromAToB_, minDistancesFromAToB_);
 
-        computeDirectedHausdorff(shapeB_, shapeA_, distanceFromBToA_, minDistancesFromBToA_);
-    }
+    computeDirectedHausdorff(shapeB_, shapeA_, distanceFromBToA_, minDistancesFromBToA_);
 }
 
 void HausdorffDistance::computeDirectedHausdorff(const Shape& fromShape, const Shape& toShape,
@@ -67,11 +64,7 @@ void HausdorffDistance::computeDirectedHausdorff(const Shape& fromShape, const S
 {
     Point2D_f fromPointRel, toPointRel;
 
-    float dist, minDist;
-
-    // initialization with a minimum value in order to maximize
-    // the directed or relative hausdorff distance
-    directedDistance = 0.f;
+    float directedDist = std::numeric_limits<float>::quiet_NaN();
 
     // outer loop
     for (const auto& fromPoint : fromShape.points())
@@ -89,7 +82,7 @@ void HausdorffDistance::computeDirectedHausdorff(const Shape& fromShape, const S
             fromPointRel.y = float(fromPoint.y) - fromShape.centroid().y;
 
             // initialization in order to minimize
-            minDist = std::numeric_limits<float>::max();
+            float minDist = std::numeric_limits<float>::max();
 
             // inner loop
             for (const auto& toPoint : toShape.points())
@@ -97,54 +90,62 @@ void HausdorffDistance::computeDirectedHausdorff(const Shape& fromShape, const S
                 toPointRel.x = float(toPoint.x) - toShape.centroid().x;
                 toPointRel.y = float(toPoint.y) - toShape.centroid().y;
 
-                dist = math::euclideanDistance(fromPointRel, toPointRel);
+                const float currentDist = math::euclideanDistance(fromPointRel, toPointRel);
 
                 // it minimizes minDist
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                }
+                if (currentDist < minDist)
+                    minDist = currentDist;
 
 #if defined(EARLY_BREAKING) && !defined(NAIVE_ALGO)
-                if (minDist < directedDistance)
-                {
+                if (!std::isnan(directedDist) && minDist < directedDist)
                     break;
-                }
 #endif
             }
 
             minDistances.push_back(minDist);
 
             // it maximizes the relative or directed hausdorff distance
-            if (minDist > directedDistance)
-            {
-                directedDistance = minDist;
-            }
+            if (std::isnan(directedDist) || minDist > directedDist)
+                directedDist = minDist;
 
 #if defined(INTERSECTION_EXCLUSION) && !defined(NAIVE_ALGO)
         }
 #endif
     }
 
-    // This empty case is possible if shape_a and shape_b are identical
-    // with the optimization INTERSECTION_EXCLUSION and
-    // with intersection_a_b with all points.
-    // In this case, the inner loop is never performed,
-    // even if shapes are not empty.
-    // It forces to be able to pick up one coherent value
-    // instead of float max.
+    // When all points belong to the provided intersection,
+    // no distance is evaluated.
+    // In this case the Hausdorff distance is zero because
+    // both shapes are identical on the evaluated domain.
     if (minDistances.empty() && !fromShape.points().empty() && !toShape.points().empty())
+    {
         minDistances.push_back(0.f);
+
+        directedDistance = 0.f;
+    }
+    else
+    {
+        directedDistance = directedDist;
+    }
 }
 
 float HausdorffDistance::distance() const
 {
+    if (std::isnan(distanceFromAToB_) || std::isnan(distanceFromBToA_))
+        return std::numeric_limits<float>::quiet_NaN();
+
     return std::max(distanceFromAToB_, distanceFromBToA_);
 }
 
 float HausdorffDistance::modifiedDistance() const
 {
-    return std::max(calculateMean(minDistancesFromAToB_), calculateMean(minDistancesFromBToA_));
+    const float meanAToB = calculateMean(minDistancesFromAToB_);
+    const float meanBToA = calculateMean(minDistancesFromBToA_);
+
+    if (std::isnan(meanAToB) || std::isnan(meanBToA))
+        return std::numeric_limits<float>::quiet_NaN();
+
+    return std::max(meanAToB, meanBToA);
 }
 
 float HausdorffDistance::hausdorffQuantile(int hundredth)
@@ -157,8 +158,13 @@ float HausdorffDistance::hausdorffQuantile(int hundredth)
         isSorted_ = true;
     }
 
-    return std::max(hausdorffQuantile(minDistancesFromAToB_, hundredth),
-                    hausdorffQuantile(minDistancesFromBToA_, hundredth));
+    const float quantileAToB = hausdorffQuantile(minDistancesFromAToB_, hundredth);
+    const float quantileBToA = hausdorffQuantile(minDistancesFromBToA_, hundredth);
+
+    if (std::isnan(quantileAToB) || std::isnan(quantileBToA))
+        return std::numeric_limits<float>::quiet_NaN();
+
+    return std::max(quantileAToB, quantileBToA);
 }
 
 float HausdorffDistance::calculateMean(const std::vector<float>& minDists)

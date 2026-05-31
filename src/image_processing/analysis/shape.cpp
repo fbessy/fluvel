@@ -6,15 +6,9 @@
 
 #include <algorithm>
 #include <cassert>
-#include <limits>
 
 namespace fluvel_ip
 {
-
-Shape::Shape()
-    : centroid_(std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
-{
-}
 
 void Shape::reserve(size_t elem_alloc_size)
 {
@@ -54,26 +48,29 @@ void Shape::shufflePoints()
 
 void Shape::calculateCentroid()
 {
-    centroid_.x = std::numeric_limits<float>::min();
-    centroid_.y = std::numeric_limits<float>::min();
-
-    if (points_.size() >= 1)
+    if (points_.empty())
     {
-        Point2D_i sum(0, 0);
+        centroid_.x = std::numeric_limits<float>::quiet_NaN();
+        centroid_.y = std::numeric_limits<float>::quiet_NaN();
 
-        for (const auto& p : points_)
-        {
-            sum += p;
-        }
-
-        centroid_.x = float(sum.x) / float(points_.size());
-        centroid_.y = float(sum.y) / float(points_.size());
+        return;
     }
+
+    Point2D_i sum(0, 0);
+
+    for (const auto& p : points_)
+    {
+        sum += p;
+    }
+
+    centroid_.x = static_cast<float>(sum.x) / static_cast<float>(points_.size());
+
+    centroid_.y = static_cast<float>(sum.y) / static_cast<float>(points_.size());
 }
 
 bool Shape::isValid() const
 {
-    return (!points_.empty() && centroid_.x >= 0.f && centroid_.y >= 0.f);
+    return !points_.empty() && !std::isnan(centroid_.x) && !std::isnan(centroid_.y);
 }
 
 float Shape::gridDiagonal(int gridWidth, int gridHeight)

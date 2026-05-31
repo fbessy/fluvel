@@ -8,6 +8,8 @@
 #include <QDragMoveEvent>
 #include <QDropEvent>
 
+#include <utility>
+
 namespace fluvel
 {
 

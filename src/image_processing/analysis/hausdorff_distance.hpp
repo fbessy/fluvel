@@ -6,6 +6,7 @@
 #include "point_containers.hpp"
 #include "shape.hpp"
 
+#include <limits>
 #include <vector>
 
 namespace fluvel_ip
@@ -30,14 +31,18 @@ class HausdorffDistance
 {
 public:
     /**
-     * @brief Construct a HausdorffDistance object.
-     *
-     * @param shapeA First shape.
+     * @brief Construct a HausdorffDistance object and compute all distance metrics.
+     *      * The input shapes are copied or moved into the object and remain owned
+     * by the HausdorffDistance instance for its entire lifetime.
+     *      * @param shapeA First shape.
      * @param shapeB Second shape.
-     * @param intersectionAB Optional set of common points between A and B.
+     * @param intersectionAB Optional set of points shared by both shapes.
+     *        Providing this set can reduce the computation cost by avoiding
+     *        distance evaluations for points already known to belong to both
+     *        shapes. This optimization is most useful when the intersection
+     *        can be obtained at negligible cost.
      */
-    HausdorffDistance(const Shape& shapeA, const Shape& shapeB,
-                      const PointSet* intersectionAB = nullptr);
+    HausdorffDistance(Shape shapeA, Shape shapeB, const PointSet* intersectionAB = nullptr);
 
     /**
      * @brief Compute the symmetric Hausdorff distance.
@@ -130,12 +135,12 @@ private:
     /**
      * @brief Directed Hausdorff distance from A to B.
      */
-    float distanceFromAToB_{0.f};
+    float distanceFromAToB_{std::numeric_limits<float>::quiet_NaN()};
 
     /**
      * @brief Directed Hausdorff distance from B to A.
      */
-    float distanceFromBToA_{0.f};
+    float distanceFromBToA_{std::numeric_limits<float>::quiet_NaN()};
 
     /**
      * @brief Minimum distances from A to B.

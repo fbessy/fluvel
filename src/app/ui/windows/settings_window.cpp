@@ -24,6 +24,8 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
+#include <utility>
+
 namespace fluvel
 {
 

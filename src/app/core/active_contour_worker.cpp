@@ -20,6 +20,7 @@
 #endif
 
 #include <cassert>
+#include <utility>
 
 namespace fluvel
 {

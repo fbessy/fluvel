@@ -5,6 +5,7 @@
 
 #include "point.hpp"
 
+#include <limits>
 #include <random>
 #include <vector>
 
@@ -23,7 +24,7 @@ public:
     /**
      * @brief Default constructor.
      */
-    Shape();
+    Shape() = default;
 
     /**
      * @brief Reserve memory for points.
@@ -126,7 +127,8 @@ private:
     std::vector<Point2D_i> points_;
 
     /// Centroid of the shape.
-    Point2D_f centroid_;
+    Point2D_f centroid_{std::numeric_limits<float>::quiet_NaN(),
+                        std::numeric_limits<float>::quiet_NaN()};
 
     /// Random generator.
     std::mt19937 rng_{std::random_device{}()};

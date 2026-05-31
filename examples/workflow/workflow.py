@@ -65,7 +65,7 @@ for image_path in sorted(dataset_dir.glob("*.png")):
 
     cv2.imwrite(str(masks_dir / f"{image_path.stem}_mask.png"), mask_gt)
 
-    gt_contours = fluvel.find_contours(mask_gt)
+    gt_contours = fluvel.find_contours(mask_gt, connectivity=fluvel.Connectivity.Eight)
 
     #
     # Segmentation
@@ -102,11 +102,11 @@ for image_path in sorted(dataset_dir.glob("*.png")):
     rows.append(
         [
             image_path.stem,
-            metrics.distance,
-            metrics.modified_distance,
-            metrics.quantile_distance,
-            metrics.centroids_distance,
-            elapsed_ms,
+            f"{metrics.distance:.2f}",
+            f"{metrics.modified_distance:.2f}",
+            f"{metrics.quantile_distance:.2f}",
+            f"{metrics.centroids_distance:.2f}",
+            f"{elapsed_ms:.0f}",
         ]
     )
 

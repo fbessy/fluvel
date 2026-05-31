@@ -16,6 +16,8 @@
 #include "py_array_conversion.hpp"
 #include "py_validation.hpp"
 
+#include <utility>
+
 namespace
 {
 constexpr auto kConnectivityDoc = R"(
