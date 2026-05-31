@@ -423,10 +423,11 @@ Examples
 
 )";
 
+// Outer and inner contours returned to Python.
 struct ContourResult
 {
-    py::array outer;
-    py::array inner;
+    py::array_t<int> outer;
+    py::array_t<int> inner;
 };
 
 } // namespace
@@ -483,7 +484,7 @@ void bindActiveContour(py::module_& m)
     m.def(
         "active_contour",
 
-        [](py::array_t<uint8_t> image, py::object phiMask,
+        [](const py::array_t<uint8_t>& image, const py::object& phiMask,
            const fluvel_ip::ActiveContourParams& acParams,
            const fluvel_ip::RegionColorParams& regionParams)
         {
@@ -531,7 +532,7 @@ void bindActiveContour(py::module_& m)
     m.def(
         "find_contours",
 
-        [](py::array_t<uint8_t> mask, fluvel_ip::Connectivity connectivity)
+        [](const py::array_t<uint8_t>& mask, fluvel_ip::Connectivity connectivity)
         {
             validateImage(mask);
 

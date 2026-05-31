@@ -193,7 +193,7 @@ void bindMorphology(py::module_& m)
     m.def(
         "dilate",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);
@@ -210,7 +210,7 @@ void bindMorphology(py::module_& m)
     m.def(
         "erode",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);
@@ -227,7 +227,7 @@ void bindMorphology(py::module_& m)
     m.def(
         "opening",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);
@@ -244,7 +244,7 @@ void bindMorphology(py::module_& m)
     m.def(
         "closing",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);
@@ -261,7 +261,7 @@ void bindMorphology(py::module_& m)
     m.def(
         "top_hat",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);
@@ -278,7 +278,7 @@ void bindMorphology(py::module_& m)
     m.def(
         "black_top_hat",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);
@@ -295,7 +295,7 @@ void bindMorphology(py::module_& m)
     m.def(
         "gradient",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);

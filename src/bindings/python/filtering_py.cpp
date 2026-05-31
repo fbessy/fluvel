@@ -193,7 +193,7 @@ void bindFiltering(py::module_& m)
     m.def(
         "anisotropic_diffusion",
 
-        [](py::array_t<uint8_t> input, const fluvel_ip::filter::AnisoParams& params)
+        [](const py::array_t<uint8_t>& input, const fluvel_ip::filter::AnisoParams& params)
         {
             validateImage(input);
 
@@ -209,7 +209,7 @@ void bindFiltering(py::module_& m)
     m.def(
         "mean",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);
@@ -226,7 +226,7 @@ void bindFiltering(py::module_& m)
     m.def(
         "median",
 
-        [](py::array_t<uint8_t> input, int radius)
+        [](const py::array_t<uint8_t>& input, int radius)
         {
             validateImage(input);
             validateRadius(radius);

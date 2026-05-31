@@ -75,7 +75,7 @@ void bindHausdorff(py::module_& m)
     m.def(
         "hausdorff_metrics",
 
-        [](py::array contourA, py::array contourB, int quantile)
+        [](const py::array_t<int>& contourA, const py::array_t<int>& contourB, int quantile)
         {
             auto shapeA = pyArrayToShape(contourA);
             auto shapeB = pyArrayToShape(contourB);

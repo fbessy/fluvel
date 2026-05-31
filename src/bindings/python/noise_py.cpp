@@ -133,7 +133,7 @@ void bindNoise(py::module_& m)
     m.def(
         "gaussian_noise",
 
-        [](py::array_t<uint8_t> input, float sigma)
+        [](const py::array_t<uint8_t>& input, float sigma)
         {
             validateImage(input);
             validateSigma(sigma);
@@ -150,7 +150,7 @@ void bindNoise(py::module_& m)
     m.def(
         "impulsive_noise",
 
-        [](py::array_t<uint8_t> input, float probability)
+        [](const py::array_t<uint8_t>& input, float probability)
         {
             validateImage(input);
             validateProbability(probability);
@@ -167,7 +167,7 @@ void bindNoise(py::module_& m)
     m.def(
         "speckle_uniform",
 
-        [](py::array_t<uint8_t> input, float sigma)
+        [](const py::array_t<uint8_t>& input, float sigma)
         {
             validateImage(input);
             validateSigma(sigma);
@@ -184,7 +184,7 @@ void bindNoise(py::module_& m)
     m.def(
         "speckle_gamma",
 
-        [](py::array_t<uint8_t> input, float sigma)
+        [](const py::array_t<uint8_t>& input, float sigma)
         {
             validateImage(input);
             validateSigma(sigma);
