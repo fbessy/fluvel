@@ -75,7 +75,7 @@ void HausdorffDistance::computeDirectedHausdorff(const Shape& fromShape, const S
         // due to the stl unordered set container.
 
 #if defined(INTERSECTION_EXCLUSION) && !defined(NAIVE_ALGO)
-        if (intersectionAB_ && !intersectionAB_->contains(fromPoint))
+        if (!intersectionAB_ || !intersectionAB_->contains(fromPoint))
         {
 #endif
             fromPointRel.x = float(fromPoint.x) - fromShape.centroid().x;
@@ -113,15 +113,24 @@ void HausdorffDistance::computeDirectedHausdorff(const Shape& fromShape, const S
 #endif
     }
 
-    // When all points belong to the provided intersection,
-    // no distance is evaluated.
-    // In this case the Hausdorff distance is zero because
-    // both shapes are identical on the evaluated domain.
-    if (minDistances.empty() && !fromShape.points().empty() && !toShape.points().empty())
+    // No distance has been evaluated.
+    //
+    // The only valid explanation is that every point of fromShape belongs
+    // to the provided intersection. In that case the directed Hausdorff
+    // distance is zero.
+    //
+    // Any other situation indicates an unexpected state and results in NaN.
+    if (minDistances.empty())
     {
-        minDistances.push_back(0.f);
-
-        directedDistance = 0.f;
+        if (intersectionAB_ && intersectionAB_->size() == fromShape.points().size())
+        {
+            directedDistance = 0.f;
+            minDistances.push_back(0.f);
+        }
+        else
+        {
+            directedDistance = std::numeric_limits<float>::quiet_NaN();
+        }
     }
     else
     {
