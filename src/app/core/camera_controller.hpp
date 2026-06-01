@@ -131,7 +131,8 @@ public:
 
     /**
      * @brief Notify controller that a frame has been displayed.
-     *      * Used for timing/latency measurements.
+     *
+     * Used for timing/latency measurements.
      */
     void onFrameDisplayed(const FrameTimestamps& ts);
 
@@ -141,21 +142,24 @@ signals:
 
     /**
      * @brief Emitted when camera startup begins.
-     *      * The controller entered the starting phase and is waiting
+     *
+     * The controller entered the starting phase and is waiting
      * for the first valid frame before entering streaming mode.
      */
     void streamingStarting();
 
     /**
      * @brief Emitted when streaming successfully starts.
-     *      * A valid frame was received and the controller entered
+     *
+     * A valid frame was received and the controller entered
      * the streaming state.
      */
     void streamingStarted(const fluvel::StreamingInfo& info);
 
     /**
      * @brief Emitted when streaming stops.
-     *      * The controller released the active stream and entered
+     *
+     * The controller released the active stream and entered
      * the stopped state.
      */
     void streamingStopped();

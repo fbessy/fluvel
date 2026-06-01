@@ -39,7 +39,8 @@ class AnalysisWindow : public QDialog
 public:
     /**
      * @brief Constructs the analysis window.
-     *      * @param parent Optional parent widget.
+     *
+     * @param parent Optional parent widget.
      */
     AnalysisWindow(QWidget* parent = nullptr);
     void checkLists();

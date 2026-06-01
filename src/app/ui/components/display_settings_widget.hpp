@@ -37,28 +37,32 @@ class DisplaySettingsWidget : public QWidget
 public:
     /**
      * @brief Constructs the display settings widget.
-     *      * @param config Initial display configuration.
+     *
+     * @param config Initial display configuration.
      * @param parent Optional parent widget.
      */
     DisplaySettingsWidget(const DisplayConfig& config, QWidget* parent = nullptr);
 
     /**
      * @brief Enables or disables pipeline-related options.
-     *      * @param hasPreprocessing True if preprocessing is available.
+     *
+     * @param hasPreprocessing True if preprocessing is available.
      */
     void updatePipelineAvailability(bool hasPreprocessing);
 
 signals:
     /**
      * @brief Emitted when the display configuration changes.
-     *      * @param config Updated configuration.
+     *
+     * @param config Updated configuration.
      */
     void displayConfigChanged(const fluvel::DisplayConfig& config);
 
 public slots:
     /**
      * @brief Shows or hides the settings panel.
-     *      * @param open True to show the panel, false to hide it.
+     *
+     * @param open True to show the panel, false to hide it.
      */
     void setPanelVisible(bool open);
 

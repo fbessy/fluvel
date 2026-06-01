@@ -61,8 +61,10 @@ public:
 
     /**
      * @brief Submit a new frame for processing.
-     *      * The frame may replace previously unprocessed frames depending on timing.
-     *      * @param capturedFrame Frame received from capture layer.
+     *
+     * The frame may replace previously unprocessed frames depending on timing.
+     *
+     * @param capturedFrame Frame received from capture layer.
      */
     void submitFrame(const CapturedFrame& capturedFrame);
 
@@ -91,7 +93,8 @@ signals:
 protected:
     /**
      * @brief Main processing loop.
-     *      * Continuously waits for new frames and processes them within a time budget.
+     *
+     * Continuously waits for new frames and processes them within a time budget.
      */
     void run() override;
 

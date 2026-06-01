@@ -26,7 +26,8 @@ class LanguageWindow : public QDialog
 public:
     /**
      * @brief Constructs the language selection dialog.
-     *      * @param parent Optional parent widget.
+     *
+     * @param parent Optional parent widget.
      */
     LanguageWindow(QWidget* parent = nullptr);
 

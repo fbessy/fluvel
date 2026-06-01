@@ -42,7 +42,8 @@ public:
 
     /**
      * @brief Returns the behavior priority.
-     *      * A high priority ensures drag-and-drop is handled before
+     *
+     * A high priority ensures drag-and-drop is handled before
      * other interactions.
      */
     int priority() const override

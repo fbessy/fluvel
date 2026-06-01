@@ -106,7 +106,8 @@ public:
 
     /**
      * @brief Returns whether the behavior is currently capturing input.
-     *      * When true, this behavior has priority over others.
+     *
+     * When true, this behavior has priority over others.
      */
     virtual bool isCapturing() const
     {
@@ -123,7 +124,8 @@ public:
 
     /**
      * @brief Cursor used when the behavior is available but not active.
-     *      * @param hasImage True if an image is loaded.
+     *
+     * @param hasImage True if an image is loaded.
      * @param isPanRelevant True if panning is meaningful.
      */
     virtual Qt::CursorShape availableCursor(bool /*hasImage*/, bool /*isPanRelevant*/,
@@ -134,7 +136,8 @@ public:
 
     /**
      * @brief Returns the priority of the behavior.
-     *      * Higher priority behaviors are processed first.
+     *
+     * Higher priority behaviors are processed first.
      */
     virtual int priority() const
     {
@@ -143,7 +146,8 @@ public:
 
     /**
      * @brief Cancels the current interaction state.
-     *      * Called to reset the behavior (e.g. when interaction is interrupted).
+     *
+     * Called to reset the behavior (e.g. when interaction is interrupted).
      */
     virtual void cancel() {};
 

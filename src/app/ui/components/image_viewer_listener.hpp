@@ -31,7 +31,8 @@ public:
 
     /**
      * @brief Called when a pixel color is picked.
-     *      * @param color Picked color value.
+     *
+     * @param color Picked color value.
      * @param imagePos Position in image coordinates.
      */
     virtual void onColorPicked(const QColor& color, const QPoint& imagePos) = 0;

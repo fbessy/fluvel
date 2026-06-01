@@ -41,14 +41,17 @@ public:
 
     /**
      * @brief Construct contour data from a binary initialization mask.
-     *      * The input image is interpreted as a binary region map.
+     *
+     * The input image is interpreted as a binary region map.
      * Pixel values greater than or equal to 128 are considered inside,
      * lower values are considered outside.
-     *      * Pixel values are fully copied into the internal phi representation.
+     *
+     * Pixel values are fully copied into the internal phi representation.
      * The provided ImageView is not stored and is only accessed during
      * construction, therefore temporary or short-lived ImageView instances
      * are safe to pass.
-     *      * @param binaryMask Input binary mask used to initialize the contour.
+     *
+     * @param binaryMask Input binary mask used to initialize the contour.
      * @param connectivity Neighborhood connectivity (4 or 8).
      */
     ContourData(const ImageView& binaryMask, Connectivity connectivity = Connectivity::Four);

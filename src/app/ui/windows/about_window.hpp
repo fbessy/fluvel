@@ -24,7 +24,8 @@ class AboutWindow : public QDialog
 public:
     /**
      * @brief Constructs the About dialog.
-     *      * @param parent Optional parent widget.
+     *
+     * @param parent Optional parent widget.
      */
     AboutWindow(QWidget* parent = nullptr);
 

@@ -58,9 +58,11 @@ public:
 
     /**
      * @brief Handles mouse press events.
-     *      * Activates the behavior if the right mouse button is pressed
+     *
+     * Activates the behavior if the right mouse button is pressed
      * and initializes the overlay.
-     *      * @param view Associated image viewer.
+     *
+     * @param view Associated image viewer.
      * @param event Mouse event.
      * @return false (event is not consumed).
      */
@@ -68,8 +70,10 @@ public:
 
     /**
      * @brief Handles mouse move events.
-     *      * Updates the overlay position and pixel information while active.
-     *      * @param view Associated image viewer.
+     *
+     * Updates the overlay position and pixel information while active.
+     *
+     * @param view Associated image viewer.
      * @param event Mouse event.
      * @return false (event is not consumed).
      */
@@ -77,9 +81,11 @@ public:
 
     /**
      * @brief Handles mouse release events.
-     *      * Deactivates the behavior and hides the overlay when the right
+     *
+     * Deactivates the behavior and hides the overlay when the right
      * mouse button is released.
-     *      * @param view Associated image viewer.
+     *
+     * @param view Associated image viewer.
      * @param event Mouse event.
      * @return false (event is not consumed).
      */
@@ -87,16 +93,19 @@ public:
 
     /**
      * @brief Cancels the behavior.
-     *      * Ensures the overlay is hidden and internal state is reset.
+     *
+     * Ensures the overlay is hidden and internal state is reset.
      */
     void cancel() override;
 
 private:
     /**
      * @brief Updates overlay content and position from a view coordinate.
-     *      * Converts the view position to image/scene space and refreshes
+     *
+     * Converts the view position to image/scene space and refreshes
      * the overlay accordingly.
-     *      * @param view Associated image viewer.
+     *
+     * @param view Associated image viewer.
      * @param viewPos Mouse position in view coordinates.
      */
     void updateOverlay(ImageViewerWidget& view, const QPoint& viewPos);

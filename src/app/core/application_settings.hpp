@@ -48,13 +48,15 @@ class ApplicationSettings : public QObject
 public:
     /**
      * @brief Access the global ApplicationSettings instance.
-     *      * @return Singleton instance.
+     *
+     * @return Singleton instance.
      */
     static ApplicationSettings& instance();
 
     /**
      * @brief Construct the settings manager.
-     *      * Typically initializes settings from persistent storage.
+     *
+     * Typically initializes settings from persistent storage.
      */
     ApplicationSettings();
     ~ApplicationSettings() override = default;

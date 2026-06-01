@@ -35,7 +35,8 @@ class FrameStatsView
 public:
     /**
      * @brief Snapshot of computed statistics.
-     *      * Values are averaged over the current time window.
+     *
+     * Values are averaged over the current time window.
      */
     struct Snapshot
     {
@@ -63,7 +64,8 @@ public:
 
     /**
      * @brief Returns a stable snapshot of the current statistics.
-     *      * The snapshot is computed over the last time window (~1 second).
+     *
+     * The snapshot is computed over the last time window (~1 second).
      */
     Snapshot snapshot();
 
@@ -75,7 +77,8 @@ public:
 private:
     /**
      * @brief Updates the current statistics window.
-     *      * Must be called with mutex locked.
+     *
+     * Must be called with mutex locked.
      */
     void updateWindowLocked();
 

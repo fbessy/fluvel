@@ -45,15 +45,19 @@ public:
 
     /**
      * @brief Called when a new input image is provided.
-     *      * This method can be used to initialize or update internal state
+     *
+     * This method can be used to initialize or update internal state
      * (e.g. region statistics, histograms, precomputed terms).
-     *      * ⚠️ Lifetime requirement:
+     *
+     * ⚠️ Lifetime requirement:
      * The provided ImageView may be stored and reused by the implementation.
      * The underlying image data MUST remain valid for the entire duration
      * of its usage (typically until the next call to onImageChanged()).
-     *      * Passing a temporary or short-lived ImageView may lead to undefined behavior.
+     *
+     * Passing a temporary or short-lived ImageView may lead to undefined behavior.
      * Use an ImageOwner to guarantee safe lifetime when needed.
-     *      * @param image Input image.
+     *
+     * @param image Input image.
      * @param contour Current contour data.
      */
     virtual void onImageChanged(const ImageView&, const ContourData&)

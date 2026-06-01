@@ -37,7 +37,8 @@ class ColorPickerBehavior : public QObject, public ImageViewerBehavior
 public:
     /**
      * @brief Constructs the color picker behavior.
-     *      * @param button Mouse button used to pick a color
+     *
+     * @param button Mouse button used to pick a color
      *               (default: Qt::RightButton).
      */
     explicit ColorPickerBehavior(Qt::MouseButton button = Qt::RightButton);
@@ -56,7 +57,8 @@ public:
 signals:
     /**
      * @brief Emitted when a color is picked from the image.
-     *      * @param color Picked color.
+     *
+     * @param color Picked color.
      * @param imgPos Position in image coordinates.
      */
     void colorPicked(const QColor& color, const QPoint& imgPos);
@@ -64,7 +66,8 @@ signals:
 protected:
     /**
      * @brief Handles mouse press events.
-     *      * Picks the color at the clicked position and emits colorPicked().
+     *
+     * Picks the color at the clicked position and emits colorPicked().
      */
     bool mousePress(ImageViewerWidget& view, QMouseEvent* e) override;
 

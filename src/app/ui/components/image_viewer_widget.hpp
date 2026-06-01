@@ -72,28 +72,33 @@ public:
 
     /**
      * @brief Sets the interaction handler.
-     *      * @param interaction Interaction object (not owned).
+     *
+     * @param interaction Interaction object (not owned).
      */
     void setInteraction(ImageViewerInteraction* interaction);
 
     /**
      * @brief Sets the listener for external callbacks.
-     *      * @param listener Listener object (not owned).
+     *
+     * @param listener Listener object (not owned).
      */
     void setListener(ImageViewerListener* listener);
 
     /**
      * @brief Sets the maximum display frame rate.
-     *      * If fps > 0, frames are throttled to the specified rate.
+     *
+     * If fps > 0, frames are throttled to the specified rate.
      * If fps == 0, throttling is disabled.
-     *      * @param fps Maximum frames per second.
+     *
+     * @param fps Maximum frames per second.
      */
     void setMaxDisplayFps(double fps);
 
     /**
      * @name Configuration
      * @brief Runtime configuration of display and processing parameters.
-     *      * These functions update internal rendering behavior without recreating the widget.
+     *
+* These functions update internal rendering behavior without recreating the widget.
      * @{
      */
     void applyDisplayConfig(const fluvel::DisplayConfig& display);
@@ -103,7 +108,8 @@ public:
     /**
      * @name Display
      * @brief Functions related to image and overlay display.
-     *      * These functions update what is rendered in the viewer,
+     *
+     * These functions update what is rendered in the viewer,
      * including image content, contours and UI overlays.
      * @{
      */
@@ -135,20 +141,24 @@ public:
 
     /**
      * @brief Sets the alignment of the overlay text.
-     *      * Controls how the text is positioned inside the overlay bounding box.
+     *
+     * Controls how the text is positioned inside the overlay bounding box.
      * Typical values include:
      * - Qt::AlignCenter | Qt::AlignVCenter (HUD / video mode)
      * - Qt::AlignLeft   | Qt::AlignTop     (debug / image mode)
-     *      * @param align Qt alignment flags (combination of Qt::AlignmentFlag).
+     *
+     * @param align Qt alignment flags (combination of Qt::AlignmentFlag).
      */
     void setOverlayAlignment(Qt::Alignment align);
 
     /**
      * @brief Sets the minimum width of the overlay background.
-     *      * If set to 0, the overlay width adapts dynamically to the text content.
+     *
+     * If set to 0, the overlay width adapts dynamically to the text content.
      * If greater than 0, the width is clamped to at least this value,
      * ensuring a stable layout.
-     *      * @param minW Minimum width in pixels.
+     *
+     * @param minW Minimum width in pixels.
      */
     void setOverlayMinWidth(qreal minW);
 

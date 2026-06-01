@@ -76,9 +76,11 @@ struct RegionParams
 
     /**
      * @brief Default comparison operator (C++20).
-     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     *
+     * Generates all comparison operators (==, !=, <, <=, >, >=)
      * by comparing members in declaration order.
-     *      * @note Requires <compare>.
+     *
+     * @note Requires <compare>.
      */
     auto operator<=>(const RegionParams&) const = default;
 
@@ -237,9 +239,11 @@ struct RegionColorParams : public RegionParams
 
     /**
      * @brief Default comparison operator (C++20).
-     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     *
+     * Generates all comparison operators (==, !=, <, <=, >, >=)
      * by comparing members in declaration order.
-     *      * @note Requires <compare>.
+     *
+     * @note Requires <compare>.
      */
     auto operator<=>(const RegionColorParams&) const = default;
 };

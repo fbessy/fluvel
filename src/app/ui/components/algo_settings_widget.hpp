@@ -40,7 +40,8 @@ class AlgoSettingsWidget : public QWidget
 public:
     /**
      * @brief Constructs the algorithm settings widget.
-     *      * @param config Configuration object to edit (by reference).
+     *
+     * @param config Configuration object to edit (by reference).
      * @param parent Optional parent widget.
      */
     AlgoSettingsWidget(ActiveContourConfig& config, QWidget* parent = nullptr);
@@ -58,7 +59,8 @@ public:
 signals:
     /**
      * @brief Emitted when the connectivity setting changes.
-     *      * @param connectivity Selected connectivity mode.
+     *
+     * @param connectivity Selected connectivity mode.
      */
     void connectivityChanged(fluvel_ip::Connectivity connectivity);
 

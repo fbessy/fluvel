@@ -124,9 +124,12 @@ public:
 
     /**
      * @brief Runs anisotropic diffusion iterations.
-     *      * Applies the diffusion process using the internal buffers initialized by reset().
-     *      * @param params Anisotropic diffusion parameters.
-     *      * @note This function does not perform memory allocation.
+     *
+     * Applies the diffusion process using the internal buffers initialized by reset().
+     *
+     * @param params Anisotropic diffusion parameters.
+     *
+     * @note This function does not perform memory allocation.
      */
     void apply(const AnisoParams& params = AnisoParams{});
 

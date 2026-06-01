@@ -30,7 +30,8 @@ class ColorSelectorWidget : public QWidget
 public:
     /**
      * @brief Constructs the color selector widget.
-     *      * @param parent Parent widget.
+     *
+     * @param parent Parent widget.
      * @param initialColor Initial selected color.
      */
     ColorSelectorWidget(QWidget* parent, QColor initialColor = Qt::black);
@@ -42,14 +43,16 @@ public:
 
     /**
      * @brief Sets the selected color.
-     *      * @param color Color to select.
+     *
+     * @param color Color to select.
      */
     void setSelectedColor(const QColor& color);
 
 signals:
     /**
      * @brief Emitted when a color is selected.
-     *      * @param color Selected color.
+     *
+     * @param color Selected color.
      */
     void colorSelected(const QColor& color);
 

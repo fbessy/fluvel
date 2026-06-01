@@ -93,7 +93,8 @@ signals:
 private:
     /**
      * @brief Handles color picking events from the image viewer.
-     *      * Updates the selected color and refreshes the analysis.
+     *
+     * Updates the selected color and refreshes the analysis.
      */
     void onColorPicked(const QColor& color, const QPoint& imagePos) override;
 

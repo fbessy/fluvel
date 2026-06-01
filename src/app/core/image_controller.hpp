@@ -53,7 +53,8 @@ public:
 
     /**
      * @brief Load an image from disk.
-     *      * @param path Path to the image file.
+     *
+     * @param path Path to the image file.
      */
     void loadImage(const QString& path);
 

@@ -35,7 +35,8 @@ class PixelInfoOverlay final : public QGraphicsItem
 public:
     /**
      * @brief Constructs the overlay and attaches it to a scene.
-     *      * @param scene Target graphics scene.
+     *
+     * @param scene Target graphics scene.
      */
     explicit PixelInfoOverlay(QGraphicsScene* scene);
 
@@ -43,9 +44,11 @@ public:
 
     /**
      * @brief Updates overlay content and position.
-     *      * Sets the displayed pixel coordinates and color values, then updates
+     *
+     * Sets the displayed pixel coordinates and color values, then updates
      * the overlay placement relative to the given anchor position.
-     *      * @param pixel Pixel coordinates in image space.
+     *
+     * @param pixel Pixel coordinates in image space.
      * @param color Pixel color value.
      * @param isGrayImg True if the image is grayscale.
      * @param anchorScenePos Anchor position in scene coordinates.
@@ -56,9 +59,11 @@ public:
 
     /**
      * @brief Updates overlay position without changing its content.
-     *      * Repositions the overlay relative to the given anchor point,
+     *
+     * Repositions the overlay relative to the given anchor point,
      * typically following cursor movement.
-     *      * @param anchorScenePos Anchor position in scene coordinates.
+     *
+     * @param anchorScenePos Anchor position in scene coordinates.
      * @param view Associated image viewer.
      */
     void updatePlacement(const QPointF& anchorScenePos, ImageViewerWidget& view);
@@ -76,7 +81,8 @@ public:
 
     /**
      * @brief Paints the overlay content.
-     *      * Renders the text containing pixel coordinates and color values.
+     *
+     * Renders the text containing pixel coordinates and color values.
      */
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
                QWidget* widget = nullptr) override;
@@ -84,7 +90,8 @@ public:
 private:
     /**
      * @brief Computes the bounding rectangle based on the text content.
-     *      * @param maxStr Reference string used to estimate maximum size.
+     *
+     * @param maxStr Reference string used to estimate maximum size.
      */
     void calc_bounding(const QString& maxStr);
 

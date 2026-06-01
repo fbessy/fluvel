@@ -37,37 +37,44 @@ class ZoomOverlayController : public QObject
 public:
     /**
      * @brief Constructs the controller.
-     *      * @param item Pointer to the overlay text item to control.
+     *
+     * @param item Pointer to the overlay text item to control.
      * @param parent Optional QObject parent.
-     *      * @pre item must not be null.
+     *
+     * @pre item must not be null.
      */
     explicit ZoomOverlayController(OverlayTextItem* item, QObject* parent = nullptr);
 
     /**
      * @brief Displays the zoom overlay.
-     *      * Updates the overlay text with the given zoom percentage and
+     *
+     * Updates the overlay text with the given zoom percentage and
      * restarts the display/fade sequence.
-     *      * @param percent Zoom value in percent (e.g. 150 for 150%).
+     *
+     * @param percent Zoom value in percent (e.g. 150 for 150%).
      */
     void show(int percent);
 
 private slots:
     /**
      * @brief Called when the display timer expires.
-     *      * Starts the fade-out animation.
+     *
+     * Starts the fade-out animation.
      */
     void onTimeout();
 
     /**
      * @brief Called when the fade-out animation finishes.
-     *      * Typically used to hide or reset the overlay item.
+     *
+     * Typically used to hide or reset the overlay item.
      */
     void onFadeFinished();
 
 private:
     /**
      * @brief Starts the fade-out animation.
-     *      * Configures and launches the opacity animation on the overlay item.
+     *
+     * Configures and launches the opacity animation on the overlay item.
      */
     void startFade();
 

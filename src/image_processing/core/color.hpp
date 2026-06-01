@@ -77,9 +77,11 @@ struct Rgb
 
     /**
      * @brief Default comparison operator (C++20).
-     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     *
+     * Generates all comparison operators (==, !=, <, <=, >, >=)
      * by comparing members in declaration order.
-     *      * @note Requires <compare>.
+     *
+     * @note Requires <compare>.
      */
     auto operator<=>(const Rgb&) const = default;
 
@@ -258,9 +260,11 @@ struct Components_3i
 
     /**
      * @brief Default comparison operator (C++20).
-     *      * Generates all comparison operators (==, !=, <, <=, >, >=)
+     *
+     * Generates all comparison operators (==, !=, <, <=, >, >=)
      * by comparing members in declaration order.
-     *      * @note Requires <compare>.
+     *
+     * @note Requires <compare>.
      */
     auto operator<=>(const Components_3i&) const = default;
 

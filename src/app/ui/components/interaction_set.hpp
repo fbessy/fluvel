@@ -59,20 +59,24 @@ public:
 
     /**
      * @brief Adds a behavior to the interaction set.
-     *      * The behavior is owned by the InteractionSet.
-     *      * @param behavior Behavior to add.
+     *
+     * The behavior is owned by the InteractionSet.
+     *
+     * @param behavior Behavior to add.
      */
     void addBehavior(std::unique_ptr<ImageViewerBehavior> behavior);
 
     /**
      * @brief Returns the currently capturing behavior.
-     *      * @return Pointer to the capturing behavior, or nullptr if none.
+     *
+     * @return Pointer to the capturing behavior, or nullptr if none.
      */
     const ImageViewerBehavior* capturingBehavior() const;
 
     /**
      * @brief Computes the cursor for the current interaction state.
-     *      * @param view Associated image viewer.
+     *
+     * @param view Associated image viewer.
      * @param hasImage True if an image is loaded.
      * @param isPanRelevant True if panning is meaningful.
      * @param e Optional mouse event.
@@ -83,7 +87,8 @@ public:
 
     /**
      * @brief Checks whether a behavior of a given type is present.
-     *      * @tparam T Behavior type.
+     *
+     * @tparam T Behavior type.
      * @return True if a behavior of type T is registered.
      */
     template <typename T> bool hasBehavior() const
@@ -124,7 +129,8 @@ protected:
 
     /**
      * @brief Computes the cursor for a given event.
-     *      * Called internally by the interaction system.
+     *
+     * Called internally by the interaction system.
      */
     Qt::CursorShape cursorForEvent(const ImageViewerWidget& view, bool hasImage, bool isPanRelevant,
                                    const QMouseEvent* event) const override;
@@ -151,7 +157,8 @@ protected:
 
     /**
      * @brief Cancels all active behaviors.
-     *      * Typically used to reset interaction state.
+     *
+     * Typically used to reset interaction state.
      */
     void cancel() override;
 

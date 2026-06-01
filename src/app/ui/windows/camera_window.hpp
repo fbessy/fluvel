@@ -109,7 +109,8 @@ class CameraWindow : public QMainWindow
 public:
     /**
      * @brief Constructs the camera window.
-     *      * @param parent Optional parent widget.
+     *
+     * @param parent Optional parent widget.
      */
     explicit CameraWindow(QWidget* parent = nullptr);
 

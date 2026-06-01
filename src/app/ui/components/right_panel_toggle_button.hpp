@@ -27,15 +27,18 @@ class RightPanelToggleButton : public QPushButton
 public:
     /**
      * @brief Constructs the toggle button.
-     *      * @param parent Optional parent widget.
+     *
+     * @param parent Optional parent widget.
      */
     explicit RightPanelToggleButton(QWidget* parent = nullptr);
 
 private slots:
     /**
      * @brief Updates the button appearance based on its checked state.
-     *      * Switches the displayed icon depending on whether the button is checked.
-     *      * @param checked True if the button is active (panel visible), false otherwise.
+     *
+     * Switches the displayed icon depending on whether the button is checked.
+     *
+     * @param checked True if the button is active (panel visible), false otherwise.
      */
     void updateAppearance(bool checked);
 

@@ -51,7 +51,8 @@ public:
 signals:
     /**
      * @brief Emitted when the configuration is accepted.
-     *      * @param config Updated video session configuration.
+     *
+     * @param config Updated video session configuration.
      */
     void videoComputeSettingsAccepted(const fluvel::VideoComputeConfig& config);
 

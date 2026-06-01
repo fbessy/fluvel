@@ -23,16 +23,19 @@ class KernelSizeSpinBox : public QSpinBox
 public:
     /**
      * @brief Constructs the spin box.
-     *      * @param parent Optional parent widget.
+     *
+     * @param parent Optional parent widget.
      */
     explicit KernelSizeSpinBox(QWidget* parent = nullptr);
 
 protected:
     /**
      * @brief Validates user input.
-     *      * Applies custom validation rules to ensure valid kernel sizes
+     *
+     * Applies custom validation rules to ensure valid kernel sizes
      * and preserves the last acceptable state.
-     *      * @param text Current text being edited.
+     *
+     * @param text Current text being edited.
      * @param pos Cursor position.
      * @return Validation state.
      */
@@ -40,16 +43,19 @@ protected:
 
     /**
      * @brief Handles focus-in events.
-     *      * Used to adjust display or restore a valid state when the widget
+     *
+     * Used to adjust display or restore a valid state when the widget
      * gains focus.
-     *      * @param event Focus event.
+     *
+     * @param event Focus event.
      */
     void focusInEvent(QFocusEvent* event) override;
 
 private:
     /**
      * @brief Sets the displayed suffix.
-     *      * @param text Suffix text.
+     *
+     * @param text Suffix text.
      */
     void setSuffix(const QString& text);
 

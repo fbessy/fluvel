@@ -61,19 +61,22 @@ public:
 
     /**
      * @brief Load a new phi image.
-     *      * Replaces both edited and committed states.
+     *
+     * Replaces both edited and committed states.
      */
     void loadPhi(const QImage& phi);
 
     /**
      * @brief Add a shape to the phi mask.
-     *      * Typically marks pixels inside the shape as active.
+     *
+     * Typically marks pixels inside the shape as active.
      */
     void addShape(const ShapeInfo& shape);
 
     /**
      * @brief Subtract a shape from the phi mask.
-     *      * Typically removes pixels inside the shape from the active region.
+     *
+     * Typically removes pixels inside the shape from the active region.
      */
     void subtractShape(const ShapeInfo& shape);
 
@@ -84,8 +87,10 @@ public:
 
     /**
      * @brief Commit current edits.
-     *      * Copies the edited state into the committed state.
-     *      * @return The committed phi image.
+     *
+     * Copies the edited state into the committed state.
+     *
+     * @return The committed phi image.
      */
     QImage commit();
 
@@ -96,13 +101,15 @@ public:
 
     /**
      * @brief Resize the phi image.
-     *      * @param size New image size.
+     *
+     * @param size New image size.
      */
     void setSize(const QSize& size);
 
     /**
      * @brief Access current edited phi.
-     *      * @return Reference to working phi image.
+     *
+     * @return Reference to working phi image.
      */
     const QImage& phi() const
     {
@@ -119,7 +126,8 @@ signals:
 private:
     /**
      * @brief Apply a shape modification to phi.
-     *      * @param shapeInfo Shape definition.
+     *
+     * @param shapeInfo Shape definition.
      * @param color Value used to update the phi image.
      */
     void changeShape(const ShapeInfo& shapeInfo, const QColor& color);

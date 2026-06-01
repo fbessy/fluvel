@@ -24,7 +24,8 @@ class ContourPointsItem : public QGraphicsItem
 public:
     /**
      * @brief Constructs the contour item.
-     *      * @param parent Optional parent graphics item.
+     *
+     * @param parent Optional parent graphics item.
      */
     explicit ContourPointsItem(QGraphicsItem* parent = nullptr);
 
@@ -44,7 +45,8 @@ public:
 
     /**
      * @brief Sets the drawing color.
-     *      * @param color Contour color.
+     *
+     * @param color Contour color.
      */
     void setColor(QColor color)
     {

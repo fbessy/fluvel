@@ -59,20 +59,23 @@ class ImageWindow : public QMainWindow
 public:
     /**
      * @brief Constructs the main image window.
-     *      * @param parent Optional parent widget.
+     *
+     * @param parent Optional parent widget.
      */
     explicit ImageWindow(QWidget* parent = nullptr);
 
 signals:
     /**
      * @brief Emitted when a file is selected.
-     *      * @param fileName Path to the selected file.
+     *
+     * @param fileName Path to the selected file.
      */
     void fileSelected(const QString& fileName);
 
     /**
      * @brief Emitted when an image is dropped into the window.
-     *      * @param path Path to the dropped file.
+     *
+     * @param path Path to the dropped file.
      */
     void imageDropped(const QString& path);
 

@@ -37,15 +37,18 @@ class PanBehavior : public ImageViewerBehavior
 public:
     /**
      * @brief Constructs the pan behavior.
-     *      * @param button Mouse button used to trigger panning
+     *
+     * @param button Mouse button used to trigger panning
      *               (default: Qt::LeftButton).
      */
     explicit PanBehavior(Qt::MouseButton button = Qt::LeftButton);
 
     /**
      * @brief Handles mouse press events.
-     *      * Starts panning if the configured button is pressed.
-     *      * @param view Associated image viewer.
+     *
+     * Starts panning if the configured button is pressed.
+     *
+     * @param view Associated image viewer.
      * @param event Mouse event.
      * @return true if the event is handled and capture begins.
      */
@@ -53,8 +56,10 @@ public:
 
     /**
      * @brief Handles mouse move events.
-     *      * Translates the view according to mouse movement while capturing.
-     *      * @param view Associated image viewer.
+     *
+     * Translates the view according to mouse movement while capturing.
+     *
+     * @param view Associated image viewer.
      * @param event Mouse event.
      * @return true if the event is handled.
      */
@@ -62,8 +67,10 @@ public:
 
     /**
      * @brief Handles mouse release events.
-     *      * Stops panning when the configured button is released.
-     *      * @param view Associated image viewer.
+     *
+     * Stops panning when the configured button is released.
+     *
+     * @param view Associated image viewer.
      * @param event Mouse event.
      * @return true if the event is handled.
      */
@@ -71,7 +78,8 @@ public:
 
     /**
      * @brief Returns the cursor when the behavior is active.
-     *      * @return Closed hand cursor during dragging.
+     *
+     * @return Closed hand cursor during dragging.
      */
     Qt::CursorShape activeCursor() const override
     {
@@ -80,11 +88,14 @@ public:
 
     /**
      * @brief Returns the cursor when the behavior is available.
-     *      * Determines whether panning is possible at the current position and
+     *
+     * Determines whether panning is possible at the current position and
      * adapts the cursor accordingly.
-     *      * If the cursor is over a movable graphics item, panning is disabled
+     *
+     * If the cursor is over a movable graphics item, panning is disabled
      * and the default cursor is used.
-     *      * @param hasImage True if an image is loaded.
+     *
+     * @param hasImage True if an image is loaded.
      * @param isPanRelevant True if panning is meaningful in current state.
      * @param view Associated image viewer.
      * @param e Optional mouse event (can be null).
@@ -119,7 +130,8 @@ public:
 
     /**
      * @brief Cancels the behavior.
-     *      * Stops any ongoing panning interaction.
+     *
+     * Stops any ongoing panning interaction.
      */
     void cancel() override
     {
@@ -128,7 +140,8 @@ public:
 
     /**
      * @brief Returns the priority of this behavior.
-     *      * Higher priority behaviors are processed first.
+     *
+     * Higher priority behaviors are processed first.
      */
     int priority() const override
     {

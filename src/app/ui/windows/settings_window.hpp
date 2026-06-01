@@ -70,14 +70,16 @@ class SettingsWindow : public QDialog
 public:
     /**
      * @brief Constructs the settings dialog.
-     *      * @param config Initial image session configuration.
+     *
+     * @param config Initial image session configuration.
      * @param parent Optional parent widget.
      */
     SettingsWindow(const ImageSessionSettings& config, QWidget* parent = nullptr);
 
     /**
      * @brief Updates the dialog with a new input image.
-     *      * @param inputImage Input image used for preview and initialization.
+     *
+     * @param inputImage Input image used for preview and initialization.
      */
     void handleInputImageReady(const QImage& inputImage);
 
@@ -236,7 +238,7 @@ private:
     ImageViewerWidget* imageViewer_ = nullptr;
     InitializationBehavior* initializationBehavior_ = nullptr;
     ImageSettingsController* imageSettingsController_ = nullptr;
-    int wheelAccumulator_ = 0;
+    int wheelAccumulator_{0};
 
     ////////////////////////////////////////
     /////////       Model              /////

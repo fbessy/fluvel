@@ -23,7 +23,8 @@ class FullscreenBehavior : public ImageViewerBehavior
 public:
     /**
      * @brief Handles mouse double-click events.
-     *      * Toggles fullscreen mode.
+     *
+     * Toggles fullscreen mode.
      */
     bool mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* event) override;
 };

@@ -65,7 +65,8 @@ public:
 
     /**
      * @brief Set visibility of the settings view.
-     *      * When hidden, updates may be deferred to avoid unnecessary processing.
+     *
+     * When hidden, updates may be deferred to avoid unnecessary processing.
      */
     void setViewVisible(bool v);
 
@@ -97,7 +98,8 @@ public:
 
     /**
      * @brief Commit current edits and return resulting phi as image.
-     *      * @return Image representing the committed state.
+     *
+     * @return Image representing the committed state.
      */
     QImage commit();
 
@@ -137,7 +139,8 @@ private:
 
     /**
      * @brief Convert UI shape to image-space shape.
-     *      * @param uiShape Shape in normalized UI coordinates.
+     *
+     * @param uiShape Shape in normalized UI coordinates.
      * @param targetSize Target image size.
      * @return Shape in image coordinates.
      */

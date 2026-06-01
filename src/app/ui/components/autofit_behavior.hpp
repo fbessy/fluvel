@@ -21,14 +21,16 @@ class AutoFitBehavior : public ImageViewerBehavior
 public:
     /**
      * @brief Constructs the auto-fit behavior.
-     *      * @param button Mouse button used to trigger auto-fit
+     *
+     * @param button Mouse button used to trigger auto-fit
      *               (default: Qt::MiddleButton).
      */
     explicit AutoFitBehavior(Qt::MouseButton button = Qt::MiddleButton);
 
     /**
      * @brief Handles mouse release events.
-     *      * Triggers automatic fitting of the image to the view.
+     *
+     * Triggers automatic fitting of the image to the view.
      */
     bool mouseRelease(ImageViewerWidget& view, QMouseEvent* event) override;
 
