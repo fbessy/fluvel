@@ -14,9 +14,16 @@ ZoomOverlayController::ZoomOverlayController(OverlayTextItem* item, QObject* par
     : QObject(parent)
     , item_(item)
 {
+    assert(item_);
+
     timer_.setSingleShot(true);
 
     connect(&timer_, &QTimer::timeout, this, &ZoomOverlayController::onTimeout);
+
+    anim_.setTargetObject(item_);
+    anim_.setPropertyName("opacity");
+
+    connect(&anim_, &QPropertyAnimation::finished, this, &ZoomOverlayController::onFadeFinished);
 
     item_->setOpacity(1.0);
     item_->setVisible(false);
@@ -24,22 +31,12 @@ ZoomOverlayController::ZoomOverlayController(OverlayTextItem* item, QObject* par
 
 void ZoomOverlayController::show(int percent)
 {
-    if (!item_)
-        return;
-
-    // stop animation en cours
-    if (anim_)
-    {
-        anim_->stop();
-        anim_->deleteLater();
-        anim_ = nullptr;
-    }
+    anim_.stop();
 
     item_->setOpacity(1.0);
     item_->setText(QString("%1%").arg(percent));
     item_->setVisible(true);
 
-    // restart timer
     timer_.start(displayDurationMs_);
 }
 
@@ -50,28 +47,19 @@ void ZoomOverlayController::onTimeout()
 
 void ZoomOverlayController::startFade()
 {
-    if (!item_)
-        return;
+    anim_.stop();
 
-    anim_ = new QPropertyAnimation(item_, "opacity", this);
-    anim_->setDuration(fadeDurationMs_);
-    anim_->setStartValue(1.0);
-    anim_->setEndValue(0.0);
+    anim_.setDuration(fadeDurationMs_);
+    anim_.setStartValue(1.0);
+    anim_.setEndValue(0.0);
 
-    connect(anim_, &QPropertyAnimation::finished, this, &ZoomOverlayController::onFadeFinished);
-
-    anim_->start(QAbstractAnimation::DeleteWhenStopped);
+    anim_.start();
 }
 
 void ZoomOverlayController::onFadeFinished()
 {
-    if (!item_)
-        return;
-
     item_->setVisible(false);
     item_->setOpacity(1.0);
-
-    anim_ = nullptr;
 }
 
 } // namespace fluvel
