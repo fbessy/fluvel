@@ -131,7 +131,7 @@ void ContourData::defineFromEllipse()
 
     BoundaryBuilder lists_init(phi_.width(), phi_.height(), outerBoundary_, innerBoundary_);
 
-    lists_init.generate_ellipse_points(0.8f, 0.8f);
+    lists_init.generateEllipsePoints(0.8f, 0.8f);
 
     definePhiFromLists();
 }

@@ -13,51 +13,52 @@
 namespace fluvel_ip
 {
 
-BoundaryBuilder::BoundaryBuilder(int phiWidth, int phiHeight, ContourPoints& Lout_init,
-                                 ContourPoints& Lin_init)
-    : grid_width_(phiWidth)
-    , grid_height_(phiHeight)
-    , Lout_init_(Lout_init)
-    , Lin_init_(Lin_init)
+BoundaryBuilder::BoundaryBuilder(int gridWidth, int gridHeight, ContourPoints& outerBoundary,
+                                 ContourPoints& innerBoundary)
+    : gridWidth_(gridWidth)
+    , gridHeight_(gridHeight)
+    , outerBoundary_(outerBoundary)
+    , innerBoundary_(innerBoundary)
 {
-    assert(phiWidth >= 1);
-    assert(phiHeight >= 1);
+    assert(gridWidth >= 1);
+    assert(gridHeight >= 1);
 }
 
-void BoundaryBuilder::generate_rectangle_points(Point2D_i topLeft, Point2D_i bottomRight,
-                                                BoundaryOrientation orientation)
+void BoundaryBuilder::generateRectanglePoints(Point2D_i topLeft, Point2D_i bottomRight,
+                                              BoundaryOrientation orientation)
 {
-    auto* list1 = &Lout_init_;
-    auto* list2 = &Lin_init_;
+    auto* outerBoundary = &outerBoundary_;
+    auto* innerBoundary = &innerBoundary_;
 
     if (orientation == BoundaryOrientation::Reversed)
     {
-        std::swap(list1, list2);
+        std::swap(outerBoundary, innerBoundary);
     }
 
-    generate_rectangle_points(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y, *list1,
-                              *list2);
+    generateRectanglePoints(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y, *outerBoundary,
+                            *innerBoundary);
 }
 
-void BoundaryBuilder::generate_rectangle_points(Point2D_f topLeft, Point2D_f bottomRight,
-                                                BoundaryOrientation orientation)
+void BoundaryBuilder::generateRectanglePoints(Point2D_f topLeft, Point2D_f bottomRight,
+                                              BoundaryOrientation orientation)
 {
-    auto* list1 = &Lout_init_;
-    auto* list2 = &Lin_init_;
+    auto* outerBoundary = &outerBoundary_;
+    auto* innerBoundary = &innerBoundary_;
 
     if (orientation == BoundaryOrientation::Reversed)
     {
-        std::swap(list1, list2);
+        std::swap(outerBoundary, innerBoundary);
     }
 
-    generate_rectangle_points(std::lround(topLeft.x * grid_width_),
-                              std::lround(topLeft.y * grid_height_),
-                              std::lround(bottomRight.x * grid_width_),
-                              std::lround(bottomRight.y * grid_height_), *list1, *list2);
+    generateRectanglePoints(
+        std::lround(topLeft.x * gridWidth_), std::lround(topLeft.y * gridHeight_),
+        std::lround(bottomRight.x * gridWidth_), std::lround(bottomRight.y * gridHeight_),
+        *outerBoundary, *innerBoundary);
 }
 
-void BoundaryBuilder::generate_rectangle_points(int x1, int y1, int x2, int y2,
-                                                ContourPoints& list_out, ContourPoints& list_in)
+void BoundaryBuilder::generateRectanglePoints(int x1, int y1, int x2, int y2,
+                                              ContourPoints& outerBoundary,
+                                              ContourPoints& innerBoundary)
 {
     if (x1 > x2)
     {
@@ -70,115 +71,116 @@ void BoundaryBuilder::generate_rectangle_points(int x1, int y1, int x2, int y2,
 
     if (x1 != x2 && y1 != y2)
     {
-        generate_rectangle_points_for_one_list(list_in, x1, y1, x2, y2);
+        generateRectanglePointsForOneList(innerBoundary, x1, y1, x2, y2);
 
 #ifdef ALGO_8_CONNEXITY
-        generate_rectangle_points_for_one_list(list_out, x1 - 1, y1 - 1, x2 + 1, y2 + 1);
+        generateRectanglePointsForOneList(outerBoundary, x1 - 1, y1 - 1, x2 + 1, y2 + 1);
 #else
         for (int x = x1; x <= x2; ++x)
         {
-            if (x >= 0 && x < grid_width_)
+            if (x >= 0 && x < gridWidth_)
             {
-                if (y1 - 1 >= 0 && y1 - 1 < grid_height_)
-                    list_out.emplace_back(x, y1 - 1);
+                if (y1 - 1 >= 0 && y1 - 1 < gridHeight_)
+                    outerBoundary.emplace_back(x, y1 - 1);
 
-                if (y2 + 1 >= 0 && y2 + 1 < grid_height_)
-                    list_out.emplace_back(x, y2 + 1);
+                if (y2 + 1 >= 0 && y2 + 1 < gridHeight_)
+                    outerBoundary.emplace_back(x, y2 + 1);
             }
         }
 
         for (int y = y1; y <= y2; ++y)
         {
-            if (y >= 0 && y < grid_height_)
+            if (y >= 0 && y < gridHeight_)
             {
-                if (x1 - 1 >= 0 && x1 - 1 < grid_width_)
-                    list_out.emplace_back(x1 - 1, y);
+                if (x1 - 1 >= 0 && x1 - 1 < gridWidth_)
+                    outerBoundary.emplace_back(x1 - 1, y);
 
-                if (x2 + 1 >= 0 && x2 + 1 < grid_width_)
-                    list_out.emplace_back(x2 + 1, y);
+                if (x2 + 1 >= 0 && x2 + 1 < gridWidth_)
+                    outerBoundary.emplace_back(x2 + 1, y);
             }
         }
 #endif
     }
 }
 
-void BoundaryBuilder::generate_rectangle_points_for_one_list(ContourPoints& list_init, int x1,
-                                                             int y1, int x2, int y2)
+void BoundaryBuilder::generateRectanglePointsForOneList(ContourPoints& boundary, int x1, int y1,
+                                                        int x2, int y2)
 {
     for (int x = x1; x <= x2; ++x)
     {
-        if (x >= 0 && x < grid_width_)
+        if (x >= 0 && x < gridWidth_)
         {
-            if (y1 >= 0 && y1 < grid_height_)
-                list_init.emplace_back(x, y1);
+            if (y1 >= 0 && y1 < gridHeight_)
+                boundary.emplace_back(x, y1);
 
-            if (y2 >= 0 && y2 < grid_height_)
-                list_init.emplace_back(x, y2);
+            if (y2 >= 0 && y2 < gridHeight_)
+                boundary.emplace_back(x, y2);
         }
     }
 
     for (int y = y1 + 1; y < y2; ++y)
     {
-        if (y >= 0 && y < grid_height_)
+        if (y >= 0 && y < gridHeight_)
         {
-            if (x1 >= 0 && x1 < grid_width_)
-                list_init.emplace_back(x1, y);
+            if (x1 >= 0 && x1 < gridWidth_)
+                boundary.emplace_back(x1, y);
 
-            if (x2 >= 0 && x2 < grid_width_)
-                list_init.emplace_back(x2, y);
+            if (x2 >= 0 && x2 < gridWidth_)
+                boundary.emplace_back(x2, y);
         }
     }
 }
 
-void BoundaryBuilder::generate_ellipse_points(int width, int height, Point2D_i center,
-                                              BoundaryOrientation orientation)
+void BoundaryBuilder::generateEllipsePoints(int width, int height, Point2D_i center,
+                                            BoundaryOrientation orientation)
 {
-    auto* list1 = &Lout_init_;
-    auto* list2 = &Lin_init_;
+    auto* outerBoundary = &outerBoundary_;
+    auto* innerBoundary = &innerBoundary_;
 
     if (orientation == BoundaryOrientation::Reversed)
     {
-        std::swap(list1, list2);
+        std::swap(outerBoundary, innerBoundary);
     }
 
     const int a = width / 2;
     const int b = height / 2;
 
-    generate_ellipse_points(center.x, center.y, a, b, *list1, *list2);
+    generateEllipsePoints(center.x, center.y, a, b, *outerBoundary, *innerBoundary);
 }
 
-void BoundaryBuilder::generate_ellipse_points(float width_ratio, float height_ratio,
-                                              Point2D_f center, BoundaryOrientation orientation)
+void BoundaryBuilder::generateEllipsePoints(float widthRatio, float heightRatio, Point2D_f center,
+                                            BoundaryOrientation orientation)
 {
-    auto* list1 = &Lout_init_;
-    auto* list2 = &Lin_init_;
+    auto* outerBoundary = &outerBoundary_;
+    auto* innerBoundary = &innerBoundary_;
 
     if (orientation == BoundaryOrientation::Reversed)
     {
-        std::swap(list1, list2);
+        std::swap(outerBoundary, innerBoundary);
     }
 
-    const float cx = (center.x + 0.5f) * grid_width_;
-    const float cy = (center.y + 0.5f) * grid_height_;
+    const float cx = (center.x + 0.5f) * gridWidth_;
+    const float cy = (center.y + 0.5f) * gridHeight_;
 
     const int x0 = std::lround(cx);
     const int y0 = std::lround(cy);
 
-    const int a = std::lround((width_ratio / 2.f) * grid_width_);
-    const int b = std::lround((height_ratio / 2.f) * grid_height_);
+    const int a = std::lround((widthRatio / 2.f) * gridWidth_);
+    const int b = std::lround((heightRatio / 2.f) * gridHeight_);
 
-    generate_ellipse_points(x0, y0, a, b, *list1, *list2);
+    generateEllipsePoints(x0, y0, a, b, *outerBoundary, *innerBoundary);
 }
 
-void BoundaryBuilder::generate_ellipse_points(int x0, int y0, int a, int b, ContourPoints& list_out,
-                                              ContourPoints& list_in)
+void BoundaryBuilder::generateEllipsePoints(int x0, int y0, int a, int b,
+                                            ContourPoints& outerBoundary,
+                                            ContourPoints& innerBoundary)
 {
-    build_ellipse_midpoint_connected(x0, y0, a, b, list_out);
-    build_inner_contiguous(x0, y0, list_out, list_in);
+    buildEllipseMidpointConnected(x0, y0, a, b, outerBoundary);
+    buildInnerContiguous(x0, y0, outerBoundary, innerBoundary);
 }
 
-void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, int b,
-                                                       ContourPoints& list_out)
+void BoundaryBuilder::buildEllipseMidpointConnected(int x0, int y0, int a, int b,
+                                                    ContourPoints& outerBoundary)
 {
     int x = 0;
     int y = b;
@@ -200,7 +202,7 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, in
     while (dx < dy)
     {
         // Ajout du point principal
-        add_4_points_in_ellipse(list_out, x, y, x0, y0);
+        add4pointsInEllipse(outerBoundary, x, y, x0, y0);
 
         // ---- Connexité 8 ----
         int dxp = x - prev_x;
@@ -209,7 +211,7 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, in
         if (abs(dxp) == 1 && abs(dyp) == 1)
         {
             // pixel correcteur (choix simple et sûr)
-            add_4_points_in_ellipse(list_out, prev_x, y, x0, y0);
+            add4pointsInEllipse(outerBoundary, prev_x, y, x0, y0);
         }
 
         prev_x = x;
@@ -239,7 +241,7 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, in
     // -------- Région 2 --------
     while (y >= 0)
     {
-        add_4_points_in_ellipse(list_out, x, y, x0, y0);
+        add4pointsInEllipse(outerBoundary, x, y, x0, y0);
 
         // ---- Connexité 8 ----
         int dxp = x - prev_x;
@@ -247,7 +249,7 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, in
 
         if (std::abs(dxp) == 1 && std::abs(dyp) == 1)
         {
-            add_4_points_in_ellipse(list_out, x, prev_y, x0, y0);
+            add4pointsInEllipse(outerBoundary, x, prev_y, x0, y0);
         }
 
         prev_x = x;
@@ -269,35 +271,35 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, in
     }
 }
 
-void BoundaryBuilder::build_inner_contiguous(int x0, int y0, const ContourPoints& outerBoundary,
-                                             ContourPoints& innerBoundary)
+void BoundaryBuilder::buildInnerContiguous(int x0, int y0, const ContourPoints& outerBoundary,
+                                           ContourPoints& innerBoundary)
 {
     PointSet seen;
     seen.reserve(outerBoundary.size());
 
-    for (const auto& p : outerBoundary)
+    for (const auto& point : outerBoundary)
     {
-        const int sx = math::sign(x0 - p.x());
-        const int sy = math::sign(y0 - p.y());
+        const int sx = math::sign(x0 - point.x());
+        const int sy = math::sign(y0 - point.y());
 
-        const Point2D_i pi{p.x() + sx, p.y() + sy};
+        const Point2D_i candidatePoint{point.x() + sx, point.y() + sy};
 
-        if (!inside_grid(pi))
+        if (!insideGrid(candidatePoint))
             continue;
 
-        if (seen.insert(pi).second)
-            innerBoundary.emplace_back(pi);
+        if (seen.insert(candidatePoint).second)
+            innerBoundary.emplace_back(candidatePoint);
     }
 }
 
-void BoundaryBuilder::check_duplicates(const ContourPoints& contour)
+void BoundaryBuilder::checkDuplicates(const ContourPoints& contour)
 {
     PointSet seen;
     seen.reserve(contour.size());
 
-    for (const auto& p : contour)
+    for (const auto& contourPoint : contour)
     {
-        const Point2D_i point{p.x(), p.y()};
+        const Point2D_i point{contourPoint.x(), contourPoint.y()};
 
         if (!seen.insert(point).second)
         {

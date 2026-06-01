@@ -37,13 +37,13 @@ public:
     /**
      * @brief Construct a BoundaryBuilder.
      *
-     * @param phi_width1 Width of the grid (phi domain).
-     * @param phi_height1 Height of the grid (phi domain).
-     * @param l_out_init1 Reference to the outer boundary container.
-     * @param l_in_init1 Reference to the inner boundary container.
+     * @param gridWidth Width of the grid (phi domain).
+     * @param gridHeight Height of the grid (phi domain).
+     * @param outerBoundary Reference to the outer boundary container.
+     * @param innerBoundary Reference to the inner boundary container.
      */
-    BoundaryBuilder(int phi_width1, int phi_height1, ContourPoints& l_out_init1,
-                    ContourPoints& l_in_init1);
+    BoundaryBuilder(int gridWidth, int gridHeight, ContourPoints& outerBoundary,
+                    ContourPoints& innerBoundary);
 
     /**
      * @brief Generate a rectangular boundary using integer coordinates.
@@ -52,8 +52,8 @@ public:
      * @param bottomRight Bottom-right corner of the rectangle.
      * @param orientation Boundary orientation (Normal or Reversed).
      */
-    void generate_rectangle_points(Point2D_i topLeft, Point2D_i bottomRight,
-                                   BoundaryOrientation orientation = BoundaryOrientation::Normal);
+    void generateRectanglePoints(Point2D_i topLeft, Point2D_i bottomRight,
+                                 BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     /**
      * @brief Generate a rectangular boundary using normalized coordinates.
@@ -64,8 +64,8 @@ public:
      * @param bottomRight Bottom-right corner (normalized).
      * @param orientation Boundary orientation (Normal or Reversed).
      */
-    void generate_rectangle_points(Point2D_f topLeft, Point2D_f bottomRight,
-                                   BoundaryOrientation orientation = BoundaryOrientation::Normal);
+    void generateRectanglePoints(Point2D_f topLeft, Point2D_f bottomRight,
+                                 BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     /**
      * @brief Generate an ellipse boundary using integer parameters.
@@ -75,113 +75,112 @@ public:
      * @param center Center of the ellipse.
      * @param orientation Boundary orientation (Normal or Reversed).
      */
-    void generate_ellipse_points(int width, int height, Point2D_i center,
-                                 BoundaryOrientation orientation = BoundaryOrientation::Normal);
+    void generateEllipsePoints(int width, int height, Point2D_i center,
+                               BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
     /**
      * @brief Generate an ellipse boundary using normalized parameters.
      *
      * Width and height are expressed as ratios relative to the grid size.
      *
-     * @param width_ratio Width ratio in [0,1].
-     * @param height_ratio Height ratio in [0,1].
+     * @param widthRatio Width ratio in [0,1].
+     * @param heightRatio Height ratio in [0,1].
      * @param center Center position (normalized, default = {0,0}).
      * @param orientation Boundary orientation (Normal or Reversed).
      */
-    void generate_ellipse_points(float width_ratio, float height_ratio, Point2D_f center = {},
-                                 BoundaryOrientation orientation = BoundaryOrientation::Normal);
+    void generateEllipsePoints(float widthRatio, float heightRatio, Point2D_f center = {},
+                               BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
 private:
     /**
      * @brief Generate rectangle points using integer coordinates.
      */
-    void generate_rectangle_points(int x1, int y1, int x2, int y2, ContourPoints& list_out,
-                                   ContourPoints& list_in);
+    void generateRectanglePoints(int x1, int y1, int x2, int y2, ContourPoints& outerBoundary,
+                                 ContourPoints& innerBoundary);
 
     /**
      * @brief Generate rectangle points for a single contour list.
      */
-    void generate_rectangle_points_for_one_list(ContourPoints& list_init, int x1, int y1, int x2,
-                                                int y2);
+    void generateRectanglePointsForOneList(ContourPoints& boundary, int x1, int y1, int x2, int y2);
 
     /**
      * @brief Generate ellipse points using integer parameters.
      */
-    void generate_ellipse_points(int x0, int y0, int a, int b, ContourPoints& list_out,
-                                 ContourPoints& list_in);
+    void generateEllipsePoints(int x0, int y0, int a, int b, ContourPoints& outerBoundary,
+                               ContourPoints& innerBoundary);
 
     /**
      * @brief Build an ellipse using a midpoint algorithm (connected boundary).
      */
-    void build_ellipse_midpoint_connected(int x0, int y0, int a, int b, ContourPoints& list_out);
+    void buildEllipseMidpointConnected(int x0, int y0, int a, int b, ContourPoints& outerBoundary);
 
     /**
      * @brief Build the inner boundary from the outer boundary.
      */
-    void build_inner_contiguous(int x0, int y0, const ContourPoints& outerBoundary,
-                                ContourPoints& innerBoundary);
+    void buildInnerContiguous(int x0, int y0, const ContourPoints& outerBoundary,
+                              ContourPoints& innerBoundary);
 
     /**
      * @brief Debug utility to check duplicate points in a contour.
      */
-    void check_duplicates(const ContourPoints& contour);
+    void checkDuplicates(const ContourPoints& contour);
 
     /**
      * @brief Add the 4 symmetric points of an ellipse.
      */
-    void add_4_points_in_ellipse(ContourPoints& list_init, int x, int y, int x0, int y0);
+    void add4pointsInEllipse(ContourPoints& boundary, int x, int y, int x0, int y0);
 
     /**
      * @brief Add a point if it is not already present (local duplicate check).
      *
      * Only checks the last few inserted points for efficiency.
      */
-    void add_point_unique(ContourPoints& out, int x, int y);
+    void addPointUnique(ContourPoints& boundary, int x, int y);
 
     /**
      * @brief Check if a coordinate is inside the grid.
      */
-    bool inside_grid(int x, int y) const;
+    bool insideGrid(int x, int y) const;
 
     /**
      * @brief Check if a point is inside the grid.
      */
-    inline bool inside_grid(const Point2D_i& p) const;
+    inline bool insideGrid(const Point2D_i& p) const;
 
-    int grid_width_;  ///< Width of the grid.
-    int grid_height_; ///< Height of the grid.
+    int gridWidth_;  ///< Width of the grid.
+    int gridHeight_; ///< Height of the grid.
 
-    ContourPoints& Lout_init_; ///< Outer boundary container.
-    ContourPoints& Lin_init_;  ///< Inner boundary container.
+    ContourPoints& outerBoundary_; ///< Outer boundary container.
+    ContourPoints& innerBoundary_; ///< Inner boundary container.
 };
 
-inline bool BoundaryBuilder::inside_grid(int x, int y) const
+inline bool BoundaryBuilder::insideGrid(int x, int y) const
 {
-    return x >= 0 && x < grid_width_ && y >= 0 && y < grid_height_;
+    return x >= 0 && x < gridWidth_ && y >= 0 && y < gridHeight_;
 }
 
-inline bool BoundaryBuilder::inside_grid(const Point2D_i& p) const
+inline bool BoundaryBuilder::insideGrid(const Point2D_i& p) const
 {
-    return inside_grid(p.x, p.y);
+    return insideGrid(p.x, p.y);
 }
 
 /**
  * @brief Add symmetric points of an ellipse while respecting grid bounds.
  */
-inline void BoundaryBuilder::add_4_points_in_ellipse(ContourPoints& list, int x, int y, int x0,
-                                                     int y0)
+inline void BoundaryBuilder::add4pointsInEllipse(ContourPoints& boundary, int x, int y, int x0,
+                                                 int y0)
 {
-    if (inside_grid(x0 - x, y0 - y))
-        add_point_unique(list, x0 - x, y0 - y);
+    if (insideGrid(x0 - x, y0 - y))
+        addPointUnique(boundary, x0 - x, y0 - y);
 
-    if (inside_grid(x0 - x, y0 + y))
-        add_point_unique(list, x0 - x, y0 + y);
+    if (insideGrid(x0 - x, y0 + y))
+        addPointUnique(boundary, x0 - x, y0 + y);
 
-    if (inside_grid(x0 + x, y0 - y))
-        add_point_unique(list, x0 + x, y0 - y);
+    if (insideGrid(x0 + x, y0 - y))
+        addPointUnique(boundary, x0 + x, y0 - y);
 
-    if (inside_grid(x0 + x, y0 + y))
-        add_point_unique(list, x0 + x, y0 + y);
+    if (insideGrid(x0 + x, y0 + y))
+        addPointUnique(boundary, x0 + x, y0 + y);
 }
 
 /**
@@ -190,22 +189,22 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(ContourPoints& list, int x,
  * This function performs a local duplicate check on the last inserted points
  * (sliding window) to avoid redundant entries while keeping performance high.
  */
-inline void BoundaryBuilder::add_point_unique(ContourPoints& out, int x, int y)
+inline void BoundaryBuilder::addPointUnique(ContourPoints& boundary, int x, int y)
 {
-    const ContourPoint p{x, y};
+    const ContourPoint point{x, y};
 
     constexpr size_t WINDOW = 4;
-    const size_t n = out.size();
+    const size_t n = boundary.size();
 
     const size_t begin = (n > WINDOW) ? (n - WINDOW) : 0;
 
     for (size_t i = begin; i < n; ++i)
     {
-        if (out[i] == p)
+        if (boundary[i] == point)
             return;
     }
 
-    out.push_back(p);
+    boundary.push_back(point);
 }
 
 } // namespace fluvel_ip
