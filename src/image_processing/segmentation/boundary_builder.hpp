@@ -35,6 +35,39 @@ class BoundaryBuilder
 {
 public:
     /**
+     * @brief Generate an elliptical contour set.
+     *
+     * Creates the outer and inner boundaries of an ellipse defined
+     * on a grid of the specified size.
+     *
+     * @param width Grid width.
+     * @param height Grid height.
+     * @param widthRatio Ellipse width ratio relative to the grid width.
+     * @param heightRatio Ellipse height ratio relative to the grid height.
+     *
+     * @return Generated contour set.
+     */
+    static ContourPointsSet generateEllipse(int width, int height, float widthRatio,
+                                            float heightRatio);
+
+    /**
+     * @brief Generate a rectangular contour set.
+     *
+     * Creates the outer and inner boundaries of a rectangle defined
+     * by normalized coordinates.
+     *
+     * @param width Grid width.
+     * @param height Grid height.
+     * @param topLeft Top-left corner in normalized coordinates.
+     * @param bottomRight Bottom-right corner in normalized coordinates.
+     *
+     * @return Generated contour set.
+     */
+    static ContourPointsSet generateRectangle(int width, int height, Point2D_f topLeft,
+                                              Point2D_f bottomRight);
+
+private:
+    /**
      * @brief Construct a BoundaryBuilder.
      *
      * @param gridWidth Width of the grid (phi domain).
@@ -91,7 +124,6 @@ public:
     void generateEllipsePoints(float widthRatio, float heightRatio, Point2D_f center = {},
                                BoundaryOrientation orientation = BoundaryOrientation::Normal);
 
-private:
     /**
      * @brief Generate rectangle points using integer coordinates.
      */

@@ -13,6 +13,36 @@
 namespace fluvel_ip
 {
 
+ContourPointsSet BoundaryBuilder::generateEllipse(int width, int height, float widthRatio,
+                                                  float heightRatio)
+{
+    ContourPointsSet contourSet;
+
+    contourSet.gridWidth = width;
+    contourSet.gridHeight = height;
+
+    BoundaryBuilder builder(width, height, contourSet.outer, contourSet.inner);
+
+    builder.generateEllipsePoints(widthRatio, heightRatio);
+
+    return contourSet;
+}
+
+ContourPointsSet BoundaryBuilder::generateRectangle(int width, int height, Point2D_f topLeft,
+                                                    Point2D_f bottomRight)
+{
+    ContourPointsSet contourSet;
+
+    contourSet.gridWidth = width;
+    contourSet.gridHeight = height;
+
+    BoundaryBuilder builder(width, height, contourSet.outer, contourSet.inner);
+
+    builder.generateRectanglePoints(topLeft, bottomRight);
+
+    return contourSet;
+}
+
 BoundaryBuilder::BoundaryBuilder(int gridWidth, int gridHeight, ContourPoints& outerBoundary,
                                  ContourPoints& innerBoundary)
     : gridWidth_(gridWidth)
@@ -22,6 +52,13 @@ BoundaryBuilder::BoundaryBuilder(int gridWidth, int gridHeight, ContourPoints& o
 {
     assert(gridWidth >= 1);
     assert(gridHeight >= 1);
+
+    const size_t perimeter = static_cast<size_t>(2 * (gridWidth + gridHeight));
+
+    const size_t reserveSize = 3 * perimeter;
+
+    outerBoundary_.reserve(reserveSize);
+    innerBoundary_.reserve(reserveSize);
 }
 
 void BoundaryBuilder::generateRectanglePoints(Point2D_i topLeft, Point2D_i bottomRight,

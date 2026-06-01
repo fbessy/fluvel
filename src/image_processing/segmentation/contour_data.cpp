@@ -126,12 +126,10 @@ void ContourData::allocateLists()
 
 void ContourData::defineFromEllipse()
 {
-    outerBoundary_.clear();
-    innerBoundary_.clear();
+    auto contourSet = BoundaryBuilder::generateEllipse(phi_.width(), phi_.height(), 0.8f, 0.8f);
 
-    BoundaryBuilder lists_init(phi_.width(), phi_.height(), outerBoundary_, innerBoundary_);
-
-    lists_init.generateEllipsePoints(0.8f, 0.8f);
+    outerBoundary_ = std::move(contourSet.outer);
+    innerBoundary_ = std::move(contourSet.inner);
 
     definePhiFromLists();
 }

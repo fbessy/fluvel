@@ -253,6 +253,24 @@ constexpr inline Point2D_i toPoint2D(const ContourPoint& point)
 }
 
 /**
+ * @brief Pair of contour boundaries associated with a grid domain.
+ *
+ * Stores the outer and inner contour representations together with
+ * the dimensions of the grid on which they are defined.
+ *
+ * The grid dimensions allow contour-based operations to be performed
+ * without requiring access to the underlying phi level-set.
+ */
+struct ContourPointsSet
+{
+    ContourPoints outer;
+    ContourPoints inner;
+
+    int gridWidth{0};
+    int gridHeight{0};
+};
+
+/**
  * @brief Pixel connectivity used by the algorithm.
  *
  * Determines neighborhood definition:
