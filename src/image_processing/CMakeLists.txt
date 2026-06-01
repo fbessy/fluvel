@@ -51,8 +51,8 @@ set(ip_src
     ${SEGMENTATION_DIR}/active_contour_types.hpp
     ${SEGMENTATION_DIR}/speed_model_types.hpp
 
-    ${SEGMENTATION_DIR}/boundary_builder.cpp
-    ${SEGMENTATION_DIR}/boundary_builder.hpp
+    ${SEGMENTATION_DIR}/boundary_factory.cpp
+    ${SEGMENTATION_DIR}/boundary_factory.hpp
 
     ${SEGMENTATION_DIR}/contour_data.cpp
     ${SEGMENTATION_DIR}/contour_data.hpp

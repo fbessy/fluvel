@@ -31,7 +31,7 @@ enum class BoundaryOrientation
  * It is typically used to initialize active contour algorithms with a valid
  * starting shape.
  */
-class BoundaryBuilder
+class BoundaryFactory
 {
 public:
     /**
@@ -68,14 +68,14 @@ public:
 
 private:
     /**
-     * @brief Construct a BoundaryBuilder.
+     * @brief Construct a BoundaryFactory.
      *
      * @param gridWidth Width of the grid (phi domain).
      * @param gridHeight Height of the grid (phi domain).
      * @param outerBoundary Reference to the outer boundary container.
      * @param innerBoundary Reference to the inner boundary container.
      */
-    BoundaryBuilder(int gridWidth, int gridHeight, ContourPoints& outerBoundary,
+    BoundaryFactory(int gridWidth, int gridHeight, ContourPoints& outerBoundary,
                     ContourPoints& innerBoundary);
 
     /**
@@ -186,12 +186,12 @@ private:
     ContourPoints& innerBoundary_; ///< Inner boundary container.
 };
 
-inline bool BoundaryBuilder::insideGrid(int x, int y) const
+inline bool BoundaryFactory::insideGrid(int x, int y) const
 {
     return x >= 0 && x < gridWidth_ && y >= 0 && y < gridHeight_;
 }
 
-inline bool BoundaryBuilder::insideGrid(const Point2D_i& p) const
+inline bool BoundaryFactory::insideGrid(const Point2D_i& p) const
 {
     return insideGrid(p.x, p.y);
 }
@@ -199,7 +199,7 @@ inline bool BoundaryBuilder::insideGrid(const Point2D_i& p) const
 /**
  * @brief Add symmetric points of an ellipse while respecting grid bounds.
  */
-inline void BoundaryBuilder::add4pointsInEllipse(ContourPoints& boundary, int x, int y, int x0,
+inline void BoundaryFactory::add4pointsInEllipse(ContourPoints& boundary, int x, int y, int x0,
                                                  int y0)
 {
     if (insideGrid(x0 - x, y0 - y))
@@ -221,7 +221,7 @@ inline void BoundaryBuilder::add4pointsInEllipse(ContourPoints& boundary, int x,
  * This function performs a local duplicate check on the last inserted points
  * (sliding window) to avoid redundant entries while keeping performance high.
  */
-inline void BoundaryBuilder::addPointUnique(ContourPoints& boundary, int x, int y)
+inline void BoundaryFactory::addPointUnique(ContourPoints& boundary, int x, int y)
 {
     const ContourPoint point{x, y};
 

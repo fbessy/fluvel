@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "boundary_builder.hpp"
+#include "boundary_factory.hpp"
 
 #include "fluvel_math.hpp"
 #include "point_containers.hpp"
@@ -13,7 +13,7 @@
 namespace fluvel_ip
 {
 
-ContourPointsSet BoundaryBuilder::generateEllipse(int width, int height, float widthRatio,
+ContourPointsSet BoundaryFactory::generateEllipse(int width, int height, float widthRatio,
                                                   float heightRatio)
 {
     ContourPointsSet contourSet;
@@ -21,14 +21,14 @@ ContourPointsSet BoundaryBuilder::generateEllipse(int width, int height, float w
     contourSet.gridWidth = width;
     contourSet.gridHeight = height;
 
-    BoundaryBuilder builder(width, height, contourSet.outer, contourSet.inner);
+    BoundaryFactory builder(width, height, contourSet.outer, contourSet.inner);
 
     builder.generateEllipsePoints(widthRatio, heightRatio);
 
     return contourSet;
 }
 
-ContourPointsSet BoundaryBuilder::generateRectangle(int width, int height, Point2D_f topLeft,
+ContourPointsSet BoundaryFactory::generateRectangle(int width, int height, Point2D_f topLeft,
                                                     Point2D_f bottomRight)
 {
     ContourPointsSet contourSet;
@@ -36,14 +36,14 @@ ContourPointsSet BoundaryBuilder::generateRectangle(int width, int height, Point
     contourSet.gridWidth = width;
     contourSet.gridHeight = height;
 
-    BoundaryBuilder builder(width, height, contourSet.outer, contourSet.inner);
+    BoundaryFactory builder(width, height, contourSet.outer, contourSet.inner);
 
     builder.generateRectanglePoints(topLeft, bottomRight);
 
     return contourSet;
 }
 
-BoundaryBuilder::BoundaryBuilder(int gridWidth, int gridHeight, ContourPoints& outerBoundary,
+BoundaryFactory::BoundaryFactory(int gridWidth, int gridHeight, ContourPoints& outerBoundary,
                                  ContourPoints& innerBoundary)
     : gridWidth_(gridWidth)
     , gridHeight_(gridHeight)
@@ -61,7 +61,7 @@ BoundaryBuilder::BoundaryBuilder(int gridWidth, int gridHeight, ContourPoints& o
     innerBoundary_.reserve(reserveSize);
 }
 
-void BoundaryBuilder::generateRectanglePoints(Point2D_i topLeft, Point2D_i bottomRight,
+void BoundaryFactory::generateRectanglePoints(Point2D_i topLeft, Point2D_i bottomRight,
                                               BoundaryOrientation orientation)
 {
     auto* outerBoundary = &outerBoundary_;
@@ -76,7 +76,7 @@ void BoundaryBuilder::generateRectanglePoints(Point2D_i topLeft, Point2D_i botto
                             *innerBoundary);
 }
 
-void BoundaryBuilder::generateRectanglePoints(Point2D_f topLeft, Point2D_f bottomRight,
+void BoundaryFactory::generateRectanglePoints(Point2D_f topLeft, Point2D_f bottomRight,
                                               BoundaryOrientation orientation)
 {
     auto* outerBoundary = &outerBoundary_;
@@ -93,7 +93,7 @@ void BoundaryBuilder::generateRectanglePoints(Point2D_f topLeft, Point2D_f botto
         *outerBoundary, *innerBoundary);
 }
 
-void BoundaryBuilder::generateRectanglePoints(int x1, int y1, int x2, int y2,
+void BoundaryFactory::generateRectanglePoints(int x1, int y1, int x2, int y2,
                                               ContourPoints& outerBoundary,
                                               ContourPoints& innerBoundary)
 {
@@ -140,7 +140,7 @@ void BoundaryBuilder::generateRectanglePoints(int x1, int y1, int x2, int y2,
     }
 }
 
-void BoundaryBuilder::generateRectanglePointsForOneList(ContourPoints& boundary, int x1, int y1,
+void BoundaryFactory::generateRectanglePointsForOneList(ContourPoints& boundary, int x1, int y1,
                                                         int x2, int y2)
 {
     for (int x = x1; x <= x2; ++x)
@@ -168,7 +168,7 @@ void BoundaryBuilder::generateRectanglePointsForOneList(ContourPoints& boundary,
     }
 }
 
-void BoundaryBuilder::generateEllipsePoints(int width, int height, Point2D_i center,
+void BoundaryFactory::generateEllipsePoints(int width, int height, Point2D_i center,
                                             BoundaryOrientation orientation)
 {
     auto* outerBoundary = &outerBoundary_;
@@ -185,7 +185,7 @@ void BoundaryBuilder::generateEllipsePoints(int width, int height, Point2D_i cen
     generateEllipsePoints(center.x, center.y, a, b, *outerBoundary, *innerBoundary);
 }
 
-void BoundaryBuilder::generateEllipsePoints(float widthRatio, float heightRatio, Point2D_f center,
+void BoundaryFactory::generateEllipsePoints(float widthRatio, float heightRatio, Point2D_f center,
                                             BoundaryOrientation orientation)
 {
     auto* outerBoundary = &outerBoundary_;
@@ -208,7 +208,7 @@ void BoundaryBuilder::generateEllipsePoints(float widthRatio, float heightRatio,
     generateEllipsePoints(x0, y0, a, b, *outerBoundary, *innerBoundary);
 }
 
-void BoundaryBuilder::generateEllipsePoints(int x0, int y0, int a, int b,
+void BoundaryFactory::generateEllipsePoints(int x0, int y0, int a, int b,
                                             ContourPoints& outerBoundary,
                                             ContourPoints& innerBoundary)
 {
@@ -216,7 +216,7 @@ void BoundaryBuilder::generateEllipsePoints(int x0, int y0, int a, int b,
     buildInnerContiguous(x0, y0, outerBoundary, innerBoundary);
 }
 
-void BoundaryBuilder::buildEllipseMidpointConnected(int x0, int y0, int a, int b,
+void BoundaryFactory::buildEllipseMidpointConnected(int x0, int y0, int a, int b,
                                                     ContourPoints& outerBoundary)
 {
     int x = 0;
@@ -308,7 +308,7 @@ void BoundaryBuilder::buildEllipseMidpointConnected(int x0, int y0, int a, int b
     }
 }
 
-void BoundaryBuilder::buildInnerContiguous(int x0, int y0, const ContourPoints& outerBoundary,
+void BoundaryFactory::buildInnerContiguous(int x0, int y0, const ContourPoints& outerBoundary,
                                            ContourPoints& innerBoundary)
 {
     PointSet seen;
@@ -329,7 +329,7 @@ void BoundaryBuilder::buildInnerContiguous(int x0, int y0, const ContourPoints& 
     }
 }
 
-void BoundaryBuilder::checkDuplicates(const ContourPoints& contour)
+void BoundaryFactory::checkDuplicates(const ContourPoints& contour)
 {
     PointSet seen;
     seen.reserve(contour.size());

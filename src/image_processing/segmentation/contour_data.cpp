@@ -1,7 +1,7 @@
 ﻿// SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "boundary_builder.hpp"
+#include "boundary_factory.hpp"
 #include "contour_data.hpp"
 #include "neighborhood.hpp"
 
@@ -126,7 +126,7 @@ void ContourData::allocateLists()
 
 void ContourData::defineFromEllipse()
 {
-    auto contourSet = BoundaryBuilder::generateEllipse(phi_.width(), phi_.height(), 0.8f, 0.8f);
+    auto contourSet = BoundaryFactory::generateEllipse(phi_.width(), phi_.height(), 0.8f, 0.8f);
 
     outerBoundary_ = std::move(contourSet.outer);
     innerBoundary_ = std::move(contourSet.inner);
