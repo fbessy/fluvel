@@ -349,7 +349,7 @@ void ActiveContour::promoteRegionToBoundary(int nx, int ny)
     }
 }
 
-void ActiveContour::updateSpeeds(Contour& boundary)
+void ActiveContour::updateSpeeds(ContourPoints& boundary)
 {
     assert(!isStopped());
 

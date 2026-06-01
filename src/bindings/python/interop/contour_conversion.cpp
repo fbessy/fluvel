@@ -3,7 +3,7 @@
 
 #include "contour_conversion.hpp"
 
-py::array_t<int> contourToPyArray(const fluvel_ip::Contour& contour)
+py::array_t<int> contourToPyArray(const fluvel_ip::ContourPoints& contour)
 {
     py::array_t<int> out({static_cast<ssize_t>(contour.size()), ssize_t(2)});
 

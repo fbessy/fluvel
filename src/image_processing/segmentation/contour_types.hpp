@@ -232,14 +232,17 @@ private:
 };
 
 /**
- * @brief Container for contour points.
+ * @brief Internal algorithm container for contour points.
  */
-using Contour = std::vector<ContourPoint>;
+using ContourPoints = std::vector<ContourPoint>;
 
 /**
- * @brief Exported geometric contour (no speed information).
+ * @brief Geometric contour represented as a list of 2D points.
+ *
+ * Unlike ContourPoints, this type does not store any
+ * algorithm-specific information such as contour speed.
  */
-using ExportedContour = std::vector<Point2D_i>;
+using Contour = std::vector<Point2D_i>;
 
 /**
  * @brief Convert a ContourPoint to a 2D point.

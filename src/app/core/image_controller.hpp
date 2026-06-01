@@ -120,8 +120,8 @@ private:
     void onProcessedImageReady(const QImage& processed);
 
     /// Handle contour update from worker (core representation).
-    void onContourUpdated(const fluvel_ip::ExportedContour& outerContour,
-                          const fluvel_ip::ExportedContour& innerContour);
+    void onContourUpdated(const fluvel_ip::Contour& outerContour,
+                          const fluvel_ip::Contour& innerContour);
 
     /// Handle worker state change.
     void onStateChanged(fluvel::WorkerState state);

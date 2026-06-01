@@ -178,8 +178,8 @@ void ImageController::refreshView()
     emit displayedImageReady(img);
 }
 
-void ImageController::onContourUpdated(const fluvel_ip::ExportedContour& outerContour,
-                                       const fluvel_ip::ExportedContour& innerContour)
+void ImageController::onContourUpdated(const fluvel_ip::Contour& outerContour,
+                                       const fluvel_ip::Contour& innerContour)
 {
     auto q_l_out = convertToQVector(outerContour);
     auto q_l_in = convertToQVector(innerContour);

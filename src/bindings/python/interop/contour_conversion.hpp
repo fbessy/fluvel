@@ -26,7 +26,7 @@ namespace py = pybind11;
  *
  * @return NumPy array of int32.
  */
-py::array_t<int> contourToPyArray(const fluvel_ip::Contour& contour);
+py::array_t<int> contourToPyArray(const fluvel_ip::ContourPoints& contour);
 
 /**
  * @brief Convert a NumPy contour array to a Shape.

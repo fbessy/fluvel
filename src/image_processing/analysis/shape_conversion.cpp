@@ -6,7 +6,7 @@
 namespace fluvel_ip
 {
 
-Shape contourToShape(const Contour& contour)
+Shape contourToShape(const ContourPoints& contour)
 {
     Shape shape;
     shape.reserve(contour.size());
@@ -21,7 +21,7 @@ Shape contourToShape(const Contour& contour)
     return shape;
 }
 
-void contourToShape(const Contour& contour, Shape& shape)
+void contourToShape(const ContourPoints& contour, Shape& shape)
 {
     shape.clear();
 

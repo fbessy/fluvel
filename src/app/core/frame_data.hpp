@@ -49,8 +49,8 @@ struct DisplayFrame
 {
     QImage image; ///< Processed image
 
-    fluvel_ip::ExportedContour outerContour; ///< Outer contour (core representation)
-    fluvel_ip::ExportedContour innerContour; ///< Inner contour (core representation)
+    fluvel_ip::Contour outerContour; ///< Outer contour (core representation)
+    fluvel_ip::Contour innerContour; ///< Inner contour (core representation)
 
     int64_t receiveTimestampNs{0}; ///< Timestamp of capture (ns)
     int64_t processTimestampNs{0}; ///< Timestamp after processing (ns)

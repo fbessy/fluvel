@@ -42,7 +42,8 @@ public:
      * @param l_out_init1 Reference to the outer boundary container.
      * @param l_in_init1 Reference to the inner boundary container.
      */
-    BoundaryBuilder(int phi_width1, int phi_height1, Contour& l_out_init1, Contour& l_in_init1);
+    BoundaryBuilder(int phi_width1, int phi_height1, ContourPoints& l_out_init1,
+                    ContourPoints& l_in_init1);
 
     /**
      * @brief Generate a rectangular boundary using integer coordinates.
@@ -94,46 +95,48 @@ private:
     /**
      * @brief Generate rectangle points using integer coordinates.
      */
-    void generate_rectangle_points(int x1, int y1, int x2, int y2, Contour& list_out,
-                                   Contour& list_in);
+    void generate_rectangle_points(int x1, int y1, int x2, int y2, ContourPoints& list_out,
+                                   ContourPoints& list_in);
 
     /**
      * @brief Generate rectangle points for a single contour list.
      */
-    void generate_rectangle_points_for_one_list(Contour& list_init, int x1, int y1, int x2, int y2);
+    void generate_rectangle_points_for_one_list(ContourPoints& list_init, int x1, int y1, int x2,
+                                                int y2);
 
     /**
      * @brief Generate ellipse points using integer parameters.
      */
-    void generate_ellipse_points(int x0, int y0, int a, int b, Contour& list_out, Contour& list_in);
+    void generate_ellipse_points(int x0, int y0, int a, int b, ContourPoints& list_out,
+                                 ContourPoints& list_in);
 
     /**
      * @brief Build an ellipse using a midpoint algorithm (connected boundary).
      */
-    void build_ellipse_midpoint_connected(int x0, int y0, int a, int b, Contour& list_out);
+    void build_ellipse_midpoint_connected(int x0, int y0, int a, int b, ContourPoints& list_out);
 
     /**
      * @brief Build the inner boundary from the outer boundary.
      */
-    void build_inner_contiguous(int x0, int y0, const Contour& outerBoundary,
-                                Contour& innerBoundary);
+    void build_inner_contiguous(int x0, int y0, const ContourPoints& outerBoundary,
+                                ContourPoints& innerBoundary);
 
     /**
      * @brief Debug utility to check duplicate points in a contour.
      */
-    void check_duplicates(const Contour& contour);
+    void check_duplicates(const ContourPoints& contour);
 
     /**
      * @brief Add the 4 symmetric points of an ellipse.
      */
-    void add_4_points_in_ellipse(Contour& list_init, int x, int y, int x0, int y0);
+    void add_4_points_in_ellipse(ContourPoints& list_init, int x, int y, int x0, int y0);
 
     /**
      * @brief Add a point if it is not already present (local duplicate check).
      *
      * Only checks the last few inserted points for efficiency.
      */
-    void add_point_unique(Contour& out, int x, int y);
+    void add_point_unique(ContourPoints& out, int x, int y);
 
     /**
      * @brief Check if a coordinate is inside the grid.
@@ -148,8 +151,8 @@ private:
     int grid_width_;  ///< Width of the grid.
     int grid_height_; ///< Height of the grid.
 
-    Contour& Lout_init_; ///< Outer boundary container.
-    Contour& Lin_init_;  ///< Inner boundary container.
+    ContourPoints& Lout_init_; ///< Outer boundary container.
+    ContourPoints& Lin_init_;  ///< Inner boundary container.
 };
 
 inline bool BoundaryBuilder::inside_grid(int x, int y) const
@@ -165,7 +168,8 @@ inline bool BoundaryBuilder::inside_grid(const Point2D_i& p) const
 /**
  * @brief Add symmetric points of an ellipse while respecting grid bounds.
  */
-inline void BoundaryBuilder::add_4_points_in_ellipse(Contour& list, int x, int y, int x0, int y0)
+inline void BoundaryBuilder::add_4_points_in_ellipse(ContourPoints& list, int x, int y, int x0,
+                                                     int y0)
 {
     if (inside_grid(x0 - x, y0 - y))
         add_point_unique(list, x0 - x, y0 - y);
@@ -186,7 +190,7 @@ inline void BoundaryBuilder::add_4_points_in_ellipse(Contour& list, int x, int y
  * This function performs a local duplicate check on the last inserted points
  * (sliding window) to avoid redundant entries while keeping performance high.
  */
-inline void BoundaryBuilder::add_point_unique(Contour& out, int x, int y)
+inline void BoundaryBuilder::add_point_unique(ContourPoints& out, int x, int y)
 {
     const ContourPoint p{x, y};
 

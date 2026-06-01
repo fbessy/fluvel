@@ -276,11 +276,12 @@ Examples
 
 )";
 
-constexpr auto kContourResultDoc = R"(
+constexpr auto kContourSetDoc = R"(
 
-Contour extraction result.
+Discrete contour representation.
 
-Contains the inner and outer contour boundaries.
+Contains the inner and outer contour boundaries defined on a
+rectangular grid.
 
 Attributes
 ----------
@@ -296,6 +297,12 @@ inner : numpy.ndarray
     Contains the points belonging to the inner boundary
     of the contour.
 
+grid_width : int
+    Width of the grid on which the contour is defined.
+
+grid_height : int
+    Height of the grid on which the contour is defined.
+
 Notes
 -----
 The contour arrays are returned as NumPy arrays of shape
@@ -305,15 +312,12 @@ The contour arrays are returned as NumPy arrays of shape
 
 Examples
 --------
->>> result = fluvel.active_contour(image)
-
->>> outer = result.outer
->>> inner = result.inner
-
 >>> contours = fluvel.find_contours(mask)
 
 >>> outer = contours.outer
 >>> inner = contours.inner
+
+>>> mask = fluvel.contours_to_mask(contours)
 
 )";
 
@@ -354,7 +358,7 @@ region_model_params : RegionModelParams, optional
 
 Returns
 -------
-ContourResult
+ContourSet
     Final contour boundaries after convergence.
 
 Examples
@@ -412,7 +416,7 @@ mask
 
 Returns
 -------
-ContourResult
+ContourSet
 
 Examples
 --------
@@ -424,10 +428,13 @@ Examples
 )";
 
 // Outer and inner contours returned to Python.
-struct ContourResult
+struct ContourSet
 {
     py::array_t<int> outer;
     py::array_t<int> inner;
+
+    int gridWidth;
+    int gridHeight;
 };
 
 } // namespace
@@ -477,9 +484,11 @@ void bindActiveContour(py::module_& m)
         .def_readwrite("color_space", &fluvel_ip::RegionColorParams::colorSpace)
         .def_readwrite("weights", &fluvel_ip::RegionColorParams::weights);
 
-    py::class_<ContourResult>(m, "ContourResult", kContourResultDoc)
-        .def_readonly("outer", &ContourResult::outer)
-        .def_readonly("inner", &ContourResult::inner);
+    py::class_<ContourSet>(m, "ContourSet", kContourSetDoc)
+        .def_readonly("outer", &ContourSet::outer)
+        .def_readonly("inner", &ContourSet::inner)
+        .def_readonly("grid_width", &ContourSet::gridWidth)
+        .def_readonly("grid_height", &ContourSet::gridHeight);
 
     m.def(
         "active_contour",
@@ -520,9 +529,9 @@ void bindActiveContour(py::module_& m)
 
             ac.converge();
 
-            return ContourResult{contourToPyArray(ac.outerBoundary()),
-
-                                 contourToPyArray(ac.innerBoundary())};
+            return ContourSet{contourToPyArray(ac.outerBoundary()),
+                              contourToPyArray(ac.innerBoundary()), ac.phi().width(),
+                              ac.phi().height()};
         },
 
         py::arg("image"), py::arg("phi_mask") = py::none(),
@@ -540,8 +549,9 @@ void bindActiveContour(py::module_& m)
 
             fluvel_ip::ContourData cd(img, connectivity);
 
-            return ContourResult{contourToPyArray(cd.outerBoundary()),
-                                 contourToPyArray(cd.innerBoundary())};
+            return ContourSet{contourToPyArray(cd.outerBoundary()),
+                              contourToPyArray(cd.innerBoundary()), cd.phi().width(),
+                              cd.phi().height()};
         },
 
         py::arg("mask"), py::arg("connectivity") = fluvel_ip::Connectivity::Eight,

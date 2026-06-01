@@ -13,8 +13,8 @@
 namespace fluvel_ip
 {
 
-BoundaryBuilder::BoundaryBuilder(int phiWidth, int phiHeight, Contour& Lout_init,
-                                 Contour& Lin_init)
+BoundaryBuilder::BoundaryBuilder(int phiWidth, int phiHeight, ContourPoints& Lout_init,
+                                 ContourPoints& Lin_init)
     : grid_width_(phiWidth)
     , grid_height_(phiHeight)
     , Lout_init_(Lout_init)
@@ -56,8 +56,8 @@ void BoundaryBuilder::generate_rectangle_points(Point2D_f topLeft, Point2D_f bot
                               std::lround(bottomRight.y * grid_height_), *list1, *list2);
 }
 
-void BoundaryBuilder::generate_rectangle_points(int x1, int y1, int x2, int y2, Contour& list_out,
-                                                Contour& list_in)
+void BoundaryBuilder::generate_rectangle_points(int x1, int y1, int x2, int y2,
+                                                ContourPoints& list_out, ContourPoints& list_in)
 {
     if (x1 > x2)
     {
@@ -102,8 +102,8 @@ void BoundaryBuilder::generate_rectangle_points(int x1, int y1, int x2, int y2, 
     }
 }
 
-void BoundaryBuilder::generate_rectangle_points_for_one_list(Contour& list_init, int x1, int y1,
-                                                             int x2, int y2)
+void BoundaryBuilder::generate_rectangle_points_for_one_list(ContourPoints& list_init, int x1,
+                                                             int y1, int x2, int y2)
 {
     for (int x = x1; x <= x2; ++x)
     {
@@ -170,15 +170,15 @@ void BoundaryBuilder::generate_ellipse_points(float width_ratio, float height_ra
     generate_ellipse_points(x0, y0, a, b, *list1, *list2);
 }
 
-void BoundaryBuilder::generate_ellipse_points(int x0, int y0, int a, int b, Contour& list_out,
-                                              Contour& list_in)
+void BoundaryBuilder::generate_ellipse_points(int x0, int y0, int a, int b, ContourPoints& list_out,
+                                              ContourPoints& list_in)
 {
     build_ellipse_midpoint_connected(x0, y0, a, b, list_out);
     build_inner_contiguous(x0, y0, list_out, list_in);
 }
 
 void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, int b,
-                                                       Contour& list_out)
+                                                       ContourPoints& list_out)
 {
     int x = 0;
     int y = b;
@@ -269,7 +269,8 @@ void BoundaryBuilder::build_ellipse_midpoint_connected(int x0, int y0, int a, in
     }
 }
 
-void BoundaryBuilder::build_inner_contiguous(int x0, int y0, const Contour& outerBoundary, Contour& innerBoundary)
+void BoundaryBuilder::build_inner_contiguous(int x0, int y0, const ContourPoints& outerBoundary,
+                                             ContourPoints& innerBoundary)
 {
     PointSet seen;
     seen.reserve(outerBoundary.size());
@@ -289,7 +290,7 @@ void BoundaryBuilder::build_inner_contiguous(int x0, int y0, const Contour& oute
     }
 }
 
-void BoundaryBuilder::check_duplicates(const Contour& contour)
+void BoundaryBuilder::check_duplicates(const ContourPoints& contour)
 {
     PointSet seen;
     seen.reserve(contour.size());

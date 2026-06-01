@@ -62,7 +62,7 @@ public:
      * @param phiHeight Height of the domain.
      * @param connectivity Neighborhood connectivity (4 or 8).
      */
-    ContourData(const Contour& outerBoundary, const Contour& innerBoundary, int phiWidth,
+    ContourData(ContourPoints outerBoundary, ContourPoints innerBoundary, int phiWidth,
                 int phiHeight, Connectivity connectivity = Connectivity::Four);
 
     /**
@@ -91,9 +91,9 @@ public:
      *
      * @return A vector of 2D points representing Lout.
      */
-    ExportedContour exportOuterBoundary() const
+    Contour exportOuterBoundary() const
     {
-        return exportContour(outerBoundary_);
+        return toContour(outerBoundary_);
     }
 
     /**
@@ -101,9 +101,9 @@ public:
      *
      * @return A vector of 2D points representing Lin.
      */
-    ExportedContour exportInnerBoundary() const
+    Contour exportInnerBoundary() const
     {
-        return exportContour(innerBoundary_);
+        return toContour(innerBoundary_);
     }
 
     /**
@@ -125,7 +125,7 @@ public:
     /**
      * @brief Access the outer boundary (Lout).
      */
-    Contour& outerBoundary()
+    ContourPoints& outerBoundary()
     {
         return outerBoundary_;
     }
@@ -133,7 +133,7 @@ public:
     /**
      * @brief Const access to the outer boundary (Lout).
      */
-    const Contour& outerBoundary() const
+    const ContourPoints& outerBoundary() const
     {
         return outerBoundary_;
     }
@@ -141,7 +141,7 @@ public:
     /**
      * @brief Access the inner boundary (Lin).
      */
-    Contour& innerBoundary()
+    ContourPoints& innerBoundary()
     {
         return innerBoundary_;
     }
@@ -149,7 +149,7 @@ public:
     /**
      * @brief Const access to the inner boundary (Lin).
      */
-    const Contour& innerBoundary() const
+    const ContourPoints& innerBoundary() const
     {
         return innerBoundary_;
     }
@@ -202,7 +202,7 @@ private:
      *
      * Ensures the contour remains contiguous and minimal.
      */
-    void eliminateRedundantPoints(Contour& boundary, PhiValue regionValue);
+    void eliminateRedundantPoints(ContourPoints& boundary, PhiValue regionValue);
 
     /**
      * @brief Allow ActiveContour to access internal helpers.
@@ -242,9 +242,9 @@ private:
     void eliminateRedundantPointsIfNeeded();
 
     /**
-     * @brief Export a contour as a vector of points.
+     * @brief Convert contour points to a geometric contour.
      */
-    std::vector<Point2D_i> exportContour(const Contour& boundary) const;
+    static Contour toContour(const ContourPoints& boundary);
 
     /**
      * @brief Check if a vector contains duplicate elements.
@@ -254,8 +254,8 @@ private:
 
     DiscreteLevelSet phi_; ///< Discrete level-set function (4 possible values).
 
-    Contour outerBoundary_; ///< Exterior boundary (Lout).
-    Contour innerBoundary_; ///< Interior boundary (Lin).
+    ContourPoints outerBoundary_; ///< Exterior boundary (Lout).
+    ContourPoints innerBoundary_; ///< Interior boundary (Lin).
 
     const Connectivity connectivity_; ///< Pixel connectivity (4- or 8-connected).
 };

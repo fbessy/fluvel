@@ -33,8 +33,8 @@ constexpr size_t kInitialSpeedArrayAllocSize = 10000u;
  */
 struct BoundarySwitchMapping
 {
-    Contour& fromBoundary;          //!< Source boundary (points to remove from).
-    Contour& toBoundary;            //!< Destination boundary (points to add to).
+    ContourPoints& fromBoundary;    //!< Source boundary (points to remove from).
+    ContourPoints& toBoundary;      //!< Destination boundary (points to add to).
     SpeedValue requiredSpeedSign;   //!< Required speed sign to trigger the switch.
     PhiValue currentToAdjacentVal;  //!< Phi value for adjacent transition.
     PhiValue neighborFromRegionVal; //!< Phi value for neighbor in source region.
@@ -199,7 +199,7 @@ public:
      *
      * @return Copy of the outer boundary.
      */
-    ExportedContour exportOuterBoundary() const
+    Contour exportOuterBoundary() const
     {
         return cd_.exportOuterBoundary();
     }
@@ -209,7 +209,7 @@ public:
      *
      * @return Copy of the inner boundary.
      */
-    ExportedContour exportInnerBoundary() const
+    Contour exportInnerBoundary() const
     {
         return cd_.exportInnerBoundary();
     }
@@ -225,7 +225,7 @@ public:
     /**
      * @brief Returns the outer boundary.
      */
-    const Contour& outerBoundary() const
+    const ContourPoints& outerBoundary() const
     {
         return cd_.outerBoundary();
     }
@@ -233,7 +233,7 @@ public:
     /**
      * @brief Returns the inner boundary.
      */
-    const Contour& innerBoundary() const
+    const ContourPoints& innerBoundary() const
     {
         return cd_.innerBoundary();
     }
@@ -300,13 +300,13 @@ private:
     /**
      * @brief Updates speeds for all points in a boundary.
      */
-    void updateSpeeds(Contour& boundary);
+    void updateSpeeds(ContourPoints& boundary);
 
     /**
      * @brief Generic speed computation loop.
      */
     template <typename SpeedModel>
-    void computeSpeeds(Contour& boundary, SpeedModel&& model)
+    void computeSpeeds(ContourPoints& boundary, SpeedModel&& model)
     {
         for (auto& point : boundary)
         {
@@ -367,7 +367,7 @@ private:
 
     const BoundarySwitchMapping* currentMapping_; //!< Currently selected mapping.
 
-    Contour pendingBoundaryPoints_; //!< Temporary storage for boundary updates.
+    ContourPoints pendingBoundaryPoints_; //!< Temporary storage for boundary updates.
 
     int stepsPerCycle_; //!< Number of steps per full cycle.
 

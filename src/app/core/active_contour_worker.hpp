@@ -117,8 +117,8 @@ signals:
     /**
      * @brief Emitted when contour geometry is updated.
      */
-    void contourUpdated(const fluvel_ip::ExportedContour& outerContour,
-                        const fluvel_ip::ExportedContour& innerContour);
+    void contourUpdated(const fluvel_ip::Contour& outerContour,
+                        const fluvel_ip::Contour& innerContour);
 
     /**
      * @brief Emitted when the worker state changes.

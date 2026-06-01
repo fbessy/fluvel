@@ -67,11 +67,11 @@ ContourData::ContourData(const ImageView& binaryMask, Connectivity connectivity)
     assert(isValid());
 }
 
-ContourData::ContourData(const Contour& outerBoundary, const Contour& innerBoundary, int phiWidth,
+ContourData::ContourData(ContourPoints outerBoundary, ContourPoints innerBoundary, int phiWidth,
                          int phiHeight, Connectivity connectivity)
     : phi_(phiWidth, phiHeight)
-    , outerBoundary_(outerBoundary)
-    , innerBoundary_(innerBoundary)
+    , outerBoundary_(std::move(outerBoundary))
+    , innerBoundary_(std::move(innerBoundary))
     , connectivity_(connectivity)
 {
     assert(!outerBoundary.empty());
@@ -142,7 +142,7 @@ void ContourData::defineListsAndPhiFromBinaryPhi()
     {
         PhiValue& currentPhi = phi_[offset];
         PhiValue regionVal;
-        Contour* boundary = nullptr;
+        ContourPoints* boundary = nullptr;
         bool isBoundary = false;
 
         // get the generic currentMapping to eliminate redundant points
@@ -255,7 +255,7 @@ void ContourData::eliminateRedundantPointsIfNeeded()
     eliminateRedundantPoints(innerBoundary_, PhiValue::InsideRegion);
 }
 
-void ContourData::eliminateRedundantPoints(Contour& boundary, PhiValue regionValue)
+void ContourData::eliminateRedundantPoints(ContourPoints& boundary, PhiValue regionValue)
 {
     for (std::size_t i = 0; i < boundary.size();)
     {
@@ -366,7 +366,7 @@ bool ContourData::isValid() const
             return false;
     }
 
-    Contour result;
+    ContourPoints result;
     result.reserve(outerBoundary_.size() + innerBoundary_.size());
     result.insert(result.end(), outerBoundary_.begin(), outerBoundary_.end());
     result.insert(result.end(), innerBoundary_.begin(), innerBoundary_.end());
@@ -377,9 +377,9 @@ bool ContourData::isValid() const
     return true;
 }
 
-ExportedContour ContourData::exportContour(const Contour& boundary) const
+Contour ContourData::toContour(const ContourPoints& boundary)
 {
-    ExportedContour geometricBoundary;
+    Contour geometricBoundary;
     geometricBoundary.reserve(boundary.size());
 
     for (const auto& point : boundary)

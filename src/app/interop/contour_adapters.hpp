@@ -22,7 +22,7 @@ namespace fluvel
  * @param contour Input contour defined as discrete pixel coordinates.
  * @return QVector of QPointF representing the contour in continuous space.
  */
-[[nodiscard]] inline QVector<QPointF> convertToQVector(const fluvel_ip::ExportedContour& contour)
+[[nodiscard]] inline QVector<QPointF> convertToQVector(const fluvel_ip::Contour& contour)
 {
     QVector<QPointF> q_contour;
     q_contour.reserve(static_cast<qsizetype>(contour.size()));

@@ -22,7 +22,7 @@ namespace fluvel_ip
  *
  * @return Shape built from the contour points.
  */
-Shape contourToShape(const Contour& contour);
+Shape contourToShape(const ContourPoints& contour);
 
 /**
  * @brief Fill a Shape from a contour.
@@ -36,6 +36,6 @@ Shape contourToShape(const Contour& contour);
  * @param contour Input contour.
  * @param shape Output shape.
  */
-void contourToShape(const Contour& contour, Shape& shape);
+void contourToShape(const ContourPoints& contour, Shape& shape);
 
 } // namespace fluvel_ip
