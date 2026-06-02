@@ -1047,9 +1047,12 @@ void ImageViewerWidget::positionMiniMap()
 
 void ImageViewerWidget::onMiniMapCenterRequested(const QPointF& scenePoint)
 {
-    centerOn(scenePoint);
+    const QPoint overlayPosition = textPosition(infoOverlay_);
 
+    centerOn(scenePoint);
     updateMiniMap();
+
+    setTextPosition(overlayPosition, infoOverlay_);
 }
 
 } // namespace fluvel
