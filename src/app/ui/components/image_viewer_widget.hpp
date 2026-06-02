@@ -34,6 +34,7 @@ namespace fluvel
 
 class ImageViewerInteraction;
 class ZoomOverlayController;
+class MiniMapWidget;
 
 /**
  * @brief Image viewer widget with interaction and overlay support.
@@ -204,6 +205,9 @@ public:
     void setDragHighlight(bool enabled);
     void notifyImageDropped(const QString& path);
 
+    void updateMiniMap();
+    void positionMiniMap();
+
     /** @} */
 
 signals:
@@ -249,6 +253,7 @@ private:
     void setupScene();
     void setupItems();
     void setupGlobalOverlays();
+    void setupMiniMap();
     void setupInfoOverlay();
     void setupContourItems();
     void setupTimers();
@@ -303,6 +308,8 @@ private:
 
     OverlayTextItem* zoomOverlayItem_ = nullptr;
     ZoomOverlayController* zoomOverlayController_ = nullptr;
+
+    MiniMapWidget* miniMap_ = nullptr;
 
     ImageViewerInteraction* interaction_ = nullptr;
     ImageViewerListener* listener_ = nullptr;

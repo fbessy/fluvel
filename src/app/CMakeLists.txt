@@ -54,6 +54,9 @@ set(app_src
     ${UI_COMP_DIR}/image_viewer_widget.cpp
     ${UI_COMP_DIR}/image_viewer_widget.hpp
 
+    ${UI_COMP_DIR}/mini_map_widget.cpp
+    ${UI_COMP_DIR}/mini_map_widget.hpp
+
     ${UI_COMP_DIR}/image_viewer_interaction.hpp
     ${UI_COMP_DIR}/interaction_set.cpp
     ${UI_COMP_DIR}/interaction_set.hpp

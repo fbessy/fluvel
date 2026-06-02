@@ -7,6 +7,7 @@
 #include "frame_clock.hpp"
 #include "image_viewer_interaction.hpp"
 #include "interaction_set.hpp"
+#include "mini_map_widget.hpp"
 #include "overlay_text_item.hpp"
 #include "qcolor_utils.hpp"
 #include "qimage_utils.hpp"
@@ -14,6 +15,7 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QScrollBar>
 #include <QThread>
 #include <QTimer>
 #include <QWheelEvent>
@@ -56,6 +58,7 @@ void ImageViewerWidget::initializeView()
     setupScene();
     setupItems();
     setupGlobalOverlays();
+    setupMiniMap();
     setupTimers();
 }
 
@@ -104,6 +107,21 @@ void ImageViewerWidget::setupGlobalOverlays()
     scene_->addItem(zoomOverlayItem_);
 
     zoomOverlayController_ = new ZoomOverlayController(zoomOverlayItem_, this);
+}
+
+void ImageViewerWidget::setupMiniMap()
+{
+    miniMap_ = new MiniMapWidget(this);
+
+    miniMap_->resize(160, 160);
+
+    miniMap_->show();
+
+    connect(horizontalScrollBar(), &QScrollBar::valueChanged, this,
+            &ImageViewerWidget::updateMiniMap);
+
+    connect(verticalScrollBar(), &QScrollBar::valueChanged, this,
+            &ImageViewerWidget::updateMiniMap);
 }
 
 void ImageViewerWidget::setupInfoOverlay()
@@ -279,6 +297,8 @@ void ImageViewerWidget::updatePixmapItem(const QImage& img)
 
     pixmapItem_->setPixmap(QPixmap::fromImage(img));
 
+    miniMap_->setImage(img);
+
 #ifdef FLUVEL_DEBUG
     qDebug() << "IMG null:" << img.isNull();
     qDebug() << "IMG format:" << img.format();
@@ -318,6 +338,7 @@ void ImageViewerWidget::scaleView(double sx, double sy)
     scale(sx, sy);
 
     setTextPosition(overlayPosition, infoOverlay_);
+    updateMiniMap();
 }
 
 void ImageViewerWidget::translateView(double dx, double dy)
@@ -327,6 +348,7 @@ void ImageViewerWidget::translateView(double dx, double dy)
     translate(dx, dy);
 
     setTextPosition(overlayPosition, infoOverlay_);
+    updateMiniMap();
 }
 
 double ImageViewerWidget::currentZoom() const
@@ -356,6 +378,7 @@ void ImageViewerWidget::toggleFullscreen()
     }
 
     setTextPosition(overlayPosition, infoOverlay_);
+    updateMiniMap();
 }
 
 void ImageViewerWidget::applyAutoFit()
@@ -370,6 +393,8 @@ void ImageViewerWidget::applyAutoFit()
     fitInView(pixmapItem_, Qt::KeepAspectRatio);
 
     setTextPosition(overlayPosition, infoOverlay_);
+
+    updateMiniMap();
 }
 
 void ImageViewerWidget::userInteracted()
@@ -466,6 +491,7 @@ bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
              << delta.y();
 #endif
 
+    updateMiniMap();
     return true;
 }
 
@@ -517,6 +543,8 @@ void ImageViewerWidget::resizeEvent(QResizeEvent* event)
         applyAutoFit();
 
     setTextPosition(overlayPosition, infoOverlay_);
+    positionMiniMap();
+    updateMiniMap();
 }
 
 void ImageViewerWidget::setInteraction(ImageViewerInteraction* interaction)
@@ -994,6 +1022,24 @@ bool ImageViewerWidget::isPixelVisible(const QPoint& viewPos) const
     QRectF visibleSceneRect = mapToScene(viewport()->rect()).boundingRect();
 
     return visibleSceneRect.contains(scenePos);
+}
+
+void ImageViewerWidget::updateMiniMap()
+{
+    if (!miniMap_)
+        return;
+
+    miniMap_->setSceneRect(scene_->sceneRect());
+
+    miniMap_->setVisibleRect(mapToScene(viewport()->rect()).boundingRect());
+}
+
+void ImageViewerWidget::positionMiniMap()
+{
+    constexpr int margin = 10;
+
+    miniMap_->move(viewport()->width() - miniMap_->width() - margin,
+                   viewport()->height() - miniMap_->height() - margin);
 }
 
 } // namespace fluvel
