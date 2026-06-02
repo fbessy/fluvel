@@ -79,6 +79,9 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     display_overlay_cb_ = new QCheckBox(tr("Overlay"));
     display_overlay_cb_->setChecked(config_.algorithmOverlayEnabled);
 
+    miniMap_cb_ = new QCheckBox(tr("Mini-map"));
+    miniMap_cb_->setChecked(config_.miniMapEnabled);
+
     auto* title = new QLabel(tr("View"));
     title->setStyleSheet("font-weight: bold; font-size: 14px;");
 
@@ -91,6 +94,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
     widget_layout->addWidget(rendering_gb);
     widget_layout->addSpacing(6);
     widget_layout->addWidget(display_overlay_cb_);
+    widget_layout->addWidget(miniMap_cb_);
 
     widget_layout->addStretch();
 
@@ -128,6 +132,13 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
             [this](bool checked)
             {
                 config_.algorithmOverlayEnabled = checked;
+                emit displayConfigChanged(config_);
+            });
+
+    connect(miniMap_cb_, &QCheckBox::toggled, this,
+            [this](bool checked)
+            {
+                config_.miniMapEnabled = checked;
                 emit displayConfigChanged(config_);
             });
 

@@ -291,6 +291,7 @@ private:
     void updateFlip();
     void updateSmoothDisplay();
     void updateTextOverlayVisibility();
+    void updateMiniMapVisibility();
 
     bool supportsDragDrop() const;
 

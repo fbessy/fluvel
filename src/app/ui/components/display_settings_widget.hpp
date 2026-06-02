@@ -85,6 +85,7 @@ private:
     QCheckBox* smooth_cb_;
 
     QCheckBox* display_overlay_cb_;
+    QCheckBox* miniMap_cb_;
 
     DisplayConfig config_{};
 };

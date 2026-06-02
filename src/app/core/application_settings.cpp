@@ -297,6 +297,7 @@ void ApplicationSettings::saveDisplay(Session session, const DisplayConfig& disp
     settings.setValue("display/inner_contour/rgb", rgbToString(displayConfig.innerContourColor));
 
     settings.setValue("display/algorithm_overlay/enabled", displayConfig.algorithmOverlayEnabled);
+    settings.setValue("display/mini_map/enabled", displayConfig.miniMapEnabled);
 
     settings.setValue("display/mode", to_string(displayConfig.displayMode));
 
@@ -546,6 +547,9 @@ void ApplicationSettings::loadDisplay(Session session, DisplayConfig& displayCon
     displayConfig.algorithmOverlayEnabled =
         settings.value("display/algorithm_overlay/enabled", DisplayConfig::kDefaultOverlayEnabled)
             .toBool();
+
+    displayConfig.miniMapEnabled =
+        settings.value("display/mini_map/enabled", DisplayConfig::kDefaultOverlayEnabled).toBool();
 
     const QString s =
         settings

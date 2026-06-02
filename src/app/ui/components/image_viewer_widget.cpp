@@ -115,7 +115,7 @@ void ImageViewerWidget::setupMiniMap()
 
     miniMap_->resize(160, 160);
 
-    miniMap_->show();
+    miniMap_->hide();
 
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, this,
             &ImageViewerWidget::updateMiniMap);
@@ -876,6 +876,7 @@ void ImageViewerWidget::updateDisplayWithConfig()
     updateFlip();
     updateSmoothDisplay();
     updateTextOverlayVisibility();
+    updateMiniMapVisibility();
 }
 
 void ImageViewerWidget::updateContourColors()
@@ -935,6 +936,14 @@ void ImageViewerWidget::updateTextOverlayVisibility()
         return;
 
     infoOverlay_->setVisible(displayConfig_.algorithmOverlayEnabled);
+}
+
+void ImageViewerWidget::updateMiniMapVisibility()
+{
+    if (!miniMap_)
+        return;
+
+    miniMap_->setVisible(displayConfig_.miniMapEnabled);
 }
 
 void ImageViewerWidget::applyDownscaleConfig(const DownscaleParams& downscale)

@@ -145,10 +145,11 @@ struct DisplayConfig
     bool innerContourVisible = kDefaultContourVisible;
     fluvel_ip::Rgb_uc innerContourColor{kDefaultInnerContourColor};
 
-    bool mirrorMode = kDefaultOptionDisabled;
-    bool smoothDisplay = kDefaultOptionDisabled;
+    bool mirrorMode{kDefaultOptionDisabled};
+    bool smoothDisplay{kDefaultOptionDisabled};
 
-    bool algorithmOverlayEnabled = kDefaultOverlayEnabled;
+    bool algorithmOverlayEnabled{kDefaultOverlayEnabled};
+    bool miniMapEnabled{kDefaultOverlayEnabled};
 };
 
 /**
