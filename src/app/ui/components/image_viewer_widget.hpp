@@ -207,6 +207,7 @@ public:
 
     void updateMiniMap();
     void positionMiniMap();
+    void onMiniMapCenterRequested(const QPointF& scenePoint);
 
     /** @} */
 

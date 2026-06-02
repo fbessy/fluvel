@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include <QImage>
+#include <QMouseEvent>
 #include <QPixmap>
 #include <QRectF>
 #include <QWidget>
@@ -21,10 +22,17 @@ public:
     void setSceneRect(const QRectF& sceneRect);
     void setVisibleRect(const QRectF& visibleRect);
 
+signals:
+    void centerRequested(const QPointF& scenePosition);
+
 protected:
     void paintEvent(QPaintEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
 
 private:
+    QPointF scenePositionFromMiniMap(const QPointF& position) const;
+
     QPixmap thumbnail_;
 
     QRectF sceneRect_;

@@ -122,6 +122,9 @@ void ImageViewerWidget::setupMiniMap()
 
     connect(verticalScrollBar(), &QScrollBar::valueChanged, this,
             &ImageViewerWidget::updateMiniMap);
+
+    connect(miniMap_, &MiniMapWidget::centerRequested, this,
+            &ImageViewerWidget::onMiniMapCenterRequested);
 }
 
 void ImageViewerWidget::setupInfoOverlay()
@@ -1040,6 +1043,13 @@ void ImageViewerWidget::positionMiniMap()
 
     miniMap_->move(viewport()->width() - miniMap_->width() - margin,
                    viewport()->height() - miniMap_->height() - margin);
+}
+
+void ImageViewerWidget::onMiniMapCenterRequested(const QPointF& scenePoint)
+{
+    centerOn(scenePoint);
+
+    updateMiniMap();
 }
 
 } // namespace fluvel

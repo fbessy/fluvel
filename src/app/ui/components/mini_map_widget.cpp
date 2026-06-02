@@ -100,4 +100,33 @@ void MiniMapWidget::paintEvent(QPaintEvent*)
     }
 }
 
+void MiniMapWidget::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() != Qt::LeftButton)
+        return;
+
+    emit centerRequested(scenePositionFromMiniMap(event->position()));
+}
+
+void MiniMapWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    if (!(event->buttons() & Qt::LeftButton))
+        return;
+
+    emit centerRequested(scenePositionFromMiniMap(event->position()));
+}
+
+QPointF MiniMapWidget::scenePositionFromMiniMap(const QPointF& position) const
+{
+    QRect imageRect = thumbnail_.rect();
+    imageRect.moveCenter(rect().center());
+
+    const double x = (position.x() - imageRect.left()) / imageRect.width();
+
+    const double y = (position.y() - imageRect.top()) / imageRect.height();
+
+    return QPointF(sceneRect_.left() + x * sceneRect_.width(),
+                   sceneRect_.top() + y * sceneRect_.height());
+}
+
 } // namespace fluvel
