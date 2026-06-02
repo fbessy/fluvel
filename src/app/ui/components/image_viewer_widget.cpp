@@ -115,7 +115,12 @@ void ImageViewerWidget::setupMiniMap()
 
     miniMap_->resize(160, 160);
 
-    miniMap_->hide();
+    // Enhanced display views restore the mini-map visibility
+    // from the display configuration after initialization.
+    if (useEnhancedDisplayConfig_)
+        miniMap_->hide();
+    else
+        miniMap_->show();
 
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, this,
             &ImageViewerWidget::updateMiniMap);
@@ -862,8 +867,6 @@ void ImageViewerWidget::upscaleItems()
 
 void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
 {
-    assert(useEnhancedDisplayConfig_);
-
     displayConfig_ = display;
 
     updateDisplayWithConfig();
@@ -871,8 +874,6 @@ void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
 
 void ImageViewerWidget::updateDisplayWithConfig()
 {
-    assert(useEnhancedDisplayConfig_);
-
     updateContourColors();
     upscaleItems();
     updateFlip();
@@ -936,25 +937,20 @@ void ImageViewerWidget::updateSmoothDisplay()
 
 void ImageViewerWidget::updateTextOverlayVisibility()
 {
-    if (!infoOverlay_)
-        return;
+    assert(infoOverlay_ && useEnhancedDisplayConfig_);
 
     infoOverlay_->setVisible(displayConfig_.algorithmOverlayEnabled);
 }
 
 void ImageViewerWidget::updateMiniMapVisibility()
 {
-    if (!miniMap_)
-        return;
+    assert(miniMap_ && useEnhancedDisplayConfig_);
 
     miniMap_->setVisible(displayConfig_.miniMapEnabled);
 }
 
 void ImageViewerWidget::applyDownscaleConfig(const DownscaleParams& downscale)
 {
-    if (!useEnhancedDisplayConfig_)
-        return;
-
     downscaleConfig_ = downscale;
 
     upscaleItems();
