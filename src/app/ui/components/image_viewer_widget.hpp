@@ -208,6 +208,7 @@ public:
     void updateMiniMap();
     void positionMiniMap();
     void onMiniMapCenterRequested(const QPointF& scenePoint);
+    void updateMiniMapThumbnail();
 
     /** @} */
 
@@ -312,6 +313,7 @@ private:
     ZoomOverlayController* zoomOverlayController_ = nullptr;
 
     MiniMapWidget* miniMap_ = nullptr;
+    QImage thumbnail_;
 
     ImageViewerInteraction* interaction_ = nullptr;
     ImageViewerListener* listener_ = nullptr;

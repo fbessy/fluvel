@@ -300,7 +300,9 @@ void ImageViewerWidget::updatePixmapItem(const QImage& img)
 
     pixmapItem_->setPixmap(QPixmap::fromImage(img));
 
-    miniMap_->setImage(img);
+    thumbnail_ = img;
+
+    updateMiniMapThumbnail();
 
 #ifdef FLUVEL_DEBUG
     qDebug() << "IMG null:" << img.isNull();
@@ -918,6 +920,8 @@ void ImageViewerWidget::updateFlip()
         contentRoot_->setTransform(QTransform());
         contentRoot_->setPos(0.0, 0.0);
     }
+
+    updateMiniMapThumbnail();
 }
 
 void ImageViewerWidget::updateSmoothDisplay()
@@ -1062,6 +1066,19 @@ void ImageViewerWidget::onMiniMapCenterRequested(const QPointF& scenePoint)
     updateMiniMap();
 
     setTextPosition(overlayPosition, infoOverlay_);
+}
+
+void ImageViewerWidget::updateMiniMapThumbnail()
+{
+    assert(miniMap_);
+
+    if (thumbnail_.isNull())
+        return;
+
+    if (useEnhancedDisplayConfig_ && displayConfig_.mirrorMode)
+        miniMap_->setImage(thumbnail_.flipped(Qt::Horizontal));
+    else
+        miniMap_->setImage(thumbnail_);
 }
 
 } // namespace fluvel
