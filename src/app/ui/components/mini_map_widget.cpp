@@ -72,8 +72,6 @@ void MiniMapWidget::paintEvent(QPaintEvent*)
         if (viewportRect.contains(imageRect))
             return;
 
-        painter.fillRect(rect(), palette().window());
-
         painter.drawPixmap(imageRect.topLeft(), thumbnail_);
 
         // ----------------------------------------------------
@@ -100,7 +98,9 @@ void MiniMapWidget::paintEvent(QPaintEvent*)
         // ----------------------------------------------------
         // Mini-map border.
         // ----------------------------------------------------
-        painter.setPen(QPen(QColor(128, 128, 128, 120), 2));
+        QColor borderColor = palette().mid().color();
+        borderColor.setAlpha(180);
+        painter.setPen(QPen(borderColor, 2));
 
         painter.drawRoundedRect(rect().adjusted(0, 0, -1, -1), 4, 4);
     }
