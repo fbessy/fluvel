@@ -1,19 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file image_controller.hpp
- * @brief Controller for static image processing workflow.
- *
- * This component manages the lifecycle of image-based processing:
- * - loading images from disk
- * - applying preprocessing (downscaling, filters)
- * - driving the active contour algorithm
- * - updating the UI with processed images and contours
- *
- * It acts as the bridge between UI interactions and the processing backend.
- */
-
 #pragma once
 
 #include "active_contour_worker.hpp"
@@ -31,13 +18,20 @@ namespace fluvel
 {
 
 /**
- * @brief High-level controller for image processing.
+ * @brief High-level controller for image-based processing.
  *
- * Responsibilities:
- * - Load and manage input images
- * - Configure and control the active contour worker
- * - Handle preprocessing (e.g. downscaling)
- * - Convert and forward results to the UI layer
+ * ImageController acts as the bridge between the user interface and
+ * the image-processing backend.
+ *
+ * Responsibilities include:
+ * - loading images from disk
+ * - applying preprocessing operations (downscaling, filtering)
+ * - configuring and driving the active contour worker
+ * - forwarding processed images and contour updates to the UI
+ * - managing the processing lifecycle (restart, pause, step, convergence)
+ *
+ * This class is intended to run in the Qt main thread and coordinates
+ * all image-processing operations for a static image session.
  *
  * @note This class is intended to run in the Qt main thread.
  */

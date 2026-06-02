@@ -111,14 +111,14 @@ The project is organized into:
 ```text
 fluvel/
 ├── src/                           # Source code
-│   ├── app/                       # Desktop/mobile application
+│   ├── app/                       # Desktop/mobile Qt application
 │   │   ├── ui/                    # Windows and reusable UI components
 │   │   ├── qml/                   # Experimental UI layer
 │   │   ├── core/                  # Application logic and orchestration
 │   │   └── interop/               # Application integration and adapters
 │   │
 │   ├── bindings/                  # Language and scripting integrations
-│   │   └── python/                # Python bindings
+│   │   └── python/                # Python bindings (pybind11)
 │   │
 │   └── image_processing/          # Image processing library
 │       ├── filtering/             # Filtering, denoising and preprocessing
@@ -126,10 +126,13 @@ fluvel/
 │       ├── analysis/              # Shape analysis and image metrics
 │       └── core/                  # Shared processing infrastructure
 │
-├── examples/                      # Example applications and usage demos
-│   ├── filtering/                 # Python filtering showcase and experiments
-│   ├── segmentation/              # Segmentation examples (future)
-│   └── bindings/                  # Language integration examples
+├── examples/                      # Python examples demonstrating Fluvel IP features
+│   ├── filtering/                 # Image filtering examples and experiments
+│   ├── hausdorff/                 # Shape comparison and Hausdorff distance examples
+│   ├── segmentation/              # Active contour segmentation examples
+│   ├── workflow/                  # Complete processing pipeline examples
+│   ├── resources/                 # Shared datasets and images used by examples
+│   └── utils.py                   # Shared utilities used across examples
 │
 ├── resources/                     # Icons and application assets
 ├── translations/                  # Application translations (.ts, .qm)
@@ -151,9 +154,9 @@ fluvel/
 
 ### Main modules
 
-- **fluvel_app** — User interface and application orchestration
-- **fluvel_ip** — Image processing and segmentation library
-- **fluvel_bindings** — Python bindings and scripting integrations
+- **fluvel** — Qt-based user interface and application orchestration
+- **fluvel_ip** — Image processing and segmentation library (C++)
+- **fluvel_bindings** — Python bindings for Fluvel IP (pybind11/C++)
 
 ---
 

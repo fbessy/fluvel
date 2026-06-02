@@ -1,20 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file camera_controller.hpp
- * @brief Camera capture and processing controller.
- *
- * This component manages the full lifecycle of a video stream:
- * - device selection and camera startup
- * - frame acquisition from Qt multimedia
- * - processing via active contour pipeline
- * - UI updates and diagnostics
- *
- * It acts as the bridge between Qt multimedia (QCamera, QVideoSink)
- * and the image processing backend.
- */
-
 #pragma once
 
 #ifndef Q_MOC_RUN
@@ -65,14 +51,22 @@ struct StreamingInfo
 /**
  * @brief High-level controller for camera streaming and processing.
  *
- * Responsibilities:
- * - Manage camera lifecycle (start/stop)
- * - Receive frames from Qt (QVideoSink)
- * - Dispatch frames to processing thread
- * - Monitor stream health (timeouts, watchdog)
- * - Emit UI-ready frames and statistics
+ * CameraController manages the complete lifecycle of a video stream,
+ * from camera initialization and frame acquisition to active contour
+ * processing and UI updates.
  *
- * @note This class is tied to Qt event loop and runs in the main thread.
+ * Responsibilities include:
+ * - device selection and camera startup
+ * - frame acquisition through Qt Multimedia
+ * - dispatching frames to the processing thread
+ * - monitoring stream health (startup timeout, watchdog, stream loss)
+ * - publishing processed frames, contours and diagnostics to the UI
+ *
+ * This class acts as the bridge between the Qt Multimedia subsystem
+ * (QCamera, QVideoSink) and the image-processing backend.
+ *
+ * @note This class is tied to the Qt event loop and is intended to run
+ * in the main thread.
  */
 class CameraController : public QObject
 {

@@ -1,18 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file frame_clock.hpp
- * @brief Global monotonic clock for frame timing.
- *
- * This module provides a centralized time reference based on a steady clock.
- * It is used to measure timestamps and durations consistently across the
- * application (e.g. frame capture, processing, display).
- *
- * The clock is initialized once and all subsequent calls return time relative
- * to that origin.
- */
-
 #pragma once
 
 #include <chrono>
@@ -24,11 +12,14 @@ namespace fluvel
 /**
  * @brief Global monotonic clock utility.
  *
- * Provides high-resolution timestamps relative to an internal start point.
- * Designed for performance measurement and synchronization within the
- * application pipeline.
+ * FrameClock provides a centralized monotonic time reference used
+ * throughout the application for frame capture, processing and display
+ * timing measurements.
  *
- * @note Uses std::chrono::steady_clock (monotonic, not affected by system time changes).
+ * All timestamps are expressed relative to a common initialization point,
+ * ensuring consistent duration and latency measurements across the pipeline.
+ *
+ * @note Uses std::chrono::steady_clock and is not affected by system time changes.
  */
 class FrameClock
 {

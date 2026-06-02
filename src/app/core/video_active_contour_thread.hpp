@@ -1,20 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file video_active_contour_thread.hpp
- * @brief Dedicated thread for real-time video processing using active contours.
- *
- * This component runs the active contour algorithm on incoming video frames
- * in a separate thread. It handles:
- * - frame acquisition from the capture layer
- * - preprocessing (downscale, filtering)
- * - contour computation
- * - conversion to display-ready data
- *
- * The thread operates continuously and emits processed frames for UI consumption.
- */
-
 #pragma once
 
 #ifndef Q_MOC_RUN
@@ -41,12 +27,24 @@ namespace fluvel
 /**
  * @brief Worker thread for video-based active contour processing.
  *
- * This class processes frames asynchronously in a dedicated thread.
- * It maintains an internal pipeline:
+ * VideoActiveContourThread executes the active contour pipeline
+ * asynchronously on incoming video frames.
+ *
+ * The processing pipeline includes:
+ * - frame acquisition from the capture layer
+ * - optional preprocessing (downscaling and filtering)
+ * - active contour computation
+ * - conversion to display-ready data
+ *
+ * Processed frames are emitted to the UI layer while frame acquisition
+ * continues independently.
+ *
+ * Internally, the thread maintains a pipeline of the form:
  *
  * CapturedFrame → preprocessing → active contour → DisplayFrame
  *
- * Thread-safety is ensured through mutexes and atomic flags.
+ * Thread-safety is ensured through mutexes, condition variables
+ * and atomic synchronization primitives.
  *
  * @note Designed for real-time processing with bounded time slices.
  */

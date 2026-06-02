@@ -1,17 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file application_settings.hpp
- * @brief Persistent application-wide settings management.
- *
- * This module provides a singleton responsible for storing, loading, and
- * updating all application settings, including image and video session
- * configurations as well as display preferences.
- *
- * Settings are persisted on disk and propagated to the UI via Qt signals.
- */
-
 #pragma once
 
 #ifndef Q_MOC_RUN
@@ -25,21 +14,25 @@
 namespace fluvel
 {
 
-//! This structure contains all the configuration of the application.
 /**
- * @brief Singleton managing application settings.
+ * @brief Singleton managing persistent application settings.
  *
- * This class centralizes all configuration used by the application,
+ * ApplicationSettings centralizes all configuration used by the application,
  * including:
- * - Image session settings
- * - Video session settings
- * - Display configuration
- * - Application language
+ * - image session settings
+ * - video session settings
+ * - display configuration
+ * - application language
  *
- * It provides persistence (load/save) and notifies the UI of changes
- * through Qt signals.
+ * Settings are loaded from persistent storage at startup, can be updated
+ * at runtime, and are saved back to disk when required.
  *
- * @note Thread affinity follows Qt object rules. Intended for use in the main thread.
+ * Changes are propagated to the user interface through Qt signals,
+ * allowing widgets and controllers to react automatically to configuration
+ * updates.
+ *
+ * @note Intended to be accessed through ApplicationSettings::instance().
+ * @note This class is expected to live in the Qt main thread.
  */
 class ApplicationSettings : public QObject
 {

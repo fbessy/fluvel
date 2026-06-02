@@ -3,12 +3,12 @@
 
 /**
  * @file file_utils.hpp
- * @brief Utility functions for file handling and image filtering.
+ * @brief Utility functions for file and image-format handling.
  *
  * This module provides helper functions for:
  * - building file dialog filters
- * - checking supported image formats
- * - manipulating file names
+ * - querying supported image formats
+ * - manipulating file names and paths
  */
 
 #pragma once

@@ -1,21 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file image_settings_controller.hpp
- * @brief Controller for editing and previewing image processing settings.
- *
- * This component manages the interactive editing of the initial level-set (phi)
- * and associated processing parameters. It provides a preview pipeline that
- * reflects user changes in real time.
- *
- * Responsibilities:
- * - Manage user-defined shapes (add/subtract)
- * - Maintain and update phi representation
- * - Apply preprocessing (downscale + filters)
- * - Generate preview images for UI
- */
-
 #pragma once
 
 #ifndef Q_MOC_RUN
@@ -48,11 +33,19 @@ struct UiShapeInfo
 /**
  * @brief Controller for image settings editing and preview.
  *
- * This class connects UI interactions (shape editing, parameter updates)
- * with the underlying phi editor and processing pipeline.
+ * ImageSettingsController manages the interactive editing of the
+ * initial level-set (phi) and associated processing parameters.
  *
- * It maintains an editable configuration and provides a preview of the
- * resulting processed image.
+ * It connects UI interactions with the underlying phi editor and
+ * preview pipeline, allowing users to modify shapes and processing
+ * settings while receiving immediate visual feedback.
+ *
+ * Responsibilities include:
+ * - managing user-defined shapes (add/subtract operations)
+ * - maintaining and updating the phi representation
+ * - applying preprocessing (downscaling and filters)
+ * - generating preview images for the user interface
+ * - committing or reverting configuration changes
  *
  * @note Intended to run in the Qt main thread.
  */

@@ -1,6 +1,17 @@
 UI Components
 =============
 
+This module contains the reusable user interface components used throughout
+the Fluvel application.
+
+It includes configuration widgets, image viewing components, overlays,
+interaction behaviors and supporting UI infrastructure used to build image
+and video processing workflows.
+
+The image viewer is designed around a composable interaction model, where
+navigation, visualization and editing features are implemented as
+independent behaviors that can be combined and extended.
+
 .. doxygenfile:: algo_settings_widget.hpp
 
 
@@ -22,7 +33,16 @@ UI Components
 .. doxygenfile:: image_viewer_widget.hpp
 
 
+.. doxygenfile:: mini_map_widget.hpp
+
+
+.. doxygenfile:: image_viewer_interaction.hpp
+
+
 .. doxygenfile:: interaction_set.hpp
+
+
+.. doxygenfile:: image_viewer_behavior.hpp
 
 
 .. doxygenfile:: fullscreen_behavior.hpp
@@ -65,4 +85,7 @@ UI Components
 
 
 .. doxygenfile:: right_panel_toggle_button.hpp
+
+
+.. doxygenfile:: image_viewer_listener.hpp
 

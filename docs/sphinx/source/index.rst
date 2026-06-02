@@ -2,8 +2,9 @@
    :parser: myst_parser.sphinx_
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Documentation
 
    modules/app/index
    modules/ip/index
+   modules/py/index

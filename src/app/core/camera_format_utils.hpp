@@ -2,8 +2,8 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 /**
- * @file camera_utils.hpp
- * @brief Utility functions related to camera configuration and formats.
+ * @file camera_format_utils.hpp
+ * @brief Utility functions related to camera device and formats.
  *
  * This module provides helper functions to compare and manipulate
  * Qt camera-related types (e.g. QCameraFormat).

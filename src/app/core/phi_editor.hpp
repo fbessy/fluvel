@@ -1,21 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file phi_editor.hpp
- * @brief Interactive editor for level-set (phi) representation.
- *
- * This component provides editing capabilities for the level-set function
- * (phi) using shape-based operations. It maintains both a working copy
- * and a committed version to support undo/revert workflows.
- *
- * Typical usage:
- * - Load or initialize phi
- * - Apply shape operations (add/subtract)
- * - Preview changes
- * - Commit or revert edits
- */
-
 #pragma once
 
 #include "shape_type.hpp"
@@ -41,11 +26,18 @@ struct ShapeInfo
 /**
  * @brief Editor for level-set image (phi).
  *
- * Maintains two versions of phi:
- * - editedPhi_   : working copy (modifiable)
- * - committedPhi_: last committed state
+ * PhiEditor provides interactive editing capabilities for the level-set
+ * representation used to initialize active contours.
  *
- * Provides shape-based editing operations and supports commit/revert semantics.
+ * It maintains both a working copy and a committed version of phi,
+ * allowing modifications to be previewed before being accepted.
+ *
+ * Supported operations include:
+ * - loading or initializing phi
+ * - adding and subtracting geometric shapes
+ * - clearing the mask
+ * - committing or reverting edits
+ * - resizing the edited representation
  *
  * @note Intended for use in the Qt main thread.
  */

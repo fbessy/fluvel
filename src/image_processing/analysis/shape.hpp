@@ -15,8 +15,11 @@ namespace fluvel_ip
 /**
  * @brief Geometric shape represented as a set of 2D integer points.
  *
- * This class is primarily used to represent contour shapes and supports
- * operations such as centroid computation and Hausdorff distance evaluation.
+ * This class is primarily used to represent contour shapes.
+ *
+ * It provides basic operations on point sets, such as centroid
+ * computation and point shuffling, and serves as the input type
+ * for shape-analysis algorithms such as Hausdorff distance evaluation.
  */
 class Shape
 {

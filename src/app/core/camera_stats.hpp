@@ -1,15 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file camera_stats.hpp
- * @brief Runtime statistics for camera processing pipeline.
- *
- * This structure aggregates performance metrics related to video capture,
- * processing, and display. It is typically used for diagnostics, monitoring,
- * and UI display.
- */
-
 #pragma once
 
 namespace fluvel
@@ -18,7 +9,14 @@ namespace fluvel
 /**
  * @brief Aggregated statistics for camera streaming and processing.
  *
- * All values are expressed in real-time metrics and updated periodically.
+ * CameraStats stores runtime metrics related to video capture,
+ * processing and display performance.
+ *
+ * It is primarily used for diagnostics, monitoring and user interface
+ * reporting.
+ *
+ * Metrics include frame rates, latency measurements, frame drop rate
+ * and contour statistics.
  */
 struct CameraStats
 {

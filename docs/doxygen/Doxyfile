@@ -1,5 +1,5 @@
 PROJECT_NAME           = "Fluvel"
-PROJECT_BRIEF          = "Active contour image processing engine"
+PROJECT_BRIEF          = "Fast level-set platform"
 
 # --------------------------------------------------
 # Input
@@ -50,15 +50,18 @@ WARN_IF_UNDOCUMENTED   = NO
 # Display
 # --------------------------------------------------
 
-FULL_PATH_NAMES        = NO
+FULL_PATH_NAMES         = NO
 
-SHOW_NAMESPACES        = YES
-SHOW_FILES             = NO
-SHOW_INCLUDE_FILES     = NO
-SHOW_USED_FILES        = NO
+SHOW_NAMESPACES         = YES
+SHOW_FILES              = NO
+SHOW_INCLUDE_FILES      = NO
+SHOW_USED_FILES         = NO
 
-INLINE_INFO            = YES
-ALWAYS_DETAILED_SEC    = YES
+INLINE_INFO             = YES
+ALWAYS_DETAILED_SEC     = YES
+
+HIDE_SCOPE_NAMES        = YES
+HIDE_COMPOUND_REFERENCE = YES
 
 # --------------------------------------------------
 # Graphviz

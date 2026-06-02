@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-/**
- * @file shape_type.hpp
- * @brief Enumeration of supported geometric shapes.
- *
- * Defines the set of shapes that can be used for phi editing
- * and UI interactions.
- */
-
 #pragma once
 
 /**

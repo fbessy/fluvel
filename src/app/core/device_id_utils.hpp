@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 /**
- * @file device_utils.hpp
+ * @file device_id_utils.hpp
  * @brief Utilities for encoding and decoding device identifiers.
  *
  * This module provides helper functions to safely convert device identifiers

@@ -1,8 +1,12 @@
 Image Processing Core
 =====================
 
-Core image structures, math utilities,
-memory views and low-level primitives.
+This module contains the fundamental building blocks used throughout
+Fluvel IP.
+
+It provides image abstractions, geometric primitives, memory views,
+mathematical utilities and common infrastructure shared by filtering,
+segmentation and analysis algorithms.
 
 .. doxygenfile:: grid2d.hpp
 

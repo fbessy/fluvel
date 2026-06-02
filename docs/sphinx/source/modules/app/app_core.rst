@@ -1,6 +1,17 @@
 Application Core
 ================
 
+The Application Core module contains the controllers, runtime services
+and shared infrastructure used by the Qt application.
+
+It coordinates image and video processing workflows, manages application
+settings, provides diagnostic and utility facilities, and acts as the
+bridge between the user interface and the underlying Fluvel IP library.
+
+The module includes image and camera controllers, processing workers,
+configuration management, frame-related utilities and editing tools
+used throughout the application.
+
 .. doxygenfile:: image_controller.hpp
 
 

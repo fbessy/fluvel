@@ -3,7 +3,14 @@
 
 /**
  * @file anisotropic_diffusion.hpp
- * @brief Perona-Malik anisotropic diffusion filter implementation.
+ * @brief Perona-Malik anisotropic diffusion filtering.
+ *
+ * Provides parameter types, convenience functions and a reusable
+ * stateful implementation of the Perona-Malik anisotropic diffusion
+ * algorithm.
+ *
+ * The filter smooths homogeneous regions while preserving significant
+ * image edges through gradient-driven diffusion.
  */
 
 #pragma once
