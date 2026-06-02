@@ -44,11 +44,14 @@ public:
     DisplaySettingsWidget(const DisplayConfig& config, QWidget* parent = nullptr);
 
     /**
-     * @brief Enables or disables pipeline-related options.
+     * @brief Updates the availability of image display modes.
      *
-     * @param hasPreprocessing True if preprocessing is available.
+     * When preprocessing is unavailable, the display mode is forced
+     * back to the source image.
+     *
+     * @param hasPreprocessing True if a preprocessed image is available.
      */
-    void updatePipelineAvailability(bool hasPreprocessing);
+    void updateDisplayModeAvailability(bool hasPreprocessing);
 
 signals:
     /**
@@ -74,18 +77,18 @@ private:
 
     bool isAnimating_{false};
 
-    QGroupBox* pipeline_displayed_gb_;
-    QRadioButton* source_rb_;
-    QRadioButton* preprocessed_rb_;
+    QGroupBox* displayModeGroupBox_ = nullptr;
+    QRadioButton* sourceRadioButton_ = nullptr;
+    QRadioButton* preprocessedRadioButton_ = nullptr;
 
-    ColorSelectorWidget* lout_selector_;
-    ColorSelectorWidget* lin_selector_;
+    ColorSelectorWidget* outerContourColorSelector_ = nullptr;
+    ColorSelectorWidget* innerContourColorSelector_ = nullptr;
 
-    QCheckBox* flip_cb_;
-    QCheckBox* smooth_cb_;
+    QCheckBox* mirrorModeCheckBox_ = nullptr;
+    QCheckBox* smoothDisplayCheckBox_ = nullptr;
 
-    QCheckBox* display_overlay_cb_;
-    QCheckBox* miniMap_cb_;
+    QCheckBox* overlayCheckBox_ = nullptr;
+    QCheckBox* miniMapCheckBox_ = nullptr;
 
     DisplayConfig config_{};
 };

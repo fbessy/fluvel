@@ -23,126 +23,124 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
-    pipeline_displayed_gb_ = new QGroupBox(tr("Image:"));
-    source_rb_ = new QRadioButton(tr("Source"));
-    preprocessed_rb_ = new QRadioButton(tr("Preprocessed"));
-    source_rb_->setChecked(config_.displayMode == ImageDisplayMode::Source);
-    preprocessed_rb_->setChecked(config_.displayMode == ImageDisplayMode::Preprocessed);
+    displayModeGroupBox_ = new QGroupBox(tr("Image:"));
+    sourceRadioButton_ = new QRadioButton(tr("Source"));
+    preprocessedRadioButton_ = new QRadioButton(tr("Preprocessed"));
+    sourceRadioButton_->setChecked(config_.displayMode == ImageDisplayMode::Source);
+    preprocessedRadioButton_->setChecked(config_.displayMode == ImageDisplayMode::Preprocessed);
 
-    QVBoxLayout* pipeline_layout = new QVBoxLayout;
-    pipeline_layout->addWidget(source_rb_);
-    pipeline_layout->addWidget(preprocessed_rb_);
-    pipeline_displayed_gb_->setLayout(pipeline_layout);
+    QVBoxLayout* displayModeLayout = new QVBoxLayout;
+    displayModeLayout->addWidget(sourceRadioButton_);
+    displayModeLayout->addWidget(preprocessedRadioButton_);
+    displayModeGroupBox_->setLayout(displayModeLayout);
 
-    lout_selector_ = new ColorSelectorWidget(this, toQColor(config_.outerContourColor));
+    outerContourColorSelector_ = new ColorSelectorWidget(this, toQColor(config_.outerContourColor));
 
-    lin_selector_ = new ColorSelectorWidget(this, toQColor(config_.innerContourColor));
+    innerContourColorSelector_ = new ColorSelectorWidget(this, toQColor(config_.innerContourColor));
 
-    QVBoxLayout* lout_layout = new QVBoxLayout;
-    lout_layout->addWidget(lout_selector_);
-    lout_layout->setContentsMargins(0, 0, 0, 0);
-    lout_layout->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout* outerLayout = new QVBoxLayout;
+    outerLayout->addWidget(outerContourColorSelector_);
+    outerLayout->setContentsMargins(0, 0, 0, 0);
 
-    QGroupBox* lout_gb = new QGroupBox(tr("Outer Contour"));
-    lout_gb->setLayout(lout_layout);
-    lout_gb->setCheckable(true);
-    lout_gb->setChecked(config_.outerContourVisible);
+    QGroupBox* outerColorGroupBox = new QGroupBox(tr("Outer Contour"));
+    outerColorGroupBox->setLayout(outerLayout);
+    outerColorGroupBox->setCheckable(true);
+    outerColorGroupBox->setChecked(config_.outerContourVisible);
 
-    lout_gb->setFlat(true);
-    lout_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    outerColorGroupBox->setFlat(true);
+    outerColorGroupBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
-    QVBoxLayout* lin_layout = new QVBoxLayout;
-    lin_layout->addWidget(lin_selector_);
-    lin_layout->setContentsMargins(0, 0, 0, 0);
-    lin_layout->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout* innerLayout = new QVBoxLayout;
+    innerLayout->addWidget(innerContourColorSelector_);
+    innerLayout->setContentsMargins(0, 0, 0, 0);
 
-    QGroupBox* lin_gb = new QGroupBox(tr("Inner Contour"));
-    lin_gb->setLayout(lin_layout);
-    lin_gb->setCheckable(true);
-    lin_gb->setChecked(config_.innerContourVisible);
+    QGroupBox* innerColorGroupBox = new QGroupBox(tr("Inner Contour"));
+    innerColorGroupBox->setLayout(innerLayout);
+    innerColorGroupBox->setCheckable(true);
+    innerColorGroupBox->setChecked(config_.innerContourVisible);
 
-    lin_gb->setFlat(true);
-    lin_gb->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    innerColorGroupBox->setFlat(true);
+    innerColorGroupBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
 
-    flip_cb_ = new QCheckBox(tr("Selfie Mirror"));
-    flip_cb_->setChecked(config_.mirrorMode);
+    mirrorModeCheckBox_ = new QCheckBox(tr("Selfie Mirror"));
+    mirrorModeCheckBox_->setChecked(config_.mirrorMode);
 
-    smooth_cb_ = new QCheckBox(tr("Smooth Display"));
-    smooth_cb_->setChecked(config_.smoothDisplay);
+    smoothDisplayCheckBox_ = new QCheckBox(tr("Smooth Display"));
+    smoothDisplayCheckBox_->setChecked(config_.smoothDisplay);
 
-    QGroupBox* rendering_gb = new QGroupBox(tr("Rendering:"));
-    QVBoxLayout* rendering_layout = new QVBoxLayout;
-    rendering_layout->addWidget(flip_cb_);
-    rendering_layout->addWidget(smooth_cb_);
-    rendering_gb->setLayout(rendering_layout);
+    QGroupBox* renderingGroupBox = new QGroupBox(tr("Rendering:"));
+    QVBoxLayout* renderingLayout = new QVBoxLayout;
+    renderingLayout->addWidget(mirrorModeCheckBox_);
+    renderingLayout->addWidget(smoothDisplayCheckBox_);
+    renderingGroupBox->setLayout(renderingLayout);
 
-    display_overlay_cb_ = new QCheckBox(tr("Overlay"));
-    display_overlay_cb_->setChecked(config_.algorithmOverlayEnabled);
+    overlayCheckBox_ = new QCheckBox(tr("Overlay"));
+    overlayCheckBox_->setChecked(config_.algorithmOverlayEnabled);
 
-    miniMap_cb_ = new QCheckBox(tr("Mini-map"));
-    miniMap_cb_->setChecked(config_.miniMapEnabled);
+    miniMapCheckBox_ = new QCheckBox(tr("Mini-map"));
+    miniMapCheckBox_->setChecked(config_.miniMapEnabled);
 
     auto* title = new QLabel(tr("View"));
     title->setStyleSheet("font-weight: bold; font-size: 14px;");
 
-    QVBoxLayout* widget_layout = new QVBoxLayout;
-    widget_layout->addWidget(title);
-    widget_layout->addSpacing(12);
-    widget_layout->addWidget(pipeline_displayed_gb_);
-    widget_layout->addWidget(lout_gb);
-    widget_layout->addWidget(lin_gb);
-    widget_layout->addWidget(rendering_gb);
-    widget_layout->addSpacing(6);
-    widget_layout->addWidget(display_overlay_cb_);
-    widget_layout->addWidget(miniMap_cb_);
+    QVBoxLayout* widgetLayout = new QVBoxLayout;
+    widgetLayout->addWidget(title);
+    widgetLayout->addSpacing(12);
+    widgetLayout->addWidget(displayModeGroupBox_);
+    widgetLayout->addWidget(outerColorGroupBox);
+    widgetLayout->addWidget(innerColorGroupBox);
+    widgetLayout->addWidget(renderingGroupBox);
+    widgetLayout->addSpacing(6);
+    widgetLayout->addWidget(overlayCheckBox_);
+    widgetLayout->addWidget(miniMapCheckBox_);
 
-    widget_layout->addStretch();
+    widgetLayout->addStretch();
 
-    setLayout(widget_layout);
+    setLayout(widgetLayout);
 
-    connect(lout_gb, &QGroupBox::toggled, this,
+    connect(outerColorGroupBox, &QGroupBox::toggled, this,
             [this](bool checked)
             {
                 config_.outerContourVisible = checked;
                 emit displayConfigChanged(config_);
             });
 
-    connect(lout_selector_, &ColorSelectorWidget::colorSelected, this,
+    connect(outerContourColorSelector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
                 config_.outerContourColor = toRgb_uc(color);
                 emit displayConfigChanged(config_);
             });
 
-    connect(lin_gb, &QGroupBox::toggled, this,
+    connect(innerColorGroupBox, &QGroupBox::toggled, this,
             [this](bool checked)
             {
                 config_.innerContourVisible = checked;
                 emit displayConfigChanged(config_);
             });
 
-    connect(lin_selector_, &ColorSelectorWidget::colorSelected, this,
+    connect(innerContourColorSelector_, &ColorSelectorWidget::colorSelected, this,
             [this](const QColor& color)
             {
                 config_.innerContourColor = toRgb_uc(color);
                 emit displayConfigChanged(config_);
             });
 
-    connect(display_overlay_cb_, &QCheckBox::toggled, this,
+    connect(overlayCheckBox_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.algorithmOverlayEnabled = checked;
                 emit displayConfigChanged(config_);
             });
 
-    connect(miniMap_cb_, &QCheckBox::toggled, this,
+    connect(miniMapCheckBox_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.miniMapEnabled = checked;
                 emit displayConfigChanged(config_);
             });
 
-    connect(source_rb_, &QRadioButton::toggled, this,
+    connect(sourceRadioButton_, &QRadioButton::toggled, this,
             [this](bool checked)
             {
                 if (!checked)
@@ -152,7 +150,7 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                 emit displayConfigChanged(config_);
             });
 
-    connect(preprocessed_rb_, &QRadioButton::toggled, this,
+    connect(preprocessedRadioButton_, &QRadioButton::toggled, this,
             [this](bool checked)
             {
                 if (!checked)
@@ -162,14 +160,14 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
                 emit displayConfigChanged(config_);
             });
 
-    connect(flip_cb_, &QCheckBox::toggled, this,
+    connect(mirrorModeCheckBox_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.mirrorMode = checked;
                 emit displayConfigChanged(config_);
             });
 
-    connect(smooth_cb_, &QCheckBox::toggled, this,
+    connect(smoothDisplayCheckBox_, &QCheckBox::toggled, this,
             [this](bool checked)
             {
                 config_.smoothDisplay = checked;
@@ -177,14 +175,14 @@ DisplaySettingsWidget::DisplaySettingsWidget(const DisplayConfig& config, QWidge
             });
 }
 
-void DisplaySettingsWidget::updatePipelineAvailability(bool hasPreprocessing)
+void DisplaySettingsWidget::updateDisplayModeAvailability(bool hasPreprocessing)
 {
-    pipeline_displayed_gb_->setEnabled(hasPreprocessing);
+    displayModeGroupBox_->setEnabled(hasPreprocessing);
 
     if (!hasPreprocessing)
     {
-        source_rb_->setChecked(true);
-        preprocessed_rb_->setChecked(false);
+        sourceRadioButton_->setChecked(true);
+        preprocessedRadioButton_->setChecked(false);
     }
 }
 

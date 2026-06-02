@@ -338,7 +338,7 @@ void CameraWindow::setupConnections()
                                         conf.compute.spatialFilteringEnabled ||
                                         conf.compute.temporalFilteringEnabled;
 
-                displayBar_->updatePipelineAvailability(hasPreprocessing);
+                displayBar_->updateDisplayModeAvailability(hasPreprocessing);
             });
 
     // refresh button in function of user action
@@ -362,7 +362,7 @@ void CameraWindow::applyInitialSettings()
     bool preprocessing = app.videoSettings().compute.downscale.downscaleEnabled ||
                          app.videoSettings().compute.temporalFilteringEnabled;
 
-    displayBar_->updatePipelineAvailability(preprocessing);
+    displayBar_->updateDisplayModeAvailability(preprocessing);
 
     refreshUi();
 

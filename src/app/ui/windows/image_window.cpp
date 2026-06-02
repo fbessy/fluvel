@@ -371,7 +371,7 @@ void ImageWindow::applyInitialSettings()
     bool preprocessing =
         config.compute.downscale.downscaleEnabled || config.compute.processing.hasActiveProcessing();
 
-    displayBar_->updatePipelineAvailability(preprocessing);
+    displayBar_->updateDisplayModeAvailability(preprocessing);
 
     updateRecentFileActions();
     updateCameraAction(cameraWindow_->isCameraAvailable());
@@ -444,7 +444,7 @@ void ImageWindow::setupConnections()
                 bool hasPreprocessing =
                     conf.compute.downscale.downscaleEnabled || conf.compute.processing.hasActiveProcessing();
 
-                displayBar_->updatePipelineAvailability(hasPreprocessing);
+                displayBar_->updateDisplayModeAvailability(hasPreprocessing);
 
                 currentDownscale_ = conf.compute.downscale;
 
