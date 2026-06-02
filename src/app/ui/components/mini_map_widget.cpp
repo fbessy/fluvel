@@ -34,12 +34,18 @@ void MiniMapWidget::setImage(const QImage& image)
 
 void MiniMapWidget::setSceneRect(const QRectF& sceneRect)
 {
+    if (sceneRect_ == sceneRect)
+        return;
+
     sceneRect_ = sceneRect;
     update();
 }
 
 void MiniMapWidget::setVisibleRect(const QRectF& visibleRect)
 {
+    if (visibleRect_ == visibleRect)
+        return;
+
     visibleRect_ = visibleRect;
     update();
 }

@@ -494,7 +494,6 @@ bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
              << delta.y();
 #endif
 
-    updateMiniMap();
     return true;
 }
 
@@ -511,6 +510,7 @@ void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoin
     const QPoint zoomOverlayPosition = cursorPosition + QPoint(20, -26);
 
     setTextPosition(zoomOverlayPosition, zoomOverlayItem_);
+    updateMiniMap();
 }
 
 void ImageViewerWidget::updateInteractionAfterZoom()
