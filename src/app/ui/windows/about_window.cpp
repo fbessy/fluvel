@@ -46,12 +46,16 @@ QString buildVersionString()
     return version;
 }
 
-QString buildType =
+const QString& buildType()
+{
 #ifdef QT_DEBUG
-    "Debug";
+    static const QString value = QStringLiteral("Debug");
 #else
-    "Release";
+    static const QString value = QStringLiteral("Release");
 #endif
+
+    return value;
+}
 
 QString packageType()
 {
@@ -119,7 +123,7 @@ QString buildFingerprint()
 
     data += "Version:" FLUVEL_VERSION "\n";
     data += "Git:" FLUVEL_GIT_COMMIT "\n";
-    data += QString("BuildType:%1\n").arg(buildType);
+    data += QString("BuildType:%1\n").arg(buildType());
     data += "Qt:" + QString(qVersion()) + "\n";
     data += "Compiler:" + compilerInfo() + "\n";
     data += "CMake:" FLUVEL_CMAKE_VERSION "\n";
@@ -248,8 +252,7 @@ AboutWindow::AboutWindow(QWidget* parent)
     linksLabel->setText(QString("<a href='https://fabienip.gitlab.io/fluvel/'>%1</a><br>"
                                 "<a href='https://github.com/fbessy/fluvel/'>GitHub</a><br>"
                                 "<a href='https://fbessy.github.io/fluvel/'>%2</a>")
-                            .arg(tr("Documentation"))
-                            .arg(tr("Home")));
+                            .arg(tr("Documentation"), tr("Home")));
 
     linksLabel->setOpenExternalLinks(true);
 
@@ -531,7 +534,7 @@ QString AboutWindow::buildTechnicalSection()
         "<div style='margin-left:12px; font-family:monospace; white-space:pre-wrap;'>";
 
     htmlBlock += addLine(tr("Git commit"), FLUVEL_GIT_COMMIT);
-    htmlBlock += addLine(tr("Build type"), buildType);
+    htmlBlock += addLine(tr("Build type"), buildType());
     htmlBlock += addLine(tr("Build origin"), FLUVEL_BUILD_ORIGIN);
     htmlBlock += addLine(tr("Build date (UTC)"), formattedBuildDate());
     htmlBlock += addLine(tr("Qt (build)"), QString(QT_VERSION_STR));

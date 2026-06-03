@@ -50,7 +50,9 @@ CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, Q
 
     if (qEnvironmentVariableIsSet("APPIMAGE"))
     {
-        for (QAbstractButton* button : dialogButtons_->buttons())
+        const auto buttons = dialogButtons_->buttons();
+
+        for (QAbstractButton* button : buttons)
         {
             button->setIcon(QIcon());
         }

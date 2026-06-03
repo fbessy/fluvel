@@ -14,11 +14,7 @@
 // to check fallbacks icons
 // #define FLUVEL_FORCE_EMBEDDED_ICONS
 
-namespace fluvel
-{
-
-// icon loader namespace for function outside a class
-namespace il
+namespace fluvel::il
 {
 
 static bool isDarkMode()
@@ -40,7 +36,8 @@ static QIcon loadSvgWithPalette(const QString& path)
     if (isDarkMode())
         color = color.lighter(110);
 
-    svg.replace(QRegularExpression(R"(color\s*:\s*#[0-9a-fA-F]+)"), "color:" + color.name());
+    static const QRegularExpression kColorRegex(R"(color\s*:\s*#[0-9a-fA-F]+)");
+    svg.replace(kColorRegex, "color:" + color.name());
 
     QByteArray data = svg.toUtf8();
 
@@ -128,6 +125,4 @@ QIcon loadIcon(const QString& svgResourceName)
     return loadSvgWithPalette(svgResourceName);
 }
 
-} // namespace il
-
-} // namespace fluvel
+} // namespace fluvel::il

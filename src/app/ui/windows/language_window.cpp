@@ -44,10 +44,10 @@ LanguageWindow::LanguageWindow(QWidget* parent)
         combo_->setCurrentIndex(index);
 
     // --- Buttons ---
-    QDialogButtonBox* buttons = new QDialogButtonBox(this);
-    buttons->addButton(QDialogButtonBox::Ok);
-    buttons->addButton(QDialogButtonBox::Cancel);
-    buttons->setCenterButtons(true);
+    QDialogButtonBox* dialogButtons_ = new QDialogButtonBox(this);
+    dialogButtons_->addButton(QDialogButtonBox::Ok);
+    dialogButtons_->addButton(QDialogButtonBox::Cancel);
+    dialogButtons_->setCenterButtons(true);
 
 #ifdef Q_OS_LINUX
 
@@ -56,7 +56,9 @@ LanguageWindow::LanguageWindow(QWidget* parent)
 
     if (qEnvironmentVariableIsSet("APPIMAGE"))
     {
-        for (QAbstractButton* button : buttons->buttons())
+        const auto buttons = dialogButtons_->buttons();
+
+        for (QAbstractButton* button : buttons)
         {
             button->setIcon(QIcon());
         }
@@ -64,9 +66,9 @@ LanguageWindow::LanguageWindow(QWidget* parent)
 
 #endif
 
-    connect(buttons, &QDialogButtonBox::accepted, this, &LanguageWindow::accept);
+    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &LanguageWindow::accept);
 
-    connect(buttons, &QDialogButtonBox::rejected, this, &LanguageWindow::reject);
+    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &LanguageWindow::reject);
 
     // --- Restart label ---
     QLabel* restart_label = new QLabel(this);
@@ -78,7 +80,7 @@ LanguageWindow::LanguageWindow(QWidget* parent)
     QVBoxLayout* layout_this = new QVBoxLayout;
     layout_this->addWidget(combo_);
     layout_this->addWidget(restart_label);
-    layout_this->addWidget(buttons);
+    layout_this->addWidget(dialogButtons_);
     layout_this->setSizeConstraint(QLayout::SetMinimumSize);
 
     setLayout(layout_this);

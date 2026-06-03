@@ -75,9 +75,9 @@ QString buildWritableImageFilter()
 
 QString defaultExtensionFromFilter(const QString& selectedFilter)
 {
-    QRegularExpression re(R"(\*\.(\w+))");
+    static const QRegularExpression kExtensionRegex(R"(\*\.(\w+))");
 
-    QRegularExpressionMatch match = re.match(selectedFilter);
+    QRegularExpressionMatch match = kExtensionRegex.match(selectedFilter);
 
     if (match.hasMatch())
         return match.captured(1);

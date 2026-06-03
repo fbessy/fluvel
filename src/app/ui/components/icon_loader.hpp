@@ -6,10 +6,9 @@
 #include <QIcon>
 #include <QStyle>
 
-namespace fluvel
-{
-
 /**
+ * @file icon_loader.hpp
+ *
  * @brief Icon loading utilities with fallback support.
  *
  * These functions attempt to load icons from:
@@ -21,14 +20,9 @@ namespace fluvel
  * @note Fallback icons are typically Qt resource paths
  *       (e.g. ":/icons/...").
  */
-namespace il
-{
 
-/**
- * @name Icon loading
- * @brief Load icons from the system theme with embedded fallback resources.
- * @{
- */
+namespace fluvel::il
+{
 
 /**
  * @brief Returns the shared Fluvel application icon.
@@ -90,8 +84,5 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback);
  * @return Loaded icon.
  */
 QIcon loadIcon(const QString& svgResourceName);
-/** @} */
 
-} // namespace il
-
-} // namespace fluvel
+} // namespace fluvel::il
