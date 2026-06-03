@@ -18,8 +18,6 @@ function(fluvel_configure_target target)
                 -Wshadow
                 -Wuninitialized
 
-                -Wswitch-enum
-
                 -Wnon-virtual-dtor
                 -Woverloaded-virtual
 
@@ -54,6 +52,23 @@ function(fluvel_configure_target target)
             $<$<CONFIG:Release>:/O2>
             $<$<CONFIG:RelWithDebInfo>:/O2 /Zi>
             $<$<CONFIG:MinSizeRel>:/O1>
+        )
+
+    endif()
+
+endfunction()
+
+function(fluvel_configure_standalone_target target)
+
+    fluvel_configure_target(${target})
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+
+        target_compile_options(${target} PRIVATE
+
+            $<$<CONFIG:Debug>:
+                -Wswitch-enum
+            >
         )
 
     endif()
