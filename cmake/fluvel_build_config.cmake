@@ -94,7 +94,24 @@ if(ENABLE_ASAN)
         -fno-omit-frame-pointer
         -fno-sanitize-recover=undefined
         -g
+
+        -Wconversion
+        -Wsign-conversion
+
+        -Wcast-qual
+        -Wformat=2
+        -Wundef
+        -Wimplicit-fallthrough
+        -Wmissing-field-initializers
+
+        #-Weverything
     )
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options(
+            -Wconditional-uninitialized
+        )
+    endif()
 
     add_link_options(
         -fsanitize=address,undefined

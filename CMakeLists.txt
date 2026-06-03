@@ -46,6 +46,8 @@ option(FLUVEL_UI_DESKTOP
 
 include(cmake/fluvel_platforms.cmake)
 include(cmake/fluvel_build_config.cmake)
+include(cmake/fluvel_target_config.cmake)
+
 
 set(FLUVEL_ROOT_DIR
     ${PROJECT_SOURCE_DIR}

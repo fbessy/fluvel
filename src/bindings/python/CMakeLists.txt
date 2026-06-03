@@ -40,6 +40,8 @@ pybind11_add_module(
     ${python_src}
 )
 
+fluvel_configure_target(${PYTHON_TARGET_NAME})
+
 target_link_libraries(
     ${PYTHON_TARGET_NAME}
 

@@ -98,6 +98,9 @@ set(ip_src
 )
 
 add_library(${LIB_TARGET_NAME} STATIC ${ip_src})
+
+fluvel_configure_target(${LIB_TARGET_NAME})
+
 add_library(fluvel::image_processing ALIAS ${LIB_TARGET_NAME})
 
 set_target_properties(${LIB_TARGET_NAME} PROPERTIES

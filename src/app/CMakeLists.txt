@@ -275,43 +275,7 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
     ${INTEROP_DIR}
 )
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    target_compile_options(${APP_TARGET_NAME} PRIVATE
-        $<$<CONFIG:Debug>:
-            -O0
-            -g
-            -Wall
-            -Wextra
-            -Wpedantic
-            -Wconversion
-            -Wsign-conversion
-            -Wshadow
-            -Wold-style-cast
-            -Wfloat-equal
-            -Wnull-dereference
-        >
-        $<$<CONFIG:Release>:
-            -O3
-            -DNDEBUG
-        >
-        $<$<CONFIG:RelWithDebInfo>:
-            -O2
-            -g
-            -DNDEBUG
-        >
-        $<$<CONFIG:MinSizeRel>:
-            -Os
-            -DNDEBUG
-        >
-    )
-elseif (MSVC)
-    target_compile_options(${APP_TARGET_NAME} PRIVATE
-        $<$<CONFIG:Debug>:/Od /Zi>
-        $<$<CONFIG:Release>:/O2>
-        $<$<CONFIG:RelWithDebInfo>:/O2 /Zi>
-        $<$<CONFIG:MinSizeRel>:/O1>
-    )
-endif()
+fluvel_configure_target(${APP_TARGET_NAME})
 
 set(APP_QT_LIBS
     Qt6::Core
