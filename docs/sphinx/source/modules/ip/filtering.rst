@@ -34,10 +34,14 @@ Morphology
 .. doxygenfile:: van_herk_morpho.hpp
 
 
-Pixel Operations
-----------------
+Noise
+-----
 
 .. doxygenfile:: noise.hpp
+
+Pixel-wise Operations
+---------------------
+
 .. doxygenfile:: pixel_wise.hpp
 
 
