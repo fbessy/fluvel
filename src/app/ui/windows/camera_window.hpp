@@ -53,7 +53,7 @@ enum class DeviceStreamingStatus
 struct SavedFormat
 {
     QSize resolution;
-    float fps = 0.f;
+    float fps{0.f};
     QVideoFrameFormat::PixelFormat pixelFormat = QVideoFrameFormat::Format_Invalid;
 
     bool isValid() const

@@ -157,7 +157,7 @@ private:
     std::unique_ptr<fluvel_ip::ActiveContour> activeContour_;
 
     /// Current frame size.
-    QSize currentSize_ = {0, 0};
+    QSize currentSize_{0, 0};
 
     /// Spatial smoothing filter (3x3 mean).
     fluvel_ip::filter::Mean3x3 spatialFilter_;

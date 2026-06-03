@@ -187,11 +187,11 @@ private:
         return ((x + 1) + (y + 1) * stridePad_) * activeChannels_ + c;
     }
 
-    int w_ = 0;              //!< Image width.
-    int h_ = 0;              //!< Image height.
-    int channels_ = 0;       //!< Number of input channels.
-    int activeChannels_ = 0; //!< Number of processed channels.
-    int stridePad_ = 0;      //!< Stride of padded buffers.
+    int w_{0};              //!< Image width.
+    int h_{0};              //!< Image height.
+    int channels_{0};       //!< Number of input channels.
+    int activeChannels_{0}; //!< Number of processed channels.
+    int stridePad_{0};      //!< Stride of padded buffers.
 
     std::vector<double> current_; //!< Current diffusion buffer.
     std::vector<double> next_;    //!< Next diffusion buffer.

@@ -76,24 +76,23 @@ private:
  */
 struct ContourDiagnostics
 {
-    int stepCount = 0; ///< Total number of evolution steps performed.
+    int stepCount{0}; ///< Total number of evolution steps performed.
 
     fluvel_ip::PhaseState state{fluvel_ip::PhaseState::Cycle1}; ///< Current phase of the algorithm.
 
-    ChannelVector meanInside{0, 0, 0}; ///< Mean value inside the contour (per channel).
-
+    ChannelVector meanInside{0, 0, 0};  ///< Mean value inside the contour (per channel).
     ChannelVector meanOutside{0, 0, 0}; ///< Mean value outside the contour (per channel).
 
     fluvel_ip::StoppingStatus stoppingStatus{
         fluvel_ip::StoppingStatus::None}; ///< Reason for stopping.
 
-    float hausdorffQuantile = 0.f; ///< Normalized Hausdorff distance (quantile).
+    float hausdorffQuantile{0.f}; ///< Normalized Hausdorff distance (quantile).
 
-    float relativeCentroidDistance = 0.f; ///< Normalized centroid displacement.
+    float relativeCentroidDistance{0.f}; ///< Normalized centroid displacement.
 
-    double elapsedSec = 0.0; ///< Execution time in seconds.
+    double elapsedSec{0.0}; ///< Execution time in seconds.
 
-    std::size_t contourSize = 0; ///< Number of points in the contour.
+    std::size_t contourSize{0}; ///< Number of points in the contour.
 };
 
 /**

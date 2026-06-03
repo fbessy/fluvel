@@ -19,10 +19,10 @@ namespace fluvel_ip
  */
 struct KernelSupport
 {
-    int min_dx = 0; ///< Minimum horizontal offset (left extent).
-    int max_dx = 0; ///< Maximum horizontal offset (right extent).
-    int min_dy = 0; ///< Minimum vertical offset (top extent).
-    int max_dy = 0; ///< Maximum vertical offset (bottom extent).
+    int min_dx{0}; ///< Minimum horizontal offset (left extent).
+    int max_dx{0}; ///< Maximum horizontal offset (right extent).
+    int min_dy{0}; ///< Minimum vertical offset (top extent).
+    int max_dy{0}; ///< Maximum vertical offset (bottom extent).
 };
 
 /**
