@@ -13,6 +13,17 @@ speed computation and initialization, making it possible to combine
 different segmentation strategies while reusing the same underlying
 infrastructure.
 
+References
+----------
+
+Yonggang Shi and William C. Karl,
+*A Real-Time Algorithm for the Approximation of Level-Set-Based Curve Evolution*,
+IEEE Transactions on Image Processing, 17(5):645–656, 2008.
+
+Tony F. Chan and Luminita A. Vese,
+*Active Contours Without Edges*,
+IEEE Transactions on Image Processing, 10(2):266–277, 2001.
+
 
 Active Contours
 ---------------

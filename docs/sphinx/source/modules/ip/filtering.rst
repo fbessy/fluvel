@@ -10,43 +10,60 @@ processing pipelines. These algorithms are commonly used to prepare images
 for segmentation and shape-analysis tasks.
 
 
-Smoothing
----------
+References
+----------
 
-.. doxygenfile:: mean_filter.hpp
-.. doxygenfile:: mean_filter_3x3.hpp
-.. doxygenfile:: mean_filter_sliding.hpp
-.. doxygenfile:: median_filter.hpp
-.. doxygenfile:: temporal_mean.hpp
+Pietro Perona and Jitendra Malik,
+*Scale-Space and Edge Detection Using Anisotropic Diffusion*,
+IEEE Transactions on Pattern Analysis and Machine Intelligence,
+12(7):629–639, 1990.
+
+Simon Perreault and Patrick Hébert,
+*Median Filtering in Constant Time*,
+IEEE Transactions on Image Processing,
+16(9):2389–2394, 2007.
+
+Marcel van Herk,
+*A Fast Algorithm for Local Minimum and Maximum Filters on Rectangular and Octagonal Kernels*,
+Pattern Recognition Letters,
+13(7):517–521, 1992.
 
 
-Diffusion
----------
+Related Components
+------------------
 
-.. doxygenfile:: anisotropic_diffusion.hpp
+- :cpp:class:`fluvel_ip::filter::TemporalMean`
 
+
+Filter
+------
+
+.. doxygennamespace:: fluvel_ip::filter
+   :members:
 
 Morphology
 ----------
 
-.. doxygenfile:: morpho.hpp
-.. doxygenfile:: naive_morpho.hpp
-.. doxygenfile:: van_herk_morpho.hpp
-
+.. doxygennamespace:: fluvel_ip::filter::morpho
+   :members:
 
 Noise
 -----
 
-.. doxygenfile:: noise.hpp
+.. doxygennamespace:: fluvel_ip::noise
+   :members:
 
 Pixel-wise Operations
 ---------------------
 
-.. doxygenfile:: pixel_wise.hpp
-
+.. doxygennamespace:: fluvel_ip::pixelwise
+   :members:
 
 Pipeline
 --------
 
-.. doxygenfile:: image_pipeline.hpp
-.. doxygenfile:: processing_params.hpp
+.. doxygenclass:: fluvel_ip::ImagePipeline
+   :members:
+
+.. doxygenstruct:: fluvel_ip::ProcessingParams
+   :members:

@@ -14,15 +14,24 @@ namespace fluvel_ip::filter
 {
 
 /**
- * @brief Temporal mean filter with adaptive behavior.
+ * @brief Adaptive temporal smoothing filter.
  *
- * This filter accumulates successive frames to reduce noise over time.
- * It uses an exponential moving average and adapts its behavior based
- * on motion estimation and temporal dynamics.
+ * This filter performs temporal denoising by maintaining an
+ * exponentially weighted moving average (EWMA) of successive frames.
  *
- * Typical use case:
- * - video denoising
- * - stabilization of noisy signals
+ * The smoothing strength is automatically adjusted according to the
+ * estimated scene motion and noise level:
+ *
+ * - static scenes are strongly averaged to reduce sensor noise,
+ * - moving scenes remain reactive to avoid motion blur and ghosting.
+ *
+ * The implementation uses a continuous-time formulation, making the
+ * filter largely independent of the input frame rate.
+ *
+ * Typical use cases:
+ * - video denoising,
+ * - low-light image stabilization,
+ * - temporal noise reduction in live acquisition pipelines.
  */
 class TemporalMean
 {
