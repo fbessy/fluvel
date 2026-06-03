@@ -117,7 +117,7 @@ ContourData::ContourData(ContourData&& contour) noexcept
 
 void ContourData::allocateLists()
 {
-    const size_t perimeter = static_cast<const size_t>(2 * (phi_.width() + phi_.height()));
+    const size_t perimeter = static_cast<size_t>(2 * (phi_.width() + phi_.height()));
     const size_t elem_alloc_size_ = 3 * perimeter;
 
     outerBoundary_.reserve(elem_alloc_size_);
