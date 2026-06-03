@@ -145,7 +145,8 @@ void bindNoise(py::module_& m)
             return imageOwnerToPyArray(out);
         },
 
-        py::arg("image"), py::arg("sigma") = kDefaultGaussianSigmaNoise, kGaussianNoiseDoc);
+        py::arg("image"), py::arg("sigma") = fluvel_ip::noise::kDefaultGaussianSigmaNoise,
+        kGaussianNoiseDoc);
 
     m.def(
         "impulsive_noise",
@@ -162,7 +163,8 @@ void bindNoise(py::module_& m)
             return imageOwnerToPyArray(out);
         },
 
-        py::arg("image"), py::arg("probability") = kDefaultImpulsiveNoise, kImpulsiveNoiseDoc);
+        py::arg("image"), py::arg("probability") = fluvel_ip::noise::kDefaultImpulsiveNoise,
+        kImpulsiveNoiseDoc);
 
     m.def(
         "speckle_uniform",
@@ -179,7 +181,8 @@ void bindNoise(py::module_& m)
             return imageOwnerToPyArray(out);
         },
 
-        py::arg("image"), py::arg("sigma") = kDefaultSpeckleNoise, kSpeckleUniformDoc);
+        py::arg("image"), py::arg("sigma") = fluvel_ip::noise::kDefaultSpeckleNoise,
+        kSpeckleUniformDoc);
 
     m.def(
         "speckle_gamma",
@@ -196,5 +199,6 @@ void bindNoise(py::module_& m)
             return imageOwnerToPyArray(out);
         },
 
-        py::arg("image"), py::arg("sigma") = kDefaultSpeckleNoise, kSpeckleGammaDoc);
+        py::arg("image"), py::arg("sigma") = fluvel_ip::noise::kDefaultSpeckleNoise,
+        kSpeckleGammaDoc);
 }

@@ -8,6 +8,9 @@
 
 #include <random>
 
+namespace fluvel_ip::noise
+{
+
 /**
  * @brief Default standard deviation for additive Gaussian noise.
  */
@@ -22,9 +25,6 @@ static constexpr float kDefaultImpulsiveNoise{0.05f};
  * @brief Default standard deviation for multiplicative speckle noise.
  */
 static constexpr float kDefaultSpeckleNoise{0.16f};
-
-namespace fluvel_ip::noise
-{
 
 /**
  * @brief Apply additive Gaussian noise.
