@@ -6,6 +6,8 @@
 #include <chrono>
 #include <type_traits>
 
+#include <cassert>
+
 namespace fluvel_ip
 {
 
@@ -34,6 +36,7 @@ public:
     void start()
     {
         start_ = clock::now();
+        started_ = true;
     }
 
     /**
@@ -53,9 +56,11 @@ public:
      * @return Elapsed time in seconds.
      */
     template <typename T = double>
+    [[nodiscard]]
     T elapsedSec() const
         requires std::is_floating_point_v<T>
     {
+        assert(started_);
         return std::chrono::duration<T>(clock::now() - start_).count();
     }
 
@@ -66,9 +71,11 @@ public:
      * @return Elapsed time in milliseconds.
      */
     template <typename T = double>
+    [[nodiscard]]
     T elapsedMs() const
         requires std::is_floating_point_v<T>
     {
+        assert(started_);
         return std::chrono::duration<T, std::milli>(clock::now() - start_).count();
     }
 
@@ -80,14 +87,25 @@ public:
      * @return True if elapsed time is less than d.
      */
     template <typename Duration>
+    [[nodiscard]]
     bool elapsedLessThan(Duration d) const
     {
+        assert(started_);
         return (clock::now() - start_) < d;
     }
 
+    [[nodiscard]]
+    bool isStarted() const noexcept
+    {
+        return started_;
+    };
+
 private:
     /// Start time point.
-    clock::time_point start_;
+    clock::time_point start_{};
+
+    /// Indicates whether the timer has been started.
+    bool started_{false};
 };
 
 } // namespace fluvel_ip

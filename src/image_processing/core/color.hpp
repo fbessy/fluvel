@@ -24,10 +24,10 @@ namespace fluvel_ip
  */
 struct Bgra32
 {
-    unsigned char blue;  ///< Blue channel
-    unsigned char green; ///< Green channel
-    unsigned char red;   ///< Red channel
-    unsigned char alpha; ///< Alpha channel
+    unsigned char blue{};  ///< Blue channel
+    unsigned char green{}; ///< Green channel
+    unsigned char red{};   ///< Red channel
+    unsigned char alpha{}; ///< Alpha channel
 };
 
 /**
@@ -222,9 +222,9 @@ using Rgb_f = Rgb<float>;
  */
 struct Lab_f
 {
-    float L; ///< Lightness
-    float a; ///< Green-red axis
-    float b; ///< Blue-yellow axis
+    float L{}; ///< Lightness
+    float a{}; ///< Green-red axis
+    float b{}; ///< Blue-yellow axis
 };
 
 /**
@@ -232,9 +232,9 @@ struct Lab_f
  */
 struct Luv_f
 {
-    float L;
-    float u;
-    float v;
+    float L{};
+    float u{};
+    float v{};
 };
 
 /**
@@ -242,9 +242,9 @@ struct Luv_f
  */
 struct Xyz_f
 {
-    float X;
-    float Y;
-    float Z;
+    float X{};
+    float Y{};
+    float Z{};
 };
 
 /**
@@ -254,9 +254,9 @@ struct Xyz_f
  */
 struct Components_3i
 {
-    int c1; ///< First component
-    int c2; ///< Second component
-    int c3; ///< Third component
+    int c1{}; ///< First component
+    int c2{}; ///< Second component
+    int c3{}; ///< Third component
 
     /**
      * @brief Default comparison operator (C++20).

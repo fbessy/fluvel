@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "median_filter.hpp"
+#include "image_alpha.hpp"
 
 #include <cassert>
 
@@ -12,7 +13,6 @@ void median(const ImageView& input, ImageOwner& output, int radius)
 {
     Median impl;
 
-    impl.reset(input);
     impl.apply(input, radius);
 
     std::swap(output, impl.outputRef());
@@ -30,11 +30,15 @@ void Median::reset(const ImageView& input)
     width_ = input.width();
     height_ = input.height();
     channels_ = input.channels();
+    activeChannels_ = std::min(channels_, 3);
 
-    buffer_ = ImageOwner::like(input);
-    output_ = ImageOwner::like(input);
+    if (!output_.hasSameLayout(input))
+        output_ = ImageOwner::like(input);
 
-    columnsHisto_.resize(width_ * kHistogramSize);
+    const size_t colHistoSize = static_cast<size_t>(width_) * static_cast<size_t>(kHistogramSize);
+
+    if (columnsHisto_.size() != colHistoSize)
+        columnsHisto_.resize(colHistoSize);
 }
 
 void Median::apply(const ImageView& input, int radius)
@@ -47,12 +51,12 @@ void Median::apply(const ImageView& input, int radius)
 
 void Median::applyNaive(const ImageView& input, int radius)
 {
+    reset(input);
+
     assert(input.width() == width_);
     assert(input.height() == height_);
+    assert(input.channels() == channels_);
     assert(radius >= 1);
-
-    if (!output_.hasSameLayout(input))
-        reset(input);
 
     const int maxValidRadius = std::min(width_ - 1, height_ - 1);
 
@@ -72,18 +76,18 @@ void Median::applyNaive(const ImageView& input, int radius)
 
         for (int x = 0; x < width_; ++x)
         {
-            for (int ch = 0; ch < channels_; ++ch)
+            for (int ch = 0; ch < activeChannels_; ++ch)
             {
                 window.clear();
 
                 for (int ky = -radius; ky <= radius; ++ky)
                 {
-                    int yy = std::clamp(y + ky, 0, height_ - 1);
+                    const int yy = std::clamp(y + ky, 0, height_ - 1);
                     const uint8_t* row = input.row(yy);
 
                     for (int kx = -radius; kx <= radius; ++kx)
                     {
-                        int xx = std::clamp(x + kx, 0, width_ - 1);
+                        const int xx = std::clamp(x + kx, 0, width_ - 1);
                         window.push_back(row[xx * channels_ + ch]);
                     }
                 }
@@ -94,6 +98,8 @@ void Median::applyNaive(const ImageView& input, int radius)
             }
         }
     }
+
+    copyAlpha(input, output_);
 }
 
 uint8_t Median::findMedian(int targetRank)
@@ -172,7 +178,7 @@ void Median::initColumnsHisto(const ImageView& input, int ch, int kernelSize)
         for (int x = 0; x < width_; ++x)
         {
             const int base = kHistogramSize * x;
-            uint8_t val = row[x * channels_ + ch];
+            const uint8_t val = row[x * channels_ + ch];
 
             columnsHisto_[base + val]++;
         }
@@ -189,12 +195,11 @@ void Median::updateColumnsHisto(int colIndex, uint8_t valRemove, uint8_t valAdd)
 
 void Median::applyPerreault(const ImageView& input, int radius)
 {
+    reset(input);
+
     assert(input.width() == width_);
     assert(input.height() == height_);
     assert(radius >= 1);
-
-    if (!output_.hasSameLayout(input))
-        reset(input);
 
     if (width_ == 1 || height_ == 1)
     {
@@ -210,7 +215,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
     const int kernelSize = 2 * radius + 1;
     const int medianRank = kernelSize * kernelSize / 2 + 1;
 
-    for (int ch = 0; ch < channels_; ++ch)
+    for (int ch = 0; ch < activeChannels_; ++ch)
     {
         // ================= TOP =================
         clearHistogram(columnsHisto_);
@@ -224,8 +229,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = 0; x < kernelSize; ++x)
             {
-                uint8_t valRemove = input.atClamped(x, y + radius + 1, ch);
-                uint8_t valAdd = input.atClamped(x, y + radius, ch);
+                const uint8_t valRemove = input.atClamped(x, y + radius + 1, ch);
+                const uint8_t valAdd = input.atClamped(x, y + radius, ch);
 
                 updateColumnsHisto(clampX(x), valRemove, valAdd);
 
@@ -237,7 +242,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
                     const int pixelCount = kernelSize * accumulatedColumns;
                     const int rank = pixelCount / 2 + 1;
 
-                    uint8_t val = findMedian(rank);
+                    const uint8_t val = findMedian(rank);
                     output_.at(x - radius, y, ch) = val;
                 }
             }
@@ -246,14 +251,14 @@ void Median::applyPerreault(const ImageView& input, int radius)
             {
                 const int col = clampX(x + radius);
 
-                uint8_t valRemove = input.atClamped(col, y + radius + 1, ch);
-                uint8_t valAdd = input.atClamped(col, y + radius, ch);
+                const uint8_t valRemove = input.atClamped(col, y + radius + 1, ch);
+                const uint8_t valAdd = input.atClamped(col, y + radius, ch);
 
                 updateColumnsHisto(col, valRemove, valAdd);
 
                 updateKernel(col, clampX(x - radius - 1));
 
-                uint8_t val = findMedian(medianRank);
+                const uint8_t val = findMedian(medianRank);
                 output_.at(x, y, ch) = val;
             }
 
@@ -267,7 +272,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
                 const int pixelCount = kernelSize * remainingColumns;
                 const int rank = pixelCount / 2 + 1;
 
-                uint8_t val = findMedian(rank);
+                const uint8_t val = findMedian(rank);
                 output_.at(x, y, ch) = val;
             }
         }
@@ -286,8 +291,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = 0; x < kernelSize; ++x)
             {
-                uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
-                uint8_t valAdd = input.atClamped(x, y + radius, ch);
+                const uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
+                const uint8_t valAdd = input.atClamped(x, y + radius, ch);
 
                 updateColumnsHisto(clampX(x), valRemove, valAdd);
 
@@ -299,7 +304,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
                     const int pixelCount = kernelSize * accumulatedColumns;
                     const int rank = pixelCount / 2 + 1;
 
-                    uint8_t val = findMedian(rank);
+                    const uint8_t val = findMedian(rank);
                     output_.at(x - radius, y, ch) = val;
                 }
             }
@@ -308,8 +313,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
             {
                 const int col = clampX(x + radius);
 
-                uint8_t valRemove = input.at(col, y - radius - 1, ch);
-                uint8_t valAdd = input.at(col, y + radius, ch);
+                const uint8_t valRemove = input.at(col, y - radius - 1, ch);
+                const uint8_t valAdd = input.at(col, y + radius, ch);
 
                 updateColumnsHisto(col, valRemove, valAdd);
 
@@ -328,7 +333,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
                 const int pixelCount = kernelSize * remainingColumns;
                 const int rank = pixelCount / 2 + 1;
 
-                uint8_t val = findMedian(rank);
+                const uint8_t val = findMedian(rank);
                 output_.at(x, y, ch) = val;
             }
         }
@@ -341,8 +346,8 @@ void Median::applyPerreault(const ImageView& input, int radius)
 
             for (int x = 0; x < kernelSize; ++x)
             {
-                uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
-                uint8_t valAdd = input.atClamped(x, y - radius, ch);
+                const uint8_t valRemove = input.atClamped(x, y - radius - 1, ch);
+                const uint8_t valAdd = input.atClamped(x, y - radius, ch);
 
                 updateColumnsHisto(clampX(x), valRemove, valAdd);
 
@@ -354,7 +359,7 @@ void Median::applyPerreault(const ImageView& input, int radius)
                     const int pixelCount = kernelSize * accumulatedColumns;
                     const int rank = pixelCount / 2 + 1;
 
-                    uint8_t val = findMedian(rank);
+                    const uint8_t val = findMedian(rank);
                     output_.at(x - radius, y, ch) = val;
                 }
             }
@@ -362,14 +367,14 @@ void Median::applyPerreault(const ImageView& input, int radius)
             for (int x = radius + 1; x < width_ - radius - 1; ++x)
             {
                 const int col = clampX(x + radius);
-                uint8_t valRemove = input.atClamped(col, y - radius - 1, ch);
-                uint8_t valAdd = input.atClamped(col, y - radius, ch);
+                const uint8_t valRemove = input.atClamped(col, y - radius - 1, ch);
+                const uint8_t valAdd = input.atClamped(col, y - radius, ch);
 
                 updateColumnsHisto(col, valRemove, valAdd);
 
                 updateKernel(col, clampX(x - radius - 1));
 
-                uint8_t val = findMedian(medianRank);
+                const uint8_t val = findMedian(medianRank);
                 output_.at(x, y, ch) = val;
             }
 
@@ -383,24 +388,26 @@ void Median::applyPerreault(const ImageView& input, int radius)
                 const int pixelCount = kernelSize * remainingColumns;
                 const int rank = pixelCount / 2 + 1;
 
-                uint8_t val = findMedian(rank);
+                const uint8_t val = findMedian(rank);
                 output_.at(x, y, ch) = val;
             }
         }
     }
+
+    copyAlpha(input, output_);
 }
 
-ImageView Median::outputView() const
+ImageView Median::outputView() const noexcept
 {
     return output_.view();
 }
 
-const ImageOwner& Median::output() const
+const ImageOwner& Median::output() const noexcept
 {
     return output_;
 }
 
-ImageOwner& Median::outputRef()
+ImageOwner& Median::outputRef() noexcept
 {
     return output_;
 }

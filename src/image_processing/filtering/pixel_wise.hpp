@@ -26,6 +26,9 @@ namespace fluvel_ip::pixelwise
  * - morphological white top-hat transforms
  * - morphological gradients
  * - directional image comparison
+ *
+ * @note For RGBA/BGRA images, the alpha channel is copied
+ * unchanged from the first operand.
  */
 void subtract(const ImageView& a, const ImageView& b, ImageOwner& out);
 

@@ -133,9 +133,6 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     // ------------------------------------------------------------
     if (config.spatialFilteringEnabled)
     {
-        if (needReset)
-            spatialFilter_.reset(algoImage);
-
         spatialFilter_.apply(algoImage);
         algoImage = spatialFilter_.outputView();
     }

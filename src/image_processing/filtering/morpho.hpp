@@ -23,6 +23,7 @@ void max(const ImageView& input, ImageOwner& output, int radius);
 /**
  * @brief Apply a morphological dilation (max filter) and return a new image.
  */
+[[nodiscard]]
 ImageOwner max(const ImageView& input, int radius);
 
 /**
@@ -39,6 +40,7 @@ void min(const ImageView& input, ImageOwner& output, int radius);
 /**
  * @brief Apply a morphological erosion (min filter) and return a new image.
  */
+[[nodiscard]]
 ImageOwner min(const ImageView& input, int radius);
 
 /**
@@ -55,6 +57,7 @@ void opening(const ImageView& input, ImageOwner& output, int radius);
 /**
  * @brief Apply morphological opening and return a new image.
  */
+[[nodiscard]]
 ImageOwner opening(const ImageView& input, int radius);
 
 /**
@@ -71,6 +74,7 @@ void closing(const ImageView& input, ImageOwner& output, int radius);
 /**
  * @brief Apply morphological closing and return a new image.
  */
+[[nodiscard]]
 ImageOwner closing(const ImageView& input, int radius);
 
 /**
@@ -90,6 +94,7 @@ void topHat(const ImageView& input, ImageOwner& output, int radius);
 /**
  * @brief Apply white top-hat transform and return a new image.
  */
+[[nodiscard]]
 ImageOwner topHat(const ImageView& input, int radius);
 
 /**
@@ -109,6 +114,7 @@ void blackTopHat(const ImageView& input, ImageOwner& output, int radius);
 /**
  * @brief Apply black top-hat transform and return a new image.
  */
+[[nodiscard]]
 ImageOwner blackTopHat(const ImageView& input, int radius);
 
 /**
@@ -128,6 +134,7 @@ void gradient(const ImageView& input, ImageOwner& output, int radius);
 /**
  * @brief Apply morphological gradient and return a new image.
  */
+[[nodiscard]]
 ImageOwner gradient(const ImageView& input, int radius);
 
 } // namespace fluvel_ip::filter::morpho

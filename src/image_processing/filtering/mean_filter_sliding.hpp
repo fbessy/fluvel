@@ -30,6 +30,7 @@ void meanSliding(const ImageView& input, ImageOwner& output, int radius);
  * @param radius Radius of the filter (kernel size = 2 * radius + 1).
  * @return Filtered image.
  */
+[[nodiscard]]
 ImageOwner meanSliding(const ImageView& input, int radius);
 
 /**
@@ -66,14 +67,23 @@ public:
      *
      * @warning The returned view is valid as long as the object is alive.
      */
-    ImageView outputView() const;
+    [[nodiscard]]
+    ImageView outputView() const noexcept;
 
     /**
      * @brief Get the result image with ownership.
      *
      * @return Reference to the internal ImageOwner.
      */
-    const ImageOwner& output() const;
+    [[nodiscard]]
+    const ImageOwner& output() const noexcept;
+
+    /**
+     * @brief Returns the result image (mutable access).
+     *
+     * @return Reference to the internal ImageOwner.
+     */
+    ImageOwner& outputRef() noexcept;
 
 private:
     /**

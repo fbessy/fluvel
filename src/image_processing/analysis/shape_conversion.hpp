@@ -33,6 +33,10 @@ Shape contourToShape(const ContourPoints& contour);
  *
  * The centroid of the resulting shape is computed automatically.
  *
+ * @note The overload taking a Shape reference reuses the existing
+ *       storage whenever possible and is recommended when converting
+ *       multiple contours repeatedly.
+ *
  * @param contour Input contour.
  * @param shape Output shape.
  */

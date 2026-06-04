@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "noise.hpp"
+#include "image_alpha.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -50,12 +51,10 @@ void gaussian(const ImageView& input, ImageOwner& output, float sigma)
 
                 dst[idx + c] = static_cast<uint8_t>(v + 0.5f);
             }
-
-            // preserve alpha
-            if (channels == 4)
-                dst[idx + 3] = src[idx + 3];
         }
     }
+
+    copyAlpha(input, output);
 }
 
 ImageOwner impulsive(const ImageView& input, float probability)
@@ -108,13 +107,11 @@ void impulsive(const ImageView& input, ImageOwner& output, float probability)
                     else
                         dst[idx + c] = src[idx + c];
                 }
-
-                // preserve alpha
-                if (channels == 4)
-                    dst[idx + 3] = src[idx + 3];
             }
         }
     }
+
+    copyAlpha(input, output);
 }
 
 ImageOwner speckleUniform(const ImageView& input, float sigma)
@@ -152,7 +149,7 @@ void speckleUniform(const ImageView& input, ImageOwner& output, float sigma)
             const int idx = x * channels;
 
             // multiplicative noise factor
-            float noise = 1.f + dist(rng);
+            const float noise = 1.f + dist(rng);
 
             for (int c = 0; c < activeChannels; ++c)
             {
@@ -161,12 +158,10 @@ void speckleUniform(const ImageView& input, ImageOwner& output, float sigma)
 
                 dst[idx + c] = static_cast<uint8_t>(v + 0.5f);
             }
-
-            // preserve alpha
-            if (channels == 4)
-                dst[idx + 3] = src[idx + 3];
         }
     }
+
+    copyAlpha(input, output);
 }
 
 ImageOwner speckleGamma(const ImageView& input, float sigma)
@@ -209,19 +204,17 @@ void speckleGamma(const ImageView& input, ImageOwner& output, float sigma)
 
             for (int c = 0; c < activeChannels; ++c)
             {
-                float n = dist(rng); // multiplicatif (mean = 1)
+                const float n = dist(rng); // multiplicatif (mean = 1)
 
                 float v = src[idx + c] * n;
 
                 v = std::clamp(v, 0.f, 255.f);
                 dst[idx + c] = static_cast<uint8_t>(v + 0.5f);
             }
-
-            // Preserve alpha
-            if (channels == 4)
-                dst[idx + 3] = src[idx + 3];
         }
     }
+
+    copyAlpha(input, output);
 }
 
 } // namespace fluvel_ip::noise

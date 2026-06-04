@@ -65,6 +65,7 @@ public:
     /**
      * @brief Get raw data pointer.
      */
+    [[nodiscard]]
     const uint8_t* data() const noexcept
     {
         return data_;
@@ -73,6 +74,7 @@ public:
     /**
      * @brief Get image width.
      */
+    [[nodiscard]]
     int width() const noexcept
     {
         return widthPixels_;
@@ -81,6 +83,7 @@ public:
     /**
      * @brief Get image height.
      */
+    [[nodiscard]]
     int height() const noexcept
     {
         return heightPixels_;
@@ -89,6 +92,7 @@ public:
     /**
      * @brief Get total number of pixels.
      */
+    [[nodiscard]]
     int pixelCount() const noexcept
     {
         return widthPixels_ * heightPixels_;
@@ -97,6 +101,7 @@ public:
     /**
      * @brief Get total size in bytes.
      */
+    [[nodiscard]]
     int byteSize() const noexcept
     {
         return strideBytes_ * heightPixels_;
@@ -105,6 +110,7 @@ public:
     /**
      * @brief Get pixel format.
      */
+    [[nodiscard]]
     ImageFormat format() const noexcept
     {
         return format_;
@@ -113,6 +119,7 @@ public:
     /**
      * @brief Get number of channels per pixel.
      */
+    [[nodiscard]]
     int channels() const noexcept
     {
         return channelsPerPixel_;
@@ -121,9 +128,23 @@ public:
     /**
      * @brief Get row stride in bytes.
      */
+    [[nodiscard]]
     int stride() const noexcept
     {
         return strideBytes_;
+    }
+
+    /**
+     * @brief Get the number of useful bytes stored in a row.
+     *
+     * This excludes any potential row padding.
+     *
+     * @return width * channels.
+     */
+    [[nodiscard]]
+    int rowBytes() const noexcept
+    {
+        return widthPixels_ * channelsPerPixel_;
     }
 
     /**
@@ -132,7 +153,7 @@ public:
     const uint8_t* row(int y) const noexcept
     {
         assert(y >= 0 && y < heightPixels_);
-        return data_ + static_cast<ptrdiff_t>(y * strideBytes_);
+        return data_ + static_cast<ptrdiff_t>(y) * static_cast<ptrdiff_t>(strideBytes_);
     }
 
     /**
@@ -160,6 +181,9 @@ public:
      */
     uint8_t atClamped(int x, int y, int c = 0) const noexcept
     {
+        assert(widthPixels_ > 0);
+        assert(heightPixels_ > 0);
+
         x = std::clamp(x, 0, widthPixels_ - 1);
         y = std::clamp(y, 0, heightPixels_ - 1);
 
@@ -266,14 +290,14 @@ public:
      *
      * Compares width, height, and format.
      */
-    bool hasSameLayout(const ImageView& view) const noexcept
+    [[nodiscard]] bool hasSameLayout(const ImageView& view) const noexcept
     {
         return width() == view.width() && height() == view.height() && format() == view.format();
     }
 
 private:
     /// Pointer to image data (non-owning).
-    const uint8_t* data_;
+    const uint8_t* data_ = nullptr;
 
     /// Image width.
     int widthPixels_{0};
@@ -282,7 +306,7 @@ private:
     int heightPixels_{0};
 
     /// Pixel format.
-    ImageFormat format_{ImageFormat::Gray8};
+    ImageFormat format_{ImageFormat::Unknown};
 
     /// Number of channels per pixel.
     int channelsPerPixel_{0};

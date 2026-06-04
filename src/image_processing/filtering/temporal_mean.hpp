@@ -59,6 +59,7 @@ public:
      *
      * @return Internal accumulation buffer (RGB float).
      */
+    [[nodiscard]]
     const Grid2D<Rgb_f>& accum() const
     {
         return accum_;
@@ -70,6 +71,7 @@ public:
      * @return ImageView referencing the internal output buffer.
      * @warning The returned view is valid as long as the object is alive.
      */
+    [[nodiscard]]
     ImageView outputView();
 
     /**
@@ -77,6 +79,7 @@ public:
      *
      * @return Reference to the internal ImageOwner.
      */
+    [[nodiscard]]
     const ImageOwner& output();
 
 private:
@@ -86,9 +89,9 @@ private:
      * Adjusts filter parameters based on motion and elapsed time.
      *
      * @param motion Estimated motion ratio.
-     * @param dt_seconds Time delta since last update.
+     * @param deltaSeconds Time delta since last update.
      */
-    void updateNoiseEstimate(float motion, float dt_seconds);
+    void updateNoiseEstimate(float motion, float deltaSeconds);
 
     /**
      * @brief Update the output image from the accumulation buffer.
@@ -99,37 +102,34 @@ private:
     Grid2D<Rgb_f> accum_;
 
     /// Indicates whether the filter has been initialized.
-    bool initialized_ = false;
+    bool accumInit_{false};
 
     /// Spatial sampling step (used for motion estimation).
-    int sampling_step_ = 1;
-
-    /// Exponential smoothing factor.
-    float alpha_ = 0.1f;
+    int samplingStep_{1};
 
     /// Estimated noise level.
-    float noise_estimate_;
+    float noiseEstimate_{0.f};
 
     /// Indicates whether noise estimation has been initialized.
-    bool noise_initialized_ = false;
+    bool noiseEstimInit_{false};
 
-    /// Indicates whether timing has been initialized.
-    bool time_initialized_ = false;
+    /// Indicates if at least one frame was processed after the reset.
+    bool hasPreviousFrame_{false};
 
     /// Timer used to compute time differences between frames.
-    ElapsedTimer timer_;
+    ElapsedTimer deltaFrameTimer_;
 
-    /// Time elapsed since initialization (seconds).
-    float time_since_init_;
-
-    /// Indicates whether high motion is detected.
-    bool high_motion_ = false;
+    /// Timer used to compute elapsed time after a reset.
+    ElapsedTimer afterResetTimer_;
 
     /// Output image buffer.
     ImageOwner output_;
 
     /// Smoothed motion ratio.
-    float motion_ratio_filtered_ = 1.f;
+    float motionRatioFiltered_{1.f};
+
+    /// Indicates whether the cached output image must be regenerated.
+    bool outputNeedsRefresh_{true};
 };
 
 } // namespace fluvel_ip::filter

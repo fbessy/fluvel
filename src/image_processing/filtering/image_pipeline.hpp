@@ -56,14 +56,16 @@ public:
      *
      * @warning The returned view is valid only while the pipeline object exists.
      */
-    ImageView outputView() const;
+    [[nodiscard]]
+    ImageView outputView() const noexcept;
 
     /**
      * @brief Get the output image with ownership.
      *
      * @return Reference to the internal ImageOwner.
      */
-    const ImageOwner& output() const;
+    [[nodiscard]]
+    const ImageOwner& output() const noexcept;
 
 private:
     ImageOwner bufferA_; ///< First internal buffer.

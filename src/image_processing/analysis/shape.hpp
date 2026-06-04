@@ -57,13 +57,6 @@ public:
     void pushBack(const Point2D_i& p);
 
     /**
-     * @brief Add a point to the shape (move version).
-     *
-     * @param p Point to move into the container.
-     */
-    void pushBack(Point2D_i&& p);
-
-    /**
      * @brief Swap this shape with another in constant time.
      *
      * @param other Shape to swap with.
@@ -92,6 +85,7 @@ public:
      *
      * @return True if the shape is valid.
      */
+    [[nodiscard]]
     bool isValid() const;
 
     /**
@@ -99,6 +93,7 @@ public:
      *
      * @return Const reference to the internal vector of points.
      */
+    [[nodiscard]]
     const std::vector<Point2D_i>& points() const
     {
         return points_;
@@ -109,6 +104,7 @@ public:
      *
      * @return Centroid as a floating-point 2D point.
      */
+    [[nodiscard]]
     const Point2D_f& centroid() const
     {
         return centroid_;

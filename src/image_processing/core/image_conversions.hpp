@@ -56,7 +56,7 @@ void convertRgbFToBgr32(const Grid2D<Rgb_f>& in, ImageOwner& out)
             dst[idx + 0] = static_cast<uint8_t>(std::clamp(p.blue + 0.5f, 0.f, 255.f));
             dst[idx + 1] = static_cast<uint8_t>(std::clamp(p.green + 0.5f, 0.f, 255.f));
             dst[idx + 2] = static_cast<uint8_t>(std::clamp(p.red + 0.5f, 0.f, 255.f));
-            dst[idx + 3] = 255; // padding / alpha ignoré
+            dst[idx + 3] = 255; // Alpha channel forced to opaque.
         }
     }
 }

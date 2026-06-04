@@ -20,11 +20,11 @@ namespace fluvel_ip
 template <typename T>
 struct Point2D
 {
-    T x; ///< X coordinate
-    T y; ///< Y coordinate
+    T x{}; ///< X coordinate
+    T y{}; ///< Y coordinate
 
     /// Default constructor.
-    Point2D() = default;
+    constexpr Point2D() = default;
 
     /**
      * @brief Construct a point from coordinates.
@@ -41,23 +41,17 @@ struct Point2D
     /**
      * @brief Equality comparison.
      */
-    bool operator==(const Point2D& other) const noexcept
-    {
-        return x == other.x && y == other.y;
-    }
+    constexpr bool operator==(const Point2D&) const = default;
 
     /**
      * @brief Inequality comparison.
      */
-    bool operator!=(const Point2D& other) const noexcept
-    {
-        return !(*this == other);
-    }
+    constexpr bool operator!=(const Point2D&) const = default;
 
     /**
      * @brief In-place addition.
      */
-    Point2D& operator+=(const Point2D& rhs) noexcept
+    constexpr Point2D& operator+=(const Point2D& rhs) noexcept
     {
         x += rhs.x;
         y += rhs.y;
@@ -67,7 +61,7 @@ struct Point2D
     /**
      * @brief Addition operator.
      */
-    friend Point2D operator+(Point2D lhs, const Point2D& rhs) noexcept
+    friend constexpr Point2D operator+(Point2D lhs, const Point2D& rhs) noexcept
     {
         lhs += rhs;
         return lhs;

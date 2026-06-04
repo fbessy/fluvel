@@ -28,6 +28,7 @@ void mean3x3(const ImageView& input, ImageOwner& output);
  * @param input Input image view.
  * @return Filtered image.
  */
+[[nodiscard]]
 ImageOwner mean3x3(const ImageView& input);
 
 /**
@@ -43,15 +44,6 @@ class Mean3x3
 {
 public:
     /**
-     * @brief Initialize internal buffers from input image.
-     *
-     * Allocates or resizes intermediate buffers if needed.
-     *
-     * @param input Input image view.
-     */
-    void reset(const ImageView& input);
-
-    /**
      * @brief Apply the 3x3 mean filter.
      *
      * Performs a horizontal pass followed by a vertical pass.
@@ -65,16 +57,34 @@ public:
      *
      * @return ImageView referencing the internal buffer.
      */
-    ImageView outputView() const;
+    [[nodiscard]]
+    ImageView outputView() const noexcept;
 
     /**
      * @brief Get the filtered image with ownership.
      *
      * @return Reference to the internal ImageOwner.
      */
-    const ImageOwner& output() const;
+    [[nodiscard]]
+    const ImageOwner& output() const noexcept;
+
+    /**
+     * @brief Returns the result image (mutable access).
+     *
+     * @return Reference to the internal ImageOwner.
+     */
+    ImageOwner& outputRef() noexcept;
 
 private:
+    /**
+     * @brief Initialize internal buffers from input image.
+     *
+     * Allocates or resizes intermediate buffers if needed.
+     *
+     * @param input Input image view.
+     */
+    void reset(const ImageView& input);
+
     /**
      * @brief Horizontal 1D pass of the separable filter.
      *
@@ -85,7 +95,7 @@ private:
      * @param width Image width in pixels.
      * @param channels Number of channels per pixel.
      */
-    void horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels);
+    static void horizontalPass(const uint8_t* src, uint8_t* dst, int width, int channels);
 
     /**
      * @brief Vertical 1D pass of the separable filter.
@@ -99,14 +109,11 @@ private:
      * @param width Image width in pixels.
      * @param channels Number of channels per pixel.
      */
-    void verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const uint8_t* row_p1,
-                      uint8_t* dst, int width, int channels);
+    static void verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const uint8_t* row_p1,
+                             uint8_t* dst, int width, int channels);
 
     ImageOwner buffer1_; ///< Intermediate buffer (horizontal pass).
     ImageOwner buffer2_; ///< Output buffer (vertical pass).
-
-    int width_{0};  ///< Cached image width.
-    int height_{0}; ///< Cached image height.
 };
 
 } // namespace fluvel_ip::filter

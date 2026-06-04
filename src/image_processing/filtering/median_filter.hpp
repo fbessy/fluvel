@@ -33,6 +33,7 @@ void median(const ImageView& input, ImageOwner& output, int radius);
  * @param radius Radius of the filter (kernel size = 2 * radius + 1).
  * @return Filtered image.
  */
+[[nodiscard]]
 ImageOwner median(const ImageView& input, int radius);
 
 /**
@@ -50,15 +51,6 @@ class Median
 {
 public:
     /**
-     * @brief Initialize internal buffers and histograms.
-     *
-     * Allocates or resizes buffers based on the input image layout.
-     *
-     * @param input Input image view.
-     */
-    void reset(const ImageView& input);
-
-    /**
      * @brief Apply the median filter.
      *
      * Selects the appropriate implementation depending on the radius.
@@ -73,14 +65,16 @@ public:
      *
      * @return ImageView referencing the internal output buffer.
      */
-    ImageView outputView() const;
+    [[nodiscard]]
+    ImageView outputView() const noexcept;
 
     /**
      * @brief Get the result image with ownership.
      *
      * @return Reference to the internal ImageOwner.
      */
-    const ImageOwner& output() const;
+    [[nodiscard]]
+    const ImageOwner& output() const noexcept;
 
     /**
      * @brief Get a mutable reference to the output image.
@@ -89,9 +83,18 @@ public:
      *
      * @return Reference to the internal ImageOwner.
      */
-    ImageOwner& outputRef();
+    ImageOwner& outputRef() noexcept;
 
 private:
+    /**
+     * @brief Initialize internal buffers and histograms.
+     *
+     * Allocates or resizes buffers based on the input image layout.
+     *
+     * @param input Input image view.
+     */
+    void reset(const ImageView& input);
+
     /**
      * @brief Apply Perreault's fast median filter.
      *
@@ -119,7 +122,7 @@ private:
      * @brief Reset histogram values to zero.
      */
     template <typename Container>
-    void clearHistogram(Container& histo)
+    static void clearHistogram(Container& histo)
     {
         std::fill(histo.begin(), histo.end(), 0);
     }
@@ -175,7 +178,6 @@ private:
      */
     void updateColumnsHisto(int colIndex, uint8_t valRemove, uint8_t valAdd);
 
-    ImageOwner buffer_; ///< Intermediate buffer (used for processing).
     ImageOwner output_; ///< Output buffer.
 
     std::vector<int> columnsHisto_;                 ///< Column histograms (size = width * 256).
@@ -183,9 +185,10 @@ private:
 
     int currentMedian_{kHistogramSize / 2}; ///< Current median index.
 
-    int width_{0};    ///< Cached image width.
-    int height_{0};   ///< Cached image height.
-    int channels_{0}; ///< Number of channels.
+    int width_{0};          ///< Cached image width.
+    int height_{0};         ///< Cached image height.
+    int channels_{0};       ///< Number of channels.
+    int activeChannels_{0}; ///< Number of processed channels.
 };
 
 } // namespace fluvel_ip::filter

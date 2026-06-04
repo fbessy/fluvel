@@ -20,9 +20,9 @@ void TemporalMean::reset(const ImageView& first_src)
 
     output_ = ImageOwner(first_src.width(), first_src.height(), ImageFormat::Bgr32);
 
-    initialized_ = false;
-    noise_initialized_ = false;
-    time_initialized_ = false;
+    accumInit_ = false;
+    noiseEstimInit_ = false;
+    hasPreviousFrame_ = false;
 
     accum_.resize(first_src.width(), first_src.height());
 
@@ -36,13 +36,18 @@ void TemporalMean::reset(const ImageView& first_src)
                                     static_cast<float>(color.blue)};
         }
     }
+    outputNeedsRefresh_ = true;
 
-    initialized_ = true;
+    const int pixelsCount = accum_.width() * accum_.height();
+    constexpr int targetSamples = 200000;
 
-    const int total_pixels = accum_.width() * accum_.height();
-    constexpr int target_samples = 200000;
+    samplingStep_ = std::max(1, int(std::sqrt(float(pixelsCount) / targetSamples)));
 
-    sampling_step_ = std::max(1, int(std::sqrt(float(total_pixels) / target_samples)));
+    motionRatioFiltered_ = 1.f;
+
+    accumInit_ = true;
+
+    afterResetTimer_.start();
 }
 
 // ------------------------------------------------------------
@@ -53,36 +58,28 @@ void TemporalMean::update(const ImageView& src)
     assert(src.width() == accum_.width());
     assert(src.height() == accum_.height());
 
-    if (!initialized_)
+    if (!accumInit_)
         return;
 
     // --------------------------------------------------------
     // 1) Compute dt (FPS independent)
     // --------------------------------------------------------
-    float dt_seconds = 0.033f;
+    float deltaSeconds = 0.033f;
 
-    if (!time_initialized_)
-    {
-        timer_.start();
-        time_initialized_ = true;
-    }
-    else
-    {
-        dt_seconds = timer_.elapsedSec<float>();
-        timer_.start();
-    }
+    if (hasPreviousFrame_)
+        deltaSeconds = deltaFrameTimer_.elapsedSec<float>();
 
-    dt_seconds = std::clamp(dt_seconds, 0.001f, 0.5f);
+    deltaSeconds = std::clamp(deltaSeconds, 0.001f, 0.5f);
 
     // --------------------------------------------------------
-    // 2) Compute motion (mean absolute difference)
+    // 2) Compute motion (Root Mean Square color difference)
     // --------------------------------------------------------
     float motion = 0.f;
     int count = 0;
 
-    for (int y = 0; y < accum_.height(); y += sampling_step_)
+    for (int y = 0; y < accum_.height(); y += samplingStep_)
     {
-        for (int x = 0; x < accum_.width(); x += sampling_step_)
+        for (int x = 0; x < accum_.width(); x += samplingStep_)
         {
             const Rgb_uc s = src.atPixelRgb(x, y);
             const Rgb_f& a = accum_.at(x, y);
@@ -102,56 +99,57 @@ void TemporalMean::update(const ImageView& src)
     // 3) Noise estimation (robust to spikes)
     // --------------------------------------------------------
 
-    float motion_for_noise = motion;
+    float motionForNoise = motion;
 
-    // Clamp relatif : max 3x le bruit courant
-    if (noise_initialized_)
+    if (noiseEstimInit_)
     {
-        float max_allowed = noise_estimate_ * 3.f;
-        motion_for_noise = std::min(motion_for_noise, max_allowed);
+        // Prevent large scene changes from instantly inflating
+        // the estimated noise floor.
+        const float maxAllowed = noiseEstimate_ * 3.f;
+        motionForNoise = std::min(motionForNoise, maxAllowed);
     }
 
-    updateNoiseEstimate(motion_for_noise, dt_seconds);
+    updateNoiseEstimate(motionForNoise, deltaSeconds);
 
     // --------------------------------------------------------
     // 4) Motion normalized by noise
     // --------------------------------------------------------
     constexpr float epsilon = 1e-6f;
 
-    float motion_ratio = motion / (noise_estimate_ + epsilon);
+    float motionRatio = motion / (noiseEstimate_ + epsilon);
 
     // Petit filtre rapide sur le ratio
-    const float tau_ratio = 0.1f;
-    float alpha_ratio = 1.f - std::exp(-dt_seconds / tau_ratio);
+    const float tauRatio = 0.1f;
+    float alphaRatio = 1.f - std::exp(-deltaSeconds / tauRatio);
 
-    motion_ratio_filtered_ += alpha_ratio * (motion_ratio - motion_ratio_filtered_);
+    motionRatioFiltered_ += alphaRatio * (motionRatio - motionRatioFiltered_);
 
     // --------------------------------------------------------
     // 5) Linear mapping to tau
     // --------------------------------------------------------
-    const float tau_min = 0.02f; // very reactive
-    const float tau_max = 0.2f;  // stable
+    const float tauMin = 0.02f; // very reactive
+    const float tauMax = 0.2f;  // stable
 
-    const float ratio_low = 1.1f;
-    const float ratio_high = 1.6f;
+    const float ratioLow = 1.1f;
+    const float ratioHigh = 1.6f;
 
     float t = 0.f;
 
-    if (motion_ratio_filtered_ > ratio_low)
+    if (motionRatioFiltered_ > ratioLow)
     {
-        t = (motion_ratio_filtered_ - ratio_low) / (ratio_high - ratio_low);
+        t = (motionRatioFiltered_ - ratioLow) / (ratioHigh - ratioLow);
     }
 
     t = std::clamp(t, 0.f, 1.f);
 
-    float t_curve = std::sqrt(t);
+    float tCurve = std::sqrt(t);
 
-    float tau = tau_max - t_curve * (tau_max - tau_min);
+    float tau = tauMax - tCurve * (tauMax - tauMin);
 
     // --------------------------------------------------------
     // 6) Convert tau -> alpha (continuous-time correct)
     // --------------------------------------------------------
-    float alpha = 1.f - std::exp(-dt_seconds / tau);
+    float alpha = 1.f - std::exp(-deltaSeconds / tau);
 
     // --------------------------------------------------------
     // 7) Apply smoothing
@@ -177,40 +175,42 @@ void TemporalMean::update(const ImageView& src)
             a.blue += alpha * (b - a.blue);
         }
     }
+    outputNeedsRefresh_ = true;
+
+    hasPreviousFrame_ = true;
+    deltaFrameTimer_.start();
 }
 
 // ------------------------------------------------------------
 // Noise estimation (FPS independent)
 // ------------------------------------------------------------
-void TemporalMean::updateNoiseEstimate(float motion, float dt_seconds)
+void TemporalMean::updateNoiseEstimate(float motion, float deltaSeconds)
 {
     // Constantes de temps
-    const float tau_init = 0.3f; // convergence rapide au démarrage
-    const float tau_up = 0.3f;   // si le bruit augmente
-    const float tau_down = 2.0f; // si le bruit diminue
+    const float tauInit = 0.3f; // convergence rapide au démarrage
+    const float tauUp = 0.3f;   // si le bruit augmente
+    const float tauDown = 2.0f; // si le bruit diminue
 
-    if (!noise_initialized_)
+    if (!noiseEstimInit_)
     {
-        noise_estimate_ = motion;
-        noise_initialized_ = true;
+        noiseEstimate_ = motion;
+        noiseEstimInit_ = true;
         return;
     }
 
     // Choix de la constante selon la direction
-    float tau = tau_down;
+    float tau = tauDown;
 
-    if (motion > noise_estimate_)
-        tau = tau_up;
+    if (motion > noiseEstimate_)
+        tau = tauUp;
 
-    // Phase d'initialisation plus agressive pendant 0.5 s
-    if (time_since_init_ < 0.5f)
-        tau = tau_init;
+    // Faster convergence during the startup phase.
+    if (afterResetTimer_.elapsedSec() < 0.5f)
+        tau = tauInit;
 
-    float alpha = 1.f - std::exp(-dt_seconds / tau);
+    float alpha = 1.f - std::exp(-deltaSeconds / tau);
 
-    noise_estimate_ += alpha * (motion - noise_estimate_);
-
-    time_since_init_ += dt_seconds;
+    noiseEstimate_ += alpha * (motion - noiseEstimate_);
 }
 
 // ------------------------------------------------------------
@@ -218,7 +218,12 @@ void TemporalMean::updateNoiseEstimate(float motion, float dt_seconds)
 // ------------------------------------------------------------
 void TemporalMean::updateOutput()
 {
+    if (!outputNeedsRefresh_)
+        return;
+
     convertRgbFToBgr32(accum_, output_);
+
+    outputNeedsRefresh_ = false;
 }
 
 ImageView TemporalMean::outputView()

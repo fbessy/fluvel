@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "image_alpha.hpp"
 #include "image_owner.hpp"
 #include "image_view.hpp"
 
@@ -51,7 +52,8 @@ void naiveMorpho(const ImageView& input, ImageOwner& output, int radius)
 
     const int w = input.width();
     const int h = input.height();
-    const int c = input.channels();
+    const int channels = input.channels();
+    const int activeChannels = std::min(channels, 3);
 
     for (int y = 0; y < h; ++y)
     {
@@ -59,21 +61,21 @@ void naiveMorpho(const ImageView& input, ImageOwner& output, int radius)
 
         for (int x = 0; x < w; ++x)
         {
-            for (int ch = 0; ch < c; ++ch)
+            for (int ch = 0; ch < activeChannels; ++ch)
             {
                 uint8_t v = IsMax ? 0 : 255;
 
                 for (int ky = -radius; ky <= radius; ++ky)
                 {
-                    int yy = std::clamp(y + ky, 0, h - 1);
+                    const int yy = std::clamp(y + ky, 0, h - 1);
                     const uint8_t* row = input.row(yy);
 
                     for (int kx = -radius; kx <= radius; ++kx)
                     {
-                        int xx = std::clamp(x + kx, 0, w - 1);
+                        const int xx = std::clamp(x + kx, 0, w - 1);
 
-                        int idx = xx * c + ch;
-                        uint8_t val = row[idx];
+                        const int idx = xx * channels + ch;
+                        const uint8_t val = row[idx];
 
                         if constexpr (IsMax)
                             v = std::max(v, val);
@@ -82,11 +84,13 @@ void naiveMorpho(const ImageView& input, ImageOwner& output, int radius)
                     }
                 }
 
-                int outIdx = x * c + ch;
+                const int outIdx = x * channels + ch;
                 dst[outIdx] = v;
             }
         }
     }
+
+    copyAlpha(input, output);
 }
 
 } // namespace fluvel_ip::filter::morpho

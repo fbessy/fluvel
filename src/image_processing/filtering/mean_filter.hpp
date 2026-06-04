@@ -22,7 +22,8 @@ namespace fluvel_ip::filter
  * @param output Output image owner (may be reused).
  * @param radius Radius of the filter (kernel size = 2 * radius + 1).
  *
- * @note Radius is internally clamped to valid image dimensions.
+ * @note The effective kernel size may be reduced when it exceeds
+ * the image dimensions.
  */
 void mean(const ImageView& input, ImageOwner& output, int radius);
 
@@ -35,6 +36,7 @@ void mean(const ImageView& input, ImageOwner& output, int radius);
  * @param radius Radius of the filter (kernel size = 2 * radius + 1).
  * @return Filtered image.
  */
+[[nodiscard]]
 ImageOwner mean(const ImageView& input, int radius);
 
 } // namespace fluvel_ip::filter

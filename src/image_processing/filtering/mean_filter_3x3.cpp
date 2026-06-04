@@ -3,6 +3,8 @@
 
 #include "mean_filter_3x3.hpp"
 
+#include <algorithm>
+
 namespace fluvel_ip::filter
 {
 
@@ -10,20 +12,18 @@ void mean3x3(const ImageView& input, ImageOwner& output)
 {
     Mean3x3 impl;
 
-    impl.reset(input);
     impl.apply(input);
 
-    output.copyFrom(impl.outputView());
+    std::swap(output, impl.outputRef());
 }
 
 ImageOwner mean3x3(const ImageView& input)
 {
     Mean3x3 impl;
 
-    impl.reset(input);
     impl.apply(input);
 
-    return impl.output(); // copy (safe)
+    return impl.output();
 }
 
 void Mean3x3::reset(const ImageView& input)
@@ -33,9 +33,6 @@ void Mean3x3::reset(const ImageView& input)
         buffer1_ = ImageOwner::like(input);
         buffer2_ = ImageOwner::like(input);
     }
-
-    width_ = input.width();
-    height_ = input.height();
 }
 
 void Mean3x3::apply(const ImageView& input)
@@ -43,30 +40,32 @@ void Mean3x3::apply(const ImageView& input)
     reset(input);
 
     const int channels = input.channels();
+    const int width = input.width();
+    const int height = input.height();
 
     // =========================
     // PASS 1 — Horizontal
     // =========================
-    for (int y = 0; y < height_; ++y)
+    for (int y = 0; y < height; ++y)
     {
         const uint8_t* src = input.row(y);
         uint8_t* dst = buffer1_.rowPtr(y);
 
-        horizontalPass(src, dst, width_, channels);
+        horizontalPass(src, dst, width, channels);
     }
 
     // =========================
     // PASS 2 — Vertical
     // =========================
-    for (int y = 0; y < height_; ++y)
+    for (int y = 0; y < height; ++y)
     {
         const uint8_t* row_m1 = buffer1_.rowPtr(std::max(0, y - 1));
         const uint8_t* row_0 = buffer1_.rowPtr(y);
-        const uint8_t* row_p1 = buffer1_.rowPtr(std::min(height_ - 1, y + 1));
+        const uint8_t* row_p1 = buffer1_.rowPtr(std::min(height - 1, y + 1));
 
         uint8_t* dst = buffer2_.rowPtr(y);
 
-        verticalPass(row_m1, row_0, row_p1, dst, width_, channels);
+        verticalPass(row_m1, row_0, row_p1, dst, width, channels);
     }
 
     std::swap(buffer1_, buffer2_);
@@ -122,12 +121,17 @@ void Mean3x3::verticalPass(const uint8_t* row_m1, const uint8_t* row_0, const ui
     }
 }
 
-ImageView Mean3x3::outputView() const
+ImageView Mean3x3::outputView() const noexcept
 {
     return buffer1_.view();
 }
 
-const ImageOwner& Mean3x3::output() const
+const ImageOwner& Mean3x3::output() const noexcept
+{
+    return buffer1_;
+}
+
+ImageOwner& Mean3x3::outputRef() noexcept
 {
     return buffer1_;
 }

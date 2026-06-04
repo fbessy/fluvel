@@ -2,8 +2,10 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "anisotropic_diffusion.hpp"
+#include "image_alpha.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <cstdint>
 #include <utility>
 
@@ -27,7 +29,7 @@ ImageOwner anisotropicDiffusion(const ImageView& input, const AnisoParams& param
     impl.reset(input);
     impl.apply(params);
 
-    return impl.output(); // copy (safe)
+    return impl.output();
 }
 
 void AnisotropicDiffusion::reset(const ImageView& input)
@@ -45,6 +47,11 @@ void AnisotropicDiffusion::reset(const ImageView& input)
 
     initFromInput(input);
     padBorders();
+
+    // Preserve alpha once: only RGB channels are diffused.
+    copyAlpha(input, output_);
+
+    initialized_ = true;
 }
 
 void AnisotropicDiffusion::initFromInput(const ImageView& input)
@@ -103,13 +110,15 @@ void AnisotropicDiffusion::padBorders()
 
 void AnisotropicDiffusion::apply(const AnisoParams& params)
 {
+    assert(initialized_);
+
     const ConductionFunction conduction = params.conduction;
     const int iterations = params.iterations;
     const double lambda = params.lambda;
     const double kappa = params.kappa;
 
     const double invKappa2 = 1.0 / (kappa * kappa);
-    const double dist[8] = {2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 2.0};
+    static constexpr double kDistances[8]{2.0, 1.0, 2.0, 1.0, 1.0, 2.0, 1.0, 2.0};
     const bool useExp = (conduction == ConductionFunction::Exponential);
 
     for (int it = 0; it < iterations; ++it)
@@ -120,8 +129,8 @@ void AnisotropicDiffusion::apply(const AnisoParams& params)
             {
                 for (int c = 0; c < activeChannels_; ++c)
                 {
-                    int p = idx(x, y, c);
-                    double center = current_[p];
+                    const int p = idx(x, y, c);
+                    const double center = current_[p];
 
                     // gradients (no bounds check thanks to padding)
                     double nabla[8] = {current_[idx(x - 1, y - 1, c)] - center,
@@ -141,7 +150,7 @@ void AnisotropicDiffusion::apply(const AnisoParams& params)
 
                         double cond = useExp ? std::exp(-val) : 1.0 / (1.0 + val);
 
-                        sigma += (cond * nabla[k]) / dist[k];
+                        sigma += (cond * nabla[k]) / kDistances[k];
                     }
 
                     next_[p] = center + lambda * sigma;
@@ -171,27 +180,21 @@ void AnisotropicDiffusion::apply(const AnisoParams& params)
 
                 dst[x * channels_ + c] = static_cast<unsigned char>(v + 0.5);
             }
-
-            // preserve alpha
-            if (channels_ == 4)
-            {
-                dst[x * 4 + 3] = 255;
-            }
         }
     }
 }
 
-ImageView AnisotropicDiffusion::outputView() const
+ImageView AnisotropicDiffusion::outputView() const noexcept
 {
     return output_.view();
 }
 
-const ImageOwner& AnisotropicDiffusion::output() const
+const ImageOwner& AnisotropicDiffusion::output() const noexcept
 {
     return output_;
 }
 
-ImageOwner& AnisotropicDiffusion::outputRef()
+ImageOwner& AnisotropicDiffusion::outputRef() noexcept
 {
     return output_;
 }

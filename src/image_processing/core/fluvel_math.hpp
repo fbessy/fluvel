@@ -51,16 +51,15 @@ constexpr int sign(int v) noexcept
  * @param b Second point.
  * @return Euclidean distance between a and b.
  *
- * @note sqrt(0.f) is well-defined and returns 0.f (IEEE-754),
- *       so no special handling is required for coincident points.
  */
+
 template <typename P>
 inline float euclideanDistance(const P& a, const P& b)
 {
-    const float dx = b.x - a.x;
-    const float dy = b.y - a.y;
+    const float dx = static_cast<float>(b.x) - static_cast<float>(a.x);
+    const float dy = static_cast<float>(b.y) - static_cast<float>(a.y);
 
-    return std::sqrt(dx * dx + dy * dy);
+    return std::hypot(dx, dy);
 }
 
 } // namespace math

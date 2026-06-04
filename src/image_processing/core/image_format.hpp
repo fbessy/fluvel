@@ -77,9 +77,9 @@ enum class ImageFormat
  * Maps a valid ImageFormat value to its corresponding channel count.
  *
  * Supported mappings:
- * - Gray8 → 1
- * - Rgb24, Bgr24 → 3
- * - Bgr32, Rgba32 → 4
+ * - 1 → Gray8
+ * - 3 → Bgr24
+ * - 4 → Bgr32
  *
  * @param format Image format.
  *
@@ -116,8 +116,8 @@ constexpr int channelCount(ImageFormat format)
  *
  * Supported mappings:
  * - 1 → Gray8
- * - 3 → Rgb24
- * - 4 → Rgba32
+ * - 3 → Bgr24
+ * - 4 → Bgr32
  *
  * @param channels Number of image channels.
  *

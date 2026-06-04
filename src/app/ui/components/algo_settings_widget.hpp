@@ -82,9 +82,6 @@ private:
     QSpinBox* alphaSpin_ = nullptr;
     QSpinBox* betaSpin_ = nullptr;
     QSpinBox* gammaSpin_ = nullptr;
-    int alpha_{0};
-    int beta_{0};
-    int gamma_{0};
 
     /// Internal smoothing parameters.
     QGroupBox* internalspeedGroupbox_ = nullptr;

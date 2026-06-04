@@ -30,11 +30,6 @@ void Shape::pushBack(const Point2D_i& p)
     points_.push_back(p);
 }
 
-void Shape::pushBack(Point2D_i&& p)
-{
-    points_.emplace_back(p);
-}
-
 void Shape::swap(Shape& other) noexcept
 {
     std::swap(points_, other.points_);

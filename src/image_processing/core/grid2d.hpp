@@ -45,6 +45,7 @@ public:
     /**
      * @brief Get grid width.
      */
+    [[nodiscard]]
     int width() const noexcept
     {
         return width_;
@@ -53,6 +54,7 @@ public:
     /**
      * @brief Get grid height.
      */
+    [[nodiscard]]
     int height() const noexcept
     {
         return height_;
@@ -97,6 +99,7 @@ public:
     /**
      * @brief Check if grid is empty.
      */
+    [[nodiscard]]
     bool empty() const noexcept
     {
         return data_.empty();
@@ -105,6 +108,7 @@ public:
     /**
      * @brief Get total number of elements.
      */
+    [[nodiscard]]
     size_t size() const noexcept
     {
         return data_.size();
@@ -189,7 +193,7 @@ public:
         width_ = width;
         height_ = height;
 
-        data_.resize(width_ * height_);
+        data_.resize(static_cast<size_t>(width_) * static_cast<size_t>(height_));
     }
 
     /**
@@ -236,7 +240,7 @@ public:
      */
     bool valid(int offset) const noexcept
     {
-        return offset >= 0 && offset < static_cast<int>(size());
+        return offset >= 0 && static_cast<size_t>(offset) < size();
     }
 
     /**
@@ -247,6 +251,9 @@ public:
      */
     const T* row(int y) const
     {
+        assert(y >= 0);
+        assert(y < height_);
+
         return data() + y * width_;
     }
 

@@ -3,8 +3,10 @@
 
 #pragma once
 
+#include "image_alpha.hpp"
 #include "image_owner.hpp"
 
+#include <algorithm>
 #include <cstdint>
 #include <deque>
 
@@ -24,31 +26,33 @@ namespace detail
  * @param src Pointer to input row data.
  * @param dst Pointer to output row data.
  * @param width Image width.
- * @param channels Number of channels per pixel.
+ * @param channels Number of channels per pixel (1, 3 or 4).
+ * @param activeChannels Number of processed channels (1 or 3).
  * @param radius Radius of the structuring element.
  */
 template <bool IsMax>
-void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels, int radius)
+void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels,
+                       int activeChannels, int radius)
 {
-    const int K = 2 * radius + 1;
+    const int kernelSize = 2 * radius + 1;
 
-    for (int ch = 0; ch < channels; ++ch)
+    for (int ch = 0; ch < activeChannels; ++ch)
     {
         std::deque<int> dq;
 
         for (int i = 0; i < width; ++i)
         {
             // Remove indices outside the sliding window
-            if (!dq.empty() && dq.front() <= i - K)
+            if (!dq.empty() && dq.front() <= i - kernelSize)
                 dq.pop_front();
 
-            int idx = i * channels + ch;
+            const int idx = i * channels + ch;
 
             // Maintain monotonic deque
             while (!dq.empty())
             {
-                uint8_t a = src[dq.back() * channels + ch];
-                uint8_t b = src[idx];
+                const uint8_t a = src[dq.back() * channels + ch];
+                const uint8_t b = src[idx];
 
                 if constexpr (IsMax)
                 {
@@ -71,7 +75,7 @@ void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels
             // Write centered result
             if (i >= radius)
             {
-                int out_i = i - radius;
+                const int out_i = i - radius;
                 dst[out_i * channels + ch] = src[dq.front() * channels + ch];
             }
         }
@@ -95,35 +99,36 @@ void vanHerkHorizontal(const uint8_t* src, uint8_t* dst, int width, int channels
  * @param output Output image.
  * @param width Image width.
  * @param height Image height.
- * @param channels Number of channels per pixel.
+ * @param channels Number of channels per pixel (1, 3 or 4).
+ * @param activeChannels Number of processed channels (1 or 3).
  * @param radius Radius of the structuring element.
  */
 template <bool IsMax>
 void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, int height,
-                     int channels, int radius)
+                     int channels, int activeChannels, int radius)
 {
-    const int K = 2 * radius + 1;
+    const int kernelSize = 2 * radius + 1;
 
     for (int x = 0; x < width; ++x)
     {
-        for (int ch = 0; ch < channels; ++ch)
+        for (int ch = 0; ch < activeChannels; ++ch)
         {
             std::deque<int> dq;
 
             for (int y = 0; y < height; ++y)
             {
-                if (!dq.empty() && dq.front() <= y - K)
+                if (!dq.empty() && dq.front() <= y - kernelSize)
                     dq.pop_front();
 
                 const uint8_t* row = buffer.rowPtr(y);
-                int idx = x * channels + ch;
+                const int idx = x * channels + ch;
 
                 while (!dq.empty())
                 {
                     const uint8_t* rowBack = buffer.rowPtr(dq.back());
 
-                    uint8_t a = rowBack[idx];
-                    uint8_t b = row[idx];
+                    const uint8_t a = rowBack[idx];
+                    const uint8_t b = row[idx];
 
                     if constexpr (IsMax)
                     {
@@ -145,7 +150,7 @@ void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, in
 
                 if (y >= radius)
                 {
-                    int out_y = y - radius;
+                    const int out_y = y - radius;
 
                     uint8_t* dst = output.rowPtr(out_y);
                     const uint8_t* rowFront = buffer.rowPtr(dq.front());
@@ -160,7 +165,7 @@ void vanHerkVertical(const ImageOwner& buffer, ImageOwner& output, int width, in
                 uint8_t* dst = output.rowPtr(y);
                 const uint8_t* rowFront = buffer.rowPtr(dq.front());
 
-                int idx = x * channels + ch;
+                const int idx = x * channels + ch;
                 dst[idx] = rowFront[idx];
             }
         }
@@ -199,7 +204,6 @@ void vanHerk(const ImageView& input, ImageOwner& output, int radius)
 
     const int w = input.width();
     const int h = input.height();
-    const int c = input.channels();
 
     // Degenerate case: no spatial neighborhood
     if (w == 1 || h == 1)
@@ -208,8 +212,11 @@ void vanHerk(const ImageView& input, ImageOwner& output, int radius)
         return;
     }
 
+    const int channels = input.channels();
+    const int activeChannels = std::min(channels, 3);
+
     // Clamp radius to valid range
-    int maxRadius = std::min((w - 1) / 2, (h - 1) / 2);
+    const int maxRadius = std::min((w - 1) / 2, (h - 1) / 2);
     radius = std::min(radius, maxRadius);
 
     // Intermediate buffer
@@ -221,11 +228,13 @@ void vanHerk(const ImageView& input, ImageOwner& output, int radius)
         const uint8_t* src = input.row(y);
         uint8_t* dst = buffer.rowPtr(y);
 
-        detail::vanHerkHorizontal<IsMax>(src, dst, w, c, radius);
+        detail::vanHerkHorizontal<IsMax>(src, dst, w, channels, activeChannels, radius);
     }
 
     // Vertical pass
-    detail::vanHerkVertical<IsMax>(buffer, output, w, h, c, radius);
+    detail::vanHerkVertical<IsMax>(buffer, output, w, h, channels, activeChannels, radius);
+
+    copyAlpha(input, output);
 }
 
 } // namespace fluvel_ip::filter::morpho

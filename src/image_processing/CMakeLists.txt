@@ -95,6 +95,9 @@ set(ip_src
     ${CORE_DIR}/color.hpp
     ${CORE_DIR}/neighborhood.hpp
     ${CORE_DIR}/elapsed_timer.hpp
+
+    ${CORE_DIR}/image_alpha.cpp
+    ${CORE_DIR}/image_alpha.hpp
 )
 
 add_library(${LIB_TARGET_NAME} STATIC ${ip_src})

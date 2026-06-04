@@ -97,14 +97,14 @@ void ImagePipeline::apply(const ImageView& input, const ProcessingParams& params
     currentPtr_ = src;
 }
 
-ImageView ImagePipeline::outputView() const
+ImageView ImagePipeline::outputView() const noexcept
 {
     assert(currentPtr_);
 
     return currentPtr_->view();
 }
 
-const ImageOwner& ImagePipeline::output() const
+const ImageOwner& ImagePipeline::output() const noexcept
 {
     assert(currentPtr_);
 

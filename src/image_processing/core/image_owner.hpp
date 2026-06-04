@@ -72,6 +72,7 @@ public:
      *
      * Compares width, height, and format.
      */
+    [[nodiscard]]
     bool hasSameLayout(const ImageView& view) const noexcept
     {
         return width() == view.width() && height() == view.height() && format() == view.format();
@@ -98,7 +99,7 @@ public:
         ensureLike(img);
 
         const int h = img.height();
-        const std::size_t rowBytes = static_cast<std::size_t>(img.width() * img.channels());
+        const std::size_t rowBytes = static_cast<std::size_t>(img.rowBytes());
 
         for (int y = 0; y < h; ++y)
         {
@@ -136,8 +137,13 @@ public:
     }
 
     /**
-     * @brief Get number of bytes per row (excluding padding).
+     * @brief Get the number of useful bytes stored in a row.
+     *
+     * This excludes any potential row padding.
+     *
+     * @return width * channels.
      */
+    [[nodiscard]]
     int rowBytes() const noexcept
     {
         return width_ * channels_;
@@ -201,6 +207,7 @@ public:
     /**
      * @brief Get raw data pointer (mutable).
      */
+    [[nodiscard]]
     uint8_t* data() noexcept
     {
         return data_.data();
@@ -209,6 +216,7 @@ public:
     /**
      * @brief Get raw data pointer (const).
      */
+    [[nodiscard]]
     const uint8_t* data() const noexcept
     {
         return data_.data();
@@ -217,6 +225,7 @@ public:
     /**
      * @brief Get image width.
      */
+    [[nodiscard]]
     int width() const noexcept
     {
         return width_;
@@ -225,6 +234,7 @@ public:
     /**
      * @brief Get image height.
      */
+    [[nodiscard]]
     int height() const noexcept
     {
         return height_;
@@ -233,6 +243,7 @@ public:
     /**
      * @brief Get row stride in bytes.
      */
+    [[nodiscard]]
     int stride() const noexcept
     {
         return stride_;
@@ -241,15 +252,25 @@ public:
     /**
      * @brief Get pixel format.
      */
+    [[nodiscard]]
     ImageFormat format() const noexcept
     {
         return format_;
     }
 
     /**
+     * @brief Get number of channels per pixel.
+     */
+    [[nodiscard]]
+    int channels() const noexcept
+    {
+        return channels_;
+    }
+
+    /**
      * @brief Get a non-owning view of the image.
      */
-    ImageView view() const noexcept
+    [[nodiscard]] ImageView view() const noexcept
     {
         return ImageView(data(), width_, height_, format_, stride_);
     }
@@ -262,12 +283,15 @@ private:
     int height_{0};
 
     /// Pixel format.
-    ImageFormat format_{ImageFormat::Gray8};
+    ImageFormat format_{ImageFormat::Unknown};
 
     /// Number of channels per pixel.
     int channels_{0};
 
     /// Row stride in bytes.
+    ///
+    /// For owned images, rows are tightly packed and
+    /// stride_ == width * channels.
     int stride_{0};
 
     /// Pixel data (row-major).

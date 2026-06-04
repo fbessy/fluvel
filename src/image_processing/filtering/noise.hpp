@@ -35,6 +35,7 @@ static constexpr float kDefaultSpeckleNoise{0.16f};
  * @param sigma Standard deviation of the noise.
  * @return Noisy image.
  */
+[[nodiscard]]
 ImageOwner gaussian(const ImageView& input, float sigma = kDefaultGaussianSigmaNoise);
 
 /**
@@ -56,6 +57,7 @@ void gaussian(const ImageView& input, ImageOwner& output, float sigma = kDefault
  * @param probability Probability of corruption per pixel.
  * @return Noisy image.
  */
+[[nodiscard]]
 ImageOwner impulsive(const ImageView& input, float probability = kDefaultImpulsiveNoise);
 
 /**
@@ -79,6 +81,7 @@ void impulsive(const ImageView& input, ImageOwner& output,
  * @param sigma Noise strength.
  * @return Noisy image.
  */
+[[nodiscard]]
 ImageOwner speckleUniform(const ImageView& input, float sigma = kDefaultSpeckleNoise);
 
 /**
@@ -103,6 +106,7 @@ void speckleUniform(const ImageView& input, ImageOwner& output, float sigma = kD
  * @param sigma Noise parameter controlling variance.
  * @return Noisy image.
  */
+[[nodiscard]]
 ImageOwner speckleGamma(const ImageView& input, float sigma = kDefaultSpeckleNoise);
 
 /**

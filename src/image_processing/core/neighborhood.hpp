@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include <array>
+
 namespace fluvel_ip
 {
 
@@ -14,8 +16,8 @@ namespace fluvel_ip
  */
 struct Vec2i
 {
-    int dx; ///< Horizontal offset (x-axis)
-    int dy; ///< Vertical offset (y-axis)
+    int dx{0}; ///< Horizontal offset (x-axis)
+    int dy{0}; ///< Vertical offset (y-axis)
 };
 
 /**
@@ -32,7 +34,7 @@ struct Vec2i
  * - contour evolution (Lin / Lout)
  * - morphological operations
  */
-constexpr Vec2i kNeighbors4[] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+constexpr std::array<Vec2i, 4> kNeighbors4{{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}};
 
 /**
  * @brief Diagonal neighbors complement for 8-connectivity.
@@ -46,7 +48,7 @@ constexpr Vec2i kNeighbors4[] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
  *
  * Typically used together with kNeighbors4.
  */
-constexpr Vec2i kNeighbors4Diag[] = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
+constexpr std::array<Vec2i, 4> kNeighbors4Diag{{{-1, -1}, {1, -1}, {-1, 1}, {1, 1}}};
 
 /**
  * @brief Check if a pixel is strictly inside the image domain (8-connectivity safe zone).
@@ -64,7 +66,8 @@ constexpr Vec2i kNeighbors4Diag[] = {{-1, -1}, {1, -1}, {-1, 1}, {1, 1}};
  *
  * @return true if all 8 neighbors are valid, false otherwise.
  */
-inline bool fullyInside8(int x, int y, int w, int h)
+[[nodiscard]]
+constexpr bool fullyInside8(int x, int y, int w, int h) noexcept
 {
     return x > 0 && x + 1 < w && y > 0 && y + 1 < h;
 }

@@ -96,6 +96,7 @@ void anisotropicDiffusion(const ImageView& input, ImageOwner& output,
  * @note Convenience wrapper. For repeated calls, prefer the class version
  *       to reuse internal buffers and improve performance.
  */
+[[nodiscard]]
 ImageOwner anisotropicDiffusion(const ImageView& input, const AnisoParams& params = AnisoParams{});
 
 /**
@@ -147,21 +148,23 @@ public:
      *
      * @warning The returned view is only valid while the object exists.
      */
-    ImageView outputView() const;
+    [[nodiscard]]
+    ImageView outputView() const noexcept;
 
     /**
      * @brief Returns the result image (const access).
      *
      * @return Reference to the internal ImageOwner.
      */
-    const ImageOwner& output() const;
+    [[nodiscard]]
+    const ImageOwner& output() const noexcept;
 
     /**
      * @brief Returns the result image (mutable access).
      *
      * @return Reference to the internal ImageOwner.
      */
-    ImageOwner& outputRef();
+    ImageOwner& outputRef() noexcept;
 
 private:
     /**
@@ -182,7 +185,8 @@ private:
      * @param c Channel index.
      * @return Linear index in padded storage.
      */
-    int idx(int x, int y, int c) const
+    [[nodiscard]]
+    int idx(int x, int y, int c) const noexcept
     {
         return ((x + 1) + (y + 1) * stridePad_) * activeChannels_ + c;
     }
@@ -197,6 +201,8 @@ private:
     std::vector<double> next_;    //!< Next diffusion buffer.
 
     ImageOwner output_; //!< Output image storage.
+
+    bool initialized_{false};
 };
 
 } // namespace fluvel_ip::filter

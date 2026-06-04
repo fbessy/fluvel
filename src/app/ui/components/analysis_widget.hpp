@@ -54,12 +54,14 @@ public:
      * @{
      */
 
-    [[nodiscard]] int imageWidth() const
+    [[nodiscard]]
+    int imageWidth() const
     {
         return image_.width();
     }
 
-    [[nodiscard]] int imageHeight() const
+    [[nodiscard]]
+    int imageHeight() const
     {
         return image_.height();
     }
