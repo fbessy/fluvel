@@ -11,26 +11,25 @@
 namespace fluvel_ip::filter
 {
 
-// ------------------------------------------------------------
-// RESET
-// ------------------------------------------------------------
-void TemporalMean::reset(const ImageView& first_src)
+void TemporalMean::reset(const ImageView& firstFrame)
 {
-    assert(first_src.channels() >= 3);
+    assert(firstFrame.channels() >= 3);
 
-    output_ = ImageOwner(first_src.width(), first_src.height(), ImageFormat::Bgr32);
+    hasTemporalHistory_ = false;
 
-    accumInit_ = false;
-    noiseEstimInit_ = false;
-    hasPreviousFrame_ = false;
+    if (output_.width() != firstFrame.width() || output_.height() != firstFrame.height() ||
+        output_.format() != ImageFormat::Bgr32)
+    {
+        output_ = ImageOwner(firstFrame.width(), firstFrame.height(), ImageFormat::Bgr32);
+    }
 
-    accum_.resize(first_src.width(), first_src.height());
+    accum_.resize(firstFrame.width(), firstFrame.height());
 
     for (int y = 0; y < accum_.height(); ++y)
     {
         for (int x = 0; x < accum_.width(); ++x)
         {
-            const Rgb_uc color = first_src.atPixelRgb(x, y);
+            const Rgb_uc color = firstFrame.atPixelRgb(x, y);
 
             accum_.at(x, y) = Rgb_f{static_cast<float>(color.red), static_cast<float>(color.green),
                                     static_cast<float>(color.blue)};
@@ -45,35 +44,51 @@ void TemporalMean::reset(const ImageView& first_src)
 
     motionRatioFiltered_ = 1.f;
 
-    accumInit_ = true;
-
-    afterResetTimer_.start();
+    warmupTimer_.start();
 }
 
 // ------------------------------------------------------------
 // UPDATE
 // ------------------------------------------------------------
-void TemporalMean::update(const ImageView& src)
+void TemporalMean::update(const ImageView& frame)
 {
-    assert(src.width() == accum_.width());
-    assert(src.height() == accum_.height());
-
-    if (!accumInit_)
+    if (accum_.empty())
+    {
+        reset(frame);
         return;
+    }
 
-    // --------------------------------------------------------
-    // 1) Compute dt (FPS independent)
-    // --------------------------------------------------------
+    if (frame.width() != accum_.width() || frame.height() != accum_.height())
+    {
+        reset(frame);
+        return;
+    }
+
+    const float motion = computeMotion(frame);
+
     float deltaSeconds = 0.033f;
 
-    if (hasPreviousFrame_)
+    if (hasTemporalHistory_)
         deltaSeconds = deltaFrameTimer_.elapsedSec<float>();
 
     deltaSeconds = std::clamp(deltaSeconds, 0.001f, 0.5f);
+    deltaFrameTimer_.restart();
 
-    // --------------------------------------------------------
-    // 2) Compute motion (Root Mean Square color difference)
-    // --------------------------------------------------------
+    if (hasTemporalHistory_)
+        updateNoiseEstimate(motion, deltaSeconds);
+    else
+        noiseEstimate_ = motion;
+
+    const float alpha = computeAdaptiveAlpha(motion, deltaSeconds);
+
+    applyTemporalSmoothing(frame, alpha);
+
+    outputNeedsRefresh_ = true;
+    hasTemporalHistory_ = true;
+}
+
+float TemporalMean::computeMotion(const ImageView& frame) const
+{
     float motion = 0.f;
     int count = 0;
 
@@ -81,104 +96,19 @@ void TemporalMean::update(const ImageView& src)
     {
         for (int x = 0; x < accum_.width(); x += samplingStep_)
         {
-            const Rgb_uc s = src.atPixelRgb(x, y);
-            const Rgb_f& a = accum_.at(x, y);
+            const Rgb_uc current = frame.atPixelRgb(x, y);
+            const Rgb_f& accumPixel = accum_.at(x, y);
 
-            float dr = float(s.red) - a.red;
-            float dg = float(s.green) - a.green;
-            float db = float(s.blue) - a.blue;
+            const float dr = float(current.red) - accumPixel.red;
+            const float dg = float(current.green) - accumPixel.green;
+            const float db = float(current.blue) - accumPixel.blue;
 
             motion += dr * dr + dg * dg + db * db;
             ++count;
         }
     }
 
-    motion = std::sqrt(motion / (3.f * count));
-
-    // --------------------------------------------------------
-    // 3) Noise estimation (robust to spikes)
-    // --------------------------------------------------------
-
-    float motionForNoise = motion;
-
-    if (noiseEstimInit_)
-    {
-        // Prevent large scene changes from instantly inflating
-        // the estimated noise floor.
-        const float maxAllowed = noiseEstimate_ * 3.f;
-        motionForNoise = std::min(motionForNoise, maxAllowed);
-    }
-
-    updateNoiseEstimate(motionForNoise, deltaSeconds);
-
-    // --------------------------------------------------------
-    // 4) Motion normalized by noise
-    // --------------------------------------------------------
-    constexpr float epsilon = 1e-6f;
-
-    float motionRatio = motion / (noiseEstimate_ + epsilon);
-
-    // Petit filtre rapide sur le ratio
-    const float tauRatio = 0.1f;
-    float alphaRatio = 1.f - std::exp(-deltaSeconds / tauRatio);
-
-    motionRatioFiltered_ += alphaRatio * (motionRatio - motionRatioFiltered_);
-
-    // --------------------------------------------------------
-    // 5) Linear mapping to tau
-    // --------------------------------------------------------
-    const float tauMin = 0.02f; // very reactive
-    const float tauMax = 0.2f;  // stable
-
-    const float ratioLow = 1.1f;
-    const float ratioHigh = 1.6f;
-
-    float t = 0.f;
-
-    if (motionRatioFiltered_ > ratioLow)
-    {
-        t = (motionRatioFiltered_ - ratioLow) / (ratioHigh - ratioLow);
-    }
-
-    t = std::clamp(t, 0.f, 1.f);
-
-    float tCurve = std::sqrt(t);
-
-    float tau = tauMax - tCurve * (tauMax - tauMin);
-
-    // --------------------------------------------------------
-    // 6) Convert tau -> alpha (continuous-time correct)
-    // --------------------------------------------------------
-    float alpha = 1.f - std::exp(-deltaSeconds / tau);
-
-    // --------------------------------------------------------
-    // 7) Apply smoothing
-    // --------------------------------------------------------
-
-    const int channels = src.channels();
-
-    for (int y = 0; y < accum_.height(); ++y)
-    {
-        const uint8_t* row = src.row(y);
-
-        for (int x = 0; x < accum_.width(); ++x)
-        {
-            const int idx = x * channels;
-
-            float r, g, b;
-            src.readPixelRgb(row, idx, r, g, b);
-
-            Rgb_f& a = accum_.at(x, y);
-
-            a.red += alpha * (r - a.red);
-            a.green += alpha * (g - a.green);
-            a.blue += alpha * (b - a.blue);
-        }
-    }
-    outputNeedsRefresh_ = true;
-
-    hasPreviousFrame_ = true;
-    deltaFrameTimer_.start();
+    return std::sqrt(motion / (3.f * count));
 }
 
 // ------------------------------------------------------------
@@ -186,31 +116,100 @@ void TemporalMean::update(const ImageView& src)
 // ------------------------------------------------------------
 void TemporalMean::updateNoiseEstimate(float motion, float deltaSeconds)
 {
-    // Constantes de temps
-    const float tauInit = 0.3f; // convergence rapide au démarrage
-    const float tauUp = 0.3f;   // si le bruit augmente
-    const float tauDown = 2.0f; // si le bruit diminue
+    constexpr float tauInit = 0.3f; // startup convergence
+    constexpr float tauUp = 0.3f;   // noise increase
+    constexpr float tauDown = 2.0f; // noise decrease
+    constexpr float warmupDurationSeconds = 0.5f;
 
-    if (!noiseEstimInit_)
-    {
-        noiseEstimate_ = motion;
-        noiseEstimInit_ = true;
-        return;
-    }
+    // Prevent large scene changes from instantly inflating
+    // the estimated noise floor.
+    const float maxAllowed = noiseEstimate_ * 3.f;
+    motion = std::min(motion, maxAllowed);
 
-    // Choix de la constante selon la direction
+    // Select the time constant depending on whether
+    // the estimated noise is increasing or decreasing.
     float tau = tauDown;
 
     if (motion > noiseEstimate_)
         tau = tauUp;
 
     // Faster convergence during the startup phase.
-    if (afterResetTimer_.elapsedSec() < 0.5f)
+    if (warmupTimer_.elapsedSec<float>() < warmupDurationSeconds)
         tau = tauInit;
 
-    float alpha = 1.f - std::exp(-deltaSeconds / tau);
+    const float alpha = 1.f - std::exp(-deltaSeconds / tau);
 
     noiseEstimate_ += alpha * (motion - noiseEstimate_);
+}
+
+float TemporalMean::computeAdaptiveAlpha(float motion, float deltaSeconds)
+{
+    // --------------------------------------------------------
+    // Motion normalized by noise
+    // --------------------------------------------------------
+    constexpr float epsilon = 1e-6f;
+
+    const float motionRatio = motion / (noiseEstimate_ + epsilon);
+
+    // Smooth the motion ratio to avoid rapid oscillations.
+    constexpr float tauRatio = 0.1f;
+
+    const float alphaRatio = 1.f - std::exp(-deltaSeconds / tauRatio);
+
+    // Smooth the normalized motion estimate to avoid
+    // rapid fluctuations of the adaptive response.
+    // This prevents abrupt changes of the temporal
+    // smoothing coefficient between successive frames.
+    motionRatioFiltered_ += alphaRatio * (motionRatio - motionRatioFiltered_);
+
+    // --------------------------------------------------------
+    // Map motion ratio to time constant
+    // --------------------------------------------------------
+    constexpr float tauMin = 0.02f; // very reactive
+    constexpr float tauMax = 0.2f;  // stable
+
+    constexpr float ratioLow = 1.1f;
+    constexpr float ratioHigh = 1.6f;
+
+    float t = 0.f;
+
+    if (motionRatioFiltered_ > ratioLow)
+        t = (motionRatioFiltered_ - ratioLow) / (ratioHigh - ratioLow);
+
+    t = std::clamp(t, 0.f, 1.f);
+
+    const float tCurve = std::sqrt(t);
+
+    const float tau = tauMax - tCurve * (tauMax - tauMin);
+
+    // --------------------------------------------------------
+    // Convert time constant to EWMA coefficient
+    // --------------------------------------------------------
+    return 1.f - std::exp(-deltaSeconds / tau);
+}
+
+void TemporalMean::applyTemporalSmoothing(const ImageView& frame, float alpha)
+{
+    const int channels = frame.channels();
+
+    for (int y = 0; y < accum_.height(); ++y)
+    {
+        const uint8_t* row = frame.row(y);
+
+        for (int x = 0; x < accum_.width(); ++x)
+        {
+            const int idx = x * channels;
+
+            float r, g, b;
+            frame.readPixelRgb(row, idx, r, g, b);
+
+            Rgb_f& accumPixel = accum_.at(x, y);
+
+            accumPixel.red += alpha * (r - accumPixel.red);
+            accumPixel.green += alpha * (g - accumPixel.green);
+            accumPixel.blue += alpha * (b - accumPixel.blue);
+        }
+    }
 }
 
 // ------------------------------------------------------------

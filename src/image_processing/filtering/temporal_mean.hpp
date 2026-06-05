@@ -41,18 +41,18 @@ public:
      *
      * Allocates internal buffers and initializes accumulation state.
      *
-     * @param first_src First input frame.
+     * @param firstFrame First input frame.
      */
-    void reset(const ImageView& first_src);
+    void reset(const ImageView& firstFrame);
 
     /**
      * @brief Update the filter with a new frame.
      *
      * Updates the temporal accumulation using the new input frame.
      *
-     * @param src Current frame.
+     * @param frame Current frame.
      */
-    void update(const ImageView& src);
+    void update(const ImageView& frame);
 
     /**
      * @brief Get the accumulated floating-point buffer.
@@ -84,14 +84,57 @@ public:
 
 private:
     /**
+     * @brief Estimate scene motion from the current frame.
+     *
+     * Computes the root mean square (RMS) color difference between the
+     * current frame and the temporal accumulation buffer.
+     *
+     * A spatial subsampling strategy is used to reduce computation cost.
+     *
+     * @param frame Current input frame.
+     * @return Estimated motion magnitude.
+     */
+    [[nodiscard]]
+    float computeMotion(const ImageView& frame) const;
+
+    /**
      * @brief Update internal noise estimation.
      *
      * Adjusts filter parameters based on motion and elapsed time.
      *
-     * @param motion Estimated motion ratio.
+     * @param motion Estimated scene motion.
      * @param deltaSeconds Time delta since last update.
      */
     void updateNoiseEstimate(float motion, float deltaSeconds);
+
+    /**
+     * @brief Compute the adaptive temporal smoothing coefficient.
+     *
+     * Converts the estimated scene motion into an EWMA coefficient
+     * using the current noise estimate and a continuous-time model.
+     *
+     * @param motion Estimated scene motion.
+     * @param deltaSeconds Time elapsed since the previous update.
+     * @return Adaptive smoothing coefficient in the range [0, 1].
+     */
+    [[nodiscard]]
+    float computeAdaptiveAlpha(float motion, float deltaSeconds);
+
+    /**
+     * @brief Apply exponential temporal smoothing to the accumulation buffer.
+     *
+     * Updates the internal accumulation image using the current input frame
+     * and the specified smoothing coefficient.
+     *
+     * Each pixel is updated according to an exponentially weighted moving
+     * average (EWMA):
+     *
+     * accum = accum + alpha * (frame - accum)
+     *
+     * @param frame Current input frame.
+     * @param alpha Smoothing coefficient in the range [0, 1].
+     */
+    void applyTemporalSmoothing(const ImageView& frame, float alpha);
 
     /**
      * @brief Update the output image from the accumulation buffer.
@@ -101,31 +144,26 @@ private:
     /// Accumulated floating-point image (temporal average).
     Grid2D<Rgb_f> accum_;
 
-    /// Indicates whether the filter has been initialized.
-    bool accumInit_{false};
-
     /// Spatial sampling step (used for motion estimation).
     int samplingStep_{1};
 
     /// Estimated noise level.
     float noiseEstimate_{0.f};
 
-    /// Indicates whether noise estimation has been initialized.
-    bool noiseEstimInit_{false};
-
-    /// Indicates if at least one frame was processed after the reset.
-    bool hasPreviousFrame_{false};
+    /// Indicates whether a valid temporal history is available.
+    bool hasTemporalHistory_{false};
 
     /// Timer used to compute time differences between frames.
     ElapsedTimer deltaFrameTimer_;
 
-    /// Timer used to compute elapsed time after a reset.
-    ElapsedTimer afterResetTimer_;
+    /// Timer used during the filter warm-up phase.
+    ElapsedTimer warmupTimer_;
 
     /// Output image buffer.
     ImageOwner output_;
 
-    /// Smoothed motion ratio.
+    /// Smoothed motion-to-noise ratio used to stabilize
+    /// the adaptive smoothing coefficient.
     float motionRatioFiltered_{1.f};
 
     /// Indicates whether the cached output image must be regenerated.
