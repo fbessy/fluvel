@@ -21,7 +21,7 @@
 
   <img src="https://img.shields.io/badge/license-CeCILL--2.1-6b6fcf">
 
-  <img src="https://img.shields.io/badge/C%2B%2B-20-6b6fcf">
+  <img src="https://img.shields.io/badge/C%2B%2B-23-6b6fcf">
 
   <img src="https://img.shields.io/badge/Qt-6-4fc98a">
 
@@ -140,8 +140,8 @@ fluvel/
 ├── scripts/                       # Development, packaging and utility scripts
 │                                  # Includes local testing and maintenance helpers
 │
-├── docs/                          # Generated local documentation (optional)
-├── web/                           # Website and homepage
+├── docs/                          # Documentation configuration and assets
+├── web/                           # Project homepage and download portal
 │
 ├── cmake/                         # Shared CMake modules and configuration
 ├── packaging/                     # Flatpak, AppImage and distribution files
