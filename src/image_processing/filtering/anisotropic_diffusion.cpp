@@ -160,7 +160,7 @@ void AnisotropicDiffusion::apply(const AnisoParams& params)
 
         std::swap(current_, next_);
 
-        // OPTIONNEL (plus rigoureux si diffusion touche les bords)
+        // OPTIONAL (only required if diffusion modifies image borders)
         padBorders();
     }
 
