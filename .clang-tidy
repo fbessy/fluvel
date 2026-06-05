@@ -9,7 +9,9 @@ Checks: >
   readability-identifier-naming,
   -bugprone-narrowing-conversions,
   misc-unused-includes,
-  modernize-use-forward-declaration
+  modernize-use-forward-declaration,
+  cppcoreguidelines-pro-type-member-init,
+  hicpp-member-init
 
 WarningsAsErrors: ''
 
@@ -43,37 +45,37 @@ CheckOptions:
   - key: readability-identifier-naming.TypeAliasCase
     value: PascalCase
 
-  # Functions → camelCase
+  # Functions → CamelCase
   - key: readability-identifier-naming.FunctionCase
-    value: camelCase
+    value: CamelCase
 
-  # Methods → camelCase
+  # Methods → CamelCase
   - key: readability-identifier-naming.MethodCase
-    value: camelCase
+    value: CamelCase
 
-  # Variables locales → camelCase
+  # Variables locales → CamelCase
   - key: readability-identifier-naming.VariableCase
-    value: camelCase
+    value: CamelCase
 
-  # Paramètres → camelCase
+  # Paramètres → CamelCase
   - key: readability-identifier-naming.ParameterCase
-    value: camelCase
+    value: CamelCase
 
-  # Membres privés → camelCase_
+  # Membres privés → CamelCase
   - key: readability-identifier-naming.PrivateMemberCase
-    value: camelCase
+    value: CamelCase
   - key: readability-identifier-naming.PrivateMemberSuffix
     value: _
 
-  # Membres protégés → camelCase_
+  # Membres protégés → CamelCase
   - key: readability-identifier-naming.ProtectedMemberCase
-    value: camelCase
+    value: CamelCase
   - key: readability-identifier-naming.ProtectedMemberSuffix
     value: _
 
-  # Membres publics → camelCase
+  # Membres publics → CamelCase
   - key: readability-identifier-naming.PublicMemberCase
-    value: camelCase
+    value: CamelCase
 
   # Constantes globales → kConstantCase
   - key: readability-identifier-naming.GlobalConstantPrefix
