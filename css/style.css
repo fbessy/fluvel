@@ -8,6 +8,8 @@
   --fluvel-secondary: #4fc98a;
   --fluvel-secondary-soft: #34c75938;
 
+  --fluvel-secondary-dark: #3ea874;
+
   --fluvel-soft: #f4f5ff;
 }
 
@@ -77,7 +79,7 @@ body {
   background: #f5f5f7;
   color: #1d1d1f;
 
-  max-width: 1200px;
+  max-width: 1300px;
 
   margin: auto;
   padding: 40px 20px;
@@ -310,16 +312,19 @@ code {
   font-size: 13px;
 }
 
-.checksums-section {
-  margin-top: 35px;
+.about-section h2,
+.demo-section h2 {
+  margin-bottom: 22px;
 }
 
-.about-section {
+.architecture-section h2 {
+  margin-bottom: 30px;
+}
+
+.about-section,
+.architecture-section,
+.demo-section {
   margin-top: 60px;
-}
-
-.about-section h2 {
-  margin-bottom: 18px;
 }
 
 .about-section p {
@@ -328,8 +333,280 @@ code {
   max-width: 760px;
 }
 
-.demo-section {
-  margin-top: 4rem;
+/* architecture overview style */
+
+.architecture-layout {
+  display: grid;
+
+  grid-template-columns:
+    280px 640px 280px;
+
+  justify-content: start;
+
+  column-gap: 40px;
+
+  align-items: start;
+
+  position: relative;
+}
+
+.arch-icon {
+  width: 32px;
+  height: 32px;
+
+  grid-row: 1 / span 2;
+
+  justify-self: center;
+  align-self: center;
+}
+
+.interface-header .arch-icon {
+  color: #000000;
+}
+
+.fluvelip-header .arch-icon {
+  color: white;
+}
+
+.interface-card {
+  width: 280px;
+
+  background: white;
+
+  border: 1px solid var(--fluvel-secondary);
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+
+  display: flex;
+  flex-direction: column;
+}
+
+.interface-header {
+  background: #eef8f2;
+  color: #2f4f3f;
+
+  border-bottom: 1px solid #e5e5e5;
+
+  text-align: left;
+
+  padding: 20px;
+}
+
+.interface-header h3 {
+  margin: 0;
+}
+
+.interface-header p {
+  margin-top: 6px;
+  margin-bottom: 0;
+
+  opacity: 0.95;
+}
+
+.header-title {
+  grid-column: 2;
+
+  margin: 0;
+
+  line-height: 1.2;
+}
+
+.header-subtitle {
+  grid-column: 2;
+
+  margin: 0;
+
+  line-height: 1.2;
+
+  opacity: .95;
+}
+
+
+
+.interface-body {
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+}
+
+.interface-tile {
+  background: white;
+  border: 1px solid #c7e4d1;
+
+  border-radius: 12px;
+
+  padding: 16px;
+
+  margin-bottom: 14px;
+
+  text-align: center;
+}
+
+.interface-tile:last-child {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+.fluvelip-card {
+  background: white;
+
+  border-radius: 20px;
+
+  overflow: hidden;
+
+  border: 1px solid #d9d7f5;
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, .06),
+    0 0 0 1px rgba(107, 111, 207, .08);
+
+  max-width: 900px;
+
+  width: 640px;
+
+  margin: 0 auto;
+
+  grid-column: 2;
+  transform: none;
+}
+
+.fluvelip-body {
+  padding: 18px;
+}
+
+.fluvelip-header {
+  background: var(--fluvel-primary);
+
+  color: white;
+
+  padding: 20px;
+
+  text-align: left;
+}
+
+.interface-header,
+.fluvelip-header {
+  display: grid;
+
+  grid-template-columns: 32px 1fr;
+
+  grid-template-rows: auto auto;
+
+  column-gap: 12px;
+
+  align-items: start;
+}
+
+.fluvelip-header p {
+  margin: 6px 0 0 0;
+}
+
+.interface-card,
+.fluvelip-card {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.interface-card:hover,
+.fluvelip-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.interface-tile,
+.feature-tile {
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.interface-tile:hover,
+.feature-tile:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.feature-tile:hover {
+  border-color: var(--fluvel-primary);
+}
+
+.interface-tile:hover {
+  border-color: var(--fluvel-secondary);
+}
+
+.module {
+  text-align: center;
+}
+
+.module:last-child {
+  margin-bottom: 0;
+}
+
+.module h3 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+
+  color: var(--fluvel-primary);
+}
+
+.module:first-child h3 {
+  margin-top: 0;
+}
+
+.module-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(180px, 1fr));
+
+  gap: 16px;
+  text-align: center;
+  justify-content: center;
+
+  max-width: 700px;
+  margin: auto;
+}
+
+.feature-tile {
+  background: var(--fluvel-soft);
+
+  border-radius: 10px;
+
+  border: 1px solid #e5e5e5;
+
+  min-height: 90px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  padding: 12px;
+  font-weight: 600;
+}
+
+.feature-subtitle {
+  margin-top: 4px;
+
+  font-size: 13px;
+
+  color: #666;
 }
 
 .demo-subtitle {

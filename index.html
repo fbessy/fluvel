@@ -44,11 +44,11 @@
 
     <div class="topbar-links">
 
-      <a href="https://github.com/fbessy/fluvel/" target="_blank">
+      <a href="https://github.com/fbessy/fluvel/" target="_blank" rel="noopener noreferrer">
         GitHub
       </a>
 
-      <a href="https://fabienip.gitlab.io/fluvel/" target="_blank">
+      <a href="https://fabienip.gitlab.io/fluvel/" target="_blank" rel="noopener noreferrer">
         Documentation
       </a>
 
@@ -127,7 +127,7 @@
 
   </details>
 
-  <div class="about-section">
+  <section class="about-section">
     <h2>About Fluvel</h2>
 
     <p>
@@ -142,9 +142,152 @@
       for segmentation analysis.
     </p>
 
-  </div>
+  </section>
 
-  <div class="demo-section">
+  <section class="architecture-section">
+
+    <h2>Architecture Overview</h2>
+
+    <div class="architecture-layout">
+
+      <div class="interface-card">
+
+        <div class="interface-header">
+          <img src="icons/fluvel_app.svg" class="arch-icon" alt="Fluvel App">
+          <h3 class="header-title">Fluvel App</h3>
+          <p class="header-subtitle">Qt6 / C++</p>
+        </div>
+
+        <div class="interface-body">
+
+          <div class="interface-tile">
+            <div class="feature-title">UI</div>
+            <div class="feature-subtitle">User interface</div>
+          </div>
+
+          <div class="interface-tile">
+            <div class="feature-title">Application Core</div>
+            <div class="feature-subtitle">
+              Workflow &amp; orchestration
+            </div>
+          </div>
+
+          <div class="interface-tile">
+            <div class="feature-title">Qt Interoperability</div>
+            <div class="feature-subtitle">
+              QImage · QVector&lt;QPointF&gt;
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="fluvelip-card">
+
+        <div class="fluvelip-header">
+          <img src="icons/fluvel_ip.svg" class="arch-icon" alt="Fluvel IP Library">
+          <h3 class="header-title">Fluvel IP Library</h3>
+          <p class="header-subtitle">C++</p>
+        </div>
+
+        <div class="fluvelip-body">
+
+          <div class="module">
+
+            <h3>Algorithms</h3>
+
+            <div class="module-grid">
+
+              <div class="feature-tile">
+                <div class="feature-title">Pre-processing</div>
+                <div class="feature-subtitle">
+                  Noise reduction &amp; enhancement
+                </div>
+              </div>
+
+              <div class="feature-tile">
+                <div class="feature-title">Segmentation</div>
+                <div class="feature-subtitle">
+                  Level-set Active Contours
+                </div>
+              </div>
+
+              <div class="feature-tile">
+                <div class="feature-title">Analysis</div>
+                <div class="feature-subtitle">
+                  Hausdorff Distances
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="module">
+
+            <h3>Core Data Model</h3>
+
+            <div class="module-grid">
+
+              <div class="feature-tile">
+                <div class="feature-title">Image Data</div>
+                <div class="feature-subtitle">fluvel_ip::ImageView</div>
+              </div>
+
+              <div class="feature-tile">
+                <div class="feature-title">Memory Ownership</div>
+                <div class="feature-subtitle">fluvel_ip::ImageOwner</div>
+              </div>
+
+              <div class="feature-tile">
+                <div class="feature-title">Geometry Data</div>
+                <div class="feature-subtitle">fluvel_ip::Contour</div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="interface-card">
+
+        <div class="interface-header">
+          <img src="icons/fluvel_api.svg" class="arch-icon" alt="Python API">
+          <div class="header-text">
+            <h3 class="header-title">Python API</h3>
+            <p class="header-subtitle">pybind11 / C++</p>
+          </div>
+        </div>
+
+        <div class="interface-body">
+
+          <div class="interface-tile">
+            <div class="feature-title">Bindings</div>
+            <div class="feature-subtitle">
+              Fluvel IP Python interface
+            </div>
+          </div>
+
+          <div class="interface-tile">
+            <div class="feature-title">Python Interoperability</div>
+            <div class="feature-subtitle">
+              NumPy arrays · pybind11::array_t
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="demo-section">
 
     <h2>Demo</h2>
 
@@ -176,7 +319,7 @@
 
     </div>
 
-  </div>
+  </section>
 
   <footer class="footer">
     Fluvel © 2026 — Fabien Bessy
