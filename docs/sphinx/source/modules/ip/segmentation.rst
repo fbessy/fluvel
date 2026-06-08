@@ -13,6 +13,24 @@ speed computation and initialization, making it possible to combine
 different segmentation strategies while reusing the same underlying
 infrastructure.
 
+Architecture
+------------
+
+The segmentation framework relies on pluggable speed models.
+
+External speed models can be injected into the active contour engine,
+while internal regularization is handled by a dedicated internal model.
+
+.. raw:: html
+
+   <div style="text-align:center;">
+     <a href="../../../../mermaid/active_contour_speed_models.svg"
+        target="_blank">
+       <img src="../../../../mermaid/active_contour_speed_models.svg"
+            style="max-width:300px; width:100%; height:auto;">
+     </a>
+   </div>
+
 References
 ----------
 

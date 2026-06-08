@@ -1,0 +1,39 @@
+classDiagram
+
+class ActiveContour
+
+class ISpeedModel {
+    <<interface>>
+    +computeSpeed()
+    +onImageChanged()
+    +onStepCycle1()
+    +onSwitch()
+}
+
+class RegionGraySpeedModel
+class RegionColorSpeedModel
+class MajorityInternalSpeed
+
+ISpeedModel <|.. RegionGraySpeedModel
+ISpeedModel <|.. RegionColorSpeedModel
+ISpeedModel <|.. MajorityInternalSpeed
+
+RegionGraySpeedModel --> ActiveContour
+
+RegionColorSpeedModel --> ActiveContour
+
+ActiveContour *-- MajorityInternalSpeed
+
+%% Active Contour Engine
+style ActiveContour fill:#f4f5ff,color:#1d1d1f,stroke:#6b6fcf,stroke-width:2px
+
+%% Internal engine component
+style MajorityInternalSpeed fill:#f4f5ff,color:#1d1d1f,stroke:#6b6fcf,stroke-width:2px
+
+%% Speed models
+style RegionGraySpeedModel fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+style RegionColorSpeedModel fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+%% Contract / Interface
+style ISpeedModel fill:#ffffff,color:#444444,stroke:#c8c8c8,stroke-width:2px

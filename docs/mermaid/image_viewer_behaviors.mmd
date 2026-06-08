@@ -1,0 +1,69 @@
+classDiagram
+
+class ImageViewerWidget
+
+class ImageViewerInteraction {
+    <<interface>>
+}
+
+class InteractionSet
+
+class ImageViewerBehavior {
+    <<interface>>
+}
+
+class PanBehavior
+class PixelInfoBehavior
+class ColorPickerBehavior
+class DragDropBehavior
+class AutoFitBehavior
+class FullscreenBehavior
+class InitializationBehavior
+
+ImageViewerInteraction <|.. InteractionSet
+
+ImageViewerWidget --> ImageViewerInteraction
+
+InteractionSet *-- ImageViewerBehavior
+
+ImageViewerBehavior <|.. PanBehavior
+ImageViewerBehavior <|.. PixelInfoBehavior
+ImageViewerBehavior <|.. ColorPickerBehavior
+ImageViewerBehavior <|.. DragDropBehavior
+ImageViewerBehavior <|.. AutoFitBehavior
+ImageViewerBehavior <|.. FullscreenBehavior
+ImageViewerBehavior <|.. InitializationBehavior
+
+%% ====================================================
+%% ENGINE (violet)
+%% ====================================================
+
+style ImageViewerWidget fill:#f4f5ff,color:#1d1d1f,stroke:#6b6fcf,stroke-width:2px
+
+style InteractionSet fill:#f4f5ff,color:#1d1d1f,stroke:#6b6fcf,stroke-width:2px
+
+%% ====================================================
+%% INTERFACES (gris)
+%% ====================================================
+
+style ImageViewerInteraction fill:#ffffff,color:#444444,stroke:#c8c8c8,stroke-width:2px
+
+style ImageViewerBehavior fill:#ffffff,color:#444444,stroke:#c8c8c8,stroke-width:2px
+
+%% ====================================================
+%% BEHAVIORS (vert)
+%% ====================================================
+
+style PanBehavior fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+style PixelInfoBehavior fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+style ColorPickerBehavior fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+style DragDropBehavior fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+style AutoFitBehavior fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+style FullscreenBehavior fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px
+
+style InitializationBehavior fill:#eef8f2,color:#1d1d1f,stroke:#4fc98a,stroke-width:2px

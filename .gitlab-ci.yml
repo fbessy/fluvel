@@ -100,6 +100,10 @@ doc:
     - mkdir -p public/assets/logo
     - cp assets/logo/fluvel.svg public/assets/logo/
 
+    - mkdir -p public/mermaid
+    - cp docs/mermaid/*.svg public/mermaid/
+    - cp docs/mermaid/*.mmd public/mermaid/
+
   artifacts:
     paths:
       - public
