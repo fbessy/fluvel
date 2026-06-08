@@ -19,9 +19,9 @@ drag-and-drop and fullscreen support.
 .. raw:: html
 
    <div style="text-align:center;">
-     <a href="../../../../../mermaid/image_viewer_behaviors.svg"
+     <a href="/fluvel/mermaid/image_viewer_behaviors.svg"
         target="_blank">
-       <img src="../../../../../mermaid/image_viewer_behaviors.svg"
+       <img src="/fluvel/mermaid/image_viewer_behaviors.svg"
             style="max-width:300px; width:100%; height:auto;">
      </a>
    </div>
