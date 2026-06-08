@@ -341,7 +341,7 @@ code {
   grid-template-columns:
     280px 640px 280px;
 
-  justify-content: center;
+  justify-content: start;
 
   column-gap: 40px;
 
