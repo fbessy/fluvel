@@ -1,18 +1,60 @@
 classDiagram
 
-class ActiveContour
+class ActiveContour {
+    +converge()
+    +step()
+    -stepCycle1() [image-driven]
+    -stepCycle2() [internal/geometric-driven]
+    -contourData
+    -parameters
+    -externalSpeedModel
+    -internalSpeedModel
+}
+
+class ContourData {
+    -outerContour [Lout]
+    -innerContour [Lin]
+    -levelSet [phi]
+}
+
+ActiveContour *-- ContourData
+
+class ContourPoint {
+    -x
+    -y
+    -speed
+}
+
+ContourData *-- ContourPoint
 
 class ISpeedModel {
     <<interface>>
-    +computeSpeed()
-    +onImageChanged()
+    +computeSpeed(contourPoint, levelSet)
+    +onImageChanged(image, contourData)
     +onStepCycle1()
-    +onSwitch()
+    +onSwitch(contourPoint, direction)
+    +fillDiagnostics(diagnostics)
 }
 
-class RegionGraySpeedModel
-class RegionColorSpeedModel
-class MajorityInternalSpeed
+class RegionGraySpeedModel {
+    +computeSpeed(contourPoint, ...)
+    +onImageChanged(grayImage, ...)
+    +...()
+    -meanOutside
+    -meanInside
+}
+
+class RegionColorSpeedModel {
+    +computeSpeed(contourPoint, ...)
+    +onImageChanged(rgbImage, ...)
+    +...()
+    -meanRgbOutside
+    -meanRgbInside
+}
+
+class MajorityInternalSpeed {
+    +computeSpeed(contourPoint, ...)
+}
 
 ISpeedModel <|.. RegionGraySpeedModel
 ISpeedModel <|.. RegionColorSpeedModel

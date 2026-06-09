@@ -1,12 +1,17 @@
 classDiagram
 
-class ImageViewerWidget
+class ImageViewerWidget {
+    +setInteraction(interactionSet)
+}
 
 class ImageViewerInteraction {
     <<interface>>
 }
 
-class InteractionSet
+class InteractionSet {
+    +addBehavior(behavior)
+    -behaviors
+}
 
 class ImageViewerBehavior {
     <<interface>>
