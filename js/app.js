@@ -177,3 +177,64 @@ fetch("latest.json")
     highlightPlatform();
 
   });
+
+const contactLink =
+  document.getElementById("contact-link");
+
+const contactModal =
+  document.getElementById("contact-modal");
+
+const closeButton =
+  document.querySelector(".modal-close");
+
+contactLink.addEventListener("click", event => {
+  event.preventDefault();
+
+  contactModal.classList.add("open");
+});
+
+closeButton.addEventListener("click", () => {
+  contactModal.classList.remove("open");
+});
+
+const contactForm =
+  document.getElementById("contact-form");
+
+if (contactForm) {
+
+  contactForm.addEventListener("submit", async event => {
+
+    event.preventDefault();
+
+    const data = new FormData(contactForm);
+
+    const response = await fetch(
+      "https://formspree.io/f/mvznrwwz",
+      {
+        method: "POST",
+        body: data,
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+    if (response.ok) {
+
+      contactForm.reset();
+
+      document
+        .getElementById("contact-success")
+        .classList.add("visible");
+
+    }
+    else {
+
+      document
+        .getElementById("contact-error")
+        .classList.add("visible");
+
+    }
+
+  });
+
+}

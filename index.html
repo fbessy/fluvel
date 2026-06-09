@@ -52,6 +52,10 @@
         Documentation
       </a>
 
+      <a href="#" id="contact-link">
+        Contact
+      </a>
+
     </div>
 
   </div>
@@ -64,11 +68,11 @@
         Windows
       </h3>
 
-      <a id="win_installer" class="button">
+      <a id="win_installer" class="button-primary">
         Installer (.exe)
       </a>
 
-      <a id="win_portable" class="button">
+      <a id="win_portable" class="button-primary">
         Portable (.zip)
       </a>
     </div>
@@ -79,15 +83,15 @@
         Linux
       </h3>
 
-      <a id="flatpak" class="button">
+      <a id="flatpak" class="button-primary">
         Flatpak
       </a>
 
-      <a id="appimage" class="button">
+      <a id="appimage" class="button-primary">
         AppImage
       </a>
 
-      <a id="deb" class="button">
+      <a id="deb" class="button-primary">
         DEB
       </a>
     </div>
@@ -98,7 +102,7 @@
         macOS
       </h3>
 
-      <a id="macos" class="button">
+      <a id="macos" class="button-primary">
         DMG
       </a>
     </div>
@@ -324,6 +328,95 @@
   <footer class="footer">
     Fluvel © 2026 — Fabien Bessy
   </footer>
+
+  <div id="contact-modal" class="modal">
+
+    <div class="modal-content">
+
+      <button class="modal-close">
+        &times;
+      </button>
+
+      <h2>Contact</h2>
+
+      <p class="contact-subtitle">
+        Questions about Fluvel, feedback, bug reports or collaboration opportunities.
+      </p>
+
+      <form id="contact-form" class="contact-form" action="https://formspree.io/f/mvznrwwz" method="POST">
+
+        <label for="subject">Subject</label>
+
+        <select id="subject" name="subject" required>
+
+          <option>
+            Questions about Fluvel
+          </option>
+
+          <option>
+            Feedback and suggestions
+          </option>
+
+          <option>
+            Professional opportunity or collaboration
+          </option>
+
+          <option>
+            Other
+          </option>
+
+        </select>
+
+        <label for="email">Email</label>
+
+        <input type="hidden" name="_subject" value="Fluvel Contact Form">
+
+        <input id="email" name="email" type="email" placeholder="your@email.com" autocomplete="email" required>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="10" placeholder="How can I help?" required></textarea>
+
+        <button type="submit" class="button-primary">
+          Send message
+        </button>
+
+      </form>
+
+      <div id="contact-success" class="contact-success">
+
+        ✓ Message sent successfully.
+        Thank you for your interest in Fluvel.
+
+      </div>
+
+      <div id="contact-error" class="contact-error">
+
+        Unable to send message.
+        Please try again later.
+
+      </div>
+
+      <div class="contact-alternative">
+
+        <p>
+          Prefer a direct contact?
+        </p>
+
+        <a href="mailto:fabien.bessy@gmail.com">
+          Email
+        </a>
+
+        ·
+
+        <a href="https://www.linkedin.com/in/fabien-bessy-a7440855/" target="_blank" rel="noopener noreferrer">
+          LinkedIn
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
 
   <script src="js/app.js"></script>
 

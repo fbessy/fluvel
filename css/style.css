@@ -145,14 +145,20 @@ body {
 
 /* ===== BUTTON ===== */
 
-a.button {
+.button-primary {
   display: inline-block;
+
   padding: 10px 15px;
-  margin: 5px 5px 5px 0;
+
   background: var(--fluvel-primary);
   color: white;
+
   text-decoration: none;
+
+  border: none;
   border-radius: 10px;
+
+  cursor: pointer;
 
   transition:
     transform 0.15s ease,
@@ -160,9 +166,11 @@ a.button {
     background 0.15s ease;
 }
 
-a.button:hover {
+.button-primary:hover {
   transform: translateY(-1px);
+
   box-shadow: 0 4px 12px rgba(74, 44, 255, 0.25);
+
   background: var(--fluvel-primary-soft);
 }
 
@@ -652,4 +660,170 @@ code {
 ::-moz-selection {
   background: var(--fluvel-secondary-soft);
   color: #111;
+}
+
+.modal {
+  display: none;
+
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.4);
+
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-content {
+  width: min(600px, 90vw);
+
+  background: white;
+
+  padding: 24px;
+
+  border-radius: 20px;
+
+  border: 1px solid #d9d7f5;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, .08),
+    0 0 0 1px rgba(107, 111, 207, .08);
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+
+  margin-bottom: 12px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f5f5f7;
+
+  color: #666;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.modal-close:hover {
+  background: var(--fluvel-soft);
+  color: var(--fluvel-primary);
+
+  transform: scale(1.05);
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+
+  padding: 12px 14px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #f5f5f7;
+
+  font: inherit;
+  color: inherit;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  outline: none;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 2px var(--fluvel-primary-soft);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 180px;
+}
+
+.contact-alternative {
+  margin-top: 20px;
+
+  text-align: center;
+
+  font-size: 14px;
+  color: #666;
+}
+
+.contact-alternative a {
+  color: var(--fluvel-primary);
+  text-decoration: none;
+}
+
+.contact-success {
+  display: none;
+
+  margin-top: 18px;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: var(--fluvel-secondary-soft);
+
+  color: var(--fluvel-secondary-dark);
+
+  font-weight: 600;
+}
+
+.contact-success.visible {
+  display: block;
+}
+
+.contact-error {
+  display: none;
+
+  margin-top: 18px;
+
+  padding: 12px;
+
+  border-radius: 12px;
+
+  background: rgba(255, 59, 48, 0.12);
+
+  color: #c0392b;
+
+  font-weight: 600;
+}
+
+.contact-error.visible {
+  display: block;
 }
