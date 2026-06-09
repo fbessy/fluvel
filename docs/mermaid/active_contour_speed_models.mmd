@@ -1,12 +1,12 @@
 classDiagram
 
 class ActiveContour {
+    +update(image)
     +converge()
     +step()
     -stepCycle1() [image-driven]
     -stepCycle2() [internal/geometric-driven]
     -contourData
-    -parameters
     -externalSpeedModel
     -internalSpeedModel
 }
