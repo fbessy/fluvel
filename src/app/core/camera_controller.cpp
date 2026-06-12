@@ -7,14 +7,19 @@
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
 
+#include <QAudioOutput>
 #include <QCamera>
 #include <QDebug>
+#include <QFileInfo>
 #include <QMediaCaptureSession>
 #include <QMediaDevices>
+#include <QMediaPlayer>
 #include <QTimer>
+#include <QUrl>
 #include <QVideoSink>
 
 #include <cassert>
+#include <utility>
 
 namespace fluvel
 {
@@ -62,6 +67,23 @@ CameraController::~CameraController()
     activeContourThread_.wait();
 }
 
+void CameraController::start(const SourceConfig& sourceConfig)
+{
+    switch (sourceConfig.type)
+    {
+        case SourceType::Url:
+        case SourceType::File:
+            start(sourceConfig.url);
+            return;
+
+        case SourceType::Camera:
+            start(sourceConfig.cameraId, sourceConfig.cameraFormat);
+            return;
+    }
+
+    std::unreachable();
+}
+
 void CameraController::start(const QByteArray& deviceId)
 {
     start(deviceId, QCameraFormat());
@@ -71,8 +93,12 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
 {
     assert(startupTimer_);
 
-    if (state_ != StreamingState::Stopped || camera_ || videoSink_ || captureSession_)
+    if (state_ != StreamingState::Stopped || camera_ || videoSink_ || captureSession_ ||
+        mediaPlayer_)
         return;
+
+    state_ = StreamingState::Starting;
+    emit streamingStarting();
 
     const auto cameras = QMediaDevices::videoInputs();
     bool isFound = false;
@@ -83,14 +109,9 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
         {
             isFound = true;
 
-            state_ = StreamingState::Starting;
-            emit streamingStarting();
-
             camera_ = new QCamera(cam, this);
             videoSink_ = new QVideoSink(this);
             captureSession_ = new QMediaCaptureSession(this);
-
-            deviceId_ = cam.id();
 
             // 👉 Application du format choisi (UI)
             if (!format.isNull())
@@ -107,6 +128,12 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
                     camera_->setCameraFormat(*it);
             }
 
+            sourceInfo_ = SourceInfo{};
+            sourceInfo_.type = SourceType::Camera;
+            sourceInfo_.deviceId = camera_->cameraDevice().id();
+            sourceInfo_.deviceFormat = camera_->cameraFormat();
+            sourceInfo_.description = camera_->cameraDevice().description();
+
             captureSession_->setCamera(camera_);
             captureSession_->setVideoSink(videoSink_);
 
@@ -119,6 +146,7 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
 #endif
 
             startupTimer_->start(kStartupTimeoutMs);
+
             camera_->start();
 
             break;
@@ -127,6 +155,84 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
 
     if (!isFound)
         emit cameraError(deviceId, QCamera::CameraError, tr("Camera not found"));
+}
+
+void CameraController::start(const QUrl& url)
+{
+    assert(startupTimer_);
+
+    if (state_ != StreamingState::Stopped || camera_ || videoSink_ || captureSession_ ||
+        mediaPlayer_)
+        return;
+
+    state_ = StreamingState::Starting;
+    emit streamingStarting();
+
+    sourceInfo_ = SourceInfo{};
+    sourceInfo_.sourceUrl = url;
+
+    if (sourceInfo_.sourceUrl.isLocalFile())
+        sourceInfo_.type = SourceType::File;
+    else
+        sourceInfo_.type = SourceType::Url;
+
+    sourceInfo_.description = shortSourceName(sourceInfo_.sourceUrl);
+
+    mediaPlayer_ = new QMediaPlayer(this);
+    videoSink_ = new QVideoSink(this);
+
+    // HTTP MP4 test source.
+    //
+    // Note:
+    // This file can be downloaded and played locally,
+    // but some media players (Qt Multimedia, VLC, mpv)
+    // may fail to stream it directly because the MP4
+    // is not suitable for seekable HTTP streaming
+    // ("no moov before mdat and stream is not seekable").
+    //
+    // Useful regression test for URL media error handling.
+
+    // mediaPlayer_->setSource(QUrl("/home/fabien/sample-20s.mp4"));
+
+    // mediaPlayer_->setSource(QUrl("https://samplelib.com/preview/mp4/sample-20s.mp4"));
+
+    /*mediaPlayer_->setSource(QUrl("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/"
+                                 "Big_Buck_Bunny_720_10s_1MB.mp4"));*/
+
+    // mediaPlayer_->setSource(QUrl("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"));
+
+    // mediaPlayer_->setSource(QUrl("http://192.168.1.110:8080/video"));
+
+    // mediaPlayer_->setSource(QUrl("rtsp://localhost:8554/test"));
+
+    // mediaPlayer_->setSource(QUrl("http://localhost:8888/test/index.m3u8"));
+
+    mediaPlayer_->setSource(url);
+    mediaPlayer_->setVideoSink(videoSink_);
+    connect(videoSink_, &QVideoSink::videoFrameChanged, this, &CameraController::onCapturedFrame);
+
+#ifdef FLUVEL_SIMULATE_STREAM_LOSS
+    testFrameCounter_ = 0;
+#endif
+
+    audioOutput_ = new QAudioOutput(this);
+    audioOutput_->setVolume(0.5f);
+    mediaPlayer_->setAudioOutput(audioOutput_);
+
+    connect(mediaPlayer_, &QMediaPlayer::mediaStatusChanged, this,
+            &CameraController::onMediaStatusChanged);
+
+    startupTimer_->start(kStartupTimeoutMs);
+
+    mediaPlayer_->play();
+}
+
+void CameraController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
+{
+    if (status == QMediaPlayer::EndOfMedia)
+    {
+        stop();
+    }
 }
 
 void CameraController::stop()
@@ -161,6 +267,15 @@ void CameraController::stop()
         captureSession_ = nullptr;
     }
 
+    if (mediaPlayer_)
+    {
+        mediaPlayer_->stop();
+
+        delete mediaPlayer_;
+
+        mediaPlayer_ = nullptr;
+    }
+
     if (videoSink_)
     {
         delete videoSink_;
@@ -172,6 +287,9 @@ void CameraController::stop()
         delete camera_;
         camera_ = nullptr;
     }
+
+    sourceInfo_ = SourceInfo{};
+    streamingInfo_ = StreamingInfo{};
 
     state_ = StreamingState::Stopped;
     emit streamingStopped();
@@ -206,18 +324,14 @@ void CameraController::onCapturedFrame(const QVideoFrame& frame)
         frameStats_.reset();
         diagnosticsTimer_->start();
 
-        if (camera_)
-        {
-            StreamingInfo info;
+        streamingInfo_ = StreamingInfo{};
+        streamingInfo_.source = sourceInfo_;
 
-            auto device = camera_->cameraDevice();
-            info.deviceId = device.id();
-            info.description = device.description();
+        streamingInfo_.frameSize = frame.size();
+        streamingInfo_.pixelFormat = frame.pixelFormat();
+        streamingInfo_.sourceFrameRate = frame.streamFrameRate();
 
-            info.format = camera_->cameraFormat();
-
-            emit streamingStarted(info);
-        }
+        emit streamingStarted(streamingInfo_);
     }
 
     frameStats_.frameCaptured();
@@ -260,7 +374,7 @@ void CameraController::onDisplayFrameReady(const DisplayFrame& displayFrame)
 void CameraController::onStartupTimeout()
 {
     stop();
-    emit startupTimeout(deviceId_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
+    emit startupTimeout(sourceInfo_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
 }
 
 void CameraController::checkWatchdog()
@@ -270,7 +384,7 @@ void CameraController::checkWatchdog()
     if (frameAgeNs > kStreamLossTimeoutNs)
     {
         stop();
-        emit streamingLost(deviceId_, static_cast<double>(frameAgeNs) / 1e9);
+        emit streamingLost(streamingInfo_, static_cast<double>(frameAgeNs) / 1e9);
     }
 }
 
@@ -310,11 +424,12 @@ void CameraController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devi
     if (state_ == StreamingState::Stopped)
         return;
 
-    const bool cameraStillExists = std::any_of(devices.begin(), devices.end(),
-                                               [&](const QCameraDevice& dev)
-                                               {
-                                                   return dev.id() == deviceId_;
-                                               });
+    const bool cameraStillExists =
+        std::any_of(devices.begin(), devices.end(),
+                    [&](const QCameraDevice& dev)
+                    {
+                        return dev.id() == streamingInfo_.source.deviceId;
+                    });
 
     if (!cameraStillExists)
         stop();
@@ -353,6 +468,14 @@ StreamingState CameraController::streamingState() const
 QList<QCameraDevice> CameraController::videoInputs() const
 {
     return QMediaDevices::videoInputs();
+}
+
+QString CameraController::shortSourceName(const QUrl& url)
+{
+    if (url.isLocalFile())
+        return QFileInfo(url.toLocalFile()).fileName();
+
+    return url.fileName();
 }
 
 } // namespace fluvel

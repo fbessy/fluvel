@@ -44,6 +44,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+#include <cassert>
+
 namespace fluvel
 {
 
@@ -211,18 +213,18 @@ void ImageWindow::setupActions()
     imageSessionAct_->setEnabled(true);
     imageSessionAct_->setStatusTip(tr("Switch to the image session."));
 
-    cameraSessionAct_ = new QAction(tr("Came&ra"), this);
-    cameraSessionAct_->setShortcut(tr("Ctrl+R"));
+    videoSessionAct_ = new QAction(tr("&Video"), this);
+    videoSessionAct_->setEnabled(true);
+    videoSessionAct_->setShortcut(tr("Ctrl+V"));
 
     QIcon cameraIcon =
         il::loadIcon(QIcon::ThemeIcon::CameraWeb, ":/icons/actions/camera-web-symbolic.svg");
 
-    cameraSessionAct_->setIcon(cameraIcon);
+    videoSessionAct_->setIcon(cameraIcon);
 
-    cameraSessionAct_->setCheckable(true);
-    cameraSessionAct_->setChecked(false);
-    cameraSessionAct_->setEnabled(false);
-    cameraSessionAct_->setStatusTip(tr("Open the camera session."));
+    videoSessionAct_->setCheckable(true);
+    videoSessionAct_->setChecked(false);
+    videoSessionAct_->setStatusTip(tr("Open the video session."));
 
     quitAct_ = new QAction(tr("&Quit"), this);
     quitAct_->setShortcut(QKeySequence::Quit);
@@ -306,7 +308,7 @@ void ImageWindow::setupMenus()
 {
     sessionMenu_ = new QMenu(tr("&Session"), this);
     sessionMenu_->addAction(imageSessionAct_);
-    sessionMenu_->addAction(cameraSessionAct_);
+    sessionMenu_->addAction(videoSessionAct_);
     sessionMenu_->addSeparator();
     sessionMenu_->addAction(quitAct_);
 
@@ -374,7 +376,6 @@ void ImageWindow::applyInitialSettings()
     displayBar_->updateDisplayModeAvailability(preprocessing);
 
     updateRecentFileActions();
-    updateCameraAction(cameraWindow_->isCameraAvailable());
 }
 
 void ImageWindow::setupConnections()
@@ -388,10 +389,6 @@ void ImageWindow::setupConnections()
             &ImageWindow::onCameraWindowClosed);
 
     setupFileEventConnections();
-
-    // --- Hardware events (camera devices via camera window via camera controller...) ---
-    connect(cameraWindow_, &CameraWindow::cameraAvailabilityChanged, this,
-            &ImageWindow::updateCameraAction);
 
     // --- Controller → View / Window updates ---
 
@@ -500,8 +497,7 @@ void ImageWindow::setupUserActionsConnections()
                 imageSessionAct_->setChecked(true);
             });
 
-    connect(cameraSessionAct_, &QAction::triggered, this,
-            &ImageWindow::onStartCameraActionTriggered);
+    connect(videoSessionAct_, &QAction::triggered, this, &ImageWindow::onStartVideoActionTriggered);
 
     connect(quitAct_, &QAction::triggered, this, &ImageWindow::close);
 
@@ -643,35 +639,15 @@ void ImageWindow::clearRecentFiles()
     updateRecentFileActions();
 }
 
-void ImageWindow::updateCameraAction(bool available)
+void ImageWindow::onStartVideoActionTriggered()
 {
-    assert(cameraSessionAct_);
+    assert(cameraWindow_);
 
-    cameraSessionAct_->setEnabled(available);
-}
+    cameraWindow_->setWindowState(cameraWindow_->windowState() & ~Qt::WindowMinimized);
 
-void ImageWindow::onStartCameraActionTriggered()
-{
-    if (!cameraSessionAct_)
-        return;
-
-    if (!cameraWindow_)
-        return;
-
-    if (!cameraWindow_->isCameraAvailable())
-    {
-        QMessageBox::information(this, tr("Information"), tr("No camera available."));
-    }
-    else
-    {
-        cameraSessionAct_->setChecked(true);
-
-        cameraWindow_->setWindowState(cameraWindow_->windowState() & ~Qt::WindowMinimized);
-
-        cameraWindow_->show();
-        cameraWindow_->raise();
-        cameraWindow_->activateWindow();
-    }
+    cameraWindow_->show();
+    cameraWindow_->raise();
+    cameraWindow_->activateWindow();
 }
 
 void ImageWindow::closeEvent(QCloseEvent* event)
@@ -844,12 +820,12 @@ void ImageWindow::onStateChanged(fluvel::WorkerState state)
 
 void ImageWindow::onCameraWindowShown()
 {
-    cameraSessionAct_->setChecked(true);
+    videoSessionAct_->setChecked(true);
 }
 
 void ImageWindow::onCameraWindowClosed()
 {
-    cameraSessionAct_->setChecked(false);
+    videoSessionAct_->setChecked(false);
 }
 
 void ImageWindow::showErrorMessage(const QString& msg)

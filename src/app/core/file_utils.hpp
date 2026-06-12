@@ -109,4 +109,26 @@ QString strippedName(const QString& fullFilename);
  */
 QString makeUniqueFileName(const QString& filePath);
 
+/**
+ * @brief Returns the list of supported video file extensions.
+ *
+ * The returned extensions are derived from the multimedia backend
+ * capabilities reported by Qt Multimedia for media decoding.
+ *
+ * Example:
+ * "*.avi *.m4v *.mkv *.mov *.mp4 *.webm"
+ */
+QString supportedVideoExtensions();
+
+/**
+ * @brief Builds a QFileDialog filter for supported video files.
+ *
+ * The filter is generated from the multimedia formats supported
+ * by the current Qt Multimedia backend.
+ *
+ * Example:
+ * "Video Files (*.avi *.m4v *.mkv *.mov *.mp4 *.webm)"
+ */
+QString buildVideoFilter();
+
 } // namespace fluvel::file_utils

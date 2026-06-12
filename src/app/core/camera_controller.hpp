@@ -10,10 +10,13 @@
 #include "frame_data.hpp"
 #include "frame_stats_view.hpp"
 #include "video_active_contour_thread.hpp"
+#include "video_types.hpp"
 
 #include <QByteArray>
 #include <QCamera>
+#include <QMediaPlayer>
 #include <QObject>
+#include <QUrl>
 #include <QtCore/qglobal.h>
 
 // #define FLUVEL_SIMULATE_STARTUP_TIMEOUT
@@ -22,31 +25,12 @@
 class QMediaCaptureSession;
 class QVideoSink;
 class QTimer;
+class QAudioOutput;
 
 namespace fluvel
 {
 
-/**
- * @brief Current streaming state.
- */
-enum class StreamingState
-{
-    Stopped,  ///< No active stream
-    Starting, ///< Camera initialization in progress
-    Streaming ///< Frames are being received
-};
-
-/**
- * @brief Information about an active video stream.
- *
- * Contains the selected device and format used for streaming.
- */
-struct StreamingInfo
-{
-    QByteArray deviceId;  ///< Unique device identifier
-    QString description;  ///< Human-readable device description
-    QCameraFormat format; ///< Active camera format
-};
+struct StreamingInfo;
 
 /**
  * @brief High-level controller for camera streaming and processing.
@@ -86,12 +70,7 @@ public:
     /**
      * @brief Start streaming using a specific device.
      */
-    void start(const QByteArray& deviceId);
-
-    /**
-     * @brief Start streaming with a specific device and format.
-     */
-    void start(const QByteArray& deviceId, const QCameraFormat& format);
+    void start(const SourceConfig& sourceConfig);
 
     /**
      * @brief Stop the current stream.
@@ -162,10 +141,10 @@ signals:
     void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
 
     /// Emitted when startup timeout is reached.
-    void startupTimeout(const QByteArray& deviceId, double timeoutSec);
+    void startupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
 
     /// Emitted when stream loss is detected.
-    void streamingLost(const QByteArray& deviceId, double frameAgeSec);
+    void streamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
 
     /// Emitted with updated textual statistics.
     void textStatsUpdated(const QString& textStats);
@@ -177,6 +156,18 @@ signals:
     void downscaleChanged(const fluvel::DownscaleParams& downscaleParams);
 
 private:
+    /**
+     * @brief Start streaming using a specific device.
+     */
+    void start(const QByteArray& deviceId);
+
+    /**
+     * @brief Start streaming with a specific device and format.
+     */
+    void start(const QByteArray& deviceId, const QCameraFormat& format);
+
+    void start(const QUrl& url);
+
     /// Handle updates in available video inputs.
     void onVideoInputsChanged();
 
@@ -198,11 +189,15 @@ private:
     /// Triggered when startup timeout is reached.
     void onStartupTimeout();
 
+    void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
+
     /// Periodic watchdog to detect stream loss.
     void checkWatchdog();
 
     /// Update internal diagnostics.
     void updateDiagnostics();
+
+    static QString shortSourceName(const QUrl& url);
 
     /// Whether to use an optimized camera format when available.
     bool useOptimizedFormat_{true};
@@ -212,6 +207,9 @@ private:
 
     /// Qt capture session.
     QMediaCaptureSession* captureSession_ = nullptr;
+
+    QMediaPlayer* mediaPlayer_ = nullptr;
+    QAudioOutput* audioOutput_ = nullptr;
 
     /// Video sink receiving frames.
     QVideoSink* videoSink_ = nullptr;
@@ -241,8 +239,11 @@ private:
     /// Current streaming state.
     StreamingState state_ = StreamingState::Stopped;
 
-    /// Current active device identifier.
-    QByteArray deviceId_;
+    /// Current source info.
+    SourceInfo sourceInfo_;
+
+    /// Current streaming info.
+    StreamingInfo streamingInfo_;
 
     //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.
     int64_t lastValidFrameTsNs_{0};

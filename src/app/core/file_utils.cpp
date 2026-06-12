@@ -4,6 +4,7 @@
 #include <QFileInfo>
 #include <QImageReader>
 #include <QImageWriter>
+#include <QMediaFormat>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QStringList>
@@ -112,5 +113,53 @@ QString makeUniqueFileName(const QString& filePath)
     }
 
     return candidate;
+}
+
+static QStringList extensionsForMediaFormat(QMediaFormat::FileFormat format)
+{
+    switch (format)
+    {
+        case QMediaFormat::MPEG4:
+            return {"*.mp4", "*.m4v"};
+
+        case QMediaFormat::Matroska:
+            return {"*.mkv"};
+
+        case QMediaFormat::AVI:
+            return {"*.avi"};
+
+        case QMediaFormat::QuickTime:
+            return {"*.mov"};
+
+        case QMediaFormat::WebM:
+            return {"*.webm"};
+
+        default:
+            return {};
+    }
+}
+
+QString supportedVideoExtensions()
+{
+    QStringList patterns;
+
+    QMediaFormat mediaFormat;
+
+    const auto formats = mediaFormat.supportedFileFormats(QMediaFormat::Decode);
+
+    for (auto format : formats)
+    {
+        patterns.append(extensionsForMediaFormat(format));
+    }
+
+    patterns.removeDuplicates();
+    patterns.sort();
+
+    return patterns.join(' ');
+}
+
+QString buildVideoFilter()
+{
+    return QObject::tr("Video Files (%1)").arg(supportedVideoExtensions());
 }
 }

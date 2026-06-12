@@ -116,6 +116,8 @@ set(app_src
     ${CORE_DIR}/camera_controller.cpp
     ${CORE_DIR}/camera_controller.hpp
 
+    ${CORE_DIR}/video_types.hpp
+
     ${CORE_DIR}/active_contour_worker.cpp
     ${CORE_DIR}/active_contour_worker.hpp
 

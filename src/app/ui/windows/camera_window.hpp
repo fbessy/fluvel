@@ -7,6 +7,8 @@
 #include "application_settings_types.hpp"
 #endif
 
+#include "video_types.hpp"
+
 #include <QMainWindow>
 
 #include <QByteArray>
@@ -15,11 +17,13 @@
 #include <QMetaObject>
 #include <QSet>
 #include <QString>
+#include <QUrl>
 
 class QWidget;
 class QComboBox;
 class QPushButton;
 class QLabel;
+class QLineEdit;
 
 class QShowEvent;
 class QCloseEvent;
@@ -168,6 +172,9 @@ private:
     void bindUiToApplicationSettings();
     void connectFrameToView();
 
+    void refreshSourceUi();
+    void updateSourceConfigFromUi();
+
     void updateDeviceList(const QList<QCameraDevice>& devices);
     int computeBestDeviceIndex(const QByteArray& previousSelection, const QByteArray& newlyPlugged);
     void setDeviceControlsEnabled(bool enabled);
@@ -175,6 +182,8 @@ private:
     void updateStreamingButton();
     void updateApplyButton();
     void refreshUi();
+
+    void openFile();
 
     void onToggleStreaming();
     void onApplySelection();
@@ -197,32 +206,54 @@ private:
     void loadPreferredFormats();
     void savePreferredFormats();
 
+    void addSourceToHistory(const QUrl& url);
+    void loadSourceHistory();
+    void saveSourceHistory();
+
+    QString lastVideoDirectory() const;
+    void saveLastVideoDirectory(const QString& directory);
+
     void onStreamingStarting();
     void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
     void onCameraError(const QByteArray& deviceId, QCamera::Error error,
                        const QString& errorString);
-    void onStartupTimeout(const QByteArray& deviceId, double timeoutSec);
-    void onStreamingLost(const QByteArray& deviceId, double frameAgeSec);
+    void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
+    void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
 #endif
 
-    void startCamera();
-    void stopCamera();
+    void startSource();
+    void stopSource();
+
+    void loadLastSourceType();
+    void saveLastSourceType();
 
     static QByteArray loadSelectedCameraId();
     void saveSelectedCameraId();
+
+    QString sourceTitle(const StreamingInfo& info) const;
+
+    static QString pixelFormatToString(QVideoFrameFormat::PixelFormat format);
 
     CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
 
     QWidget* central_ = nullptr;
 
+    QLabel* sourceLabel_ = nullptr;
+    QComboBox* sourceTypeCombo_ = nullptr;
+
     QLabel* deviceLabel_ = nullptr;
     QComboBox* deviceSelector_ = nullptr;
     QLabel* formatLabel_ = nullptr;
     QComboBox* formatSelector_ = nullptr;
+
+    QComboBox* sourceCombo_ = nullptr;
+    QPushButton* openFileButton_ = nullptr;
+    QPushButton* clearButton_ = nullptr;
+
     QPushButton* toggleStreamingButton_ = nullptr;
     QPushButton* applyButton_ = nullptr;
     RightPanelToggleButton* rightPanelToggle_ = nullptr;
@@ -233,8 +264,7 @@ private:
 
     DisplaySettingsWidget* displayBar_ = nullptr;
 
-    QSet<QByteArray> knownDeviceIds_;
-    QByteArray selectedDeviceId_;
+    QSet<QByteArray> lastKnownDeviceIds_;
     QByteArray streamingDeviceId_;
 
     ImageViewerWidget* imageViewer_ = nullptr;
@@ -258,7 +288,9 @@ private:
     bool isUpdatingUi_{false};
 
     QString downscaleTitleStr_;
-    QString deviceTitleStr_;
+    QString sourceTitleStr_;
+
+    SourceConfig sourceConfig_;
 };
 
 } // namespace fluvel

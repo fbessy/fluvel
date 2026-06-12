@@ -9,6 +9,7 @@
 #include "camera_settings_window.hpp"
 #include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
+#include "file_utils.hpp"
 #include "fullscreen_behavior.hpp"
 #include "icon_loader.hpp"
 #include "interaction_set.hpp"
@@ -16,20 +17,31 @@
 #include "pixel_info_behavior.hpp"
 #include "qcolor_utils.hpp"
 #include "right_panel_toggle_button.hpp"
+#include "video_types.hpp"
 
 #include <QCameraDevice>
 #include <QComboBox>
+#include <QFileDialog>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
 #include <QVBoxLayout>
+
+#include <utility>
 
 #ifdef Q_OS_ANDROID
 #include <QCoreApplication>
 #include <QPermission>
 #include <QtCore/qpermissions.h>
 #endif
+
+static constexpr auto kLastSourceTypeKey = "sources/last_type";
+static constexpr auto kCameraDeviceKey = "camera/device";
+static constexpr auto kCameraFormatsKey = "camera/formats";
+static constexpr auto kSourceHistoryKey = "sources/history";
+static constexpr auto kLastVideoDirectory = "video/last_directory";
 
 namespace fluvel
 {
@@ -47,6 +59,7 @@ CameraWindow::CameraWindow(QWidget* parent)
     setupLayout();
 
     loadPreferredFormats();
+    loadSourceHistory();
 
     applyInitialSettings();
     setupConnections();
@@ -74,6 +87,13 @@ void CameraWindow::createUi()
 
     central_ = new QWidget(this);
 
+    sourceLabel_ = new QLabel(tr("Source: "));
+
+    sourceTypeCombo_ = new QComboBox(this);
+    sourceTypeCombo_->addItem(tr("Camera"), QVariant::fromValue(SourceType::Camera));
+    sourceTypeCombo_->addItem(tr("URL"), QVariant::fromValue(SourceType::Url));
+    sourceTypeCombo_->addItem(tr("File"), QVariant::fromValue(SourceType::File));
+
     deviceLabel_ = new QLabel(tr("Device: "));
     deviceSelector_ = new QComboBox(this);
 
@@ -94,6 +114,18 @@ void CameraWindow::createUi()
 
     formatActiveIcon_ = createActiveFormatIcon();
     formatAvailableIcon_ = createEmptyIcon(kFormatIconSize);
+
+    openFileButton_ = new QPushButton(tr("Open..."));
+    openFileButton_->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+
+    sourceCombo_ = new QComboBox(this);
+    sourceCombo_->setEditable(true);
+
+    clearButton_ = new QPushButton(tr("Clear"));
+    QIcon deleteIcon =
+        il::loadIcon(QIcon::ThemeIcon::EditClear, ":/icons/actions/edit-clear-history.svg");
+
+    clearButton_->setIcon(deleteIcon);
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                               ":/icons/media/media-playback-start-symbolic.svg");
@@ -222,6 +254,10 @@ void CameraWindow::setupLayout()
     controlLayout->setSpacing(8);
 
     // Device
+    controlLayout->addWidget(sourceLabel_);
+    controlLayout->addWidget(sourceTypeCombo_);
+
+    // Device
     controlLayout->addWidget(deviceLabel_);
     controlLayout->addWidget(deviceSelector_);
 
@@ -229,6 +265,11 @@ void CameraWindow::setupLayout()
     controlLayout->addSpacing(12);
     controlLayout->addWidget(formatLabel_);
     controlLayout->addWidget(formatSelector_);
+
+    // File/Url
+    controlLayout->addWidget(openFileButton_);
+    controlLayout->addWidget(sourceCombo_, 1);
+    controlLayout->addWidget(clearButton_);
 
     // Action principale
     controlLayout->addSpacing(12);
@@ -262,15 +303,16 @@ void CameraWindow::setupConnections()
 {
     // --- User actions ---
 
-    connect(toggleStreamingButton_, &QPushButton::clicked, this, &CameraWindow::onToggleStreaming);
+    connect(sourceTypeCombo_, &QComboBox::currentIndexChanged, this,
+            [this](int index)
+            {
+                sourceConfig_.type = sourceTypeCombo_->itemData(index).value<SourceType>();
 
-    connect(applyButton_, &QPushButton::clicked, this, &CameraWindow::onApplySelection);
+                saveLastSourceType();
 
-    connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
-            &DisplaySettingsWidget::setPanelVisible);
-
-    connect(settingsButton_, &QPushButton::clicked, cameraSettingsWindow_,
-            &CameraSettingsWindow::show);
+                refreshSourceUi();
+                updateApplyButton();
+            });
 
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this, &CameraWindow::onDeviceChanged);
 
@@ -283,12 +325,32 @@ void CameraWindow::setupConnections()
                 updateApplyButton();
 
                 auto fmt = getSelectedFormat();
-                if (!fmt.isNull() && !selectedDeviceId_.isEmpty())
+
+                if (!fmt.isNull() && !sourceConfig_.cameraId.isEmpty())
                 {
-                    preferredFormats_[selectedDeviceId_] = fmt;
+                    sourceConfig_.cameraFormat = fmt;
                     savePreferredFormats();
                 }
             });
+
+    connect(openFileButton_, &QPushButton::clicked, this, &CameraWindow::openFile);
+
+    connect(clearButton_, &QPushButton::clicked, this,
+            [this]()
+            {
+                sourceCombo_->clear();
+                saveSourceHistory();
+            });
+
+    connect(toggleStreamingButton_, &QPushButton::clicked, this, &CameraWindow::onToggleStreaming);
+
+    connect(applyButton_, &QPushButton::clicked, this, &CameraWindow::onApplySelection);
+
+    connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
+            &DisplaySettingsWidget::setPanelVisible);
+
+    connect(settingsButton_, &QPushButton::clicked, cameraSettingsWindow_,
+            &CameraSettingsWindow::show);
 
     // --- Hardware events (camera devices) ---
 
@@ -364,6 +426,9 @@ void CameraWindow::applyInitialSettings()
 
     displayBar_->updateDisplayModeAvailability(preprocessing);
 
+    loadLastSourceType();
+
+    refreshSourceUi();
     refreshUi();
 
     onDownscaleChanged(downscaleParams);
@@ -412,6 +477,60 @@ void CameraWindow::bindUiToApplicationSettings()
             &ApplicationSettings::setVideoComputeSettings);
 }
 
+void CameraWindow::refreshSourceUi()
+{
+    assert(sourceTypeCombo_ && sourceCombo_);
+
+    bool cameraMode = sourceConfig_.type == SourceType::Camera;
+    bool urlMode = sourceConfig_.type == SourceType::Url;
+    bool fileMode = sourceConfig_.type == SourceType::File;
+
+    deviceLabel_->setVisible(cameraMode);
+    deviceSelector_->setVisible(cameraMode);
+    formatLabel_->setVisible(cameraMode);
+    formatSelector_->setVisible(cameraMode);
+
+    openFileButton_->setVisible(fileMode);
+    sourceCombo_->setVisible(!cameraMode);
+    clearButton_->setVisible(!cameraMode);
+
+    if (urlMode)
+    {
+        sourceCombo_->lineEdit()->setPlaceholderText(
+            "https://video.mp4  https://stream.m3u8  rtsp://camera/live");
+    }
+    else if (fileMode)
+    {
+        sourceCombo_->lineEdit()->setPlaceholderText(tr("Open a local video file..."));
+    }
+}
+
+void CameraWindow::updateSourceConfigFromUi()
+{
+    auto type = static_cast<SourceType>(sourceTypeCombo_->currentData().toInt());
+
+    sourceConfig_.type = type;
+
+    switch (sourceConfig_.type)
+    {
+        case SourceType::Camera:
+            sourceConfig_.cameraId = deviceSelector_->currentData().toByteArray();
+
+            sourceConfig_.cameraFormat = getSelectedFormat();
+            return;
+
+        case SourceType::Url:
+            sourceConfig_.url = QUrl(sourceCombo_->currentText().trimmed());
+            return;
+
+        case SourceType::File:
+            sourceConfig_.url = QUrl::fromUserInput(sourceCombo_->currentText().trimmed());
+            return;
+    }
+
+    std::unreachable();
+}
+
 void CameraWindow::updateDeviceList(const QList<QCameraDevice>& devices)
 {
     assert(deviceSelector_);
@@ -432,7 +551,7 @@ void CameraWindow::updateDeviceList(const QList<QCameraDevice>& devices)
 
         currentIds.insert(deviceId);
 
-        if (!knownDeviceIds_.isEmpty() && !knownDeviceIds_.contains(deviceId))
+        if (!lastKnownDeviceIds_.isEmpty() && !lastKnownDeviceIds_.contains(deviceId))
             newlyAddedCamera = deviceId;
 
         QIcon icon = deviceIdleIcon_;
@@ -447,7 +566,7 @@ void CameraWindow::updateDeviceList(const QList<QCameraDevice>& devices)
         deviceSelector_->addItem(icon, dev.description(), deviceId);
     }
 
-    knownDeviceIds_ = currentIds;
+    lastKnownDeviceIds_ = currentIds;
 
     const bool hasDevice = !devices.isEmpty();
 
@@ -515,9 +634,9 @@ void CameraWindow::onToggleStreaming()
         return;
 
     if (cameraController_->isStreaming())
-        stopCamera();
+        stopSource();
     else
-        startCamera();
+        startSource();
 }
 
 void CameraWindow::onApplySelection()
@@ -531,7 +650,7 @@ void CameraWindow::onApplySelection()
         return;
 
     configChangeInProgress_ = true;
-    stopCamera();
+    stopSource();
 }
 
 void CameraWindow::onDeviceChanged(int /*index*/)
@@ -553,7 +672,7 @@ void CameraWindow::refreshFormatListFromSelection()
     }
 
     QByteArray deviceId = deviceSelector_->itemData(index).toByteArray();
-    selectedDeviceId_ = deviceId;
+    sourceConfig_.cameraId = deviceId;
 
     // 👉 récupérer directement depuis la liste actuelle
     const auto devices = cameraController_->videoInputs();
@@ -611,9 +730,9 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
     }
 
     // 1. PRIORITÉ : format associé à CE device uniquement
-    if (!selectedDeviceId_.isEmpty())
+    if (!sourceConfig_.cameraId.isEmpty())
     {
-        auto preferred = preferredFormats_.value(selectedDeviceId_);
+        auto preferred = preferredFormats_.value(sourceConfig_.cameraId);
 
         if (!preferred.isNull())
         {
@@ -642,10 +761,13 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
 
 bool CameraWindow::hasPendingConfiguration() const
 {
+    if (sourceConfig_.type != SourceType::Camera)
+        return false;
+
     if (!cameraController_->isStreaming())
         return false;
 
-    if (selectedDeviceId_.isEmpty() || streamingDeviceId_.isEmpty())
+    if (sourceConfig_.cameraId.isEmpty() || streamingDeviceId_.isEmpty())
         return false;
 
     const auto selectedFormat = getSelectedFormat();
@@ -653,7 +775,7 @@ bool CameraWindow::hasPendingConfiguration() const
     if (selectedFormat.isNull() || activeFormat_.isNull())
         return false;
 
-    return selectedDeviceId_ != streamingDeviceId_ ||
+    return sourceConfig_.cameraId != streamingDeviceId_ ||
            !camera_utils::isSameCameraFormat(selectedFormat, activeFormat_);
 }
 
@@ -665,7 +787,7 @@ void CameraWindow::showEvent(QShowEvent* event)
 
 void CameraWindow::closeEvent(QCloseEvent* event)
 {
-    stopCamera();
+    stopSource();
 
     saveSelectedCameraId();
     savePreferredFormats();
@@ -723,25 +845,16 @@ QCameraFormat CameraWindow::getSelectedFormat() const
     return formatSelector_->itemData(index).value<QCameraFormat>();
 }
 
-void CameraWindow::startCamera()
+void CameraWindow::startSource()
 {
-    assert(deviceSelector_ && cameraController_);
+    assert(cameraController_);
 
-    if (deviceSelector_->currentIndex() < 0)
-        return;
+    updateSourceConfigFromUi();
 
-    QByteArray selectedId = deviceSelector_->currentData().toByteArray();
-    if (selectedId.isEmpty())
-        return;
-
-    const auto selectedFormat = getSelectedFormat();
-    if (selectedFormat.isNull())
-        return;
-
-    cameraController_->start(selectedId, selectedFormat);
+    cameraController_->start(sourceConfig_);
 }
 
-void CameraWindow::stopCamera()
+void CameraWindow::stopSource()
 {
     assert(cameraController_);
 
@@ -757,11 +870,17 @@ void CameraWindow::onStreamingStarted(const StreamingInfo& info)
 {
     assert(imageViewer_);
 
-    streamingDeviceId_ = info.deviceId;
-    deviceStreamingStatus_[info.deviceId] = DeviceStreamingStatus::Streaming;
-    preferredFormats_[info.deviceId] = info.format;
-
-    activeFormat_ = info.format;
+    if (info.source.type == SourceType::Camera)
+    {
+        streamingDeviceId_ = info.source.deviceId;
+        deviceStreamingStatus_[info.source.deviceId] = DeviceStreamingStatus::Streaming;
+        preferredFormats_[info.source.deviceId] = info.source.deviceFormat;
+        activeFormat_ = info.source.deviceFormat;
+    }
+    else if (info.source.sourceUrl.isLocalFile())
+    {
+        saveLastVideoDirectory(QFileInfo(info.source.sourceUrl.toLocalFile()).absolutePath());
+    }
 
     if (!configChangeInProgress_)
     {
@@ -771,14 +890,60 @@ void CameraWindow::onStreamingStarted(const StreamingInfo& info)
 
     refreshUi();
 
-    deviceTitleStr_ = QString("%1 - %2").arg(info.description, formatToString(activeFormat_));
+    sourceTitleStr_ = sourceTitle(info);
 
     updateWindowTitle();
 
-    saveSelectedCameraId();
-    savePreferredFormats();
+    if (info.source.type == SourceType::Camera)
+    {
+        saveSelectedCameraId();
+        savePreferredFormats();
+    }
+    else
+    {
+        addSourceToHistory(info.source.sourceUrl);
+    }
 
     configChangeInProgress_ = false;
+}
+
+QString CameraWindow::lastVideoDirectory() const
+{
+    QSettings settings;
+
+    return settings.value(kLastVideoDirectory).toString();
+}
+
+void CameraWindow::saveLastVideoDirectory(const QString& directory)
+{
+    if (directory.isEmpty())
+        return;
+
+    QSettings settings;
+
+    settings.setValue(kLastVideoDirectory, directory);
+}
+
+QString CameraWindow::sourceTitle(const StreamingInfo& info) const
+{
+    QString title = info.source.description;
+
+    if (info.frameSize.isValid())
+    {
+        title += QString(" - %1x%2").arg(info.frameSize.width()).arg(info.frameSize.height());
+    }
+
+    if (info.pixelFormat != QVideoFrameFormat::Format_Invalid)
+    {
+        title += QString(" %1").arg(pixelFormatToString(info.pixelFormat));
+    }
+
+    if (info.sourceFrameRate > 0.f)
+    {
+        title += QString(" @%1").arg(info.sourceFrameRate, 0, 'f', 0);
+    }
+
+    return title;
 }
 
 void CameraWindow::onStreamingStopped()
@@ -796,7 +961,7 @@ void CameraWindow::onStreamingStopped()
 
     if (configChangeInProgress_)
     {
-        startCamera();
+        startSource();
     }
     else
     {
@@ -830,19 +995,20 @@ void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
     refreshUi();
 }
 
-void CameraWindow::onStartupTimeout(const QByteArray& deviceId, double timeoutSec)
+void CameraWindow::onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec)
 {
     QMessageBox::warning(this, tr("Camera startup failed"),
                          tr("The camera did not produce a valid frame within %1 seconds.\n"
                             "The device may be busy or not responding.")
                              .arg(timeoutSec, 0, 'f', 1));
 
-    deviceStreamingStatus_[deviceId] = DeviceStreamingStatus::Error;
+    if (sourceInfo.type == SourceType::Camera)
+        deviceStreamingStatus_[sourceInfo.deviceId] = DeviceStreamingStatus::Error;
 
     refreshUi();
 }
 
-void CameraWindow::onStreamingLost(const QByteArray& deviceId, double frameAgeSec)
+void CameraWindow::onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec)
 {
     assert(imageViewer_);
 
@@ -854,7 +1020,8 @@ void CameraWindow::onStreamingLost(const QByteArray& deviceId, double frameAgeSe
         tr("No valid frame received for %1 seconds.\nThe camera stream may have stalled.")
             .arg(frameAgeSec, 0, 'f', 1));
 
-    deviceStreamingStatus_[deviceId] = DeviceStreamingStatus::Error;
+    if (streamingInfo.source.type == SourceType::Camera)
+        deviceStreamingStatus_[streamingInfo.source.deviceId] = DeviceStreamingStatus::Error;
 
     refreshUi();
 }
@@ -929,7 +1096,7 @@ QString CameraWindow::pixelFormatToShortString(QVideoFrameFormat::PixelFormat fm
         case QVideoFrameFormat::Format_Jpeg:
             return "MJPEG";
         default:
-            return "Other";
+            return tr("Other");
     }
 }
 
@@ -997,12 +1164,37 @@ bool CameraWindow::is30fps(float fps) const
     return std::abs(fps - 30.0f) < 1.0f;
 }
 
-static constexpr auto kCameraDeviceKey = "camera/device";
-
 QByteArray CameraWindow::loadSelectedCameraId()
 {
     QSettings settings;
     return settings.value(kCameraDeviceKey).toByteArray();
+}
+
+void CameraWindow::loadLastSourceType()
+{
+    QSettings settings;
+
+    int value = settings.value(kLastSourceTypeKey, static_cast<int>(SourceType::Camera)).toInt();
+
+    SourceType type = static_cast<SourceType>(value);
+
+    int index = sourceTypeCombo_->findData(QVariant::fromValue(type));
+
+    if (index >= 0)
+    {
+        QSignalBlocker blocker(sourceTypeCombo_);
+
+        sourceTypeCombo_->setCurrentIndex(index);
+
+        sourceConfig_.type = type;
+    }
+}
+
+void CameraWindow::saveLastSourceType()
+{
+    QSettings settings;
+
+    settings.setValue(kLastSourceTypeKey, static_cast<int>(sourceConfig_.type));
 }
 
 void CameraWindow::saveSelectedCameraId()
@@ -1010,8 +1202,6 @@ void CameraWindow::saveSelectedCameraId()
     QSettings settings;
     settings.setValue(kCameraDeviceKey, deviceSelector_->currentData().toByteArray());
 }
-
-static constexpr auto kCameraFormatsKey = "camera/formats";
 
 void CameraWindow::savePreferredFormats()
 {
@@ -1090,6 +1280,52 @@ void CameraWindow::loadPreferredFormats()
     settings.endGroup();
 }
 
+void CameraWindow::addSourceToHistory(const QUrl& url)
+{
+    QSignalBlocker blocker(sourceCombo_);
+
+    QString value = url.toString();
+
+    if (value.isEmpty())
+        return;
+
+    int existing = sourceCombo_->findText(value);
+
+    if (existing >= 0)
+        sourceCombo_->removeItem(existing);
+
+    sourceCombo_->insertItem(0, value);
+
+    sourceCombo_->setCurrentIndex(0);
+
+    constexpr int kMaxHistory = 20;
+
+    while (sourceCombo_->count() > kMaxHistory)
+        sourceCombo_->removeItem(sourceCombo_->count() - 1);
+
+    saveSourceHistory();
+}
+
+void CameraWindow::loadSourceHistory()
+{
+    QSettings settings;
+
+    QStringList values = settings.value(kSourceHistoryKey).toStringList();
+
+    sourceCombo_->addItems(values);
+}
+
+void CameraWindow::saveSourceHistory()
+{
+    QStringList values;
+
+    for (int i = 0; i < sourceCombo_->count(); ++i)
+        values << sourceCombo_->itemText(i);
+
+    QSettings settings;
+    settings.setValue(kSourceHistoryKey, values);
+}
+
 void CameraWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
 {
     assert(cameraController_);
@@ -1106,7 +1342,7 @@ void CameraWindow::updateWindowTitle()
 {
     if (cameraController_ && cameraController_->isStreaming())
     {
-        QString title = deviceTitleStr_;
+        QString title = sourceTitleStr_;
 
         if (!downscaleTitleStr_.isEmpty())
             title += " " + downscaleTitleStr_;
@@ -1115,7 +1351,136 @@ void CameraWindow::updateWindowTitle()
     }
     else
     {
-        setWindowTitle(tr("Camera"));
+        setWindowTitle(tr("Video"));
+    }
+}
+
+QString CameraWindow::pixelFormatToString(QVideoFrameFormat::PixelFormat format)
+{
+    using PF = QVideoFrameFormat::PixelFormat;
+
+    switch (format)
+    {
+        case PF::Format_Invalid:
+            return "Invalid";
+
+        case PF::Format_ARGB8888:
+            return "ARGB8888";
+
+        case PF::Format_ARGB8888_Premultiplied:
+            return "ARGB8888_Premultiplied";
+
+        case PF::Format_XRGB8888:
+            return "XRGB8888";
+
+        case PF::Format_BGRA8888:
+            return "BGRA8888";
+
+        case PF::Format_BGRA8888_Premultiplied:
+            return "BGRA8888_Premultiplied";
+
+        case PF::Format_BGRX8888:
+            return "BGRX8888";
+
+        case PF::Format_ABGR8888:
+            return "ABGR8888";
+
+        case PF::Format_XBGR8888:
+            return "XBGR8888";
+
+        case PF::Format_RGBA8888:
+            return "RGBA8888";
+
+        case PF::Format_RGBX8888:
+            return "RGBX8888";
+
+        case PF::Format_AYUV:
+            return "AYUV";
+
+        case PF::Format_AYUV_Premultiplied:
+            return "AYUV_Premultiplied";
+
+        case PF::Format_YUV420P:
+            return "YUV420P";
+
+        case PF::Format_YUV422P:
+            return "YUV422P";
+
+        case PF::Format_YV12:
+            return "YV12";
+
+        case PF::Format_UYVY:
+            return "UYVY";
+
+        case PF::Format_YUYV:
+            return "YUYV";
+
+        case PF::Format_NV12:
+            return "NV12";
+
+        case PF::Format_NV21:
+            return "NV21";
+
+        case PF::Format_IMC1:
+            return "IMC1";
+
+        case PF::Format_IMC2:
+            return "IMC2";
+
+        case PF::Format_IMC3:
+            return "IMC3";
+
+        case PF::Format_IMC4:
+            return "IMC4";
+
+        case PF::Format_Y8:
+            return "Y8";
+
+        case PF::Format_Y16:
+            return "Y16";
+
+        case PF::Format_P010:
+            return "P010";
+
+        case PF::Format_P016:
+            return "P016";
+
+        case PF::Format_SamplerExternalOES:
+            return "SamplerExternalOES";
+
+        case PF::Format_Jpeg:
+            return "JPEG";
+
+        case PF::Format_SamplerRect:
+            return "SamplerRect";
+
+        case PF::Format_YUV420P10:
+            return "YUV420P10";
+    }
+
+    return QString(tr("Unknown(%1)")).arg(static_cast<int>(format));
+}
+
+void CameraWindow::openFile()
+{
+    QString filename = QFileDialog::getOpenFileName(
+        this, tr("Open Video File"), lastVideoDirectory(), file_utils::buildVideoFilter());
+
+    if (filename.isEmpty())
+        return;
+
+    sourceTypeCombo_->setCurrentIndex(static_cast<int>(SourceType::File));
+
+    sourceCombo_->setCurrentText(QUrl::fromLocalFile(filename).toString());
+
+    if (cameraController_->isStreaming())
+    {
+        configChangeInProgress_ = true;
+        stopSource();
+    }
+    else
+    {
+        startSource();
     }
 }
 

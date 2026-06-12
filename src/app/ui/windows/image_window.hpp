@@ -122,8 +122,7 @@ private:
     void showErrorMessage(const QString& msg);
     void showWarningMessage(const QString& msg);
 
-    void updateCameraAction(bool available);
-    void onStartCameraActionTriggered();
+    void onStartVideoActionTriggered();
 
     void saveDisplayed();
 
@@ -166,7 +165,7 @@ private:
     QAction* quitAct_ = nullptr;
 
     QAction* imageSessionAct_ = nullptr;
-    QAction* cameraSessionAct_ = nullptr;
+    QAction* videoSessionAct_ = nullptr;
     QAction* analysisAct_ = nullptr;
     QAction* settingsAct_ = nullptr;
 
