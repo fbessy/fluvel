@@ -5,6 +5,7 @@
 #include <QImageReader>
 #include <QImageWriter>
 #include <QMediaFormat>
+#include <QObject>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QStringList>

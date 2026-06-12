@@ -12,7 +12,8 @@
 #pragma once
 
 #include <QCameraFormat>
-#include <cmath>
+#include <QString>
+#include <QVideoFrameFormat>
 
 namespace fluvel::camera_utils
 {
@@ -33,12 +34,62 @@ namespace fluvel::camera_utils
  * @param b Second camera format.
  * @return true if formats are considered equivalent, false otherwise.
  */
-inline bool isSameCameraFormat(const QCameraFormat& a, const QCameraFormat& b)
-{
-    constexpr double kFpsEpsilon = 0.01;
+bool isSameCameraFormat(const QCameraFormat& a, const QCameraFormat& b);
 
-    return a.pixelFormat() == b.pixelFormat() && a.resolution() == b.resolution() &&
-           std::abs(a.maxFrameRate() - b.maxFrameRate()) < kFpsEpsilon;
-}
+/**
+ * @brief Returns whether the pixel format is a YUV 4:2:0 format.
+ *
+ * Supported formats include YUV420P, NV12 and NV21.
+ *
+ * @param format Pixel format to test.
+ * @return True if the format is YUV 4:2:0.
+ */
+bool isYuv420(QVideoFrameFormat::PixelFormat format);
+
+/**
+ * @brief Returns whether the pixel format is a YUV format.
+ *
+ * @param format Pixel format to test.
+ * @return True if the format is supported as YUV.
+ */
+bool isYuv(QVideoFrameFormat::PixelFormat format);
+
+/**
+ * @brief Returns whether the resolution is 640×480.
+ *
+ * @param size Resolution to test.
+ * @return True if the resolution is 640×480.
+ */
+bool is640x480(const QSize& size);
+
+/**
+ * @brief Returns whether the frame rate is approximately 30 fps.
+ *
+ * @param fps Frame rate to test.
+ * @return True if the frame rate is close to 30 fps.
+ */
+bool is30fps(float fps);
+
+/**
+ * @brief Finds the preferred camera format in a list of formats.
+ *
+ * The selection prioritizes YUV 4:2:0 formats at 640×480 and
+ * 30 fps when available.
+ *
+ * @param formats Available camera formats.
+ * @return Index of the preferred format, or -1 if no suitable format is found.
+ */
+int findBestFormatIndex(const QList<QCameraFormat>& formats);
+
+/**
+ * @brief Converts a camera format to a display string.
+ *
+ * The resulting string is intended for UI display and includes
+ * the pixel format, resolution and frame rate when available.
+ *
+ * @param format Camera format to convert.
+ * @return Display string for the camera format.
+ */
+QString formatToString(const QCameraFormat& format);
 
 } // namespace fluvel::camera_utils

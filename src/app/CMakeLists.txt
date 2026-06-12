@@ -153,7 +153,12 @@ set(app_src
     ${CORE_DIR}/qcolor_utils.hpp
 
     ${CORE_DIR}/device_id_utils.hpp
+
+    ${CORE_DIR}/camera_format_utils.cpp
     ${CORE_DIR}/camera_format_utils.hpp
+
+    ${CORE_DIR}/video_format_utils.cpp
+    ${CORE_DIR}/video_format_utils.hpp
 
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
