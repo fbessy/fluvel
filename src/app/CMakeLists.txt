@@ -15,8 +15,8 @@ set(app_src
     ${UI_WIN_DIR}/image_window.cpp
     ${UI_WIN_DIR}/image_window.hpp
 
-    ${UI_WIN_DIR}/camera_window.cpp
-    ${UI_WIN_DIR}/camera_window.hpp
+    ${UI_WIN_DIR}/video_window.cpp
+    ${UI_WIN_DIR}/video_window.hpp
 
     ${UI_WIN_DIR}/analysis_window.cpp
     ${UI_WIN_DIR}/analysis_window.hpp
@@ -24,8 +24,8 @@ set(app_src
     ${UI_WIN_DIR}/settings_window.cpp
     ${UI_WIN_DIR}/settings_window.hpp
 
-    ${UI_WIN_DIR}/camera_settings_window.cpp
-    ${UI_WIN_DIR}/camera_settings_window.hpp
+    ${UI_WIN_DIR}/video_settings_window.cpp
+    ${UI_WIN_DIR}/video_settings_window.hpp
 
     ${UI_WIN_DIR}/language_window.cpp
     ${UI_WIN_DIR}/language_window.hpp
@@ -113,8 +113,8 @@ set(app_src
     ${CORE_DIR}/image_settings_controller.cpp
     ${CORE_DIR}/image_settings_controller.hpp
 
-    ${CORE_DIR}/camera_controller.cpp
-    ${CORE_DIR}/camera_controller.hpp
+    ${CORE_DIR}/video_controller.cpp
+    ${CORE_DIR}/video_controller.hpp
 
     ${CORE_DIR}/video_types.hpp
 

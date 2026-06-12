@@ -9,7 +9,7 @@
 // clang-format off
 #if defined(FLUVEL_PLATFORM_MOBILE)
     #if defined(FLUVEL_UI_DESKTOP)
-        #include "camera_window.hpp"
+        #include "video_window.hpp"
     #else
         #include <QQmlApplicationEngine>
         #include <QQmlContext>
@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 #else
 
 #if defined(FLUVEL_PLATFORM_MOBILE)
-    auto root = std::make_unique<fluvel::CameraWindow>();
+    auto root = std::make_unique<fluvel::VideoWindow>();
 #else
     auto root = std::make_unique<fluvel::ImageWindow>();
 #endif

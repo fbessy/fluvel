@@ -35,7 +35,7 @@ struct StreamingInfo;
 /**
  * @brief High-level controller for camera streaming and processing.
  *
- * CameraController manages the complete lifecycle of a video stream,
+ * VideoController manages the complete lifecycle of a video stream,
  * from camera initialization and frame acquisition to active contour
  * processing and UI updates.
  *
@@ -52,7 +52,7 @@ struct StreamingInfo;
  * @note This class is tied to the Qt event loop and is intended to run
  * in the main thread.
  */
-class CameraController : public QObject
+class VideoController : public QObject
 {
     Q_OBJECT
 
@@ -60,12 +60,12 @@ public:
     /**
      * @brief Construct a camera controller with initial session settings.
      */
-    explicit CameraController(const VideoSessionSettings& session, QObject* parent = nullptr);
+    explicit VideoController(const VideoSessionSettings& session, QObject* parent = nullptr);
 
     /**
      * @brief Destroy the controller and release resources.
      */
-    ~CameraController() override;
+    ~VideoController() override;
 
     /**
      * @brief Start streaming using a specific device.

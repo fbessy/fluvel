@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "camera_controller.hpp"
+#include "video_controller.hpp"
 #include "camera_format_utils.hpp"
 #include "camera_stats.hpp"
 #include "contour_adapters.hpp"
@@ -24,20 +24,20 @@
 namespace fluvel
 {
 
-CameraController::CameraController(const VideoSessionSettings& session, QObject* parent)
+VideoController::VideoController(const VideoSessionSettings& session, QObject* parent)
     : QObject(parent)
     , activeContourThread_(this)
 {
     auto mediaDevices = new QMediaDevices(this);
 
     connect(mediaDevices, &QMediaDevices::videoInputsChanged, this,
-            &CameraController::onVideoInputsChanged);
+            &VideoController::onVideoInputsChanged);
 
     onVideoSettingsChanged(session);
     onVideoDisplaySettingsChanged(session.display);
 
     connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
-            &CameraController::onDisplayFrameReady, Qt::QueuedConnection);
+            &VideoController::onDisplayFrameReady, Qt::QueuedConnection);
 
     activeContourThread_.start();
 
@@ -50,24 +50,24 @@ CameraController::CameraController(const VideoSessionSettings& session, QObject*
     diagnosticsTimer_ = new QTimer(this);
     diagnosticsTimer_->setInterval(kDiagnosticsPeriodMs);
 
-    connect(startupTimer_, &QTimer::timeout, this, &CameraController::onStartupTimeout);
+    connect(startupTimer_, &QTimer::timeout, this, &VideoController::onStartupTimeout);
 
-    connect(watchdogTimer_, &QTimer::timeout, this, &CameraController::checkWatchdog);
+    connect(watchdogTimer_, &QTimer::timeout, this, &VideoController::checkWatchdog);
 
-    connect(diagnosticsTimer_, &QTimer::timeout, this, &CameraController::updateDiagnostics);
+    connect(diagnosticsTimer_, &QTimer::timeout, this, &VideoController::updateDiagnostics);
 
     connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
-            &CameraController::onFrameProcessed);
+            &VideoController::onFrameProcessed);
 }
 
-CameraController::~CameraController()
+VideoController::~VideoController()
 {
     stop();
     activeContourThread_.stop();
     activeContourThread_.wait();
 }
 
-void CameraController::start(const SourceConfig& sourceConfig)
+void VideoController::start(const SourceConfig& sourceConfig)
 {
     switch (sourceConfig.type)
     {
@@ -84,12 +84,12 @@ void CameraController::start(const SourceConfig& sourceConfig)
     std::unreachable();
 }
 
-void CameraController::start(const QByteArray& deviceId)
+void VideoController::start(const QByteArray& deviceId)
 {
     start(deviceId, QCameraFormat());
 }
 
-void CameraController::start(const QByteArray& deviceId, const QCameraFormat& format)
+void VideoController::start(const QByteArray& deviceId, const QCameraFormat& format)
 {
     assert(startupTimer_);
 
@@ -137,9 +137,9 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
             captureSession_->setCamera(camera_);
             captureSession_->setVideoSink(videoSink_);
 
-            connect(camera_, &QCamera::errorOccurred, this, &CameraController::onCameraError);
+            connect(camera_, &QCamera::errorOccurred, this, &VideoController::onCameraError);
             connect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                    &CameraController::onCapturedFrame);
+                    &VideoController::onCapturedFrame);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
             testFrameCounter_ = 0;
@@ -157,7 +157,7 @@ void CameraController::start(const QByteArray& deviceId, const QCameraFormat& fo
         emit cameraError(deviceId, QCamera::CameraError, tr("Camera not found"));
 }
 
-void CameraController::start(const QUrl& url)
+void VideoController::start(const QUrl& url)
 {
     assert(startupTimer_);
 
@@ -209,7 +209,7 @@ void CameraController::start(const QUrl& url)
 
     mediaPlayer_->setSource(url);
     mediaPlayer_->setVideoSink(videoSink_);
-    connect(videoSink_, &QVideoSink::videoFrameChanged, this, &CameraController::onCapturedFrame);
+    connect(videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onCapturedFrame);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     testFrameCounter_ = 0;
@@ -220,14 +220,14 @@ void CameraController::start(const QUrl& url)
     mediaPlayer_->setAudioOutput(audioOutput_);
 
     connect(mediaPlayer_, &QMediaPlayer::mediaStatusChanged, this,
-            &CameraController::onMediaStatusChanged);
+            &VideoController::onMediaStatusChanged);
 
     startupTimer_->start(kStartupTimeoutMs);
 
     mediaPlayer_->play();
 }
 
-void CameraController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
+void VideoController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
     if (status == QMediaPlayer::EndOfMedia)
     {
@@ -235,7 +235,7 @@ void CameraController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
     }
 }
 
-void CameraController::stop()
+void VideoController::stop()
 {
     assert(startupTimer_ && watchdogTimer_ && diagnosticsTimer_);
 
@@ -249,12 +249,12 @@ void CameraController::stop()
     if (videoSink_)
     {
         disconnect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                   &CameraController::onCapturedFrame);
+                   &VideoController::onCapturedFrame);
     }
 
     if (camera_)
     {
-        disconnect(camera_, &QCamera::errorOccurred, this, &CameraController::onCameraError);
+        disconnect(camera_, &QCamera::errorOccurred, this, &VideoController::onCameraError);
         camera_->stop();
     }
 
@@ -295,7 +295,7 @@ void CameraController::stop()
     emit streamingStopped();
 }
 
-void CameraController::onCapturedFrame(const QVideoFrame& frame)
+void VideoController::onCapturedFrame(const QVideoFrame& frame)
 {
     assert(startupTimer_ && watchdogTimer_ && diagnosticsTimer_);
 
@@ -343,17 +343,17 @@ void CameraController::onCapturedFrame(const QVideoFrame& frame)
     activeContourThread_.submitFrame(cf);
 }
 
-void CameraController::onFrameProcessed(quint64 contourSize)
+void VideoController::onFrameProcessed(quint64 contourSize)
 {
     frameStats_.frameProcessed(contourSize);
 }
 
-void CameraController::onFrameDisplayed(const FrameTimestamps& ts)
+void VideoController::onFrameDisplayed(const FrameTimestamps& ts)
 {
     frameStats_.frameDisplayed(ts);
 }
 
-void CameraController::onDisplayFrameReady(const DisplayFrame& displayFrame)
+void VideoController::onDisplayFrameReady(const DisplayFrame& displayFrame)
 {
     UiFrame uiDisplayFrame;
 
@@ -371,13 +371,13 @@ void CameraController::onDisplayFrameReady(const DisplayFrame& displayFrame)
     emit imageAndContourUpdated(uiDisplayFrame);
 }
 
-void CameraController::onStartupTimeout()
+void VideoController::onStartupTimeout()
 {
     stop();
     emit startupTimeout(sourceInfo_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
 }
 
-void CameraController::checkWatchdog()
+void VideoController::checkWatchdog()
 {
     const int64_t frameAgeNs = FrameClock::nowNs() - lastValidFrameTsNs_;
 
@@ -388,7 +388,7 @@ void CameraController::checkWatchdog()
     }
 }
 
-void CameraController::updateDiagnostics()
+void VideoController::updateDiagnostics()
 {
     auto snap = frameStats_.snapshot();
 
@@ -410,7 +410,7 @@ void CameraController::updateDiagnostics()
     emit textStatsUpdated(textStats);
 }
 
-void CameraController::onVideoInputsChanged()
+void VideoController::onVideoInputsChanged()
 {
     const auto devices = QMediaDevices::videoInputs();
 
@@ -419,7 +419,7 @@ void CameraController::onVideoInputsChanged()
     emit videoInputsChanged(devices);
 }
 
-void CameraController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devices)
+void VideoController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devices)
 {
     if (state_ == StreamingState::Stopped)
         return;
@@ -435,7 +435,7 @@ void CameraController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devi
         stop();
 }
 
-void CameraController::onCameraError(QCamera::Error error, const QString& errorString)
+void VideoController::onCameraError(QCamera::Error error, const QString& errorString)
 {
     if (!camera_)
         return;
@@ -443,34 +443,34 @@ void CameraController::onCameraError(QCamera::Error error, const QString& errorS
     emit cameraError(camera_->cameraDevice().id(), error, errorString);
 }
 
-void CameraController::onVideoSettingsChanged(const VideoSessionSettings& session)
+void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
     activeContourThread_.setAlgoConfig(session.compute);
 
     emit downscaleChanged(session.compute.downscale);
 }
 
-void CameraController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
+void VideoController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
 {
     activeContourThread_.setDisplayMode(display.displayMode);
 }
 
-bool CameraController::isStreaming() const
+bool VideoController::isStreaming() const
 {
     return state_ == StreamingState::Streaming;
 }
 
-StreamingState CameraController::streamingState() const
+StreamingState VideoController::streamingState() const
 {
     return state_;
 }
 
-QList<QCameraDevice> CameraController::videoInputs() const
+QList<QCameraDevice> VideoController::videoInputs() const
 {
     return QMediaDevices::videoInputs();
 }
 
-QString CameraController::shortSourceName(const QUrl& url)
+QString VideoController::shortSourceName(const QUrl& url)
 {
     if (url.isLocalFile())
         return QFileInfo(url.toLocalFile()).fileName();

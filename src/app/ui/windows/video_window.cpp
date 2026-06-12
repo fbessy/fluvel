@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "camera_window.hpp"
+#include "video_window.hpp"
 #include "application_settings.hpp"
 #include "autofit_behavior.hpp"
-#include "camera_controller.hpp"
 #include "camera_format_utils.hpp"
-#include "camera_settings_window.hpp"
 #include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
 #include "file_utils.hpp"
@@ -17,6 +15,8 @@
 #include "pixel_info_behavior.hpp"
 #include "qcolor_utils.hpp"
 #include "right_panel_toggle_button.hpp"
+#include "video_controller.hpp"
+#include "video_settings_window.hpp"
 #include "video_types.hpp"
 
 #include <QCameraDevice>
@@ -46,7 +46,7 @@ static constexpr auto kLastVideoDirectory = "video/last_directory";
 namespace fluvel
 {
 
-CameraWindow::CameraWindow(QWidget* parent)
+VideoWindow::VideoWindow(QWidget* parent)
     : QMainWindow(parent)
 
 {
@@ -65,13 +65,13 @@ CameraWindow::CameraWindow(QWidget* parent)
     setupConnections();
 }
 
-void CameraWindow::setupWindow()
+void VideoWindow::setupWindow()
 {
     setWindowIcon(il::appIcon());
     updateWindowTitle();
 }
 
-void CameraWindow::restoreSettings()
+void VideoWindow::restoreSettings()
 {
     QSettings settings;
 
@@ -81,7 +81,7 @@ void CameraWindow::restoreSettings()
         resize(900, 600);
 }
 
-void CameraWindow::createUi()
+void VideoWindow::createUi()
 {
     const auto& config = ApplicationSettings::instance().videoSettings();
 
@@ -158,10 +158,10 @@ void CameraWindow::createUi()
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
-    cameraSettingsWindow_ = new CameraSettingsWindow(config, this);
+    cameraSettingsWindow_ = new VideoSettingsWindow(config, this);
 }
 
-QIcon CameraWindow::createActiveCameraIcon()
+QIcon VideoWindow::createActiveCameraIcon()
 {
     const int pixSize = 13;
     const int ellipseSize = 11;
@@ -180,14 +180,14 @@ QIcon CameraWindow::createActiveCameraIcon()
     return QIcon(pix);
 }
 
-QIcon CameraWindow::createEmptyIcon(int size)
+QIcon VideoWindow::createEmptyIcon(int size)
 {
     QPixmap pix(size, size);
     pix.fill(Qt::transparent);
     return QIcon(pix);
 }
 
-QIcon CameraWindow::createActiveFormatIcon()
+QIcon VideoWindow::createActiveFormatIcon()
 {
     QIcon icon;
 
@@ -200,7 +200,7 @@ QIcon CameraWindow::createActiveFormatIcon()
     return icon;
 }
 
-QIcon CameraWindow::createErrorCameraIcon()
+QIcon VideoWindow::createErrorCameraIcon()
 {
     const int pixSize = 13;
     const int ellipseSize = 11;
@@ -219,7 +219,7 @@ QIcon CameraWindow::createErrorCameraIcon()
     return QIcon(pix);
 }
 
-void CameraWindow::setupView()
+void VideoWindow::setupView()
 {
     const auto& app = ApplicationSettings::instance();
 
@@ -236,13 +236,13 @@ void CameraWindow::setupView()
     imageViewer_->setInteraction(interaction.release());
 }
 
-void CameraWindow::setupController()
+void VideoWindow::setupController()
 {
     const auto& config = ApplicationSettings::instance().videoSettings();
-    cameraController_ = new CameraController(config, this);
+    cameraController_ = new VideoController(config, this);
 }
 
-void CameraWindow::setupLayout()
+void VideoWindow::setupLayout()
 {
     QVBoxLayout* vLayout = new QVBoxLayout(central_);
     vLayout->setContentsMargins(0, 0, 0, 0);
@@ -299,7 +299,7 @@ void CameraWindow::setupLayout()
     setCentralWidget(central_);
 }
 
-void CameraWindow::setupConnections()
+void VideoWindow::setupConnections()
 {
     // --- User actions ---
 
@@ -314,7 +314,7 @@ void CameraWindow::setupConnections()
                 updateApplyButton();
             });
 
-    connect(deviceSelector_, &QComboBox::currentIndexChanged, this, &CameraWindow::onDeviceChanged);
+    connect(deviceSelector_, &QComboBox::currentIndexChanged, this, &VideoWindow::onDeviceChanged);
 
     connect(formatSelector_, &QComboBox::currentIndexChanged, this,
             [this]()
@@ -333,7 +333,7 @@ void CameraWindow::setupConnections()
                 }
             });
 
-    connect(openFileButton_, &QPushButton::clicked, this, &CameraWindow::openFile);
+    connect(openFileButton_, &QPushButton::clicked, this, &VideoWindow::openFile);
 
     connect(clearButton_, &QPushButton::clicked, this,
             [this]()
@@ -342,47 +342,47 @@ void CameraWindow::setupConnections()
                 saveSourceHistory();
             });
 
-    connect(toggleStreamingButton_, &QPushButton::clicked, this, &CameraWindow::onToggleStreaming);
+    connect(toggleStreamingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleStreaming);
 
-    connect(applyButton_, &QPushButton::clicked, this, &CameraWindow::onApplySelection);
+    connect(applyButton_, &QPushButton::clicked, this, &VideoWindow::onApplySelection);
 
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
     connect(settingsButton_, &QPushButton::clicked, cameraSettingsWindow_,
-            &CameraSettingsWindow::show);
+            &VideoSettingsWindow::show);
 
     // --- Hardware events (camera devices) ---
 
-    connect(cameraController_, &CameraController::videoInputsChanged, this,
-            &CameraWindow::updateDeviceList);
+    connect(cameraController_, &VideoController::videoInputsChanged, this,
+            &VideoWindow::updateDeviceList);
 
-    connect(cameraController_, &CameraController::streamingStarting, this,
-            &CameraWindow::onStreamingStarting);
+    connect(cameraController_, &VideoController::streamingStarting, this,
+            &VideoWindow::onStreamingStarting);
 
-    connect(cameraController_, &CameraController::streamingStarted, this,
-            &CameraWindow::onStreamingStarted);
+    connect(cameraController_, &VideoController::streamingStarted, this,
+            &VideoWindow::onStreamingStarted);
 
-    connect(cameraController_, &CameraController::streamingStopped, this,
-            &CameraWindow::onStreamingStopped);
+    connect(cameraController_, &VideoController::streamingStopped, this,
+            &VideoWindow::onStreamingStopped);
 
-    connect(cameraController_, &CameraController::cameraError, this, &CameraWindow::onCameraError);
+    connect(cameraController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
 
-    connect(cameraController_, &CameraController::streamingLost, this,
-            &CameraWindow::onStreamingLost);
+    connect(cameraController_, &VideoController::streamingLost, this,
+            &VideoWindow::onStreamingLost);
 
-    connect(cameraController_, &CameraController::startupTimeout, this,
-            &CameraWindow::onStartupTimeout);
+    connect(cameraController_, &VideoController::startupTimeout, this,
+            &VideoWindow::onStartupTimeout);
 
     // --- Controller → View / Window updates ---
 
-    connect(cameraController_, &CameraController::textStatsUpdated, imageViewer_,
+    connect(cameraController_, &VideoController::textStatsUpdated, imageViewer_,
             &ImageViewerWidget::setText);
 
     // ---  View → Controller for display stats ---
 
     connect(imageViewer_, &ImageViewerWidget::frameDisplayed, cameraController_,
-            &CameraController::onFrameDisplayed);
+            &VideoController::onFrameDisplayed);
 
     // --- Application settings synchronization ---
 
@@ -405,13 +405,13 @@ void CameraWindow::setupConnections()
 
     // refresh button in function of user action
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this,
-            &CameraWindow::updateApplyButton);
+            &VideoWindow::updateApplyButton);
 
-    connect(cameraController_, &CameraController::downscaleChanged, this,
-            &CameraWindow::onDownscaleChanged);
+    connect(cameraController_, &VideoController::downscaleChanged, this,
+            &VideoWindow::onDownscaleChanged);
 }
 
-void CameraWindow::applyInitialSettings()
+void VideoWindow::applyInitialSettings()
 {
     assert(imageViewer_ && displayBar_);
 
@@ -434,20 +434,20 @@ void CameraWindow::applyInitialSettings()
     onDownscaleChanged(downscaleParams);
 }
 
-void CameraWindow::bindApplicationSettingsToController()
+void VideoWindow::bindApplicationSettingsToController()
 {
     assert(cameraController_);
 
     const auto& app = ApplicationSettings::instance();
 
     connect(&app, &ApplicationSettings::videoSettingsChanged, cameraController_,
-            &CameraController::onVideoSettingsChanged);
+            &VideoController::onVideoSettingsChanged);
 
     connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, cameraController_,
-            &CameraController::onVideoDisplaySettingsChanged);
+            &VideoController::onVideoDisplaySettingsChanged);
 }
 
-void CameraWindow::bindApplicationSettingsToView()
+void VideoWindow::bindApplicationSettingsToView()
 {
     assert(imageViewer_);
 
@@ -463,7 +463,7 @@ void CameraWindow::bindApplicationSettingsToView()
             &ImageViewerWidget::applyDisplayConfig);
 }
 
-void CameraWindow::bindUiToApplicationSettings()
+void VideoWindow::bindUiToApplicationSettings()
 {
     assert(displayBar_ && cameraSettingsWindow_);
 
@@ -473,11 +473,11 @@ void CameraWindow::bindUiToApplicationSettings()
             &ApplicationSettings::setVideoDisplayConfig);
 
     // commit settings
-    connect(cameraSettingsWindow_, &CameraSettingsWindow::videoComputeSettingsAccepted, &app,
+    connect(cameraSettingsWindow_, &VideoSettingsWindow::videoComputeSettingsAccepted, &app,
             &ApplicationSettings::setVideoComputeSettings);
 }
 
-void CameraWindow::refreshSourceUi()
+void VideoWindow::refreshSourceUi()
 {
     assert(sourceTypeCombo_ && sourceCombo_);
 
@@ -505,7 +505,7 @@ void CameraWindow::refreshSourceUi()
     }
 }
 
-void CameraWindow::updateSourceConfigFromUi()
+void VideoWindow::updateSourceConfigFromUi()
 {
     auto type = static_cast<SourceType>(sourceTypeCombo_->currentData().toInt());
 
@@ -531,7 +531,7 @@ void CameraWindow::updateSourceConfigFromUi()
     std::unreachable();
 }
 
-void CameraWindow::updateDeviceList(const QList<QCameraDevice>& devices)
+void VideoWindow::updateDeviceList(const QList<QCameraDevice>& devices)
 {
     assert(deviceSelector_);
 
@@ -585,8 +585,8 @@ void CameraWindow::updateDeviceList(const QList<QCameraDevice>& devices)
     emit cameraAvailabilityChanged(isCameraAvailable());
 }
 
-int CameraWindow::computeBestDeviceIndex(const QByteArray& previousSelection,
-                                         const QByteArray& newlyPlugged)
+int VideoWindow::computeBestDeviceIndex(const QByteArray& previousSelection,
+                                        const QByteArray& newlyPlugged)
 {
     assert(deviceSelector_);
 
@@ -615,7 +615,7 @@ int CameraWindow::computeBestDeviceIndex(const QByteArray& previousSelection,
     return index;
 }
 
-void CameraWindow::setDeviceControlsEnabled(bool enabled)
+void VideoWindow::setDeviceControlsEnabled(bool enabled)
 {
     assert(deviceSelector_ && toggleStreamingButton_);
 
@@ -623,7 +623,7 @@ void CameraWindow::setDeviceControlsEnabled(bool enabled)
     toggleStreamingButton_->setEnabled(enabled);
 }
 
-void CameraWindow::onToggleStreaming()
+void VideoWindow::onToggleStreaming()
 {
     assert(deviceSelector_ && cameraController_);
 
@@ -639,7 +639,7 @@ void CameraWindow::onToggleStreaming()
         startSource();
 }
 
-void CameraWindow::onApplySelection()
+void VideoWindow::onApplySelection()
 {
     assert(cameraController_);
 
@@ -653,12 +653,12 @@ void CameraWindow::onApplySelection()
     stopSource();
 }
 
-void CameraWindow::onDeviceChanged(int /*index*/)
+void VideoWindow::onDeviceChanged(int /*index*/)
 {
     refreshFormatListFromSelection();
 }
 
-void CameraWindow::refreshFormatListFromSelection()
+void VideoWindow::refreshFormatListFromSelection()
 {
     assert(deviceSelector_ && formatSelector_ && cameraController_);
 
@@ -697,7 +697,7 @@ void CameraWindow::refreshFormatListFromSelection()
     updateFormatList(device->videoFormats());
 }
 
-void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
+void VideoWindow::updateFormatList(const QList<QCameraFormat>& formats)
 {
     assert(formatSelector_);
 
@@ -759,7 +759,7 @@ void CameraWindow::updateFormatList(const QList<QCameraFormat>& formats)
         formatSelector_->setCurrentIndex(indexToSelect);
 }
 
-bool CameraWindow::hasPendingConfiguration() const
+bool VideoWindow::hasPendingConfiguration() const
 {
     if (sourceConfig_.type != SourceType::Camera)
         return false;
@@ -779,13 +779,13 @@ bool CameraWindow::hasPendingConfiguration() const
            !camera_utils::isSameCameraFormat(selectedFormat, activeFormat_);
 }
 
-void CameraWindow::showEvent(QShowEvent* event)
+void VideoWindow::showEvent(QShowEvent* event)
 {
     emit cameraWindowShown();
     QMainWindow::showEvent(event);
 }
 
-void CameraWindow::closeEvent(QCloseEvent* event)
+void VideoWindow::closeEvent(QCloseEvent* event)
 {
     stopSource();
 
@@ -801,7 +801,7 @@ void CameraWindow::closeEvent(QCloseEvent* event)
 }
 
 #ifdef Q_OS_ANDROID
-void CameraWindow::ensureCameraPermission()
+void VideoWindow::ensureCameraPermission()
 {
     QCameraPermission permission;
 
@@ -826,14 +826,14 @@ void CameraWindow::ensureCameraPermission()
 }
 #endif
 
-void CameraWindow::connectFrameToView()
+void VideoWindow::connectFrameToView()
 {
     disconnect(frameToViewConnection_);
-    frameToViewConnection_ = connect(cameraController_, &CameraController::imageAndContourUpdated,
+    frameToViewConnection_ = connect(cameraController_, &VideoController::imageAndContourUpdated,
                                      imageViewer_, &ImageViewerWidget::setImageAndContour);
 }
 
-QCameraFormat CameraWindow::getSelectedFormat() const
+QCameraFormat VideoWindow::getSelectedFormat() const
 {
     assert(formatSelector_);
 
@@ -845,7 +845,7 @@ QCameraFormat CameraWindow::getSelectedFormat() const
     return formatSelector_->itemData(index).value<QCameraFormat>();
 }
 
-void CameraWindow::startSource()
+void VideoWindow::startSource()
 {
     assert(cameraController_);
 
@@ -854,19 +854,19 @@ void CameraWindow::startSource()
     cameraController_->start(sourceConfig_);
 }
 
-void CameraWindow::stopSource()
+void VideoWindow::stopSource()
 {
     assert(cameraController_);
 
     cameraController_->stop();
 }
 
-void CameraWindow::onStreamingStarting()
+void VideoWindow::onStreamingStarting()
 {
     refreshUi();
 }
 
-void CameraWindow::onStreamingStarted(const StreamingInfo& info)
+void VideoWindow::onStreamingStarted(const StreamingInfo& info)
 {
     assert(imageViewer_);
 
@@ -907,14 +907,14 @@ void CameraWindow::onStreamingStarted(const StreamingInfo& info)
     configChangeInProgress_ = false;
 }
 
-QString CameraWindow::lastVideoDirectory() const
+QString VideoWindow::lastVideoDirectory() const
 {
     QSettings settings;
 
     return settings.value(kLastVideoDirectory).toString();
 }
 
-void CameraWindow::saveLastVideoDirectory(const QString& directory)
+void VideoWindow::saveLastVideoDirectory(const QString& directory)
 {
     if (directory.isEmpty())
         return;
@@ -924,7 +924,7 @@ void CameraWindow::saveLastVideoDirectory(const QString& directory)
     settings.setValue(kLastVideoDirectory, directory);
 }
 
-QString CameraWindow::sourceTitle(const StreamingInfo& info) const
+QString VideoWindow::sourceTitle(const StreamingInfo& info) const
 {
     QString title = info.source.description;
 
@@ -946,7 +946,7 @@ QString CameraWindow::sourceTitle(const StreamingInfo& info) const
     return title;
 }
 
-void CameraWindow::onStreamingStopped()
+void VideoWindow::onStreamingStopped()
 {
     assert(imageViewer_);
 
@@ -973,8 +973,8 @@ void CameraWindow::onStreamingStopped()
     }
 }
 
-void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
-                                 const QString& errorString)
+void VideoWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
+                                const QString& errorString)
 {
     assert(imageViewer_);
 
@@ -995,7 +995,7 @@ void CameraWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
     refreshUi();
 }
 
-void CameraWindow::onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec)
+void VideoWindow::onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec)
 {
     QMessageBox::warning(this, tr("Camera startup failed"),
                          tr("The camera did not produce a valid frame within %1 seconds.\n"
@@ -1008,7 +1008,7 @@ void CameraWindow::onStartupTimeout(const SourceInfo& sourceInfo, double timeout
     refreshUi();
 }
 
-void CameraWindow::onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec)
+void VideoWindow::onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec)
 {
     assert(imageViewer_);
 
@@ -1026,13 +1026,13 @@ void CameraWindow::onStreamingLost(const StreamingInfo& streamingInfo, double fr
     refreshUi();
 }
 
-void CameraWindow::refreshActionButtons()
+void VideoWindow::refreshActionButtons()
 {
     updateStreamingButton();
     updateApplyButton();
 }
 
-void CameraWindow::updateStreamingButton()
+void VideoWindow::updateStreamingButton()
 {
     assert(cameraController_ && toggleStreamingButton_ && deviceSelector_);
 
@@ -1061,12 +1061,12 @@ void CameraWindow::updateStreamingButton()
     }
 }
 
-void CameraWindow::updateApplyButton()
+void VideoWindow::updateApplyButton()
 {
     applyButton_->setVisible(hasPendingConfiguration());
 }
 
-void CameraWindow::refreshUi()
+void VideoWindow::refreshUi()
 {
     assert(cameraController_);
 
@@ -1074,14 +1074,14 @@ void CameraWindow::refreshUi()
     refreshActionButtons();
 }
 
-bool CameraWindow::isCameraAvailable() const
+bool VideoWindow::isCameraAvailable() const
 {
     assert(deviceSelector_);
 
     return deviceSelector_->count() > 0;
 }
 
-QString CameraWindow::pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt)
+QString VideoWindow::pixelFormatToShortString(QVideoFrameFormat::PixelFormat fmt)
 {
     switch (fmt)
     {
@@ -1100,7 +1100,7 @@ QString CameraWindow::pixelFormatToShortString(QVideoFrameFormat::PixelFormat fm
     }
 }
 
-QString CameraWindow::formatToString(const QCameraFormat& fmt)
+QString VideoWindow::formatToString(const QCameraFormat& fmt)
 {
     const QSize res = fmt.resolution();
     const int fps = static_cast<int>(fmt.maxFrameRate());
@@ -1110,7 +1110,7 @@ QString CameraWindow::formatToString(const QCameraFormat& fmt)
     return QString("%1 %2x%3 @%4").arg(pixelFormat).arg(res.width()).arg(res.height()).arg(fps);
 }
 
-int CameraWindow::findBestFormatIndex(const QList<QCameraFormat>& formats) const
+int VideoWindow::findBestFormatIndex(const QList<QCameraFormat>& formats) const
 {
     for (int i = 0; i < formats.size(); ++i)
     {
@@ -1143,34 +1143,34 @@ int CameraWindow::findBestFormatIndex(const QList<QCameraFormat>& formats) const
     return -1;
 }
 
-bool CameraWindow::isYuv420(QVideoFrameFormat::PixelFormat fmt) const
+bool VideoWindow::isYuv420(QVideoFrameFormat::PixelFormat fmt) const
 {
     return fmt == QVideoFrameFormat::Format_YUV420P || fmt == QVideoFrameFormat::Format_NV12 ||
            fmt == QVideoFrameFormat::Format_NV21;
 }
 
-bool CameraWindow::isYuv(QVideoFrameFormat::PixelFormat fmt) const
+bool VideoWindow::isYuv(QVideoFrameFormat::PixelFormat fmt) const
 {
     return isYuv420(fmt) || fmt == QVideoFrameFormat::Format_YUYV;
 }
 
-bool CameraWindow::is640x480(const QSize& s) const
+bool VideoWindow::is640x480(const QSize& s) const
 {
     return s.width() == 640 && s.height() == 480;
 }
 
-bool CameraWindow::is30fps(float fps) const
+bool VideoWindow::is30fps(float fps) const
 {
     return std::abs(fps - 30.0f) < 1.0f;
 }
 
-QByteArray CameraWindow::loadSelectedCameraId()
+QByteArray VideoWindow::loadSelectedCameraId()
 {
     QSettings settings;
     return settings.value(kCameraDeviceKey).toByteArray();
 }
 
-void CameraWindow::loadLastSourceType()
+void VideoWindow::loadLastSourceType()
 {
     QSettings settings;
 
@@ -1190,20 +1190,20 @@ void CameraWindow::loadLastSourceType()
     }
 }
 
-void CameraWindow::saveLastSourceType()
+void VideoWindow::saveLastSourceType()
 {
     QSettings settings;
 
     settings.setValue(kLastSourceTypeKey, static_cast<int>(sourceConfig_.type));
 }
 
-void CameraWindow::saveSelectedCameraId()
+void VideoWindow::saveSelectedCameraId()
 {
     QSettings settings;
     settings.setValue(kCameraDeviceKey, deviceSelector_->currentData().toByteArray());
 }
 
-void CameraWindow::savePreferredFormats()
+void VideoWindow::savePreferredFormats()
 {
     QSettings settings;
 
@@ -1229,7 +1229,7 @@ void CameraWindow::savePreferredFormats()
     settings.endGroup();
 }
 
-void CameraWindow::loadPreferredFormats()
+void VideoWindow::loadPreferredFormats()
 {
     assert(cameraController_);
 
@@ -1280,7 +1280,7 @@ void CameraWindow::loadPreferredFormats()
     settings.endGroup();
 }
 
-void CameraWindow::addSourceToHistory(const QUrl& url)
+void VideoWindow::addSourceToHistory(const QUrl& url)
 {
     QSignalBlocker blocker(sourceCombo_);
 
@@ -1306,7 +1306,7 @@ void CameraWindow::addSourceToHistory(const QUrl& url)
     saveSourceHistory();
 }
 
-void CameraWindow::loadSourceHistory()
+void VideoWindow::loadSourceHistory()
 {
     QSettings settings;
 
@@ -1315,7 +1315,7 @@ void CameraWindow::loadSourceHistory()
     sourceCombo_->addItems(values);
 }
 
-void CameraWindow::saveSourceHistory()
+void VideoWindow::saveSourceHistory()
 {
     QStringList values;
 
@@ -1326,7 +1326,7 @@ void CameraWindow::saveSourceHistory()
     settings.setValue(kSourceHistoryKey, values);
 }
 
-void CameraWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
+void VideoWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
 {
     assert(cameraController_);
 
@@ -1338,7 +1338,7 @@ void CameraWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
     updateWindowTitle();
 }
 
-void CameraWindow::updateWindowTitle()
+void VideoWindow::updateWindowTitle()
 {
     if (cameraController_ && cameraController_->isStreaming())
     {
@@ -1355,7 +1355,7 @@ void CameraWindow::updateWindowTitle()
     }
 }
 
-QString CameraWindow::pixelFormatToString(QVideoFrameFormat::PixelFormat format)
+QString VideoWindow::pixelFormatToString(QVideoFrameFormat::PixelFormat format)
 {
     using PF = QVideoFrameFormat::PixelFormat;
 
@@ -1461,7 +1461,7 @@ QString CameraWindow::pixelFormatToString(QVideoFrameFormat::PixelFormat format)
     return QString(tr("Unknown(%1)")).arg(static_cast<int>(format));
 }
 
-void CameraWindow::openFile()
+void VideoWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(
         this, tr("Open Video File"), lastVideoDirectory(), file_utils::buildVideoFilter());

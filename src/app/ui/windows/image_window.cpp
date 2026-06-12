@@ -6,9 +6,9 @@
 #include "about_window.hpp"
 #include "analysis_window.hpp"
 #include "application_settings.hpp"
-#include "camera_window.hpp"
 #include "language_window.hpp"
 #include "settings_window.hpp"
+#include "video_window.hpp"
 
 #include "display_settings_widget.hpp"
 #include "icon_loader.hpp"
@@ -352,7 +352,7 @@ void ImageWindow::setupChildWindows()
     const auto& config = ApplicationSettings::instance().imageSettings();
 
     settingsWindow_ = new SettingsWindow(config, this);
-    cameraWindow_ = new CameraWindow(this);
+    cameraWindow_ = new VideoWindow(this);
     analysisWindow_ = new AnalysisWindow(this);
     aboutWindow_ = new AboutWindow(this);
     languageWindow_ = new LanguageWindow(this);
@@ -383,9 +383,9 @@ void ImageWindow::setupConnections()
     setupUserActionsConnections();
 
     // to refresh camera session state in the menu
-    connect(cameraWindow_, &CameraWindow::cameraWindowShown, this,
+    connect(cameraWindow_, &VideoWindow::cameraWindowShown, this,
             &ImageWindow::onCameraWindowShown);
-    connect(cameraWindow_, &CameraWindow::cameraWindowClosed, this,
+    connect(cameraWindow_, &VideoWindow::cameraWindowClosed, this,
             &ImageWindow::onCameraWindowClosed);
 
     setupFileEventConnections();

@@ -32,8 +32,8 @@ namespace fluvel
 {
 
 struct StreamingInfo;
-class CameraController;
-class CameraSettingsWindow;
+class VideoController;
+class VideoSettingsWindow;
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
 class ImageViewerWidget;
@@ -100,14 +100,14 @@ private:
  * - configure processing and display settings
  *
  * It coordinates interactions between:
- * - CameraController (capture and streaming)
+ * - VideoController (capture and streaming)
  * - ImageViewerWidget (display)
  * - settings widgets (camera and display)
  *
  * The class also manages device availability, preferred formats,
  * and streaming state.
  */
-class CameraWindow : public QMainWindow
+class VideoWindow : public QMainWindow
 {
     Q_OBJECT
 public:
@@ -116,7 +116,7 @@ public:
      *
      * @param parent Optional parent widget.
      */
-    explicit CameraWindow(QWidget* parent = nullptr);
+    explicit VideoWindow(QWidget* parent = nullptr);
 
     /**
      * @brief Returns whether at least one camera device is available.
@@ -238,7 +238,7 @@ private:
 
     static QString pixelFormatToString(QVideoFrameFormat::PixelFormat format);
 
-    CameraSettingsWindow* cameraSettingsWindow_ = nullptr;
+    VideoSettingsWindow* cameraSettingsWindow_ = nullptr;
 
     QWidget* central_ = nullptr;
 
@@ -268,7 +268,7 @@ private:
     QByteArray streamingDeviceId_;
 
     ImageViewerWidget* imageViewer_ = nullptr;
-    CameraController* cameraController_ = nullptr;
+    VideoController* cameraController_ = nullptr;
     QMetaObject::Connection frameToViewConnection_;
 
     QHash<QByteArray, DeviceStreamingStatus> deviceStreamingStatus_;

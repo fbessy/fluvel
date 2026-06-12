@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "camera_settings_window.hpp"
+#include "video_settings_window.hpp"
 #include "algo_settings_widget.hpp"
 
 #include <QAbstractButton>
@@ -20,7 +20,7 @@
 namespace fluvel
 {
 
-CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, QWidget* parent)
+VideoSettingsWindow::VideoSettingsWindow(const VideoSessionSettings& config, QWidget* parent)
     : QDialog(parent)
     , committedConfig_(config.compute)
     , editedConfig_(config.compute)
@@ -101,15 +101,15 @@ CameraSettingsWindow::CameraSettingsWindow(const VideoSessionSettings& config, Q
 
     updateUIFromConfig();
 
-    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &CameraSettingsWindow::accept);
+    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &VideoSettingsWindow::accept);
 
-    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &CameraSettingsWindow::reject);
+    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &VideoSettingsWindow::reject);
 
     connect(dialogButtons_->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
-            &CameraSettingsWindow::restoreToDefaults);
+            &VideoSettingsWindow::restoreToDefaults);
 }
 
-void CameraSettingsWindow::setupDownscaleGroup()
+void VideoSettingsWindow::setupDownscaleGroup()
 {
     downscaleGb_ = new QGroupBox(tr("Downscale"));
     downscaleGb_->setCheckable(true);
@@ -124,7 +124,7 @@ void CameraSettingsWindow::setupDownscaleGroup()
     downscaleGb_->setLayout(fl);
 }
 
-void CameraSettingsWindow::accept()
+void VideoSettingsWindow::accept()
 {
     editedConfig_.downscale.downscaleEnabled = downscaleGb_->isChecked();
     editedConfig_.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
@@ -139,7 +139,7 @@ void CameraSettingsWindow::accept()
     QDialog::accept();
 }
 
-void CameraSettingsWindow::updateUIFromConfig()
+void VideoSettingsWindow::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
 
@@ -155,7 +155,7 @@ void CameraSettingsWindow::updateUIFromConfig()
     algoWidget_->reject();
 }
 
-void CameraSettingsWindow::reject()
+void VideoSettingsWindow::reject()
 {
     editedConfig_ = committedConfig_;
     updateUIFromConfig();
@@ -163,13 +163,13 @@ void CameraSettingsWindow::reject()
     QDialog::reject();
 }
 
-void CameraSettingsWindow::restoreToDefaults()
+void VideoSettingsWindow::restoreToDefaults()
 {
     editedConfig_ = {};   // reset avec defaults structs
     updateUIFromConfig(); // resync UI
 }
 
-void CameraSettingsWindow::closeEvent(QCloseEvent* event)
+void VideoSettingsWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 

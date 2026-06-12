@@ -24,7 +24,7 @@ class QCloseEvent;
 namespace fluvel
 {
 
-class CameraWindow;
+class VideoWindow;
 class AnalysisWindow;
 class SettingsWindow;
 class AboutWindow;
@@ -127,7 +127,7 @@ private:
     void saveDisplayed();
 
     // --- UI ---
-    CameraWindow* cameraWindow_ = nullptr;
+    VideoWindow* cameraWindow_ = nullptr;
     AnalysisWindow* analysisWindow_ = nullptr;
     SettingsWindow* settingsWindow_ = nullptr;
     AboutWindow* aboutWindow_ = nullptr;
