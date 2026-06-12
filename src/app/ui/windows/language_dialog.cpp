@@ -99,18 +99,6 @@ void LanguageDialog::accept()
     QDialog::accept();
 }
 
-void LanguageDialog::reject()
-{
-    // restaurer la langue active
-    auto language = ApplicationSettings::instance().appLanguage();
-
-    int index = combo_->findData(QVariant::fromValue(int(language)));
-    if (index >= 0)
-        combo_->setCurrentIndex(index);
-
-    QDialog::reject();
-}
-
 void LanguageDialog::closeEvent(QCloseEvent* event)
 {
     QSettings settings;

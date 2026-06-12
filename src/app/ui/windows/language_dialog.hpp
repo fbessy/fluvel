@@ -38,11 +38,6 @@ protected:
     void accept() override;
 
     /**
-     * @brief Restores the language selection from current settings.
-     */
-    void reject() override;
-
-    /**
      * @brief Handles dialog close events.
      */
     void closeEvent(QCloseEvent* event) override;
