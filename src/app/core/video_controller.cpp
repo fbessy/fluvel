@@ -154,7 +154,7 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
     }
 
     if (!isFound)
-        emit cameraError(deviceId, QCamera::CameraError, tr("Camera not found"));
+        emit cameraError(startupInfo_, QCamera::CameraError, tr("Camera not found"));
 }
 
 void VideoController::start(const QUrl& url)
@@ -183,6 +183,8 @@ void VideoController::start(const QUrl& url)
 
     mediaPlayer_->setSource(url);
     mediaPlayer_->setVideoSink(videoSink_);
+
+    connect(mediaPlayer_, &QMediaPlayer::errorOccurred, this, &VideoController::onMediaPlayerError);
     connect(videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
@@ -243,6 +245,8 @@ void VideoController::stop()
 
     if (mediaPlayer_)
     {
+        disconnect(mediaPlayer_, &QMediaPlayer::errorOccurred, this,
+                   &VideoController::onMediaPlayerError);
         mediaPlayer_->stop();
 
         delete mediaPlayer_;
@@ -411,7 +415,15 @@ void VideoController::onCameraError(QCamera::Error error, const QString& errorSt
     if (!camera_)
         return;
 
-    emit cameraError(camera_->cameraDevice().id(), error, errorString);
+    emit cameraError(startupInfo_, error, errorString);
+}
+
+void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString)
+{
+    if (!mediaPlayer_)
+        return;
+
+    emit mediaPlayerError(startupInfo_, error, errorString);
 }
 
 void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session)

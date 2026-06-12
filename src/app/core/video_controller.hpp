@@ -143,7 +143,12 @@ signals:
     void streamingStopped();
 
     /// Emitted on camera error.
-    void cameraError(const QByteArray& deviceId, QCamera::Error error, const QString& errorString);
+    void cameraError(const SourceInfo& sourceInfo, QCamera::Error error,
+                     const QString& errorString);
+
+    /// Emitted on media player error.
+    void mediaPlayerError(const SourceInfo& sourceInfo, QMediaPlayer::Error error,
+                          const QString& errorString);
 
     /// Emitted when startup timeout is reached.
     void startupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
@@ -184,6 +189,9 @@ private:
 
     /// Handle camera error callback.
     void onCameraError(QCamera::Error error, const QString& errorString);
+
+    /// Handle media player error callback.
+    void onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString);
 
     /// Called when a new video frame is received from the active source.
     void onFrameReceived(const QVideoFrame& frame);

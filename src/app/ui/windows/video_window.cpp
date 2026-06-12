@@ -22,6 +22,7 @@
 #include <QCameraDevice>
 #include <QComboBox>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -367,6 +368,8 @@ void VideoWindow::setupConnections()
             &VideoWindow::onStreamingStopped);
 
     connect(videoController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
+    connect(videoController_, &VideoController::mediaPlayerError, this,
+            &VideoWindow::onMediaPlayerError);
 
     connect(videoController_, &VideoController::streamingLost, this,
             &VideoWindow::onStreamingLost);
@@ -498,7 +501,7 @@ void VideoWindow::refreshSourceUi()
     {
         sourceCombo_->lineEdit()->setPlaceholderText(
             "https://video.mp4  https://stream.m3u8  rtsp://camera/live  "
-            "http://192.168.1.110:8080/video");
+            "https://192.168.1.110:8080/video");
     }
     else if (fileMode)
     {
@@ -571,6 +574,9 @@ void VideoWindow::updateDeviceList(const QList<QCameraDevice>& devices)
 
     const bool hasDevice = !devices.isEmpty();
 
+    if (!hasDevice)
+        formatSelector_->clear();
+
     setDeviceControlsEnabled(hasDevice);
 
     int currentIndex = -1;
@@ -621,6 +627,7 @@ void VideoWindow::setDeviceControlsEnabled(bool enabled)
     assert(deviceSelector_ && toggleStreamingButton_);
 
     deviceSelector_->setEnabled(enabled);
+    formatSelector_->setEnabled(enabled);
     toggleStreamingButton_->setEnabled(enabled);
 }
 
@@ -974,7 +981,7 @@ void VideoWindow::onStreamingStopped()
     }
 }
 
-void VideoWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
+void VideoWindow::onCameraError(const SourceInfo& sourceInfo, QCamera::Error,
                                 const QString& errorString)
 {
     assert(imageViewer_);
@@ -982,15 +989,37 @@ void VideoWindow::onCameraError(const QByteArray& deviceId, QCamera::Error,
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
-    QMessageBox::warning(this, tr("Camera error"), errorString);
+    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description).arg(errorString);
 
-    deviceStreamingStatus_[deviceId] = DeviceStreamingStatus::Error;
+    QMessageBox::warning(this, tr("Camera error"), message);
+
+    deviceStreamingStatus_[sourceInfo.deviceId] = DeviceStreamingStatus::Error;
 
     // un switch raté devient un stop
     if (configChangeInProgress_)
     {
         configChangeInProgress_ = false;
         streamingDeviceId_.clear();
+    }
+
+    refreshUi();
+}
+
+void VideoWindow::onMediaPlayerError(const SourceInfo& sourceInfo, QMediaPlayer::Error,
+                                     const QString& errorString)
+{
+    assert(imageViewer_);
+
+    disconnect(frameToViewConnection_);
+    imageViewer_->showPlaceholder(true);
+
+    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description).arg(errorString);
+
+    QMessageBox::warning(this, tr("Media error"), message);
+
+    if (configChangeInProgress_)
+    {
+        configChangeInProgress_ = false;
     }
 
     refreshUi();
@@ -1469,6 +1498,14 @@ void VideoWindow::openFile()
 
     if (filename.isEmpty())
         return;
+
+    QFileInfo fi(filename);
+
+    if (!fi.exists())
+        return;
+
+    QSignalBlocker blocker1(sourceTypeCombo_);
+    QSignalBlocker blocker2(sourceCombo_);
 
     sourceTypeCombo_->setCurrentIndex(static_cast<int>(SourceType::File));
 
