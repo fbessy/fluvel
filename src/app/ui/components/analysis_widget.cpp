@@ -36,7 +36,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 {
     ++countThis;         // static variable to count the instances
     idThis_ = countThis; // in order to know if *this is the first or the second widget of
-                         // evaluation_window
+                         // analysis_window
 
     QSettings settings;
 

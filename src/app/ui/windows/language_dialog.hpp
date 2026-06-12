@@ -19,7 +19,7 @@ namespace fluvel
  * The selection is applied when the dialog is accepted and
  * restored when rejected.
  */
-class LanguageWindow : public QDialog
+class LanguageDialog : public QDialog
 {
     Q_OBJECT
 
@@ -29,7 +29,7 @@ public:
      *
      * @param parent Optional parent widget.
      */
-    LanguageWindow(QWidget* parent = nullptr);
+    LanguageDialog(QWidget* parent = nullptr);
 
 protected:
     /**

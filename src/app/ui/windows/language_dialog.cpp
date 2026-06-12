@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "language_window.hpp"
+#include "language_dialog.hpp"
 #include "application_settings.hpp"
 
 #include <QAbstractButton>
@@ -15,13 +15,13 @@
 namespace fluvel
 {
 
-LanguageWindow::LanguageWindow(QWidget* parent)
+LanguageDialog::LanguageDialog(QWidget* parent)
     : QDialog(parent)
 {
     setWindowTitle(tr("Language"));
 
     QSettings settings;
-    const auto geo = settings.value("ui_geometry/language_window").toByteArray();
+    const auto geo = settings.value("ui_geometry/language_dialog").toByteArray();
     if (!geo.isEmpty())
         restoreGeometry(geo);
 
@@ -66,9 +66,9 @@ LanguageWindow::LanguageWindow(QWidget* parent)
 
 #endif
 
-    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &LanguageWindow::accept);
+    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &LanguageDialog::accept);
 
-    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &LanguageWindow::reject);
+    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &LanguageDialog::reject);
 
     // --- Restart label ---
     QLabel* restart_label = new QLabel(this);
@@ -86,7 +86,7 @@ LanguageWindow::LanguageWindow(QWidget* parent)
     setLayout(layout_this);
 }
 
-void LanguageWindow::accept()
+void LanguageDialog::accept()
 {
     // récupérer la valeur logique (pas l’index)
     Language language = Language(combo_->currentData().toInt());
@@ -99,7 +99,7 @@ void LanguageWindow::accept()
     QDialog::accept();
 }
 
-void LanguageWindow::reject()
+void LanguageDialog::reject()
 {
     // restaurer la langue active
     auto language = ApplicationSettings::instance().appLanguage();
@@ -111,10 +111,10 @@ void LanguageWindow::reject()
     QDialog::reject();
 }
 
-void LanguageWindow::closeEvent(QCloseEvent* event)
+void LanguageDialog::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
-    settings.setValue("ui_geometry/language_window", saveGeometry());
+    settings.setValue("ui_geometry/language_dialog", saveGeometry());
 
     QDialog::closeEvent(event);
 }

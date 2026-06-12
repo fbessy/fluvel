@@ -33,7 +33,7 @@ namespace fluvel
 
 struct StreamingInfo;
 class VideoController;
-class VideoSettingsWindow;
+class VideoSettingsDialog;
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
 class ImageViewerWidget;
@@ -237,7 +237,7 @@ private:
 
     static QString pixelFormatToString(QVideoFrameFormat::PixelFormat format);
 
-    VideoSettingsWindow* videoSettingsWindow_ = nullptr;
+    VideoSettingsDialog* videoSettingsWindow_ = nullptr;
 
     QWidget* central_ = nullptr;
 

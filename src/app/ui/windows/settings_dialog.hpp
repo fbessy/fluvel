@@ -63,7 +63,7 @@ enum class TabIndex
  *
  * @note The dialog maintains both committed and edited configurations.
  */
-class SettingsWindow : public QDialog
+class SettingsDialog : public QDialog
 {
     Q_OBJECT
 
@@ -74,7 +74,7 @@ public:
      * @param config Initial image compute configuration.
      * @param parent Optional parent widget.
      */
-    SettingsWindow(const ImageComputeConfig& config, QWidget* parent = nullptr);
+    SettingsDialog(const ImageComputeConfig& config, QWidget* parent = nullptr);
 
     /**
      * @brief Updates the dialog with a new input image.

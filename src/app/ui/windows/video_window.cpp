@@ -16,7 +16,7 @@
 #include "qcolor_utils.hpp"
 #include "right_panel_toggle_button.hpp"
 #include "video_controller.hpp"
-#include "video_settings_window.hpp"
+#include "video_settings_dialog.hpp"
 #include "video_types.hpp"
 
 #include <QCameraDevice>
@@ -158,7 +158,7 @@ void VideoWindow::createUi()
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
-    videoSettingsWindow_ = new VideoSettingsWindow(config.compute, this);
+    videoSettingsWindow_ = new VideoSettingsDialog(config.compute, this);
 }
 
 QIcon VideoWindow::createActiveCameraIcon()
@@ -350,7 +350,7 @@ void VideoWindow::setupConnections()
             &DisplaySettingsWidget::setPanelVisible);
 
     connect(settingsButton_, &QPushButton::clicked, videoSettingsWindow_,
-            &VideoSettingsWindow::show);
+            &VideoSettingsDialog::show);
 
     // --- Hardware events (camera devices) ---
 
@@ -473,7 +473,7 @@ void VideoWindow::bindUiToApplicationSettings()
             &ApplicationSettings::setVideoDisplayConfig);
 
     // commit settings
-    connect(videoSettingsWindow_, &VideoSettingsWindow::videoComputeSettingsAccepted, &app,
+    connect(videoSettingsWindow_, &VideoSettingsDialog::videoComputeSettingsAccepted, &app,
             &ApplicationSettings::setVideoComputeSettings);
 }
 
@@ -497,7 +497,8 @@ void VideoWindow::refreshSourceUi()
     if (urlMode)
     {
         sourceCombo_->lineEdit()->setPlaceholderText(
-            "https://video.mp4  https://stream.m3u8  rtsp://camera/live");
+            "https://video.mp4  https://stream.m3u8  rtsp://camera/live  "
+            "http://192.168.1.110:8080/video");
     }
     else if (fileMode)
     {

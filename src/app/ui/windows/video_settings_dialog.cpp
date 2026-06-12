@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "video_settings_window.hpp"
 #include "algo_settings_widget.hpp"
+#include "video_settings_dialog.hpp"
 
 #include <QAbstractButton>
 #include <QCheckBox>
@@ -20,7 +20,7 @@
 namespace fluvel
 {
 
-VideoSettingsWindow::VideoSettingsWindow(const VideoComputeConfig& config, QWidget* parent)
+VideoSettingsDialog::VideoSettingsDialog(const VideoComputeConfig& config, QWidget* parent)
     : QDialog(parent)
     , committedConfig_(config)
     , editedConfig_(config)
@@ -29,9 +29,9 @@ VideoSettingsWindow::VideoSettingsWindow(const VideoComputeConfig& config, QWidg
 
     QSettings settings;
 
-    if (settings.contains("ui_geometry/video_settings_window"))
+    if (settings.contains("ui_geometry/video_settings_dialog"))
     {
-        restoreGeometry(settings.value("ui_geometry/video_settings_window").toByteArray());
+        restoreGeometry(settings.value("ui_geometry/video_settings_dialog").toByteArray());
     }
     else
     {
@@ -101,15 +101,15 @@ VideoSettingsWindow::VideoSettingsWindow(const VideoComputeConfig& config, QWidg
 
     updateUIFromConfig();
 
-    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &VideoSettingsWindow::accept);
+    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &VideoSettingsDialog::accept);
 
-    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &VideoSettingsWindow::reject);
+    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &VideoSettingsDialog::reject);
 
     connect(dialogButtons_->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
-            &VideoSettingsWindow::restoreToDefaults);
+            &VideoSettingsDialog::restoreToDefaults);
 }
 
-void VideoSettingsWindow::setupDownscaleGroup()
+void VideoSettingsDialog::setupDownscaleGroup()
 {
     downscaleGb_ = new QGroupBox(tr("Downscale"));
     downscaleGb_->setCheckable(true);
@@ -124,7 +124,7 @@ void VideoSettingsWindow::setupDownscaleGroup()
     downscaleGb_->setLayout(fl);
 }
 
-void VideoSettingsWindow::accept()
+void VideoSettingsDialog::accept()
 {
     editedConfig_.downscale.downscaleEnabled = downscaleGb_->isChecked();
     editedConfig_.downscale.downscaleFactor = downscaleFactorCb_->currentData().toInt();
@@ -139,7 +139,7 @@ void VideoSettingsWindow::accept()
     QDialog::accept();
 }
 
-void VideoSettingsWindow::updateUIFromConfig()
+void VideoSettingsDialog::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
 
@@ -155,7 +155,7 @@ void VideoSettingsWindow::updateUIFromConfig()
     algoWidget_->reject();
 }
 
-void VideoSettingsWindow::reject()
+void VideoSettingsDialog::reject()
 {
     editedConfig_ = committedConfig_;
     updateUIFromConfig();
@@ -163,17 +163,17 @@ void VideoSettingsWindow::reject()
     QDialog::reject();
 }
 
-void VideoSettingsWindow::restoreToDefaults()
+void VideoSettingsDialog::restoreToDefaults()
 {
     editedConfig_ = {};   // reset avec defaults structs
     updateUIFromConfig(); // resync UI
 }
 
-void VideoSettingsWindow::closeEvent(QCloseEvent* event)
+void VideoSettingsDialog::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("ui_geometry/video_settings_window", saveGeometry());
+    settings.setValue("ui_geometry/video_settings_dialog", saveGeometry());
 
     QDialog::closeEvent(event);
 }

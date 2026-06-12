@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "about_window.hpp"
+#include "about_dialog.hpp"
 #include "application_settings.hpp"
 #include "icon_loader.hpp"
 
@@ -138,15 +138,15 @@ QString buildFingerprint()
 
 } // namespace
 
-AboutWindow::AboutWindow(QWidget* parent)
+AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent)
 {
     QSettings settings;
 
     setWindowTitle(tr("About Fluvel"));
 
-    if (settings.contains("ui_geometry/about_window"))
-        restoreGeometry(settings.value("ui_geometry/about_window").toByteArray());
+    if (settings.contains("ui_geometry/about_dialog"))
+        restoreGeometry(settings.value("ui_geometry/about_dialog").toByteArray());
     else
         resize(700, 400);
 
@@ -426,12 +426,12 @@ AboutWindow::AboutWindow(QWidget* parent)
     this->setLayout(layout_this);
 }
 
-void AboutWindow::openHomepage()
+void AboutDialog::openHomepage()
 {
     QDesktopServices::openUrl(QUrl(kProjectUrl, QUrl::TolerantMode));
 }
 
-QString AboutWindow::buildTechnicalSection()
+QString AboutDialog::buildTechnicalSection()
 {
     const auto readFormatsRaw = QImageReader::supportedImageFormats();
     QStringList readFormats;
@@ -558,11 +558,11 @@ QString AboutWindow::buildTechnicalSection()
     return html;
 }
 
-void AboutWindow::closeEvent(QCloseEvent* event)
+void AboutDialog::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("ui_geometry/about_window", saveGeometry());
+    settings.setValue("ui_geometry/about_dialog", saveGeometry());
     settings.setValue("ui_geometry/license_window", licenseWindow_->saveGeometry());
 
     QDialog::closeEvent(event);

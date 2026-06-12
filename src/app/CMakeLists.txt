@@ -21,17 +21,17 @@ set(app_src
     ${UI_WIN_DIR}/analysis_window.cpp
     ${UI_WIN_DIR}/analysis_window.hpp
 
-    ${UI_WIN_DIR}/settings_window.cpp
-    ${UI_WIN_DIR}/settings_window.hpp
+    ${UI_WIN_DIR}/settings_dialog.cpp
+    ${UI_WIN_DIR}/settings_dialog.hpp
 
-    ${UI_WIN_DIR}/video_settings_window.cpp
-    ${UI_WIN_DIR}/video_settings_window.hpp
+    ${UI_WIN_DIR}/video_settings_dialog.cpp
+    ${UI_WIN_DIR}/video_settings_dialog.hpp
 
-    ${UI_WIN_DIR}/language_window.cpp
-    ${UI_WIN_DIR}/language_window.hpp
+    ${UI_WIN_DIR}/language_dialog.cpp
+    ${UI_WIN_DIR}/language_dialog.hpp
 
-    ${UI_WIN_DIR}/about_window.cpp
-    ${UI_WIN_DIR}/about_window.hpp
+    ${UI_WIN_DIR}/about_dialog.cpp
+    ${UI_WIN_DIR}/about_dialog.hpp
 
     ${UI_COMP_DIR}/algo_settings_widget.cpp
     ${UI_COMP_DIR}/algo_settings_widget.hpp

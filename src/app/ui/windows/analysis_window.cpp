@@ -20,7 +20,7 @@ namespace fluvel
 {
 
 AnalysisWindow::AnalysisWindow(QWidget* parent)
-    : QDialog(parent)
+    : QMainWindow(parent)
 
 {
     intersection_.reserve(10000);
@@ -39,22 +39,22 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     }
 
     ///////////////////////////////////////////////////////////////
-    ///          Input evaluation QDialog window (this)         ///
+    ///          Input analysis QMainWindow (this)              ///
     ///////////////////////////////////////////////////////////////
 
     widget1_ = new AnalysisWidget(this);
     widget2_ = new AnalysisWidget(this);
 
-    QHBoxLayout* lists_select_layout = new QHBoxLayout;
-    lists_select_layout->addWidget(widget1_);
-    lists_select_layout->addWidget(widget2_);
+    QHBoxLayout* listsSelectLayout = new QHBoxLayout;
+    listsSelectLayout->addWidget(widget1_);
+    listsSelectLayout->addWidget(widget2_);
 
     computeButton_ = new QPushButton(tr("Compute Hausdorff Distance"));
     computeButton_->setEnabled(false);
 
-    QVBoxLayout* input_layout = new QVBoxLayout;
-    input_layout->addLayout(lists_select_layout);
-    input_layout->addWidget(computeButton_);
+    QVBoxLayout* inputLayout = new QVBoxLayout;
+    inputLayout->addLayout(listsSelectLayout);
+    inputLayout->addWidget(computeButton_);
 
     connect(computeButton_, &QPushButton::clicked, this, &AnalysisWindow::computeHd);
 
@@ -158,7 +158,9 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
     checkLists();
 
-    setLayout(input_layout);
+    QWidget* centralWidget = new QWidget(this);
+    centralWidget->setLayout(inputLayout);
+    setCentralWidget(centralWidget);
 
     resultsPopup_ = new QDialog(this);
     resultsPopup_->setWindowTitle(tr("Analysis: Results"));
@@ -259,24 +261,23 @@ void AnalysisWindow::calculateShapesIntersection()
     std::size_t size1 = widget1_->shape().points().size();
     std::size_t size2 = widget2_->shape().points().size();
 
-    const fluvel_ip::Shape& smaller_shape = (size1 < size2) ? widget1_->shape() : widget2_->shape();
+    const fluvel_ip::Shape& smallerShape = (size1 < size2) ? widget1_->shape() : widget2_->shape();
 
-    const QImage& larger_shape_img = (size1 < size2) ? widget2_->image() : widget1_->image();
+    const QImage& largerShapeImg = (size1 < size2) ? widget2_->image() : widget1_->image();
 
-    const fluvel_ip::Rgb_uc& chosen_rgb = (size1 < size2) ? widget2_->rgb() : widget1_->rgb();
+    const fluvel_ip::Rgb_uc& chosenRgb = (size1 < size2) ? widget2_->rgb() : widget1_->rgb();
 
-    QRgb rgb_pix;
+    QRgb rgbPixels;
 
     intersection_.clear();
 
-    for (const auto& p : smaller_shape.points())
+    for (const auto& p : smallerShape.points())
     {
-        if (p.x >= 0 && p.x < larger_shape_img.width() && p.y >= 0 &&
-            p.y < larger_shape_img.height())
+        if (p.x >= 0 && p.x < largerShapeImg.width() && p.y >= 0 && p.y < largerShapeImg.height())
         {
-            rgb_pix = larger_shape_img.pixel(p.x, p.y);
+            rgbPixels = largerShapeImg.pixel(p.x, p.y);
 
-            if (toRgb_uc(rgb_pix) == chosen_rgb)
+            if (toRgb_uc(rgbPixels) == chosenRgb)
             {
                 intersection_.insert(p);
             }
@@ -293,7 +294,7 @@ void AnalysisWindow::closeEvent(QCloseEvent* event)
     widget1_->saveSettings();
     widget2_->saveSettings();
 
-    QDialog::closeEvent(event);
+    QMainWindow::closeEvent(event);
 }
 
 } // namespace fluvel

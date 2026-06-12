@@ -11,6 +11,7 @@
 #include "image_viewer_listener.hpp"
 #include "shape.hpp"
 
+#include <QDialog>
 #include <QImage>
 #include <QString>
 #include <QWidget>

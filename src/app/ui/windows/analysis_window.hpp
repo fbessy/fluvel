@@ -7,13 +7,14 @@
 #include "hausdorff_distance.hpp"
 #include "point_containers.hpp"
 
-#include <QDialog>
+#include <QMainWindow>
 
 class QWidget;
 class QCloseEvent;
 class QPushButton;
 class QLabel;
 class QSpinBox;
+class QDialog;
 
 namespace fluvel
 {
@@ -21,7 +22,7 @@ namespace fluvel
 class AnalysisWidget;
 
 /**
- * @brief Dialog for comparing analysis results between two images.
+ * @brief Main window for comparing analysis results between two images.
  *
  * This window allows the user to compare shapes extracted from two
  * AnalysisWidget instances. It computes various metrics such as:
@@ -32,7 +33,7 @@ class AnalysisWidget;
  *
  * Results are displayed in a dedicated popup.
  */
-class AnalysisWindow : public QDialog
+class AnalysisWindow : public QMainWindow
 {
     Q_OBJECT
 

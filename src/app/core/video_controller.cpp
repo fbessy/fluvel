@@ -181,32 +181,6 @@ void VideoController::start(const QUrl& url)
     mediaPlayer_ = new QMediaPlayer(this);
     videoSink_ = new QVideoSink(this);
 
-    // HTTP MP4 test source.
-    //
-    // Note:
-    // This file can be downloaded and played locally,
-    // but some media players (Qt Multimedia, VLC, mpv)
-    // may fail to stream it directly because the MP4
-    // is not suitable for seekable HTTP streaming
-    // ("no moov before mdat and stream is not seekable").
-    //
-    // Useful regression test for URL media error handling.
-
-    // mediaPlayer_->setSource(QUrl("/home/fabien/sample-20s.mp4"));
-
-    // mediaPlayer_->setSource(QUrl("https://samplelib.com/preview/mp4/sample-20s.mp4"));
-
-    /*mediaPlayer_->setSource(QUrl("https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/"
-                                 "Big_Buck_Bunny_720_10s_1MB.mp4"));*/
-
-    // mediaPlayer_->setSource(QUrl("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"));
-
-    // mediaPlayer_->setSource(QUrl("http://192.168.1.110:8080/video"));
-
-    // mediaPlayer_->setSource(QUrl("rtsp://localhost:8554/test"));
-
-    // mediaPlayer_->setSource(QUrl("http://localhost:8888/test/index.m3u8"));
-
     mediaPlayer_->setSource(url);
     mediaPlayer_->setVideoSink(videoSink_);
     connect(videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);

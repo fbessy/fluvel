@@ -17,7 +17,7 @@ namespace fluvel
  * This dialog shows general information such as version, authors,
  * and license details. It may also provide links to external resources.
  */
-class AboutWindow : public QDialog
+class AboutDialog : public QDialog
 {
     Q_OBJECT
 
@@ -27,7 +27,7 @@ public:
      *
      * @param parent Optional parent widget.
      */
-    AboutWindow(QWidget* parent = nullptr);
+    AboutDialog(QWidget* parent = nullptr);
 
 protected:
     /**

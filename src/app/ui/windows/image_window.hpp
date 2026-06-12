@@ -26,9 +26,9 @@ namespace fluvel
 
 class VideoWindow;
 class AnalysisWindow;
-class SettingsWindow;
-class AboutWindow;
-class LanguageWindow;
+class SettingsDialog;
+class AboutDialog;
+class LanguageDialog;
 
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
@@ -126,9 +126,9 @@ private:
     // --- UI ---
     VideoWindow* videoWindow_ = nullptr;
     AnalysisWindow* analysisWindow_ = nullptr;
-    SettingsWindow* settingsWindow_ = nullptr;
-    AboutWindow* aboutWindow_ = nullptr;
-    LanguageWindow* languageWindow_ = nullptr;
+    SettingsDialog* settingsWindow_ = nullptr;
+    AboutDialog* AboutDialog_ = nullptr;
+    LanguageDialog* languageWindow_ = nullptr;
 
     QMenu* fileMenu_ = nullptr;
     QMenu* segmentationMenu_ = nullptr;

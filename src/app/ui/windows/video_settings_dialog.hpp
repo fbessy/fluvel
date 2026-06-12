@@ -35,7 +35,7 @@ class AlgoSettingsWidget;
  *
  * The configuration is applied when the dialog is accepted.
  */
-class VideoSettingsWindow : public QDialog
+class VideoSettingsDialog : public QDialog
 {
     Q_OBJECT
 
@@ -46,7 +46,7 @@ public:
      * @param parent Optional parent widget.
      *
      */
-    VideoSettingsWindow(const VideoComputeConfig& config, QWidget* parent = nullptr);
+    VideoSettingsDialog(const VideoComputeConfig& config, QWidget* parent = nullptr);
 
 signals:
     /**

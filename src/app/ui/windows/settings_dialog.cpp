@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "settings_window.hpp"
+#include "settings_dialog.hpp"
 
 #include "algo_settings_widget.hpp"
 #include "image_viewer_widget.hpp"
@@ -29,7 +29,7 @@
 namespace fluvel
 {
 
-SettingsWindow::SettingsWindow(const ImageComputeConfig& config, QWidget* parent)
+SettingsDialog::SettingsDialog(const ImageComputeConfig& config, QWidget* parent)
     : QDialog(parent)
     , committedConfig_(config)
     , editedConfig_(config)
@@ -38,9 +38,9 @@ SettingsWindow::SettingsWindow(const ImageComputeConfig& config, QWidget* parent
 
     QSettings settings;
 
-    if (settings.contains("ui_geometry/settings_window"))
+    if (settings.contains("ui_geometry/settings_dialog"))
     {
-        restoreGeometry(settings.value("ui_geometry/settings_window").toByteArray());
+        restoreGeometry(settings.value("ui_geometry/settings_dialog").toByteArray());
     }
     else
     {
@@ -134,7 +134,7 @@ SettingsWindow::SettingsWindow(const ImageComputeConfig& config, QWidget* parent
     setupConnections();
 }
 
-void SettingsWindow::setupUiAlgoTab()
+void SettingsDialog::setupUiAlgoTab()
 {
     algoWidget_ = new AlgoSettingsWidget(editedConfig_.contourConfig, this);
 
@@ -145,7 +145,7 @@ void SettingsWindow::setupUiAlgoTab()
     algoPage_->setLayout(algoLayout);
 }
 
-void SettingsWindow::setupUiInitTab()
+void SettingsDialog::setupUiInitTab()
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /// Initialization tab
@@ -303,7 +303,7 @@ void SettingsWindow::setupUiInitTab()
     initPage_->setLayout(initialization_layout);
 }
 
-void SettingsWindow::setupUiDownscaleTab()
+void SettingsDialog::setupUiDownscaleTab()
 {
     downscalePage_ = new QGroupBox(tr("Downscale"));
     downscalePage_->setCheckable(true);
@@ -326,7 +326,7 @@ void SettingsWindow::setupUiDownscaleTab()
     downscalePage_->setLayout(vbox);
 }
 
-void SettingsWindow::setupUiPreprocessingTab()
+void SettingsDialog::setupUiPreprocessingTab()
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /// Preprocessing tab
@@ -554,17 +554,17 @@ void SettingsWindow::setupUiPreprocessingTab()
     processPage_->setLayout(processLayout);
 }
 
-void SettingsWindow::setupConnections()
+void SettingsDialog::setupConnections()
 {
     // connect( tabs, SIGNAL(currentChanged(int)), this, SLOT(tab_visu(int)) );
 
-    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &SettingsWindow::accept);
+    connect(dialogButtons_, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
 
-    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &SettingsWindow::reject);
+    connect(dialogButtons_, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
 
     auto* restoreBtn = dialogButtons_->button(QDialogButtonBox::RestoreDefaults);
 
-    connect(restoreBtn, &QPushButton::clicked, this, &SettingsWindow::restoreDefaults);
+    connect(restoreBtn, &QPushButton::clicked, this, &SettingsDialog::restoreDefaults);
 
     connect(widthSlider_, &QSlider::valueChanged, widthShapeSpin_, &QSpinBox::setValue);
 
@@ -798,11 +798,11 @@ void SettingsWindow::setupConnections()
                 timeFilt_->setText(tr("%1 s").arg(elapsedSec, 5, 'f', 2));
             });
 
-    connect(addButton_, &QPushButton::clicked, this, &SettingsWindow::onAddShape);
+    connect(addButton_, &QPushButton::clicked, this, &SettingsDialog::onAddShape);
 
-    connect(subtractButton_, &QPushButton::clicked, this, &SettingsWindow::onSubtractShape);
+    connect(subtractButton_, &QPushButton::clicked, this, &SettingsDialog::onSubtractShape);
 
-    connect(clearButton_, &QPushButton::clicked, this, &SettingsWindow::onClearPhi);
+    connect(clearButton_, &QPushButton::clicked, this, &SettingsDialog::onClearPhi);
 
     connect(imageSettingsController_, &ImageSettingsController::viewChanged, imageViewer_,
             &ImageViewerWidget::setImage);
@@ -810,52 +810,52 @@ void SettingsWindow::setupConnections()
     connect(algoWidget_, &AlgoSettingsWidget::connectivityChanged, imageSettingsController_,
             &ImageSettingsController::onConnectivityChanged);
 
-    connect(rectangleRadio_, &QRadioButton::toggled, this, &SettingsWindow::onUiShapeChanged);
-    connect(ellipseRadio_, &QRadioButton::toggled, this, &SettingsWindow::onUiShapeChanged);
+    connect(rectangleRadio_, &QRadioButton::toggled, this, &SettingsDialog::onUiShapeChanged);
+    connect(ellipseRadio_, &QRadioButton::toggled, this, &SettingsDialog::onUiShapeChanged);
 
-    connect(widthShapeSpin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
-    connect(heightShapeSpin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
+    connect(widthShapeSpin_, &QSpinBox::valueChanged, this, &SettingsDialog::onUiShapeChanged);
+    connect(heightShapeSpin_, &QSpinBox::valueChanged, this, &SettingsDialog::onUiShapeChanged);
 
-    connect(abscissaSpin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
-    connect(ordinateSpin_, &QSpinBox::valueChanged, this, &SettingsWindow::onUiShapeChanged);
+    connect(abscissaSpin_, &QSpinBox::valueChanged, this, &SettingsDialog::onUiShapeChanged);
+    connect(ordinateSpin_, &QSpinBox::valueChanged, this, &SettingsDialog::onUiShapeChanged);
 
-    connect(this, &SettingsWindow::updateOverlay, imageSettingsController_,
+    connect(this, &SettingsDialog::updateOverlay, imageSettingsController_,
             &ImageSettingsController::onUpdateOverlay);
 
     connect(initializationBehavior_, &InitializationBehavior::previewShapeRequested, this,
-            &SettingsWindow::onPreviewShapeAt);
+            &SettingsDialog::onPreviewShapeAt);
 
     connect(initializationBehavior_, &InitializationBehavior::addShapeRequested, this,
-            &SettingsWindow::onAddShapeAt);
+            &SettingsDialog::onAddShapeAt);
 
     connect(initializationBehavior_, &InitializationBehavior::removeShapeRequested, this,
-            &SettingsWindow::onSubtractShapeAt);
+            &SettingsDialog::onSubtractShapeAt);
 
     connect(initializationBehavior_, &InitializationBehavior::resizeShapeRequested, this,
-            &SettingsWindow::onResizeShape);
+            &SettingsDialog::onResizeShape);
 
     connect(initializationBehavior_, &InitializationBehavior::toggleShapeRequested, this,
-            &SettingsWindow::onToggleShape);
+            &SettingsDialog::onToggleShape);
 
-    connect(tabs_, &QTabWidget::currentChanged, this, &SettingsWindow::onTabChanged);
+    connect(tabs_, &QTabWidget::currentChanged, this, &SettingsDialog::onTabChanged);
 
-    connect(this, &SettingsWindow::initializationModeChanged, imageSettingsController_,
+    connect(this, &SettingsDialog::initializationModeChanged, imageSettingsController_,
             &ImageSettingsController::setInteractiveMode);
 }
 
-void SettingsWindow::onUiShapeChanged()
+void SettingsDialog::onUiShapeChanged()
 {
     emit updateOverlay(getUiShape());
 }
 
-UiShapeInfo SettingsWindow::getUiShape() const
+UiShapeInfo SettingsDialog::getUiShape() const
 {
     QPoint position{abscissaSpin_->value(), ordinateSpin_->value()};
 
     return getUiShapeAt(position);
 }
 
-UiShapeInfo SettingsWindow::getUiShapeAt(QPoint position) const
+UiShapeInfo SettingsDialog::getUiShapeAt(QPoint position) const
 {
     UiShapeInfo uiShape;
 
@@ -874,7 +874,7 @@ UiShapeInfo SettingsWindow::getUiShapeAt(QPoint position) const
     return uiShape;
 }
 
-void SettingsWindow::accept()
+void SettingsDialog::accept()
 {
     // 1. commit algo widget dans edited
     algoWidget_->accept();
@@ -891,7 +891,7 @@ void SettingsWindow::accept()
     QDialog::accept();
 }
 
-void SettingsWindow::updateUIFromConfig()
+void SettingsDialog::updateUIFromConfig()
 {
     QSignalBlocker blocker(this);
 
@@ -953,7 +953,7 @@ void SettingsWindow::updateUIFromConfig()
     notifyConfigEdited();
 }
 
-void SettingsWindow::reject()
+void SettingsDialog::reject()
 {
     editedConfig_ = committedConfig_;
     updateUIFromConfig();
@@ -961,19 +961,19 @@ void SettingsWindow::reject()
     QDialog::reject();
 }
 
-void SettingsWindow::restoreDefaults()
+void SettingsDialog::restoreDefaults()
 {
     editedConfig_ = {};
     updateUIFromConfig();
 }
 
-void SettingsWindow::onAddShape()
+void SettingsDialog::onAddShape()
 {
     if (imageSettingsController_)
         imageSettingsController_->addShape(getUiShape());
 }
 
-void SettingsWindow::onAddShapeAt(QPoint position)
+void SettingsDialog::onAddShapeAt(QPoint position)
 {
     if (imageSettingsController_)
     {
@@ -982,13 +982,13 @@ void SettingsWindow::onAddShapeAt(QPoint position)
     }
 }
 
-void SettingsWindow::onSubtractShape()
+void SettingsDialog::onSubtractShape()
 {
     if (imageSettingsController_)
         imageSettingsController_->subtractShape(getUiShape());
 }
 
-void SettingsWindow::onSubtractShapeAt(QPoint position)
+void SettingsDialog::onSubtractShapeAt(QPoint position)
 {
     if (imageSettingsController_)
     {
@@ -997,19 +997,19 @@ void SettingsWindow::onSubtractShapeAt(QPoint position)
     }
 }
 
-void SettingsWindow::onClearPhi()
+void SettingsDialog::onClearPhi()
 {
     if (imageSettingsController_)
         imageSettingsController_->clearPhi();
 }
 
-void SettingsWindow::handleInputImageReady(const QImage& inputImage)
+void SettingsDialog::handleInputImageReady(const QImage& inputImage)
 {
     if (!inputImage.isNull())
         imageSettingsController_->onInputImageReady(inputImage);
 }
 
-void SettingsWindow::showEvent(QShowEvent* event)
+void SettingsDialog::showEvent(QShowEvent* event)
 {
     QDialog::showEvent(event);
 
@@ -1019,23 +1019,23 @@ void SettingsWindow::showEvent(QShowEvent* event)
     emit updateOverlay(getUiShape());
 }
 
-void SettingsWindow::closeEvent(QCloseEvent* event)
+void SettingsDialog::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("ui_geometry/settings_window", saveGeometry());
+    settings.setValue("ui_geometry/settings_dialog", saveGeometry());
 
     QDialog::closeEvent(event);
 }
 
-void SettingsWindow::notifyConfigEdited()
+void SettingsDialog::notifyConfigEdited()
 {
     if (imageSettingsController_)
         imageSettingsController_->updateEditedConfig(editedConfig_.downscale,
                                                      editedConfig_.processing);
 }
 
-void SettingsWindow::onPreviewShapeAt(QPoint position)
+void SettingsDialog::onPreviewShapeAt(QPoint position)
 {
     QPoint uiPosition = uiPositionFromView(position);
 
@@ -1058,7 +1058,7 @@ void SettingsWindow::onPreviewShapeAt(QPoint position)
     emit updateOverlay(shape);
 }
 
-void SettingsWindow::onResizeShape(int delta)
+void SettingsDialog::onResizeShape(int delta)
 {
     wheelAccumulator_ += delta;
 
@@ -1079,7 +1079,7 @@ void SettingsWindow::onResizeShape(int delta)
     }
 }
 
-void SettingsWindow::onToggleShape()
+void SettingsDialog::onToggleShape()
 {
     if (rectangleRadio_->isChecked())
         ellipseRadio_->setChecked(true);
@@ -1087,7 +1087,7 @@ void SettingsWindow::onToggleShape()
         rectangleRadio_->setChecked(true);
 }
 
-QPoint SettingsWindow::uiPositionFromView(const QPoint& viewPosition) const
+QPoint SettingsDialog::uiPositionFromView(const QPoint& viewPosition) const
 {
     if (imageViewer_->image().isNull())
         return QPoint(-1, -1);
@@ -1103,7 +1103,7 @@ QPoint SettingsWindow::uiPositionFromView(const QPoint& viewPosition) const
     return QPoint(ux, uy);
 }
 
-void SettingsWindow::onTabChanged(int index)
+void SettingsDialog::onTabChanged(int index)
 {
     constexpr int kInitializationTab = int(TabIndex::Initialization);
     emit initializationModeChanged(index == kInitializationTab);

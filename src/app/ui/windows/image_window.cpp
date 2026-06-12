@@ -3,11 +3,11 @@
 
 #include "image_window.hpp"
 
-#include "about_window.hpp"
+#include "about_dialog.hpp"
 #include "analysis_window.hpp"
 #include "application_settings.hpp"
-#include "language_window.hpp"
-#include "settings_window.hpp"
+#include "language_dialog.hpp"
+#include "settings_dialog.hpp"
 #include "video_window.hpp"
 
 #include "display_settings_widget.hpp"
@@ -351,11 +351,11 @@ void ImageWindow::setupChildWindows()
 {
     const auto& config = ApplicationSettings::instance().imageSettings();
 
-    settingsWindow_ = new SettingsWindow(config.compute, this);
+    settingsWindow_ = new SettingsDialog(config.compute, this);
     videoWindow_ = new VideoWindow(this);
     analysisWindow_ = new AnalysisWindow(this);
-    aboutWindow_ = new AboutWindow(this);
-    languageWindow_ = new LanguageWindow(this);
+    AboutDialog_ = new AboutDialog(this);
+    languageWindow_ = new LanguageDialog(this);
 }
 
 void ImageWindow::applyInitialSettings()
@@ -421,7 +421,7 @@ void ImageWindow::setupConnections()
 
     // to forward a new image for the image settings window view (preview)
     connect(imageController_, &ImageController::inputImageReady, settingsWindow_,
-            &SettingsWindow::handleInputImageReady);
+            &SettingsDialog::handleInputImageReady);
 
     // to retrieve worker events and refresh the buttons states (start/restart, pause/resume)
     connect(imageController_, &ImageController::stateChanged, this, &ImageWindow::onStateChanged);
@@ -478,7 +478,7 @@ void ImageWindow::bindUiToApplicationSettings()
 {
     const auto& config = ApplicationSettings::instance();
 
-    connect(settingsWindow_, &SettingsWindow::imageComputeSettingsAccepted, &config,
+    connect(settingsWindow_, &SettingsDialog::imageComputeSettingsAccepted, &config,
             &ApplicationSettings::setImageComputeSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &config,
@@ -547,13 +547,13 @@ void ImageWindow::setupUserActionsConnections()
 
     connect(analysisAct_, &QAction::triggered, analysisWindow_, &AnalysisWindow::show);
 
-    connect(settingsAct_, &QAction::triggered, settingsWindow_, &SettingsWindow::show);
+    connect(settingsAct_, &QAction::triggered, settingsWindow_, &SettingsDialog::show);
 
     // ---   4th menu   ---
 
-    connect(aboutAct_, &QAction::triggered, aboutWindow_, &AboutWindow::show);
+    connect(aboutAct_, &QAction::triggered, AboutDialog_, &AboutDialog::show);
 
-    connect(languageAct_, &QAction::triggered, languageWindow_, &LanguageWindow::show);
+    connect(languageAct_, &QAction::triggered, languageWindow_, &LanguageDialog::show);
 
     // ---   6 buttons   ---
 
@@ -569,7 +569,7 @@ void ImageWindow::setupUserActionsConnections()
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, settingsWindow_, &SettingsWindow::show);
+    connect(settingsButton_, &QPushButton::clicked, settingsWindow_, &SettingsDialog::show);
 
     // when the user drag and drop an image in the view of the image window.
     connect(imageViewer_, &ImageViewerWidget::imageDropped, imageController_,

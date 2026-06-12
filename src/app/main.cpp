@@ -31,12 +31,6 @@
 
 int main(int argc, char* argv[])
 {
-    //[Video]
-    // Investigate Qt 6.11 + VAAPI issue on Haswell
-    // Requires QT_FFMPEG_DECODING_HW_DEVICE_TYPES=
-
-    qputenv("QT_FFMPEG_DECODING_HW_DEVICE_TYPES", "");
-
 #if defined(FLUVEL_PLATFORM_MOBILE) && !defined(FLUVEL_UI_DESKTOP)
     QGuiApplication app(argc, argv);
 #else
