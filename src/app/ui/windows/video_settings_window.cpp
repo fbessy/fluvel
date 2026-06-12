@@ -20,18 +20,18 @@
 namespace fluvel
 {
 
-VideoSettingsWindow::VideoSettingsWindow(const VideoSessionSettings& config, QWidget* parent)
+VideoSettingsWindow::VideoSettingsWindow(const VideoComputeConfig& config, QWidget* parent)
     : QDialog(parent)
-    , committedConfig_(config.compute)
-    , editedConfig_(config.compute)
+    , committedConfig_(config)
+    , editedConfig_(config)
 {
-    setWindowTitle(tr("Camera session settings"));
+    setWindowTitle(tr("Video session settings"));
 
     QSettings settings;
 
-    if (settings.contains("ui_geometry/camera_settings_window"))
+    if (settings.contains("ui_geometry/video_settings_window"))
     {
-        restoreGeometry(settings.value("ui_geometry/camera_settings_window").toByteArray());
+        restoreGeometry(settings.value("ui_geometry/video_settings_window").toByteArray());
     }
     else
     {
@@ -173,7 +173,7 @@ void VideoSettingsWindow::closeEvent(QCloseEvent* event)
 {
     QSettings settings;
 
-    settings.setValue("ui_geometry/camera_settings_window", saveGeometry());
+    settings.setValue("ui_geometry/video_settings_window", saveGeometry());
 
     QDialog::closeEvent(event);
 }

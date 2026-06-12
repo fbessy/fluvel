@@ -8,7 +8,7 @@
 #endif
 
 #include "contour_point_item.hpp"
-#include "frame_data.hpp"
+#include "frame_pipeline.hpp"
 #include "image_viewer_listener.hpp"
 #include "overlay_text_item.hpp"
 

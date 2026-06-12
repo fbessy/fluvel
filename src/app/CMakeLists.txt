@@ -90,8 +90,8 @@ set(app_src
     ${UI_COMP_DIR}/contour_point_item.cpp
     ${UI_COMP_DIR}/contour_point_item.hpp
 
-    ${UI_COMP_DIR}/frame_stats_view.cpp
-    ${UI_COMP_DIR}/frame_stats_view.hpp
+    ${UI_COMP_DIR}/frame_stats_collector.cpp
+    ${UI_COMP_DIR}/frame_stats_collector.hpp
 
     ${UI_COMP_DIR}/phi_view_model.cpp
     ${UI_COMP_DIR}/phi_view_model.hpp
@@ -124,7 +124,7 @@ set(app_src
     ${CORE_DIR}/video_active_contour_thread.cpp
     ${CORE_DIR}/video_active_contour_thread.hpp
 
-    ${CORE_DIR}/frame_data.hpp
+    ${CORE_DIR}/frame_pipeline.hpp
 
     ${CORE_DIR}/frame_clock.cpp
     ${CORE_DIR}/frame_clock.hpp
@@ -138,7 +138,7 @@ set(app_src
     ${CORE_DIR}/phi_editor.hpp
 
     ${CORE_DIR}/shape_type.hpp
-    ${CORE_DIR}/camera_stats.hpp
+    ${CORE_DIR}/streaming_stats.hpp
 
     ${CORE_DIR}/image_debug.cpp
     ${CORE_DIR}/image_debug.hpp

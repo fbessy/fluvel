@@ -39,7 +39,7 @@ QSettings camSessionSettings()
     QFileInfo info(base.fileName());
     QString dir = info.dir().absolutePath();
 
-    return QSettings(dir + "/camera_session.ini", QSettings::IniFormat);
+    return QSettings(dir + "/video_session.ini", QSettings::IniFormat);
 }
 
 QSettings sessionSettings(fluvel::Session session)
@@ -48,7 +48,7 @@ QSettings sessionSettings(fluvel::Session session)
     {
         case fluvel::Session::Image:
             return imgSessionSettings();
-        case fluvel::Session::Camera:
+        case fluvel::Session::Video:
             return camSessionSettings();
     }
     Q_UNREACHABLE();
@@ -212,7 +212,7 @@ void ApplicationSettings::saveVideoSessionSettings()
 
     // preprocess
 
-    saveDownscale(Session::Camera, videoSettings_.compute.downscale);
+    saveDownscale(Session::Video, videoSettings_.compute.downscale);
 
     settings.setValue("preprocess/spatial_filtering_enabled",
                       videoSettings_.compute.spatialFilteringEnabled);
@@ -222,11 +222,11 @@ void ApplicationSettings::saveVideoSessionSettings()
 
     // algo
 
-    saveAlgo(Session::Camera, videoSettings_.compute.contourConfig);
+    saveAlgo(Session::Video, videoSettings_.compute.contourConfig);
 
     // display
 
-    saveDisplay(Session::Camera, videoSettings_.display);
+    saveDisplay(Session::Video, videoSettings_.display);
 
     emit videoSettingsChanged(videoSettings_);
 }
@@ -425,7 +425,7 @@ void ApplicationSettings::loadVideoSessionSettings()
 
     // preprocess tab
 
-    loadDownscale(Session::Camera, videoSettings_.compute.downscale);
+    loadDownscale(Session::Video, videoSettings_.compute.downscale);
 
     videoSettings_.compute.spatialFilteringEnabled =
         settings
@@ -439,10 +439,10 @@ void ApplicationSettings::loadVideoSessionSettings()
                    VideoComputeConfig::kDefaultTemporalFilteringEnabled)
             .toBool();
 
-    loadAlgo(Session::Camera, videoSettings_.compute.contourConfig);
+    loadAlgo(Session::Video, videoSettings_.compute.contourConfig);
 
     // display
-    loadDisplay(Session::Camera, videoSettings_.display);
+    loadDisplay(Session::Video, videoSettings_.display);
 }
 
 void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoConfig)
@@ -473,7 +473,7 @@ void ApplicationSettings::loadAlgo(Session session, ActiveContourConfig& algoCon
 
     switch (session)
     {
-        case Session::Camera:
+        case Session::Video:
             algoConfig.contourParams.failureMode = fluvel_ip::FailureHandlingMode::RecoverOnFailure;
             break;
 
@@ -511,7 +511,7 @@ void ApplicationSettings::loadDownscale(Session session, DownscaleParams& downsc
 {
     QSettings settings = sessionSettings(session);
 
-    bool defaultIsDownscale = (session == Session::Camera);
+    bool defaultIsDownscale = (session == Session::Video);
 
     downscaleParams.downscaleEnabled =
         settings.value("preprocess/downscale_enabled", defaultIsDownscale).toBool();

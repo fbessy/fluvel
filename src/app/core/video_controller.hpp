@@ -7,8 +7,8 @@
 #include "application_settings_types.hpp"
 #endif
 
-#include "frame_data.hpp"
-#include "frame_stats_view.hpp"
+#include "frame_pipeline.hpp"
+#include "frame_stats_collector.hpp"
 #include "video_active_contour_thread.hpp"
 #include "video_types.hpp"
 
@@ -33,21 +33,26 @@ namespace fluvel
 struct StreamingInfo;
 
 /**
- * @brief High-level controller for camera streaming and processing.
+ * @brief High-level controller for video streaming and processing.
  *
- * VideoController manages the complete lifecycle of a video stream,
- * from camera initialization and frame acquisition to active contour
+ * VideoController manages the complete lifecycle of a video source,
+ * from source initialization and frame reception to active contour
  * processing and UI updates.
  *
+ * Supported sources include:
+ * - camera devices
+ * - network video streams
+ * - local video files
+ *
  * Responsibilities include:
- * - device selection and camera startup
- * - frame acquisition through Qt Multimedia
+ * - source initialization and startup
+ * - frame reception through Qt Multimedia
  * - dispatching frames to the processing thread
  * - monitoring stream health (startup timeout, watchdog, stream loss)
  * - publishing processed frames, contours and diagnostics to the UI
  *
  * This class acts as the bridge between the Qt Multimedia subsystem
- * (QCamera, QVideoSink) and the image-processing backend.
+ * and the image-processing backend.
  *
  * @note This class is tied to the Qt event loop and is intended to run
  * in the main thread.
@@ -58,7 +63,7 @@ class VideoController : public QObject
 
 public:
     /**
-     * @brief Construct a camera controller with initial session settings.
+     * @brief Constructs a video controller with initial session settings.
      */
     explicit VideoController(const VideoSessionSettings& session, QObject* parent = nullptr);
 
@@ -68,7 +73,7 @@ public:
     ~VideoController() override;
 
     /**
-     * @brief Start streaming using a specific device.
+     * @brief Starts streaming from the specified source.
      */
     void start(const SourceConfig& sourceConfig);
 
@@ -114,7 +119,7 @@ signals:
     void videoInputsChanged(const QList<QCameraDevice>& devices);
 
     /**
-     * @brief Emitted when camera startup begins.
+     * @brief Emitted when source startup begins.
      *
      * The controller entered the starting phase and is waiting
      * for the first valid frame before entering streaming mode.
@@ -166,6 +171,9 @@ private:
      */
     void start(const QByteArray& deviceId, const QCameraFormat& format);
 
+    /**
+     * @brief Starts streaming from a media URL.
+     */
     void start(const QUrl& url);
 
     /// Handle updates in available video inputs.
@@ -177,10 +185,10 @@ private:
     /// Handle camera error callback.
     void onCameraError(QCamera::Error error, const QString& errorString);
 
-    /// Handle incoming video frame from Qt.
-    void onCapturedFrame(const QVideoFrame& frame);
+    /// Called when a new video frame is received from the active source.
+    void onFrameReceived(const QVideoFrame& frame);
 
-    /// Called when processing thread produces contour data.
+    /// Called when frame processing has completed.
     void onFrameProcessed(quint64 contourSize);
 
     /// Called when a display-ready frame is available.
@@ -218,7 +226,7 @@ private:
     VideoActiveContourThread activeContourThread_;
 
     /// Frame statistics and diagnostics view.
-    FrameStatsView frameStats_;
+    FrameStatsCollector frameStats_;
 
     // --- Timing configuration ---
 
@@ -239,10 +247,10 @@ private:
     /// Current streaming state.
     StreamingState state_ = StreamingState::Stopped;
 
-    /// Current source info.
-    SourceInfo sourceInfo_;
+    /// Information about the source being opened or streamed.
+    SourceInfo startupInfo_;
 
-    /// Current streaming info.
+    /// Runtime information about the active stream.
     StreamingInfo streamingInfo_;
 
     //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.

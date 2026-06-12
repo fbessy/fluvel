@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "frame_stats_view.hpp"
+#include "frame_stats_collector.hpp"
 #include <QMutexLocker>
 
 namespace fluvel
 {
 
-FrameStatsView::FrameStatsView()
+FrameStatsCollector::FrameStatsCollector()
 {
     reset();
 }
 
-void FrameStatsView::reset()
+void FrameStatsCollector::reset()
 {
     QMutexLocker lock(&mutex_);
 
-    capturedFrames_ = 0;
+    receivedFrames_ = 0;
     processedFrames_ = 0;
     displayedFrames_ = 0;
     droppedFrames_ = 0;
@@ -32,15 +32,15 @@ void FrameStatsView::reset()
     lastSnapshot_ = {};
 }
 
-void FrameStatsView::frameCaptured()
+void FrameStatsCollector::frameReceived()
 {
     QMutexLocker lock(&mutex_);
 
-    ++capturedFrames_;
+    ++receivedFrames_;
     updateWindowLocked();
 }
 
-void FrameStatsView::frameProcessed(quint64 contourSize)
+void FrameStatsCollector::frameProcessed(quint64 contourSize)
 {
     QMutexLocker lock(&mutex_);
 
@@ -48,13 +48,13 @@ void FrameStatsView::frameProcessed(quint64 contourSize)
     ++processedFrames_;
 }
 
-void FrameStatsView::frameDisplayed(const FrameTimestamps& ts)
+void FrameStatsCollector::frameDisplayed(const FrameTimestamps& ts)
 {
     QMutexLocker lock(&mutex_);
 
     ++displayedFrames_;
 
-    // Latences fiables (basées sur la frame)
+    // Frame-based latency measurements
     double latencyDisplayMs = double(ts.displayTimestampNs - ts.receiveTimestampNs) * 1e-6;
 
     double latencyProcMs = double(ts.processTimestampNs - ts.receiveTimestampNs) * 1e-6;
@@ -67,13 +67,13 @@ void FrameStatsView::frameDisplayed(const FrameTimestamps& ts)
     updateWindowLocked();
 }
 
-FrameStatsView::Snapshot FrameStatsView::snapshot()
+FrameStatsCollector::Snapshot FrameStatsCollector::snapshot()
 {
     QMutexLocker lock(&mutex_);
     return lastSnapshot_;
 }
 
-void FrameStatsView::updateWindowLocked()
+void FrameStatsCollector::updateWindowLocked()
 {
     if (windowTimer_.elapsedLessThan(kWindowMs))
         return;
@@ -83,34 +83,34 @@ void FrameStatsView::updateWindowLocked()
     Snapshot snap;
 
     // FPS
-    snap.capturedFps = double(capturedFrames_) / seconds;
+    snap.receivedFps = double(receivedFrames_) / seconds;
     snap.processedFps = double(processedFrames_) / seconds;
     snap.displayedFps = double(displayedFrames_) / seconds;
 
     // Drop
     droppedFrames_ =
-        (capturedFrames_ > displayedFrames_) ? (capturedFrames_ - displayedFrames_) : 0;
+        (receivedFrames_ > displayedFrames_) ? (receivedFrames_ - displayedFrames_) : 0;
 
-    snap.dropRate = capturedFrames_ > 0 ? double(droppedFrames_) / double(capturedFrames_) : 0.0;
+    snap.dropRate = receivedFrames_ > 0 ? double(droppedFrames_) / double(receivedFrames_) : 0.0;
 
-    // Latence display
+    // Display latency
     snap.avgLatencyDisplayMs =
         displayedFrames_ > 0 ? latencySumDisplayMs_ / double(displayedFrames_) : 0.0;
 
     snap.maxLatencyDisplayMs = latencyMaxDisplayMs_;
 
-    // Latence proc
+    // Processing latency
     snap.avgLatencyProcMs =
         displayedFrames_ > 0 ? latencySumProcMs_ / double(displayedFrames_) : 0.0;
 
-    // Contour
+    // Contour statistics
     snap.avgContourSize =
         processedFrames_ > 0 ? double(contourSizeSum_) / double(processedFrames_) : 0.0;
 
     lastSnapshot_ = snap;
 
-    // Reset fenêtre
-    capturedFrames_ = 0;
+    // Window reset
+    receivedFrames_ = 0;
     processedFrames_ = 0;
     displayedFrames_ = 0;
     droppedFrames_ = 0;

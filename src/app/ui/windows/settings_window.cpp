@@ -29,10 +29,10 @@
 namespace fluvel
 {
 
-SettingsWindow::SettingsWindow(const ImageSessionSettings& config, QWidget* parent)
+SettingsWindow::SettingsWindow(const ImageComputeConfig& config, QWidget* parent)
     : QDialog(parent)
-    , committedConfig_(config.compute)
-    , editedConfig_(config.compute)
+    , committedConfig_(config)
+    , editedConfig_(config)
 {
     setWindowTitle(tr("Image session settings"));
 

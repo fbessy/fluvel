@@ -217,14 +217,14 @@ void ImageWindow::setupActions()
     videoSessionAct_->setEnabled(true);
     videoSessionAct_->setShortcut(tr("Ctrl+V"));
 
-    QIcon cameraIcon =
+    QIcon videoIcon =
         il::loadIcon(QIcon::ThemeIcon::CameraWeb, ":/icons/actions/camera-web-symbolic.svg");
 
-    videoSessionAct_->setIcon(cameraIcon);
+    videoSessionAct_->setIcon(videoIcon);
 
     videoSessionAct_->setCheckable(true);
     videoSessionAct_->setChecked(false);
-    videoSessionAct_->setStatusTip(tr("Open the video session."));
+    videoSessionAct_->setStatusTip(tr("Open a video session."));
 
     quitAct_ = new QAction(tr("&Quit"), this);
     quitAct_->setShortcut(QKeySequence::Quit);
@@ -351,8 +351,8 @@ void ImageWindow::setupChildWindows()
 {
     const auto& config = ApplicationSettings::instance().imageSettings();
 
-    settingsWindow_ = new SettingsWindow(config, this);
-    cameraWindow_ = new VideoWindow(this);
+    settingsWindow_ = new SettingsWindow(config.compute, this);
+    videoWindow_ = new VideoWindow(this);
     analysisWindow_ = new AnalysisWindow(this);
     aboutWindow_ = new AboutWindow(this);
     languageWindow_ = new LanguageWindow(this);
@@ -382,11 +382,9 @@ void ImageWindow::setupConnections()
 {
     setupUserActionsConnections();
 
-    // to refresh camera session state in the menu
-    connect(cameraWindow_, &VideoWindow::cameraWindowShown, this,
-            &ImageWindow::onCameraWindowShown);
-    connect(cameraWindow_, &VideoWindow::cameraWindowClosed, this,
-            &ImageWindow::onCameraWindowClosed);
+    // to refresh video session state in the menu
+    connect(videoWindow_, &VideoWindow::videoWindowShown, this, &ImageWindow::onVideoWindowShown);
+    connect(videoWindow_, &VideoWindow::videoWindowClosed, this, &ImageWindow::onVideoWindowClosed);
 
     setupFileEventConnections();
 
@@ -641,13 +639,13 @@ void ImageWindow::clearRecentFiles()
 
 void ImageWindow::onStartVideoActionTriggered()
 {
-    assert(cameraWindow_);
+    assert(videoWindow_);
 
-    cameraWindow_->setWindowState(cameraWindow_->windowState() & ~Qt::WindowMinimized);
+    videoWindow_->setWindowState(videoWindow_->windowState() & ~Qt::WindowMinimized);
 
-    cameraWindow_->show();
-    cameraWindow_->raise();
-    cameraWindow_->activateWindow();
+    videoWindow_->show();
+    videoWindow_->raise();
+    videoWindow_->activateWindow();
 }
 
 void ImageWindow::closeEvent(QCloseEvent* event)
@@ -818,12 +816,12 @@ void ImageWindow::onStateChanged(fluvel::WorkerState state)
     }
 }
 
-void ImageWindow::onCameraWindowShown()
+void ImageWindow::onVideoWindowShown()
 {
     videoSessionAct_->setChecked(true);
 }
 
-void ImageWindow::onCameraWindowClosed()
+void ImageWindow::onVideoWindowClosed()
 {
     videoSessionAct_->setChecked(false);
 }

@@ -13,7 +13,7 @@ namespace fluvel
  * @brief Global monotonic clock utility.
  *
  * FrameClock provides a centralized monotonic time reference used
- * throughout the application for frame capture, processing and display
+ * throughout the application for frame reception, processing and display
  * timing measurements.
  *
  * All timestamps are expressed relative to a common initialization point,

@@ -71,10 +71,10 @@ public:
     /**
      * @brief Constructs the settings dialog.
      *
-     * @param config Initial image session configuration.
+     * @param config Initial image compute configuration.
      * @param parent Optional parent widget.
      */
-    SettingsWindow(const ImageSessionSettings& config, QWidget* parent = nullptr);
+    SettingsWindow(const ImageComputeConfig& config, QWidget* parent = nullptr);
 
     /**
      * @brief Updates the dialog with a new input image.

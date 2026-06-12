@@ -79,7 +79,7 @@ inline Language language_from_string(std::string_view s)
 enum class Session
 {
     Image, ///< Static image processing
-    Camera ///< Live camera processing
+    Video  ///< Dynamic video processing
 };
 
 /**

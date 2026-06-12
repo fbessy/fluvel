@@ -86,8 +86,8 @@ struct SourceInfo
      *
      * Examples:
      * - Camera device name
-     * - Video file name
      * - Stream name or host
+     * - Video file name
      */
     QString description;
 };

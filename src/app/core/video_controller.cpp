@@ -3,9 +3,9 @@
 
 #include "video_controller.hpp"
 #include "camera_format_utils.hpp"
-#include "camera_stats.hpp"
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
+#include "streaming_stats.hpp"
 
 #include <QAudioOutput>
 #include <QCamera>
@@ -128,18 +128,18 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
                     camera_->setCameraFormat(*it);
             }
 
-            sourceInfo_ = SourceInfo{};
-            sourceInfo_.type = SourceType::Camera;
-            sourceInfo_.deviceId = camera_->cameraDevice().id();
-            sourceInfo_.deviceFormat = camera_->cameraFormat();
-            sourceInfo_.description = camera_->cameraDevice().description();
+            startupInfo_ = SourceInfo{};
+            startupInfo_.type = SourceType::Camera;
+            startupInfo_.deviceId = camera_->cameraDevice().id();
+            startupInfo_.deviceFormat = camera_->cameraFormat();
+            startupInfo_.description = camera_->cameraDevice().description();
 
             captureSession_->setCamera(camera_);
             captureSession_->setVideoSink(videoSink_);
 
             connect(camera_, &QCamera::errorOccurred, this, &VideoController::onCameraError);
             connect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                    &VideoController::onCapturedFrame);
+                    &VideoController::onFrameReceived);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
             testFrameCounter_ = 0;
@@ -168,15 +168,15 @@ void VideoController::start(const QUrl& url)
     state_ = StreamingState::Starting;
     emit streamingStarting();
 
-    sourceInfo_ = SourceInfo{};
-    sourceInfo_.sourceUrl = url;
+    startupInfo_ = SourceInfo{};
+    startupInfo_.sourceUrl = url;
 
-    if (sourceInfo_.sourceUrl.isLocalFile())
-        sourceInfo_.type = SourceType::File;
+    if (startupInfo_.sourceUrl.isLocalFile())
+        startupInfo_.type = SourceType::File;
     else
-        sourceInfo_.type = SourceType::Url;
+        startupInfo_.type = SourceType::Url;
 
-    sourceInfo_.description = shortSourceName(sourceInfo_.sourceUrl);
+    startupInfo_.description = shortSourceName(startupInfo_.sourceUrl);
 
     mediaPlayer_ = new QMediaPlayer(this);
     videoSink_ = new QVideoSink(this);
@@ -209,7 +209,7 @@ void VideoController::start(const QUrl& url)
 
     mediaPlayer_->setSource(url);
     mediaPlayer_->setVideoSink(videoSink_);
-    connect(videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onCapturedFrame);
+    connect(videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     testFrameCounter_ = 0;
@@ -249,7 +249,7 @@ void VideoController::stop()
     if (videoSink_)
     {
         disconnect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                   &VideoController::onCapturedFrame);
+                   &VideoController::onFrameReceived);
     }
 
     if (camera_)
@@ -288,14 +288,11 @@ void VideoController::stop()
         camera_ = nullptr;
     }
 
-    sourceInfo_ = SourceInfo{};
-    streamingInfo_ = StreamingInfo{};
-
     state_ = StreamingState::Stopped;
     emit streamingStopped();
 }
 
-void VideoController::onCapturedFrame(const QVideoFrame& frame)
+void VideoController::onFrameReceived(const QVideoFrame& frame)
 {
     assert(startupTimer_ && watchdogTimer_ && diagnosticsTimer_);
 
@@ -325,7 +322,7 @@ void VideoController::onCapturedFrame(const QVideoFrame& frame)
         diagnosticsTimer_->start();
 
         streamingInfo_ = StreamingInfo{};
-        streamingInfo_.source = sourceInfo_;
+        streamingInfo_.source = startupInfo_;
 
         streamingInfo_.frameSize = frame.size();
         streamingInfo_.pixelFormat = frame.pixelFormat();
@@ -334,9 +331,9 @@ void VideoController::onCapturedFrame(const QVideoFrame& frame)
         emit streamingStarted(streamingInfo_);
     }
 
-    frameStats_.frameCaptured();
+    frameStats_.frameReceived();
 
-    CapturedFrame cf;
+    ReceivedFrame cf;
     cf.frame = frame;
     cf.receiveTimestampNs = now;
 
@@ -374,7 +371,7 @@ void VideoController::onDisplayFrameReady(const DisplayFrame& displayFrame)
 void VideoController::onStartupTimeout()
 {
     stop();
-    emit startupTimeout(sourceInfo_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
+    emit startupTimeout(startupInfo_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
 }
 
 void VideoController::checkWatchdog()
@@ -392,14 +389,14 @@ void VideoController::updateDiagnostics()
 {
     auto snap = frameStats_.snapshot();
 
-    CameraStats stats{snap.capturedFps,      snap.processedFps,        snap.displayedFps,
-                      snap.dropRate,         snap.avgLatencyDisplayMs, snap.maxLatencyDisplayMs,
-                      snap.avgLatencyProcMs, snap.avgContourSize};
+    StreamingStats stats{snap.receivedFps,      snap.processedFps,        snap.displayedFps,
+                         snap.dropRate,         snap.avgLatencyDisplayMs, snap.maxLatencyDisplayMs,
+                         snap.avgLatencyProcMs, snap.avgContourSize};
 
     QString textStats = QString(tr("In | Proc | Disp: %1 | %2 | %3 fps\n"
                                    "Lat: %4 ms (proc %5) | Drop: %6 %\n"
                                    "Contour: %7 pts"))
-                            .arg(stats.capturedFps, 0, 'f', 1)
+                            .arg(stats.receivedFps, 0, 'f', 1)
                             .arg(stats.processedFps, 0, 'f', 1)
                             .arg(stats.displayedFps, 0, 'f', 1)
                             .arg(stats.avgLatencyDisplayMs, 0, 'f', 1)

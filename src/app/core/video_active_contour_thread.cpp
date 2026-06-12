@@ -18,7 +18,7 @@ VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
 {
 }
 
-void VideoActiveContourThread::submitFrame(const CapturedFrame& frame)
+void VideoActiveContourThread::submitFrame(const ReceivedFrame& frame)
 {
     int wi = writeIndex_.load(std::memory_order_relaxed);
     int next = 1 - wi;
@@ -45,7 +45,7 @@ void VideoActiveContourThread::run()
             {
                 readIndex = wi;
 
-                CapturedFrame cf = buffers_[readIndex];
+                ReceivedFrame cf = buffers_[readIndex];
 
                 DisplayFrame df = processFrame(cf.frame);
 

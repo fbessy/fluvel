@@ -158,7 +158,7 @@ void VideoWindow::createUi()
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
-    cameraSettingsWindow_ = new VideoSettingsWindow(config, this);
+    videoSettingsWindow_ = new VideoSettingsWindow(config.compute, this);
 }
 
 QIcon VideoWindow::createActiveCameraIcon()
@@ -239,7 +239,7 @@ void VideoWindow::setupView()
 void VideoWindow::setupController()
 {
     const auto& config = ApplicationSettings::instance().videoSettings();
-    cameraController_ = new VideoController(config, this);
+    videoController_ = new VideoController(config, this);
 }
 
 void VideoWindow::setupLayout()
@@ -349,39 +349,39 @@ void VideoWindow::setupConnections()
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, cameraSettingsWindow_,
+    connect(settingsButton_, &QPushButton::clicked, videoSettingsWindow_,
             &VideoSettingsWindow::show);
 
     // --- Hardware events (camera devices) ---
 
-    connect(cameraController_, &VideoController::videoInputsChanged, this,
+    connect(videoController_, &VideoController::videoInputsChanged, this,
             &VideoWindow::updateDeviceList);
 
-    connect(cameraController_, &VideoController::streamingStarting, this,
+    connect(videoController_, &VideoController::streamingStarting, this,
             &VideoWindow::onStreamingStarting);
 
-    connect(cameraController_, &VideoController::streamingStarted, this,
+    connect(videoController_, &VideoController::streamingStarted, this,
             &VideoWindow::onStreamingStarted);
 
-    connect(cameraController_, &VideoController::streamingStopped, this,
+    connect(videoController_, &VideoController::streamingStopped, this,
             &VideoWindow::onStreamingStopped);
 
-    connect(cameraController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
+    connect(videoController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
 
-    connect(cameraController_, &VideoController::streamingLost, this,
+    connect(videoController_, &VideoController::streamingLost, this,
             &VideoWindow::onStreamingLost);
 
-    connect(cameraController_, &VideoController::startupTimeout, this,
+    connect(videoController_, &VideoController::startupTimeout, this,
             &VideoWindow::onStartupTimeout);
 
     // --- Controller → View / Window updates ---
 
-    connect(cameraController_, &VideoController::textStatsUpdated, imageViewer_,
+    connect(videoController_, &VideoController::textStatsUpdated, imageViewer_,
             &ImageViewerWidget::setText);
 
     // ---  View → Controller for display stats ---
 
-    connect(imageViewer_, &ImageViewerWidget::frameDisplayed, cameraController_,
+    connect(imageViewer_, &ImageViewerWidget::frameDisplayed, videoController_,
             &VideoController::onFrameDisplayed);
 
     // --- Application settings synchronization ---
@@ -407,7 +407,7 @@ void VideoWindow::setupConnections()
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this,
             &VideoWindow::updateApplyButton);
 
-    connect(cameraController_, &VideoController::downscaleChanged, this,
+    connect(videoController_, &VideoController::downscaleChanged, this,
             &VideoWindow::onDownscaleChanged);
 }
 
@@ -436,14 +436,14 @@ void VideoWindow::applyInitialSettings()
 
 void VideoWindow::bindApplicationSettingsToController()
 {
-    assert(cameraController_);
+    assert(videoController_);
 
     const auto& app = ApplicationSettings::instance();
 
-    connect(&app, &ApplicationSettings::videoSettingsChanged, cameraController_,
+    connect(&app, &ApplicationSettings::videoSettingsChanged, videoController_,
             &VideoController::onVideoSettingsChanged);
 
-    connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, cameraController_,
+    connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, videoController_,
             &VideoController::onVideoDisplaySettingsChanged);
 }
 
@@ -465,7 +465,7 @@ void VideoWindow::bindApplicationSettingsToView()
 
 void VideoWindow::bindUiToApplicationSettings()
 {
-    assert(displayBar_ && cameraSettingsWindow_);
+    assert(displayBar_ && videoSettingsWindow_);
 
     const auto& app = ApplicationSettings::instance();
 
@@ -473,7 +473,7 @@ void VideoWindow::bindUiToApplicationSettings()
             &ApplicationSettings::setVideoDisplayConfig);
 
     // commit settings
-    connect(cameraSettingsWindow_, &VideoSettingsWindow::videoComputeSettingsAccepted, &app,
+    connect(videoSettingsWindow_, &VideoSettingsWindow::videoComputeSettingsAccepted, &app,
             &ApplicationSettings::setVideoComputeSettings);
 }
 
@@ -625,7 +625,7 @@ void VideoWindow::setDeviceControlsEnabled(bool enabled)
 
 void VideoWindow::onToggleStreaming()
 {
-    assert(deviceSelector_ && cameraController_);
+    assert(deviceSelector_ && videoController_);
 
     if (configChangeInProgress_)
         return;
@@ -633,7 +633,7 @@ void VideoWindow::onToggleStreaming()
     if (deviceSelector_->currentIndex() < 0)
         return;
 
-    if (cameraController_->isStreaming())
+    if (videoController_->isStreaming())
         stopSource();
     else
         startSource();
@@ -641,12 +641,12 @@ void VideoWindow::onToggleStreaming()
 
 void VideoWindow::onApplySelection()
 {
-    assert(cameraController_);
+    assert(videoController_);
 
     if (configChangeInProgress_)
         return;
 
-    if (!cameraController_->isStreaming())
+    if (!videoController_->isStreaming())
         return;
 
     configChangeInProgress_ = true;
@@ -660,7 +660,7 @@ void VideoWindow::onDeviceChanged(int /*index*/)
 
 void VideoWindow::refreshFormatListFromSelection()
 {
-    assert(deviceSelector_ && formatSelector_ && cameraController_);
+    assert(deviceSelector_ && formatSelector_ && videoController_);
 
     ScopedUiUpdateGuard guard(isUpdatingUi_);
 
@@ -675,7 +675,7 @@ void VideoWindow::refreshFormatListFromSelection()
     sourceConfig_.cameraId = deviceId;
 
     // 👉 récupérer directement depuis la liste actuelle
-    const auto devices = cameraController_->videoInputs();
+    const auto devices = videoController_->videoInputs();
 
     const QCameraDevice* device = nullptr;
 
@@ -764,7 +764,7 @@ bool VideoWindow::hasPendingConfiguration() const
     if (sourceConfig_.type != SourceType::Camera)
         return false;
 
-    if (!cameraController_->isStreaming())
+    if (!videoController_->isStreaming())
         return false;
 
     if (sourceConfig_.cameraId.isEmpty() || streamingDeviceId_.isEmpty())
@@ -781,7 +781,7 @@ bool VideoWindow::hasPendingConfiguration() const
 
 void VideoWindow::showEvent(QShowEvent* event)
 {
-    emit cameraWindowShown();
+    emit videoWindowShown();
     QMainWindow::showEvent(event);
 }
 
@@ -796,7 +796,7 @@ void VideoWindow::closeEvent(QCloseEvent* event)
 
     settings.setValue("ui_geometry/camera_window", saveGeometry());
 
-    emit cameraWindowClosed();
+    emit videoWindowClosed();
     QMainWindow::closeEvent(event);
 }
 
@@ -829,7 +829,7 @@ void VideoWindow::ensureCameraPermission()
 void VideoWindow::connectFrameToView()
 {
     disconnect(frameToViewConnection_);
-    frameToViewConnection_ = connect(cameraController_, &VideoController::imageAndContourUpdated,
+    frameToViewConnection_ = connect(videoController_, &VideoController::imageAndContourUpdated,
                                      imageViewer_, &ImageViewerWidget::setImageAndContour);
 }
 
@@ -847,18 +847,18 @@ QCameraFormat VideoWindow::getSelectedFormat() const
 
 void VideoWindow::startSource()
 {
-    assert(cameraController_);
+    assert(videoController_);
 
     updateSourceConfigFromUi();
 
-    cameraController_->start(sourceConfig_);
+    videoController_->start(sourceConfig_);
 }
 
 void VideoWindow::stopSource()
 {
-    assert(cameraController_);
+    assert(videoController_);
 
-    cameraController_->stop();
+    videoController_->stop();
 }
 
 void VideoWindow::onStreamingStarting()
@@ -1034,9 +1034,9 @@ void VideoWindow::refreshActionButtons()
 
 void VideoWindow::updateStreamingButton()
 {
-    assert(cameraController_ && toggleStreamingButton_ && deviceSelector_);
+    assert(videoController_ && toggleStreamingButton_ && deviceSelector_);
 
-    switch (cameraController_->streamingState())
+    switch (videoController_->streamingState())
     {
         case StreamingState::Stopped:
             toggleStreamingButton_->setEnabled(true);
@@ -1068,9 +1068,9 @@ void VideoWindow::updateApplyButton()
 
 void VideoWindow::refreshUi()
 {
-    assert(cameraController_);
+    assert(videoController_);
 
-    updateDeviceList(cameraController_->videoInputs());
+    updateDeviceList(videoController_->videoInputs());
     refreshActionButtons();
 }
 
@@ -1231,7 +1231,7 @@ void VideoWindow::savePreferredFormats()
 
 void VideoWindow::loadPreferredFormats()
 {
-    assert(cameraController_);
+    assert(videoController_);
 
     QSettings settings;
 
@@ -1254,7 +1254,7 @@ void VideoWindow::loadPreferredFormats()
         // 👉 on ne peut pas reconstruire directement un QCameraFormat
         // donc on stocke une "cible" temporaire et on match plus tard
 
-        const auto inputs = cameraController_->videoInputs();
+        const auto inputs = videoController_->videoInputs();
 
         for (const auto& cam : inputs)
         {
@@ -1328,7 +1328,7 @@ void VideoWindow::saveSourceHistory()
 
 void VideoWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
 {
-    assert(cameraController_);
+    assert(videoController_);
 
     downscaleTitleStr_.clear();
 
@@ -1340,7 +1340,7 @@ void VideoWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
 
 void VideoWindow::updateWindowTitle()
 {
-    if (cameraController_ && cameraController_->isStreaming())
+    if (videoController_ && videoController_->isStreaming())
     {
         QString title = sourceTitleStr_;
 
@@ -1473,7 +1473,7 @@ void VideoWindow::openFile()
 
     sourceCombo_->setCurrentText(QUrl::fromLocalFile(filename).toString());
 
-    if (cameraController_->isStreaming())
+    if (videoController_->isStreaming())
     {
         configChangeInProgress_ = true;
         stopSource();

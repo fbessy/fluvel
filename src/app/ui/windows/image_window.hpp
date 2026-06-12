@@ -37,20 +37,17 @@ class ImageViewerWidget;
 class ImageController;
 
 /**
- * @brief Main application window for image processing and segmentation.
+ * @brief Main window for image-based active contour processing.
  *
- * This window provides the primary user interface to:
- * - open and display images
- * - control segmentation and processing workflows
- * - manage sessions (image, camera, analysis)
- * - access application settings and tools
+ * ImageWindow provides the primary user interface for image
+ * segmentation workflows and acts as the entry point to the
+ * image session.
  *
- * It coordinates:
- * - ImageViewerWidget for rendering
- * - ImageController for processing logic
- * - multiple child windows (camera, analysis, settings, etc.)
+ * It coordinates image loading, active contour execution,
+ * visualization and application settings.
  *
- * The class also manages recent files, user actions, and application state.
+ * The window can also launch the independent video session
+ * through VideoWindow.
  */
 class ImageWindow : public QMainWindow
 {
@@ -94,8 +91,8 @@ private:
     void onInputImageReady(const QImage& input);
     void onFileOpened(const QString& path);
     void onStateChanged(fluvel::WorkerState state);
-    void onCameraWindowShown();
-    void onCameraWindowClosed();
+    void onVideoWindowShown();
+    void onVideoWindowClosed();
 
     // --- Setup ---
     void setupUi();
@@ -127,7 +124,7 @@ private:
     void saveDisplayed();
 
     // --- UI ---
-    VideoWindow* cameraWindow_ = nullptr;
+    VideoWindow* videoWindow_ = nullptr;
     AnalysisWindow* analysisWindow_ = nullptr;
     SettingsWindow* settingsWindow_ = nullptr;
     AboutWindow* aboutWindow_ = nullptr;

@@ -28,7 +28,7 @@ class AlgoSettingsWidget;
  * @brief Dialog for configuring video session and processing settings.
  *
  * This dialog allows the user to configure parameters related to
- * video acquisition and processing, including:
+ * video reception and processing, including:
  * - downscaling options
  * - spatial and temporal processing
  * - algorithm parameters via AlgoSettingsWidget
@@ -41,12 +41,12 @@ class VideoSettingsWindow : public QDialog
 
 public:
     /**
-     * @brief Constructs the camera settings dialog.
-     * @param config Initial video session configuration.
+     * @brief Constructs the video settings dialog.
+     * @param config Initial video compute configuration.
      * @param parent Optional parent widget.
      *
      */
-    VideoSettingsWindow(const VideoSessionSettings& config, QWidget* parent = nullptr);
+    VideoSettingsWindow(const VideoComputeConfig& config, QWidget* parent = nullptr);
 
 signals:
     /**
@@ -99,8 +99,8 @@ private:
     QDialogButtonBox* dialogButtons_ = nullptr;
 
     // --- Model ---
-    VideoComputeConfig committedConfig_{}; // original
-    VideoComputeConfig editedConfig_{};    // UI en cours
+    VideoComputeConfig committedConfig_{}; // applied settings
+    VideoComputeConfig editedConfig_{};    // pending changes
 };
 
 } // namespace fluvel

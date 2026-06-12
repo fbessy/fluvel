@@ -91,30 +91,29 @@ private:
 };
 
 /**
- * @brief Main window handling camera streaming and visualization.
+ * @brief Main window for video source selection, streaming and visualization.
  *
  * This window provides the user interface to:
- * - select a camera device and format
+ * - select a video source (camera, URL or file)
+ * - configure camera formats when applicable
  * - start and stop video streaming
  * - display frames in an ImageViewerWidget
  * - configure processing and display settings
  *
  * It coordinates interactions between:
- * - VideoController (capture and streaming)
+ * - VideoController (video acquisition and streaming)
  * - ImageViewerWidget (display)
- * - settings widgets (camera and display)
+ * - settings widgets
  *
- * The class also manages device availability, preferred formats,
- * and streaming state.
+ * The class also manages source history, device availability,
+ * preferred camera formats and streaming state.
  */
 class VideoWindow : public QMainWindow
 {
     Q_OBJECT
 public:
     /**
-     * @brief Constructs the camera window.
-     *
-     * @param parent Optional parent widget.
+     * @brief Constructs the video window.
      */
     explicit VideoWindow(QWidget* parent = nullptr);
 
@@ -133,12 +132,12 @@ signals:
     /**
      * @brief Emitted when the window is shown.
      */
-    void cameraWindowShown();
+    void videoWindowShown();
 
     /**
      * @brief Emitted when the window is closed.
      */
-    void cameraWindowClosed();
+    void videoWindowClosed();
 
 protected:
     /**
@@ -238,7 +237,7 @@ private:
 
     static QString pixelFormatToString(QVideoFrameFormat::PixelFormat format);
 
-    VideoSettingsWindow* cameraSettingsWindow_ = nullptr;
+    VideoSettingsWindow* videoSettingsWindow_ = nullptr;
 
     QWidget* central_ = nullptr;
 
@@ -268,7 +267,7 @@ private:
     QByteArray streamingDeviceId_;
 
     ImageViewerWidget* imageViewer_ = nullptr;
-    VideoController* cameraController_ = nullptr;
+    VideoController* videoController_ = nullptr;
     QMetaObject::Connection frameToViewConnection_;
 
     QHash<QByteArray, DeviceStreamingStatus> deviceStreamingStatus_;

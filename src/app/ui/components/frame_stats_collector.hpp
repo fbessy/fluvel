@@ -4,7 +4,7 @@
 #pragma once
 
 #include "elapsed_timer.hpp"
-#include "frame_data.hpp"
+#include "frame_pipeline.hpp"
 
 #include <QMutex>
 #include <QtGlobal>
@@ -13,13 +13,13 @@ namespace fluvel
 {
 
 /**
- * @brief Computes real-time statistics for the frame processing pipeline.
+ * @brief Computes real-time statistics for the video processing pipeline.
  *
- * This class tracks frame lifecycle events (capture, processing, display)
+ * This class tracks frame lifecycle events (reception, processing and display)
  * and computes aggregated statistics over a sliding time window (~1 second).
  *
  * It provides metrics such as:
- * - capture / processing / display FPS
+ * - reception / processing / display FPS
  * - frame drop rate
  * - processing and display latencies
  * - average contour size
@@ -28,19 +28,17 @@ namespace fluvel
  * - All updates and reads are protected by a mutex
  * - snapshot() returns a stable copy of the last computed values
  *
- * The statistics are updated periodically based on an internal time window.
+ * Statistics are periodically recomputed using an internal sliding time window.
  */
-class FrameStatsView
+class FrameStatsCollector
 {
 public:
     /**
-     * @brief Snapshot of computed statistics.
-     *
-     * Values are averaged over the current time window.
+     * @brief Statistics computed over the current time window.
      */
     struct Snapshot
     {
-        double capturedFps{0.0};
+        double receivedFps{0.0};
         double processedFps{0.0};
         double displayedFps{0.0};
         double dropRate{0.0};
@@ -50,22 +48,22 @@ public:
         double avgContourSize{0.0};
     };
 
-    FrameStatsView();
+    FrameStatsCollector();
 
     /**
      * @name Frame events
      * @brief Notify the stats system of frame lifecycle events.
      * @{
      */
-    void frameCaptured();
+    void frameReceived();
     void frameProcessed(quint64 contourSize);
     void frameDisplayed(const FrameTimestamps& ts);
     /** @} */
 
     /**
-     * @brief Returns a stable snapshot of the current statistics.
+     * @brief Returns the most recently computed statistics snapshot.
      *
-     * The snapshot is computed over the last time window (~1 second).
+     * The returned values are averaged over the current statistics window.
      */
     Snapshot snapshot();
 
@@ -89,18 +87,18 @@ private:
     /// Duration of the statistics window (~1 second).
     static constexpr std::chrono::milliseconds kWindowMs{1000};
 
-    // snapshot précédent (pour affichage stable)
+    /// Last computed snapshot used for stable reporting.
     Snapshot lastSnapshot_{};
 
-    // compteurs fenêtre courante
-    quint64 capturedFrames_{0};
+    /// Frame counters for the current statistics window.
+    quint64 receivedFrames_{0};
     quint64 processedFrames_{0};
     quint64 displayedFrames_{0};
     quint64 droppedFrames_{0};
 
     quint64 contourSizeSum_{0};
 
-    // latence fenêtre
+    /// Latency accumulators for the current statistics window.
     double latencySumDisplayMs_{0.0};
     double latencyMaxDisplayMs_{0.0};
     double latencySumProcMs_{0.0};

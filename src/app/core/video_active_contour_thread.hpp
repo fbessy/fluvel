@@ -11,7 +11,7 @@
 #include "temporal_mean.hpp"
 #endif
 
-#include "frame_data.hpp"
+#include "frame_pipeline.hpp"
 
 #include <QVideoFrame>
 #include <QThread>
@@ -31,22 +31,22 @@ namespace fluvel
  * asynchronously on incoming video frames.
  *
  * The processing pipeline includes:
- * - frame acquisition from the capture layer
+ * - frame reception from the active video source
  * - optional preprocessing (downscaling and filtering)
  * - active contour computation
  * - conversion to display-ready data
  *
- * Processed frames are emitted to the UI layer while frame acquisition
+ * Processed frames are emitted to the UI layer while frame reception
  * continues independently.
  *
- * Internally, the thread maintains a pipeline of the form:
+ * Internally, the thread maintains the following pipeline:
  *
- * CapturedFrame → preprocessing → active contour → DisplayFrame
+ * ReceivedFrame → preprocessing → active contour → DisplayFrame
  *
  * Thread-safety is ensured through mutexes, condition variables
  * and atomic synchronization primitives.
  *
- * @note Designed for real-time processing with bounded time slices.
+ * @note Designed for real-time processing with bounded processing latency.
  */
 class VideoActiveContourThread : public QThread
 {
@@ -62,9 +62,9 @@ public:
      *
      * The frame may replace previously unprocessed frames depending on timing.
      *
-     * @param capturedFrame Frame received from capture layer.
+     * @param frame Frame received from the active video source.
      */
-    void submitFrame(const CapturedFrame& capturedFrame);
+    void submitFrame(const ReceivedFrame& frame);
 
     /**
      * @brief Stop the processing thread.
@@ -140,9 +140,6 @@ private:
     /// Condition variable for frame availability.
     QWaitCondition condition_;
 
-    /// Last received frame.
-    CapturedFrame lastCapturedFrame_;
-
     /// Whether a new frame is available.
     bool frameAvailable_{false};
 
@@ -165,8 +162,8 @@ private:
     /// Temporal smoothing filter.
     fluvel_ip::filter::TemporalMean temporalSmoother_;
 
-    /// Double buffer for captured frames.
-    CapturedFrame buffers_[2];
+    /// Double buffer for received frames.
+    ReceivedFrame buffers_[2];
 
     /// Index of the write buffer.
     std::atomic<int> writeIndex_{0};
