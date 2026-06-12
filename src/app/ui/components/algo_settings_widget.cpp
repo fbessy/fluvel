@@ -186,6 +186,18 @@ void AlgoSettingsWidget::accept()
 
 void AlgoSettingsWidget::reject()
 {
+    QSignalBlocker b1(connectivityCb_);
+    QSignalBlocker b2(naSpin_);
+    QSignalBlocker b3(nsSpin_);
+    QSignalBlocker b4(internalspeedGroupbox_);
+    QSignalBlocker b5(diskRadiusSpin_);
+    QSignalBlocker b6(lambdaOutSpin_);
+    QSignalBlocker b7(lambdaInSpin_);
+    QSignalBlocker b8(colorSpaceCb_);
+    QSignalBlocker b9(alphaSpin_);
+    QSignalBlocker b10(betaSpin_);
+    QSignalBlocker b11(gammaSpin_);
+
     int index = connectivityCb_->findData(QVariant::fromValue(config_.connectivity));
     if (index >= 0)
         connectivityCb_->setCurrentIndex(index);
