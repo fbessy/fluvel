@@ -173,12 +173,13 @@ private:
     void connectFrameToView();
 
     void refreshSourceUi();
-    void updateSourceConfigFromUi();
+    void updateSourceConfigFromUi(int sourceTypeComboIndex);
 
     void updateDeviceList(const QList<QCameraDevice>& devices);
     int computeBestDeviceIndex(const QByteArray& previousSelection, const QByteArray& newlyPlugged);
     void setDeviceControlsEnabled(bool enabled);
     void refreshActionButtons();
+    bool canStartSource() const;
     void updateStreamingButton();
     void updateApplyButton();
     void refreshUi();
@@ -231,8 +232,6 @@ private:
 
     QString sourceTitle(const StreamingInfo& info) const;
 
-    static QString pixelFormatToString(QVideoFrameFormat::PixelFormat format);
-
     VideoSettingsDialog* videoSettingsWindow_ = nullptr;
 
     QWidget* central_ = nullptr;
@@ -260,7 +259,6 @@ private:
     DisplaySettingsWidget* displayBar_ = nullptr;
 
     QSet<QByteArray> lastKnownDeviceIds_;
-    QByteArray streamingDeviceId_;
 
     ImageViewerWidget* imageViewer_ = nullptr;
     VideoController* videoController_ = nullptr;
@@ -278,14 +276,13 @@ private:
     bool configChangeInProgress_{false};
 
     QHash<QByteArray, QCameraFormat> preferredFormats_;
-    QCameraFormat activeFormat_;
 
     bool isUpdatingUi_{false};
 
     QString downscaleTitleStr_;
     QString sourceTitleStr_;
 
-    SourceConfig sourceConfig_;
+    SourceConfig sourceConfig_{};
 };
 
 } // namespace fluvel

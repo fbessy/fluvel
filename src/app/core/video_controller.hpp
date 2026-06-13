@@ -93,6 +93,11 @@ public:
     StreamingState streamingState() const;
 
     /**
+     * @brief Getter for active source info.
+     */
+    SourceInfo activeSource() const;
+
+    /**
      * @brief List available video input devices.
      */
     QList<QCameraDevice> videoInputs() const;

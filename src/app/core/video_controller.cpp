@@ -79,6 +79,9 @@ void VideoController::start(const SourceConfig& sourceConfig)
         case SourceType::Camera:
             start(sourceConfig.cameraId, sourceConfig.cameraFormat);
             return;
+
+        case SourceType::None:
+            return;
     }
 
     std::unreachable();
@@ -128,7 +131,7 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
                     camera_->setCameraFormat(*it);
             }
 
-            startupInfo_ = SourceInfo{};
+            startupInfo_ = {};
             startupInfo_.type = SourceType::Camera;
             startupInfo_.deviceId = camera_->cameraDevice().id();
             startupInfo_.deviceFormat = camera_->cameraFormat();
@@ -168,7 +171,7 @@ void VideoController::start(const QUrl& url)
     state_ = StreamingState::Starting;
     emit streamingStarting();
 
-    startupInfo_ = SourceInfo{};
+    startupInfo_ = {};
     startupInfo_.sourceUrl = url;
 
     if (startupInfo_.sourceUrl.isLocalFile())
@@ -299,7 +302,7 @@ void VideoController::onFrameReceived(const QVideoFrame& frame)
         frameStats_.reset();
         diagnosticsTimer_->start();
 
-        streamingInfo_ = StreamingInfo{};
+        streamingInfo_ = {};
         streamingInfo_.source = startupInfo_;
 
         streamingInfo_.frameSize = frame.size();
@@ -446,6 +449,14 @@ bool VideoController::isStreaming() const
 StreamingState VideoController::streamingState() const
 {
     return state_;
+}
+
+SourceInfo VideoController::activeSource() const
+{
+    if (state_ != StreamingState::Streaming)
+        return {};
+
+    return streamingInfo_.source;
 }
 
 QList<QCameraDevice> VideoController::videoInputs() const

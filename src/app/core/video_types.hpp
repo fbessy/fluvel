@@ -14,6 +14,7 @@ namespace fluvel
 
 enum class SourceType
 {
+    None,
     Camera,
     Url,
     File
@@ -21,7 +22,7 @@ enum class SourceType
 
 struct SourceConfig
 {
-    SourceType type{SourceType::Camera};
+    SourceType type{SourceType::None};
 
     QByteArray cameraId;
     QCameraFormat cameraFormat;
@@ -53,8 +54,10 @@ struct SourceInfo
 {
     /**
      * @brief Source type.
+     *
+     * SourceType::None indicates that no source is currently active.
      */
-    SourceType type{SourceType::Camera};
+    SourceType type{SourceType::None};
 
     /**
      * @brief Unique camera identifier.
