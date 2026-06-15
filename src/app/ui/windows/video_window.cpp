@@ -127,8 +127,17 @@ void VideoWindow::createUi()
     sourceCombo_ = new QComboBox(this);
     sourceCombo_->setEditable(true);
     sourceCombo_->lineEdit()->setPlaceholderText(
-        "https://video.mp4  https://stream.m3u8  rtsp://camera/live  "
-        "https://192.168.1.110:8080/video");
+        "https://video.mp4  https://stream.m3u8  rtsp://camera/live");
+    sourceCombo_->setToolTip(tr("Media URL examples:\n\n"
+                                "HTTP video:\n"
+                                "https://host/video.mp4\n\n"
+                                "HLS stream:\n"
+                                "https://host/stream.m3u8\n\n"
+                                "RTSP stream:\n"
+                                "rtsp://host/camera/live\n\n"
+                                "Local network camera:\n"
+                                "https://192.168.1.110:8080/video\n"
+                                "rtsp://192.168.1.110:1935/live"));
 
     clearButton_ = new QPushButton(tr("Clear"));
     QIcon deleteIcon =
@@ -979,19 +988,19 @@ void VideoWindow::onStreamingStopped()
     }
 }
 
-void VideoWindow::onCameraError(const SourceInfo& sourceInfo, QCamera::Error,
-                                const QString& errorString)
+void VideoWindow::onCameraError(const CameraErrorInfo& errorInfo)
 {
     assert(imageViewer_);
 
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
-    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description, errorString);
+    QString message =
+        tr("Source: %1\n\n%2").arg(errorInfo.sourceInfo.description, errorInfo.errorString);
 
     QMessageBox::warning(this, tr("Camera error"), message);
 
-    deviceStreamingStatus_[sourceInfo.deviceId] = DeviceStreamingStatus::Error;
+    deviceStreamingStatus_[errorInfo.sourceInfo.deviceId] = DeviceStreamingStatus::Error;
 
     // un switch raté devient un stop
     if (configChangeInProgress_)
@@ -1002,15 +1011,15 @@ void VideoWindow::onCameraError(const SourceInfo& sourceInfo, QCamera::Error,
     refreshUi();
 }
 
-void VideoWindow::onMediaPlayerError(const SourceInfo& sourceInfo, QMediaPlayer::Error,
-                                     const QString& errorString)
+void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 {
     assert(imageViewer_);
 
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
-    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description, errorString);
+    QString message =
+        tr("Source: %1\n\n%2").arg(errorInfo.sourceInfo.description, errorInfo.errorString);
 
     QMessageBox::warning(this, tr("Media error"), message);
 

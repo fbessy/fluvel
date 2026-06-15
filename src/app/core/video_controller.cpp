@@ -156,7 +156,18 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
     }
 
     if (!isFound)
-        emit cameraError(startupInfo_, QCamera::CameraError, tr("Camera not found"));
+    {
+        CameraErrorInfo err;
+
+        err.error = QCamera::NoError; // not a backend error
+        err.errorString = tr("Camera not found");
+        err.state = StreamingState::Starting;
+
+        err.sourceInfo.type = SourceType::Camera;
+        err.sourceInfo.deviceId = deviceId;
+
+        emit cameraError(err);
+    }
 }
 
 void VideoController::start(const QUrl& url)
@@ -412,7 +423,13 @@ void VideoController::onCameraError(QCamera::Error error, const QString& errorSt
     if (!camera_)
         return;
 
-    emit cameraError(startupInfo_, error, errorString);
+    CameraErrorInfo camError;
+    camError.error = error;
+    camError.errorString = errorString;
+    camError.sourceInfo = startupInfo_;
+    camError.state = state_;
+
+    emit cameraError(camError);
 }
 
 void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString)
@@ -420,7 +437,13 @@ void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QStrin
     if (!mediaPlayer_)
         return;
 
-    emit mediaPlayerError(startupInfo_, error, errorString);
+    MediaPlayerErrorInfo mediaError;
+    mediaError.error = error;
+    mediaError.errorString = errorString;
+    mediaError.sourceInfo = startupInfo_;
+    mediaError.state = state_;
+
+    emit mediaPlayerError(mediaError);
 }
 
 void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session)

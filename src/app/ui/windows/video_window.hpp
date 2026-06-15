@@ -210,10 +210,8 @@ private:
     void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
 
-    void onCameraError(const SourceInfo& sourceInfo, QCamera::Error error,
-                       const QString& errorString);
-    void onMediaPlayerError(const SourceInfo& sourceInfo, QMediaPlayer::Error error,
-                            const QString& errorString);
+    void onCameraError(const CameraErrorInfo& errorInfo);
+    void onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo);
 
     void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
     void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);

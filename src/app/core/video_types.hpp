@@ -3,7 +3,9 @@
 
 #pragma once
 
+#include <QCamera>
 #include <QCameraFormat>
+#include <QMediaPlayer>
 #include <QSize>
 #include <QString>
 #include <QUrl>
@@ -163,6 +165,72 @@ struct StreamingInfo
      * Zero when unknown or not applicable.
      */
     qint64 durationMs{0};
+};
+
+/**
+ * @brief Information describing a camera error.
+ *
+ * This structure captures the context of a camera-related error,
+ * including the source that triggered the error and the controller
+ * state at the time the error occurred.
+ *
+ * It is intended to be propagated through signals and used by the UI
+ * or higher-level components to present diagnostics and error messages.
+ */
+struct CameraErrorInfo
+{
+    /**
+     * @brief Camera error reported by Qt Multimedia.
+     */
+    QCamera::Error error;
+
+    /**
+     * @brief Human-readable error description.
+     */
+    QString errorString;
+
+    /**
+     * @brief Source associated with the error.
+     */
+    SourceInfo sourceInfo;
+
+    /**
+     * @brief Controller state when the error occurred.
+     */
+    StreamingState state;
+};
+
+/**
+ * @brief Information describing a media player error.
+ *
+ * This structure captures the context of a media playback error,
+ * including the source that triggered the error and the controller
+ * state at the time the error occurred.
+ *
+ * It is intended to be propagated through signals and used by the UI
+ * or higher-level components to present diagnostics and error messages.
+ */
+struct MediaPlayerErrorInfo
+{
+    /**
+     * @brief Media player error reported by Qt Multimedia.
+     */
+    QMediaPlayer::Error error;
+
+    /**
+     * @brief Human-readable error description.
+     */
+    QString errorString;
+
+    /**
+     * @brief Source associated with the error.
+     */
+    SourceInfo sourceInfo;
+
+    /**
+     * @brief Controller state when the error occurred.
+     */
+    StreamingState state;
 };
 
 } // namespace fluvel

@@ -499,6 +499,11 @@ QString AboutDialog::buildTechnicalSection()
 
     html += "<div style='margin-bottom:4px;'><b>" + tr("Media sources") + "</b></div>";
 
+    html += "<div style='margin-left:12px; font-size:9pt; color:#444; margin-bottom:6px;'>";
+    html += tr("Media source support is provided by Fluvel and Qt Multimedia.") + "<br>";
+    html += tr("Available video formats depend on the platform and multimedia backend.");
+    html += "</div>";
+
     html += "<div style='font-family:monospace; margin-bottom:8px;'>";
     html += tr("Camera devices") + "<br>";
     html += "HTTP / HTTPS<br>";

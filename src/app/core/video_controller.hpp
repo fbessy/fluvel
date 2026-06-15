@@ -30,8 +30,6 @@ class QAudioOutput;
 namespace fluvel
 {
 
-struct StreamingInfo;
-
 /**
  * @brief High-level controller for video streaming and processing.
  *
@@ -148,12 +146,10 @@ signals:
     void streamingStopped();
 
     /// Emitted on camera error.
-    void cameraError(const fluvel::SourceInfo& sourceInfo, QCamera::Error error,
-                     const QString& errorString);
+    void cameraError(const fluvel::CameraErrorInfo& errorInfo);
 
     /// Emitted on media player error.
-    void mediaPlayerError(const fluvel::SourceInfo& sourceInfo, QMediaPlayer::Error error,
-                          const QString& errorString);
+    void mediaPlayerError(const fluvel::MediaPlayerErrorInfo& errorInfo);
 
     /// Emitted when startup timeout is reached.
     void startupTimeout(const fluvel::SourceInfo& sourceInfo, double timeoutSec);
@@ -261,10 +257,10 @@ private:
     StreamingState state_ = StreamingState::Stopped;
 
     /// Information about the source being opened or streamed.
-    SourceInfo startupInfo_;
+    SourceInfo startupInfo_{};
 
     /// Runtime information about the active stream.
-    StreamingInfo streamingInfo_;
+    StreamingInfo streamingInfo_{};
 
     //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.
     int64_t lastValidFrameTsNs_{0};
