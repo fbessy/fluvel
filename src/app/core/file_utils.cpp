@@ -118,26 +118,13 @@ QString makeUniqueFileName(const QString& filePath)
 
 static QStringList extensionsForMediaFormat(QMediaFormat::FileFormat format)
 {
-    switch (format)
+    for (const auto& info : detail::kVideoFormats)
     {
-        case QMediaFormat::MPEG4:
-            return {"*.mp4", "*.m4v"};
-
-        case QMediaFormat::Matroska:
-            return {"*.mkv"};
-
-        case QMediaFormat::AVI:
-            return {"*.avi"};
-
-        case QMediaFormat::QuickTime:
-            return {"*.mov"};
-
-        case QMediaFormat::WebM:
-            return {"*.webm"};
-
-        default:
-            return {};
+        if (info.format == format)
+            return info.extensions;
     }
+
+    return {};
 }
 
 QString supportedVideoExtensions()
@@ -150,7 +137,10 @@ QString supportedVideoExtensions()
 
     for (auto format : formats)
     {
-        patterns.append(extensionsForMediaFormat(format));
+        for (const auto& ext : extensionsForMediaFormat(format))
+        {
+            patterns << "*." + ext;
+        }
     }
 
     patterns.removeDuplicates();
@@ -176,5 +166,27 @@ bool isSupportedVideoFile(const QString& path)
     QStringList extensions = supportedVideoExtensions().split(' ');
 
     return extensions.contains(suffix, Qt::CaseInsensitive);
+}
+
+QString supportedVideoFormats()
+{
+    QStringList formats;
+
+    QMediaFormat mediaFormat;
+
+    const auto supported = mediaFormat.supportedFileFormats(QMediaFormat::Decode);
+
+    for (auto format : supported)
+    {
+        for (const auto& ext : extensionsForMediaFormat(format))
+        {
+            formats << ext.toUpper();
+        }
+    }
+
+    formats.removeDuplicates();
+    formats.sort();
+
+    return formats.join(", ");
 }
 }

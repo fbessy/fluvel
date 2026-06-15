@@ -3,6 +3,7 @@
 
 #include "about_dialog.hpp"
 #include "application_settings.hpp"
+#include "file_utils.hpp"
 #include "icon_loader.hpp"
 
 #include <QCryptographicHash>
@@ -476,9 +477,8 @@ QString AboutDialog::buildTechnicalSection()
 
     html += "<div style='margin-left:12px;'>";
 
-    html += "<div style='margin-bottom:6px;'>"
-            "<b>" +
-            tr("Version") + ":</b> " + buildVersionString() + "</div>";
+    html += "<div style='margin-bottom:8px;'><b>" + tr("Version") + ":</b> " +
+            buildVersionString() + "</div>";
 
     html += "<div style='margin-bottom:4px;'><b>" + tr("Configuration directory") + "</b></div>";
 
@@ -491,9 +491,20 @@ QString AboutDialog::buildTechnicalSection()
     html += tr("Available formats depend on the Qt installation and platform.");
     html += "</div>";
 
-    html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word;'>";
-    html += "<b>" + tr("Read") + " :</b> " + readFormats.join(", ") + "<br>";
-    html += "<b>" + tr("Write") + ":</b> " + writeFormats.join(", ");
+    html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word; "
+            "margin-bottom:8px;'>";
+    html += tr("Read") + ": " + readFormats.join(", ") + "<br>";
+    html += tr("Write") + ": " + writeFormats.join(", ");
+    html += "</div>";
+
+    html += "<div style='margin-bottom:4px;'><b>" + tr("Media sources") + "</b></div>";
+
+    html += "<div style='font-family:monospace; margin-bottom:8px;'>";
+    html += tr("Camera devices") + "<br>";
+    html += "HTTP / HTTPS<br>";
+    html += "RTSP<br>";
+    html += "HLS (M3U8)<br>";
+    html += tr("Local files (") + file_utils::supportedVideoFormats() + ")";
     html += "</div>";
 
     html += "</div>"; // end Application block

@@ -13,10 +13,36 @@
 
 #pragma once
 
+#include <QMediaFormat>
 #include <QString>
+#include <QStringList>
 
 namespace fluvel::file_utils
 {
+
+/**
+ * @brief Associates a Qt multimedia container format with file extensions.
+ *
+ * This structure is used as a central mapping between
+ * QMediaFormat::FileFormat values reported by Qt Multimedia
+ * and the corresponding filename extensions used by Fluvel.
+ */
+struct MediaFormatInfo
+{
+    QMediaFormat::FileFormat format;
+    QStringList extensions;
+};
+
+namespace detail
+{
+inline const std::array<MediaFormatInfo, 7> kVideoFormats = {{{QMediaFormat::WMV, {"wmv"}},
+                                                              {QMediaFormat::AVI, {"avi"}},
+                                                              {QMediaFormat::Matroska, {"mkv"}},
+                                                              {QMediaFormat::MPEG4, {"mp4", "m4v"}},
+                                                              {QMediaFormat::Ogg, {"ogg", "ogv"}},
+                                                              {QMediaFormat::QuickTime, {"mov"}},
+                                                              {QMediaFormat::WebM, {"webm"}}}};
+}
 
 /**
  * @brief Build a file dialog filter for supported image formats.
@@ -139,5 +165,21 @@ QString buildVideoFilter();
  * the file can actually be opened or decoded.
  */
 bool isSupportedVideoFile(const QString& path);
+
+/**
+ * @brief Returns supported video file formats as human-readable names.
+ *
+ * The formats are derived from the multimedia backend capabilities
+ * reported by Qt Multimedia for media decoding.
+ *
+ * Unlike supportedVideoExtensions(), this function returns
+ * uppercase format names intended for display in the user interface.
+ *
+ * Example:
+ * "AVI, M4V, MKV, MOV, MP4, WEBM"
+ *
+ * @return Comma-separated list of supported video formats.
+ */
+QString supportedVideoFormats();
 
 } // namespace fluvel::file_utils
