@@ -38,10 +38,23 @@ bool DragDropBehavior::dragEnter(ImageViewerWidget& view, QDragEnterEvent* e)
     return true;
 }
 
-bool DragDropBehavior::dragMove(ImageViewerWidget&, QDragMoveEvent* e)
+bool DragDropBehavior::dragMove(ImageViewerWidget& view, QDragMoveEvent* e)
 {
-    e->acceptProposedAction();
-    return true;
+    const auto urls = e->mimeData()->urls();
+
+    if (urls.isEmpty())
+        return false;
+
+    const QString path = urls.first().toLocalFile();
+
+    const bool accepted = acceptsFile(path);
+
+    view.setDragHighlight(accepted);
+
+    if (accepted)
+        e->acceptProposedAction();
+
+    return accepted;
 }
 
 bool DragDropBehavior::dragLeave(ImageViewerWidget& view, QDragLeaveEvent*)
