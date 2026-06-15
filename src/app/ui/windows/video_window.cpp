@@ -987,7 +987,7 @@ void VideoWindow::onCameraError(const SourceInfo& sourceInfo, QCamera::Error,
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
-    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description).arg(errorString);
+    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description, errorString);
 
     QMessageBox::warning(this, tr("Camera error"), message);
 
@@ -1010,7 +1010,7 @@ void VideoWindow::onMediaPlayerError(const SourceInfo& sourceInfo, QMediaPlayer:
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
-    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description).arg(errorString);
+    QString message = tr("Source: %1\n\n%2").arg(sourceInfo.description, errorString);
 
     QMessageBox::warning(this, tr("Media error"), message);
 
@@ -1080,7 +1080,7 @@ bool VideoWindow::canStartSource() const
 
             if (url.isLocalFile())
             {
-                return QFileInfo(url.toLocalFile()).exists();
+                return QFileInfo::exists(url.toLocalFile());
             }
 
             return true;

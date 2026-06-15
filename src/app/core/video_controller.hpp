@@ -148,18 +148,18 @@ signals:
     void streamingStopped();
 
     /// Emitted on camera error.
-    void cameraError(const SourceInfo& sourceInfo, QCamera::Error error,
+    void cameraError(const fluvel::SourceInfo& sourceInfo, QCamera::Error error,
                      const QString& errorString);
 
     /// Emitted on media player error.
-    void mediaPlayerError(const SourceInfo& sourceInfo, QMediaPlayer::Error error,
+    void mediaPlayerError(const fluvel::SourceInfo& sourceInfo, QMediaPlayer::Error error,
                           const QString& errorString);
 
     /// Emitted when startup timeout is reached.
-    void startupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
+    void startupTimeout(const fluvel::SourceInfo& sourceInfo, double timeoutSec);
 
     /// Emitted when stream loss is detected.
-    void streamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
+    void streamingLost(const fluvel::StreamingInfo& streamingInfo, double frameAgeSec);
 
     /// Emitted with updated textual statistics.
     void textStatsUpdated(const QString& textStats);
