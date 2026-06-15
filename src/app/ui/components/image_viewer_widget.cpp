@@ -737,7 +737,12 @@ void ImageViewerWidget::drawForeground(QPainter* painter, const QRectF& rect)
         f.setPointSize(f.pointSize() + 2);
         painter->setFont(f);
 
-        painter->drawText(rect, Qt::AlignCenter, tr("Drop an image here\nor\nFile → Open"));
+        QString text;
+
+        if (interaction_)
+            text = interaction_->placeholderText();
+
+        painter->drawText(rect, Qt::AlignCenter, text);
     }
 
     painter->restore();

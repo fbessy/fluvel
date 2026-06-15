@@ -7,6 +7,7 @@
 #include "camera_format_utils.hpp"
 #include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
+#include "drag_drop_behavior.hpp"
 #include "file_utils.hpp"
 #include "fullscreen_behavior.hpp"
 #include "icon_loader.hpp"
@@ -235,6 +236,8 @@ void VideoWindow::setupView()
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
+    interaction->addBehavior(std::make_unique<DragDropBehavior>(
+        DragDropContent::Videos, tr("Drop a video here\n\nor click Open...")));
     imageViewer_->setInteraction(interaction.release());
 }
 
@@ -360,6 +363,9 @@ void VideoWindow::setupConnections()
 
     connect(settingsButton_, &QPushButton::clicked, videoSettingsWindow_,
             &VideoSettingsDialog::show);
+
+    // when the user drag and drop a video in the view of the video window.
+    connect(imageViewer_, &ImageViewerWidget::imageDropped, this, &VideoWindow::openMediaFile);
 
     // --- Hardware events (camera devices) ---
 
@@ -1358,6 +1364,11 @@ void VideoWindow::openFile()
     QString filename = QFileDialog::getOpenFileName(
         this, tr("Open Video File"), lastVideoDirectory(), file_utils::buildVideoFilter());
 
+    openMediaFile(filename);
+}
+
+void VideoWindow::openMediaFile(const QString& filename)
+{
     if (filename.isEmpty())
         return;
 

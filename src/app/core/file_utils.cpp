@@ -163,4 +163,18 @@ QString buildVideoFilter()
 {
     return QObject::tr("Video Files (%1)").arg(supportedVideoExtensions());
 }
+
+bool isSupportedVideoFile(const QString& path)
+{
+    QFileInfo fi(path);
+
+    if (!fi.exists())
+        return false;
+
+    const QString suffix = "*." + fi.suffix().toLower();
+
+    QStringList extensions = supportedVideoExtensions().split(' ');
+
+    return extensions.contains(suffix, Qt::CaseInsensitive);
+}
 }

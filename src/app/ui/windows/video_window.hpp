@@ -185,6 +185,7 @@ private:
     void refreshUi();
 
     void openFile();
+    void openMediaFile(const QString& filename);
 
     void onToggleStreaming();
     void onApplySelection();

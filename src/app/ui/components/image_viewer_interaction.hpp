@@ -93,6 +93,14 @@ public:
     /** @} */
 
     /**
+     * @brief Returns the placeholder text displayed by the viewer.
+     */
+    virtual QString placeholderText() const
+    {
+        return {};
+    }
+
+    /**
      * @name Interaction state
      * @brief Cursor and lifecycle control.
      * @{

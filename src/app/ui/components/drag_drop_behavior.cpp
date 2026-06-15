@@ -2,19 +2,34 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "drag_drop_behavior.hpp"
+#include "file_utils.hpp"
 
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QString>
 
 namespace fluvel
 {
 
+DragDropBehavior::DragDropBehavior(DragDropContent content, const QString& placeholder)
+    : content_(content)
+    , placeholder_(placeholder)
+{
+}
+
 bool DragDropBehavior::dragEnter(ImageViewerWidget& view, QDragEnterEvent* e)
 {
-    if (!e->mimeData()->hasUrls())
+    const auto urls = e->mimeData()->urls();
+
+    if (urls.isEmpty())
+        return false;
+
+    const QString path = urls.first().toLocalFile();
+
+    if (!acceptsFile(path))
         return false;
 
     view.setDragHighlight(true);
@@ -53,6 +68,29 @@ bool DragDropBehavior::drop(ImageViewerWidget& view, QDropEvent* e)
 
     e->acceptProposedAction();
     return true;
+}
+
+bool DragDropBehavior::acceptsFile(const QString& filename) const
+{
+    switch (content_)
+    {
+        case DragDropContent::Images:
+            return file_utils::isSupportedImage(filename);
+
+        case DragDropContent::Videos:
+            return file_utils::isSupportedVideoFile(filename);
+
+        case DragDropContent::ImagesAndVideos:
+            return file_utils::isSupportedImage(filename) ||
+                   file_utils::isSupportedVideoFile(filename);
+    }
+
+    return false;
+}
+
+QString DragDropBehavior::placeholderText() const
+{
+    return placeholder_;
 }
 
 } // namespace fluvel

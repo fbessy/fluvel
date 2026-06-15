@@ -123,7 +123,7 @@ void ImageWindow::setupUi()
     rightPanelToggle_ = new RightPanelToggleButton;
 
     settingsButton_ = new QPushButton;
-    settingsButton_->setToolTip(tr("Image session settings"));
+    settingsButton_->setToolTip(tr("Open image session settings."));
     settingsButton_->setFlat(true);
     settingsButton_->setFocusPolicy(Qt::NoFocus);
 
@@ -172,7 +172,8 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
-    interaction->addBehavior(std::make_unique<DragDropBehavior>());
+    interaction->addBehavior(std::make_unique<DragDropBehavior>(
+        DragDropContent::Images, tr("Drop an image here\nor\nFile → Open")));
     imageViewer_->setInteraction(interaction.release());
 
     // --- Display bar (à droite) ---

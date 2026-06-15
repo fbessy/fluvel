@@ -172,6 +172,17 @@ bool InteractionSet::drop(ImageViewerWidget& view, QDropEvent* event)
     return false;
 }
 
+QString InteractionSet::placeholderText() const
+{
+    for (const auto& behavior : behaviors_)
+    {
+        if (!behavior->placeholderText().isEmpty())
+            return behavior->placeholderText();
+    }
+
+    return {};
+}
+
 void InteractionSet::cancel()
 {
     if (auto* b = capturingBehavior())

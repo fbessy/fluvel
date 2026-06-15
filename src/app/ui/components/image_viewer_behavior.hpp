@@ -10,6 +10,7 @@
 #include <QDragLeaveEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QString>
 
 class QMouseEvent;
 
@@ -97,6 +98,14 @@ public:
     }
 
     /** @} */
+
+    /**
+     * @brief Returns the placeholder text displayed by the viewer.
+     */
+    virtual QString placeholderText() const
+    {
+        return {};
+    }
 
     /**
      * @name Interaction state

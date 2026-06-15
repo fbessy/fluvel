@@ -54,14 +54,15 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
     // interaction->addBehavior(std::make_unique<FullscreenBehavior>());
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<ColorPickerBehavior>());
-    interaction->addBehavior(std::make_unique<DragDropBehavior>());
+    interaction->addBehavior(std::make_unique<DragDropBehavior>(
+        DragDropContent::Images, tr("Drop an image here\n\nor click Open...")));
     imageViewer_->setInteraction(interaction.release());
 
     imageViewer_->setListener(this);
 
     ///////////////////////////////////////
 
-    openButton_ = new QPushButton(tr("Open image") + " " + QString::number(idThis_));
+    openButton_ = new QPushButton(tr("Open..."));
 
     QVBoxLayout* img_layout = new QVBoxLayout;
     img_layout->addWidget(nameLabel_);

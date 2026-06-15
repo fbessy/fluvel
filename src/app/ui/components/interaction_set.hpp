@@ -156,6 +156,11 @@ protected:
     bool drop(ImageViewerWidget& view, QDropEvent* event) override;
 
     /**
+     * @brief Returns the placeholder text displayed by the viewer.
+     */
+    QString placeholderText() const override;
+
+    /**
      * @brief Cancels all active behaviors.
      *
      * Typically used to reset interaction state.

@@ -131,4 +131,13 @@ QString supportedVideoExtensions();
  */
 QString buildVideoFilter();
 
+/**
+ * @brief Checks whether the file extension is supported for video decoding.
+ *
+ * This function validates the filename extension against the list of
+ * video formats reported by Qt Multimedia. It does not verify that
+ * the file can actually be opened or decoded.
+ */
+bool isSupportedVideoFile(const QString& path);
+
 } // namespace fluvel::file_utils
