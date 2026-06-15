@@ -116,6 +116,7 @@ set(app_src
     ${CORE_DIR}/video_controller.cpp
     ${CORE_DIR}/video_controller.hpp
 
+    ${CORE_DIR}/video_types.cpp
     ${CORE_DIR}/video_types.hpp
 
     ${CORE_DIR}/active_contour_worker.cpp

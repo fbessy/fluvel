@@ -12,14 +12,28 @@
 namespace fluvel
 {
 
+/**
+ * @brief Supported video source types.
+ */
 enum class SourceType
 {
     None,
     Camera,
-    Url,
-    File
+    Media
 };
 
+/**
+ * @brief User-selected source configuration.
+ *
+ * Contains the parameters required to start a video source.
+ *
+ * This structure represents the desired source state as configured
+ * from the user interface before the source is started.
+ *
+ * Depending on the source type, only a subset of the fields is used:
+ * - cameraId and cameraFormat for camera sources
+ * - url for media sources
+ */
 struct SourceConfig
 {
     SourceType type{SourceType::None};
@@ -41,10 +55,10 @@ enum class StreamingState
 };
 
 /**
- * @brief Information about a video source.
+ * @brief Runtime information about a configured video source.
  *
- * Contains the source selected by the user and the resolved
- * information required to identify it during its lifetime.
+ * Extends SourceConfig with information resolved during source
+ * initialization, such as the source description.
  *
  * This information is available before the first frame is received
  * and can therefore be used for startup failures, source errors,
@@ -93,6 +107,21 @@ struct SourceInfo
      * - Video file name
      */
     QString description;
+
+    /**
+     * @brief Checks whether this active source matches the given source configuration.
+     *
+     * Compares the source type and the parameters that uniquely identify the source:
+     * - camera device and format for camera sources
+     * - URL for media sources
+     *
+     * The human-readable description is ignored.
+     *
+     * @param config Source configuration to compare against.
+     *
+     * @return true if both represent the same source configuration, false otherwise.
+     */
+    bool matches(const SourceConfig& config) const;
 };
 
 /**

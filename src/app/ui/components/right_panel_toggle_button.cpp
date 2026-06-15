@@ -26,7 +26,7 @@ void RightPanelToggleButton::updateAppearance(bool checked)
 {
     setIcon(checked ? iconOn_ : iconOff_);
 
-    setToolTip(checked ? tr("Right panel is visible.") : tr("Right panel is hidden."));
+    setToolTip(checked ? tr("Hide right panel.") : tr("Show right panel."));
 }
 
 } // namespace fluvel

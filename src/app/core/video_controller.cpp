@@ -71,13 +71,12 @@ void VideoController::start(const SourceConfig& sourceConfig)
 {
     switch (sourceConfig.type)
     {
-        case SourceType::Url:
-        case SourceType::File:
-            start(sourceConfig.url);
-            return;
-
         case SourceType::Camera:
             start(sourceConfig.cameraId, sourceConfig.cameraFormat);
+            return;
+
+        case SourceType::Media:
+            start(sourceConfig.url);
             return;
 
         case SourceType::None:
@@ -172,13 +171,8 @@ void VideoController::start(const QUrl& url)
     emit streamingStarting();
 
     startupInfo_ = {};
+    startupInfo_.type = SourceType::Media;
     startupInfo_.sourceUrl = url;
-
-    if (startupInfo_.sourceUrl.isLocalFile())
-        startupInfo_.type = SourceType::File;
-    else
-        startupInfo_.type = SourceType::Url;
-
     startupInfo_.description = shortSourceName(startupInfo_.sourceUrl);
 
     mediaPlayer_ = new QMediaPlayer(this);

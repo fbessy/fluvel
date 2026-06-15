@@ -93,9 +93,10 @@ void VideoWindow::createUi()
     sourceLabel_ = new QLabel(tr("Source: "));
 
     sourceTypeCombo_ = new QComboBox(this);
+    sourceTypeCombo_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     sourceTypeCombo_->addItem(tr("Camera"), QVariant::fromValue(SourceType::Camera));
-    sourceTypeCombo_->addItem(tr("URL"), QVariant::fromValue(SourceType::Url));
-    sourceTypeCombo_->addItem(tr("File"), QVariant::fromValue(SourceType::File));
+    sourceTypeCombo_->addItem(tr("File / URL"), QVariant::fromValue(SourceType::Media));
+    sourceTypeCombo_->setToolTip(tr("Select a camera, video file, or network stream."));
 
     deviceLabel_ = new QLabel(tr("Device: "));
     deviceSelector_ = new QComboBox(this);
@@ -114,21 +115,27 @@ void VideoWindow::createUi()
     formatSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     static constexpr int kFormatIconSize{16};
     formatSelector_->setIconSize(QSize(kFormatIconSize, kFormatIconSize));
+    formatSelector_->setToolTip(tr("Camera resolution, frame rate and pixel format."));
 
     formatActiveIcon_ = createActiveFormatIcon();
     formatAvailableIcon_ = createEmptyIcon(kFormatIconSize);
 
     openFileButton_ = new QPushButton(tr("Open..."));
     openFileButton_->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    openFileButton_->setToolTip(tr("Select a local video file."));
 
     sourceCombo_ = new QComboBox(this);
     sourceCombo_->setEditable(true);
+    sourceCombo_->lineEdit()->setPlaceholderText(
+        "https://video.mp4  https://stream.m3u8  rtsp://camera/live  "
+        "https://192.168.1.110:8080/video");
 
     clearButton_ = new QPushButton(tr("Clear"));
     QIcon deleteIcon =
         il::loadIcon(QIcon::ThemeIcon::EditClear, ":/icons/actions/edit-clear-history.svg");
 
     clearButton_->setIcon(deleteIcon);
+    clearButton_->setToolTip(tr("Remove all saved source addresses."));
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                               ":/icons/media/media-playback-start-symbolic.svg");
@@ -142,7 +149,7 @@ void VideoWindow::createUi()
     applyButton_->setVisible(false);
     applyButton_->setFlat(true);
     applyButton_->setText(tr("Apply"));
-    applyButton_->setToolTip(tr("Apply selected camera and format."));
+    applyButton_->setToolTip(tr("Restart the active source using the selected configuration."));
 
     QIcon applyIcon = createActiveFormatIcon();
     applyButton_->setIcon(applyIcon);
@@ -150,7 +157,7 @@ void VideoWindow::createUi()
     rightPanelToggle_ = new RightPanelToggleButton;
 
     settingsButton_ = new QPushButton;
-    settingsButton_->setToolTip(tr("Camera session settings"));
+    settingsButton_->setToolTip(tr("Open video session settings."));
     settingsButton_->setFlat(true);
     settingsButton_->setFocusPolicy(Qt::NoFocus);
 
@@ -254,42 +261,46 @@ void VideoWindow::setupLayout()
     vLayout->setSpacing(0);
 
     QWidget* controlBar = new QWidget(central_);
-    QHBoxLayout* controlLayout = new QHBoxLayout(controlBar); // 👈 direct en horizontal
-    controlLayout->setContentsMargins(8, 4, 8, 4);
-    controlLayout->setSpacing(8);
 
-    // Device
-    controlLayout->addWidget(sourceLabel_);
-    controlLayout->addWidget(sourceTypeCombo_);
+    QVBoxLayout* controlBarLayout = new QVBoxLayout(controlBar);
+    controlBarLayout->setContentsMargins(8, 4, 8, 4);
+    controlBarLayout->setSpacing(8);
 
-    // Device
-    controlLayout->addWidget(deviceLabel_);
-    controlLayout->addWidget(deviceSelector_);
+    QHBoxLayout* configLayout = new QHBoxLayout;
+    configLayout->setSpacing(4);
 
-    // Format
-    controlLayout->addSpacing(12);
-    controlLayout->addWidget(formatLabel_);
-    controlLayout->addWidget(formatSelector_);
+    QHBoxLayout* actionLayout = new QHBoxLayout;
 
-    // File/Url
-    controlLayout->addWidget(openFileButton_);
-    controlLayout->addWidget(sourceCombo_, 1);
-    controlLayout->addWidget(clearButton_);
+    configLayout->addWidget(sourceLabel_);
+    configLayout->addWidget(sourceTypeCombo_);
+    configLayout->addSpacing(20);
 
-    // Action principale
-    controlLayout->addSpacing(12);
-    controlLayout->addWidget(toggleStreamingButton_);
-    controlLayout->addWidget(applyButton_);
+    configLayout->addWidget(deviceLabel_);
+    configLayout->addWidget(deviceSelector_);
 
-    // Stretch → pousse le reste à droite
-    controlLayout->addStretch();
+    configLayout->addWidget(formatLabel_);
+    configLayout->addWidget(formatSelector_);
 
-    // Actions secondaires
-    controlLayout->addWidget(rightPanelToggle_);
-    controlLayout->addSpacing(8);
-    controlLayout->addWidget(settingsButton_);
+    configLayout->addWidget(openFileButton_);
 
-    // --- Layout contenu principal ---
+    configLayout->addWidget(sourceCombo_, 1);
+    configLayout->addWidget(clearButton_);
+
+    configLayout->addStretch();
+
+    configLayout->addWidget(rightPanelToggle_);
+    configLayout->addSpacing(8);
+    configLayout->addWidget(settingsButton_);
+
+    actionLayout->addWidget(toggleStreamingButton_);
+    actionLayout->addWidget(applyButton_);
+    actionLayout->addStretch();
+
+    int sourceWidth = sourceLabel_->sizeHint().width() + sourceTypeCombo_->sizeHint().width() +
+                      configLayout->spacing();
+
+    toggleStreamingButton_->setFixedWidth(sourceWidth);
+
     QHBoxLayout* contentLayout = new QHBoxLayout();
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
@@ -297,7 +308,9 @@ void VideoWindow::setupLayout()
     contentLayout->addWidget(imageViewer_, 1);
     contentLayout->addWidget(displayBar_, 0);
 
-    // Assemblage
+    controlBarLayout->addLayout(configLayout);
+    controlBarLayout->addLayout(actionLayout);
+
     vLayout->addWidget(controlBar);
     vLayout->addLayout(contentLayout);
 
@@ -316,7 +329,7 @@ void VideoWindow::setupConnections()
                 saveLastSourceType();
 
                 refreshSourceUi();
-                refreshActionButtons();
+                updateActionBar();
             });
 
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this, &VideoWindow::onDeviceChanged);
@@ -327,8 +340,6 @@ void VideoWindow::setupConnections()
                 if (isUpdatingUi_)
                     return;
 
-                updateApplyButton();
-
                 auto fmt = getSelectedFormat();
 
                 if (!fmt.isNull() && !sourceConfig_.cameraId.isEmpty())
@@ -336,13 +347,15 @@ void VideoWindow::setupConnections()
                     sourceConfig_.cameraFormat = fmt;
                     savePreferredFormats();
                 }
+
+                updateApplyButton();
             });
 
     connect(sourceCombo_->lineEdit(), &QLineEdit::textChanged, this,
             [this]()
             {
                 updateSourceConfigFromUi(sourceTypeCombo_->currentIndex());
-                refreshActionButtons();
+                updateActionBar();
             });
 
     connect(openFileButton_, &QPushButton::clicked, this, &VideoWindow::openFile);
@@ -499,28 +512,16 @@ void VideoWindow::refreshSourceUi()
     assert(sourceTypeCombo_ && sourceCombo_);
 
     bool cameraMode = (sourceConfig_.type == SourceType::Camera);
-    bool urlMode = (sourceConfig_.type == SourceType::Url);
-    bool fileMode = (sourceConfig_.type == SourceType::File);
+    bool mediaMode = (sourceConfig_.type == SourceType::Media);
 
     deviceLabel_->setVisible(cameraMode);
     deviceSelector_->setVisible(cameraMode);
     formatLabel_->setVisible(cameraMode);
     formatSelector_->setVisible(cameraMode);
 
-    openFileButton_->setVisible(fileMode);
-    sourceCombo_->setVisible(!cameraMode);
-    clearButton_->setVisible(!cameraMode);
-
-    if (urlMode)
-    {
-        sourceCombo_->lineEdit()->setPlaceholderText(
-            "https://video.mp4  https://stream.m3u8  rtsp://camera/live  "
-            "https://192.168.1.110:8080/video");
-    }
-    else if (fileMode)
-    {
-        sourceCombo_->lineEdit()->setPlaceholderText(tr("Open a local video file..."));
-    }
+    openFileButton_->setVisible(mediaMode);
+    sourceCombo_->setVisible(mediaMode);
+    clearButton_->setVisible(mediaMode);
 }
 
 void VideoWindow::updateSourceConfigFromUi(int sourceTypeComboIndex)
@@ -536,8 +537,7 @@ void VideoWindow::updateSourceConfigFromUi(int sourceTypeComboIndex)
             sourceConfig_.cameraFormat = getSelectedFormat();
             return;
 
-        case SourceType::Url:
-        case SourceType::File:
+        case SourceType::Media:
             sourceConfig_.url = QUrl::fromUserInput(sourceCombo_->currentText().trimmed());
             return;
 
@@ -781,28 +781,13 @@ void VideoWindow::updateFormatList(const QList<QCameraFormat>& formats)
 
 bool VideoWindow::hasPendingConfiguration() const
 {
-    assert(videoController_);
-
-    if (sourceConfig_.type != SourceType::Camera)
-        return false;
-
     if (!videoController_->isStreaming())
         return false;
 
-    const auto activeSource = videoController_->activeSource();
-    const auto streamingDeviceId = activeSource.deviceId;
-    const auto activeFormat = activeSource.deviceFormat;
-
-    if (sourceConfig_.cameraId.isEmpty() || streamingDeviceId.isEmpty())
+    if (!canStartSource())
         return false;
 
-    const auto selectedFormat = getSelectedFormat();
-
-    if (selectedFormat.isNull() || activeFormat.isNull())
-        return false;
-
-    return sourceConfig_.cameraId != streamingDeviceId ||
-           !camera_utils::isSameCameraFormat(selectedFormat, activeFormat);
+    return !videoController_->activeSource().matches(sourceConfig_);
 }
 
 void VideoWindow::showEvent(QShowEvent* event)
@@ -1068,7 +1053,7 @@ void VideoWindow::onStreamingLost(const StreamingInfo& streamingInfo, double fra
     refreshUi();
 }
 
-void VideoWindow::refreshActionButtons()
+void VideoWindow::updateActionBar()
 {
     updateStreamingButton();
     updateApplyButton();
@@ -1081,8 +1066,7 @@ bool VideoWindow::canStartSource() const
         case SourceType::Camera:
             return deviceSelector_->count() > 0 && deviceSelector_->currentIndex() >= 0;
 
-        case SourceType::File:
-        case SourceType::Url:
+        case SourceType::Media:
         {
             QString text = sourceCombo_->currentText().trimmed();
 
@@ -1118,14 +1102,14 @@ void VideoWindow::updateStreamingButton()
         case StreamingState::Stopped:
             toggleStreamingButton_->setEnabled(canStartSource());
             toggleStreamingButton_->setText(tr("Start"));
-            toggleStreamingButton_->setToolTip(tr("Start camera streaming."));
+            toggleStreamingButton_->setToolTip(tr("Start selected source."));
             toggleStreamingButton_->setIcon(startIcon_);
             break;
 
         case StreamingState::Streaming:
             toggleStreamingButton_->setEnabled(true);
             toggleStreamingButton_->setText(tr("Stop"));
-            toggleStreamingButton_->setToolTip(tr("Stop camera streaming."));
+            toggleStreamingButton_->setToolTip(tr("Stop active source."));
             toggleStreamingButton_->setIcon(stopIcon_);
             break;
 
@@ -1148,7 +1132,7 @@ void VideoWindow::refreshUi()
     assert(videoController_);
 
     updateDeviceList(videoController_->videoInputs());
-    refreshActionButtons();
+    updateActionBar();
 }
 
 bool VideoWindow::isCameraAvailable() const
@@ -1174,10 +1158,9 @@ void VideoWindow::loadLastSourceType()
 
     switch (static_cast<SourceType>(value))
     {
-        case SourceType::Camera:
-        case SourceType::Url:
-        case SourceType::File:
         case SourceType::None:
+        case SourceType::Camera:
+        case SourceType::Media:
             type = static_cast<SourceType>(value);
             break;
     }
@@ -1377,7 +1360,7 @@ void VideoWindow::openMediaFile(const QString& filename)
     if (!fi.exists())
         return;
 
-    int index = sourceTypeCombo_->findData(QVariant::fromValue(SourceType::File));
+    int index = sourceTypeCombo_->findData(QVariant::fromValue(SourceType::Media));
     sourceTypeCombo_->setCurrentIndex(index);
 
     sourceCombo_->setCurrentText(QUrl::fromLocalFile(filename).toString());

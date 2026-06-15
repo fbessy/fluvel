@@ -178,8 +178,8 @@ private:
     void updateDeviceList(const QList<QCameraDevice>& devices);
     int computeBestDeviceIndex(const QByteArray& previousSelection, const QByteArray& newlyPlugged);
     void setDeviceControlsEnabled(bool enabled);
-    void refreshActionButtons();
     bool canStartSource() const;
+    void updateActionBar();
     void updateStreamingButton();
     void updateApplyButton();
     void refreshUi();
