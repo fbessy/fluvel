@@ -58,6 +58,17 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
 
     connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
             &VideoController::onFrameProcessed);
+
+    connect(&mediaPlayer_, &QMediaPlayer::errorOccurred, this,
+            &VideoController::onMediaPlayerError);
+
+    connect(&mediaPlayer_, &QMediaPlayer::mediaStatusChanged, this,
+            &VideoController::onMediaStatusChanged);
+
+    connect(&videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
+
+    audioOutput_.setVolume(0.5f);
+    mediaPlayer_.setAudioOutput(&audioOutput_);
 }
 
 VideoController::~VideoController()
@@ -95,8 +106,7 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
 {
     assert(startupTimer_);
 
-    if (state_ != StreamingState::Stopped || camera_ || videoSink_ || captureSession_ ||
-        mediaPlayer_)
+    if (state_ != StreamingState::Stopped || camera_)
         return;
 
     state_ = StreamingState::Starting;
@@ -112,8 +122,6 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
             isFound = true;
 
             camera_ = new QCamera(cam, this);
-            videoSink_ = new QVideoSink(this);
-            captureSession_ = new QMediaCaptureSession(this);
 
             // 👉 Application du format choisi (UI)
             if (!format.isNull())
@@ -136,12 +144,10 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
             startupInfo_.deviceFormat = camera_->cameraFormat();
             startupInfo_.description = camera_->cameraDevice().description();
 
-            captureSession_->setCamera(camera_);
-            captureSession_->setVideoSink(videoSink_);
+            captureSession_.setCamera(camera_);
+            captureSession_.setVideoSink(&videoSink_);
 
             connect(camera_, &QCamera::errorOccurred, this, &VideoController::onCameraError);
-            connect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                    &VideoController::onFrameReceived);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
             testFrameCounter_ = 0;
@@ -174,8 +180,7 @@ void VideoController::start(const QUrl& url)
 {
     assert(startupTimer_);
 
-    if (state_ != StreamingState::Stopped || camera_ || videoSink_ || captureSession_ ||
-        mediaPlayer_)
+    if (state_ != StreamingState::Stopped || camera_)
         return;
 
     state_ = StreamingState::Starting;
@@ -186,29 +191,16 @@ void VideoController::start(const QUrl& url)
     startupInfo_.sourceUrl = url;
     startupInfo_.description = shortSourceName(startupInfo_.sourceUrl);
 
-    mediaPlayer_ = new QMediaPlayer(this);
-    videoSink_ = new QVideoSink(this);
-
-    mediaPlayer_->setSource(url);
-    mediaPlayer_->setVideoSink(videoSink_);
-
-    connect(mediaPlayer_, &QMediaPlayer::errorOccurred, this, &VideoController::onMediaPlayerError);
-    connect(videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
+    mediaPlayer_.setSource(url);
+    mediaPlayer_.setVideoSink(&videoSink_);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     testFrameCounter_ = 0;
 #endif
 
-    audioOutput_ = new QAudioOutput(this);
-    audioOutput_->setVolume(0.5f);
-    mediaPlayer_->setAudioOutput(audioOutput_);
-
-    connect(mediaPlayer_, &QMediaPlayer::mediaStatusChanged, this,
-            &VideoController::onMediaStatusChanged);
-
     startupTimer_->start(kStartupTimeoutMs);
 
-    mediaPlayer_->play();
+    mediaPlayer_.play();
 }
 
 void VideoController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
@@ -230,42 +222,16 @@ void VideoController::stop()
     watchdogTimer_->stop();
     diagnosticsTimer_->stop();
 
-    if (videoSink_)
-    {
-        disconnect(videoSink_, &QVideoSink::videoFrameChanged, this,
-                   &VideoController::onFrameReceived);
-    }
-
     if (camera_)
     {
         disconnect(camera_, &QCamera::errorOccurred, this, &VideoController::onCameraError);
         camera_->stop();
     }
 
-    if (captureSession_)
-    {
-        captureSession_->setVideoSink(nullptr);
-        captureSession_->setCamera(nullptr);
+    captureSession_.setVideoSink(nullptr);
+    captureSession_.setCamera(nullptr);
 
-        delete captureSession_;
-        captureSession_ = nullptr;
-    }
-
-    if (mediaPlayer_)
-    {
-        disconnect(mediaPlayer_, &QMediaPlayer::errorOccurred, this,
-                   &VideoController::onMediaPlayerError);
-        mediaPlayer_->stop();
-
-        delete mediaPlayer_;
-        mediaPlayer_ = nullptr;
-    }
-
-    if (videoSink_)
-    {
-        delete videoSink_;
-        videoSink_ = nullptr;
-    }
+    mediaPlayer_.stop();
 
     if (camera_)
     {
@@ -438,9 +404,6 @@ void VideoController::onCameraError(QCamera::Error error, const QString& errorSt
 
 void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString)
 {
-    if (!mediaPlayer_)
-        return;
-
     const StreamingState state = state_;
 
     MediaPlayerErrorInfo mediaError;

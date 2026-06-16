@@ -12,20 +12,20 @@
 #include "video_active_contour_thread.hpp"
 #include "video_types.hpp"
 
+#include <QAudioOutput>
 #include <QByteArray>
 #include <QCamera>
+#include <QMediaCaptureSession>
 #include <QMediaPlayer>
 #include <QObject>
 #include <QUrl>
+#include <QVideoSink>
 #include <QtCore/qglobal.h>
 
 // #define FLUVEL_SIMULATE_STARTUP_TIMEOUT
 // #define FLUVEL_SIMULATE_STREAM_LOSS
 
-class QMediaCaptureSession;
-class QVideoSink;
 class QTimer;
-class QAudioOutput;
 
 namespace fluvel
 {
@@ -223,13 +223,13 @@ private:
     QCamera* camera_ = nullptr;
 
     /// Qt capture session.
-    QMediaCaptureSession* captureSession_ = nullptr;
+    QMediaCaptureSession captureSession_;
 
-    QMediaPlayer* mediaPlayer_ = nullptr;
-    QAudioOutput* audioOutput_ = nullptr;
+    QMediaPlayer mediaPlayer_;
+    QAudioOutput audioOutput_;
 
     /// Video sink receiving frames.
-    QVideoSink* videoSink_ = nullptr;
+    QVideoSink videoSink_;
 
     /// Processing thread running active contour.
     VideoActiveContourThread activeContourThread_;
