@@ -28,6 +28,7 @@
 #include <QFileInfo>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
@@ -128,8 +129,10 @@ void VideoWindow::createUi()
 
     sourceCombo_ = new QComboBox(this);
     sourceCombo_->setEditable(true);
+
     sourceCombo_->lineEdit()->setPlaceholderText(
         "https://video.mp4  https://stream.m3u8  rtsp://camera/live");
+
     sourceCombo_->setToolTip(tr("Media URL examples:\n\n"
                                 "HTTP video:\n"
                                 "https://host/video.mp4\n\n"
@@ -141,6 +144,16 @@ void VideoWindow::createUi()
                                 "https://192.168.1.110:8080/video\n"
                                 "rtsp://192.168.1.110:1935/live"));
 
+    sourceCombo_->lineEdit()->setClearButtonEnabled(true);
+
+    sourceCombo_->lineEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    clearHistoryIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::EditClear, ":/icons/actions/edit-clear-history.svg");
+
+    connect(sourceCombo_->lineEdit(), &QWidget::customContextMenuRequested, this,
+            &VideoWindow::onSourceContextMenuRequested);
+
     sourceCompleterModel_ = new QStringListModel(this);
 
     sourceCompleter_ = new QCompleter(sourceCompleterModel_, sourceCombo_);
@@ -148,13 +161,6 @@ void VideoWindow::createUi()
     sourceCompleter_->setCompletionMode(QCompleter::PopupCompletion);
 
     sourceCombo_->setCompleter(sourceCompleter_);
-
-    clearButton_ = new QPushButton(tr("Clear"));
-    QIcon deleteIcon =
-        il::loadIcon(QIcon::ThemeIcon::EditClear, ":/icons/actions/edit-clear-history.svg");
-
-    clearButton_->setIcon(deleteIcon);
-    clearButton_->setToolTip(tr("Remove all saved source addresses."));
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                               ":/icons/media/media-playback-start-symbolic.svg");
@@ -303,7 +309,6 @@ void VideoWindow::setupLayout()
     configLayout->addWidget(openFileButton_);
 
     configLayout->addWidget(sourceCombo_, 1);
-    configLayout->addWidget(clearButton_);
 
     configLayout->addStretch();
 
@@ -378,14 +383,6 @@ void VideoWindow::setupConnections()
             });
 
     connect(openFileButton_, &QPushButton::clicked, this, &VideoWindow::openFile);
-
-    connect(clearButton_, &QPushButton::clicked, this,
-            [this]()
-            {
-                sourceCombo_->clear();
-                saveSourceHistory();
-                updateSourceCompleter();
-            });
 
     connect(toggleStreamingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleStreaming);
 
@@ -541,7 +538,6 @@ void VideoWindow::refreshSourceUi()
 
     openFileButton_->setVisible(mediaMode);
     sourceCombo_->setVisible(mediaMode);
-    clearButton_->setVisible(mediaMode);
 }
 
 void VideoWindow::updateSourceConfigFromUi(int sourceTypeComboIndex)
@@ -1440,6 +1436,31 @@ void VideoWindow::updateSourceCompleter()
     entries.removeDuplicates();
 
     sourceCompleterModel_->setStringList(entries);
+}
+
+void VideoWindow::onSourceContextMenuRequested(const QPoint& pos)
+{
+    QLineEdit* edit = sourceCombo_->lineEdit();
+
+    QMenu* menu = edit->createStandardContextMenu();
+
+    menu->addSeparator();
+
+    QAction* clearHistoryAction = menu->addAction(clearHistoryIcon_, tr("Clear source history"));
+
+    const bool hasHistory = sourceCombo_->count() > 0;
+    clearHistoryAction->setEnabled(hasHistory);
+
+    QAction* selected = menu->exec(edit->mapToGlobal(pos));
+
+    if (selected == clearHistoryAction)
+    {
+        sourceCombo_->clear();
+        saveSourceHistory();
+        updateSourceCompleter();
+    }
+
+    delete menu;
 }
 
 } // namespace fluvel

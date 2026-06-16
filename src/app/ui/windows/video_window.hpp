@@ -265,6 +265,7 @@ private:
     QString sourceTitle(const StreamingInfo& info) const;
 
     void updateSourceCompleter();
+    void onSourceContextMenuRequested(const QPoint& pos);
 
     QStringListModel* sourceCompleterModel_ = nullptr;
     QCompleter* sourceCompleter_ = nullptr;
@@ -281,9 +282,9 @@ private:
     QLabel* formatLabel_ = nullptr;
     QComboBox* formatSelector_ = nullptr;
 
-    QComboBox* sourceCombo_ = nullptr;
     QPushButton* openFileButton_ = nullptr;
-    QPushButton* clearButton_ = nullptr;
+    QComboBox* sourceCombo_ = nullptr;
+    QIcon clearHistoryIcon_;
 
     QPushButton* toggleStreamingButton_ = nullptr;
     QPushButton* applyButton_ = nullptr;
