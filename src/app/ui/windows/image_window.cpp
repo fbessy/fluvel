@@ -245,8 +245,7 @@ void ImageWindow::setupActions()
 
     openAct_->setIcon(openIcon);
 
-    clearAct_ = new QAction(tr("Clear list"), this);
-    clearAct_->setStatusTip(tr("Clear the recent files list."));
+    clearAct_ = new QAction(tr("Clear recent files"), this);
 
     QIcon deleteIcon =
         il::loadIcon(QIcon::ThemeIcon::EditClear, ":/icons/actions/edit-clear-history.svg");
