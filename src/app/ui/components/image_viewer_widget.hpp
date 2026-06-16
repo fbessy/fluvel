@@ -296,27 +296,27 @@ private:
 
     bool supportsDragDrop() const;
 
-    QGraphicsScene* scene_ = nullptr;
-    QGraphicsItemGroup* contentRoot_ = nullptr;
-    QGraphicsPixmapItem* pixmapItem_ = nullptr;
+    QGraphicsScene* scene_{nullptr};
+    QGraphicsItemGroup* contentRoot_{nullptr};
+    QGraphicsPixmapItem* pixmapItem_{nullptr};
     QImage lastDisplayedImage_;
 
     DisplayConfig displayConfig_{};
     DownscaleParams downscaleConfig_{};
 
-    ContourPointsItem* outerContour_ = nullptr;
-    ContourPointsItem* innerContour_ = nullptr;
+    ContourPointsItem* outerContour_{nullptr};
+    ContourPointsItem* innerContour_{nullptr};
 
-    OverlayTextItem* infoOverlay_ = nullptr;
+    OverlayTextItem* infoOverlay_{nullptr};
 
-    OverlayTextItem* zoomOverlayItem_ = nullptr;
-    ZoomOverlayController* zoomOverlayController_ = nullptr;
+    OverlayTextItem* zoomOverlayItem_{nullptr};
+    ZoomOverlayController* zoomOverlayController_{nullptr};
 
-    MiniMapWidget* miniMap_ = nullptr;
+    MiniMapWidget* miniMap_{nullptr};
     QImage thumbnail_;
 
-    ImageViewerInteraction* interaction_ = nullptr;
-    ImageViewerListener* listener_ = nullptr;
+    ImageViewerInteraction* interaction_{nullptr};
+    ImageViewerListener* listener_{nullptr};
 
     // --- Throttling ---
     UiFrame pendingFrame_;
@@ -325,7 +325,7 @@ private:
     QElapsedTimer displayTimer_;
     int minDisplayIntervalMs_{0};
 
-    QTimer* throttleTimer_ = nullptr;
+    QTimer* throttleTimer_{nullptr};
 
     bool autoFitEnabled_{true};
 
@@ -338,7 +338,7 @@ private:
     QRect normalGeometry_;
     Qt::WindowFlags normalWindowFlags_;
 
-    QGraphicsBlurEffect* blur_ = nullptr;
+    QGraphicsBlurEffect* blur_{nullptr};
     bool placeholderVisible_{false};
 
     bool dragHighlight_{false};

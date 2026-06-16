@@ -55,21 +55,21 @@ private:
 
     void calculateShapesIntersection();
 
-    AnalysisWidget* widget1_ = nullptr;
-    AnalysisWidget* widget2_ = nullptr;
-    QPushButton* computeButton_ = nullptr;
+    AnalysisWidget* widget1_{nullptr};
+    AnalysisWidget* widget2_{nullptr};
+    QPushButton* computeButton_{nullptr};
 
     fluvel_ip::PointSet intersection_;
 
-    QDialog* resultsPopup_ = nullptr;
-    QLabel* hausdorffLabel_ = nullptr;
-    QSpinBox* percentileSp_ = nullptr;
-    QLabel* quantileLabel_ = nullptr;
-    QLabel* normalizedHausdorffLabel_ = nullptr;
-    QLabel* normalizedQuantileLabel_ = nullptr;
-    QLabel* centroidsDistLabel_ = nullptr;
-    QLabel* normalizedCentroidsDistLabel_ = nullptr;
-    QLabel* timeLabel_ = nullptr;
+    QDialog* resultsPopup_{nullptr};
+    QLabel* hausdorffLabel_{nullptr};
+    QSpinBox* percentileSp_{nullptr};
+    QLabel* quantileLabel_{nullptr};
+    QLabel* normalizedHausdorffLabel_{nullptr};
+    QLabel* normalizedQuantileLabel_{nullptr};
+    QLabel* centroidsDistLabel_{nullptr};
+    QLabel* normalizedCentroidsDistLabel_{nullptr};
+    QLabel* timeLabel_{nullptr};
 
     std::unique_ptr<fluvel_ip::HausdorffDistance> hd_;
     float factor_{0.f};

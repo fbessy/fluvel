@@ -121,17 +121,17 @@ private:
 
     void createList();
 
-    QLabel* textListLength_ = nullptr;
+    QLabel* textListLength_{nullptr};
     QString absoluteName_;
-    QLabel* nameLabel_ = nullptr;
-    ImageViewerWidget* imageViewer_ = nullptr;
-    QPushButton* openButton_ = nullptr;
+    QLabel* nameLabel_{nullptr};
+    ImageViewerWidget* imageViewer_{nullptr};
+    QPushButton* openButton_{nullptr};
 
-    ColorSelectorWidget* colorSelector_ = nullptr;
+    ColorSelectorWidget* colorSelector_{nullptr};
     fluvel_ip::Rgb_uc selectedColor_;
 
-    QGroupBox* noiseGroup_ = nullptr;
-    QSpinBox* noiseSp_ = nullptr;
+    QGroupBox* noiseGroup_{nullptr};
+    QSpinBox* noiseSp_{nullptr};
     std::mt19937 rng_{std::random_device{}()};
     QImage noiseImage_;
 

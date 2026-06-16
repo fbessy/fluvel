@@ -43,7 +43,7 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
-    QComboBox* combo_ = nullptr;
+    QComboBox* combo_{nullptr};
 };
 
 } // namespace fluvel

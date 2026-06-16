@@ -86,17 +86,17 @@ private:
 
     // --- UI ---
 
-    QTabWidget* tabs_ = nullptr;
+    QTabWidget* tabs_{nullptr};
 
-    QGroupBox* downscaleGb_ = nullptr;
-    QComboBox* downscaleFactorCb_ = nullptr;
+    QGroupBox* downscaleGb_{nullptr};
+    QComboBox* downscaleFactorCb_{nullptr};
 
-    QCheckBox* spatialCb_ = nullptr;
-    QCheckBox* temporalCb_ = nullptr;
+    QCheckBox* spatialCb_{nullptr};
+    QCheckBox* temporalCb_{nullptr};
 
-    AlgoSettingsWidget* algoWidget_ = nullptr;
+    AlgoSettingsWidget* algoWidget_{nullptr};
 
-    QDialogButtonBox* dialogButtons_ = nullptr;
+    QDialogButtonBox* dialogButtons_{nullptr};
 
     // --- Model ---
     VideoComputeConfig committedConfig_{}; // applied settings

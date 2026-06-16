@@ -77,7 +77,7 @@ private:
      * This pointer alternates between bufferA_ and bufferB_
      * during pipeline execution (ping-pong buffering).
      */
-    ImageOwner* currentPtr_ = nullptr;
+    ImageOwner* currentPtr_{nullptr};
 };
 
 } // namespace fluvel_ip

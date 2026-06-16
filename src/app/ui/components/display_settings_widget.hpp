@@ -77,18 +77,18 @@ private:
 
     bool isAnimating_{false};
 
-    QGroupBox* displayModeGroupBox_ = nullptr;
-    QRadioButton* sourceRadioButton_ = nullptr;
-    QRadioButton* preprocessedRadioButton_ = nullptr;
+    QGroupBox* displayModeGroupBox_{nullptr};
+    QRadioButton* sourceRadioButton_{nullptr};
+    QRadioButton* preprocessedRadioButton_{nullptr};
 
-    ColorSelectorWidget* outerContourColorSelector_ = nullptr;
-    ColorSelectorWidget* innerContourColorSelector_ = nullptr;
+    ColorSelectorWidget* outerContourColorSelector_{nullptr};
+    ColorSelectorWidget* innerContourColorSelector_{nullptr};
 
-    QCheckBox* mirrorModeCheckBox_ = nullptr;
-    QCheckBox* smoothDisplayCheckBox_ = nullptr;
+    QCheckBox* mirrorModeCheckBox_{nullptr};
+    QCheckBox* smoothDisplayCheckBox_{nullptr};
 
-    QCheckBox* overlayCheckBox_ = nullptr;
-    QCheckBox* miniMapCheckBox_ = nullptr;
+    QCheckBox* overlayCheckBox_{nullptr};
+    QCheckBox* miniMapCheckBox_{nullptr};
 
     DisplayConfig config_{};
 };

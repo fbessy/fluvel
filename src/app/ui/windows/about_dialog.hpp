@@ -39,7 +39,7 @@ private:
     void openHomepage();
     QString buildTechnicalSection();
 
-    QDialog* licenseWindow_ = nullptr;
+    QDialog* licenseWindow_{nullptr};
 };
 
 } // namespace fluvel

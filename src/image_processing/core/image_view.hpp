@@ -297,7 +297,7 @@ public:
 
 private:
     /// Pointer to image data (non-owning).
-    const uint8_t* data_ = nullptr;
+    const uint8_t* data_{nullptr};
 
     /// Image width.
     int widthPixels_{0};

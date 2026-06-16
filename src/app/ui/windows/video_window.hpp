@@ -267,39 +267,39 @@ private:
     void updateSourceCompleter();
     void onSourceContextMenuRequested(const QPoint& pos);
 
-    QStringListModel* sourceCompleterModel_ = nullptr;
-    QCompleter* sourceCompleter_ = nullptr;
+    QStringListModel* sourceCompleterModel_{nullptr};
+    QCompleter* sourceCompleter_{nullptr};
 
-    VideoSettingsDialog* videoSettingsWindow_ = nullptr;
+    VideoSettingsDialog* videoSettingsWindow_{nullptr};
 
-    QWidget* central_ = nullptr;
+    QWidget* central_{nullptr};
 
-    QLabel* sourceLabel_ = nullptr;
-    QComboBox* sourceTypeCombo_ = nullptr;
+    QLabel* sourceLabel_{nullptr};
+    QComboBox* sourceTypeCombo_{nullptr};
 
-    QLabel* deviceLabel_ = nullptr;
-    QComboBox* deviceSelector_ = nullptr;
-    QLabel* formatLabel_ = nullptr;
-    QComboBox* formatSelector_ = nullptr;
+    QLabel* deviceLabel_{nullptr};
+    QComboBox* deviceSelector_{nullptr};
+    QLabel* formatLabel_{nullptr};
+    QComboBox* formatSelector_{nullptr};
 
-    QPushButton* openFileButton_ = nullptr;
-    QComboBox* sourceCombo_ = nullptr;
+    QPushButton* openFileButton_{nullptr};
+    QComboBox* sourceCombo_{nullptr};
     QIcon clearHistoryIcon_;
 
-    QPushButton* toggleStreamingButton_ = nullptr;
-    QPushButton* applyButton_ = nullptr;
-    RightPanelToggleButton* rightPanelToggle_ = nullptr;
-    QPushButton* settingsButton_ = nullptr;
+    QPushButton* toggleStreamingButton_{nullptr};
+    QPushButton* applyButton_{nullptr};
+    RightPanelToggleButton* rightPanelToggle_{nullptr};
+    QPushButton* settingsButton_{nullptr};
     QIcon startIcon_;
     QIcon stopIcon_;
     QIcon settingsIcon_;
 
-    DisplaySettingsWidget* displayBar_ = nullptr;
+    DisplaySettingsWidget* displayBar_{nullptr};
 
     QSet<QByteArray> lastKnownDeviceIds_;
 
-    ImageViewerWidget* imageViewer_ = nullptr;
-    VideoController* videoController_ = nullptr;
+    ImageViewerWidget* imageViewer_{nullptr};
+    VideoController* videoController_{nullptr};
     QMetaObject::Connection frameToViewConnection_;
 
     QHash<QByteArray, DeviceStreamingStatus> deviceStreamingStatus_;

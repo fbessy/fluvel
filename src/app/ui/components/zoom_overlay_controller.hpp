@@ -79,7 +79,7 @@ private:
     void startFade();
 
     /// Overlay item displaying the zoom text (not owned).
-    OverlayTextItem* item_ = nullptr;
+    OverlayTextItem* item_{nullptr};
 
     /// Timer controlling how long the overlay stays visible.
     QTimer timer_;

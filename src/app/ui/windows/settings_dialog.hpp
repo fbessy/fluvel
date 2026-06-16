@@ -156,88 +156,88 @@ private:
     /////////////  UI Data  ///////////////
     ///////////////////////////////////////
 
-    QTabWidget* tabs_ = nullptr;
+    QTabWidget* tabs_{nullptr};
 
     /////////////////////////////////////////
 
-    QGroupBox* downscalePage_ = nullptr;
-    QComboBox* downscaleFactorCb_ = nullptr;
+    QGroupBox* downscalePage_{nullptr};
+    QComboBox* downscaleFactorCb_{nullptr};
 
     /////////////////////////////////////////
 
-    QGroupBox* processPage_ = nullptr;
-    QTabWidget* processInnerTabs_ = nullptr;
+    QGroupBox* processPage_{nullptr};
+    QTabWidget* processInnerTabs_{nullptr};
 
-    QGroupBox* gaussianNoiseGroupbox_ = nullptr;
-    QDoubleSpinBox* gaussianNoiseStdSpin_ = nullptr;
+    QGroupBox* gaussianNoiseGroupbox_{nullptr};
+    QDoubleSpinBox* gaussianNoiseStdSpin_{nullptr};
 
-    QGroupBox* impulsiveNoiseGroupbox_ = nullptr;
-    QDoubleSpinBox* impulsiveNoisePercentSpin_ = nullptr;
+    QGroupBox* impulsiveNoiseGroupbox_{nullptr};
+    QDoubleSpinBox* impulsiveNoisePercentSpin_{nullptr};
 
-    QGroupBox* speckleNoiseGroupbox_ = nullptr;
-    QDoubleSpinBox* speckleNoiseStdSpin_ = nullptr;
+    QGroupBox* speckleNoiseGroupbox_{nullptr};
+    QDoubleSpinBox* speckleNoiseStdSpin_{nullptr};
 
-    QGroupBox* medianGroupbox_ = nullptr;
-    KernelSizeSpinBox* medianKernelSizeSpin_ = nullptr;
+    QGroupBox* medianGroupbox_{nullptr};
+    KernelSizeSpinBox* medianKernelSizeSpin_{nullptr};
 
-    QGroupBox* meanGroupbox_ = nullptr;
-    KernelSizeSpinBox* meanKernelSizeSpin_ = nullptr;
+    QGroupBox* meanGroupbox_{nullptr};
+    KernelSizeSpinBox* meanKernelSizeSpin_{nullptr};
 
-    QGroupBox* anisoGroupbox_ = nullptr;
-    QRadioButton* anisoExpConductionRadio_ = nullptr;
-    QRadioButton* anisoReciprocalConductionRadio_ = nullptr;
-    QSpinBox* iterationFilterSpin_ = nullptr;
-    QDoubleSpinBox* lambdaSpin_ = nullptr;
-    QDoubleSpinBox* kappaSpin_ = nullptr;
+    QGroupBox* anisoGroupbox_{nullptr};
+    QRadioButton* anisoExpConductionRadio_{nullptr};
+    QRadioButton* anisoReciprocalConductionRadio_{nullptr};
+    QSpinBox* iterationFilterSpin_{nullptr};
+    QDoubleSpinBox* lambdaSpin_{nullptr};
+    QDoubleSpinBox* kappaSpin_{nullptr};
 
-    QGroupBox* openGroupbox_ = nullptr;
-    KernelSizeSpinBox* openKernelSizeSpin_ = nullptr;
+    QGroupBox* openGroupbox_{nullptr};
+    KernelSizeSpinBox* openKernelSizeSpin_{nullptr};
 
-    QGroupBox* closeGroupbox_ = nullptr;
-    KernelSizeSpinBox* closeKernelSizeSpin_ = nullptr;
+    QGroupBox* closeGroupbox_{nullptr};
+    KernelSizeSpinBox* closeKernelSizeSpin_{nullptr};
 
-    QGroupBox* tophatGroupbox_ = nullptr;
-    QRadioButton* whitetophatRadio_ = nullptr;
-    QRadioButton* blacktophatRadio_ = nullptr;
-    KernelSizeSpinBox* tophatKernelSizeSpin_ = nullptr;
+    QGroupBox* tophatGroupbox_{nullptr};
+    QRadioButton* whitetophatRadio_{nullptr};
+    QRadioButton* blacktophatRadio_{nullptr};
+    KernelSizeSpinBox* tophatKernelSizeSpin_{nullptr};
 
-    QLabel* timeFilt_ = nullptr;
-
-    /////////////////////////////////////////
-
-    QWidget* initPage_ = nullptr;
-
-    QRadioButton* rectangleRadio_ = nullptr;
-    QRadioButton* ellipseRadio_ = nullptr;
-    QSpinBox* widthShapeSpin_ = nullptr;
-    QSlider* widthSlider_ = nullptr;
-    QSpinBox* heightShapeSpin_ = nullptr;
-    QSlider* heightSlider_ = nullptr;
-    QSpinBox* abscissaSpin_ = nullptr;
-    QSlider* abscissaSlider_ = nullptr;
-    QSpinBox* ordinateSpin_ = nullptr;
-    QSlider* ordinateSlider_ = nullptr;
-
-    QPushButton* addButton_ = nullptr;
-    QPushButton* subtractButton_ = nullptr;
-    QPushButton* clearButton_ = nullptr;
+    QLabel* timeFilt_{nullptr};
 
     /////////////////////////////////////////
 
-    QWidget* algoPage_ = nullptr;
-    AlgoSettingsWidget* algoWidget_ = nullptr;
+    QWidget* initPage_{nullptr};
+
+    QRadioButton* rectangleRadio_{nullptr};
+    QRadioButton* ellipseRadio_{nullptr};
+    QSpinBox* widthShapeSpin_{nullptr};
+    QSlider* widthSlider_{nullptr};
+    QSpinBox* heightShapeSpin_{nullptr};
+    QSlider* heightSlider_{nullptr};
+    QSpinBox* abscissaSpin_{nullptr};
+    QSlider* abscissaSlider_{nullptr};
+    QSpinBox* ordinateSpin_{nullptr};
+    QSlider* ordinateSlider_{nullptr};
+
+    QPushButton* addButton_{nullptr};
+    QPushButton* subtractButton_{nullptr};
+    QPushButton* clearButton_{nullptr};
 
     /////////////////////////////////////////
 
-    QDialogButtonBox* dialogButtons_ = nullptr;
+    QWidget* algoPage_{nullptr};
+    AlgoSettingsWidget* algoWidget_{nullptr};
+
+    /////////////////////////////////////////
+
+    QDialogButtonBox* dialogButtons_{nullptr};
 
     ////////////////////////////////////////
     /////////    View - Controller    /////
     ///////////////////////////////////////
 
-    ImageViewerWidget* imageViewer_ = nullptr;
-    InitializationBehavior* initializationBehavior_ = nullptr;
-    ImageSettingsController* imageSettingsController_ = nullptr;
+    ImageViewerWidget* imageViewer_{nullptr};
+    InitializationBehavior* initializationBehavior_{nullptr};
+    ImageSettingsController* imageSettingsController_{nullptr};
     int wheelAccumulator_{0};
 
     ////////////////////////////////////////

@@ -220,7 +220,7 @@ private:
     bool useOptimizedFormat_{true};
 
     /// Qt camera object.
-    QCamera* camera_ = nullptr;
+    QCamera* camera_{nullptr};
 
     /// Qt capture session.
     QMediaCaptureSession captureSession_;
@@ -245,13 +245,13 @@ private:
     static constexpr int kDiagnosticsPeriodMs{500};               // 0.5 sec
 
     /// Timer used to detect startup timeout.
-    QTimer* startupTimer_ = nullptr;
+    QTimer* startupTimer_{nullptr};
 
     /// Timer used for stream watchdog.
-    QTimer* watchdogTimer_ = nullptr;
+    QTimer* watchdogTimer_{nullptr};
 
     /// Timer used for periodic diagnostics updates.
-    QTimer* diagnosticsTimer_ = nullptr;
+    QTimer* diagnosticsTimer_{nullptr};
 
     /// Current streaming state.
     StreamingState state_ = StreamingState::Stopped;

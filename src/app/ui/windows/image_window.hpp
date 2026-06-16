@@ -124,54 +124,54 @@ private:
     void saveDisplayed();
 
     // --- UI ---
-    VideoWindow* videoWindow_ = nullptr;
-    AnalysisWindow* analysisWindow_ = nullptr;
-    SettingsDialog* settingsWindow_ = nullptr;
-    AboutDialog* AboutDialog_ = nullptr;
-    LanguageDialog* languageWindow_ = nullptr;
+    VideoWindow* videoWindow_{nullptr};
+    AnalysisWindow* analysisWindow_{nullptr};
+    SettingsDialog* settingsWindow_{nullptr};
+    AboutDialog* AboutDialog_{nullptr};
+    LanguageDialog* languageWindow_{nullptr};
 
-    QMenu* fileMenu_ = nullptr;
-    QMenu* segmentationMenu_ = nullptr;
-    QMenu* sessionMenu_ = nullptr;
-    QMenu* helpMenu_ = nullptr;
+    QMenu* fileMenu_{nullptr};
+    QMenu* segmentationMenu_{nullptr};
+    QMenu* sessionMenu_{nullptr};
+    QMenu* helpMenu_{nullptr};
 
-    QPushButton* restartButton_ = nullptr;
-    QPushButton* togglePauseButton_ = nullptr;
-    QPushButton* stepButton_ = nullptr;
-    QPushButton* convergeButton_ = nullptr;
-    RightPanelToggleButton* rightPanelToggle_ = nullptr;
-    QPushButton* settingsButton_ = nullptr;
+    QPushButton* restartButton_{nullptr};
+    QPushButton* togglePauseButton_{nullptr};
+    QPushButton* stepButton_{nullptr};
+    QPushButton* convergeButton_{nullptr};
+    RightPanelToggleButton* rightPanelToggle_{nullptr};
+    QPushButton* settingsButton_{nullptr};
 
     QIcon startResumeIcon_;
     QIcon restartIcon_;
     QIcon pauseIcon_;
     QIcon settingsIcon_;
 
-    DisplaySettingsWidget* displayBar_ = nullptr;
+    DisplaySettingsWidget* displayBar_{nullptr};
 
     // --- Actions ---
 
-    QAction* openAct_ = nullptr;
-    QAction* separatorAct_ = nullptr;
+    QAction* openAct_{nullptr};
+    QAction* separatorAct_{nullptr};
 
     static constexpr qsizetype kMaxRecentFiles{5};
     std::array<QAction*, kMaxRecentFiles> recentFileActs_;
 
-    QAction* clearAct_ = nullptr;
-    QAction* saveAct_ = nullptr;
-    QAction* quitAct_ = nullptr;
+    QAction* clearAct_{nullptr};
+    QAction* saveAct_{nullptr};
+    QAction* quitAct_{nullptr};
 
-    QAction* imageSessionAct_ = nullptr;
-    QAction* videoSessionAct_ = nullptr;
-    QAction* analysisAct_ = nullptr;
-    QAction* settingsAct_ = nullptr;
+    QAction* imageSessionAct_{nullptr};
+    QAction* videoSessionAct_{nullptr};
+    QAction* analysisAct_{nullptr};
+    QAction* settingsAct_{nullptr};
 
-    QAction* aboutAct_ = nullptr;
-    QAction* languageAct_ = nullptr;
+    QAction* aboutAct_{nullptr};
+    QAction* languageAct_{nullptr};
 
     // --- VIEW - CONTROLLER ---
-    ImageViewerWidget* imageViewer_ = nullptr;
-    ImageController* imageController_ = nullptr;
+    ImageViewerWidget* imageViewer_{nullptr};
+    ImageController* imageController_{nullptr};
 
     // --- Current image state ---
     QString fileName_;

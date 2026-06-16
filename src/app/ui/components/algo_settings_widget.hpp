@@ -66,26 +66,26 @@ signals:
 
 private:
     /// UI elements for connectivity selection.
-    QComboBox* connectivityCb_ = nullptr;
+    QComboBox* connectivityCb_{nullptr};
 
     /// Iteration parameters.
-    QSpinBox* naSpin_ = nullptr;
-    QSpinBox* nsSpin_ = nullptr;
+    QSpinBox* naSpin_{nullptr};
+    QSpinBox* nsSpin_{nullptr};
 
     /// Data term parameters.
-    QSpinBox* lambdaOutSpin_ = nullptr;
-    QSpinBox* lambdaInSpin_ = nullptr;
+    QSpinBox* lambdaOutSpin_{nullptr};
+    QSpinBox* lambdaInSpin_{nullptr};
 
     /// Color model parameters.
-    QGroupBox* colorWeightsGroupbox_ = nullptr;
-    QComboBox* colorSpaceCb_ = nullptr;
-    QSpinBox* alphaSpin_ = nullptr;
-    QSpinBox* betaSpin_ = nullptr;
-    QSpinBox* gammaSpin_ = nullptr;
+    QGroupBox* colorWeightsGroupbox_{nullptr};
+    QComboBox* colorSpaceCb_{nullptr};
+    QSpinBox* alphaSpin_{nullptr};
+    QSpinBox* betaSpin_{nullptr};
+    QSpinBox* gammaSpin_{nullptr};
 
     /// Internal smoothing parameters.
-    QGroupBox* internalspeedGroupbox_ = nullptr;
-    QSpinBox* diskRadiusSpin_ = nullptr;
+    QGroupBox* internalspeedGroupbox_{nullptr};
+    QSpinBox* diskRadiusSpin_{nullptr};
 
     ActiveContourConfig& config_;
 };
