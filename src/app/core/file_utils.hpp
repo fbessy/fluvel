@@ -17,6 +17,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <array>
+
 namespace fluvel::file_utils
 {
 
