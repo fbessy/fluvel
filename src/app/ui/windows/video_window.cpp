@@ -674,7 +674,7 @@ void VideoWindow::onToggleStreaming()
 
     if (videoController_->isStreaming())
         stopSource();
-    else if (canStartSource())
+    else
         startSource();
 }
 
@@ -881,6 +881,9 @@ void VideoWindow::startSource()
     assert(videoController_ && sourceTypeCombo_);
 
     updateSourceConfigFromUi(sourceTypeCombo_->currentIndex());
+
+    if (!canStartSource())
+        return;
 
     videoController_->start(sourceConfig_);
 }
@@ -1404,9 +1407,7 @@ void VideoWindow::openMediaFile(const QString& filename)
     if (filename.isEmpty())
         return;
 
-    QFileInfo fi(filename);
-
-    if (!fi.exists())
+    if (!file_utils::isSupportedVideoFile(filename))
         return;
 
     int index = sourceTypeCombo_->findData(QVariant::fromValue(SourceType::Media));
