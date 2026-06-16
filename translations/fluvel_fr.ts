@@ -1567,8 +1567,8 @@ ou cliquez sur Ouvrir...</translation>
         <translation>Format recommandé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1009"/>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1035"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1023"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1049"/>
         <source>Source: %1
 
 %2</source>
@@ -1577,81 +1577,82 @@ ou cliquez sur Ouvrir...</translation>
 %2</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1011"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1025"/>
         <source>Camera error</source>
         <translation>Erreur de caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1037"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1051"/>
         <source>Media error</source>
         <translation>Erreur multimédia</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1073"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1087"/>
         <source>Camera startup failed</source>
         <translation>Échec du démarrage de la caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1074"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1088"/>
         <source>The camera did not produce a valid frame within %1 seconds.
 The device may be busy or not responding.</source>
         <translation>La caméra n’a produit aucune image valide dans un délai de %1 secondes.
 Le périphérique est peut-être occupé ou ne répond pas.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1092"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1106"/>
         <source>Camera stream lost</source>
         <translation>Flux de la caméra perdu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1093"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1107"/>
         <source>No valid frame received for %1 seconds.
 The camera stream may have stalled.</source>
         <translation>Aucune image valide reçue pendant %1 secondes.
 Le flux de la caméra est peut-être interrompu.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1148"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1162"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1149"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1163"/>
         <source>Start selected source.</source>
         <translation>Démarrer la source sélectionnée.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1156"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1170"/>
         <source>Stop active source.</source>
         <translation>Arrêter la source active.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1389"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="977"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1403"/>
         <source>Video</source>
         <translation>Vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1396"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1410"/>
         <source>Open Video File</source>
         <translation>Ouvrir un fichier vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1449"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1463"/>
         <source>Clear source history</source>
         <translation>Effacer l&apos;historique des sources</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1155"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1169"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1162"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1176"/>
         <source>Starting...</source>
         <translation>Démarrage…</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1163"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1177"/>
         <source>Camera startup in progress.</source>
         <translation>Démarrage de la caméra en cours.</translation>
     </message>
