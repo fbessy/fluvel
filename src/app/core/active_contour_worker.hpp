@@ -15,6 +15,7 @@
 #include "contour_diagnostics.hpp"
 #include "elapsed_timer.hpp"
 #include "image_owner.hpp"
+
 #include <chrono>
 
 #endif
@@ -183,7 +184,7 @@ private:
 
     WorkerState state_{WorkerState::Uninitialized};
     RunMode mode_{RunMode::Interactive};
-    QTimer* workerTimer_;
+    QTimer workerTimer_;
     std::unique_ptr<fluvel_ip::ActiveContour> activeContour_;
 
     QImage image_;

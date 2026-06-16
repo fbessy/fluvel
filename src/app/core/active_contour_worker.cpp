@@ -27,10 +27,9 @@ namespace fluvel
 
 ActiveContourWorker::ActiveContourWorker()
     : QObject(nullptr)
-    , workerTimer_(new QTimer(this))
 {
-    workerTimer_->setInterval(kWorkerPeriodMs);
-    connect(workerTimer_, &QTimer::timeout, this, &ActiveContourWorker::onTimeout);
+    workerTimer_.setInterval(kWorkerPeriodMs);
+    connect(&workerTimer_, &QTimer::timeout, this, &ActiveContourWorker::onTimeout);
 }
 
 void ActiveContourWorker::restart()
@@ -66,7 +65,7 @@ void ActiveContourWorker::start()
         return;
 
     setState(WorkerState::Running);
-    workerTimer_->start();
+    workerTimer_.start();
 }
 
 void ActiveContourWorker::togglePause()
@@ -187,7 +186,7 @@ bool ActiveContourWorker::stepOnceAlgo()
 
 void ActiveContourWorker::applyProcessing()
 {
-    workerTimer_->stop();
+    workerTimer_.stop();
     setState(WorkerState::Initializing);
 
     processedImage_ = image_;
@@ -221,7 +220,7 @@ void ActiveContourWorker::applyProcessing()
 
 void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConfig& config)
 {
-    workerTimer_->stop();
+    workerTimer_.stop();
     setState(WorkerState::Initializing);
 
     image_ = image;
@@ -246,7 +245,7 @@ void ActiveContourWorker::initializeActiveContour()
     if (processedImage_.isNull())
         return;
 
-    workerTimer_->stop();
+    workerTimer_.stop();
     setState(WorkerState::Initializing);
 
     activeContour_.reset();
@@ -293,7 +292,7 @@ void ActiveContourWorker::initializeActiveContour()
 
 void ActiveContourWorker::finish()
 {
-    workerTimer_->stop();
+    workerTimer_.stop();
     setState(WorkerState::Finished);
 }
 
@@ -311,7 +310,7 @@ void ActiveContourWorker::suspend()
 {
     if (state_ == WorkerState::Running)
     {
-        workerTimer_->stop();
+        workerTimer_.stop();
         setState(WorkerState::Suspended);
 
         updateDiagnostics();
