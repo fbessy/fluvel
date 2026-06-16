@@ -1104,20 +1104,18 @@ bool VideoWindow::canStartSource() const
 
         case SourceType::Media:
         {
-            QString text = sourceCombo_->currentText().trimmed();
+            const QString text = sourceCombo_->currentText().trimmed();
 
             if (text.isEmpty())
                 return false;
 
-            QUrl url = QUrl::fromUserInput(text);
+            const QUrl url = QUrl::fromUserInput(text);
 
             if (!url.isValid())
                 return false;
 
             if (url.isLocalFile())
-            {
-                return QFileInfo::exists(url.toLocalFile());
-            }
+                return file_utils::isSupportedVideoFile(url.toLocalFile());
 
             return true;
         }
