@@ -137,7 +137,9 @@ QString supportedVideoExtensions()
 
     for (auto format : formats)
     {
-        for (const auto& ext : extensionsForMediaFormat(format))
+        const auto extensions = extensionsForMediaFormat(format);
+
+        for (const auto& ext : extensions)
         {
             patterns << "*." + ext;
         }
@@ -158,7 +160,7 @@ bool isSupportedVideoFile(const QString& path)
 {
     QFileInfo fi(path);
 
-    if (!fi.exists())
+    if (!fi.isFile())
         return false;
 
     const QString suffix = "*." + fi.suffix().toLower();
@@ -178,7 +180,9 @@ QString supportedVideoFormats()
 
     for (auto format : supported)
     {
-        for (const auto& ext : extensionsForMediaFormat(format))
+        const auto extensions = extensionsForMediaFormat(format);
+
+        for (const auto& ext : extensions)
         {
             formats << ext.toUpper();
         }
