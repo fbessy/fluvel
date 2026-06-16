@@ -23,6 +23,7 @@
 
 #include <QCameraDevice>
 #include <QComboBox>
+#include <QCompleter>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QLabel>
@@ -30,6 +31,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
+#include <QStringListModel>
 #include <QVBoxLayout>
 
 #include <utility>
@@ -138,6 +140,14 @@ void VideoWindow::createUi()
                                 "Local network camera:\n"
                                 "https://192.168.1.110:8080/video\n"
                                 "rtsp://192.168.1.110:1935/live"));
+
+    sourceCompleterModel_ = new QStringListModel(this);
+
+    sourceCompleter_ = new QCompleter(sourceCompleterModel_, sourceCombo_);
+    sourceCompleter_->setCaseSensitivity(Qt::CaseInsensitive);
+    sourceCompleter_->setCompletionMode(QCompleter::PopupCompletion);
+
+    sourceCombo_->setCompleter(sourceCompleter_);
 
     clearButton_ = new QPushButton(tr("Clear"));
     QIcon deleteIcon =
@@ -374,6 +384,7 @@ void VideoWindow::setupConnections()
             {
                 sourceCombo_->clear();
                 saveSourceHistory();
+                updateSourceCompleter();
             });
 
     connect(toggleStreamingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleStreaming);
@@ -1325,6 +1336,8 @@ void VideoWindow::addSourceToHistory(const QUrl& url)
         sourceCombo_->removeItem(sourceCombo_->count() - 1);
 
     saveSourceHistory();
+
+    updateSourceCompleter();
 }
 
 void VideoWindow::loadSourceHistory()
@@ -1334,6 +1347,8 @@ void VideoWindow::loadSourceHistory()
     QStringList values = settings.value(kSourceHistoryKey).toStringList();
 
     sourceCombo_->addItems(values);
+
+    updateSourceCompleter();
 }
 
 void VideoWindow::saveSourceHistory()
@@ -1408,6 +1423,22 @@ void VideoWindow::openMediaFile(const QString& filename)
     {
         startSource();
     }
+}
+
+void VideoWindow::updateSourceCompleter()
+{
+    QStringList entries;
+
+    entries << "https://";
+    entries << "rtsp://";
+    entries << "file://";
+
+    for (int i = 0; i < sourceCombo_->count(); ++i)
+        entries << sourceCombo_->itemText(i);
+
+    entries.removeDuplicates();
+
+    sourceCompleterModel_->setStringList(entries);
 }
 
 } // namespace fluvel

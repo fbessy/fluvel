@@ -26,6 +26,8 @@ class QComboBox;
 class QPushButton;
 class QLabel;
 class QLineEdit;
+class QStringListModel;
+class QCompleter;
 
 class QShowEvent;
 class QCloseEvent;
@@ -261,6 +263,11 @@ private:
     void saveSelectedCameraId();
 
     QString sourceTitle(const StreamingInfo& info) const;
+
+    void updateSourceCompleter();
+
+    QStringListModel* sourceCompleterModel_ = nullptr;
+    QCompleter* sourceCompleter_ = nullptr;
 
     VideoSettingsDialog* videoSettingsWindow_ = nullptr;
 
