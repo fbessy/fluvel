@@ -20,47 +20,52 @@ VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
 
 void VideoActiveContourThread::submitFrame(const ReceivedFrame& frame)
 {
-    int wi = writeIndex_.load(std::memory_order_relaxed);
-    int next = 1 - wi;
+    QMutexLocker locker(&frameMutex_);
+
+    const int next = writeIndex_ ^ 1;
 
     buffers_[next] = frame;
 
-    writeIndex_.store(next, std::memory_order_release);
-    hasNewFrame_.store(true, std::memory_order_release);
+    writeIndex_ = next;
+    hasNewFrame_ = true;
+
+    condition_.wakeOne();
 }
 
 void VideoActiveContourThread::run()
 {
-    running_.store(true);
+    running_ = true;
 
     int readIndex = 0;
 
-    while (running_.load())
+    while (running_)
     {
-        if (hasNewFrame_.load(std::memory_order_acquire))
+        ReceivedFrame cf;
+
         {
-            int wi = writeIndex_.load(std::memory_order_acquire);
+            QMutexLocker locker(&frameMutex_);
 
-            if (wi != readIndex)
+            while (!hasNewFrame_ && running_)
             {
-                readIndex = wi;
-
-                ReceivedFrame cf = buffers_[readIndex];
-
-                DisplayFrame df = processFrame(cf.frame);
-
-                df.receiveTimestampNs = cf.receiveTimestampNs;
-
-                emit frameProcessed(df.outerContour.size() + df.innerContour.size());
-                emit displayFrameReady(df);
+                condition_.wait(&frameMutex_);
             }
 
-            hasNewFrame_.store(false, std::memory_order_release);
+            if (!running_)
+                break;
+
+            readIndex = writeIndex_;
+
+            cf = buffers_[readIndex];
+
+            hasNewFrame_ = false;
         }
-        else
-        {
-            QThread::usleep(200);
-        }
+
+        DisplayFrame df = processFrame(cf.frame);
+
+        df.receiveTimestampNs = cf.receiveTimestampNs;
+
+        emit frameProcessed(df.outerContour.size() + df.innerContour.size());
+        emit displayFrameReady(df);
     }
 }
 
@@ -214,7 +219,9 @@ void VideoActiveContourThread::exportContours(DisplayFrame& displayFrame)
 void VideoActiveContourThread::stop()
 {
     QMutexLocker locker(&frameMutex_);
+
     running_ = false;
+
     condition_.wakeAll();
 }
 

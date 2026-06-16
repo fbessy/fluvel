@@ -166,10 +166,10 @@ private:
     ReceivedFrame buffers_[2];
 
     /// Index of the write buffer.
-    std::atomic<int> writeIndex_{0};
+    int writeIndex_{0};
 
     /// Indicates if a new frame is available.
-    std::atomic<bool> hasNewFrame_{false};
+    bool hasNewFrame_{false};
 };
 
 } // namespace fluvel
