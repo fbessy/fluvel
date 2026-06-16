@@ -956,20 +956,34 @@ QString VideoWindow::sourceTitle(const StreamingInfo& info) const
 {
     QString title = info.source.description;
 
-    if (info.frameSize.isValid())
+    if (title.isEmpty() && info.source.type == SourceType::Media)
     {
-        title += QString(" - %1x%2").arg(info.frameSize.width()).arg(info.frameSize.height());
+        const QUrl& url = info.source.sourceUrl;
+
+        if (url.isLocalFile())
+        {
+            title = url.fileName();
+        }
+        else
+        {
+            title = url.host();
+
+            if (title.isEmpty())
+                title = url.fileName();
+        }
     }
+
+    if (title.isEmpty())
+        title = tr("Video");
+
+    if (info.frameSize.isValid())
+        title += QString(" - %1x%2").arg(info.frameSize.width()).arg(info.frameSize.height());
 
     if (info.pixelFormat != QVideoFrameFormat::Format_Invalid)
-    {
         title += QString(" %1").arg(video_utils::pixelFormatToString(info.pixelFormat));
-    }
 
     if (info.sourceFrameRate > 0.f)
-    {
         title += QString(" @%1").arg(info.sourceFrameRate, 0, 'f', 0);
-    }
 
     return title;
 }
