@@ -258,7 +258,6 @@ void VideoController::stop()
         mediaPlayer_->stop();
 
         delete mediaPlayer_;
-
         mediaPlayer_ = nullptr;
     }
 
@@ -423,11 +422,16 @@ void VideoController::onCameraError(QCamera::Error error, const QString& errorSt
     if (!camera_)
         return;
 
+    const StreamingState state = state_;
+
     CameraErrorInfo camError;
     camError.error = error;
     camError.errorString = errorString;
     camError.sourceInfo = startupInfo_;
-    camError.state = state_;
+    camError.state = state;
+
+    if (state == StreamingState::Starting)
+        stop();
 
     emit cameraError(camError);
 }
@@ -437,11 +441,16 @@ void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QStrin
     if (!mediaPlayer_)
         return;
 
+    const StreamingState state = state_;
+
     MediaPlayerErrorInfo mediaError;
     mediaError.error = error;
     mediaError.errorString = errorString;
     mediaError.sourceInfo = startupInfo_;
-    mediaError.state = state_;
+    mediaError.state = state;
+
+    if (state == StreamingState::Starting)
+        stop();
 
     emit mediaPlayerError(mediaError);
 }

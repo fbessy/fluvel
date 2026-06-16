@@ -192,12 +192,12 @@ struct CameraErrorInfo
     /**
      * @brief Source associated with the error.
      */
-    SourceInfo sourceInfo;
+    SourceInfo sourceInfo{};
 
     /**
      * @brief Controller state when the error occurred.
      */
-    StreamingState state;
+    StreamingState state{StreamingState::Stopped};
 };
 
 /**
@@ -225,12 +225,12 @@ struct MediaPlayerErrorInfo
     /**
      * @brief Source associated with the error.
      */
-    SourceInfo sourceInfo;
+    SourceInfo sourceInfo{};
 
     /**
      * @brief Controller state when the error occurred.
      */
-    StreamingState state;
+    StreamingState state{StreamingState::Stopped};
 };
 
 } // namespace fluvel

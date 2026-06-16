@@ -1015,6 +1015,9 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 {
     assert(imageViewer_);
 
+    if (!shouldReportMediaError(errorInfo))
+        return;
+
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
@@ -1029,6 +1032,30 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     }
 
     refreshUi();
+}
+
+bool VideoWindow::shouldReportMediaError(const MediaPlayerErrorInfo& errorInfo)
+{
+    if (errorInfo.state != StreamingState::Streaming)
+        return true;
+
+    constexpr int kDeduplicationDelayMs = 5000;
+
+    const bool sameSource = lastReportedError_.source == errorInfo.sourceInfo.description;
+
+    const bool sameMessage = lastReportedError_.message == errorInfo.errorString;
+
+    const bool recent = lastReportedError_.timer.isValid() &&
+                        lastReportedError_.timer.elapsed() < kDeduplicationDelayMs;
+
+    if (sameSource && sameMessage && recent)
+        return false;
+
+    lastReportedError_.source = errorInfo.sourceInfo.description;
+    lastReportedError_.message = errorInfo.errorString;
+    lastReportedError_.timer.restart();
+
+    return true;
 }
 
 void VideoWindow::onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec)

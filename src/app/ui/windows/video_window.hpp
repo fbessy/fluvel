@@ -13,6 +13,7 @@
 
 #include <QByteArray>
 #include <QCamera>
+#include <QElapsedTimer>
 #include <QIcon>
 #include <QMediaPlayer>
 #include <QMetaObject>
@@ -89,6 +90,34 @@ public:
 
 private:
     bool& flag_;
+};
+
+/**
+ * @brief Stores information about the last reported error.
+ *
+ * This structure is used to suppress duplicate error notifications
+ * occurring within a short time interval.
+ *
+ * Two errors are considered duplicates when they originate from the
+ * same source and report the same message within the configured
+ * deduplication window.
+ */
+struct LastReportedError
+{
+    /**
+     * @brief Source associated with the error.
+     */
+    QString source;
+
+    /**
+     * @brief Error message used for duplicate detection.
+     */
+    QString message;
+
+    /**
+     * @brief Time elapsed since the error was last reported.
+     */
+    QElapsedTimer timer;
 };
 
 /**
@@ -213,6 +242,8 @@ private:
     void onCameraError(const CameraErrorInfo& errorInfo);
     void onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo);
 
+    bool shouldReportMediaError(const MediaPlayerErrorInfo& errorInfo);
+
     void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
     void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
 
@@ -282,6 +313,8 @@ private:
     QString sourceTitleStr_;
 
     SourceConfig sourceConfig_{};
+
+    LastReportedError lastReportedError_{};
 };
 
 } // namespace fluvel
