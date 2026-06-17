@@ -14,7 +14,6 @@
 #include <QMediaDevices>
 #include <QMediaMetaData>
 #include <QMediaPlayer>
-#include <QTimer>
 #include <QUrl>
 #include <QVideoSink>
 
@@ -41,20 +40,13 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
 
     activeContourThread_.start();
 
-    startupTimer_ = new QTimer(this);
-    startupTimer_->setSingleShot(true);
+    startupTimer_.setSingleShot(true);
+    watchdogTimer_.setInterval(kWatchdogPeriodMs);
+    diagnosticsTimer_.setInterval(kDiagnosticsPeriodMs);
 
-    watchdogTimer_ = new QTimer(this);
-    watchdogTimer_->setInterval(kWatchdogPeriodMs);
-
-    diagnosticsTimer_ = new QTimer(this);
-    diagnosticsTimer_->setInterval(kDiagnosticsPeriodMs);
-
-    connect(startupTimer_, &QTimer::timeout, this, &VideoController::onStartupTimeout);
-
-    connect(watchdogTimer_, &QTimer::timeout, this, &VideoController::checkWatchdog);
-
-    connect(diagnosticsTimer_, &QTimer::timeout, this, &VideoController::updateDiagnostics);
+    connect(&startupTimer_, &QTimer::timeout, this, &VideoController::onStartupTimeout);
+    connect(&watchdogTimer_, &QTimer::timeout, this, &VideoController::checkWatchdog);
+    connect(&diagnosticsTimer_, &QTimer::timeout, this, &VideoController::updateDiagnostics);
 
     connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
             &VideoController::onFrameProcessed);
@@ -110,8 +102,6 @@ void VideoController::start(const QByteArray& deviceId)
 
 void VideoController::start(const QByteArray& deviceId, const QCameraFormat& format)
 {
-    assert(startupTimer_);
-
     if (state_ != StreamingState::Stopped || camera_)
         return;
 
@@ -161,7 +151,7 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
             testFrameCounter_ = 0;
 #endif
 
-            startupTimer_->start(kStartupTimeoutMs);
+            startupTimer_.start(kStartupTimeoutMs);
 
             camera_->start();
 
@@ -186,8 +176,6 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
 
 void VideoController::start(const QUrl& url)
 {
-    assert(startupTimer_);
-
     if (state_ != StreamingState::Stopped || camera_)
         return;
 
@@ -207,7 +195,7 @@ void VideoController::start(const QUrl& url)
     testFrameCounter_ = 0;
 #endif
 
-    startupTimer_->start(kStartupTimeoutMs);
+    startupTimer_.start(kStartupTimeoutMs);
 
     mediaPlayer_.play();
 }
@@ -224,14 +212,12 @@ void VideoController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 
 void VideoController::stop()
 {
-    assert(startupTimer_ && watchdogTimer_ && diagnosticsTimer_);
-
     if (state_ == StreamingState::Stopped)
         return;
 
-    startupTimer_->stop();
-    watchdogTimer_->stop();
-    diagnosticsTimer_->stop();
+    startupTimer_.stop();
+    watchdogTimer_.stop();
+    diagnosticsTimer_.stop();
 
     if (camera_)
     {
@@ -258,8 +244,6 @@ void VideoController::stop()
 
 void VideoController::onFrameReceived(const QVideoFrame& frame)
 {
-    assert(startupTimer_ && watchdogTimer_ && diagnosticsTimer_);
-
 #ifdef FLUVEL_SIMULATE_STARTUP_TIMEOUT
     return;
 #endif
@@ -279,11 +263,11 @@ void VideoController::onFrameReceived(const QVideoFrame& frame)
     {
         state_ = StreamingState::Streaming;
 
-        startupTimer_->stop();
-        watchdogTimer_->start();
+        startupTimer_.stop();
+        watchdogTimer_.start();
 
         frameStats_.reset();
-        diagnosticsTimer_->start();
+        diagnosticsTimer_.start();
 
         streamingInfo_ = {};
         streamingInfo_.source = startupInfo_;

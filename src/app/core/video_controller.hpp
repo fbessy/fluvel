@@ -18,14 +18,13 @@
 #include <QMediaCaptureSession>
 #include <QMediaPlayer>
 #include <QObject>
+#include <QTimer>
 #include <QUrl>
 #include <QVideoSink>
 #include <QtCore/qglobal.h>
 
 // #define FLUVEL_SIMULATE_STARTUP_TIMEOUT
 // #define FLUVEL_SIMULATE_STREAM_LOSS
-
-class QTimer;
 
 namespace fluvel
 {
@@ -287,13 +286,13 @@ private:
     static constexpr int kDiagnosticsPeriodMs{500};               // 0.5 sec
 
     /// Timer used to detect startup timeout.
-    QTimer* startupTimer_{nullptr};
+    QTimer startupTimer_;
 
     /// Timer used for stream watchdog.
-    QTimer* watchdogTimer_{nullptr};
+    QTimer watchdogTimer_;
 
     /// Timer used for periodic diagnostics updates.
-    QTimer* diagnosticsTimer_{nullptr};
+    QTimer diagnosticsTimer_;
 
     /// Current streaming state.
     StreamingState state_{StreamingState::Stopped};
