@@ -9,7 +9,6 @@
 
 #include <QImage>
 #include <QObject>
-#include <QTimer>
 
 #include <vector>
 

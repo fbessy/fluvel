@@ -105,6 +105,9 @@ set(app_src
     ${UI_COMP_DIR}/right_panel_toggle_button.cpp
     ${UI_COMP_DIR}/right_panel_toggle_button.hpp
 
+    ${UI_COMP_DIR}/timeline_slider.cpp
+    ${UI_COMP_DIR}/timeline_slider.hpp
+
     ${UI_COMP_DIR}/image_viewer_listener.hpp
 
     ${CORE_DIR}/image_controller.cpp
@@ -160,6 +163,9 @@ set(app_src
 
     ${CORE_DIR}/video_format_utils.cpp
     ${CORE_DIR}/video_format_utils.hpp
+
+    ${CORE_DIR}/time_utils.cpp
+    ${CORE_DIR}/time_utils.hpp
 
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp

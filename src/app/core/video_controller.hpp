@@ -65,9 +65,6 @@ public:
      */
     explicit VideoController(const VideoSessionSettings& session, QObject* parent = nullptr);
 
-    /**
-     * @brief Destroy the controller and release resources.
-     */
     ~VideoController() override;
 
     /**
@@ -116,6 +113,13 @@ public:
      * Used for timing/latency measurements.
      */
     void onFrameDisplayed(const FrameTimestamps& ts);
+
+    /**
+     * @brief Seek to a position in the current media.
+     *
+     * @param posMs Target position in milliseconds.
+     */
+    void seek(qint64 posMs);
 
 signals:
     /// Emitted when available video inputs change.
@@ -166,6 +170,20 @@ signals:
     /// Emitted when downscale parameters change.
     void downscaleChanged(const fluvel::DownscaleParams& downscaleParams);
 
+    /**
+     * @brief Emitted when the playback position changes.
+     *
+     * @param positionMs Current playback position in milliseconds.
+     */
+    void playbackPositionChanged(qint64 positionMs);
+
+    /**
+     * @brief Emitted when media information changes.
+     *
+     * @param info Updated media information.
+     */
+    void mediaInfoChanged(const MediaInfo& info);
+
 private:
     /**
      * @brief Start streaming using a specific device.
@@ -206,7 +224,17 @@ private:
     /// Triggered when startup timeout is reached.
     void onStartupTimeout();
 
+    /**
+     * @brief Handle media player status changes.
+     *
+     * @param status New media status.
+     */
     void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
+
+    /**
+     * @brief Handle media metadata updates.
+     */
+    void onMetaDataChanged();
 
     /// Periodic watchdog to detect stream loss.
     void checkWatchdog();
@@ -214,7 +242,21 @@ private:
     /// Update internal diagnostics.
     void updateDiagnostics();
 
-    static QString shortSourceName(const QUrl& url);
+    /**
+     * @brief Refresh media information from the active source.
+     */
+    void updateMediaInfo();
+
+    /**
+     * @brief Determine whether a media title is suitable for display.
+     *
+     * Filters out empty or non-informative titles returned by multimedia
+     * backends.
+     *
+     * @param title Media title to evaluate.
+     * @return True if the title is considered useful.
+     */
+    static bool isUsefulMediaTitle(const QString& title);
 
     /// Whether to use an optimized camera format when available.
     bool useOptimizedFormat_{true};
@@ -254,7 +296,7 @@ private:
     QTimer* diagnosticsTimer_{nullptr};
 
     /// Current streaming state.
-    StreamingState state_ = StreamingState::Stopped;
+    StreamingState state_{StreamingState::Stopped};
 
     /// Information about the source being opened or streamed.
     SourceInfo startupInfo_{};
@@ -262,10 +304,11 @@ private:
     /// Runtime information about the active stream.
     StreamingInfo streamingInfo_{};
 
+    /// Information about the currently loaded media.
+    MediaInfo mediaInfo_{};
+
     //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.
     int64_t lastValidFrameTsNs_{0};
-
-    //! Timeout used to detect loss of video stream.
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     int testFrameCounter_{0};

@@ -9,10 +9,10 @@
 
 #include <QAudioOutput>
 #include <QCamera>
-#include <QDebug>
 #include <QFileInfo>
 #include <QMediaCaptureSession>
 #include <QMediaDevices>
+#include <QMediaMetaData>
 #include <QMediaPlayer>
 #include <QTimer>
 #include <QUrl>
@@ -66,6 +66,12 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
             &VideoController::onMediaStatusChanged);
 
     connect(&videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
+
+    connect(&mediaPlayer_, &QMediaPlayer::positionChanged, this,
+            &VideoController::playbackPositionChanged);
+
+    connect(&mediaPlayer_, &QMediaPlayer::metaDataChanged, this,
+            &VideoController::onMetaDataChanged);
 
     audioOutput_.setVolume(0.5f);
     mediaPlayer_.setAudioOutput(&audioOutput_);
@@ -144,6 +150,8 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
             startupInfo_.deviceFormat = camera_->cameraFormat();
             startupInfo_.description = camera_->cameraDevice().description();
 
+            mediaInfo_ = {};
+
             captureSession_.setCamera(camera_);
             captureSession_.setVideoSink(&videoSink_);
 
@@ -189,7 +197,8 @@ void VideoController::start(const QUrl& url)
     startupInfo_ = {};
     startupInfo_.type = SourceType::Media;
     startupInfo_.sourceUrl = url;
-    startupInfo_.description = shortSourceName(startupInfo_.sourceUrl);
+
+    mediaInfo_ = {};
 
     mediaPlayer_.setSource(url);
     mediaPlayer_.setVideoSink(&videoSink_);
@@ -205,6 +214,8 @@ void VideoController::start(const QUrl& url)
 
 void VideoController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
+    updateMediaInfo();
+
     if (status == QMediaPlayer::EndOfMedia)
     {
         stop();
@@ -238,6 +249,8 @@ void VideoController::stop()
         delete camera_;
         camera_ = nullptr;
     }
+
+    mediaInfo_ = {};
 
     state_ = StreamingState::Stopped;
     emit streamingStopped();
@@ -372,12 +385,11 @@ void VideoController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devic
     if (state_ == StreamingState::Stopped)
         return;
 
-    const bool cameraStillExists =
-        std::any_of(devices.begin(), devices.end(),
-                    [&](const QCameraDevice& dev)
-                    {
-                        return dev.id() == streamingInfo_.source.deviceId;
-                    });
+    const bool cameraStillExists = std::any_of(devices.begin(), devices.end(),
+                                               [&](const QCameraDevice& dev)
+                                               {
+                                                   return dev.id() == startupInfo_.deviceId;
+                                               });
 
     if (!cameraStillExists)
         stop();
@@ -453,12 +465,49 @@ QList<QCameraDevice> VideoController::videoInputs() const
     return QMediaDevices::videoInputs();
 }
 
-QString VideoController::shortSourceName(const QUrl& url)
+void VideoController::seek(qint64 posMs)
 {
-    if (url.isLocalFile())
-        return QFileInfo(url.toLocalFile()).fileName();
+    mediaPlayer_.setPosition(posMs);
+}
 
-    return url.fileName();
+void VideoController::onMetaDataChanged()
+{
+    updateMediaInfo();
+}
+
+bool VideoController::isUsefulMediaTitle(const QString& title)
+{
+    const QString trimmed = title.trimmed();
+
+    if (trimmed.isEmpty())
+        return false;
+
+    static const QStringList kIgnoredTitles{"video",    "track",   "track 1",
+                                            "untitled", "unknown", "media"};
+
+    return !kIgnoredTitles.contains(trimmed.toLower());
+}
+
+void VideoController::updateMediaInfo()
+{
+    MediaInfo info{};
+
+    info.seekable = mediaPlayer_.isSeekable();
+    info.durationMs = mediaPlayer_.duration();
+
+    const QString title = mediaPlayer_.metaData().stringValue(QMediaMetaData::Title);
+
+    if (isUsefulMediaTitle(title))
+        info.title = title;
+
+    const double fps = mediaPlayer_.metaData().value(QMediaMetaData::VideoFrameRate).toDouble();
+
+    if (fps > 0.0)
+        info.frameRate = fps;
+
+    mediaInfo_ = info;
+
+    emit mediaInfoChanged(mediaInfo_);
 }
 
 } // namespace fluvel

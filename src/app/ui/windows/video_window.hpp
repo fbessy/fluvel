@@ -28,6 +28,7 @@ class QLabel;
 class QLineEdit;
 class QStringListModel;
 class QCompleter;
+class QSlider;
 
 class QShowEvent;
 class QCloseEvent;
@@ -41,6 +42,7 @@ class VideoSettingsDialog;
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
 class ImageViewerWidget;
+class TimelineSlider;
 
 /**
  * @brief Streaming status for a camera device.
@@ -266,6 +268,11 @@ private:
 
     void updateSourceCompleter();
     void onSourceContextMenuRequested(const QPoint& pos);
+    void onPlaybackPositionChanged(qint64 pos);
+    void setSeekControlsVisible(bool visible);
+    void onMediaInfoChanged(const MediaInfo& info);
+    QString buildSourceTitle() const;
+    void appendStreamingInfo(QString& title, const StreamingInfo& info) const;
 
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
@@ -323,6 +330,16 @@ private:
     SourceConfig sourceConfig_{};
 
     LastReportedError lastReportedError_{};
+
+    QWidget* playbackBar_{nullptr};
+
+    TimelineSlider* playbackSlider_{nullptr};
+
+    QLabel* playbackPositionLabel_{nullptr};
+    QLabel* playbackDurationLabel_{nullptr};
+
+    StreamingInfo streamingInfo_{};
+    MediaInfo mediaInfo_{};
 };
 
 } // namespace fluvel

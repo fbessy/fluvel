@@ -16,6 +16,8 @@
 #include "pixel_info_behavior.hpp"
 #include "qcolor_utils.hpp"
 #include "right_panel_toggle_button.hpp"
+#include "time_utils.hpp"
+#include "timeline_slider.hpp"
 #include "video_controller.hpp"
 #include "video_format_utils.hpp"
 #include "video_settings_dialog.hpp"
@@ -32,6 +34,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QSettings>
+#include <QSlider>
 #include <QStringListModel>
 #include <QVBoxLayout>
 
@@ -194,6 +197,16 @@ void VideoWindow::createUi()
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
     videoSettingsWindow_ = new VideoSettingsDialog(config.compute, this);
+
+    // --- Playback bar ---
+    playbackBar_ = new QWidget(this);
+
+    playbackSlider_ = new TimelineSlider(this);
+
+    playbackPositionLabel_ = new QLabel("00:00");
+    playbackDurationLabel_ = new QLabel("00:00");
+
+    setSeekControlsVisible(false);
 }
 
 QIcon VideoWindow::createActiveCameraIcon()
@@ -285,6 +298,9 @@ void VideoWindow::setupLayout()
     vLayout->setContentsMargins(0, 0, 0, 0);
     vLayout->setSpacing(0);
 
+    //
+    // Top control bar
+    //
     QWidget* controlBar = new QWidget(central_);
 
     QVBoxLayout* controlBarLayout = new QVBoxLayout(controlBar);
@@ -293,8 +309,6 @@ void VideoWindow::setupLayout()
 
     QHBoxLayout* configLayout = new QHBoxLayout;
     configLayout->setSpacing(4);
-
-    QHBoxLayout* actionLayout = new QHBoxLayout;
 
     configLayout->addWidget(sourceLabel_);
     configLayout->addWidget(sourceTypeCombo_);
@@ -316,6 +330,8 @@ void VideoWindow::setupLayout()
     configLayout->addSpacing(8);
     configLayout->addWidget(settingsButton_);
 
+    QHBoxLayout* actionLayout = new QHBoxLayout;
+
     actionLayout->addWidget(toggleStreamingButton_);
     actionLayout->addWidget(applyButton_);
     actionLayout->addStretch();
@@ -325,18 +341,49 @@ void VideoWindow::setupLayout()
 
     toggleStreamingButton_->setFixedWidth(sourceWidth);
 
-    QHBoxLayout* contentLayout = new QHBoxLayout();
+    controlBarLayout->addLayout(configLayout);
+    controlBarLayout->addLayout(actionLayout);
+
+    //
+    // Video area
+    //
+    QHBoxLayout* contentLayout = new QHBoxLayout;
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
     contentLayout->addWidget(imageViewer_, 1);
     contentLayout->addWidget(displayBar_, 0);
 
-    controlBarLayout->addLayout(configLayout);
-    controlBarLayout->addLayout(actionLayout);
+    //
+    // Playback bar
+    //
+    QWidget* playbackBar = new QWidget(central_);
 
+    QHBoxLayout* playbackLayout = new QHBoxLayout(playbackBar);
+    playbackLayout->setContentsMargins(8, 4, 8, 4);
+
+    // Plus tard :
+    // playbackLayout->addWidget(playPauseButton_);
+
+    playbackLayout->addWidget(playbackPositionLabel_);
+    playbackLayout->addWidget(playbackSlider_, 1);
+    playbackLayout->addWidget(playbackDurationLabel_);
+
+    //
+    // Video + playback
+    //
+    QVBoxLayout* videoLayout = new QVBoxLayout;
+    videoLayout->setContentsMargins(0, 0, 0, 0);
+    videoLayout->setSpacing(0);
+
+    videoLayout->addLayout(contentLayout, 1);
+    videoLayout->addWidget(playbackBar);
+
+    //
+    // Main layout
+    //
     vLayout->addWidget(controlBar);
-    vLayout->addLayout(contentLayout);
+    vLayout->addLayout(videoLayout, 1);
 
     setCentralWidget(central_);
 }
@@ -456,6 +503,27 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::downscaleChanged, this,
             &VideoWindow::onDownscaleChanged);
+
+    connect(videoController_, &VideoController::playbackPositionChanged, this,
+            &VideoWindow::onPlaybackPositionChanged);
+
+    connect(playbackSlider_, &QSlider::sliderReleased, this,
+            [this]
+            {
+                videoController_->seek(playbackSlider_->value());
+            });
+
+    connect(playbackSlider_, &QSlider::sliderMoved, this,
+            [this]
+            {
+                playbackPositionLabel_->setText(
+                    time_utils::formatDuration(playbackSlider_->value()));
+
+                videoController_->seek(playbackSlider_->value());
+            });
+
+    connect(videoController_, &VideoController::mediaInfoChanged, this,
+            &VideoWindow::onMediaInfoChanged);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -881,6 +949,9 @@ void VideoWindow::startSource()
     if (!canStartSource())
         return;
 
+    streamingInfo_ = {};
+    mediaInfo_ = {};
+
     videoController_->start(sourceConfig_);
 }
 
@@ -900,6 +971,8 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
 {
     assert(imageViewer_);
 
+    streamingInfo_ = info;
+
     if (info.source.type == SourceType::Camera)
     {
         deviceStreamingStatus_[info.source.deviceId] = DeviceStreamingStatus::Streaming;
@@ -917,8 +990,6 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
     }
 
     refreshUi();
-
-    sourceTitleStr_ = sourceTitle(info);
 
     updateWindowTitle();
 
@@ -976,14 +1047,7 @@ QString VideoWindow::sourceTitle(const StreamingInfo& info) const
     if (title.isEmpty())
         title = tr("Video");
 
-    if (info.frameSize.isValid())
-        title += QString(" - %1x%2").arg(info.frameSize.width()).arg(info.frameSize.height());
-
-    if (info.pixelFormat != QVideoFrameFormat::Format_Invalid)
-        title += QString(" %1").arg(video_utils::pixelFormatToString(info.pixelFormat));
-
-    if (info.sourceFrameRate > 0.f)
-        title += QString(" @%1").arg(info.sourceFrameRate, 0, 'f', 0);
+    appendStreamingInfo(title, info);
 
     return title;
 }
@@ -991,6 +1055,10 @@ QString VideoWindow::sourceTitle(const StreamingInfo& info) const
 void VideoWindow::onStreamingStopped()
 {
     assert(imageViewer_);
+
+    streamingInfo_ = {};
+    mediaInfo_ = {};
+    setSeekControlsVisible(false);
 
     for (auto& state : deviceStreamingStatus_)
     {
@@ -1056,6 +1124,8 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     }
 
     refreshUi();
+
+    setSeekControlsVisible(false);
 }
 
 bool VideoWindow::shouldReportMediaError(const MediaPlayerErrorInfo& errorInfo)
@@ -1389,19 +1459,18 @@ void VideoWindow::onDownscaleChanged(const DownscaleParams& downscaleParams)
 
 void VideoWindow::updateWindowTitle()
 {
-    if (videoController_ && videoController_->isStreaming())
-    {
-        QString title = sourceTitleStr_;
-
-        if (!downscaleTitleStr_.isEmpty())
-            title += " " + downscaleTitleStr_;
-
-        setWindowTitle(title);
-    }
-    else
+    if (!videoController_ || !videoController_->isStreaming())
     {
         setWindowTitle(tr("Video"));
+        return;
     }
+
+    sourceTitleStr_ = buildSourceTitle();
+
+    if (!downscaleTitleStr_.isEmpty())
+        sourceTitleStr_ += " " + downscaleTitleStr_;
+
+    setWindowTitle(sourceTitleStr_);
 }
 
 void VideoWindow::openFile()
@@ -1475,6 +1544,77 @@ void VideoWindow::onSourceContextMenuRequested(const QPoint& pos)
     }
 
     delete menu;
+}
+
+void VideoWindow::onPlaybackPositionChanged(qint64 pos)
+{
+    if (playbackSlider_->isSliderDown())
+        return;
+
+    playbackSlider_->setValue(static_cast<int>(pos));
+
+    playbackPositionLabel_->setText(time_utils::formatDuration(pos));
+}
+
+void VideoWindow::setSeekControlsVisible(bool visible)
+{
+    assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_);
+
+    playbackSlider_->setVisible(visible);
+    playbackPositionLabel_->setVisible(visible);
+    playbackDurationLabel_->setVisible(visible);
+}
+
+void VideoWindow::onMediaInfoChanged(const MediaInfo& info)
+{
+    mediaInfo_ = info;
+
+    playbackSlider_->setRange(0, static_cast<int>(mediaInfo_.durationMs));
+
+    playbackDurationLabel_->setText(time_utils::formatDuration(mediaInfo_.durationMs));
+
+    setSeekControlsVisible(mediaInfo_.seekable);
+
+    updateWindowTitle();
+}
+
+QString VideoWindow::buildSourceTitle() const
+{
+    QString title;
+
+    if (!mediaInfo_.title.isEmpty())
+    {
+        title = mediaInfo_.title;
+        appendStreamingInfo(title, streamingInfo_);
+    }
+    else
+    {
+        title = sourceTitle(streamingInfo_);
+    }
+
+    return title;
+}
+
+void VideoWindow::appendStreamingInfo(QString& title, const StreamingInfo& info) const
+{
+    if (info.frameSize.isValid())
+    {
+        title += QString(" - %1x%2").arg(info.frameSize.width()).arg(info.frameSize.height());
+    }
+
+    if (info.pixelFormat != QVideoFrameFormat::Format_Invalid)
+    {
+        title += QString(" %1").arg(video_utils::pixelFormatToString(info.pixelFormat));
+    }
+
+    if (info.sourceFrameRate > 0.0)
+    {
+        title += QString(" @%1").arg(info.sourceFrameRate, 0, 'f', 0);
+    }
+    else if (mediaInfo_.frameRate > 0.0)
+    {
+        title += QString(" @%1").arg(mediaInfo_.frameRate, 0, 'f', 0);
+    }
 }
 
 } // namespace fluvel

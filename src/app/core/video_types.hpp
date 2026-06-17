@@ -153,18 +153,43 @@ struct StreamingInfo
      * @brief Source frame rate reported by the backend.
      */
     double sourceFrameRate{0.0};
+};
+
+/**
+ * @brief Metadata describing a media source.
+ *
+ * Contains information provided by the media backend that may become
+ * available asynchronously after the source has been opened.
+ *
+ * Unlike StreamingInfo, these properties describe the media itself
+ * rather than the currently received video frames.
+ */
+struct MediaInfo
+{
+    /**
+     * @brief Human-readable media title.
+     *
+     * Typically extracted from embedded metadata when available.
+     * Empty when no suitable title is provided by the media.
+     */
+    QString title;
 
     /**
      * @brief Indicates whether random seeking is supported.
+     *
+     * When true, playback position can be changed through the media
+     * timeline. Live streams are typically not seekable.
      */
     bool seekable{false};
 
     /**
      * @brief Media duration in milliseconds.
      *
-     * Zero when unknown or not applicable.
+     * Zero when unknown, unavailable, or not applicable.
      */
     qint64 durationMs{0};
+
+    double frameRate{0.0};
 };
 
 /**
