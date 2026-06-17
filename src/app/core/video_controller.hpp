@@ -312,6 +312,9 @@ private:
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     int testFrameCounter_{0};
 #endif
+
+    /// Whether the watchdog is allowed to report stream loss.
+    bool watchdogArmed_{true};
 };
 
 } // namespace fluvel

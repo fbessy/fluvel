@@ -258,6 +258,7 @@ void VideoController::onFrameReceived(const QVideoFrame& frame)
 
     const int64_t now = FrameClock::nowNs();
     lastValidFrameTsNs_ = now;
+    watchdogArmed_ = true;
 
     if (state_ == StreamingState::Starting)
     {
@@ -324,6 +325,9 @@ void VideoController::onStartupTimeout()
 
 void VideoController::checkWatchdog()
 {
+    if (!watchdogArmed_)
+        return;
+
     const int64_t frameAgeNs = FrameClock::nowNs() - lastValidFrameTsNs_;
 
     if (frameAgeNs > kStreamLossTimeoutNs)
@@ -451,6 +455,8 @@ QList<QCameraDevice> VideoController::videoInputs() const
 
 void VideoController::seek(qint64 posMs)
 {
+    watchdogArmed_ = false;
+
     mediaPlayer_.setPosition(posMs);
 }
 
