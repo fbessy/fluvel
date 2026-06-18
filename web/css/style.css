@@ -125,6 +125,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 20px;
 }
 
 .platform-icon {
@@ -172,6 +173,12 @@ body {
   box-shadow: 0 4px 12px rgba(74, 44, 255, 0.25);
 
   background: var(--fluvel-primary-soft);
+}
+
+.download-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 code {
