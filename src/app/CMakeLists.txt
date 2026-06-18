@@ -105,8 +105,14 @@ set(app_src
     ${UI_COMP_DIR}/right_panel_toggle_button.cpp
     ${UI_COMP_DIR}/right_panel_toggle_button.hpp
 
+    ${UI_COMP_DIR}/jump_slider.cpp
+    ${UI_COMP_DIR}/jump_slider.hpp
+
     ${UI_COMP_DIR}/timeline_slider.cpp
     ${UI_COMP_DIR}/timeline_slider.hpp
+
+    ${UI_COMP_DIR}/volume_slider.cpp
+    ${UI_COMP_DIR}/volume_slider.hpp
 
     ${UI_COMP_DIR}/image_viewer_listener.hpp
 
@@ -264,6 +270,10 @@ set(APP_RESOURCES
     ${FLUVEL_RESOURCES_DIR}/icons/view/sidebar-right-show.svg
 
     ${FLUVEL_RESOURCES_DIR}/icons/status/check-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/status/audio-volume-muted.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/status/audio-volume-low.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/status/audio-volume-medium.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/status/audio-volume-high.svg
 
     ${FLUVEL_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-en.txt
     ${FLUVEL_RESOURCES_DIR}/licenses/Licence_CeCILL_V2.1-fr.txt

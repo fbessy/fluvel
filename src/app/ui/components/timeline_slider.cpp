@@ -6,32 +6,20 @@
 
 #include <QMouseEvent>
 #include <QToolTip>
-#include <QWidget>
+
+#include <algorithm>
 
 namespace fluvel
 {
 
 TimelineSlider::TimelineSlider(QWidget* parent)
-    : QSlider(Qt::Horizontal, parent)
+    : JumpSlider(parent)
 {
-    setMouseTracking(true);
-}
-
-void TimelineSlider::mousePressEvent(QMouseEvent* event)
-{
-    if (event->button() == Qt::LeftButton)
-    {
-        const double ratio = static_cast<double>(event->position().x()) / width();
-
-        setValue(minimum() + ratio * (maximum() - minimum()));
-    }
-
-    QSlider::mousePressEvent(event);
 }
 
 void TimelineSlider::mouseMoveEvent(QMouseEvent* event)
 {
-    const double ratio = static_cast<double>(event->position().x()) / width();
+    const double ratio = std::clamp(static_cast<double>(event->position().x()) / width(), 0.0, 1.0);
 
     const qint64 positionMs = minimum() + ratio * (maximum() - minimum());
 

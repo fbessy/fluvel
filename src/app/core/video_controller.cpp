@@ -65,7 +65,6 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     connect(&mediaPlayer_, &QMediaPlayer::metaDataChanged, this,
             &VideoController::onMetaDataChanged);
 
-    audioOutput_.setVolume(0.5f);
     mediaPlayer_.setAudioOutput(&audioOutput_);
 }
 
@@ -458,6 +457,16 @@ void VideoController::seek(qint64 posMs)
     watchdogArmed_ = false;
 
     mediaPlayer_.setPosition(posMs);
+}
+
+float VideoController::volume() const
+{
+    return audioOutput_.volume();
+}
+
+void VideoController::setVolume(float volume)
+{
+    audioOutput_.setVolume(std::clamp(volume, 0.0f, 1.0f));
 }
 
 void VideoController::onMetaDataChanged()

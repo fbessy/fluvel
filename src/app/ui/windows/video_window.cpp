@@ -22,6 +22,7 @@
 #include "video_format_utils.hpp"
 #include "video_settings_dialog.hpp"
 #include "video_types.hpp"
+#include "volume_slider.hpp"
 
 #include <QCameraDevice>
 #include <QComboBox>
@@ -37,6 +38,7 @@
 #include <QSlider>
 #include <QStringListModel>
 #include <QVBoxLayout>
+#include <QWidgetAction>
 
 #include <utility>
 
@@ -173,6 +175,43 @@ void VideoWindow::createUi()
 
     toggleStreamingButton_ = new QPushButton;
 
+    volumeButton_ = new QPushButton(this);
+    volumeButton_->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    volumeSlider_ = new VolumeSlider;
+    volumeSlider_->setRange(0, 100);
+    volumeSlider_->setFixedWidth(150);
+
+    volumeLabel_ = new QLabel("100%");
+    volumeLabel_->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    volumeLabel_->setFixedWidth(volumeLabel_->fontMetrics().horizontalAdvance("100%"));
+
+    volumeMenu_ = new QMenu(this);
+
+    auto* popupWidget = new QWidget;
+
+    auto* popupLayout = new QHBoxLayout(popupWidget);
+    popupLayout->addWidget(volumeSlider_);
+    popupLayout->addWidget(volumeLabel_);
+    popupLayout->setContentsMargins(8, 8, 8, 8);
+
+    auto* action = new QWidgetAction(volumeMenu_);
+    action->setDefaultWidget(popupWidget);
+
+    volumeMenu_->addAction(action);
+
+    volumeMuteIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeMuted, ":/icons/status/audio-volume-muted.svg");
+
+    volumeLowIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeLow, ":/icons/status/audio-volume-low.svg");
+
+    volumeMediumIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeMedium, ":/icons/status/audio-volume-medium.svg");
+
+    volumeHighIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeHigh, ":/icons/status/audio-volume-high.svg");
+
     applyButton_ = new QPushButton;
     applyButton_->setVisible(false);
     applyButton_->setFlat(true);
@@ -207,6 +246,7 @@ void VideoWindow::createUi()
     playbackDurationLabel_ = new QLabel("00:00");
 
     setSeekControlsVisible(false);
+    volumeButton_->setVisible(false);
 }
 
 QIcon VideoWindow::createActiveCameraIcon()
@@ -333,6 +373,7 @@ void VideoWindow::setupLayout()
     QHBoxLayout* actionLayout = new QHBoxLayout;
 
     actionLayout->addWidget(toggleStreamingButton_);
+    actionLayout->addWidget(volumeButton_);
     actionLayout->addWidget(applyButton_);
     actionLayout->addStretch();
 
@@ -524,6 +565,28 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::mediaInfoChanged, this,
             &VideoWindow::onMediaInfoChanged);
+
+    connect(volumeSlider_, &QSlider::valueChanged, this, &VideoWindow::onVolumeChanged);
+
+    connect(volumeSlider_, &QSlider::sliderReleased, this, &VideoWindow::saveVolume);
+
+    connect(volumeSlider_, &QSlider::valueChanged, volumeLabel_,
+            [this](int value)
+            {
+                volumeLabel_->setText(QString("%1%").arg(value));
+            });
+
+    connect(volumeButton_, &QPushButton::clicked, this,
+            [this]()
+            {
+                volumeMenu_->popup(volumeButton_->mapToGlobal(QPoint(0, volumeButton_->height())));
+            });
+
+    connect(volumeButton_, &QWidget::customContextMenuRequested, this,
+            [this]()
+            {
+                toggleMute();
+            });
 }
 
 void VideoWindow::applyInitialSettings()
@@ -540,6 +603,14 @@ void VideoWindow::applyInitialSettings()
                          app.videoSettings().compute.temporalFilteringEnabled;
 
     displayBar_->updateDisplayModeAvailability(preprocessing);
+
+    QSettings settings;
+    const int volume = settings.value("media/volume", 50).toInt();
+    volumeSlider_->setValue(volume);
+    volumeLabel_->setText(QString("%1%").arg(volume));
+
+    updateVolumeIcon(volume);
+    videoController_->setVolume(volume / 100.f);
 
     loadLastSourceType();
 
@@ -685,8 +756,6 @@ void VideoWindow::updateDeviceList(const QList<QCameraDevice>& devices)
 
     if (currentIndex >= 0)
         onDeviceChanged(currentIndex);
-
-    emit cameraAvailabilityChanged(isCameraAvailable());
 }
 
 int VideoWindow::computeBestDeviceIndex(const QByteArray& previousSelection,
@@ -1058,7 +1127,9 @@ void VideoWindow::onStreamingStopped()
 
     streamingInfo_ = {};
     mediaInfo_ = {};
+
     setSeekControlsVisible(false);
+    volumeButton_->setVisible(false);
 
     for (auto& state : deviceStreamingStatus_)
     {
@@ -1126,6 +1197,7 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     refreshUi();
 
     setSeekControlsVisible(false);
+    volumeButton_->setVisible(false);
 }
 
 bool VideoWindow::shouldReportMediaError(const MediaPlayerErrorInfo& errorInfo)
@@ -1261,13 +1333,6 @@ void VideoWindow::refreshUi()
 
     updateDeviceList(videoController_->videoInputs());
     updateActionBar();
-}
-
-bool VideoWindow::isCameraAvailable() const
-{
-    assert(deviceSelector_);
-
-    return deviceSelector_->count() > 0;
 }
 
 QByteArray VideoWindow::loadSelectedCameraId()
@@ -1574,6 +1639,7 @@ void VideoWindow::onMediaInfoChanged(const MediaInfo& info)
     playbackDurationLabel_->setText(time_utils::formatDuration(mediaInfo_.durationMs));
 
     setSeekControlsVisible(mediaInfo_.seekable);
+    volumeButton_->setVisible(true);
 
     updateWindowTitle();
 }
@@ -1615,6 +1681,56 @@ void VideoWindow::appendStreamingInfo(QString& title, const StreamingInfo& info)
     {
         title += QString(" @%1").arg(mediaInfo_.frameRate, 0, 'f', 0);
     }
+}
+
+void VideoWindow::onVolumeChanged(int value)
+{
+    if (value > 0)
+        lastNonZeroVolume_ = value;
+
+    videoController_->setVolume(value / 100.f);
+    updateVolumeIcon(value);
+}
+
+void VideoWindow::toggleMute()
+{
+    if (volumeSlider_->value() == 0)
+    {
+        volumeSlider_->setValue(lastNonZeroVolume_);
+    }
+    else
+    {
+        lastNonZeroVolume_ = volumeSlider_->value();
+        volumeSlider_->setValue(0);
+    }
+}
+
+void VideoWindow::saveVolume()
+{
+    QSettings settings;
+    settings.setValue("media/volume", volumeSlider_->value());
+}
+
+void VideoWindow::updateVolumeIcon(int volume)
+{
+    if (volume == 0)
+    {
+        volumeButton_->setIcon(volumeMuteIcon_);
+    }
+    else if (volume < 33)
+    {
+        volumeButton_->setIcon(volumeLowIcon_);
+    }
+    else if (volume < 66)
+    {
+        volumeButton_->setIcon(volumeMediumIcon_);
+    }
+    else
+    {
+        volumeButton_->setIcon(volumeHighIcon_);
+    }
+
+    volumeButton_->setToolTip(tr("Volume: %1%").arg(volume));
 }
 
 } // namespace fluvel

@@ -43,6 +43,7 @@ class RightPanelToggleButton;
 class DisplaySettingsWidget;
 class ImageViewerWidget;
 class TimelineSlider;
+class VolumeSlider;
 
 /**
  * @brief Streaming status for a camera device.
@@ -151,17 +152,7 @@ public:
      */
     explicit VideoWindow(QWidget* parent = nullptr);
 
-    /**
-     * @brief Returns whether at least one camera device is available.
-     */
-    bool isCameraAvailable() const;
-
 signals:
-
-    /**
-     * @brief Emitted when camera availability changes.
-     */
-    void cameraAvailabilityChanged(bool available);
 
     /**
      * @brief Emitted when the window is shown.
@@ -274,6 +265,11 @@ private:
     QString buildSourceTitle() const;
     void appendStreamingInfo(QString& title, const StreamingInfo& info) const;
 
+    void onVolumeChanged(int value);
+    void updateVolumeIcon(int volume);
+    void toggleMute();
+    void saveVolume();
+
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
 
@@ -340,6 +336,18 @@ private:
 
     StreamingInfo streamingInfo_{};
     MediaInfo mediaInfo_{};
+
+    QPushButton* volumeButton_{nullptr};
+    VolumeSlider* volumeSlider_{nullptr};
+    QLabel* volumeLabel_{nullptr};
+    QMenu* volumeMenu_{nullptr};
+
+    QIcon volumeMuteIcon_;
+    QIcon volumeLowIcon_;
+    QIcon volumeMediumIcon_;
+    QIcon volumeHighIcon_;
+
+    int lastNonZeroVolume_{50};
 };
 
 } // namespace fluvel

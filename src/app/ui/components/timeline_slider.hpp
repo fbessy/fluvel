@@ -3,11 +3,9 @@
 
 #pragma once
 
-#include <QObject>
-#include <QSlider>
+#include "jump_slider.hpp"
 
 class QMouseEvent;
-class QWidget;
 
 namespace fluvel
 {
@@ -18,10 +16,8 @@ namespace fluvel
  * This slider allows direct seeking by clicking or dragging at any position
  * on the timeline, updating its value according to the mouse position.
  */
-class TimelineSlider : public QSlider
+class TimelineSlider : public JumpSlider
 {
-    Q_OBJECT
-
 public:
     /**
      * @brief Constructs a timeline slider.
@@ -32,18 +28,9 @@ public:
 
 protected:
     /**
-     * @brief Handles mouse press events.
+     * @brief Handles mouse move events.
      *
-     * Updates the slider position according to the clicked location.
-     *
-     * @param event Mouse event.
-     */
-    void mousePressEvent(QMouseEvent* event) override;
-
-    /**
-     * @brief Handles mouse press events.
-     *
-     * Updates the slider position according to the clicked location.
+     * Displays the media position corresponding to the current mouse location.
      *
      * @param event Mouse event.
      */

@@ -120,6 +120,18 @@ public:
      */
     void seek(qint64 posMs);
 
+    /**
+     * @brief Returns the current audio volume.
+     *      * @return Volume in the range [0.0, 1.0].
+     */
+    float volume() const;
+
+    /**
+     * @brief Sets the audio volume.
+     *      * @param volume Volume in the range [0.0, 1.0].
+     */
+    void setVolume(float volume);
+
 signals:
     /// Emitted when available video inputs change.
     void videoInputsChanged(const QList<QCameraDevice>& devices);
