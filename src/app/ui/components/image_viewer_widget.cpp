@@ -372,10 +372,16 @@ void ImageViewerWidget::toggleFullscreen()
 
     if (!isFullScreenMode_)
     {
+        previousAutoFitEnabled_ = autoFitEnabled_;
+        previousTransform_ = transform();
+
         normalGeometry_ = window()->geometry();
         normalWindowFlags_ = window()->windowFlags();
+
         window()->setWindowFlags(Qt::Window);
         window()->showFullScreen();
+
+        applyAutoFit();
 
         isFullScreenMode_ = true;
     }
@@ -384,6 +390,14 @@ void ImageViewerWidget::toggleFullscreen()
         window()->setWindowFlags(normalWindowFlags_);
         window()->showNormal();
         window()->setGeometry(normalGeometry_);
+
+        autoFitEnabled_ = previousAutoFitEnabled_;
+
+        if (previousAutoFitEnabled_)
+            applyAutoFit();
+        else
+            setTransform(previousTransform_);
+
         isFullScreenMode_ = false;
     }
 

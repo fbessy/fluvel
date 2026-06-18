@@ -18,6 +18,7 @@
 #include <QGraphicsView>
 #include <QImage>
 #include <QTimer>
+#include <QTransform>
 
 class QWheelEvent;
 class QMouseEvent;
@@ -344,6 +345,9 @@ private:
     bool dragHighlight_{false};
 
     const bool useEnhancedDisplayConfig_{false};
+
+    bool previousAutoFitEnabled_;
+    QTransform previousTransform_;
 };
 
 } // namespace fluvel
