@@ -330,6 +330,9 @@ void VideoController::onStartupTimeout()
 
 void VideoController::checkWatchdog()
 {
+    if (isPaused())
+        return;
+
     if (!watchdogArmed_)
         return;
 
@@ -524,8 +527,6 @@ bool VideoController::isPaused() const
 
 void VideoController::pause()
 {
-    watchdogArmed_ = false;
-
     mediaPlayer_.pause();
 }
 
