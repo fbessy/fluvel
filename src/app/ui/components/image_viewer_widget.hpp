@@ -346,8 +346,11 @@ private:
 
     const bool useEnhancedDisplayConfig_{false};
 
-    bool previousAutoFitEnabled_;
+    bool previousAutoFitEnabled_{true};
     QTransform previousTransform_;
+
+    int previousHScroll_{0};
+    int previousVScroll_{0};
 };
 
 } // namespace fluvel

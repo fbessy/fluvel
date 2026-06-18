@@ -374,6 +374,8 @@ void ImageViewerWidget::toggleFullscreen()
     {
         previousAutoFitEnabled_ = autoFitEnabled_;
         previousTransform_ = transform();
+        previousHScroll_ = horizontalScrollBar()->value();
+        previousVScroll_ = verticalScrollBar()->value();
 
         normalGeometry_ = window()->geometry();
         normalWindowFlags_ = window()->windowFlags();
@@ -395,6 +397,9 @@ void ImageViewerWidget::toggleFullscreen()
             applyAutoFit();
         else
             setTransform(previousTransform_);
+
+        horizontalScrollBar()->setValue(previousHScroll_);
+        verticalScrollBar()->setValue(previousVScroll_);
 
         isFullScreenMode_ = false;
     }
