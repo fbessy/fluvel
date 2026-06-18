@@ -65,6 +65,12 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     connect(&mediaPlayer_, &QMediaPlayer::metaDataChanged, this,
             &VideoController::onMetaDataChanged);
 
+    connect(&mediaPlayer_, &QMediaPlayer::playbackStateChanged, this,
+            [this](QMediaPlayer::PlaybackState state)
+            {
+                emit pausedChanged(state == QMediaPlayer::PausedState);
+            });
+
     mediaPlayer_.setAudioOutput(&audioOutput_);
 }
 
@@ -494,6 +500,8 @@ void VideoController::updateMediaInfo()
     info.seekable = mediaPlayer_.isSeekable();
     info.durationMs = mediaPlayer_.duration();
 
+    info.hasAudio = mediaPlayer_.hasAudio();
+
     const QString title = mediaPlayer_.metaData().stringValue(QMediaMetaData::Title);
 
     if (isUsefulMediaTitle(title))
@@ -507,6 +515,23 @@ void VideoController::updateMediaInfo()
     mediaInfo_ = info;
 
     emit mediaInfoChanged(mediaInfo_);
+}
+
+bool VideoController::isPaused() const
+{
+    return mediaPlayer_.playbackState() == QMediaPlayer::PausedState;
+}
+
+void VideoController::pause()
+{
+    watchdogArmed_ = false;
+
+    mediaPlayer_.pause();
+}
+
+void VideoController::resume()
+{
+    mediaPlayer_.play();
 }
 
 } // namespace fluvel

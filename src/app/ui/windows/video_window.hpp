@@ -259,11 +259,18 @@ private:
 
     void updateSourceCompleter();
     void onSourceContextMenuRequested(const QPoint& pos);
-    void onPlaybackPositionChanged(qint64 pos);
-    void setSeekControlsVisible(bool visible);
+
     void onMediaInfoChanged(const MediaInfo& info);
     QString buildSourceTitle() const;
     void appendStreamingInfo(QString& title, const StreamingInfo& info) const;
+
+    void updateMediaControls();
+
+    void onPlaybackPositionChanged(qint64 pos);
+    void setSeekControlsVisible(bool visible);
+
+    void updatePlayPauseButton(bool paused);
+    void togglePause();
 
     void onVolumeChanged(int value);
     void updateVolumeIcon(int volume);
@@ -289,8 +296,6 @@ private:
     QComboBox* sourceCombo_{nullptr};
     QIcon clearHistoryIcon_;
 
-    QPushButton* toggleStreamingButton_{nullptr};
-    QPushButton* applyButton_{nullptr};
     RightPanelToggleButton* rightPanelToggle_{nullptr};
     QPushButton* settingsButton_{nullptr};
     QIcon startIcon_;
@@ -298,6 +303,10 @@ private:
     QIcon settingsIcon_;
 
     DisplaySettingsWidget* displayBar_{nullptr};
+
+    QWidget* sourceActionsWidget_{nullptr};
+    QPushButton* toggleStreamingButton_{nullptr};
+    QPushButton* applyButton_{nullptr};
 
     QSet<QByteArray> lastKnownDeviceIds_;
 
@@ -327,7 +336,11 @@ private:
 
     LastReportedError lastReportedError_{};
 
-    QWidget* playbackBar_{nullptr};
+    QWidget* mediaControlsWidget_{nullptr};
+
+    QPushButton* playPauseButton_{nullptr};
+    QIcon resumeIcon_;
+    QIcon pauseIcon_;
 
     TimelineSlider* playbackSlider_{nullptr};
 

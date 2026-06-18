@@ -189,6 +189,14 @@ struct MediaInfo
      */
     qint64 durationMs{0};
 
+    /**
+     * @brief Whether the media contains audio.
+     */
+    bool hasAudio{false};
+
+    /**
+     * @brief Source frame rate reported by the backend.
+     */
     double frameRate{0.0};
 };
 

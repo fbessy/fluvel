@@ -132,6 +132,23 @@ public:
      */
     void setVolume(float volume);
 
+    /**
+     * @brief Check whether media playback is currently paused.
+     *
+     * @return True if playback is paused, false otherwise.
+     */
+    bool isPaused() const;
+
+    /**
+     * @brief Pause media playback.
+     */
+    void pause();
+
+    /**
+     * @brief Resume media playback.
+     */
+    void resume();
+
 signals:
     /// Emitted when available video inputs change.
     void videoInputsChanged(const QList<QCameraDevice>& devices);
@@ -194,6 +211,13 @@ signals:
      * @param info Updated media information.
      */
     void mediaInfoChanged(const MediaInfo& info);
+
+    /**
+     * @brief Emitted when media playback is paused or resumed.
+     *
+     * @param paused Current pause state.
+     */
+    void pausedChanged(bool paused);
 
 private:
     /**

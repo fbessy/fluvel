@@ -174,6 +174,80 @@ void VideoWindow::createUi()
                              ":/icons/media/media-playback-stop-symbolic.svg");
 
     toggleStreamingButton_ = new QPushButton;
+    const int sourceWidth =
+        sourceLabel_->sizeHint().width() + sourceTypeCombo_->sizeHint().width() + 4;
+    toggleStreamingButton_->setFixedWidth(sourceWidth);
+
+    QIcon applyIcon = createActiveFormatIcon();
+
+    applyButton_ = new QPushButton;
+    applyButton_->setIcon(applyIcon);
+    applyButton_->setVisible(false);
+    applyButton_->setFlat(true);
+    applyButton_->setText(tr("Apply"));
+    applyButton_->setToolTip(tr("Restart the active source using the selected configuration."));
+
+    sourceActionsWidget_ = new QWidget(this);
+
+    auto* sourceActionsLayout = new QHBoxLayout(sourceActionsWidget_);
+    sourceActionsLayout->setContentsMargins(0, 0, 0, 0);
+
+    sourceActionsLayout->addWidget(toggleStreamingButton_);
+    sourceActionsLayout->addSpacing(20);
+    sourceActionsLayout->addWidget(applyButton_);
+    sourceActionsLayout->setAlignment(Qt::AlignLeft);
+
+    const int actionsWidth = toggleStreamingButton_->width() + applyButton_->sizeHint().width() +
+                             sourceActionsLayout->spacing() + 20;
+
+    sourceActionsWidget_->setFixedWidth(actionsWidth);
+
+    rightPanelToggle_ = new RightPanelToggleButton;
+
+    settingsButton_ = new QPushButton;
+    settingsButton_->setToolTip(tr("Open video session settings."));
+    settingsButton_->setFlat(true);
+    settingsButton_->setFocusPolicy(Qt::NoFocus);
+
+    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
+
+    settingsButton_->setIcon(settingsIcon_);
+
+    // --- Display bar ---
+    displayBar_ = new DisplaySettingsWidget(config.display, central_);
+
+    videoSettingsWindow_ = new VideoSettingsDialog(config.compute, this);
+
+    // --- Play/Pause button ---
+
+    resumeIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
+                               ":/icons/media/media-playback-start-symbolic.svg");
+
+    pauseIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause,
+                              ":/icons/media/media-playback-pause-symbolic.svg");
+
+    playPauseButton_ = new QPushButton;
+    playPauseButton_->setIcon(resumeIcon_);
+
+    // --- Playback widgets ---
+    playbackSlider_ = new TimelineSlider(this);
+    playbackSlider_->setMinimumWidth(250);
+
+    playbackPositionLabel_ = new QLabel("00:00");
+    playbackDurationLabel_ = new QLabel("00:00");
+
+    // --- Volume widgets ---
+    volumeMuteIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeMuted, ":/icons/status/audio-volume-muted.svg");
+
+    volumeLowIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeLow, ":/icons/status/audio-volume-low.svg");
+
+    volumeMediumIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeMedium, ":/icons/status/audio-volume-medium.svg");
+
+    volumeHighIcon_ =
+        il::loadIcon(QIcon::ThemeIcon::AudioVolumeHigh, ":/icons/status/audio-volume-high.svg");
 
     volumeButton_ = new QPushButton(this);
     volumeButton_->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -200,51 +274,19 @@ void VideoWindow::createUi()
 
     volumeMenu_->addAction(action);
 
-    volumeMuteIcon_ =
-        il::loadIcon(QIcon::ThemeIcon::AudioVolumeMuted, ":/icons/status/audio-volume-muted.svg");
+    mediaControlsWidget_ = new QWidget(this);
 
-    volumeLowIcon_ =
-        il::loadIcon(QIcon::ThemeIcon::AudioVolumeLow, ":/icons/status/audio-volume-low.svg");
+    auto* mediaLayout = new QHBoxLayout(mediaControlsWidget_);
+    mediaLayout->setContentsMargins(0, 0, 0, 0);
+    mediaLayout->addSpacing(20);
 
-    volumeMediumIcon_ =
-        il::loadIcon(QIcon::ThemeIcon::AudioVolumeMedium, ":/icons/status/audio-volume-medium.svg");
+    mediaLayout->addWidget(playPauseButton_);
+    mediaLayout->addWidget(playbackPositionLabel_);
+    mediaLayout->addWidget(playbackSlider_, 1);
+    mediaLayout->addWidget(playbackDurationLabel_);
+    mediaLayout->addWidget(volumeButton_);
 
-    volumeHighIcon_ =
-        il::loadIcon(QIcon::ThemeIcon::AudioVolumeHigh, ":/icons/status/audio-volume-high.svg");
-
-    applyButton_ = new QPushButton;
-    applyButton_->setVisible(false);
-    applyButton_->setFlat(true);
-    applyButton_->setText(tr("Apply"));
-    applyButton_->setToolTip(tr("Restart the active source using the selected configuration."));
-
-    QIcon applyIcon = createActiveFormatIcon();
-    applyButton_->setIcon(applyIcon);
-
-    rightPanelToggle_ = new RightPanelToggleButton;
-
-    settingsButton_ = new QPushButton;
-    settingsButton_->setToolTip(tr("Open video session settings."));
-    settingsButton_->setFlat(true);
-    settingsButton_->setFocusPolicy(Qt::NoFocus);
-
-    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
-
-    settingsButton_->setIcon(settingsIcon_);
-
-    // --- Display bar ---
-    displayBar_ = new DisplaySettingsWidget(config.display, central_);
-
-    videoSettingsWindow_ = new VideoSettingsDialog(config.compute, this);
-
-    // --- Playback bar ---
-    playbackBar_ = new QWidget(this);
-
-    playbackSlider_ = new TimelineSlider(this);
-
-    playbackPositionLabel_ = new QLabel("00:00");
-    playbackDurationLabel_ = new QLabel("00:00");
-
+    playPauseButton_->setVisible(false);
     setSeekControlsVisible(false);
     volumeButton_->setVisible(false);
 }
@@ -347,6 +389,9 @@ void VideoWindow::setupLayout()
     controlBarLayout->setContentsMargins(8, 4, 8, 4);
     controlBarLayout->setSpacing(8);
 
+    //
+    // Source configuration
+    //
     QHBoxLayout* configLayout = new QHBoxLayout;
     configLayout->setSpacing(4);
 
@@ -370,17 +415,16 @@ void VideoWindow::setupLayout()
     configLayout->addSpacing(8);
     configLayout->addWidget(settingsButton_);
 
+    //
+    // Actions + media controls
+    //
     QHBoxLayout* actionLayout = new QHBoxLayout;
 
-    actionLayout->addWidget(toggleStreamingButton_);
-    actionLayout->addWidget(volumeButton_);
-    actionLayout->addWidget(applyButton_);
+    actionLayout->addWidget(sourceActionsWidget_);
+
     actionLayout->addStretch();
 
-    int sourceWidth = sourceLabel_->sizeHint().width() + sourceTypeCombo_->sizeHint().width() +
-                      configLayout->spacing();
-
-    toggleStreamingButton_->setFixedWidth(sourceWidth);
+    actionLayout->addWidget(mediaControlsWidget_, 1);
 
     controlBarLayout->addLayout(configLayout);
     controlBarLayout->addLayout(actionLayout);
@@ -396,35 +440,10 @@ void VideoWindow::setupLayout()
     contentLayout->addWidget(displayBar_, 0);
 
     //
-    // Playback bar
-    //
-    QWidget* playbackBar = new QWidget(central_);
-
-    QHBoxLayout* playbackLayout = new QHBoxLayout(playbackBar);
-    playbackLayout->setContentsMargins(8, 4, 8, 4);
-
-    // Plus tard :
-    // playbackLayout->addWidget(playPauseButton_);
-
-    playbackLayout->addWidget(playbackPositionLabel_);
-    playbackLayout->addWidget(playbackSlider_, 1);
-    playbackLayout->addWidget(playbackDurationLabel_);
-
-    //
-    // Video + playback
-    //
-    QVBoxLayout* videoLayout = new QVBoxLayout;
-    videoLayout->setContentsMargins(0, 0, 0, 0);
-    videoLayout->setSpacing(0);
-
-    videoLayout->addLayout(contentLayout, 1);
-    videoLayout->addWidget(playbackBar);
-
-    //
     // Main layout
     //
     vLayout->addWidget(controlBar);
-    vLayout->addLayout(videoLayout, 1);
+    vLayout->addLayout(contentLayout, 1);
 
     setCentralWidget(central_);
 }
@@ -587,6 +606,11 @@ void VideoWindow::setupConnections()
             {
                 toggleMute();
             });
+
+    connect(playPauseButton_, &QPushButton::clicked, this, &VideoWindow::togglePause);
+
+    connect(videoController_, &VideoController::pausedChanged, this,
+            &VideoWindow::updatePlayPauseButton);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -1128,6 +1152,7 @@ void VideoWindow::onStreamingStopped()
     streamingInfo_ = {};
     mediaInfo_ = {};
 
+    playPauseButton_->setVisible(false);
     setSeekControlsVisible(false);
     volumeButton_->setVisible(false);
 
@@ -1196,6 +1221,7 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 
     refreshUi();
 
+    playPauseButton_->setVisible(false);
     setSeekControlsVisible(false);
     volumeButton_->setVisible(false);
 }
@@ -1613,6 +1639,8 @@ void VideoWindow::onSourceContextMenuRequested(const QPoint& pos)
 
 void VideoWindow::onPlaybackPositionChanged(qint64 pos)
 {
+    assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_);
+
     if (playbackSlider_->isSliderDown())
         return;
 
@@ -1632,14 +1660,18 @@ void VideoWindow::setSeekControlsVisible(bool visible)
 
 void VideoWindow::onMediaInfoChanged(const MediaInfo& info)
 {
+    assert(playbackSlider_ && playbackDurationLabel_ && videoController_ && playPauseButton_ &&
+           volumeButton_);
+
     mediaInfo_ = info;
 
     playbackSlider_->setRange(0, static_cast<int>(mediaInfo_.durationMs));
 
     playbackDurationLabel_->setText(time_utils::formatDuration(mediaInfo_.durationMs));
 
-    setSeekControlsVisible(mediaInfo_.seekable);
-    volumeButton_->setVisible(true);
+    updatePlayPauseButton(videoController_->isPaused());
+
+    updateMediaControls();
 
     updateWindowTitle();
 }
@@ -1731,6 +1763,39 @@ void VideoWindow::updateVolumeIcon(int volume)
     }
 
     volumeButton_->setToolTip(tr("Volume: %1%").arg(volume));
+}
+
+void VideoWindow::updatePlayPauseButton(bool paused)
+{
+    playPauseButton_->setIcon(paused ? resumeIcon_ : pauseIcon_);
+}
+
+void VideoWindow::togglePause()
+{
+    if (videoController_->isPaused())
+    {
+        videoController_->resume();
+    }
+    else
+    {
+        videoController_->pause();
+    }
+}
+
+void VideoWindow::updateMediaControls()
+{
+    const bool hasSeek = mediaInfo_.seekable;
+    const bool hasAudio = mediaInfo_.hasAudio;
+
+    playPauseButton_->setVisible(hasSeek);
+
+    playbackPositionLabel_->setVisible(hasSeek);
+    playbackSlider_->setVisible(hasSeek);
+    playbackDurationLabel_->setVisible(hasSeek);
+
+    volumeButton_->setVisible(hasAudio);
+
+    mediaControlsWidget_->setVisible(hasSeek || hasAudio);
 }
 
 } // namespace fluvel
