@@ -378,7 +378,6 @@ void ImageViewerWidget::toggleFullscreen()
         normalGeometry_ = window()->geometry();
         normalWindowFlags_ = window()->windowFlags();
 
-        window()->setWindowFlags(Qt::Window);
         window()->showFullScreen();
 
         applyAutoFit();
@@ -387,7 +386,6 @@ void ImageViewerWidget::toggleFullscreen()
     }
     else
     {
-        window()->setWindowFlags(normalWindowFlags_);
         window()->showNormal();
         window()->setGeometry(normalGeometry_);
 
