@@ -20,11 +20,12 @@ class JumpSlider : public QSlider
 {
 public:
     /**
-     * @brief Constructs a jump slider.
+     * @brief Constructs a jump slider with the specified orientation.
      *
      * @param parent Parent widget.
+     * @param orientation Orientation of the slider.
      */
-    explicit JumpSlider(QWidget* parent = nullptr);
+    explicit JumpSlider(QWidget* parent = nullptr, Qt::Orientation orientation = Qt::Horizontal);
 
 protected:
     /**

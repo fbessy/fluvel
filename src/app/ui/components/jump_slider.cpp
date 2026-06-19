@@ -11,8 +11,8 @@
 namespace fluvel
 {
 
-JumpSlider::JumpSlider(QWidget* parent)
-    : QSlider(Qt::Horizontal, parent)
+JumpSlider::JumpSlider(QWidget* parent, Qt::Orientation orientation)
+    : QSlider(orientation, parent)
 {
     setMouseTracking(true);
 }
@@ -21,8 +21,19 @@ void JumpSlider::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        const double ratio =
-            std::clamp(static_cast<double>(event->position().x()) / width(), 0.0, 1.0);
+        double ratio = 0.0;
+
+        if (orientation() == Qt::Horizontal)
+        {
+            ratio = event->position().x() / width();
+        }
+        else
+        {
+            // Qt places the minimum value at the bottom for vertical sliders.
+            ratio = 1.0 - (event->position().y() / height());
+        }
+
+        ratio = std::clamp(ratio, 0.0, 1.0);
 
         setValue(minimum() + ratio * (maximum() - minimum()));
     }
