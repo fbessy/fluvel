@@ -143,8 +143,8 @@ void ImageWindow::setupUi()
     vLayout->setSpacing(0);
 
     // --- Control bar ---
-    QWidget* controlBar = new QWidget(central);
-    QHBoxLayout* controlLayout = new QHBoxLayout(controlBar);
+    controlBar_ = new QWidget(central);
+    QHBoxLayout* controlLayout = new QHBoxLayout(controlBar_);
     controlLayout->setContentsMargins(8, 4, 8, 4);
     controlLayout->setSpacing(6);
 
@@ -188,7 +188,7 @@ void ImageWindow::setupUi()
     contentLayout->addWidget(displayBar_, 0); // largeur naturelle
 
     // Assemblage global
-    vLayout->addWidget(controlBar);
+    vLayout->addWidget(controlBar_);
     vLayout->addLayout(contentLayout);
 
     setCentralWidget(central);
@@ -574,6 +574,9 @@ void ImageWindow::setupUserActionsConnections()
     // when the user drag and drop an image in the view of the image window.
     connect(imageViewer_, &ImageViewerWidget::imageDropped, imageController_,
             &ImageController::loadImage);
+
+    connect(imageViewer_, &ImageViewerWidget::toggleFullscreenRequested, this,
+            &ImageWindow::toggleFullscreen);
 }
 
 void ImageWindow::setupFileEventConnections()
@@ -866,6 +869,50 @@ void ImageWindow::showEvent(QShowEvent* event)
                        });
 
     QMainWindow::showEvent(event);
+}
+
+void ImageWindow::toggleFullscreen()
+{
+    if (!isFullScreen_)
+    {
+        enterFullscreen();
+    }
+    else
+    {
+        leaveFullscreen();
+    }
+}
+
+void ImageWindow::enterFullscreen()
+{
+    imageViewer_->enterFullscreenMode();
+
+    menuBar()->hide();
+
+    controlBar_->hide();
+    displayBar_->hide();
+
+    statusBar()->hide();
+
+    showFullScreen();
+
+    isFullScreen_ = true;
+}
+
+void ImageWindow::leaveFullscreen()
+{
+    imageViewer_->leaveFullscreenMode();
+
+    showNormal();
+
+    menuBar()->show();
+
+    controlBar_->show();
+    displayBar_->show();
+
+    statusBar()->show();
+
+    isFullScreen_ = false;
 }
 
 } // namespace fluvel

@@ -187,6 +187,9 @@ public:
      */
 
     void toggleFullscreen();
+    void enterFullscreenMode();
+    void leaveFullscreenMode();
+
     void applyAutoFit();
 
     bool isPanRelevant() const;
@@ -228,6 +231,11 @@ signals:
      * @brief Emitted when an image is dropped.
      */
     void imageDropped(const QString& path);
+
+    /**
+     * @brief Emitted when the user requests toggling fullscreen mode.
+     */
+    void toggleFullscreenRequested();
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -332,12 +340,7 @@ private:
 
     // --- Zoom / Pan ---
     const double minZoom_{0.1};
-    const double maxZoom_{20.0};
-
-    // --- Fullscreen ---
-    bool isFullScreenMode_{false};
-    QRect normalGeometry_;
-    Qt::WindowFlags normalWindowFlags_;
+    const double maxZoom_{100.0};
 
     QGraphicsBlurEffect* blur_{nullptr};
     bool placeholderVisible_{false};
@@ -348,9 +351,13 @@ private:
 
     bool previousAutoFitEnabled_{true};
     QTransform previousTransform_;
-
+    QPointF previousSceneCenter_;
     int previousHScroll_{0};
     int previousVScroll_{0};
+    Qt::ScrollBarPolicy previousHScrollPolicy_{Qt::ScrollBarAsNeeded};
+    Qt::ScrollBarPolicy previousVScrollPolicy_{Qt::ScrollBarAsNeeded};
+
+    QBrush previousBackgroundBrush_;
 };
 
 } // namespace fluvel

@@ -64,6 +64,9 @@ void ImageViewerWidget::initializeView()
 
 void ImageViewerWidget::setupView()
 {
+    setFrameShape(QFrame::NoFrame);
+    setFrameStyle(QFrame::NoFrame);
+
     setRenderHint(QPainter::SmoothPixmapTransform, false);
     setAlignment(Qt::AlignCenter);
 
@@ -368,40 +371,83 @@ double ImageViewerWidget::currentZoom() const
 
 void ImageViewerWidget::toggleFullscreen()
 {
+    emit toggleFullscreenRequested();
+}
+
+void ImageViewerWidget::enterFullscreenMode()
+{
     const QPoint overlayPosition = textPosition(infoOverlay_);
 
-    if (!isFullScreenMode_)
+    previousAutoFitEnabled_ = autoFitEnabled_;
+    previousTransform_ = transform();
+    previousBackgroundBrush_ = backgroundBrush();
+    previousHScrollPolicy_ = horizontalScrollBarPolicy();
+    previousVScrollPolicy_ = verticalScrollBarPolicy();
+
+    // previousSceneCenter_ = mapToScene(viewport()->rect().center());
+    // qDebug() << "save center" << previousSceneCenter_;
+
+    previousHScroll_ = horizontalScrollBar()->value();
+    previousVScroll_ = verticalScrollBar()->value();
+
+    // qDebug() << "save H" << previousHScroll_ << horizontalScrollBar()->maximum();
+    // qDebug() << "save V" << previousVScroll_ << verticalScrollBar()->maximum();
+
+    setBackgroundBrush(Qt::black);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    applyAutoFit();
+
+    setTextPosition(overlayPosition, infoOverlay_);
+    updateMiniMap();
+}
+
+void ImageViewerWidget::leaveFullscreenMode()
+{
+    const QPoint overlayPosition = textPosition(infoOverlay_);
+
+    setBackgroundBrush(previousBackgroundBrush_);
+    setHorizontalScrollBarPolicy(previousHScrollPolicy_);
+    setVerticalScrollBarPolicy(previousVScrollPolicy_);
+
+    const bool shouldRestorePreviousState = autoFitEnabled_;
+
+    // Restore the windowed view state only if the user did not modify
+    // the zoom while in fullscreen mode. Otherwise keep the current
+    // fullscreen zoom state.
+    if (shouldRestorePreviousState)
     {
-        previousAutoFitEnabled_ = autoFitEnabled_;
-        previousTransform_ = transform();
-        previousHScroll_ = horizontalScrollBar()->value();
-        previousVScroll_ = verticalScrollBar()->value();
-
-        normalGeometry_ = window()->geometry();
-        normalWindowFlags_ = window()->windowFlags();
-
-        window()->showFullScreen();
-
-        applyAutoFit();
-
-        isFullScreenMode_ = true;
-    }
-    else
-    {
-        window()->showNormal();
-        window()->setGeometry(normalGeometry_);
-
-        autoFitEnabled_ = previousAutoFitEnabled_;
-
         if (previousAutoFitEnabled_)
+        {
             applyAutoFit();
+        }
         else
+        {
+            /*
+            qDebug() << "before restore";
+            qDebug() << transform();
+            qDebug() << horizontalScrollBar()->maximum();
+            qDebug() << verticalScrollBar()->maximum();*/
+
             setTransform(previousTransform_);
 
-        horizontalScrollBar()->setValue(previousHScroll_);
-        verticalScrollBar()->setValue(previousVScroll_);
+            /*qDebug() << "after transform";
+            qDebug() << transform();
+            qDebug() << horizontalScrollBar()->maximum();
+            qDebug() << verticalScrollBar()->maximum();*/
 
-        isFullScreenMode_ = false;
+            // centerOn(previousSceneCenter_);
+            // qDebug() << "restored center" << mapToScene(viewport()->rect().center());
+
+            /*qDebug() << "restore H" << previousHScroll_ << horizontalScrollBar()->maximum();
+            qDebug() << "restore V" << previousVScroll_ << verticalScrollBar()->maximum();*/
+
+            horizontalScrollBar()->setValue(previousHScroll_);
+            verticalScrollBar()->setValue(previousVScroll_);
+
+            autoFitEnabled_ = false;
+        }
     }
 
     setTextPosition(overlayPosition, infoOverlay_);
@@ -417,6 +463,7 @@ void ImageViewerWidget::applyAutoFit()
 
     autoFitEnabled_ = true;
     resetTransform();
+
     fitInView(pixmapItem_, Qt::KeepAspectRatio);
 
     setTextPosition(overlayPosition, infoOverlay_);

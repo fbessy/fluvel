@@ -277,12 +277,18 @@ private:
     void toggleMute();
     void saveVolume();
 
+    void toggleFullscreen();
+    void enterFullscreen();
+    void leaveFullscreen();
+
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
 
     VideoSettingsDialog* videoSettingsWindow_{nullptr};
 
     QWidget* central_{nullptr};
+
+    QWidget* sourceConfigWidget_{nullptr};
 
     QLabel* sourceLabel_{nullptr};
     QComboBox* sourceTypeCombo_{nullptr};
@@ -360,7 +366,11 @@ private:
     QIcon volumeMediumIcon_;
     QIcon volumeHighIcon_;
 
+    QWidget* controlBar_{nullptr};
+
     int lastNonZeroVolume_{50};
+
+    bool isFullScreen_{false};
 };
 
 } // namespace fluvel

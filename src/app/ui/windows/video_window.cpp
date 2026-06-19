@@ -167,6 +167,43 @@ void VideoWindow::createUi()
 
     sourceCombo_->setCompleter(sourceCompleter_);
 
+    rightPanelToggle_ = new RightPanelToggleButton;
+
+    settingsButton_ = new QPushButton;
+    settingsButton_->setToolTip(tr("Open video session settings."));
+    settingsButton_->setFlat(true);
+    settingsButton_->setFocusPolicy(Qt::NoFocus);
+
+    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
+
+    settingsButton_->setIcon(settingsIcon_);
+
+    sourceConfigWidget_ = new QWidget(this);
+
+    auto* sourceConfigLayout = new QHBoxLayout(sourceConfigWidget_);
+    sourceConfigLayout->setContentsMargins(0, 0, 0, 0);
+    sourceConfigLayout->setSpacing(4);
+
+    sourceConfigLayout->addWidget(sourceLabel_);
+    sourceConfigLayout->addWidget(sourceTypeCombo_);
+    sourceConfigLayout->addSpacing(20);
+
+    sourceConfigLayout->addWidget(deviceLabel_);
+    sourceConfigLayout->addWidget(deviceSelector_);
+
+    sourceConfigLayout->addWidget(formatLabel_);
+    sourceConfigLayout->addWidget(formatSelector_);
+
+    sourceConfigLayout->addWidget(openFileButton_);
+
+    sourceConfigLayout->addWidget(sourceCombo_, 1);
+
+    sourceConfigLayout->addStretch();
+
+    sourceConfigLayout->addWidget(rightPanelToggle_);
+    sourceConfigLayout->addSpacing(8);
+    sourceConfigLayout->addWidget(settingsButton_);
+
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                               ":/icons/media/media-playback-start-symbolic.svg");
 
@@ -201,17 +238,6 @@ void VideoWindow::createUi()
                              sourceActionsLayout->spacing() + 20;
 
     sourceActionsWidget_->setFixedWidth(actionsWidth);
-
-    rightPanelToggle_ = new RightPanelToggleButton;
-
-    settingsButton_ = new QPushButton;
-    settingsButton_->setToolTip(tr("Open video session settings."));
-    settingsButton_->setFlat(true);
-    settingsButton_->setFocusPolicy(Qt::NoFocus);
-
-    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
-
-    settingsButton_->setIcon(settingsIcon_);
 
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
@@ -383,9 +409,9 @@ void VideoWindow::setupLayout()
     //
     // Top control bar
     //
-    QWidget* controlBar = new QWidget(central_);
+    controlBar_ = new QWidget(central_);
 
-    QVBoxLayout* controlBarLayout = new QVBoxLayout(controlBar);
+    QVBoxLayout* controlBarLayout = new QVBoxLayout(controlBar_);
     controlBarLayout->setContentsMargins(8, 4, 8, 4);
     controlBarLayout->setSpacing(8);
 
@@ -393,27 +419,7 @@ void VideoWindow::setupLayout()
     // Source configuration
     //
     QHBoxLayout* configLayout = new QHBoxLayout;
-    configLayout->setSpacing(4);
-
-    configLayout->addWidget(sourceLabel_);
-    configLayout->addWidget(sourceTypeCombo_);
-    configLayout->addSpacing(20);
-
-    configLayout->addWidget(deviceLabel_);
-    configLayout->addWidget(deviceSelector_);
-
-    configLayout->addWidget(formatLabel_);
-    configLayout->addWidget(formatSelector_);
-
-    configLayout->addWidget(openFileButton_);
-
-    configLayout->addWidget(sourceCombo_, 1);
-
-    configLayout->addStretch();
-
-    configLayout->addWidget(rightPanelToggle_);
-    configLayout->addSpacing(8);
-    configLayout->addWidget(settingsButton_);
+    configLayout->addWidget(sourceConfigWidget_, 1);
 
     //
     // Actions + media controls
@@ -442,7 +448,7 @@ void VideoWindow::setupLayout()
     //
     // Main layout
     //
-    vLayout->addWidget(controlBar);
+    vLayout->addWidget(controlBar_);
     vLayout->addLayout(contentLayout, 1);
 
     setCentralWidget(central_);
@@ -611,6 +617,9 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::pausedChanged, this,
             &VideoWindow::updatePlayPauseButton);
+
+    connect(imageViewer_, &ImageViewerWidget::toggleFullscreenRequested, this,
+            &VideoWindow::toggleFullscreen);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -1796,6 +1805,42 @@ void VideoWindow::updateMediaControls()
     volumeButton_->setVisible(hasAudio);
 
     mediaControlsWidget_->setVisible(hasSeek || hasAudio);
+}
+
+void VideoWindow::toggleFullscreen()
+{
+    if (!isFullScreen_)
+    {
+        enterFullscreen();
+    }
+    else
+    {
+        leaveFullscreen();
+    }
+}
+
+void VideoWindow::enterFullscreen()
+{
+    imageViewer_->enterFullscreenMode();
+
+    controlBar_->hide();
+    displayBar_->hide();
+
+    showFullScreen();
+
+    isFullScreen_ = true;
+}
+
+void VideoWindow::leaveFullscreen()
+{
+    imageViewer_->leaveFullscreenMode();
+
+    showNormal();
+
+    controlBar_->show();
+    displayBar_->show();
+
+    isFullScreen_ = false;
 }
 
 } // namespace fluvel

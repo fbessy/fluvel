@@ -123,6 +123,10 @@ private:
 
     void saveDisplayed();
 
+    void toggleFullscreen();
+    void enterFullscreen();
+    void leaveFullscreen();
+
     // --- UI ---
     VideoWindow* videoWindow_{nullptr};
     AnalysisWindow* analysisWindow_{nullptr};
@@ -141,6 +145,8 @@ private:
     QPushButton* convergeButton_{nullptr};
     RightPanelToggleButton* rightPanelToggle_{nullptr};
     QPushButton* settingsButton_{nullptr};
+
+    QWidget* controlBar_{nullptr};
 
     QIcon startResumeIcon_;
     QIcon restartIcon_;
@@ -181,6 +187,8 @@ private:
     DownscaleParams currentDownscale_{};
 
     QString lastDirectoryUsed_;
+
+    bool isFullScreen_{false};
 };
 
 } // namespace fluvel
