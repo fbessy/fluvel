@@ -36,6 +36,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSlider>
+#include <QStackedLayout>
 #include <QStringListModel>
 #include <QVBoxLayout>
 #include <QWidgetAction>
@@ -98,7 +99,7 @@ void VideoWindow::createUi()
 
     central_ = new QWidget(this);
 
-    sourceLabel_ = new QLabel(tr("Source: "));
+    sourceTypeLabel_ = new QLabel(tr("Source: "));
 
     QIcon cameraIcon =
         il::loadIcon(QIcon::ThemeIcon::CameraVideo, ":/icons/actions/camera-video-symbolic.svg");
@@ -111,6 +112,13 @@ void VideoWindow::createUi()
     sourceTypeCombo_->addItem(videoIcon, tr("File / URL"), QVariant::fromValue(SourceType::Media));
     sourceTypeCombo_->setToolTip(tr("Select a camera, video file, or network stream."));
 
+    auto* sourceTypeLayout = new QHBoxLayout;
+    sourceTypeLayout->setContentsMargins(0, 0, 0, 0);
+    sourceTypeLayout->addWidget(sourceTypeLabel_);
+    sourceTypeLayout->addWidget(sourceTypeCombo_);
+    sourceTypeWidget_ = new QWidget;
+    sourceTypeWidget_->setLayout(sourceTypeLayout);
+
     deviceLabel_ = new QLabel(tr("Device: "));
     deviceSelector_ = new QComboBox(this);
 
@@ -118,6 +126,14 @@ void VideoWindow::createUi()
     deviceSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     static constexpr int kCameraIconSize{13};
     deviceSelector_->setIconSize(QSize(kCameraIconSize, kCameraIconSize));
+
+    auto* deviceLayout = new QHBoxLayout;
+    deviceLayout->setContentsMargins(0, 0, 0, 0);
+    deviceLayout->addWidget(deviceLabel_);
+    deviceLayout->addWidget(deviceSelector_);
+    deviceWidget_ = new QWidget;
+    deviceWidget_->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    deviceWidget_->setLayout(deviceLayout);
 
     deviceActiveIcon_ = createActiveCameraIcon();
     deviceIdleIcon_ = createEmptyIcon(kCameraIconSize);
@@ -130,6 +146,23 @@ void VideoWindow::createUi()
     formatSelector_->setIconSize(QSize(kFormatIconSize, kFormatIconSize));
     formatSelector_->setToolTip(tr("Camera resolution, frame rate and pixel format."));
 
+    auto* formatLayout = new QHBoxLayout;
+    formatLayout->setContentsMargins(0, 0, 0, 0);
+    formatLayout->addWidget(formatLabel_);
+    formatLayout->addWidget(formatSelector_);
+    formatWidget_ = new QWidget;
+    formatWidget_->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    formatWidget_->setLayout(formatLayout);
+
+    auto* cameraConfigLayout = new QHBoxLayout;
+    cameraConfigLayout->setContentsMargins(0, 0, 0, 0);
+    cameraConfigLayout->setSpacing(20);
+    cameraConfigLayout->addWidget(deviceWidget_);
+    cameraConfigLayout->addWidget(formatWidget_);
+    cameraConfigLayout->addStretch();
+    cameraConfigWidget_ = new QWidget;
+    cameraConfigWidget_->setLayout(cameraConfigLayout);
+
     formatActiveIcon_ = createActiveFormatIcon();
     formatAvailableIcon_ = createEmptyIcon(kFormatIconSize);
 
@@ -139,43 +172,60 @@ void VideoWindow::createUi()
 
     QIcon networkIcon = il::loadIcon(":/icons/actions/globe-symbolic.svg");
 
-    sourceCombo_ = new QComboBox(this);
-    sourceCombo_->setEditable(true);
+    urlCombo_ = new QComboBox(this);
+    urlCombo_->setEditable(true);
 
-    auto* actionSourceCombo =
-        sourceCombo_->lineEdit()->addAction(networkIcon, QLineEdit::LeadingPosition);
+    urlCombo_->lineEdit()->addAction(networkIcon, QLineEdit::LeadingPosition);
 
-    sourceCombo_->lineEdit()->setPlaceholderText(
+    urlCombo_->lineEdit()->setPlaceholderText(
         "https://video.mp4  https://stream.m3u8  rtsp://camera/live");
 
-    sourceCombo_->setToolTip(tr("Media URL examples:\n\n"
-                                "HTTP video:\n"
-                                "https://host/video.mp4\n\n"
-                                "HLS stream:\n"
-                                "https://host/stream.m3u8\n\n"
-                                "RTSP stream:\n"
-                                "rtsp://host/camera/live\n\n"
-                                "Local network camera:\n"
-                                "https://192.168.1.110:8080/video\n"
-                                "rtsp://192.168.1.110:1935/live"));
+    urlCombo_->setToolTip(tr("Media URL examples:\n\n"
+                             "HTTP video:\n"
+                             "https://host/video.mp4\n\n"
+                             "HLS stream:\n"
+                             "https://host/stream.m3u8\n\n"
+                             "RTSP stream:\n"
+                             "rtsp://host/camera/live\n\n"
+                             "Local network camera:\n"
+                             "https://192.168.1.110:8080/video\n"
+                             "rtsp://192.168.1.110:1935/live"));
 
-    sourceCombo_->lineEdit()->setClearButtonEnabled(true);
+    urlCombo_->lineEdit()->setClearButtonEnabled(true);
 
-    sourceCombo_->lineEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
+    urlCombo_->lineEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
 
     clearHistoryIcon_ =
         il::loadIcon(QIcon::ThemeIcon::EditClear, ":/icons/actions/edit-clear-history.svg");
 
-    connect(sourceCombo_->lineEdit(), &QWidget::customContextMenuRequested, this,
+    connect(urlCombo_->lineEdit(), &QWidget::customContextMenuRequested, this,
             &VideoWindow::onSourceContextMenuRequested);
 
     sourceCompleterModel_ = new QStringListModel(this);
 
-    sourceCompleter_ = new QCompleter(sourceCompleterModel_, sourceCombo_);
+    sourceCompleter_ = new QCompleter(sourceCompleterModel_, urlCombo_);
     sourceCompleter_->setCaseSensitivity(Qt::CaseInsensitive);
     sourceCompleter_->setCompletionMode(QCompleter::PopupCompletion);
 
-    sourceCombo_->setCompleter(sourceCompleter_);
+    urlCombo_->setCompleter(sourceCompleter_);
+
+    auto* fileUrlConfigLayout = new QHBoxLayout;
+    fileUrlConfigLayout->setContentsMargins(0, 0, 0, 0);
+    fileUrlConfigLayout->setSpacing(20);
+
+    fileUrlConfigLayout->addWidget(openFileButton_);
+    fileUrlConfigLayout->addWidget(urlCombo_, 1);
+    fileUrlConfigWidget_ = new QWidget;
+    fileUrlConfigWidget_->setLayout(fileUrlConfigLayout);
+
+    sourceConfigStack_ = new QStackedLayout;
+    sourceConfigStack_->setContentsMargins(0, 0, 0, 0);
+
+    sourceConfigStack_->addWidget(cameraConfigWidget_);
+    sourceConfigStack_->addWidget(fileUrlConfigWidget_);
+
+    sourceConfigWidget_ = new QWidget;
+    sourceConfigWidget_->setLayout(sourceConfigStack_);
 
     rightPanelToggle_ = new RightPanelToggleButton;
 
@@ -188,31 +238,13 @@ void VideoWindow::createUi()
 
     settingsButton_->setIcon(settingsIcon_);
 
-    sourceConfigWidget_ = new QWidget(this);
-
-    auto* sourceConfigLayout = new QHBoxLayout(sourceConfigWidget_);
-    sourceConfigLayout->setContentsMargins(0, 0, 0, 0);
-    sourceConfigLayout->setSpacing(4);
-
-    sourceConfigLayout->addWidget(sourceLabel_);
-    sourceConfigLayout->addWidget(sourceTypeCombo_);
-    sourceConfigLayout->addSpacing(20);
-
-    sourceConfigLayout->addWidget(deviceLabel_);
-    sourceConfigLayout->addWidget(deviceSelector_);
-
-    sourceConfigLayout->addWidget(formatLabel_);
-    sourceConfigLayout->addWidget(formatSelector_);
-
-    sourceConfigLayout->addWidget(openFileButton_);
-
-    sourceConfigLayout->addWidget(sourceCombo_, 1);
-
-    sourceConfigLayout->addStretch();
-
-    sourceConfigLayout->addWidget(rightPanelToggle_);
-    sourceConfigLayout->addSpacing(8);
-    sourceConfigLayout->addWidget(settingsButton_);
+    auto* configRightBlockLayout = new QHBoxLayout;
+    configRightBlockLayout->setContentsMargins(0, 0, 0, 0);
+    configRightBlockLayout->addWidget(rightPanelToggle_);
+    configRightBlockLayout->addWidget(settingsButton_);
+    configRightBlockWidget_ = new QWidget;
+    configRightBlockWidget_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    configRightBlockWidget_->setLayout(configRightBlockLayout);
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                               ":/icons/media/media-playback-start-symbolic.svg");
@@ -221,33 +253,15 @@ void VideoWindow::createUi()
                              ":/icons/media/media-playback-stop-symbolic.svg");
 
     toggleStreamingButton_ = new QPushButton;
-    const int sourceWidth =
-        sourceLabel_->sizeHint().width() + sourceTypeCombo_->sizeHint().width() + 4;
-    toggleStreamingButton_->setFixedWidth(sourceWidth);
 
     QIcon applyIcon = createActiveFormatIcon();
 
     applyButton_ = new QPushButton;
     applyButton_->setIcon(applyIcon);
-    applyButton_->setVisible(false);
+    applyButton_->setEnabled(false);
     applyButton_->setFlat(true);
     applyButton_->setText(tr("Apply"));
     applyButton_->setToolTip(tr("Restart the active source using the selected configuration."));
-
-    sourceActionsWidget_ = new QWidget(this);
-
-    auto* sourceActionsLayout = new QHBoxLayout(sourceActionsWidget_);
-    sourceActionsLayout->setContentsMargins(0, 0, 0, 0);
-
-    sourceActionsLayout->addWidget(toggleStreamingButton_);
-    sourceActionsLayout->addSpacing(20);
-    sourceActionsLayout->addWidget(applyButton_);
-    sourceActionsLayout->setAlignment(Qt::AlignLeft);
-
-    const int actionsWidth = toggleStreamingButton_->width() + applyButton_->sizeHint().width() +
-                             sourceActionsLayout->spacing() + 20;
-
-    sourceActionsWidget_->setFixedWidth(actionsWidth);
 
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
@@ -314,7 +328,7 @@ void VideoWindow::createUi()
 
     auto* mediaLayout = new QHBoxLayout(mediaControlsWidget_);
     mediaLayout->setContentsMargins(0, 0, 0, 0);
-    mediaLayout->addSpacing(20);
+    mediaLayout->setSpacing(8);
 
     mediaLayout->addWidget(playPauseButton_);
     mediaLayout->addWidget(playbackPositionLabel_);
@@ -325,6 +339,7 @@ void VideoWindow::createUi()
     playPauseButton_->setVisible(false);
     setSeekControlsVisible(false);
     volumeButton_->setVisible(false);
+    mediaControlsWidget_->setVisible(false);
 }
 
 QIcon VideoWindow::createActiveCameraIcon()
@@ -412,7 +427,7 @@ void VideoWindow::setupController()
 
 void VideoWindow::setupLayout()
 {
-    QVBoxLayout* vLayout = new QVBoxLayout(central_);
+    auto* vLayout = new QVBoxLayout(central_);
     vLayout->setContentsMargins(0, 0, 0, 0);
     vLayout->setSpacing(0);
 
@@ -421,34 +436,68 @@ void VideoWindow::setupLayout()
     //
     controlBar_ = new QWidget(central_);
 
-    QVBoxLayout* controlBarLayout = new QVBoxLayout(controlBar_);
-    controlBarLayout->setContentsMargins(8, 4, 8, 4);
-    controlBarLayout->setSpacing(8);
+    //
+    // Source column
+    //
+    auto* sourceColumn = new QVBoxLayout;
+    sourceColumn->setContentsMargins(0, 0, 0, 0);
+    sourceColumn->setSpacing(4);
+
+    sourceColumn->addWidget(sourceTypeWidget_);
+    sourceColumn->addWidget(toggleStreamingButton_);
 
     //
-    // Source configuration
+    // Apply column
     //
-    QHBoxLayout* configLayout = new QHBoxLayout;
-    configLayout->addWidget(sourceConfigWidget_, 1);
+    auto* applyColumn = new QVBoxLayout;
+    applyColumn->setContentsMargins(0, 0, 0, 0);
+    applyColumn->setSpacing(4);
+
+    applyColumn->addStretch(); // vide au dessus
+    applyColumn->addWidget(applyButton_);
 
     //
-    // Actions + media controls
+    // Config column
     //
-    QHBoxLayout* actionLayout = new QHBoxLayout;
+    auto* configColumn = new QVBoxLayout;
+    configColumn->setContentsMargins(0, 0, 0, 0);
+    configColumn->setSpacing(4);
 
-    actionLayout->addWidget(sourceActionsWidget_);
+    configColumn->addWidget(sourceConfigWidget_);
+    configColumn->addStretch();
+    configColumn->addWidget(mediaControlsWidget_);
 
-    actionLayout->addStretch();
+    //
+    // Right column
+    //
+    auto* rightColumn = new QVBoxLayout;
+    rightColumn->setContentsMargins(0, 0, 0, 0);
+    rightColumn->setSpacing(4);
 
-    actionLayout->addWidget(mediaControlsWidget_, 1);
+    rightColumn->addWidget(configRightBlockWidget_);
+    rightColumn->addStretch(); // vide dessous
 
-    controlBarLayout->addLayout(configLayout);
-    controlBarLayout->addLayout(actionLayout);
+    //
+    // Main top bar layout
+    //
+
+    static constexpr int kGroupSpacing = 20;
+
+    auto* topBarLayout = new QHBoxLayout(controlBar_);
+    topBarLayout->setContentsMargins(8, 4, 8, 4);
+    topBarLayout->setSpacing(8);
+
+    topBarLayout->addLayout(sourceColumn);
+    topBarLayout->addLayout(applyColumn);
+    topBarLayout->addSpacing(kGroupSpacing);
+    topBarLayout->addLayout(configColumn);
+    topBarLayout->addSpacing(kGroupSpacing);
+    topBarLayout->addLayout(rightColumn);
 
     //
     // Video area
     //
-    QHBoxLayout* contentLayout = new QHBoxLayout;
+    auto* contentLayout = new QHBoxLayout;
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
@@ -498,7 +547,7 @@ void VideoWindow::setupConnections()
                 updateApplyButton();
             });
 
-    connect(sourceCombo_->lineEdit(), &QLineEdit::textChanged, this,
+    connect(urlCombo_->lineEdit(), &QLineEdit::textChanged, this,
             [this]()
             {
                 updateSourceConfigFromUi(sourceTypeCombo_->currentIndex());
@@ -711,18 +760,11 @@ void VideoWindow::bindUiToApplicationSettings()
 
 void VideoWindow::refreshSourceUi()
 {
-    assert(sourceTypeCombo_ && sourceCombo_);
+    assert(sourceTypeCombo_ && urlCombo_);
 
-    bool cameraMode = (sourceConfig_.type == SourceType::Camera);
-    bool mediaMode = (sourceConfig_.type == SourceType::Media);
+    const bool cameraMode = (sourceConfig_.type == SourceType::Camera);
 
-    deviceLabel_->setVisible(cameraMode);
-    deviceSelector_->setVisible(cameraMode);
-    formatLabel_->setVisible(cameraMode);
-    formatSelector_->setVisible(cameraMode);
-
-    openFileButton_->setVisible(mediaMode);
-    sourceCombo_->setVisible(mediaMode);
+    sourceConfigStack_->setCurrentWidget(cameraMode ? cameraConfigWidget_ : fileUrlConfigWidget_);
 }
 
 void VideoWindow::updateSourceConfigFromUi(int sourceTypeComboIndex)
@@ -739,7 +781,7 @@ void VideoWindow::updateSourceConfigFromUi(int sourceTypeComboIndex)
             return;
 
         case SourceType::Media:
-            sourceConfig_.url = QUrl::fromUserInput(sourceCombo_->currentText().trimmed());
+            sourceConfig_.url = QUrl::fromUserInput(urlCombo_->currentText().trimmed());
             return;
 
         case SourceType::None:
@@ -1318,7 +1360,7 @@ bool VideoWindow::canStartSource() const
 
         case SourceType::Media:
         {
-            const QString text = sourceCombo_->currentText().trimmed();
+            const QString text = urlCombo_->currentText().trimmed();
 
             if (text.isEmpty())
                 return false;
@@ -1372,7 +1414,7 @@ void VideoWindow::updateStreamingButton()
 
 void VideoWindow::updateApplyButton()
 {
-    applyButton_->setVisible(hasPendingConfiguration());
+    applyButton_->setEnabled(hasPendingConfiguration());
 }
 
 void VideoWindow::refreshUi()
@@ -1510,26 +1552,26 @@ void VideoWindow::loadPreferredFormats()
 
 void VideoWindow::addSourceToHistory(const QUrl& url)
 {
-    QSignalBlocker blocker(sourceCombo_);
+    QSignalBlocker blocker(urlCombo_);
 
     QString value = url.toString();
 
     if (value.isEmpty())
         return;
 
-    int existing = sourceCombo_->findText(value);
+    int existing = urlCombo_->findText(value);
 
     if (existing >= 0)
-        sourceCombo_->removeItem(existing);
+        urlCombo_->removeItem(existing);
 
-    sourceCombo_->insertItem(0, value);
+    urlCombo_->insertItem(0, value);
 
-    sourceCombo_->setCurrentIndex(0);
+    urlCombo_->setCurrentIndex(0);
 
     constexpr int kMaxHistory = 20;
 
-    while (sourceCombo_->count() > kMaxHistory)
-        sourceCombo_->removeItem(sourceCombo_->count() - 1);
+    while (urlCombo_->count() > kMaxHistory)
+        urlCombo_->removeItem(urlCombo_->count() - 1);
 
     saveSourceHistory();
 
@@ -1542,7 +1584,7 @@ void VideoWindow::loadSourceHistory()
 
     QStringList values = settings.value(kSourceHistoryKey).toStringList();
 
-    sourceCombo_->addItems(values);
+    urlCombo_->addItems(values);
 
     updateSourceCompleter();
 }
@@ -1551,8 +1593,8 @@ void VideoWindow::saveSourceHistory()
 {
     QStringList values;
 
-    for (int i = 0; i < sourceCombo_->count(); ++i)
-        values << sourceCombo_->itemText(i);
+    for (int i = 0; i < urlCombo_->count(); ++i)
+        values << urlCombo_->itemText(i);
 
     QSettings settings;
     settings.setValue(kSourceHistoryKey, values);
@@ -1605,7 +1647,7 @@ void VideoWindow::openMediaFile(const QString& filename)
     int index = sourceTypeCombo_->findData(QVariant::fromValue(SourceType::Media));
     sourceTypeCombo_->setCurrentIndex(index);
 
-    sourceCombo_->setCurrentText(QUrl::fromLocalFile(filename).toString());
+    urlCombo_->setCurrentText(QUrl::fromLocalFile(filename).toString());
 
     if (videoController_->isStreaming())
     {
@@ -1626,8 +1668,8 @@ void VideoWindow::updateSourceCompleter()
     entries << "rtsp://";
     entries << "file://";
 
-    for (int i = 0; i < sourceCombo_->count(); ++i)
-        entries << sourceCombo_->itemText(i);
+    for (int i = 0; i < urlCombo_->count(); ++i)
+        entries << urlCombo_->itemText(i);
 
     entries.removeDuplicates();
 
@@ -1636,7 +1678,7 @@ void VideoWindow::updateSourceCompleter()
 
 void VideoWindow::onSourceContextMenuRequested(const QPoint& pos)
 {
-    QLineEdit* edit = sourceCombo_->lineEdit();
+    QLineEdit* edit = urlCombo_->lineEdit();
 
     QMenu* menu = edit->createStandardContextMenu();
 
@@ -1644,14 +1686,14 @@ void VideoWindow::onSourceContextMenuRequested(const QPoint& pos)
 
     QAction* clearHistoryAction = menu->addAction(clearHistoryIcon_, tr("Clear source history"));
 
-    const bool hasHistory = sourceCombo_->count() > 0;
+    const bool hasHistory = urlCombo_->count() > 0;
     clearHistoryAction->setEnabled(hasHistory);
 
     QAction* selected = menu->exec(edit->mapToGlobal(pos));
 
     if (selected == clearHistoryAction)
     {
-        sourceCombo_->clear();
+        urlCombo_->clear();
         saveSourceHistory();
         updateSourceCompleter();
     }

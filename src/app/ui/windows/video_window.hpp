@@ -29,6 +29,7 @@ class QLineEdit;
 class QStringListModel;
 class QCompleter;
 class QSlider;
+class QStackedLayout;
 
 class QShowEvent;
 class QCloseEvent;
@@ -288,31 +289,42 @@ private:
 
     QWidget* central_{nullptr};
 
-    QWidget* sourceConfigWidget_{nullptr};
-
-    QLabel* sourceLabel_{nullptr};
+    QLabel* sourceTypeLabel_{nullptr};
     QComboBox* sourceTypeCombo_{nullptr};
+    QWidget* sourceTypeWidget_{nullptr};
 
     QLabel* deviceLabel_{nullptr};
     QComboBox* deviceSelector_{nullptr};
+    QWidget* deviceWidget_{nullptr};
+
     QLabel* formatLabel_{nullptr};
     QComboBox* formatSelector_{nullptr};
+    QWidget* formatWidget_{nullptr};
+
+    QWidget* cameraConfigWidget_{nullptr};
 
     QPushButton* openFileButton_{nullptr};
-    QComboBox* sourceCombo_{nullptr};
+    QComboBox* urlCombo_{nullptr};
     QIcon clearHistoryIcon_;
+    QWidget* fileUrlConfigWidget_{nullptr};
+
+    QWidget* sourceConfigWidget_{nullptr};
+    QStackedLayout* sourceConfigStack_{nullptr};
 
     RightPanelToggleButton* rightPanelToggle_{nullptr};
+
+    QIcon settingsIcon_;
     QPushButton* settingsButton_{nullptr};
+
+    QWidget* configRightBlockWidget_{nullptr};
+
     QIcon startIcon_;
     QIcon stopIcon_;
-    QIcon settingsIcon_;
+    QPushButton* toggleStreamingButton_{nullptr};
+
+    QPushButton* applyButton_{nullptr};
 
     DisplaySettingsWidget* displayBar_{nullptr};
-
-    QWidget* sourceActionsWidget_{nullptr};
-    QPushButton* toggleStreamingButton_{nullptr};
-    QPushButton* applyButton_{nullptr};
 
     QSet<QByteArray> lastKnownDeviceIds_;
 
