@@ -11,6 +11,8 @@
 #include <QSignalBlocker>
 #include <QString>
 
+#include "icon_loader.hpp"
+
 namespace fluvel
 {
 
@@ -29,7 +31,11 @@ ColorSelectorWidget::ColorSelectorWidget(QWidget* parent, QColor initialColor)
     addColorItem(Qt::white, tr("White"));
     addColorItem(Qt::transparent, tr("Custom"));
 
-    custom_pb_ = new QPushButton(tr("Custom..."));
+    QIcon pickerIcon =
+        il::loadIcon("color-picker-symbolic", ":/icons/actions/color-picker-symbolic.svg");
+
+    custom_pb_ = new QPushButton;
+    custom_pb_->setIcon(pickerIcon);
 
     auto* layout = new QHBoxLayout(this);
     layout->addWidget(color_cb_);

@@ -1,19 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 16 16"
      width="16"
      height="16">
 
-  <defs>
-    <style type="text/css">
-      .ColorScheme-Text {
-      color:#232629;
-      }
-    </style>
-  </defs>
-
   <path
-    class="ColorScheme-Text"
-    style="fill:currentColor;stroke:none"
+    fill="currentColor"
     d="
     M14 14
     L14 2
@@ -34,4 +26,4 @@
     Z
     "/>
 
-  </svg>
+</svg>

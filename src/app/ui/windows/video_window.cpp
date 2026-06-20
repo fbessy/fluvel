@@ -100,10 +100,15 @@ void VideoWindow::createUi()
 
     sourceLabel_ = new QLabel(tr("Source: "));
 
+    QIcon cameraIcon =
+        il::loadIcon(QIcon::ThemeIcon::CameraVideo, ":/icons/actions/camera-video-symbolic.svg");
+
+    QIcon videoIcon = il::loadIcon("video-x-generic-symbolic", ":/icons/file/video-symbolic.svg");
+
     sourceTypeCombo_ = new QComboBox(this);
     sourceTypeCombo_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-    sourceTypeCombo_->addItem(tr("Camera"), QVariant::fromValue(SourceType::Camera));
-    sourceTypeCombo_->addItem(tr("File / URL"), QVariant::fromValue(SourceType::Media));
+    sourceTypeCombo_->addItem(cameraIcon, tr("Camera"), QVariant::fromValue(SourceType::Camera));
+    sourceTypeCombo_->addItem(videoIcon, tr("File / URL"), QVariant::fromValue(SourceType::Media));
     sourceTypeCombo_->setToolTip(tr("Select a camera, video file, or network stream."));
 
     deviceLabel_ = new QLabel(tr("Device: "));
@@ -129,11 +134,16 @@ void VideoWindow::createUi()
     formatAvailableIcon_ = createEmptyIcon(kFormatIconSize);
 
     openFileButton_ = new QPushButton(tr("Open..."));
-    openFileButton_->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    openFileButton_->setIcon(videoIcon);
     openFileButton_->setToolTip(tr("Select a local video file."));
+
+    QIcon networkIcon = il::loadIcon(":/icons/actions/globe-symbolic.svg");
 
     sourceCombo_ = new QComboBox(this);
     sourceCombo_->setEditable(true);
+
+    auto* actionSourceCombo =
+        sourceCombo_->lineEdit()->addAction(networkIcon, QLineEdit::LeadingPosition);
 
     sourceCombo_->lineEdit()->setPlaceholderText(
         "https://video.mp4  https://stream.m3u8  rtsp://camera/live");

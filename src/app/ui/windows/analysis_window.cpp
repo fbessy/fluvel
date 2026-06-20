@@ -7,6 +7,7 @@
 #include "color_adapters.hpp"
 #include "elapsed_timer.hpp"
 #include "hausdorff_distance.hpp"
+#include "icon_loader.hpp"
 
 #include <QFormLayout>
 #include <QGroupBox>
@@ -49,8 +50,11 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     listsSelectLayout->addWidget(widget1_);
     listsSelectLayout->addWidget(widget2_);
 
+    QIcon measureIcon = il::loadIcon(":/icons/actions/measure-symbolic.svg");
+
     computeButton_ = new QPushButton(tr("Compute Hausdorff Distance"));
     computeButton_->setEnabled(false);
+    computeButton_->setIcon(measureIcon);
 
     QVBoxLayout* inputLayout = new QVBoxLayout;
     inputLayout->addLayout(listsSelectLayout);

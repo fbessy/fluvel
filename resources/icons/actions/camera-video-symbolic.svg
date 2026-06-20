@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 22 22">
+  <path
+    fill="currentColor"
+    d="m1 5
+    v12
+    h14
+    v-3
+    l6 3
+    v-12
+    l-6 3
+    v-3
+    h-14
+
+    zm1 1
+    h12
+    v10
+    h-12
+    v-10
+
+    zm18 0.61719
+    v8.7656
+    l-5 -2.5
+    v-3.7656
+    l5 -2.5
+
+    zm-10 0.38281
+    v1
+    h3
+    v-1
+    h-3
+    z"/>
+</svg>

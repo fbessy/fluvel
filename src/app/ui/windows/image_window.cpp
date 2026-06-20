@@ -173,7 +173,7 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<PanBehavior>());
     interaction->addBehavior(std::make_unique<PixelInfoBehavior>());
     interaction->addBehavior(std::make_unique<DragDropBehavior>(
-        DragDropContent::Images, tr("Drop an image here\nor\nFile → Open")));
+        DragDropContent::Images, tr("Drop an image here\n\nor choose File → Open")));
     imageViewer_->setInteraction(interaction.release());
 
     // --- Display bar (à droite) ---
@@ -218,8 +218,7 @@ void ImageWindow::setupActions()
     videoSessionAct_->setEnabled(true);
     videoSessionAct_->setShortcut(tr("Ctrl+V"));
 
-    QIcon videoIcon =
-        il::loadIcon(QIcon::ThemeIcon::CameraWeb, ":/icons/actions/camera-web-symbolic.svg");
+    QIcon videoIcon = il::loadIcon("video-x-generic-symbolic", ":/icons/file/video-symbolic.svg");
 
     videoSessionAct_->setIcon(videoIcon);
 

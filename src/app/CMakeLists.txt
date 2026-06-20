@@ -243,7 +243,6 @@ set(APP_RESOURCES
 
 
     ${FLUVEL_RESOURCES_DIR}/icons/actions/image-session-symbolic.svg
-    ${FLUVEL_RESOURCES_DIR}/icons/actions/camera-web-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/actions/application-exit-symbolic.svg
 
     ${FLUVEL_RESOURCES_DIR}/icons/actions/edit-clear-history.svg
@@ -255,10 +254,15 @@ set(APP_RESOURCES
 
     ${FLUVEL_RESOURCES_DIR}/icons/actions/go-next-symbolic.svg
 
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/camera-video-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/globe-symbolic.svg
+
 
     ${FLUVEL_RESOURCES_DIR}/icons/file/document-open-recent-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/file/document-open-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/file/document-save-as-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/file/image-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/file/video-symbolic.svg
 
     ${FLUVEL_RESOURCES_DIR}/icons/media/media-playback-pause-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/media/media-playback-start-symbolic.svg

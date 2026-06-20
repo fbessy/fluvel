@@ -8,6 +8,7 @@
 #include "color_picker_behavior.hpp"
 #include "drag_drop_behavior.hpp"
 #include "file_utils.hpp"
+#include "icon_loader.hpp"
 #include "image_viewer_widget.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
@@ -62,7 +63,10 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     ///////////////////////////////////////
 
+    QIcon imageIcon = il::loadIcon("image-x-generic-symbolic", ":/icons/file/image-symbolic.svg");
+
     openButton_ = new QPushButton(tr("Open..."));
+    openButton_->setIcon(imageIcon);
 
     QVBoxLayout* img_layout = new QVBoxLayout;
     img_layout->addWidget(nameLabel_);
@@ -165,7 +169,7 @@ void AnalysisWidget::onColorSelected(const QColor& c)
 void AnalysisWidget::openFilename()
 {
     const QString fileName =
-        QFileDialog::getOpenFileName(this, tr("Open File") + " " + QString::number(idThis_),
+        QFileDialog::getOpenFileName(this, tr("Open Image") + " " + QString::number(idThis_),
                                      lastDirectoryUsed_, file_utils::buildImageFilter());
 
     if (fileName.isEmpty())
