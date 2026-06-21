@@ -8,7 +8,6 @@
 #include <QPainter>
 #include <QPalette>
 #include <QPixmap>
-#include <QRegularExpression>
 #include <QSvgRenderer>
 
 // to check fallbacks icons
@@ -58,8 +57,7 @@ static QIcon loadSvgWithPalette(const QString& path, IconMode mode)
         }
     }
 
-    static const QRegularExpression kColorRegex(R"(color\s*:\s*#[0-9a-fA-F]+)");
-    svg.replace(kColorRegex, "color:" + color.name());
+    svg.replace("<svg ", QString("<svg color=\"%1\" ").arg(color.name()));
 
     QByteArray data = svg.toUtf8();
 
