@@ -25,6 +25,24 @@ namespace fluvel::il
 {
 
 /**
+ * @brief Icon color selection mode used for SVG fallback rendering.
+ *
+ * Auto follows the current application palette.
+ * Light forces white icons.
+ * Dark forces black icons.
+ *
+ * @note This mode only affects embedded SVG fallback icons.
+ *       Icons loaded from the desktop icon theme are returned
+ *       unchanged.
+ */
+enum class IconMode
+{
+    Auto,
+    Light,
+    Dark
+};
+
+/**
  * @brief Returns the shared Fluvel application icon.
  *
  * The icon instance is lazily initialized and reused for the
@@ -49,10 +67,11 @@ QIcon desktopAppIcon();
  *
  * @param themeName Theme icon name.
  * @param fallback Fallback icon resource path.
+ * @param mode Color mode applied to SVG fallback icons.
  *
  * @return Loaded icon.
  */
-QIcon loadIcon(const QString& themeName, const QString& fallback);
+QIcon loadIcon(const QString& themeName, const QString& fallback, IconMode mode = IconMode::Auto);
 
 /**
  * @brief Loads an icon from the current icon theme using a Qt theme enum.
@@ -63,13 +82,14 @@ QIcon loadIcon(const QString& themeName, const QString& fallback);
  *
  * @param iconEnum Qt theme icon enum.
  * @param fallback Fallback icon resource path.
+ * @param mode Color mode applied to SVG fallback icons.
  *
  * @return Loaded icon.
  */
-QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback);
+QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback, IconMode mode = IconMode::Auto);
 
 /**
- * @brief Load an application icon from an embedded resource.
+ * @brief Loads an SVG icon from an embedded resource.
  *
  * This function loads an SVG icon from the application resources and
  * applies the current Qt palette colors when needed. It is mainly used
@@ -80,9 +100,10 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback);
  * application icons go through the same loading pipeline.
  *
  * @param resourceName Qt resource path of the icon.
+ * @param mode Color mode applied to SVG fallback icons.
  *
  * @return Loaded icon.
  */
-QIcon loadIcon(const QString& svgResourceName);
+QIcon loadIcon(const QString& svgResourceName, IconMode mode = IconMode::Auto);
 
 } // namespace fluvel::il

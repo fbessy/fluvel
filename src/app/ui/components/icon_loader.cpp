@@ -22,7 +22,7 @@ static bool isDarkMode()
     return qApp->palette().color(QPalette::Window).lightness() < 128;
 }
 
-static QIcon loadSvgWithPalette(const QString& path)
+static QIcon loadSvgWithPalette(const QString& path, IconMode mode)
 {
     QFile file(path);
 
@@ -31,10 +31,32 @@ static QIcon loadSvgWithPalette(const QString& path)
 
     QString svg = QString::fromUtf8(file.readAll());
 
-    QColor color = qApp->palette().color(QPalette::WindowText);
+    QColor color;
 
-    if (isDarkMode())
-        color = color.lighter(110);
+    switch (mode)
+    {
+        case IconMode::Auto:
+        {
+            color = qApp->palette().color(QPalette::WindowText);
+
+            if (isDarkMode())
+                color = color.lighter(110);
+
+            break;
+        }
+
+        case IconMode::Light:
+        {
+            color = Qt::white;
+            break;
+        }
+
+        case IconMode::Dark:
+        {
+            color = Qt::black;
+            break;
+        }
+    }
 
     static const QRegularExpression kColorRegex(R"(color\s*:\s*#[0-9a-fA-F]+)");
     svg.replace(kColorRegex, "color:" + color.name());
@@ -86,7 +108,7 @@ QIcon desktopAppIcon()
     return icon;
 }
 
-QIcon loadIcon(const QString& themeName, const QString& fallback)
+QIcon loadIcon(const QString& themeName, const QString& fallback, IconMode mode)
 {
 #ifndef FLUVEL_FORCE_EMBEDDED_ICONS
 
@@ -102,10 +124,10 @@ QIcon loadIcon(const QString& themeName, const QString& fallback)
 
 #endif
 
-    return loadSvgWithPalette(fallback);
+    return loadSvgWithPalette(fallback, mode);
 }
 
-QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback)
+QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback, IconMode mode)
 {
 #ifndef FLUVEL_FORCE_EMBEDDED_ICONS
 
@@ -117,12 +139,12 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback)
 
 #endif
 
-    return loadSvgWithPalette(fallback);
+    return loadSvgWithPalette(fallback, mode);
 }
 
-QIcon loadIcon(const QString& svgResourceName)
+QIcon loadIcon(const QString& svgResourceName, IconMode mode)
 {
-    return loadSvgWithPalette(svgResourceName);
+    return loadSvgWithPalette(svgResourceName, mode);
 }
 
 } // namespace fluvel::il
