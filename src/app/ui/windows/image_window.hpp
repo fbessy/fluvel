@@ -4,6 +4,8 @@
 #pragma once
 
 #include "active_contour_worker.hpp"
+#include "analysis_window.hpp"
+#include "video_window.hpp"
 
 #include <QIcon>
 #include <QImage>
@@ -11,6 +13,7 @@
 #include <QString>
 
 #include <array>
+#include <memory>
 
 class QWidget;
 
@@ -24,8 +27,6 @@ class QCloseEvent;
 namespace fluvel
 {
 
-class VideoWindow;
-class AnalysisWindow;
 class SettingsDialog;
 class AboutDialog;
 class LanguageDialog;
@@ -119,6 +120,7 @@ private:
     void showErrorMessage(const QString& msg);
     void showWarningMessage(const QString& msg);
 
+    void onImageSessionActionTriggered();
     void onStartVideoActionTriggered();
 
     void saveDisplayed();
@@ -128,8 +130,8 @@ private:
     void leaveFullscreen();
 
     // --- UI ---
-    VideoWindow* videoWindow_{nullptr};
-    AnalysisWindow* analysisWindow_{nullptr};
+    std::unique_ptr<VideoWindow> videoWindow_;
+    std::unique_ptr<AnalysisWindow> analysisWindow_;
     SettingsDialog* settingsWindow_{nullptr};
     AboutDialog* AboutDialog_{nullptr};
     LanguageDialog* languageWindow_{nullptr};

@@ -4,11 +4,9 @@
 #include "image_window.hpp"
 
 #include "about_dialog.hpp"
-#include "analysis_window.hpp"
 #include "application_settings.hpp"
 #include "language_dialog.hpp"
 #include "settings_dialog.hpp"
-#include "video_window.hpp"
 
 #include "display_settings_widget.hpp"
 #include "icon_loader.hpp"
@@ -350,9 +348,10 @@ void ImageWindow::setupChildWindows()
 {
     const auto& config = ApplicationSettings::instance().imageSettings();
 
+    videoWindow_ = std::make_unique<VideoWindow>();
+    analysisWindow_ = std::make_unique<AnalysisWindow>();
+
     settingsWindow_ = new SettingsDialog(config.compute, this);
-    videoWindow_ = new VideoWindow(this);
-    analysisWindow_ = new AnalysisWindow(this);
     AboutDialog_ = new AboutDialog(this);
     languageWindow_ = new LanguageDialog(this);
 }
@@ -382,8 +381,10 @@ void ImageWindow::setupConnections()
     setupUserActionsConnections();
 
     // to refresh video session state in the menu
-    connect(videoWindow_, &VideoWindow::videoWindowShown, this, &ImageWindow::onVideoWindowShown);
-    connect(videoWindow_, &VideoWindow::videoWindowClosed, this, &ImageWindow::onVideoWindowClosed);
+    connect(videoWindow_.get(), &VideoWindow::videoWindowShown, this,
+            &ImageWindow::onVideoWindowShown);
+    connect(videoWindow_.get(), &VideoWindow::videoWindowClosed, this,
+            &ImageWindow::onVideoWindowClosed);
 
     setupFileEventConnections();
 
@@ -489,10 +490,7 @@ void ImageWindow::setupUserActionsConnections()
     // ---   1st menu   ---
 
     connect(imageSessionAct_, &QAction::triggered, this,
-            [this]()
-            {
-                imageSessionAct_->setChecked(true);
-            });
+            &ImageWindow::onImageSessionActionTriggered);
 
     connect(videoSessionAct_, &QAction::triggered, this, &ImageWindow::onStartVideoActionTriggered);
 
@@ -544,7 +542,7 @@ void ImageWindow::setupUserActionsConnections()
 
     // ---   3rd menu   ---
 
-    connect(analysisAct_, &QAction::triggered, analysisWindow_, &AnalysisWindow::show);
+    connect(analysisAct_, &QAction::triggered, analysisWindow_.get(), &AnalysisWindow::show);
 
     connect(settingsAct_, &QAction::triggered, settingsWindow_, &SettingsDialog::show);
 
@@ -639,15 +637,26 @@ void ImageWindow::clearRecentFiles()
     updateRecentFileActions();
 }
 
+void ImageWindow::onImageSessionActionTriggered()
+{
+    assert(imageSessionAct_);
+
+    // Keep the image session action checked. Unlike the video
+    // session, the main image window is always available and
+    // this action is used only to bring it to the foreground.
+    imageSessionAct_->setChecked(true);
+}
+
 void ImageWindow::onStartVideoActionTriggered()
 {
     assert(videoWindow_);
 
-    videoWindow_->setWindowState(videoWindow_->windowState() & ~Qt::WindowMinimized);
+    if (!videoWindow_->isVisible())
+        videoWindow_->show();
+    else
+        videoWindow_->activateWindow();
 
-    videoWindow_->show();
-    videoWindow_->raise();
-    videoWindow_->activateWindow();
+    videoSessionAct_->setChecked(videoWindow_->isVisible());
 }
 
 void ImageWindow::closeEvent(QCloseEvent* event)
