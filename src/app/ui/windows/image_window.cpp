@@ -44,6 +44,8 @@
 
 #include <cassert>
 
+static constexpr int kControlSpacing = 6;
+
 namespace fluvel
 {
 
@@ -129,8 +131,13 @@ void ImageWindow::setupUi()
 
     settingsButton_->setIcon(settingsIcon_);
 
-    // settingsButton->setAutoDefault(false);
-    // settingsButton->setFlat(true);
+    auto* configRightBlockLayout = new QHBoxLayout;
+    configRightBlockLayout->setContentsMargins(0, 0, 0, 0);
+    configRightBlockLayout->addWidget(rightPanelToggle_);
+    configRightBlockLayout->addWidget(settingsButton_);
+    auto* configRightBlockWidget = new QWidget;
+    configRightBlockWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    configRightBlockWidget->setLayout(configRightBlockLayout);
 
     // Widget central
     QWidget* central = new QWidget(this);
@@ -144,16 +151,14 @@ void ImageWindow::setupUi()
     controlBar_ = new QWidget(central);
     QHBoxLayout* controlLayout = new QHBoxLayout(controlBar_);
     controlLayout->setContentsMargins(8, 4, 8, 4);
-    controlLayout->setSpacing(6);
+    controlLayout->setSpacing(kControlSpacing);
 
     controlLayout->addWidget(restartButton_);
     controlLayout->addWidget(togglePauseButton_);
     controlLayout->addWidget(stepButton_);
     controlLayout->addWidget(convergeButton_);
     controlLayout->addStretch();
-    controlLayout->addWidget(rightPanelToggle_);
-    controlLayout->addSpacerItem(new QSpacerItem(12, 0, QSizePolicy::Fixed, QSizePolicy::Minimum));
-    controlLayout->addWidget(settingsButton_);
+    controlLayout->addWidget(configRightBlockWidget);
 
     // --- Image view ---
 

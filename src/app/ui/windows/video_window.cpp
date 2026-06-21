@@ -49,11 +49,20 @@
 #include <QtCore/qpermissions.h>
 #endif
 
-static constexpr auto kLastSourceTypeKey = "sources/last_type";
-static constexpr auto kCameraDeviceKey = "camera/device";
-static constexpr auto kCameraFormatsKey = "camera/formats";
-static constexpr auto kSourceHistoryKey = "sources/history";
-static constexpr auto kLastVideoDirectory = "video/last_directory";
+namespace
+{
+constexpr auto kLastSourceTypeKey = "sources/last_type";
+constexpr auto kCameraDeviceKey = "camera/device";
+constexpr auto kCameraFormatsKey = "camera/formats";
+constexpr auto kSourceHistoryKey = "sources/history";
+constexpr auto kLastVideoDirectory = "video/last_directory";
+
+constexpr int kControlSpacing = 6;
+constexpr int kSectionSpacing = 12;
+constexpr int kGroupSpacing = 20;
+
+constexpr int kVerticalSpacing = 4;
+} // namespace
 
 namespace fluvel
 {
@@ -132,7 +141,6 @@ void VideoWindow::createUi()
     deviceLayout->addWidget(deviceLabel_);
     deviceLayout->addWidget(deviceSelector_);
     deviceWidget_ = new QWidget;
-    deviceWidget_->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     deviceWidget_->setLayout(deviceLayout);
 
     deviceActiveIcon_ = createActiveCameraIcon();
@@ -151,12 +159,11 @@ void VideoWindow::createUi()
     formatLayout->addWidget(formatLabel_);
     formatLayout->addWidget(formatSelector_);
     formatWidget_ = new QWidget;
-    formatWidget_->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
     formatWidget_->setLayout(formatLayout);
 
     auto* cameraConfigLayout = new QHBoxLayout;
     cameraConfigLayout->setContentsMargins(0, 0, 0, 0);
-    cameraConfigLayout->setSpacing(20);
+    cameraConfigLayout->setSpacing(kSectionSpacing);
     cameraConfigLayout->addWidget(deviceWidget_);
     cameraConfigLayout->addWidget(formatWidget_);
     cameraConfigLayout->addStretch();
@@ -211,7 +218,7 @@ void VideoWindow::createUi()
 
     auto* fileUrlConfigLayout = new QHBoxLayout;
     fileUrlConfigLayout->setContentsMargins(0, 0, 0, 0);
-    fileUrlConfigLayout->setSpacing(20);
+    fileUrlConfigLayout->setSpacing(kSectionSpacing);
 
     fileUrlConfigLayout->addWidget(openFileButton_);
     fileUrlConfigLayout->addWidget(urlCombo_, 1);
@@ -328,7 +335,7 @@ void VideoWindow::createUi()
 
     auto* mediaLayout = new QHBoxLayout(mediaControlsWidget_);
     mediaLayout->setContentsMargins(0, 0, 0, 0);
-    mediaLayout->setSpacing(8);
+    mediaLayout->setSpacing(kControlSpacing);
 
     mediaLayout->addWidget(playPauseButton_);
     mediaLayout->addWidget(playbackPositionLabel_);
@@ -439,29 +446,39 @@ void VideoWindow::setupLayout()
     //
     // Source column
     //
-    auto* sourceColumn = new QVBoxLayout;
-    sourceColumn->setContentsMargins(0, 0, 0, 0);
-    sourceColumn->setSpacing(4);
+    auto* sourceTypeColumn = new QVBoxLayout;
+    sourceTypeColumn->setContentsMargins(0, 0, 0, 0);
+    sourceTypeColumn->setSpacing(kVerticalSpacing);
 
-    sourceColumn->addWidget(sourceTypeWidget_);
-    sourceColumn->addWidget(toggleStreamingButton_);
+    sourceTypeColumn->addWidget(sourceTypeWidget_);
+    sourceTypeColumn->addWidget(toggleStreamingButton_);
 
     //
     // Apply column
     //
     auto* applyColumn = new QVBoxLayout;
     applyColumn->setContentsMargins(0, 0, 0, 0);
-    applyColumn->setSpacing(4);
+    applyColumn->setSpacing(kVerticalSpacing);
 
     applyColumn->addStretch(); // vide au dessus
     applyColumn->addWidget(applyButton_);
+
+    //
+    // Left column
+    //
+    auto* leftColumn = new QHBoxLayout;
+    leftColumn->setContentsMargins(0, 0, 0, 0);
+    leftColumn->setSpacing(kSectionSpacing);
+
+    leftColumn->addLayout(sourceTypeColumn);
+    leftColumn->addLayout(applyColumn);
 
     //
     // Config column
     //
     auto* configColumn = new QVBoxLayout;
     configColumn->setContentsMargins(0, 0, 0, 0);
-    configColumn->setSpacing(4);
+    configColumn->setSpacing(kVerticalSpacing);
 
     configColumn->addWidget(sourceConfigWidget_);
     configColumn->addStretch();
@@ -472,7 +489,7 @@ void VideoWindow::setupLayout()
     //
     auto* rightColumn = new QVBoxLayout;
     rightColumn->setContentsMargins(0, 0, 0, 0);
-    rightColumn->setSpacing(4);
+    rightColumn->setSpacing(kVerticalSpacing);
 
     rightColumn->addWidget(configRightBlockWidget_);
     rightColumn->addStretch(); // vide dessous
@@ -481,17 +498,12 @@ void VideoWindow::setupLayout()
     // Main top bar layout
     //
 
-    static constexpr int kGroupSpacing = 20;
-
     auto* topBarLayout = new QHBoxLayout(controlBar_);
     topBarLayout->setContentsMargins(8, 4, 8, 4);
-    topBarLayout->setSpacing(8);
+    topBarLayout->setSpacing(kGroupSpacing);
 
-    topBarLayout->addLayout(sourceColumn);
-    topBarLayout->addLayout(applyColumn);
-    topBarLayout->addSpacing(kGroupSpacing);
+    topBarLayout->addLayout(leftColumn);
     topBarLayout->addLayout(configColumn);
-    topBarLayout->addSpacing(kGroupSpacing);
     topBarLayout->addLayout(rightColumn);
 
     //
