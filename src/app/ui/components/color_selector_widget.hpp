@@ -67,8 +67,8 @@ private:
 
     QPixmap drawColorSquare(const QColor& color, int size = 12);
 
-    QComboBox* color_cb_;
-    QPushButton* custom_pb_;
+    QComboBox* color_cb_{nullptr};
+    QPushButton* custom_pb_{nullptr};
 };
 
 } // namespace fluvel
