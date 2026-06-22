@@ -10,7 +10,9 @@
 #include <QIcon>
 #include <QImage>
 #include <QMainWindow>
+#include <QPushButton>
 #include <QString>
+#include <QTimer>
 
 #include <array>
 #include <memory>
@@ -19,7 +21,9 @@ class QWidget;
 
 class QMenu;
 class QAction;
-class QPushButton;
+
+class QGraphicsOpacityEffect;
+class QPropertyAnimation;
 
 class QShowEvent;
 class QCloseEvent;
@@ -27,12 +31,64 @@ class QCloseEvent;
 namespace fluvel
 {
 
+/**
+ * @brief Set of control buttons associated with an active contour session.
+ *
+ * This structure groups together the UI controls used to drive the
+ * active contour execution. It is used by both the standard toolbar
+ * and the fullscreen control overlay.
+ */
+struct ControlButtons
+{
+    QPushButton* restart{nullptr};
+    QPushButton* pause{nullptr};
+    QPushButton* step{nullptr};
+    QPushButton* converge{nullptr};
+};
+
+/**
+ * @brief Icons used by a control button set.
+ *
+ * Different presentations may use different icon themes
+ * (for example standard system icons versus fullscreen
+ * light-colored icons) while sharing the same behavior.
+ */
+struct ControlIcons
+{
+    QIcon startResume;
+    QIcon pause;
+    QIcon restart;
+    QIcon step;
+    QIcon converge;
+};
+
+/**
+ * @brief Visual presentation of a control button set.
+ *
+ * A control theme combines:
+ * - the target buttons to update
+ * - the icons to display
+ * - presentation options such as text and tooltip visibility
+ *
+ * This allows the same update logic to be reused for both
+ * the standard toolbar and the fullscreen overlay controls.
+ */
+struct ControlTheme
+{
+    ControlButtons buttons;
+    ControlIcons icons;
+
+    bool showText{true};
+    bool showToolTips{true};
+};
+
 class SettingsDialog;
 class AboutDialog;
 class LanguageDialog;
 
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
+class FullscreenImageControlBar;
 
 class ImageViewerWidget;
 class ImageController;
@@ -129,6 +185,10 @@ private:
     void enterFullscreen();
     void leaveFullscreen();
 
+    void positionFullscreenBar();
+    void updateButtons(const ControlTheme& theme, WorkerState state);
+    void onViewerMouseMoved(const QPointF& pos);
+
     // --- UI ---
     std::unique_ptr<VideoWindow> videoWindow_;
     std::unique_ptr<AnalysisWindow> analysisWindow_;
@@ -145,6 +205,12 @@ private:
     QPushButton* togglePauseButton_{nullptr};
     QPushButton* stepButton_{nullptr};
     QPushButton* convergeButton_{nullptr};
+
+    QPushButton* restartButtonLight_{nullptr};
+    QPushButton* togglePauseLightButton_{nullptr};
+    QPushButton* stepButtonLight_{nullptr};
+    QPushButton* convergeButtonLight_{nullptr};
+
     RightPanelToggleButton* rightPanelToggle_{nullptr};
     QPushButton* settingsButton_{nullptr};
 
@@ -191,6 +257,17 @@ private:
     QString lastDirectoryUsed_;
 
     bool isFullScreen_{false};
+
+    FullscreenImageControlBar* fullscreenBar_{nullptr};
+    QTimer hideFullscreenTimer_;
+
+    QGraphicsOpacityEffect* fullscreenOpacity_{nullptr};
+
+    QPropertyAnimation* showAnimation_{nullptr};
+    QPropertyAnimation* hideAnimation_{nullptr};
+
+    ControlTheme normalTheme_;
+    ControlTheme fullscreenTheme_;
 };
 
 } // namespace fluvel

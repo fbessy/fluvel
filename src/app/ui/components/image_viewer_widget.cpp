@@ -643,6 +643,8 @@ void ImageViewerWidget::mousePressEvent(QMouseEvent* event)
 
 void ImageViewerWidget::mouseMoveEvent(QMouseEvent* event)
 {
+    emit mouseMoved(event->pos());
+
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 

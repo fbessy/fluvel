@@ -114,6 +114,12 @@ set(app_src
     ${UI_COMP_DIR}/volume_slider.cpp
     ${UI_COMP_DIR}/volume_slider.hpp
 
+    ${UI_COMP_DIR}/fullscreen_image_control_bar.cpp
+    ${UI_COMP_DIR}/fullscreen_image_control_bar.hpp
+
+    ${UI_COMP_DIR}/fullscreen_video_control_bar.cpp
+    ${UI_COMP_DIR}/fullscreen_video_control_bar.hpp
+
     ${UI_COMP_DIR}/image_viewer_listener.hpp
 
     ${CORE_DIR}/image_controller.cpp

@@ -9,6 +9,7 @@
 #include "settings_dialog.hpp"
 
 #include "display_settings_widget.hpp"
+#include "fullscreen_image_control_bar.hpp"
 #include "icon_loader.hpp"
 #include "right_panel_toggle_button.hpp"
 
@@ -28,12 +29,13 @@
 #include <QCloseEvent>
 #include <QDir>
 #include <QFileDialog>
+#include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QPushButton>
+#include <QPropertyAnimation>
 #include <QSettings>
 #include <QShowEvent>
 #include <QStatusBar>
@@ -120,6 +122,11 @@ void ImageWindow::setupUi()
     stepButton_->setEnabled(false);
     convergeButton_->setEnabled(false);
 
+    normalTheme_.buttons = {restartButton_, togglePauseButton_, stepButton_, convergeButton_};
+    normalTheme_.icons = {startResumeIcon_, pauseIcon_, restartIcon_, stepIcon, convergeIcon};
+    normalTheme_.showText = true;
+    normalTheme_.showToolTips = true;
+
     rightPanelToggle_ = new RightPanelToggleButton;
 
     settingsButton_ = new QPushButton;
@@ -178,6 +185,43 @@ void ImageWindow::setupUi()
     interaction->addBehavior(std::make_unique<DragDropBehavior>(
         DragDropContent::Images, tr("Drop an image here\n\nor choose File → Open")));
     imageViewer_->setInteraction(interaction.release());
+
+    fullscreenBar_ = new FullscreenImageControlBar(imageViewer_);
+
+    fullscreenTheme_.buttons = {fullscreenBar_->restartButton(), fullscreenBar_->pauseButton(),
+                                fullscreenBar_->stepButton(), fullscreenBar_->convergeButton()};
+
+    fullscreenTheme_.icons = {
+        il::loadIcon(":/icons/media/media-playback-start-symbolic.svg", il::IconMode::Light),
+        il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light),
+        il::loadIcon(":/icons/media/media-playlist-repeat-symbolic.svg", il::IconMode::Light),
+        il::loadIcon(":/icons/actions/go-next-symbolic.svg", il::IconMode::Light),
+        il::loadIcon(":/icons/media/media-seek-forward-symbolic.svg", il::IconMode::Light)};
+
+    fullscreenTheme_.showText = false;
+    fullscreenTheme_.showToolTips = false;
+
+    fullscreenBar_->setAttribute(Qt::WA_NoMousePropagation);
+    fullscreenBar_->hide();
+
+    fullscreenOpacity_ = new QGraphicsOpacityEffect(fullscreenBar_);
+    fullscreenOpacity_->setOpacity(0.0);
+    fullscreenBar_->setGraphicsEffect(fullscreenOpacity_);
+
+    showAnimation_ = new QPropertyAnimation(fullscreenOpacity_, "opacity", this);
+
+    showAnimation_->setDuration(100);
+    showAnimation_->setStartValue(0.0);
+    showAnimation_->setEndValue(1.0);
+
+    hideAnimation_ = new QPropertyAnimation(fullscreenOpacity_, "opacity", this);
+
+    hideAnimation_->setDuration(250);
+    hideAnimation_->setStartValue(1.0);
+    hideAnimation_->setEndValue(0.0);
+
+    hideFullscreenTimer_.setSingleShot(true);
+    hideFullscreenTimer_.setInterval(1500);
 
     // --- Display bar (à droite) ---
     displayBar_ = new DisplaySettingsWidget(config.display, central);
@@ -450,6 +494,54 @@ void ImageWindow::setupConnections()
 
                 updateWindowTitle();
             });
+
+    // fullscreen bar connections
+
+    connect(fullscreenBar_->restartButton(), &QPushButton::clicked, imageController_,
+            &ImageController::restart);
+
+    connect(fullscreenBar_->pauseButton(), &QPushButton::clicked, imageController_,
+            &ImageController::togglePause);
+
+    connect(fullscreenBar_->stepButton(), &QPushButton::clicked, imageController_,
+            &ImageController::step);
+
+    connect(fullscreenBar_->convergeButton(), &QPushButton::clicked, imageController_,
+            &ImageController::converge);
+
+    connect(&hideFullscreenTimer_, &QTimer::timeout, this,
+            [this]()
+            {
+                if (fullscreenBar_->underMouse())
+                {
+                    hideFullscreenTimer_.start();
+                    return;
+                }
+
+                showAnimation_->stop();
+                hideAnimation_->stop();
+
+                hideAnimation_->start();
+            });
+
+    connect(imageViewer_, &ImageViewerWidget::mouseMoved, this, &ImageWindow::onViewerMouseMoved);
+
+    auto restartHideTimer = [this]()
+    {
+        hideFullscreenTimer_.start();
+    };
+
+    connect(hideAnimation_, &QPropertyAnimation::finished, this,
+            [this]()
+            {
+                if (fullscreenOpacity_->opacity() < 0.01)
+                    fullscreenBar_->hide();
+            });
+
+    connect(fullscreenBar_->restartButton(), &QPushButton::clicked, this, restartHideTimer);
+    connect(fullscreenBar_->pauseButton(), &QPushButton::clicked, this, restartHideTimer);
+    connect(fullscreenBar_->stepButton(), &QPushButton::clicked, this, restartHideTimer);
+    connect(fullscreenBar_->convergeButton(), &QPushButton::clicked, this, restartHideTimer);
 }
 
 void ImageWindow::bindApplicationSettingsToController()
@@ -796,40 +888,10 @@ void ImageWindow::saveDisplayed()
     }
 }
 
-void ImageWindow::onStateChanged(fluvel::WorkerState state)
+void ImageWindow::onStateChanged(WorkerState state)
 {
-    bool isEnable = (state != WorkerState::Uninitialized && state != WorkerState::Initializing);
-
-    restartButton_->setEnabled(isEnable);
-    togglePauseButton_->setEnabled(isEnable);
-    stepButton_->setEnabled(isEnable);
-    convergeButton_->setEnabled(isEnable);
-
-    if (state == WorkerState::Running || state == WorkerState::Suspended)
-    {
-        restartButton_->setText(tr("Restart"));
-        restartButton_->setToolTip(tr("Restart the active contour from its initial state."));
-        restartButton_->setIcon(restartIcon_);
-    }
-    else if (state == WorkerState::Ready)
-    {
-        restartButton_->setText(tr("Start"));
-        restartButton_->setToolTip(tr("Run the active contour."));
-        restartButton_->setIcon(startResumeIcon_);
-    }
-
-    if (state == WorkerState::Running)
-    {
-        togglePauseButton_->setText(tr("Pause"));
-        togglePauseButton_->setToolTip(tr("Suspend execution and display the current state."));
-        togglePauseButton_->setIcon(pauseIcon_);
-    }
-    else if (state == WorkerState::Suspended || state == WorkerState::Ready)
-    {
-        togglePauseButton_->setText(tr("Resume"));
-        togglePauseButton_->setToolTip(tr("Resume the active contour execution."));
-        togglePauseButton_->setIcon(startResumeIcon_);
-    }
+    updateButtons(normalTheme_, state);
+    updateButtons(fullscreenTheme_, state);
 }
 
 void ImageWindow::onVideoWindowShown()
@@ -909,11 +971,14 @@ void ImageWindow::enterFullscreen()
 
     showFullScreen();
 
+    positionFullscreenBar();
+
     isFullScreen_ = true;
 }
 
 void ImageWindow::leaveFullscreen()
 {
+    fullscreenBar_->hide();
     imageViewer_->leaveFullscreenMode();
 
     showNormal();
@@ -926,6 +991,134 @@ void ImageWindow::leaveFullscreen()
     statusBar()->show();
 
     isFullScreen_ = false;
+}
+
+void ImageWindow::positionFullscreenBar()
+{
+    if (!fullscreenBar_)
+        return;
+
+    fullscreenBar_->adjustSize();
+
+    const QSize size = fullscreenBar_->size();
+
+    constexpr int kBottomMargin = 12;
+
+    const int x = (imageViewer_->width() - size.width()) / 2;
+
+    const int y = imageViewer_->height() - size.height() - kBottomMargin;
+
+    fullscreenBar_->move(x, y);
+}
+
+void ImageWindow::updateButtons(const ControlTheme& theme, WorkerState state)
+{
+    const bool enabled = state != WorkerState::Uninitialized && state != WorkerState::Initializing;
+
+    theme.buttons.restart->setEnabled(enabled);
+    theme.buttons.pause->setEnabled(enabled);
+    theme.buttons.step->setEnabled(enabled);
+    theme.buttons.converge->setEnabled(enabled);
+
+    auto setText = [&](QPushButton* button, const QString& text)
+    {
+        button->setText(theme.showText ? text : QString{});
+    };
+
+    auto setToolTip = [&](QPushButton* button, const QString& text)
+    {
+        button->setToolTip(theme.showToolTips ? text : QString{});
+    };
+
+    //
+    // Restart / Start
+    //
+
+    if (state == WorkerState::Running || state == WorkerState::Suspended)
+    {
+        setText(theme.buttons.restart, tr("Restart"));
+
+        setToolTip(theme.buttons.restart, tr("Restart the active contour from its initial state."));
+
+        theme.buttons.restart->setIcon(theme.icons.restart);
+    }
+    else if (state == WorkerState::Ready)
+    {
+        setText(theme.buttons.restart, tr("Start"));
+
+        setToolTip(theme.buttons.restart, tr("Run the active contour."));
+
+        theme.buttons.restart->setIcon(theme.icons.startResume);
+    }
+
+    //
+    // Pause / Resume
+    //
+
+    if (state == WorkerState::Running)
+    {
+        setText(theme.buttons.pause, tr("Pause"));
+
+        setToolTip(theme.buttons.pause, tr("Suspend execution and display the current state."));
+
+        theme.buttons.pause->setIcon(theme.icons.pause);
+    }
+    else if (state == WorkerState::Ready || state == WorkerState::Suspended)
+    {
+        setText(theme.buttons.pause, tr("Resume"));
+
+        setToolTip(theme.buttons.pause, tr("Resume the active contour execution."));
+
+        theme.buttons.pause->setIcon(theme.icons.startResume);
+    }
+
+    //
+    // Step
+    //
+
+    theme.buttons.step->setIcon(theme.icons.step);
+
+    setText(theme.buttons.step, tr("Step"));
+
+    setToolTip(theme.buttons.step, tr("Advance the active contour by one iteration."));
+
+    //
+    // Converge
+    //
+
+    theme.buttons.converge->setIcon(theme.icons.converge);
+
+    setText(theme.buttons.converge, tr("Converge"));
+
+    setToolTip(theme.buttons.converge,
+               tr("Run until completion without displaying intermediate steps."));
+}
+
+void ImageWindow::onViewerMouseMoved(const QPointF& pos)
+{
+    if (!isFullScreen_)
+        return;
+
+    constexpr int kTriggerZoneHeight = 150;
+
+    const bool inBottomZone = pos.y() > imageViewer_->height() - kTriggerZoneHeight;
+
+    if (!inBottomZone)
+        return;
+
+    positionFullscreenBar();
+
+    if (!fullscreenBar_->isVisible())
+    {
+        fullscreenBar_->show();
+
+        showAnimation_->stop();
+        hideAnimation_->stop();
+
+        showAnimation_->start();
+    }
+
+    hideFullscreenTimer_.start();
 }
 
 } // namespace fluvel

@@ -237,6 +237,8 @@ signals:
      */
     void toggleFullscreenRequested();
 
+    void mouseMoved(const QPoint& pos);
+
 protected:
     void wheelEvent(QWheelEvent* event) override;
 
