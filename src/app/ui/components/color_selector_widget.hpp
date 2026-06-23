@@ -65,8 +65,6 @@ private:
 
     void addColorItem(const QColor& color, const QString& name);
 
-    QPixmap drawColorSquare(const QColor& color, int size = 12);
-
     QComboBox* color_cb_{nullptr};
     QPushButton* custom_pb_{nullptr};
 };

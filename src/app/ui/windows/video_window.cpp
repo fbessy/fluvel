@@ -143,9 +143,12 @@ void VideoWindow::createUi()
     deviceWidget_ = new QWidget;
     deviceWidget_->setLayout(deviceLayout);
 
-    deviceActiveIcon_ = createActiveCameraIcon();
-    deviceIdleIcon_ = createEmptyIcon(kCameraIconSize);
-    deviceErrorIcon_ = createErrorCameraIcon();
+    QColor greenActive("#4FC98A");
+    QColor orangeError("#FF9F0A");
+
+    deviceActiveIcon_ = il::createDisk(greenActive);
+    deviceIdleIcon_ = il::createEmpty(kCameraIconSize);
+    deviceErrorIcon_ = il::createDisk(orangeError);
 
     formatLabel_ = new QLabel(tr("Format: "));
     formatSelector_ = new QComboBox(this);
@@ -171,7 +174,7 @@ void VideoWindow::createUi()
     cameraConfigWidget_->setLayout(cameraConfigLayout);
 
     formatActiveIcon_ = createActiveFormatIcon();
-    formatAvailableIcon_ = createEmptyIcon(kFormatIconSize);
+    formatAvailableIcon_ = il::createEmpty(kFormatIconSize);
 
     openFileButton_ = new QPushButton(tr("Open..."));
     openFileButton_->setIcon(videoIcon);
@@ -349,32 +352,6 @@ void VideoWindow::createUi()
     mediaControlsWidget_->setVisible(false);
 }
 
-QIcon VideoWindow::createActiveCameraIcon()
-{
-    const int pixSize = 13;
-    const int ellipseSize = 11;
-
-    QPixmap pix(pixSize, pixSize);
-    pix.fill(Qt::transparent);
-
-    QPainter p(&pix);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    p.setBrush(QColor(0, 180, 0));
-    p.setPen(QPen(QColor(40, 40, 40), 1));
-
-    p.drawEllipse(1, 1, ellipseSize, ellipseSize);
-
-    return QIcon(pix);
-}
-
-QIcon VideoWindow::createEmptyIcon(int size)
-{
-    QPixmap pix(size, size);
-    pix.fill(Qt::transparent);
-    return QIcon(pix);
-}
-
 QIcon VideoWindow::createActiveFormatIcon()
 {
     QIcon icon;
@@ -386,25 +363,6 @@ QIcon VideoWindow::createActiveFormatIcon()
 #endif
 
     return icon;
-}
-
-QIcon VideoWindow::createErrorCameraIcon()
-{
-    const int pixSize = 13;
-    const int ellipseSize = 11;
-
-    QPixmap pix(pixSize, pixSize);
-    pix.fill(Qt::transparent);
-
-    QPainter p(&pix);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    p.setBrush(QColor(255, 165, 0)); // orange
-    p.setPen(QPen(QColor(40, 40, 40), 1));
-
-    p.drawEllipse(1, 1, ellipseSize, ellipseSize);
-
-    return QIcon(pix);
 }
 
 void VideoWindow::setupView()

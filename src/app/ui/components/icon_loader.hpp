@@ -106,4 +106,44 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback, IconMode mode
  */
 QIcon loadIcon(const QString& svgResourceName, IconMode mode = IconMode::Auto);
 
+/**
+ * @brief Creates a circular color icon.
+ *
+ * The icon is rendered at a higher resolution and then downscaled
+ * to improve visual quality and antialiasing when displayed at
+ * small sizes.
+ *
+ * @param color Fill color of the disk.
+ * @param size Final icon size in pixels.
+ *
+ * @return A circular color icon.
+ */
+QIcon createDisk(const QColor& color, int size = 13);
+
+/**
+ * @brief Creates a rounded square color icon.
+ *
+ * The icon is rendered at a higher resolution and then downscaled
+ * to improve visual quality and antialiasing when displayed at
+ * small sizes.
+ *
+ * @param color Fill color of the square.
+ * @param size Final icon size in pixels.
+ *
+ * @return A rounded square color icon.
+ */
+QIcon createSquare(const QColor& color, int size = 12);
+
+/**
+ * @brief Creates an empty transparent icon.
+ *
+ * This helper can be used to reserve icon space in item views,
+ * menus or toolbars when no visible icon is required.
+ *
+ * @param size Icon size in pixels.
+ *
+ * @return A transparent icon of the requested size.
+ */
+QIcon createEmpty(int size = 13);
+
 } // namespace fluvel::il

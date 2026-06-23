@@ -183,9 +183,6 @@ private:
     void setupWindow();
     void restoreSettings();
     void createUi();
-    static QIcon createActiveCameraIcon();
-    static QIcon createEmptyIcon(int size);
-    static QIcon createErrorCameraIcon();
     static QIcon createActiveFormatIcon();
     void setupView();
     void setupController();

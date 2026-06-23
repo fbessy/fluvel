@@ -48,22 +48,9 @@ ColorSelectorWidget::ColorSelectorWidget(QWidget* parent, QColor initialColor)
     connect(custom_pb_, &QPushButton::clicked, this, &ColorSelectorWidget::onCustomClicked);
 }
 
-QPixmap ColorSelectorWidget::drawColorSquare(const QColor& color, int size)
-{
-    QPixmap pm(size, size);
-    pm.fill(Qt::transparent);
-
-    QPainter p(&pm);
-    p.fillRect(pm.rect(), color);
-    p.setPen(Qt::black);
-    p.drawRect(pm.rect().adjusted(0, 0, -1, -1));
-
-    return pm;
-}
-
 void ColorSelectorWidget::addColorItem(const QColor& color, const QString& name)
 {
-    color_cb_->addItem(drawColorSquare(color), name, color);
+    color_cb_->addItem(il::createSquare(color), name, color);
 }
 
 QColor ColorSelectorWidget::color() const
@@ -89,7 +76,7 @@ void ColorSelectorWidget::onCustomClicked()
 
     QSignalBlocker blocker(color_cb_);
 
-    color_cb_->setItemIcon(customIndex, drawColorSquare(chosen));
+    color_cb_->setItemIcon(customIndex, il::createSquare(chosen));
     color_cb_->setItemData(customIndex, chosen);
     color_cb_->setCurrentIndex(customIndex);
 
@@ -117,7 +104,7 @@ void ColorSelectorWidget::setSelectedColor(const QColor& color)
     const int customIndex = color_cb_->findText(tr("Custom"));
     if (customIndex >= 0)
     {
-        color_cb_->setItemIcon(customIndex, drawColorSquare(color));
+        color_cb_->setItemIcon(customIndex, il::createSquare(color));
         color_cb_->setItemData(customIndex, color);
         color_cb_->setCurrentIndex(customIndex);
 

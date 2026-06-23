@@ -145,4 +145,53 @@ QIcon loadIcon(const QString& svgResourceName, IconMode mode)
     return loadSvgWithPalette(svgResourceName, mode);
 }
 
+QIcon createDisk(const QColor& color, int size)
+{
+    constexpr int kRenderScale = 4;
+
+    QPixmap pix(size * kRenderScale, size * kRenderScale);
+
+    pix.fill(Qt::transparent);
+
+    QPainter p(&pix);
+
+    p.setRenderHint(QPainter::Antialiasing);
+
+    p.setBrush(color);
+    p.setPen(Qt::NoPen);
+
+    p.drawEllipse(pix.rect().adjusted(2, 2, -2, -2));
+
+    return QIcon(pix.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+QIcon createSquare(const QColor& color, int size)
+{
+    constexpr int kRenderScale = 4;
+
+    QPixmap pix(size * kRenderScale, size * kRenderScale);
+
+    pix.fill(Qt::transparent);
+
+    QPainter p(&pix);
+
+    p.setRenderHint(QPainter::Antialiasing);
+
+    p.setBrush(color);
+    p.setPen(Qt::NoPen);
+
+    const QRect rect = pix.rect().adjusted(2, 2, -2, -2);
+
+    p.drawRoundedRect(rect, rect.width() * 0.15, rect.height() * 0.15);
+
+    return QIcon(pix.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+QIcon createEmpty(int size)
+{
+    QPixmap pix(size, size);
+    pix.fill(Qt::transparent);
+    return QIcon(pix);
+}
+
 } // namespace fluvel::il
