@@ -159,19 +159,17 @@ AboutDialog::AboutDialog(QWidget* parent)
     iconLabel->setPixmap(il::appIcon().pixmap(48 * 3, 48 * 3));
     iconLabel->setAlignment(Qt::AlignCenter);
 
-    QLabel* nameLabel = new QLabel;
-    nameLabel->setText("<b>Fluvel</b>");
-    QFont font1;
-    font1.setPointSize(22);
-    font1.setBold(true);
-    nameLabel->setFont(font1);
+    QLabel* nameLabel = new QLabel("Fluvel");
+
+    nameLabel->setStyleSheet("font-size:24px;"
+                             "font-weight:700;"
+                             "color:#7662F2;");
+
     nameLabel->setAlignment(Qt::AlignCenter);
-    nameLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                       Qt::LinksAccessibleByKeyboard);
 
     QLabel* versionLabel = new QLabel;
     QFont font2;
-    font2.setPointSize(12);
+    font2.setPointSize(11);
     versionLabel->setFont(font2);
 
     QString shortVersion = FLUVEL_VERSION;
@@ -185,8 +183,7 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     versionLabel->setText(verStr);
     versionLabel->setAlignment(Qt::AlignCenter);
-    versionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                          Qt::LinksAccessibleByKeyboard);
+    versionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
     QLabel* yearsLabel = new QLabel;
     QFont font3;
@@ -196,8 +193,6 @@ AboutDialog::AboutDialog(QWidget* parent)
                         "\nFabien Bessy"
                         "\nLicensed under CeCILL v2.1");
     yearsLabel->setAlignment(Qt::AlignCenter);
-    yearsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                        Qt::LinksAccessibleByKeyboard);
 
     QPushButton* license = new QPushButton(tr("License"));
     license->setAutoDefault(false);
@@ -276,10 +271,6 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     QLabel* overviewLabel = new QLabel;
     overviewLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    overviewLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                           Qt::LinksAccessibleByKeyboard);
-
-    overviewLabel->setOpenExternalLinks(true);
     overviewLabel->setWordWrap(true);
 
     overviewLabel->setText(
@@ -303,10 +294,6 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     QLabel* scientificLabel = new QLabel;
     scientificLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    scientificLabel->setTextInteractionFlags(
-        Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
-
-    scientificLabel->setOpenExternalLinks(true);
     scientificLabel->setWordWrap(true);
 
     scientificLabel->setText(
@@ -326,8 +313,7 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     QLabel* authorLabel = new QLabel;
     authorLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    authorLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                         Qt::LinksAccessibleByKeyboard);
+    authorLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     authorLabel->setOpenExternalLinks(true);
     authorLabel->setWordWrap(true);
@@ -358,10 +344,6 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     QLabel* supportLabel = new QLabel;
     supportLabel->setAlignment(Qt::AlignJustify | Qt::AlignVCenter);
-    supportLabel->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse |
-                                          Qt::LinksAccessibleByKeyboard);
-
-    supportLabel->setOpenExternalLinks(true);
     supportLabel->setWordWrap(true);
 
     supportLabel->setText(
