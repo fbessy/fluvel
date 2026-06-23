@@ -87,8 +87,6 @@ QPushButton:disabled
 
     playbackSlider_->setFixedHeight(80);
 
-    qDebug() << playbackSlider_->size();
-
     constexpr QSize kIconSize(32, 32);
 
     startStopButton_->setIconSize(kIconSize);
