@@ -19,6 +19,7 @@
 #include <QMetaObject>
 #include <QSet>
 #include <QString>
+#include <QTimer>
 #include <QUrl>
 
 class QWidget;
@@ -34,6 +35,9 @@ class QStackedLayout;
 class QShowEvent;
 class QCloseEvent;
 
+class QGraphicsOpacityEffect;
+class QPropertyAnimation;
+
 namespace fluvel
 {
 
@@ -45,6 +49,7 @@ class DisplaySettingsWidget;
 class ImageViewerWidget;
 class TimelineSlider;
 class VolumeSlider;
+class FullscreenVideoControlBar;
 
 /**
  * @brief Streaming status for a camera device.
@@ -279,6 +284,11 @@ private:
     void enterFullscreen();
     void leaveFullscreen();
 
+    void positionFullscreenBar();
+    // void updateButtons(const ControlTheme& theme, WorkerState state);
+    void onActivityDetected(const QPoint& pos);
+    void onIdle();
+
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
 
@@ -380,6 +390,19 @@ private:
     int lastNonZeroVolume_{50};
 
     bool isFullScreen_{false};
+
+    FullscreenVideoControlBar* fullscreenBar_{nullptr};
+
+    QGraphicsOpacityEffect* fullscreenOpacity_{nullptr};
+
+    QPropertyAnimation* showAnimation_{nullptr};
+    QPropertyAnimation* hideAnimation_{nullptr};
+
+    QIcon startIconLight_;
+    QIcon stopIconLight_;
+
+    QIcon resumeIconLight_;
+    QIcon pauseIconLight_;
 };
 
 } // namespace fluvel

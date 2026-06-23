@@ -162,6 +162,16 @@ void ImageViewerWidget::setupTimers()
     throttleTimer_->setSingleShot(true);
 
     connect(throttleTimer_, &QTimer::timeout, this, &ImageViewerWidget::flushPendingFrame);
+
+    inactivityTimer_.setSingleShot(true);
+
+    connect(&inactivityTimer_, &QTimer::timeout, this,
+            [this]()
+            {
+                isUserActive_ = false;
+                updateCursor(nullptr);
+                emit idle();
+            });
 }
 
 // ------------------------------------------------------------
@@ -401,6 +411,8 @@ void ImageViewerWidget::enterFullscreenMode()
 
     setTextPosition(overlayPosition, infoOverlay_);
     updateMiniMap();
+
+    isFullscreen_ = true;
 }
 
 void ImageViewerWidget::leaveFullscreenMode()
@@ -452,6 +464,8 @@ void ImageViewerWidget::leaveFullscreenMode()
 
     setTextPosition(overlayPosition, infoOverlay_);
     updateMiniMap();
+
+    isFullscreen_ = false;
 }
 
 void ImageViewerWidget::applyAutoFit()
@@ -505,6 +519,8 @@ void ImageViewerWidget::setTextPosition(QPoint position, OverlayTextItem* textOv
 // ------------------------------------------------------------
 void ImageViewerWidget::wheelEvent(QWheelEvent* event)
 {
+    notifyUserActivity(event->position().toPoint());
+
     if (!hasImage())
     {
         event->ignore();
@@ -629,6 +645,8 @@ void ImageViewerWidget::setInteraction(ImageViewerInteraction* interaction)
 
 void ImageViewerWidget::mousePressEvent(QMouseEvent* event)
 {
+    notifyUserActivity(event->pos());
+
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
@@ -643,7 +661,7 @@ void ImageViewerWidget::mousePressEvent(QMouseEvent* event)
 
 void ImageViewerWidget::mouseMoveEvent(QMouseEvent* event)
 {
-    emit mouseMoved(event->pos());
+    notifyUserActivity(event->pos());
 
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
@@ -668,6 +686,8 @@ void ImageViewerWidget::mouseMoveEvent(QMouseEvent* event)
 
 void ImageViewerWidget::mouseReleaseEvent(QMouseEvent* event)
 {
+    notifyUserActivity(event->pos());
+
     QGraphicsItem* item = itemAt(event->pos());
     bool itemMovable = item && (item->flags() & QGraphicsItem::ItemIsMovable);
 
@@ -682,6 +702,8 @@ void ImageViewerWidget::mouseReleaseEvent(QMouseEvent* event)
 
 void ImageViewerWidget::mouseDoubleClickEvent(QMouseEvent* event)
 {
+    notifyUserActivity(event->pos());
+
     if (interaction_)
         interaction_->mouseDoubleClick(*this, event);
 
@@ -1146,6 +1168,23 @@ void ImageViewerWidget::updateMiniMapThumbnail()
         miniMap_->setImage(thumbnail_.flipped(Qt::Horizontal));
     else
         miniMap_->setImage(thumbnail_);
+}
+
+bool ImageViewerWidget::isUserActive() const
+{
+    return isUserActive_;
+}
+
+bool ImageViewerWidget::isFullscreen() const
+{
+    return isFullscreen_;
+}
+
+void ImageViewerWidget::notifyUserActivity(const QPoint& viewPos)
+{
+    isUserActive_ = true;
+    inactivityTimer_.start(kUserIdleTimeoutMs);
+    emit activityDetected(viewPos);
 }
 
 } // namespace fluvel

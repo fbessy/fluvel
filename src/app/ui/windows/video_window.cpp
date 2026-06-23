@@ -10,6 +10,7 @@
 #include "drag_drop_behavior.hpp"
 #include "file_utils.hpp"
 #include "fullscreen_behavior.hpp"
+#include "fullscreen_video_control_bar.hpp"
 #include "icon_loader.hpp"
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
@@ -29,10 +30,12 @@
 #include <QCompleter>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGraphicsOpacityEffect>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QSettings>
 #include <QSlider>
@@ -262,6 +265,12 @@ void VideoWindow::createUi()
     stopIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStop,
                              ":/icons/media/media-playback-stop-symbolic.svg");
 
+    startIconLight_ =
+        il::loadIcon(":/icons/media/media-playback-start-symbolic.svg", il::IconMode::Light);
+
+    stopIconLight_ =
+        il::loadIcon(":/icons/media/media-playback-stop-symbolic.svg", il::IconMode::Light);
+
     toggleStreamingButton_ = new QPushButton;
 
     QIcon applyIcon = createActiveFormatIcon();
@@ -285,6 +294,12 @@ void VideoWindow::createUi()
 
     pauseIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause,
                               ":/icons/media/media-playback-pause-symbolic.svg");
+
+    resumeIconLight_ =
+        il::loadIcon(":/icons/media/media-playback-start-symbolic.svg", il::IconMode::Light);
+
+    pauseIconLight_ =
+        il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light);
 
     playPauseButton_ = new QPushButton;
     playPauseButton_->setIcon(resumeIcon_);
@@ -346,8 +361,6 @@ void VideoWindow::createUi()
     mediaLayout->addWidget(playbackDurationLabel_);
     mediaLayout->addWidget(volumeButton_);
 
-    playPauseButton_->setVisible(false);
-    setSeekControlsVisible(false);
     volumeButton_->setVisible(false);
     mediaControlsWidget_->setVisible(false);
 }
@@ -382,6 +395,33 @@ void VideoWindow::setupView()
     interaction->addBehavior(std::make_unique<DragDropBehavior>(
         DragDropContent::Videos, tr("Drop a video here\n\nor click Open...")));
     imageViewer_->setInteraction(interaction.release());
+
+    fullscreenBar_ = new FullscreenVideoControlBar(imageViewer_);
+    fullscreenBar_->hide();
+
+    fullscreenBar_->startStopButton()->setIcon(startIconLight_);
+    fullscreenBar_->playPauseButton()->setIcon(resumeIconLight_);
+    fullscreenBar_->volumeButton()->setIcon(volumeHighIcon_);
+
+    fullscreenBar_->volumeButton()->setVisible(false);
+
+    setSeekControlsVisible(false);
+
+    fullscreenOpacity_ = new QGraphicsOpacityEffect(fullscreenBar_);
+    fullscreenOpacity_->setOpacity(0.0);
+    fullscreenBar_->setGraphicsEffect(fullscreenOpacity_);
+
+    showAnimation_ = new QPropertyAnimation(fullscreenOpacity_, "opacity", this);
+
+    showAnimation_->setDuration(100);
+    showAnimation_->setStartValue(0.0);
+    showAnimation_->setEndValue(1.0);
+
+    hideAnimation_ = new QPropertyAnimation(fullscreenOpacity_, "opacity", this);
+
+    hideAnimation_->setDuration(250);
+    hideAnimation_->setStartValue(1.0);
+    hideAnimation_->setEndValue(0.0);
 }
 
 void VideoWindow::setupController()
@@ -652,6 +692,44 @@ void VideoWindow::setupConnections()
 
     connect(imageViewer_, &ImageViewerWidget::toggleFullscreenRequested, this,
             &VideoWindow::toggleFullscreen);
+
+    // fullscreen bar connections
+
+    connect(imageViewer_, &ImageViewerWidget::activityDetected, this,
+            &VideoWindow::onActivityDetected);
+
+    connect(imageViewer_, &ImageViewerWidget::idle, this, &VideoWindow::onIdle);
+
+    connect(hideAnimation_, &QPropertyAnimation::finished, this,
+            [this]()
+            {
+                if (fullscreenOpacity_->opacity() < 0.01)
+                {
+                    fullscreenBar_->hide();
+                }
+            });
+
+    connect(fullscreenBar_->startStopButton(), &QPushButton::clicked, this,
+            &VideoWindow::onToggleStreaming);
+
+    connect(fullscreenBar_->playPauseButton(), &QPushButton::clicked, this,
+            &VideoWindow::togglePause);
+
+    connect(fullscreenBar_->playbackSlider(), &QSlider::sliderReleased, this,
+            [this]
+            {
+                videoController_->seek(fullscreenBar_->playbackSlider()->value());
+            });
+
+    connect(fullscreenBar_->playbackSlider(), &QSlider::sliderMoved, this,
+            [this]
+            {
+                const auto value = fullscreenBar_->playbackSlider()->value();
+
+                fullscreenBar_->positionLabel()->setText(time_utils::formatDuration(value));
+
+                videoController_->seek(value);
+            });
 }
 
 void VideoWindow::applyInitialSettings()
@@ -1186,9 +1264,9 @@ void VideoWindow::onStreamingStopped()
     streamingInfo_ = {};
     mediaInfo_ = {};
 
-    playPauseButton_->setVisible(false);
     setSeekControlsVisible(false);
     volumeButton_->setVisible(false);
+    fullscreenBar_->volumeButton()->setVisible(false);
 
     for (auto& state : deviceStreamingStatus_)
     {
@@ -1235,7 +1313,7 @@ void VideoWindow::onCameraError(const CameraErrorInfo& errorInfo)
 
 void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 {
-    assert(imageViewer_);
+    assert(imageViewer_ && fullscreenBar_);
 
     if (!shouldReportMediaError(errorInfo))
         return;
@@ -1255,9 +1333,10 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 
     refreshUi();
 
-    playPauseButton_->setVisible(false);
     setSeekControlsVisible(false);
+
     volumeButton_->setVisible(false);
+    fullscreenBar_->volumeButton()->setVisible(false);
 }
 
 bool VideoWindow::shouldReportMediaError(const MediaPlayerErrorInfo& errorInfo)
@@ -1364,6 +1443,7 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Start"));
             toggleStreamingButton_->setToolTip(tr("Start selected source."));
             toggleStreamingButton_->setIcon(startIcon_);
+            fullscreenBar_->startStopButton()->setIcon(startIconLight_);
             break;
 
         case StreamingState::Streaming:
@@ -1371,6 +1451,7 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Stop"));
             toggleStreamingButton_->setToolTip(tr("Stop active source."));
             toggleStreamingButton_->setIcon(stopIcon_);
+            fullscreenBar_->startStopButton()->setIcon(stopIconLight_);
             break;
 
         case StreamingState::Starting:
@@ -1378,6 +1459,7 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Starting..."));
             toggleStreamingButton_->setToolTip(tr("Camera startup in progress."));
             toggleStreamingButton_->setIcon(QIcon());
+            fullscreenBar_->startStopButton()->setIcon(stopIconLight_);
             break;
     }
 }
@@ -1673,35 +1755,67 @@ void VideoWindow::onSourceContextMenuRequested(const QPoint& pos)
 
 void VideoWindow::onPlaybackPositionChanged(qint64 pos)
 {
-    assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_);
+    assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_ && fullscreenBar_);
 
-    if (playbackSlider_->isSliderDown())
+    if (playbackSlider_->isSliderDown() || fullscreenBar_->playbackSlider()->isSliderDown())
         return;
 
-    playbackSlider_->setValue(static_cast<int>(pos));
+    const int posInt = static_cast<int>(pos);
 
-    playbackPositionLabel_->setText(time_utils::formatDuration(pos));
+    playbackSlider_->setValue(posInt);
+    fullscreenBar_->playbackSlider()->setValue(posInt);
+
+    const auto position = time_utils::formatDuration(pos);
+
+    playbackPositionLabel_->setText(position);
+    fullscreenBar_->positionLabel()->setText(position);
 }
 
 void VideoWindow::setSeekControlsVisible(bool visible)
 {
-    assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_);
+    assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_ && fullscreenBar_);
 
-    playbackSlider_->setVisible(visible);
+    playPauseButton_->setVisible(visible);
     playbackPositionLabel_->setVisible(visible);
+    playbackSlider_->setVisible(visible);
     playbackDurationLabel_->setVisible(visible);
+
+    fullscreenBar_->playPauseButton()->setVisible(visible);
+    fullscreenBar_->positionLabel()->setVisible(visible);
+    fullscreenBar_->playbackSlider()->setVisible(visible);
+    fullscreenBar_->durationLabel()->setVisible(visible);
+
+    bool isVisible = fullscreenBar_->isVisible();
+
+    if (isVisible)
+    {
+        fullscreenBar_->hide();
+    }
+
+    // fullscreenBar_->adjustSize();
+
+    if (isVisible)
+    {
+        fullscreenBar_->show();
+    }
 }
 
 void VideoWindow::onMediaInfoChanged(const MediaInfo& info)
 {
     assert(playbackSlider_ && playbackDurationLabel_ && videoController_ && playPauseButton_ &&
-           volumeButton_);
+           volumeButton_ && fullscreenBar_);
 
     mediaInfo_ = info;
 
-    playbackSlider_->setRange(0, static_cast<int>(mediaInfo_.durationMs));
+    const int durationInt = static_cast<int>(mediaInfo_.durationMs);
 
-    playbackDurationLabel_->setText(time_utils::formatDuration(mediaInfo_.durationMs));
+    playbackSlider_->setRange(0, durationInt);
+    fullscreenBar_->playbackSlider()->setRange(0, durationInt);
+
+    const auto duration = time_utils::formatDuration(mediaInfo_.durationMs);
+
+    playbackDurationLabel_->setText(duration);
+    fullscreenBar_->durationLabel()->setText(duration);
 
     updatePlayPauseButton(videoController_->isPaused());
 
@@ -1802,6 +1916,8 @@ void VideoWindow::updateVolumeIcon(int volume)
 void VideoWindow::updatePlayPauseButton(bool paused)
 {
     playPauseButton_->setIcon(paused ? resumeIcon_ : pauseIcon_);
+
+    fullscreenBar_->playPauseButton()->setIcon(paused ? resumeIconLight_ : pauseIconLight_);
 }
 
 void VideoWindow::togglePause()
@@ -1822,7 +1938,6 @@ void VideoWindow::updateMediaControls()
     const bool hasAudio = mediaInfo_.hasAudio;
 
     playPauseButton_->setVisible(hasSeek);
-
     playbackPositionLabel_->setVisible(hasSeek);
     playbackSlider_->setVisible(hasSeek);
     playbackDurationLabel_->setVisible(hasSeek);
@@ -1830,6 +1945,27 @@ void VideoWindow::updateMediaControls()
     volumeButton_->setVisible(hasAudio);
 
     mediaControlsWidget_->setVisible(hasSeek || hasAudio);
+
+    fullscreenBar_->playPauseButton()->setVisible(hasSeek);
+    fullscreenBar_->positionLabel()->setVisible(hasSeek);
+    fullscreenBar_->playbackSlider()->setVisible(hasSeek);
+    fullscreenBar_->durationLabel()->setVisible(hasSeek);
+
+    fullscreenBar_->volumeButton()->setVisible(hasAudio);
+
+    bool isVisible = fullscreenBar_->isVisible();
+
+    if (isVisible)
+    {
+        fullscreenBar_->hide();
+    }
+
+    // fullscreenBar_->adjustSize();
+
+    if (isVisible)
+    {
+        fullscreenBar_->show();
+    }
 }
 
 void VideoWindow::toggleFullscreen()
@@ -1853,11 +1989,14 @@ void VideoWindow::enterFullscreen()
 
     showFullScreen();
 
+    positionFullscreenBar();
+
     isFullScreen_ = true;
 }
 
 void VideoWindow::leaveFullscreen()
 {
+    fullscreenBar_->hide();
     imageViewer_->leaveFullscreenMode();
 
     showNormal();
@@ -1866,6 +2005,144 @@ void VideoWindow::leaveFullscreen()
     displayBar_->show();
 
     isFullScreen_ = false;
+}
+
+void VideoWindow::positionFullscreenBar()
+{
+    constexpr int kBottomMargin = 12;
+
+    const int width = imageViewer_->width() * 0.8;
+    const int height = fullscreenBar_->sizeHint().height();
+
+    fullscreenBar_->resize(width, height);
+
+    const int x = (imageViewer_->width() - width) / 2;
+
+    const int y = imageViewer_->height() - fullscreenBar_->height() - kBottomMargin;
+
+    fullscreenBar_->move(x, y);
+}
+
+/*void VideoWindow::updateButtons(const ControlTheme& theme, WorkerState state)
+{
+    const bool enabled = state != WorkerState::Uninitialized && state != WorkerState::Initializing;
+
+    theme.buttons.restart->setEnabled(enabled);
+    theme.buttons.pause->setEnabled(enabled);
+    theme.buttons.step->setEnabled(enabled);
+    theme.buttons.converge->setEnabled(enabled);
+
+    auto setText = [&](QPushButton* button, const QString& text)
+    {
+        button->setText(theme.showText ? text : QString{});
+    };
+
+    auto setToolTip = [&](QPushButton* button, const QString& text)
+    {
+        button->setToolTip(theme.showToolTips ? text : QString{});
+    };
+
+    //
+    // Restart / Start
+    //
+
+    if (state == WorkerState::Running || state == WorkerState::Suspended)
+    {
+        setText(theme.buttons.restart, tr("Restart"));
+
+        setToolTip(theme.buttons.restart, tr("Restart the active contour from its initial state."));
+
+        theme.buttons.restart->setIcon(theme.icons.restart);
+    }
+    else if (state == WorkerState::Ready)
+    {
+        setText(theme.buttons.restart, tr("Start"));
+
+        setToolTip(theme.buttons.restart, tr("Run the active contour."));
+
+        theme.buttons.restart->setIcon(theme.icons.startResume);
+    }
+
+    //
+    // Pause / Resume
+    //
+
+    if (state == WorkerState::Running)
+    {
+        setText(theme.buttons.pause, tr("Pause"));
+
+        setToolTip(theme.buttons.pause, tr("Suspend execution and display the current state."));
+
+        theme.buttons.pause->setIcon(theme.icons.pause);
+    }
+    else if (state == WorkerState::Ready || state == WorkerState::Suspended)
+    {
+        setText(theme.buttons.pause, tr("Resume"));
+
+        setToolTip(theme.buttons.pause, tr("Resume the active contour execution."));
+
+        theme.buttons.pause->setIcon(theme.icons.startResume);
+    }
+
+    //
+    // Step
+    //
+
+    theme.buttons.step->setIcon(theme.icons.step);
+
+    setText(theme.buttons.step, tr("Step"));
+
+    setToolTip(theme.buttons.step, tr("Advance the active contour by one iteration."));
+
+    //
+    // Converge
+    //
+
+    theme.buttons.converge->setIcon(theme.icons.converge);
+
+    setText(theme.buttons.converge, tr("Converge"));
+
+    setToolTip(theme.buttons.converge,
+               tr("Run until completion without displaying intermediate steps."));
+}*/
+
+void VideoWindow::onActivityDetected(const QPoint& pos)
+{
+    if (!isFullScreen_)
+        return;
+
+    constexpr int kTriggerZoneHeight = 150;
+
+    const bool inBottomZone = pos.y() > imageViewer_->height() - kTriggerZoneHeight;
+
+    if (!inBottomZone)
+        return;
+
+    positionFullscreenBar();
+
+    if (!fullscreenBar_->isVisible())
+    {
+        fullscreenBar_->show();
+
+        showAnimation_->stop();
+        hideAnimation_->stop();
+
+        showAnimation_->start();
+    }
+}
+
+void VideoWindow::onIdle()
+{
+    if (!isFullScreen_)
+        return;
+
+    if (fullscreenBar_->underMouse())
+        return;
+
+    showAnimation_->stop();
+    hideAnimation_->stop();
+
+    hideAnimation_->start();
 }
 
 } // namespace fluvel

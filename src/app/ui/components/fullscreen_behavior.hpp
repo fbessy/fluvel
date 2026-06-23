@@ -4,6 +4,7 @@
 #pragma once
 
 #include "image_viewer_behavior.hpp"
+#include "image_viewer_widget.hpp"
 
 class QMouseEvent;
 
@@ -27,6 +28,28 @@ public:
      * Toggles fullscreen mode.
      */
     bool mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* event) override;
+
+    /**
+     * @brief Returns the behavior priority.
+     *
+     * Higher-priority behaviors are evaluated before lower-priority
+     * ones when processing input events.
+     *
+     * @return Priority value.
+     */
+    int priority() const override
+    {
+        return 80;
+    }
+
+    /**
+     * @brief Returns the cursor shape associated with fullscreen mode.
+     *
+     * The cursor is hidden while the viewer is fullscreen and the user
+     * is inactive.
+     */
+    Qt::CursorShape availableCursor(bool, bool, const ImageViewerWidget& view,
+                                    const QMouseEvent*) const override;
 };
 
 } // namespace fluvel

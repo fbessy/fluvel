@@ -33,6 +33,8 @@ class QDropEvent;
 namespace fluvel
 {
 
+constexpr int kUserIdleTimeoutMs = 2000;
+
 class ImageViewerInteraction;
 class ZoomOverlayController;
 class MiniMapWidget;
@@ -214,6 +216,9 @@ public:
     void onMiniMapCenterRequested(const QPointF& scenePoint);
     void updateMiniMapThumbnail();
 
+    bool isUserActive() const;
+    bool isFullscreen() const;
+
     /** @} */
 
 signals:
@@ -237,7 +242,28 @@ signals:
      */
     void toggleFullscreenRequested();
 
-    void mouseMoved(const QPoint& pos);
+    /**
+     * @brief Emitted when user activity is detected.
+     *
+     * This signal is emitted whenever the user interacts with the
+     * viewer (mouse movement, mouse button press, wheel event, etc.).
+     *
+     * It can be used to restore UI elements that were hidden after
+     * a period of inactivity, such as fullscreen controls or the
+     * mouse cursor.
+     */
+    void activityDetected(const QPoint& viewPos);
+
+    /**
+     * @brief Emitted when the viewer becomes idle.
+     *
+     * This signal is emitted after a configurable period of user
+     * inactivity.
+     *
+     * It can be used to hide UI elements such as fullscreen controls
+     * or the mouse cursor.
+     */
+    void idle();
 
 protected:
     void wheelEvent(QWheelEvent* event) override;
@@ -307,6 +333,8 @@ private:
 
     bool supportsDragDrop() const;
 
+    void notifyUserActivity(const QPoint& viewPos);
+
     QGraphicsScene* scene_{nullptr};
     QGraphicsItemGroup* contentRoot_{nullptr};
     QGraphicsPixmapItem* pixmapItem_{nullptr};
@@ -360,6 +388,10 @@ private:
     Qt::ScrollBarPolicy previousVScrollPolicy_{Qt::ScrollBarAsNeeded};
 
     QBrush previousBackgroundBrush_;
+
+    QTimer inactivityTimer_;
+    bool isFullscreen_{false};
+    bool isUserActive_{false};
 };
 
 } // namespace fluvel

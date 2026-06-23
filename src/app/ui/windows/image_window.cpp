@@ -40,7 +40,6 @@
 #include <QShowEvent>
 #include <QStatusBar>
 #include <QStyle>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -201,7 +200,6 @@ void ImageWindow::setupUi()
     fullscreenTheme_.showText = false;
     fullscreenTheme_.showToolTips = false;
 
-    fullscreenBar_->setAttribute(Qt::WA_NoMousePropagation);
     fullscreenBar_->hide();
 
     fullscreenOpacity_ = new QGraphicsOpacityEffect(fullscreenBar_);
@@ -219,9 +217,6 @@ void ImageWindow::setupUi()
     hideAnimation_->setDuration(250);
     hideAnimation_->setStartValue(1.0);
     hideAnimation_->setEndValue(0.0);
-
-    hideFullscreenTimer_.setSingleShot(true);
-    hideFullscreenTimer_.setInterval(1500);
 
     // --- Display bar (à droite) ---
     displayBar_ = new DisplaySettingsWidget(config.display, central);
@@ -509,27 +504,10 @@ void ImageWindow::setupConnections()
     connect(fullscreenBar_->convergeButton(), &QPushButton::clicked, imageController_,
             &ImageController::converge);
 
-    connect(&hideFullscreenTimer_, &QTimer::timeout, this,
-            [this]()
-            {
-                if (fullscreenBar_->underMouse())
-                {
-                    hideFullscreenTimer_.start();
-                    return;
-                }
+    connect(imageViewer_, &ImageViewerWidget::activityDetected, this,
+            &ImageWindow::onActivityDetected);
 
-                showAnimation_->stop();
-                hideAnimation_->stop();
-
-                hideAnimation_->start();
-            });
-
-    connect(imageViewer_, &ImageViewerWidget::mouseMoved, this, &ImageWindow::onViewerMouseMoved);
-
-    auto restartHideTimer = [this]()
-    {
-        hideFullscreenTimer_.start();
-    };
+    connect(imageViewer_, &ImageViewerWidget::idle, this, &ImageWindow::onIdle);
 
     connect(hideAnimation_, &QPropertyAnimation::finished, this,
             [this]()
@@ -537,11 +515,6 @@ void ImageWindow::setupConnections()
                 if (fullscreenOpacity_->opacity() < 0.01)
                     fullscreenBar_->hide();
             });
-
-    connect(fullscreenBar_->restartButton(), &QPushButton::clicked, this, restartHideTimer);
-    connect(fullscreenBar_->pauseButton(), &QPushButton::clicked, this, restartHideTimer);
-    connect(fullscreenBar_->stepButton(), &QPushButton::clicked, this, restartHideTimer);
-    connect(fullscreenBar_->convergeButton(), &QPushButton::clicked, this, restartHideTimer);
 }
 
 void ImageWindow::bindApplicationSettingsToController()
@@ -1094,7 +1067,7 @@ void ImageWindow::updateButtons(const ControlTheme& theme, WorkerState state)
                tr("Run until completion without displaying intermediate steps."));
 }
 
-void ImageWindow::onViewerMouseMoved(const QPointF& pos)
+void ImageWindow::onActivityDetected(const QPoint& pos)
 {
     if (!isFullScreen_)
         return;
@@ -1117,8 +1090,20 @@ void ImageWindow::onViewerMouseMoved(const QPointF& pos)
 
         showAnimation_->start();
     }
+}
 
-    hideFullscreenTimer_.start();
+void ImageWindow::onIdle()
+{
+    if (!isFullScreen_)
+        return;
+
+    if (fullscreenBar_->underMouse())
+        return;
+
+    showAnimation_->stop();
+    hideAnimation_->stop();
+
+    hideAnimation_->start();
 }
 
 } // namespace fluvel

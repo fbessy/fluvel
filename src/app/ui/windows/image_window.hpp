@@ -187,7 +187,8 @@ private:
 
     void positionFullscreenBar();
     void updateButtons(const ControlTheme& theme, WorkerState state);
-    void onViewerMouseMoved(const QPointF& pos);
+    void onActivityDetected(const QPoint& pos);
+    void onIdle();
 
     // --- UI ---
     std::unique_ptr<VideoWindow> videoWindow_;
@@ -259,7 +260,6 @@ private:
     bool isFullScreen_{false};
 
     FullscreenImageControlBar* fullscreenBar_{nullptr};
-    QTimer hideFullscreenTimer_;
 
     QGraphicsOpacityEffect* fullscreenOpacity_{nullptr};
 

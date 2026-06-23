@@ -24,4 +24,13 @@ bool FullscreenBehavior::mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* 
     return false;
 }
 
+Qt::CursorShape FullscreenBehavior::availableCursor(bool, bool, const ImageViewerWidget& view,
+                                                    const QMouseEvent*) const
+{
+    if (view.isFullscreen() && !view.isUserActive())
+        return Qt::BlankCursor;
+
+    return Qt::ArrowCursor;
+}
+
 } // namespace fluvel
