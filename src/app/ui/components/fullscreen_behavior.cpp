@@ -13,7 +13,8 @@ bool FullscreenBehavior::mouseDoubleClick(ImageViewerWidget& view, QMouseEvent* 
 {
     Q_UNUSED(event);
 
-    if (event->type() == QEvent::MouseButtonDblClick && event->button() == Qt::LeftButton)
+    if (event->type() == QEvent::MouseButtonDblClick && event->button() == Qt::LeftButton &&
+        view.hasImage())
     {
         view.toggleFullscreen();
         event->accept();
