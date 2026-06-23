@@ -19,11 +19,12 @@ QPushButton
 {
     background-color: rgba(0,0,0,180);
 
-    border: 1px solid rgba(255,255,255,130);
+    border: 1px solid rgba(255,255,255,40);
 
-    border-radius: 5px;
+    border-radius: 8px;
 
     padding: 10px;
+
     min-width: 56px;
     min-height: 56px;
 }
@@ -31,21 +32,23 @@ QPushButton
 QPushButton:hover
 {
     background-color: rgba(0,0,0,220);
+    border: 1px solid rgba(255,255,255,80);
 
-    border: 1px solid rgba(255,255,255,200);
+    border-radius: 8px;
 }
 
 QPushButton:pressed
 {
-    background-color: rgba(255,255,255,180);
-
+    background-color: rgba(255,255,255,120);
     color: black;
+
+    border-radius: 8px;
 }
 
 QPushButton:disabled
 {
-    color: rgba(255,255,255,100);
-    border: 1px solid rgba(255,255,255,50);
+    background-color: rgba(0,0,0,100);
+    border: 1px solid rgba(255,255,255,25);
 }
 )");
 
