@@ -62,6 +62,9 @@ VideoSettingsDialog::VideoSettingsDialog(const VideoComputeConfig& config, QWidg
 
     tabs_ = new QTabWidget(this);
 
+    tabs_->setDocumentMode(true);
+    tabs_->setUsesScrollButtons(false);
+
     auto* tabBar = tabs_->tabBar();
 
     tabBar->setExpanding(false);

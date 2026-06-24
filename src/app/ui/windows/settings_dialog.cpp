@@ -84,6 +84,9 @@ SettingsDialog::SettingsDialog(const ImageComputeConfig& config, QWidget* parent
 
     tabs_ = new QTabWidget(this);
 
+    tabs_->setDocumentMode(true);
+    tabs_->setUsesScrollButtons(false);
+
     auto* tabBar = tabs_->tabBar();
     tabBar->setExpanding(false);
     tabBar->setUsesScrollButtons(false);
@@ -512,6 +515,9 @@ void SettingsDialog::setupUiPreprocessingTab()
 
     processInnerTabs_ = new QTabWidget(this);
 
+    processInnerTabs_->setDocumentMode(true);
+    processInnerTabs_->setUsesScrollButtons(false);
+
     QWidget* pageNoise = new QWidget;
     QWidget* pageFilterIso = new QWidget;
     QWidget* pageFilterAnsio = new QWidget;
@@ -530,6 +536,10 @@ void SettingsDialog::setupUiPreprocessingTab()
     pageFilterMorpho->setLayout(filterLayout);
 
     QTabWidget* filterTabs = new QTabWidget(this);
+
+    filterTabs->setDocumentMode(true);
+    filterTabs->setUsesScrollButtons(false);
+
     filterTabs->addTab(pageFilterIso, tr("Linear"));
     filterTabs->addTab(pageFilterAnsio, tr("Edge preserving"));
     filterTabs->addTab(pageFilterMorpho, tr("Math morpho"));

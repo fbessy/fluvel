@@ -391,6 +391,10 @@ AboutDialog::AboutDialog(QWidget* parent)
     page5->setLayout(supportLayout);
 
     QTabWidget* tabs = new QTabWidget;
+
+    tabs->setDocumentMode(true);
+    tabs->setUsesScrollButtons(false);
+
     tabs->addTab(page1, tr("Overview"));
     tabs->addTab(page2, tr("Scientific"));
     tabs->addTab(page3, tr("Author"));
