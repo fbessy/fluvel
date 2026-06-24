@@ -240,7 +240,7 @@ private:
     void onCameraError(const CameraErrorInfo& errorInfo);
     void onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo);
 
-    bool shouldReportMediaError(const MediaPlayerErrorInfo& errorInfo);
+    bool shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo);
 
     void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
     void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
@@ -348,7 +348,7 @@ private:
     QIcon formatActiveIcon_;
     QIcon formatAvailableIcon_;
 
-    bool configChangeInProgress_{false};
+    bool restartPending_{false};
 
     QHash<QByteArray, QCameraFormat> preferredFormats_;
 

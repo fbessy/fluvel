@@ -938,7 +938,7 @@ void VideoWindow::onToggleStreaming()
 {
     assert(deviceSelector_ && videoController_);
 
-    if (configChangeInProgress_)
+    if (restartPending_)
         return;
 
     if (videoController_->isStreaming())
@@ -951,13 +951,13 @@ void VideoWindow::onApplySelection()
 {
     assert(videoController_);
 
-    if (configChangeInProgress_)
+    if (restartPending_)
         return;
 
     if (!videoController_->isStreaming())
         return;
 
-    configChangeInProgress_ = true;
+    restartPending_ = true;
     stopSource();
 }
 
@@ -1188,7 +1188,7 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
         saveLastVideoDirectory(QFileInfo(info.source.sourceUrl.toLocalFile()).absolutePath());
     }
 
-    if (!configChangeInProgress_)
+    if (!restartPending_)
     {
         imageViewer_->showPlaceholder(false);
         connectFrameToView();
@@ -1208,7 +1208,7 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
         addSourceToHistory(info.source.sourceUrl);
     }
 
-    configChangeInProgress_ = false;
+    restartPending_ = false;
 }
 
 QString VideoWindow::lastVideoDirectory() const
@@ -1274,7 +1274,7 @@ void VideoWindow::onStreamingStopped()
             state = DeviceStreamingStatus::Idle;
     }
 
-    if (configChangeInProgress_)
+    if (restartPending_)
     {
         startSource();
     }
@@ -1303,9 +1303,9 @@ void VideoWindow::onCameraError(const CameraErrorInfo& errorInfo)
     deviceStreamingStatus_[errorInfo.sourceInfo.deviceId] = DeviceStreamingStatus::Error;
 
     // un switch raté devient un stop
-    if (configChangeInProgress_)
+    if (restartPending_)
     {
-        configChangeInProgress_ = false;
+        restartPending_ = false;
     }
 
     refreshUi();
@@ -1315,7 +1315,7 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 {
     assert(imageViewer_ && fullscreenBar_);
 
-    if (!shouldReportMediaError(errorInfo))
+    if (!shouldShowMediaError(errorInfo))
         return;
 
     disconnect(frameToViewConnection_);
@@ -1326,9 +1326,9 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 
     QMessageBox::warning(this, tr("Media error"), message);
 
-    if (configChangeInProgress_)
+    if (restartPending_)
     {
-        configChangeInProgress_ = false;
+        restartPending_ = false;
     }
 
     refreshUi();
@@ -1339,7 +1339,7 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     fullscreenBar_->volumeButton()->setVisible(false);
 }
 
-bool VideoWindow::shouldReportMediaError(const MediaPlayerErrorInfo& errorInfo)
+bool VideoWindow::shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo)
 {
     if (errorInfo.state != StreamingState::Streaming)
         return true;
@@ -1703,7 +1703,7 @@ void VideoWindow::openMediaFile(const QString& filename)
 
     if (videoController_->isStreaming())
     {
-        configChangeInProgress_ = true;
+        restartPending_ = true;
         stopSource();
     }
     else
