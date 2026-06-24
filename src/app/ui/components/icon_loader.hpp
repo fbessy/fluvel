@@ -132,7 +132,7 @@ QIcon createDisk(const QColor& color, int size = 13);
  *
  * @return A rounded square color icon.
  */
-QIcon createSquare(const QColor& color, int size = 12);
+QIcon createSquare(const QColor& color, int size = 13);
 
 /**
  * @brief Creates an empty transparent icon.
