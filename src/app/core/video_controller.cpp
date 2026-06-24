@@ -29,20 +29,20 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
 {
     auto mediaDevices = new QMediaDevices(this);
 
-    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this,
-            &VideoController::onVideoInputsChanged);
-
     onVideoSettingsChanged(session);
     onVideoDisplaySettingsChanged(session.display);
 
-    connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
-            &VideoController::onDisplayFrameReady, Qt::QueuedConnection);
-
-    activeContourThread_.start();
+    mediaPlayer_.setAudioOutput(&audioOutput_);
 
     startupTimer_.setSingleShot(true);
     watchdogTimer_.setInterval(kWatchdogPeriodMs);
     diagnosticsTimer_.setInterval(kDiagnosticsPeriodMs);
+
+    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this,
+            &VideoController::onVideoInputsChanged);
+
+    connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
+            &VideoController::onDisplayFrameReady, Qt::QueuedConnection);
 
     connect(&startupTimer_, &QTimer::timeout, this, &VideoController::onStartupTimeout);
     connect(&watchdogTimer_, &QTimer::timeout, this, &VideoController::checkWatchdog);
@@ -71,7 +71,7 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
                 emit pausedChanged(state == QMediaPlayer::PausedState);
             });
 
-    mediaPlayer_.setAudioOutput(&audioOutput_);
+    activeContourThread_.start();
 }
 
 VideoController::~VideoController()
