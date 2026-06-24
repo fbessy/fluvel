@@ -1292,6 +1292,8 @@ void VideoWindow::onCameraError(const CameraErrorInfo& errorInfo)
 {
     assert(imageViewer_);
 
+    restartPending_ = false;
+
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
@@ -1301,12 +1303,6 @@ void VideoWindow::onCameraError(const CameraErrorInfo& errorInfo)
     QMessageBox::warning(this, tr("Camera error"), message);
 
     deviceStreamingStatus_[errorInfo.sourceInfo.deviceId] = DeviceStreamingStatus::Error;
-
-    // un switch raté devient un stop
-    if (restartPending_)
-    {
-        restartPending_ = false;
-    }
 
     refreshUi();
 }
@@ -1318,6 +1314,8 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     if (!shouldShowMediaError(errorInfo))
         return;
 
+    restartPending_ = false;
+
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
@@ -1325,11 +1323,6 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
         tr("Source: %1\n\n%2").arg(errorInfo.sourceInfo.description, errorInfo.errorString);
 
     QMessageBox::warning(this, tr("Media error"), message);
-
-    if (restartPending_)
-    {
-        restartPending_ = false;
-    }
 
     refreshUi();
 
