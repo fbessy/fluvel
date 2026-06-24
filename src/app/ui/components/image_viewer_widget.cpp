@@ -619,7 +619,7 @@ void ImageViewerWidget::updateInteractionAfterZoom()
 
 double ImageViewerWidget::computeZoomFactor(QWheelEvent* event) const
 {
-    constexpr double zoomFactor = 1.15;
+    constexpr double zoomFactor = 1.1;
     return (event->angleDelta().y() > 0) ? zoomFactor : 1.0 / zoomFactor;
 }
 
