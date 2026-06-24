@@ -353,4 +353,46 @@ private:
     bool watchdogArmed_{true};
 };
 
+/**
+ * @section error_handling Video error handling policy
+ *
+ * Error handling is split between VideoController and VideoWindow.
+ *
+ * VideoController is responsible for:
+ * - detecting backend errors;
+ * - deciding whether the source must be stopped;
+ * - collecting error information;
+ * - emitting cameraError() and mediaPlayerError().
+ *
+ * VideoWindow is responsible for:
+ * - displaying error messages to the user.
+ * - updating the UI state;
+ *
+ * Startup errors are considered fatal and automatically stop the source.
+ *
+ * Runtime backend errors are reported but do not automatically stop the
+ * source. Stream loss detection is handled separately by the watchdog and is
+ * considered the authoritative runtime failure mechanism.
+ *
+ *
+ *
+ * Streaming lifecycle:
+ *
+ *     Stopped
+ *         |
+ *         v
+ *      Starting
+ *         |
+ *         +---- startup error ------> Stopped
+ *         |
+ *         +---- startup timeout ----> Stopped
+ *         |
+ *         v
+ *      Streaming
+ *         |
+ *         +---- backend error ------> Streaming
+ *         |
+ *         +---- stream loss --------> Stopped
+ */
+
 } // namespace fluvel
