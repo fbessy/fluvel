@@ -1039,6 +1039,9 @@ void ImageViewerWidget::updateMiniMapVisibility()
 {
     assert(miniMap_ && useEnhancedDisplayConfig_);
 
+    if (!hasImage())
+        return;
+
     miniMap_->setVisible(displayConfig_.miniMapEnabled);
 }
 
