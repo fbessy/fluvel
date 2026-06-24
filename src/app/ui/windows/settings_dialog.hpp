@@ -21,7 +21,6 @@ class QLabel;
 class QRadioButton;
 class QSlider;
 class QSpinBox;
-class QTabWidget;
 class QWidget;
 
 class QCloseEvent;
@@ -33,6 +32,7 @@ class ImageViewerWidget;
 class InitializationBehavior;
 class KernelSizeSpinBox;
 class AlgoSettingsWidget;
+class AnimatedTabWidget;
 
 /**
  * @brief Tab indices for the settings dialog.
@@ -156,7 +156,7 @@ private:
     /////////////  UI Data  ///////////////
     ///////////////////////////////////////
 
-    QTabWidget* tabs_{nullptr};
+    AnimatedTabWidget* tabs_{nullptr};
 
     /////////////////////////////////////////
 
@@ -166,7 +166,7 @@ private:
     /////////////////////////////////////////
 
     QGroupBox* processPage_{nullptr};
-    QTabWidget* processInnerTabs_{nullptr};
+    AnimatedTabWidget* processInnerTabs_{nullptr};
 
     QGroupBox* gaussianNoiseGroupbox_{nullptr};
     QDoubleSpinBox* gaussianNoiseStdSpin_{nullptr};

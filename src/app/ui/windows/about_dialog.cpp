@@ -22,6 +22,8 @@
 
 #include <QtGlobal>
 
+#include "animated_tab_widget.hpp"
+
 namespace fluvel
 {
 
@@ -390,7 +392,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     page4->setLayout(techLayout);
     page5->setLayout(supportLayout);
 
-    QTabWidget* tabs = new QTabWidget;
+    auto* tabs = new AnimatedTabWidget;
 
     tabs->setDocumentMode(true);
     tabs->setUsesScrollButtons(false);

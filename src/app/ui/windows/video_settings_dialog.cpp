@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "algo_settings_widget.hpp"
 #include "video_settings_dialog.hpp"
+#include "algo_settings_widget.hpp"
+#include "animated_tab_widget.hpp"
 
 #include <QAbstractButton>
 #include <QCheckBox>
@@ -60,7 +61,7 @@ VideoSettingsDialog::VideoSettingsDialog(const VideoComputeConfig& config, QWidg
 
 #endif
 
-    tabs_ = new QTabWidget(this);
+    tabs_ = new AnimatedTabWidget(this);
 
     tabs_->setDocumentMode(true);
     tabs_->setUsesScrollButtons(false);

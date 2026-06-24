@@ -122,6 +122,8 @@ set(app_src
 
     ${UI_COMP_DIR}/image_viewer_listener.hpp
 
+    ${UI_COMP_DIR}/animated_tab_widget.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 

@@ -4,6 +4,7 @@
 #include "settings_dialog.hpp"
 
 #include "algo_settings_widget.hpp"
+#include "animated_tab_widget.hpp"
 #include "image_viewer_widget.hpp"
 #include "initialization_behavior.hpp"
 #include "interaction_set.hpp"
@@ -21,7 +22,6 @@
 #include <QSettings>
 #include <QSlider>
 #include <QTabBar>
-#include <QTabWidget>
 #include <QVBoxLayout>
 
 #include <utility>
@@ -82,12 +82,12 @@ SettingsDialog::SettingsDialog(const ImageComputeConfig& config, QWidget* parent
     setupUiInitTab();
     setupUiAlgoTab();
 
-    tabs_ = new QTabWidget(this);
+    tabs_ = new AnimatedTabWidget(this);
 
     tabs_->setDocumentMode(true);
     tabs_->setUsesScrollButtons(false);
 
-    auto* tabBar = tabs_->tabBar();
+    QTabBar* tabBar = tabs_->tabBar();
     tabBar->setExpanding(false);
     tabBar->setUsesScrollButtons(false);
     tabBar->setElideMode(Qt::ElideNone);
@@ -513,7 +513,7 @@ void SettingsDialog::setupUiPreprocessingTab()
 
     ////////////////////////////////////////////
 
-    processInnerTabs_ = new QTabWidget(this);
+    processInnerTabs_ = new AnimatedTabWidget(this);
 
     processInnerTabs_->setDocumentMode(true);
     processInnerTabs_->setUsesScrollButtons(false);
@@ -535,7 +535,7 @@ void SettingsDialog::setupUiPreprocessingTab()
     filterLayout->addStretch(1);
     pageFilterMorpho->setLayout(filterLayout);
 
-    QTabWidget* filterTabs = new QTabWidget(this);
+    AnimatedTabWidget* filterTabs = new AnimatedTabWidget(this);
 
     filterTabs->setDocumentMode(true);
     filterTabs->setUsesScrollButtons(false);
