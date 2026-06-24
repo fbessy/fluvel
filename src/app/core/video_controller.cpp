@@ -325,6 +325,7 @@ void VideoController::onDisplayFrameReady(const DisplayFrame& displayFrame)
 void VideoController::onStartupTimeout()
 {
     stop();
+
     emit startupTimeout(startupInfo_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
 }
 
@@ -341,6 +342,7 @@ void VideoController::checkWatchdog()
     if (frameAgeNs > kStreamLossTimeoutNs)
     {
         stop();
+
         emit streamingLost(streamingInfo_, static_cast<double>(frameAgeNs) / 1e9);
     }
 }
@@ -393,9 +395,6 @@ void VideoController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devic
 
 void VideoController::onCameraError(QCamera::Error error, const QString& errorString)
 {
-    if (!camera_)
-        return;
-
     const StreamingState state = state_;
 
     CameraErrorInfo camError;
@@ -404,24 +403,29 @@ void VideoController::onCameraError(QCamera::Error error, const QString& errorSt
     camError.sourceInfo = startupInfo_;
     camError.state = state;
 
-    if (state == StreamingState::Starting)
-        stop();
-
     emit cameraError(camError);
+
+    if (state == StreamingState::Starting)
+    {
+        // stop() disconnects camera-related callbacks. Defer it to the next event
+        // loop iteration to avoid tearing down the camera pipeline while the
+        // current error callback is still executing.
+        QTimer::singleShot(0, this, &VideoController::stop);
+    }
 }
 
 void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString)
 {
     const StreamingState state = state_;
 
+    if (state == StreamingState::Starting)
+        stop();
+
     MediaPlayerErrorInfo mediaError;
     mediaError.error = error;
     mediaError.errorString = errorString;
     mediaError.sourceInfo = startupInfo_;
     mediaError.state = state;
-
-    if (state == StreamingState::Starting)
-        stop();
 
     emit mediaPlayerError(mediaError);
 }
