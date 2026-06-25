@@ -358,9 +358,10 @@ void VideoWindow::createUi()
     mediaLayout->setSpacing(kControlSpacing);
 
     mediaLayout->addWidget(playPauseButton_);
+    mediaLayout->addSpacing(kControlSpacing);
     mediaLayout->addWidget(volumeButton_);
 
-    mediaLayout->addSpacing(3 * kControlSpacing);
+    mediaLayout->addSpacing(2 * kControlSpacing);
 
     mediaLayout->addWidget(playbackPositionLabel_);
     mediaLayout->addWidget(playbackSeparatorLabel_);
