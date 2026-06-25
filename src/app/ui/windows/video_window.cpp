@@ -310,6 +310,7 @@ void VideoWindow::createUi()
     playbackSlider_->setMinimumWidth(250);
 
     playbackPositionLabel_ = new QLabel("00:00");
+    playbackSeparatorLabel_ = new QLabel("/");
     playbackDurationLabel_ = new ClickableLabel("-00:00");
 
     // --- Volume widgets ---
@@ -356,10 +357,11 @@ void VideoWindow::createUi()
     mediaLayout->setContentsMargins(0, 0, 0, 0);
     mediaLayout->setSpacing(kControlSpacing);
 
-    playbackSeparatorLabel_ = new QLabel("/");
-
     mediaLayout->addWidget(playPauseButton_);
     mediaLayout->addWidget(volumeButton_);
+
+    mediaLayout->addSpacing(3 * kControlSpacing);
+
     mediaLayout->addWidget(playbackPositionLabel_);
     mediaLayout->addWidget(playbackSeparatorLabel_);
     mediaLayout->addWidget(playbackDurationLabel_);
@@ -687,8 +689,7 @@ void VideoWindow::setupConnections()
             {
                 const QSize menuSize = volumeMenu_->sizeHint();
 
-                volumeMenu_->popup(volumeButton_->mapToGlobal(
-                    QPoint(volumeButton_->width() - menuSize.width(), volumeButton_->height())));
+                volumeMenu_->popup(volumeButton_->mapToGlobal(QPoint(0, volumeButton_->height())));
             });
 
     connect(volumeButton_, &QWidget::customContextMenuRequested, this,
