@@ -3,6 +3,7 @@
 
 #include "fullscreen_video_control_bar.hpp"
 
+#include "clickable_label.hpp"
 #include "timeline_slider.hpp"
 
 #include <QHBoxLayout>
@@ -72,7 +73,7 @@ QPushButton:disabled
     volumeButton_ = new QPushButton;
 
     positionLabel_ = new QLabel("00:00");
-    durationLabel_ = new QLabel("00:00");
+    durationLabel_ = new ClickableLabel("-00:00");
 
     QFont font = positionLabel_->font();
 
@@ -147,7 +148,7 @@ QLabel* FullscreenVideoControlBar::positionLabel() const
     return positionLabel_;
 }
 
-QLabel* FullscreenVideoControlBar::durationLabel() const
+ClickableLabel* FullscreenVideoControlBar::durationLabel() const
 {
     return durationLabel_;
 }

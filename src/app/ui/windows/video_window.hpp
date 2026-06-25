@@ -50,6 +50,7 @@ class ImageViewerWidget;
 class TimelineSlider;
 class VolumeSlider;
 class FullscreenVideoControlBar;
+class ClickableLabel;
 
 /**
  * @brief Streaming status for a camera device.
@@ -129,6 +130,12 @@ struct LastReportedError
      * @brief Time elapsed since the error was last reported.
      */
     QElapsedTimer timer;
+};
+
+enum class TimeDisplayMode
+{
+    TotalDuration,
+    RemainingTime
 };
 
 /**
@@ -289,6 +296,9 @@ private:
     void onActivityDetected(const QPoint& pos);
     void onIdle();
 
+    void toggleTimeDisplayMode();
+    void updateDurationLabel();
+
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
 
@@ -370,7 +380,7 @@ private:
     TimelineSlider* playbackSlider_{nullptr};
 
     QLabel* playbackPositionLabel_{nullptr};
-    QLabel* playbackDurationLabel_{nullptr};
+    ClickableLabel* playbackDurationLabel_{nullptr};
 
     StreamingInfo streamingInfo_{};
     MediaInfo mediaInfo_{};
@@ -403,6 +413,9 @@ private:
 
     QIcon resumeIconLight_;
     QIcon pauseIconLight_;
+
+    TimeDisplayMode timeDisplayMode_{TimeDisplayMode::TotalDuration};
+    QLabel* playbackSeparatorLabel_{nullptr};
 };
 
 } // namespace fluvel

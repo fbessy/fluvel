@@ -5,6 +5,7 @@
 #include "application_settings.hpp"
 #include "autofit_behavior.hpp"
 #include "camera_format_utils.hpp"
+#include "clickable_label.hpp"
 #include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
 #include "drag_drop_behavior.hpp"
@@ -309,7 +310,7 @@ void VideoWindow::createUi()
     playbackSlider_->setMinimumWidth(250);
 
     playbackPositionLabel_ = new QLabel("00:00");
-    playbackDurationLabel_ = new QLabel("00:00");
+    playbackDurationLabel_ = new ClickableLabel("-00:00");
 
     // --- Volume widgets ---
     volumeMuteIcon_ =
@@ -355,11 +356,14 @@ void VideoWindow::createUi()
     mediaLayout->setContentsMargins(0, 0, 0, 0);
     mediaLayout->setSpacing(kControlSpacing);
 
+    playbackSeparatorLabel_ = new QLabel("/");
+
     mediaLayout->addWidget(playPauseButton_);
-    mediaLayout->addWidget(playbackPositionLabel_);
-    mediaLayout->addWidget(playbackSlider_, 1);
-    mediaLayout->addWidget(playbackDurationLabel_);
     mediaLayout->addWidget(volumeButton_);
+    mediaLayout->addWidget(playbackPositionLabel_);
+    mediaLayout->addWidget(playbackSeparatorLabel_);
+    mediaLayout->addWidget(playbackDurationLabel_);
+    mediaLayout->addWidget(playbackSlider_, 1);
 
     volumeButton_->setVisible(false);
     mediaControlsWidget_->setVisible(false);
@@ -642,6 +646,12 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::playbackPositionChanged, this,
             &VideoWindow::onPlaybackPositionChanged);
 
+    connect(playbackDurationLabel_, &ClickableLabel::clicked, this,
+            &VideoWindow::toggleTimeDisplayMode);
+
+    connect(fullscreenBar_->durationLabel(), &ClickableLabel::clicked, this,
+            &VideoWindow::toggleTimeDisplayMode);
+
     connect(playbackSlider_, &QSlider::sliderReleased, this,
             [this]
             {
@@ -653,6 +663,8 @@ void VideoWindow::setupConnections()
             {
                 playbackPositionLabel_->setText(
                     time_utils::formatDuration(playbackSlider_->value()));
+
+                updateDurationLabel();
 
                 videoController_->seek(playbackSlider_->value());
             });
@@ -1746,6 +1758,36 @@ void VideoWindow::onSourceContextMenuRequested(const QPoint& pos)
     delete menu;
 }
 
+void VideoWindow::toggleTimeDisplayMode()
+{
+    if (timeDisplayMode_ == TimeDisplayMode::TotalDuration)
+        timeDisplayMode_ = TimeDisplayMode::RemainingTime;
+    else
+        timeDisplayMode_ = TimeDisplayMode::TotalDuration;
+
+    updateDurationLabel();
+}
+
+void VideoWindow::updateDurationLabel()
+{
+    QString text;
+
+    if (timeDisplayMode_ == TimeDisplayMode::TotalDuration)
+    {
+        text = time_utils::formatDuration(mediaInfo_.durationMs);
+    }
+    else
+    {
+        const int pos = playbackSlider_->value();
+        const qint64 remaining = std::max<qint64>(0, mediaInfo_.durationMs - pos);
+
+        text = "-" + time_utils::formatDuration(remaining);
+    }
+
+    playbackDurationLabel_->setText(text);
+    fullscreenBar_->durationLabel()->setText(text);
+}
+
 void VideoWindow::onPlaybackPositionChanged(qint64 pos)
 {
     assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_ && fullscreenBar_);
@@ -1762,6 +1804,8 @@ void VideoWindow::onPlaybackPositionChanged(qint64 pos)
 
     playbackPositionLabel_->setText(position);
     fullscreenBar_->positionLabel()->setText(position);
+
+    updateDurationLabel();
 }
 
 void VideoWindow::setSeekControlsVisible(bool visible)
@@ -1770,8 +1814,9 @@ void VideoWindow::setSeekControlsVisible(bool visible)
 
     playPauseButton_->setVisible(visible);
     playbackPositionLabel_->setVisible(visible);
-    playbackSlider_->setVisible(visible);
+    playbackSeparatorLabel_->setVisible(visible);
     playbackDurationLabel_->setVisible(visible);
+    playbackSlider_->setVisible(visible);
 
     fullscreenBar_->playPauseButton()->setVisible(visible);
     fullscreenBar_->positionLabel()->setVisible(visible);
@@ -1805,10 +1850,7 @@ void VideoWindow::onMediaInfoChanged(const MediaInfo& info)
     playbackSlider_->setRange(0, durationInt);
     fullscreenBar_->playbackSlider()->setRange(0, durationInt);
 
-    const auto duration = time_utils::formatDuration(mediaInfo_.durationMs);
-
-    playbackDurationLabel_->setText(duration);
-    fullscreenBar_->durationLabel()->setText(duration);
+    updateDurationLabel();
 
     updatePlayPauseButton(videoController_->isPaused());
 
@@ -1932,8 +1974,9 @@ void VideoWindow::updateMediaControls()
 
     playPauseButton_->setVisible(hasSeek);
     playbackPositionLabel_->setVisible(hasSeek);
-    playbackSlider_->setVisible(hasSeek);
+    playbackSeparatorLabel_->setVisible(hasSeek);
     playbackDurationLabel_->setVisible(hasSeek);
+    playbackSlider_->setVisible(hasSeek);
 
     volumeButton_->setVisible(hasAudio);
 

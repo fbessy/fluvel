@@ -124,6 +124,9 @@ set(app_src
 
     ${UI_COMP_DIR}/animated_tab_widget.hpp
 
+    ${UI_COMP_DIR}/clickable_label.cpp
+    ${UI_COMP_DIR}/clickable_label.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 

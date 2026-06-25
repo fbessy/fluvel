@@ -12,6 +12,7 @@ namespace fluvel
 {
 
 class TimelineSlider;
+class ClickableLabel;
 
 /**
  * @brief Fullscreen media control bar.
@@ -67,7 +68,7 @@ public:
      *
      * @return Duration label.
      */
-    QLabel* durationLabel() const;
+    ClickableLabel* durationLabel() const;
 
     /**
      * @brief Returns the volume button.
@@ -83,7 +84,7 @@ private:
     TimelineSlider* playbackSlider_{nullptr};
 
     QLabel* positionLabel_{nullptr};
-    QLabel* durationLabel_{nullptr};
+    ClickableLabel* durationLabel_{nullptr};
 
     QPushButton* volumeButton_{nullptr};
 };
