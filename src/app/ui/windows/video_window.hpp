@@ -282,7 +282,7 @@ private:
     void updatePlayPauseButton(bool paused);
     void togglePause();
 
-    void onVolumeChanged(int value);
+    void setVolume(int value);
     void updateVolumeIcon(int volume);
     void toggleMute();
     void saveVolume();
@@ -298,6 +298,8 @@ private:
 
     void toggleTimeDisplayMode();
     void updateDurationLabel();
+    void updateFullscreenBar();
+    void updateFullscreenLayout();
 
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};

@@ -199,6 +199,21 @@ void DisplaySettingsWidget::setPanelVisible(bool visible)
     animate(visible);
 }
 
+void DisplaySettingsWidget::setMirrorModeEnabled(bool enabled)
+{
+    mirrorModeCheckBox_->setChecked(enabled);
+}
+
+void DisplaySettingsWidget::setSmoothDisplayEnabled(bool enabled)
+{
+    smoothDisplayCheckBox_->setChecked(enabled);
+}
+
+void DisplaySettingsWidget::setAlgorithmOverlayEnabled(bool enabled)
+{
+    overlayCheckBox_->setChecked(enabled);
+}
+
 void DisplaySettingsWidget::animate(bool open)
 {
     isAnimating_ = true;

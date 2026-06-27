@@ -3,16 +3,20 @@
 
 #pragma once
 
+#include "styled_tool_button.hpp"
+
 #include <QWidget>
 
 class QLabel;
-class QPushButton;
+class QComboBox;
 
 namespace fluvel
 {
 
 class TimelineSlider;
+class VolumeSlider;
 class ClickableLabel;
+class VolumeControlWidget;
 
 /**
  * @brief Fullscreen media control bar.
@@ -40,14 +44,14 @@ public:
      *
      * @return Start/stop button.
      */
-    QPushButton* startStopButton() const;
+    StyledToolButton* startStopButton() const;
 
     /**
      * @brief Returns the play/pause button.
      *
      * @return Play/pause button.
      */
-    QPushButton* playPauseButton() const;
+    StyledToolButton* playPauseButton() const;
 
     /**
      * @brief Returns the playback timeline slider.
@@ -71,22 +75,56 @@ public:
     ClickableLabel* durationLabel() const;
 
     /**
-     * @brief Returns the volume button.
+     * @brief Returns the volume control widget.
      *
-     * @return Volume button.
+     * @return Volume control widget.
      */
-    QPushButton* volumeButton() const;
+    VolumeControlWidget* volumeControl() const;
+
+    /**
+     * @brief Returns the mirror mode toggle button.
+     *      * This checkable button enables or disables the selfie mirror effect.
+     *      * @return Pointer to the mirror mode button.
+     */
+    StyledToolButton* mirrorButton() const;
+
+    /**
+     * @brief Returns the smooth display toggle button.
+     *      * This checkable button enables or disables smooth image rendering.
+     *      * @return Pointer to the smooth display button.
+     */
+    StyledToolButton* smoothButton() const;
+
+    /**
+     * @brief Returns the algorithm overlay toggle button.
+     *      * This checkable button controls the visibility of the segmentation overlay.
+     *      * @return Pointer to the overlay button.
+     */
+    StyledToolButton* overlayButton() const;
+
+    /**
+     * @brief Returns the camera selection combo box.
+     *      * The combo box lists the available camera devices and is intended for
+     * fullscreen camera mode.
+     *      * @return Pointer to the camera selector.
+     */
+    QComboBox* cameraSelector() const;
 
 private:
-    QPushButton* startStopButton_{nullptr};
-    QPushButton* playPauseButton_{nullptr};
+    StyledToolButton* startStopButton_{nullptr};
+    StyledToolButton* playPauseButton_{nullptr};
+    VolumeControlWidget* volumeControl_{nullptr};
+
+    StyledToolButton* mirrorButton_{nullptr};
+    StyledToolButton* smoothButton_{nullptr};
+    StyledToolButton* overlayButton_{nullptr};
 
     TimelineSlider* playbackSlider_{nullptr};
 
     QLabel* positionLabel_{nullptr};
     ClickableLabel* durationLabel_{nullptr};
 
-    QPushButton* volumeButton_{nullptr};
+    QComboBox* cameraSelector_{nullptr};
 };
 
 } // namespace fluvel

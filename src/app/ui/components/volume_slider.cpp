@@ -6,25 +6,24 @@
 #include <QMouseEvent>
 #include <QToolTip>
 
-#include <algorithm>
-
 namespace fluvel
 {
 
-VolumeSlider::VolumeSlider(QWidget* parent)
-    : JumpSlider(parent)
+VolumeSlider::VolumeSlider(QWidget* parent, ui::Appearance appearance)
+    : StyledSlider(parent, appearance)
 {
 }
 
-void VolumeSlider::mouseMoveEvent(QMouseEvent* event)
+bool VolumeSlider::hasHoverBubble() const
 {
-    const double ratio = std::clamp(static_cast<double>(event->position().x()) / width(), 0.0, 1.0);
+    return true;
+}
 
+QString VolumeSlider::hoverText(double ratio) const
+{
     const int volume = minimum() + ratio * (maximum() - minimum());
 
-    QToolTip::showText(event->globalPosition().toPoint(), QString("%1%").arg(volume), this);
-
-    JumpSlider::mouseMoveEvent(event);
+    return QString("%1 %").arg(volume);
 }
 
 } // namespace fluvel

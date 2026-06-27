@@ -16,6 +16,7 @@
 
 #include <QColor>
 #include <QIcon>
+#include <QString>
 #include <QtCore/qglobal.h>
 
 class QString;
@@ -49,5 +50,21 @@ QColor desaturateAndDarken(const QColor& original, qreal saturationFactor, qreal
  * @return Colorized icon.
  */
 QIcon colorizeIcon(const QIcon& baseIcon, const QColor& color, const QSize& size);
+
+/**
+ * @brief Converts a QColor to a CSS RGBA string.
+ *
+ * Returns a string formatted as:
+ * @code
+ * rgba(r,g,b,a)
+ * @endcode
+ *
+ * where the alpha component is expressed in the Qt stylesheet range
+ * [0,255].
+ *
+ * @param color Color to convert.
+ * @return CSS-compatible RGBA string.
+ */
+QString rgba(const QColor& color);
 
 } // namespace fluvel::qcolor_utils

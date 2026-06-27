@@ -5,7 +5,6 @@
 
 #include <QPainter>
 #include <QSize>
-#include <QString>
 
 namespace fluvel::qcolor_utils
 {
@@ -49,6 +48,15 @@ QIcon colorizeIcon(const QIcon& baseIcon, const QColor& color, const QSize& size
     painter.fillRect(pixmap.rect(), color);
 
     return QIcon(pixmap);
+}
+
+QString rgba(const QColor& color)
+{
+    return QString("rgba(%1,%2,%3,%4)")
+        .arg(color.red())
+        .arg(color.green())
+        .arg(color.blue())
+        .arg(color.alpha());
 }
 
 } // namespace qcolor_utils

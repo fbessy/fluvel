@@ -108,6 +108,9 @@ set(app_src
     ${UI_COMP_DIR}/jump_slider.cpp
     ${UI_COMP_DIR}/jump_slider.hpp
 
+    ${UI_COMP_DIR}/styled_slider.cpp
+    ${UI_COMP_DIR}/styled_slider.hpp
+
     ${UI_COMP_DIR}/timeline_slider.cpp
     ${UI_COMP_DIR}/timeline_slider.hpp
 
@@ -126,6 +129,18 @@ set(app_src
 
     ${UI_COMP_DIR}/clickable_label.cpp
     ${UI_COMP_DIR}/clickable_label.hpp
+
+    ${UI_COMP_DIR}/qt_utils.cpp
+    ${UI_COMP_DIR}/qt_utils.hpp
+
+    ${UI_COMP_DIR}/volume_control_widget.cpp
+    ${UI_COMP_DIR}/volume_control_widget.hpp
+
+    ${UI_COMP_DIR}/styled_tool_button.cpp
+    ${UI_COMP_DIR}/styled_tool_button.hpp
+
+    ${UI_COMP_DIR}/ui_appearance.hpp
+    ${UI_COMP_DIR}/ui_theme.hpp
 
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
@@ -267,6 +282,7 @@ set(APP_RESOURCES
 
     ${FLUVEL_RESOURCES_DIR}/icons/actions/camera-video-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/actions/globe-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/smooth_rendering-symbolic.svg
 
 
     ${FLUVEL_RESOURCES_DIR}/icons/file/document-open-recent-symbolic.svg
@@ -283,6 +299,7 @@ set(APP_RESOURCES
 
     ${FLUVEL_RESOURCES_DIR}/icons/view/sidebar-right-hide.svg
     ${FLUVEL_RESOURCES_DIR}/icons/view/sidebar-right-show.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/view/mirror-symbolic.svg
 
     ${FLUVEL_RESOURCES_DIR}/icons/status/check-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/status/audio-volume-muted.svg

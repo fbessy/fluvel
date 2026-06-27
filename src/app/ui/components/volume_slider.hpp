@@ -3,7 +3,8 @@
 
 #pragma once
 
-#include "jump_slider.hpp"
+#include "styled_slider.hpp"
+#include "ui_appearance.hpp"
 
 class QMouseEvent;
 
@@ -17,7 +18,7 @@ namespace fluvel
  * slider groove and displays the corresponding volume percentage while
  * hovering over the control.
  */
-class VolumeSlider : public JumpSlider
+class VolumeSlider : public StyledSlider
 {
 public:
     /**
@@ -25,18 +26,13 @@ public:
      *
      * @param parent Parent widget.
      */
-    explicit VolumeSlider(QWidget* parent = nullptr);
+    explicit VolumeSlider(QWidget* parent = nullptr,
+                          ui::Appearance appearance = ui::Appearance::Modern);
 
 protected:
-    /**
-     * @brief Handles mouse move events.
-     *
-     * Displays the volume percentage corresponding to the current
-     * mouse position.
-     *
-     * @param event Mouse event.
-     */
-    void mouseMoveEvent(QMouseEvent* event) override;
+    QString hoverText(double ratio) const override;
+
+    bool hasHoverBubble() const override;
 };
 
 } // namespace fluvel

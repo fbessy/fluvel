@@ -17,6 +17,7 @@
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
 #include "qcolor_utils.hpp"
+#include "qt_utils.hpp"
 #include "right_panel_toggle_button.hpp"
 #include "time_utils.hpp"
 #include "timeline_slider.hpp"
@@ -24,6 +25,7 @@
 #include "video_format_utils.hpp"
 #include "video_settings_dialog.hpp"
 #include "video_types.hpp"
+#include "volume_control_widget.hpp"
 #include "volume_slider.hpp"
 
 #include <QCameraDevice>
@@ -42,6 +44,7 @@
 #include <QSlider>
 #include <QStackedLayout>
 #include <QStringListModel>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidgetAction>
 
@@ -306,7 +309,7 @@ void VideoWindow::createUi()
     playPauseButton_->setIcon(resumeIcon_);
 
     // --- Playback widgets ---
-    playbackSlider_ = new TimelineSlider(this);
+    playbackSlider_ = new TimelineSlider(this, ui::Appearance::Native);
     playbackSlider_->setMinimumWidth(250);
 
     playbackPositionLabel_ = new QLabel("00:00");
@@ -329,7 +332,7 @@ void VideoWindow::createUi()
     volumeButton_ = new QPushButton(this);
     volumeButton_->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    volumeSlider_ = new VolumeSlider;
+    volumeSlider_ = new VolumeSlider(this, ui::Appearance::Native);
     volumeSlider_->setRange(0, 100);
     volumeSlider_->setFixedWidth(150);
 
@@ -369,7 +372,7 @@ void VideoWindow::createUi()
     mediaLayout->addWidget(playbackSlider_, 1);
 
     volumeButton_->setVisible(false);
-    mediaControlsWidget_->setVisible(false);
+    mediaControlsWidget_->setEnabled(false);
 }
 
 QIcon VideoWindow::createActiveFormatIcon()
@@ -408,9 +411,7 @@ void VideoWindow::setupView()
 
     fullscreenBar_->startStopButton()->setIcon(startIconLight_);
     fullscreenBar_->playPauseButton()->setIcon(resumeIconLight_);
-    fullscreenBar_->volumeButton()->setIcon(volumeHighIcon_);
-
-    fullscreenBar_->volumeButton()->setVisible(false);
+    fullscreenBar_->volumeControl()->setVisible(false);
 
     setSeekControlsVisible(false);
 
@@ -543,6 +544,9 @@ void VideoWindow::setupConnections()
 
                 refreshSourceUi();
                 updateActionBar();
+
+                fullscreenBar_->adjustSize();
+                positionFullscreenBar();
             });
 
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this, &VideoWindow::onDeviceChanged);
@@ -675,7 +679,7 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::mediaInfoChanged, this,
             &VideoWindow::onMediaInfoChanged);
 
-    connect(volumeSlider_, &QSlider::valueChanged, this, &VideoWindow::onVolumeChanged);
+    connect(volumeSlider_, &QSlider::valueChanged, this, &VideoWindow::setVolume);
 
     connect(volumeSlider_, &QSlider::sliderReleased, this, &VideoWindow::saveVolume);
 
@@ -744,6 +748,24 @@ void VideoWindow::setupConnections()
 
                 videoController_->seek(value);
             });
+
+    connect(fullscreenBar_->cameraSelector(), &QComboBox::currentIndexChanged, deviceSelector_,
+            &QComboBox::setCurrentIndex);
+
+    connect(deviceSelector_, &QComboBox::currentIndexChanged, fullscreenBar_->cameraSelector(),
+            &QComboBox::setCurrentIndex);
+
+    connect(fullscreenBar_->mirrorButton(), &QToolButton::toggled, displayBar_,
+            &DisplaySettingsWidget::setMirrorModeEnabled);
+
+    connect(fullscreenBar_->smoothButton(), &QToolButton::toggled, displayBar_,
+            &DisplaySettingsWidget::setSmoothDisplayEnabled);
+
+    connect(fullscreenBar_->overlayButton(), &QToolButton::toggled, displayBar_,
+            &DisplaySettingsWidget::setAlgorithmOverlayEnabled);
+
+    connect(fullscreenBar_->volumeControl(), &VolumeControlWidget::volumeChanged, this,
+            &VideoWindow::setVolume);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -903,6 +925,8 @@ void VideoWindow::updateDeviceList(const QList<QCameraDevice>& devices)
         currentIndex = computeBestDeviceIndex(previousSelection, newlyAddedCamera);
 
     deviceSelector_->setCurrentIndex(currentIndex);
+
+    qt_utils::copyComboBox(deviceSelector_, fullscreenBar_->cameraSelector());
 
     if (currentIndex >= 0)
         onDeviceChanged(currentIndex);
@@ -1280,7 +1304,7 @@ void VideoWindow::onStreamingStopped()
 
     setSeekControlsVisible(false);
     volumeButton_->setVisible(false);
-    fullscreenBar_->volumeButton()->setVisible(false);
+    fullscreenBar_->volumeControl()->setVisible(false);
 
     for (auto& state : deviceStreamingStatus_)
     {
@@ -1343,7 +1367,7 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     setSeekControlsVisible(false);
 
     volumeButton_->setVisible(false);
-    fullscreenBar_->volumeButton()->setVisible(false);
+    fullscreenBar_->volumeControl()->setVisible(false);
 }
 
 bool VideoWindow::shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo)
@@ -1482,6 +1506,7 @@ void VideoWindow::refreshUi()
 
     updateDeviceList(videoController_->videoInputs());
     updateActionBar();
+    updateFullscreenBar();
 }
 
 QByteArray VideoWindow::loadSelectedCameraId()
@@ -1829,13 +1854,6 @@ void VideoWindow::setSeekControlsVisible(bool visible)
 
     if (isVisible)
     {
-        fullscreenBar_->hide();
-    }
-
-    // fullscreenBar_->adjustSize();
-
-    if (isVisible)
-    {
         fullscreenBar_->show();
     }
 }
@@ -1900,7 +1918,7 @@ void VideoWindow::appendStreamingInfo(QString& title, const StreamingInfo& info)
     }
 }
 
-void VideoWindow::onVolumeChanged(int value)
+void VideoWindow::setVolume(int value)
 {
     if (value > 0)
         lastNonZeroVolume_ = value;
@@ -1982,23 +2000,16 @@ void VideoWindow::updateMediaControls()
 
     volumeButton_->setVisible(hasAudio);
 
-    mediaControlsWidget_->setVisible(hasSeek || hasAudio);
+    mediaControlsWidget_->setEnabled(hasSeek || hasAudio);
 
     fullscreenBar_->playPauseButton()->setVisible(hasSeek);
     fullscreenBar_->positionLabel()->setVisible(hasSeek);
     fullscreenBar_->playbackSlider()->setVisible(hasSeek);
     fullscreenBar_->durationLabel()->setVisible(hasSeek);
 
-    fullscreenBar_->volumeButton()->setVisible(hasAudio);
+    fullscreenBar_->volumeControl()->setVisible(hasAudio);
 
     bool isVisible = fullscreenBar_->isVisible();
-
-    if (isVisible)
-    {
-        fullscreenBar_->hide();
-    }
-
-    // fullscreenBar_->adjustSize();
 
     if (isVisible)
     {
@@ -2049,14 +2060,14 @@ void VideoWindow::positionFullscreenBar()
 {
     constexpr int kBottomMargin = 12;
 
-    const int width = imageViewer_->width() * 0.8;
-    const int height = fullscreenBar_->sizeHint().height();
+    fullscreenBar_->adjustSize();
 
-    fullscreenBar_->resize(width, height);
+    const QSize size = fullscreenBar_->sizeHint();
 
-    const int x = (imageViewer_->width() - width) / 2;
+    fullscreenBar_->resize(size);
 
-    const int y = imageViewer_->height() - fullscreenBar_->height() - kBottomMargin;
+    const int x = (imageViewer_->width() - size.width()) / 2;
+    const int y = imageViewer_->height() - size.height() - kBottomMargin;
 
     fullscreenBar_->move(x, y);
 }
@@ -2072,6 +2083,8 @@ void VideoWindow::onActivityDetected(const QPoint& pos)
 
     if (!inBottomZone)
         return;
+
+    fullscreenBar_->adjustSize();
 
     positionFullscreenBar();
 
@@ -2098,6 +2111,57 @@ void VideoWindow::onIdle()
     hideAnimation_->stop();
 
     hideAnimation_->start();
+}
+
+void VideoWindow::updateFullscreenBar()
+{
+    // Source type selected by the user.
+    // Unlike streamingInfo_, this remains valid even when playback is stopped.
+    const bool cameraMode = (sourceConfig_.type == SourceType::Camera);
+    const bool mediaMode = (sourceConfig_.type == SourceType::Media);
+
+    // Available media features.
+    const bool hasSeek = mediaMode && mediaInfo_.seekable;
+    const bool hasAudio = mediaMode && mediaInfo_.hasAudio;
+
+    //
+    // Widgets that only make sense for a specific source type.
+    //
+
+    fullscreenBar_->cameraSelector()->setVisible(cameraMode);
+    fullscreenBar_->volumeControl()->setVisible(hasAudio);
+
+    //
+    // Playback controls keep their place in the layout.
+    // They are disabled instead of being hidden to avoid layout jumps.
+    //
+
+    fullscreenBar_->playPauseButton()->setVisible(mediaMode);
+    fullscreenBar_->positionLabel()->setVisible(mediaMode);
+    fullscreenBar_->durationLabel()->setVisible(mediaMode);
+    fullscreenBar_->playbackSlider()->setVisible(mediaMode);
+
+    fullscreenBar_->playPauseButton()->setEnabled(hasSeek);
+    fullscreenBar_->positionLabel()->setEnabled(hasSeek);
+    fullscreenBar_->durationLabel()->setEnabled(hasSeek);
+    fullscreenBar_->playbackSlider()->setEnabled(hasSeek);
+
+    //
+    // Display controls are always available.
+    //
+
+    fullscreenBar_->mirrorButton()->setEnabled(true);
+    fullscreenBar_->smoothButton()->setEnabled(true);
+    fullscreenBar_->overlayButton()->setEnabled(true);
+}
+
+void VideoWindow::updateFullscreenLayout()
+{
+    updateFullscreenBar();
+
+    fullscreenBar_->adjustSize();
+
+    positionFullscreenBar();
 }
 
 } // namespace fluvel
