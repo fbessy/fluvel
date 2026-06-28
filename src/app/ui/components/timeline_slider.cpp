@@ -4,9 +4,7 @@
 #include "timeline_slider.hpp"
 
 #include "time_utils.hpp"
-
-#include <QMouseEvent>
-#include <QToolTip>
+#include "ui_theme.hpp"
 
 namespace fluvel
 {
@@ -14,11 +12,8 @@ namespace fluvel
 TimelineSlider::TimelineSlider(QWidget* parent, ui::Appearance appearance)
     : StyledSlider(parent, appearance)
 {
-}
-
-bool TimelineSlider::hasHoverBubble() const
-{
-    return true;
+    if (isModernStyle())
+        setFixedHeight(ui::kTimelineSliderHeight);
 }
 
 QString TimelineSlider::hoverText(double ratio) const

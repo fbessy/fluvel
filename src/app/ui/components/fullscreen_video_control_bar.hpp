@@ -14,9 +14,8 @@ namespace fluvel
 {
 
 class TimelineSlider;
-class VolumeSlider;
 class ClickableLabel;
-class VolumeControlWidget;
+class VolumeController;
 
 /**
  * @brief Fullscreen media control bar.
@@ -40,11 +39,28 @@ public:
     explicit FullscreenVideoControlBar(QWidget* parent = nullptr);
 
     /**
+     * @brief Returns the camera selection combo box.
+     *
+     * The combo box lists the available camera devices and is intended for
+     * fullscreen camera mode.
+     *
+     * @return Pointer to the camera selector.
+     */
+    QComboBox* cameraSelector() const;
+
+    /**
      * @brief Returns the stream start/stop button.
      *
      * @return Start/stop button.
      */
     StyledToolButton* startStopButton() const;
+
+    /**
+     * @brief Returns the volume controller.
+     *
+     * @return Volume controller.
+     */
+    VolumeController* volumeController() const;
 
     /**
      * @brief Returns the play/pause button.
@@ -54,18 +70,18 @@ public:
     StyledToolButton* playPauseButton() const;
 
     /**
-     * @brief Returns the playback timeline slider.
-     *
-     * @return Playback slider.
-     */
-    TimelineSlider* playbackSlider() const;
-
-    /**
      * @brief Returns the current playback position label.
      *
      * @return Position label.
      */
     QLabel* positionLabel() const;
+
+    /**
+     * @brief Returns the playback timeline slider.
+     *
+     * @return Playback slider.
+     */
+    TimelineSlider* playbackSlider() const;
 
     /**
      * @brief Returns the media duration label.
@@ -75,45 +91,36 @@ public:
     ClickableLabel* durationLabel() const;
 
     /**
-     * @brief Returns the volume control widget.
-     *
-     * @return Volume control widget.
-     */
-    VolumeControlWidget* volumeControl() const;
-
-    /**
      * @brief Returns the mirror mode toggle button.
-     *      * This checkable button enables or disables the selfie mirror effect.
-     *      * @return Pointer to the mirror mode button.
+     *
+     * This checkable button enables or disables the selfie mirror effect.
+     *
+     * @return Pointer to the mirror mode button.
      */
     StyledToolButton* mirrorButton() const;
 
     /**
      * @brief Returns the smooth display toggle button.
-     *      * This checkable button enables or disables smooth image rendering.
-     *      * @return Pointer to the smooth display button.
+     *
+     * This checkable button enables or disables smooth image rendering.
+     *
+     * @return Pointer to the smooth display button.
      */
     StyledToolButton* smoothButton() const;
 
     /**
      * @brief Returns the algorithm overlay toggle button.
-     *      * This checkable button controls the visibility of the segmentation overlay.
-     *      * @return Pointer to the overlay button.
+     *
+     * This checkable button controls the visibility of the segmentation overlay.
+     *
+     * @return Pointer to the overlay button.
      */
     StyledToolButton* overlayButton() const;
-
-    /**
-     * @brief Returns the camera selection combo box.
-     *      * The combo box lists the available camera devices and is intended for
-     * fullscreen camera mode.
-     *      * @return Pointer to the camera selector.
-     */
-    QComboBox* cameraSelector() const;
 
 private:
     StyledToolButton* startStopButton_{nullptr};
     StyledToolButton* playPauseButton_{nullptr};
-    VolumeControlWidget* volumeControl_{nullptr};
+    VolumeController* volumeController_{nullptr};
 
     StyledToolButton* mirrorButton_{nullptr};
     StyledToolButton* smoothButton_{nullptr};

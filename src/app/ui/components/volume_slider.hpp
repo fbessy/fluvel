@@ -6,8 +6,6 @@
 #include "styled_slider.hpp"
 #include "ui_appearance.hpp"
 
-class QMouseEvent;
-
 namespace fluvel
 {
 
@@ -25,14 +23,35 @@ public:
      * @brief Constructs a volume slider.
      *
      * @param parent Parent widget.
+     * @param appearance Slider appearance.
      */
     explicit VolumeSlider(QWidget* parent = nullptr,
                           ui::Appearance appearance = ui::Appearance::Modern);
 
 protected:
+    /**
+     * @brief Returns the hovered volume percentage.
+     *
+     * @param ratio Normalized slider position.
+     * @return Volume formatted as a percentage.
+     */
     QString hoverText(double ratio) const override;
 
-    bool hasHoverBubble() const override;
+private:
+    int grooveHeight() const override;
+    int grooveHoverHeight() const override;
+    int handleRadius() const override;
+    int handleHoverRadius() const override;
+
+    int sliderHeight() const override;
+
+    int topMargin() const override;
+    int bottomMargin() const override;
+
+    int hoverFontPointSize() const override;
+    QMargins hoverBubbleMargins() const override;
+    int hoverBubbleRadius() const override;
+    int hoverBubbleOffset() const override;
 };
 
 } // namespace fluvel

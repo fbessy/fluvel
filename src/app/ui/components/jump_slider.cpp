@@ -21,7 +21,7 @@ void JumpSlider::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        double ratio = 0.0;
+        double ratio;
 
         if (orientation() == Qt::Horizontal)
         {
@@ -29,7 +29,7 @@ void JumpSlider::mousePressEvent(QMouseEvent* event)
         }
         else
         {
-            // Qt places the minimum value at the bottom for vertical sliders.
+            // Vertical sliders are inverted.
             ratio = 1.0 - (event->position().y() / height());
         }
 

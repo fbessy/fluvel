@@ -2,7 +2,9 @@
 
 #include "styled_slider.hpp"
 
-class QMouseEvent;
+#include <QString>
+
+class QWidget;
 
 namespace fluvel
 {
@@ -16,13 +18,23 @@ namespace fluvel
 class TimelineSlider : public StyledSlider
 {
 public:
+    /**
+     * @brief Constructs a timeline slider.
+     *
+     * @param parent Parent widget.
+     * @param appearance Slider appearance.
+     */
     explicit TimelineSlider(QWidget* parent = nullptr,
                             ui::Appearance appearance = ui::Appearance::Modern);
 
 protected:
+    /**
+     * @brief Returns the formatted media time corresponding to the hovered position.
+     *
+     * @param ratio Normalized slider position in the range [0,1].
+     * @return Formatted time string.
+     */
     QString hoverText(double ratio) const override;
-
-    bool hasHoverBubble() const override;
 };
 
 } // namespace fluvel

@@ -6,26 +6,17 @@
 #include "icon_loader.hpp"
 #include "timeline_slider.hpp"
 #include "ui_theme.hpp"
-#include "volume_control_widget.hpp"
+#include "volume_controller.hpp"
+#include "volume_slider.hpp"
 
 #include <QColor>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListView>
-#include <QPropertyAnimation>
-#include <QWidget>
 
 namespace fluvel
 {
-
-static QString rgba(const QColor& c)
-{
-    return QString("rgba(%1,%2,%3,%4)").arg(c.red()).arg(c.green()).arg(c.blue()).arg(c.alpha());
-}
-
-const QColor kAccentColor(107, 111, 207, 220);
-const QColor kAccentHover = kAccentColor.lighter(110);
 
 FullscreenVideoControlBar::FullscreenVideoControlBar(QWidget* parent)
     : QWidget(parent)
@@ -39,7 +30,6 @@ FullscreenVideoControlBar::FullscreenVideoControlBar(QWidget* parent)
 #fullscreenBackground {
     background-color: rgba(32,36,42,210);
     border-radius: 16px;
-    opacity: 0.8;
 }
 )");
 
@@ -51,122 +41,72 @@ QComboBox {
     min-width: 220px;
 }
 
-QLabel:disabled
-{
+QLabel:disabled {
     color: rgba(255,255,255,70);
 }
 
-QComboBox
-{
+QComboBox {
     color: white;
-
     background-color: rgba(255,255,255,20);
-
     border: 1px solid rgba(255,255,255,35);
     border-radius: 15px;
-
     padding: 4px 28px 4px 10px;
-
     min-height: 30px;
 }
 
-QComboBox:focus
-{
-    border: 1px solid #8B5CF6;
-}
-
-QComboBox:hover
-{
+QComboBox:hover {
     background-color: rgba(255,255,255,30);
 }
 
-QComboBox::drop-down
-{
+QComboBox:focus {
+    border: 1px solid #8B5CF6;
+}
+
+QComboBox::drop-down {
     border: none;
     width: 24px;
 }
 
-QComboBox::down-arrow
-{
+QComboBox::down-arrow {
     image: none;
 }
 
-QComboBox QAbstractItemView
-{
-    background-color: rgb(32,36,42);
-    color: white;
-
-    border: none;
-
-    outline: none;
-
-    padding: 4px;
-}
-
-QComboBox QAbstractItemView
-{
+QComboBox QAbstractItemView {
     background: rgb(32,36,42);
+    color: white;
     border: 1px solid rgb(60,60,60);
     border-radius: 12px;
     selection-background-color: rgba(255,255,255,25);
 }
 
-QComboBox QAbstractItemView::item:selected
-{
+QComboBox QAbstractItemView::item:selected {
     background-color: rgba(255,255,255,25);
-    color: white;
 }
 
-QComboBox QAbstractItemView::item:hover
-{
+QComboBox QAbstractItemView::item:hover {
     background-color: rgba(255,255,255,15);
 }
 
-QListView
-{
-    background: rgb(32,36,42);
-    border: none;
-}
-
-QScrollBar:vertical
-{
+QScrollBar:vertical {
     width: 0px;
-    border: none;
-    background: transparent;
 }
 
-QScrollBar:horizontal
-{
+QScrollBar:horizontal {
     height: 0px;
-    border: none;
-    background: transparent;
 }
-
-QListView::viewport
-{
-    background: rgb(32,36,42);
-}
-
 )");
 
     cameraSelector_ = new QComboBox;
-    auto* view = new QListView(cameraSelector_);
 
+    auto* view = new QListView(cameraSelector_);
     view->setFrameShape(QFrame::NoFrame);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
-    view->viewport()->setAutoFillBackground(false);
-    view->setAutoFillBackground(false);
-    view->viewport()->setStyleSheet("background: rgb(32,36,42);");
-    view->setContentsMargins(0, 0, 0, 0);
-    view->viewport()->setContentsMargins(0, 0, 0, 0);
-    view->setAttribute(Qt::WA_StyledBackground);
-
     cameraSelector_->setView(view);
 
     startStopButton_ = new StyledToolButton(this, ui::Appearance::Modern);
     playPauseButton_ = new StyledToolButton(this, ui::Appearance::Modern);
-    volumeControl_ = new VolumeControlWidget(this, ui::Appearance::Modern);
+    volumeController_ = new VolumeController(this, ui::Appearance::Modern);
 
     mirrorButton_ = new StyledToolButton(this, ui::Appearance::Modern);
     smoothButton_ = new StyledToolButton(this, ui::Appearance::Modern);
@@ -176,76 +116,76 @@ QListView::viewport
     smoothButton_->setCheckable(true);
     overlayButton_->setCheckable(true);
 
-    QIcon mirrorIcon = il::loadIcon(":/icons/view/mirror-symbolic.svg", il::IconMode::Light);
+    mirrorButton_->setIcon(il::loadIcon(":/icons/view/mirror-symbolic.svg", il::IconMode::Light));
+    smoothButton_->setIcon(
+        il::loadIcon(":/icons/actions/smooth_rendering-symbolic.svg", il::IconMode::Light));
+    overlayButton_->setIcon(
+        il::loadIcon(":/icons/actions/help-about-symbolic.svg", il::IconMode::Light));
 
-    QIcon smoothIcon =
-        il::loadIcon(":/icons/actions/smooth_rendering-symbolic.svg", il::IconMode::Light);
+    constexpr QSize kIconSize(ui::kButtonIconSize, ui::kButtonIconSize);
+    constexpr QSize kButtonSize(ui::kButtonSize, ui::kButtonSize);
 
-    QIcon infoIcon = il::loadIcon(":/icons/actions/help-about-symbolic.svg", il::IconMode::Light);
-
-    mirrorButton_->setIcon(mirrorIcon);
-    smoothButton_->setIcon(smoothIcon);
-    overlayButton_->setIcon(infoIcon);
-
-    constexpr QSize kNormalIconSize(24, 24);
-    constexpr QSize kCheckedIconSize(26, 26);
-
-    for (StyledToolButton* b : {mirrorButton_, smoothButton_, overlayButton_})
+    for (auto* b : {startStopButton_, playPauseButton_, volumeController_->button(), mirrorButton_,
+                    smoothButton_, overlayButton_})
     {
-        connect(b, &QToolButton::toggled, this,
-                [b, kNormalIconSize, kCheckedIconSize](bool checked)
-                {
-                    b->setIconSize(checked ? kCheckedIconSize : kNormalIconSize);
-                });
+        b->setIconSize(kIconSize);
+        b->setFixedSize(kButtonSize);
+        b->setCursor(Qt::PointingHandCursor);
     }
 
     positionLabel_ = new QLabel("00:00");
     durationLabel_ = new ClickableLabel("-00:00");
 
-    QFont f = positionLabel_->font();
-    f.setBold(true);
-    f.setPointSize(14);
-    positionLabel_->setFont(f);
-    durationLabel_->setFont(f);
+    QFont font = positionLabel_->font();
+    font.setBold(true);
+    font.setPointSize(14);
+
+    positionLabel_->setFont(font);
+    durationLabel_->setFont(font);
 
     playbackSlider_ = new TimelineSlider(this, ui::Appearance::Modern);
     playbackSlider_->setMinimumWidth(260);
     playbackSlider_->setMaximumWidth(520);
     playbackSlider_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    const auto bSize = ui::kButtonSize;
-    const auto iSize = ui::kButtonIconSize;
+    QWidget* widgets[] = {startStopButton_,
+                          playPauseButton_,
+                          volumeController_->button(),
+                          volumeController_->slider(),
+                          positionLabel_,
+                          playbackSlider_,
+                          durationLabel_,
+                          mirrorButton_,
+                          smoothButton_,
+                          overlayButton_};
 
-    constexpr QSize kIconSize(iSize, iSize);
-
-    for (auto* b :
-         {startStopButton_, playPauseButton_, mirrorButton_, smoothButton_, overlayButton_})
+    for (QWidget* widget : widgets)
     {
-        b->setIconSize(kIconSize);
-        b->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        b->setFixedSize(bSize, bSize);
-        b->setCursor(Qt::PointingHandCursor);
-        // b->setAutoRaise(true);
-    }
-
-    QWidget* widgets[] = {startStopButton_, playPauseButton_, volumeControl_,
-                          positionLabel_,   playbackSlider_,  durationLabel_,
-                          mirrorButton_,    smoothButton_,    overlayButton_};
-
-    for (QWidget* w : widgets)
-    {
-        auto sp = w->sizePolicy();
+        auto sp = widget->sizePolicy();
         sp.setRetainSizeWhenHidden(true);
-        w->setSizePolicy(sp);
+        widget->setSizePolicy(sp);
     }
+
+    auto* transportLayout = new QHBoxLayout;
+    transportLayout->setContentsMargins(0, 0, 0, 0);
+    transportLayout->setSpacing(6);
+
+    transportLayout->addWidget(cameraSelector_);
+    transportLayout->addWidget(startStopButton_);
+    transportLayout->addWidget(volumeController_->button());
+    transportLayout->addWidget(playPauseButton_);
+
+    auto* mediaLayout = new QVBoxLayout;
+    mediaLayout->setContentsMargins(0, 0, 0, 0);
+    mediaLayout->setSpacing(2);
+
+    mediaLayout->addWidget(volumeController_->slider());
+    mediaLayout->addLayout(transportLayout);
 
     auto* leftLayout = new QHBoxLayout;
+    leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(6);
-
-    leftLayout->addWidget(cameraSelector_);
-    leftLayout->addWidget(startStopButton_);
-    leftLayout->addWidget(playPauseButton_);
-    leftLayout->addWidget(volumeControl_);
+    leftLayout->addLayout(mediaLayout);
 
     auto* centerLayout = new QHBoxLayout;
     centerLayout->setSpacing(6);
@@ -262,12 +202,11 @@ QListView::viewport
     rightLayout->addWidget(overlayButton_);
 
     auto* layout = new QHBoxLayout;
-
     layout->setContentsMargins(18, 10, 18, 10);
     layout->setSpacing(14);
 
     layout->addLayout(leftLayout);
-    layout->addLayout(centerLayout);
+    layout->addLayout(centerLayout, 1);
     layout->addLayout(rightLayout);
 
     background->setLayout(layout);
@@ -277,45 +216,54 @@ QListView::viewport
     root->addWidget(background);
 }
 
-StyledToolButton* FullscreenVideoControlBar::startStopButton() const
-{
-    return startStopButton_;
-}
-StyledToolButton* FullscreenVideoControlBar::playPauseButton() const
-{
-    return playPauseButton_;
-}
-VolumeControlWidget* FullscreenVideoControlBar::volumeControl() const
-{
-    return volumeControl_;
-}
-StyledToolButton* FullscreenVideoControlBar::mirrorButton() const
-{
-    return mirrorButton_;
-}
-StyledToolButton* FullscreenVideoControlBar::smoothButton() const
-{
-    return smoothButton_;
-}
-StyledToolButton* FullscreenVideoControlBar::overlayButton() const
-{
-    return overlayButton_;
-}
 QComboBox* FullscreenVideoControlBar::cameraSelector() const
 {
     return cameraSelector_;
 }
-TimelineSlider* FullscreenVideoControlBar::playbackSlider() const
+
+StyledToolButton* FullscreenVideoControlBar::startStopButton() const
 {
-    return playbackSlider_;
+    return startStopButton_;
 }
+
+VolumeController* FullscreenVideoControlBar::volumeController() const
+{
+    return volumeController_;
+}
+
+StyledToolButton* FullscreenVideoControlBar::playPauseButton() const
+{
+    return playPauseButton_;
+}
+
 QLabel* FullscreenVideoControlBar::positionLabel() const
 {
     return positionLabel_;
 }
+
+TimelineSlider* FullscreenVideoControlBar::playbackSlider() const
+{
+    return playbackSlider_;
+}
+
 ClickableLabel* FullscreenVideoControlBar::durationLabel() const
 {
     return durationLabel_;
+}
+
+StyledToolButton* FullscreenVideoControlBar::mirrorButton() const
+{
+    return mirrorButton_;
+}
+
+StyledToolButton* FullscreenVideoControlBar::smoothButton() const
+{
+    return smoothButton_;
+}
+
+StyledToolButton* FullscreenVideoControlBar::overlayButton() const
+{
+    return overlayButton_;
 }
 
 } // namespace fluvel

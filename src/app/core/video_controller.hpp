@@ -122,13 +122,15 @@ public:
 
     /**
      * @brief Returns the current audio volume.
-     *      * @return Volume in the range [0.0, 1.0].
+     *
+     * @return Volume in the range [0.0, 1.0].
      */
     float volume() const;
 
     /**
      * @brief Sets the audio volume.
-     *      * @param volume Volume in the range [0.0, 1.0].
+     *
+     * @param volume Volume in the range [0.0, 1.0].
      */
     void setVolume(float volume);
 

@@ -323,10 +323,10 @@ void ImageViewerWidget::updatePixmapItem(const QImage& img)
     updateMiniMapThumbnail();
 
 #ifdef FLUVEL_DEBUG
-    qDebug() << "IMG null:" << img.isNull();
-    qDebug() << "IMG format:" << img.format();
-    qDebug() << "PIX null:" << pixmapItem_->pixmap().isNull();
-    qDebug() << "IMG size:" << img.size();
+    // qDebug() << "IMG null:" << img.isNull();
+    // qDebug() << "IMG format:" << img.format();
+    // qDebug() << "PIX null:" << pixmapItem_->pixmap().isNull();
+    // qDebug() << "IMG size:" << img.size();
 #endif
 
     lastDisplayedImage_ = img;

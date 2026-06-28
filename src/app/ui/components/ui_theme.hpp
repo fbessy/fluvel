@@ -59,7 +59,23 @@ constexpr int kControlRadius = 15;
 constexpr int kPopupRadius = 12;
 constexpr int kPanelRadius = 16;
 
+// ============================================================================
+// Sliders
+// ============================================================================
+
 constexpr int kSliderHeight = 82;
+constexpr int kTimelineSliderHeight = 82;
+constexpr int kVolumeSliderHeight = 48;
+
+constexpr int kSliderSideMargin = 16;
+constexpr int kSliderTopMargin = 16;
+constexpr int kSliderBottomMargin = 6;
+
+constexpr int kSliderGrooveHeight = 8;
+constexpr int kSliderGrooveHoverHeight = 11;
+
+constexpr int kSliderHandleRadius = 11;
+constexpr int kSliderHandleHoverRadius = 13;
 
 // ============================================================================
 // Layout

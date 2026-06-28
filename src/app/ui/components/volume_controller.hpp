@@ -5,10 +5,9 @@
 
 #include "ui_appearance.hpp"
 
-#include <QWidget>
+#include <QObject>
 
-class QHBoxLayout;
-class QToolButton;
+class QWidget;
 
 namespace fluvel
 {
@@ -17,13 +16,14 @@ class VolumeSlider;
 class StyledToolButton;
 
 /**
- * @brief Compact widget used to control audio volume.
+ * @brief Controls audio volume widgets.
  *
- * The widget combines a volume button and a horizontal slider.
- * It supports mute/unmute, direct volume changes and optional
- * modern or native rendering.
+ * VolumeController owns a volume button and a slider and
+ * synchronizes their state (mute, icon and current volume).
+ *
+ * Layout is intentionally left to the caller.
  */
-class VolumeControlWidget : public QWidget
+class VolumeController : public QObject
 {
     Q_OBJECT
 
@@ -34,8 +34,8 @@ public:
      * @param parent Parent widget.
      * @param appearance Slider appearance.
      */
-    explicit VolumeControlWidget(QWidget* parent = nullptr,
-                                 ui::Appearance appearance = ui::Appearance::Modern);
+    explicit VolumeController(QWidget* parent = nullptr,
+                              ui::Appearance appearance = ui::Appearance::Modern);
 
     /**
      * @brief Returns the current volume.
@@ -50,9 +50,16 @@ public:
     void setVolume(int volume);
 
     /**
+     * @brief Show or hide widgets.
+     *
+     * @param visible Enable visibility.
+     */
+    void setControlsVisible(bool visible);
+
+    /**
      * @brief Returns the volume button.
      */
-    QToolButton* button() const;
+    StyledToolButton* button() const;
 
     /**
      * @brief Returns the slider.
@@ -65,26 +72,15 @@ signals:
      */
     void volumeChanged(int volume);
 
-    /**
-     * @brief Emitted when mute/unmute is requested.
-     */
-    void muteRequested();
-
-private slots:
-
-    void onButtonClicked();
-
-    void onSliderChanged(int value);
-
 private:
-    void toggleSlider();
-
+    void onMuteButtonClicked();
+    void onSliderChanged(int value);
     void updateIcon();
 
     StyledToolButton* button_{nullptr};
-
     VolumeSlider* slider_{nullptr};
 
+    /// Volume restored after unmuting.
     int lastNonZeroVolume_{50};
 };
 

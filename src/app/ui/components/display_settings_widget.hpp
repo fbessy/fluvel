@@ -55,28 +55,34 @@ public:
 
     /**
      * @brief Enables or disables the selfie mirror display.
-     *      * Updates the corresponding user interface control.
+     *
+     * Updates the corresponding user interface control.
      * The usual configuration update chain is triggered through the
      * checkbox's toggled() signal.
-     *      * @param enabled True to enable the mirror effect.
+     *
+     * @param enabled True to enable the mirror effect.
      */
     void setMirrorModeEnabled(bool enabled);
 
     /**
      * @brief Enables or disables smooth image rendering.
-     *      * Updates the corresponding user interface control.
+     *
+     * Updates the corresponding user interface control.
      * The usual configuration update chain is triggered through the
      * checkbox's toggled() signal.
-     *      * @param enabled True to enable smooth rendering.
+     *
+     * @param enabled True to enable smooth rendering.
      */
     void setSmoothDisplayEnabled(bool enabled);
 
     /**
      * @brief Shows or hides the algorithm overlay.
-     *      * Updates the corresponding user interface control.
+     *
+     * Updates the corresponding user interface control.
      * The usual configuration update chain is triggered through the
      * checkbox's toggled() signal.
-     *      * @param enabled True to display the overlay.
+     *
+     * @param enabled True to display the overlay.
      */
     void setAlgorithmOverlayEnabled(bool enabled);
 

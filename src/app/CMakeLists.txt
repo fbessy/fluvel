@@ -133,8 +133,8 @@ set(app_src
     ${UI_COMP_DIR}/qt_utils.cpp
     ${UI_COMP_DIR}/qt_utils.hpp
 
-    ${UI_COMP_DIR}/volume_control_widget.cpp
-    ${UI_COMP_DIR}/volume_control_widget.hpp
+    ${UI_COMP_DIR}/volume_controller.cpp
+    ${UI_COMP_DIR}/volume_controller.hpp
 
     ${UI_COMP_DIR}/styled_tool_button.cpp
     ${UI_COMP_DIR}/styled_tool_button.hpp
