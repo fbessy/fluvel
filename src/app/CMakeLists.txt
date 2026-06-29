@@ -141,6 +141,7 @@ set(app_src
 
     ${UI_COMP_DIR}/ui_appearance.hpp
     ${UI_COMP_DIR}/ui_theme.hpp
+    ${UI_COMP_DIR}/slider_style.hpp
 
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp

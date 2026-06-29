@@ -10,12 +10,13 @@
 namespace fluvel
 {
 
-StyledSlider::StyledSlider(QWidget* parent, ui::Appearance appearance)
+StyledSlider::StyledSlider(QWidget* parent, ui::Appearance appearance, SliderStyle style)
     : JumpSlider(parent)
+    , style_(style)
     , appearance_(appearance)
 {
     if (appearance_ == ui::Appearance::Modern)
-        setFixedHeight(sliderHeight());
+        setFixedHeight(style_.sliderHeight);
 }
 
 void StyledSlider::mouseMoveEvent(QMouseEvent* event)
@@ -68,18 +69,18 @@ void StyledSlider::paintEvent(QPaintEvent* event)
         const QPoint handle = handleCenter();
 
         const int grooveHeight = groove.height();
-        const int currentHandleRadius = hover_ ? handleHoverRadius() : handleRadius();
+        const int currentHandleRadius = hover_ ? style_.handleHoverRadius : style_.handleRadius;
 
         painter.setPen(Qt::NoPen);
 
-        painter.setBrush(grooveColor());
+        painter.setBrush(ui::kSliderGrooveColor);
         painter.drawRoundedRect(groove, grooveHeight / 2, grooveHeight / 2);
 
-        painter.setBrush(progressColor());
+        painter.setBrush(ui::kSliderProgressColor);
         painter.drawRoundedRect(progress, grooveHeight / 2, grooveHeight / 2);
 
-        painter.setBrush(handleColor());
-        painter.setPen(QPen(handleBorderColor(), 1));
+        painter.setBrush(ui::kSliderHandleColor);
+        painter.setPen(QPen(ui::kSliderHandleBorderColor, 1));
 
         painter.drawEllipse(handle, currentHandleRadius, currentHandleRadius);
 
@@ -104,11 +105,11 @@ void StyledSlider::paintHoverBubble(QPainter& painter)
 
     QFont font = painter.font();
     font.setBold(true);
-    font.setPointSize(hoverFontPointSize());
+    font.setPointSize(style_.hoverFontPointSize);
 
     painter.setFont(font);
 
-    const QMargins margins = hoverBubbleMargins();
+    const QMargins margins = style_.hoverBubbleMargins;
 
     const QRect bubbleContentRect =
         QFontMetrics(font)
@@ -116,27 +117,29 @@ void StyledSlider::paintHoverBubble(QPainter& painter)
             .adjusted(-margins.left(), -margins.top(), margins.right(), margins.bottom());
 
     QRect bubbleRect = bubbleContentRect;
-    bubbleRect.moveCenter(QPoint(hoverPosition_.x(), grooveRect().top() - hoverBubbleOffset()));
+    bubbleRect.moveCenter(
+        QPoint(hoverPosition_.x(), grooveRect().top() - style_.hoverBubbleOffset));
 
     const int x = std::clamp(bubbleRect.left(), 4, width() - bubbleRect.width() - 4);
 
     bubbleRect.moveLeft(x);
 
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(20, 20, 20, 180));
-    painter.drawRoundedRect(bubbleRect, hoverBubbleRadius(), hoverBubbleRadius());
+    painter.setBrush(ui::kTooltipBackgroundColor);
+    painter.drawRoundedRect(bubbleRect, style_.hoverBubbleRadius, style_.hoverBubbleRadius);
 
-    painter.setPen(Qt::white);
+    painter.setPen(ui::kTooltipTextColor);
     painter.drawText(bubbleRect, Qt::AlignCenter, bubbleText_);
 }
 
 QRect StyledSlider::grooveRect() const
 {
-    const int currentGrooveHeight = hover_ ? grooveHoverHeight() : grooveHeight();
+    const int currentGrooveHeight = hover_ ? style_.grooveHoverHeight : style_.grooveHeight;
 
-    return QRect(ui::kSliderSideMargin,
-                 topMargin() + (height() - topMargin() - bottomMargin() - currentGrooveHeight) / 2,
-                 width() - 2 * ui::kSliderSideMargin, currentGrooveHeight);
+    return QRect(style_.sideMargin,
+                 style_.topMargin +
+                     (height() - style_.topMargin - style_.bottomMargin - currentGrooveHeight) / 2,
+                 width() - 2 * style_.sideMargin, currentGrooveHeight);
 }
 
 double StyledSlider::ratio() const
@@ -166,81 +169,6 @@ QPoint StyledSlider::handleCenter() const
 bool StyledSlider::isModernStyle() const
 {
     return appearance_ == ui::Appearance::Modern;
-}
-
-QColor StyledSlider::grooveColor() const
-{
-    return QColor(255, 255, 255, 80);
-}
-
-QColor StyledSlider::progressColor() const
-{
-    return QColor(107, 111, 207);
-}
-
-QColor StyledSlider::handleColor() const
-{
-    return Qt::white;
-}
-
-QColor StyledSlider::handleBorderColor() const
-{
-    return QColor(107, 111, 207, 120);
-}
-
-int StyledSlider::grooveHeight() const
-{
-    return ui::kSliderGrooveHeight;
-}
-
-int StyledSlider::grooveHoverHeight() const
-{
-    return ui::kSliderGrooveHoverHeight;
-}
-
-int StyledSlider::handleRadius() const
-{
-    return ui::kSliderHandleRadius;
-}
-
-int StyledSlider::handleHoverRadius() const
-{
-    return ui::kSliderHandleHoverRadius;
-}
-
-int StyledSlider::topMargin() const
-{
-    return ui::kSliderTopMargin;
-}
-
-int StyledSlider::bottomMargin() const
-{
-    return ui::kSliderBottomMargin;
-}
-
-int StyledSlider::sliderHeight() const
-{
-    return ui::kSliderHeight;
-}
-
-int StyledSlider::hoverFontPointSize() const
-{
-    return 10;
-}
-
-QMargins StyledSlider::hoverBubbleMargins() const
-{
-    return {10, 4, 10, 4};
-}
-
-int StyledSlider::hoverBubbleRadius() const
-{
-    return 8;
-}
-
-int StyledSlider::hoverBubbleOffset() const
-{
-    return 22;
 }
 
 } // namespace fluvel

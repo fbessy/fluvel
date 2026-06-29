@@ -92,7 +92,7 @@ QToolButton:checked:hover
                       .arg(qcolor_utils::rgba(ui::kControlDisabled))
                       .arg(qcolor_utils::rgba(ui::kControlDisabledBorder))
                       .arg(qcolor_utils::rgba(ui::kAccentColor))
-                      .arg(qcolor_utils::rgba(ui::kAccentHover)));
+                      .arg(qcolor_utils::rgba(ui::kAccentHoverColor)));
 }
 
 } // namespace fluvel

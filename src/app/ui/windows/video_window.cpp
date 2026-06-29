@@ -692,8 +692,6 @@ void VideoWindow::setupConnections()
     connect(volumeButton_, &QPushButton::clicked, this,
             [this]()
             {
-                const QSize menuSize = volumeMenu_->sizeHint();
-
                 volumeMenu_->popup(volumeButton_->mapToGlobal(QPoint(0, volumeButton_->height())));
             });
 

@@ -4,16 +4,13 @@
 #include "timeline_slider.hpp"
 
 #include "time_utils.hpp"
-#include "ui_theme.hpp"
 
 namespace fluvel
 {
 
 TimelineSlider::TimelineSlider(QWidget* parent, ui::Appearance appearance)
-    : StyledSlider(parent, appearance)
+    : StyledSlider(parent, appearance, SliderStyle::timeline())
 {
-    if (isModernStyle())
-        setFixedHeight(ui::kTimelineSliderHeight);
 }
 
 QString TimelineSlider::hoverText(double ratio) const

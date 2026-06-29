@@ -4,6 +4,7 @@
 #pragma once
 
 #include "jump_slider.hpp"
+#include "slider_style.hpp"
 #include "ui_appearance.hpp"
 
 #include <QColor>
@@ -30,7 +31,8 @@ class StyledSlider : public JumpSlider
 
 public:
     explicit StyledSlider(QWidget* parent = nullptr,
-                          ui::Appearance appearance = ui::Appearance::Modern);
+                          ui::Appearance appearance = ui::Appearance::Modern,
+                          SliderStyle style = {});
 
     /**
      * @brief Returns whether the slider uses the custom Fluvel appearance.
@@ -63,25 +65,6 @@ protected:
 
     [[nodiscard]]
     double ratio() const;
-
-    virtual QColor grooveColor() const;
-    virtual int grooveHeight() const;
-    virtual int grooveHoverHeight() const;
-    virtual QColor progressColor() const;
-
-    virtual QColor handleColor() const;
-    virtual QColor handleBorderColor() const;
-    virtual int handleRadius() const;
-    virtual int handleHoverRadius() const;
-
-    virtual int sliderHeight() const;
-    virtual int topMargin() const;
-    virtual int bottomMargin() const;
-
-    virtual int hoverFontPointSize() const;
-    virtual QMargins hoverBubbleMargins() const;
-    virtual int hoverBubbleRadius() const;
-    virtual int hoverBubbleOffset() const;
 
     void mouseMoveEvent(QMouseEvent* event) override;
     void leaveEvent(QEvent* event) override;
@@ -116,6 +99,9 @@ protected:
 
     /// Text displayed in the hover bubble or native tooltip.
     QString bubbleText_;
+
+    /// Geometry and rendering parameters of the slider.
+    SliderStyle style_{};
 
 private:
     ui::Appearance appearance_{ui::Appearance::Modern};

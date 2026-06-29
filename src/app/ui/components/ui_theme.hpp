@@ -13,7 +13,7 @@ namespace fluvel::ui
 // ============================================================================
 
 inline const QColor kAccentColor(107, 111, 207, 220);
-inline const QColor kAccentHover = kAccentColor.lighter(110);
+inline const QColor kAccentHoverColor = kAccentColor.lighter(110);
 
 // ============================================================================
 // Text colors
@@ -49,6 +49,19 @@ inline const QColor kSelectionBackground(255, 255, 255, 25);
 inline const QColor kSelectionHover(255, 255, 255, 15);
 
 // ============================================================================
+// Slider colors
+// ============================================================================
+
+inline const QColor kSliderGrooveColor(255, 255, 255, 80);
+inline const QColor kSliderProgressColor = kAccentColor;
+inline const QColor kSliderHandleColor(Qt::white);
+inline const QColor kSliderHandleBorderColor(kAccentColor.red(), kAccentColor.green(),
+                                             kAccentColor.blue(), 120);
+
+inline const QColor kTooltipBackgroundColor(20, 20, 20, 180);
+inline const QColor kTooltipTextColor = kTextColor;
+
+// ============================================================================
 // Metrics
 // ============================================================================
 
@@ -58,24 +71,6 @@ constexpr int kButtonIconSize = 24;
 constexpr int kControlRadius = 15;
 constexpr int kPopupRadius = 12;
 constexpr int kPanelRadius = 16;
-
-// ============================================================================
-// Sliders
-// ============================================================================
-
-constexpr int kSliderHeight = 82;
-constexpr int kTimelineSliderHeight = 82;
-constexpr int kVolumeSliderHeight = 48;
-
-constexpr int kSliderSideMargin = 16;
-constexpr int kSliderTopMargin = 16;
-constexpr int kSliderBottomMargin = 6;
-
-constexpr int kSliderGrooveHeight = 8;
-constexpr int kSliderGrooveHoverHeight = 11;
-
-constexpr int kSliderHandleRadius = 11;
-constexpr int kSliderHandleHoverRadius = 13;
 
 // ============================================================================
 // Layout
