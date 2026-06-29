@@ -50,11 +50,11 @@ public:
     void setVolume(int volume);
 
     /**
-     * @brief Show or hide widgets.
+     * @brief Enable or disable widgets.
      *
-     * @param visible Enable visibility.
+     * @param enabled Widget state.
      */
-    void setControlsVisible(bool visible);
+    void setControlsEnabled(bool enabled);
 
     /**
      * @brief Returns the volume button.

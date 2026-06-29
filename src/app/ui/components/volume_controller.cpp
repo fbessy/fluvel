@@ -101,10 +101,10 @@ void VolumeController::updateIcon()
     button_->setIcon(icon);
 }
 
-void VolumeController::setControlsVisible(bool visible)
+void VolumeController::setControlsEnabled(bool enabled)
 {
-    button_->setVisible(visible);
-    slider_->setVisible(visible);
+    button_->setEnabled(enabled);
+    slider_->setEnabled(enabled);
 }
 
 } // namespace fluvel

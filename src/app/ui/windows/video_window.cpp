@@ -371,7 +371,7 @@ void VideoWindow::createUi()
     mediaLayout->addWidget(playbackDurationLabel_);
     mediaLayout->addWidget(playbackSlider_, 1);
 
-    volumeButton_->setVisible(false);
+    volumeButton_->setEnabled(false);
     mediaControlsWidget_->setEnabled(false);
 }
 
@@ -411,7 +411,7 @@ void VideoWindow::setupView()
 
     fullscreenBar_->startStopButton()->setIcon(startIconLight_);
     fullscreenBar_->playPauseButton()->setIcon(resumeIconLight_);
-    fullscreenBar_->volumeController()->setControlsVisible(false);
+    fullscreenBar_->volumeController()->setControlsEnabled(false);
 
     setSeekControlsVisible(false);
 
@@ -1301,8 +1301,8 @@ void VideoWindow::onStreamingStopped()
     mediaInfo_ = {};
 
     setSeekControlsVisible(false);
-    volumeButton_->setVisible(false);
-    fullscreenBar_->volumeController()->setControlsVisible(false);
+    volumeButton_->setEnabled(false);
+    fullscreenBar_->volumeController()->setControlsEnabled(false);
 
     for (auto& state : deviceStreamingStatus_)
     {
@@ -1364,8 +1364,8 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
 
     setSeekControlsVisible(false);
 
-    volumeButton_->setVisible(false);
-    fullscreenBar_->volumeController()->setControlsVisible(false);
+    volumeButton_->setEnabled(false);
+    fullscreenBar_->volumeController()->setControlsEnabled(false);
 }
 
 bool VideoWindow::shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo)
@@ -1996,7 +1996,7 @@ void VideoWindow::updateMediaControls()
     playbackDurationLabel_->setVisible(hasSeek);
     playbackSlider_->setVisible(hasSeek);
 
-    volumeButton_->setVisible(hasAudio);
+    volumeButton_->setEnabled(hasAudio);
 
     mediaControlsWidget_->setEnabled(hasSeek || hasAudio);
 
@@ -2005,7 +2005,7 @@ void VideoWindow::updateMediaControls()
     fullscreenBar_->playbackSlider()->setVisible(hasSeek);
     fullscreenBar_->durationLabel()->setVisible(hasSeek);
 
-    fullscreenBar_->volumeController()->setControlsVisible(hasAudio);
+    fullscreenBar_->volumeController()->setControlsEnabled(hasAudio);
 
     bool isVisible = fullscreenBar_->isVisible();
 
@@ -2127,7 +2127,7 @@ void VideoWindow::updateFullscreenBar()
     //
 
     fullscreenBar_->cameraSelector()->setVisible(cameraMode);
-    fullscreenBar_->volumeController()->setControlsVisible(hasAudio);
+    fullscreenBar_->volumeController()->setControlsEnabled(hasAudio);
 
     //
     // Playback controls keep their place in the layout.
