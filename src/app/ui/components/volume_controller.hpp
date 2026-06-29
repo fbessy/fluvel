@@ -50,11 +50,24 @@ public:
     void setVolume(int volume);
 
     /**
-     * @brief Enable or disable widgets.
+     * @brief Enables or disables the volume controls.
      *
-     * @param enabled Widget state.
+     * Both the volume button and the slider are enabled or disabled
+     * simultaneously.
+     *
+     * @param enabled True to enable the controls, false to disable them.
      */
     void setControlsEnabled(bool enabled);
+
+    /**
+     * @brief Shows or hides the volume controls.
+     *
+     * Both the volume button and the slider are shown or hidden
+     * simultaneously.
+     *
+     * @param visible True to show the controls, false to hide them.
+     */
+    void setControlsVisible(bool visible);
 
     /**
      * @brief Returns the volume button.

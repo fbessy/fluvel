@@ -370,9 +370,6 @@ void VideoWindow::createUi()
     mediaLayout->addWidget(playbackSeparatorLabel_);
     mediaLayout->addWidget(playbackDurationLabel_);
     mediaLayout->addWidget(playbackSlider_, 1);
-
-    volumeButton_->setEnabled(false);
-    mediaControlsWidget_->setEnabled(false);
 }
 
 QIcon VideoWindow::createActiveFormatIcon()
@@ -412,8 +409,6 @@ void VideoWindow::setupView()
     fullscreenBar_->startStopButton()->setIcon(startIconLight_);
     fullscreenBar_->playPauseButton()->setIcon(resumeIconLight_);
     fullscreenBar_->volumeController()->setControlsEnabled(false);
-
-    setSeekControlsVisible(false);
 
     fullscreenOpacity_ = new QGraphicsOpacityEffect(fullscreenBar_);
     fullscreenOpacity_->setOpacity(0.0);
@@ -543,7 +538,8 @@ void VideoWindow::setupConnections()
                 saveLastSourceType();
 
                 refreshSourceUi();
-                updateActionBar();
+
+                refreshUi();
 
                 fullscreenBar_->adjustSize();
                 positionFullscreenBar();
@@ -1299,8 +1295,8 @@ void VideoWindow::onStreamingStopped()
 
     streamingInfo_ = {};
     mediaInfo_ = {};
+    updateDurationLabel();
 
-    setSeekControlsVisible(false);
     volumeButton_->setEnabled(false);
     fullscreenBar_->volumeController()->setControlsEnabled(false);
 
@@ -1361,8 +1357,6 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     QMessageBox::warning(this, tr("Media error"), message);
 
     refreshUi();
-
-    setSeekControlsVisible(false);
 
     volumeButton_->setEnabled(false);
     fullscreenBar_->volumeController()->setControlsEnabled(false);
@@ -1504,6 +1498,7 @@ void VideoWindow::refreshUi()
 
     updateDeviceList(videoController_->videoInputs());
     updateActionBar();
+    updateMediaBar();
     updateFullscreenBar();
 }
 
@@ -1833,29 +1828,6 @@ void VideoWindow::onPlaybackPositionChanged(qint64 pos)
     updateDurationLabel();
 }
 
-void VideoWindow::setSeekControlsVisible(bool visible)
-{
-    assert(playbackSlider_ && playbackPositionLabel_ && playbackDurationLabel_ && fullscreenBar_);
-
-    playPauseButton_->setVisible(visible);
-    playbackPositionLabel_->setVisible(visible);
-    playbackSeparatorLabel_->setVisible(visible);
-    playbackDurationLabel_->setVisible(visible);
-    playbackSlider_->setVisible(visible);
-
-    fullscreenBar_->playPauseButton()->setVisible(visible);
-    fullscreenBar_->positionLabel()->setVisible(visible);
-    fullscreenBar_->playbackSlider()->setVisible(visible);
-    fullscreenBar_->durationLabel()->setVisible(visible);
-
-    bool isVisible = fullscreenBar_->isVisible();
-
-    if (isVisible)
-    {
-        fullscreenBar_->show();
-    }
-}
-
 void VideoWindow::onMediaInfoChanged(const MediaInfo& info)
 {
     assert(playbackSlider_ && playbackDurationLabel_ && videoController_ && playPauseButton_ &&
@@ -1872,7 +1844,7 @@ void VideoWindow::onMediaInfoChanged(const MediaInfo& info)
 
     updatePlayPauseButton(videoController_->isPaused());
 
-    updateMediaControls();
+    refreshUi();
 
     updateWindowTitle();
 }
@@ -1985,36 +1957,6 @@ void VideoWindow::togglePause()
     }
 }
 
-void VideoWindow::updateMediaControls()
-{
-    const bool hasSeek = mediaInfo_.seekable;
-    const bool hasAudio = mediaInfo_.hasAudio;
-
-    playPauseButton_->setVisible(hasSeek);
-    playbackPositionLabel_->setVisible(hasSeek);
-    playbackSeparatorLabel_->setVisible(hasSeek);
-    playbackDurationLabel_->setVisible(hasSeek);
-    playbackSlider_->setVisible(hasSeek);
-
-    volumeButton_->setEnabled(hasAudio);
-
-    mediaControlsWidget_->setEnabled(hasSeek || hasAudio);
-
-    fullscreenBar_->playPauseButton()->setVisible(hasSeek);
-    fullscreenBar_->positionLabel()->setVisible(hasSeek);
-    fullscreenBar_->playbackSlider()->setVisible(hasSeek);
-    fullscreenBar_->durationLabel()->setVisible(hasSeek);
-
-    fullscreenBar_->volumeController()->setControlsEnabled(hasAudio);
-
-    bool isVisible = fullscreenBar_->isVisible();
-
-    if (isVisible)
-    {
-        fullscreenBar_->show();
-    }
-}
-
 void VideoWindow::toggleFullscreen()
 {
     if (!isFullScreen_)
@@ -2111,55 +2053,69 @@ void VideoWindow::onIdle()
     hideAnimation_->start();
 }
 
-void VideoWindow::updateFullscreenBar()
+void VideoWindow::updateMediaBar()
 {
-    // Source type selected by the user.
-    // Unlike streamingInfo_, this remains valid even when playback is stopped.
-    const bool cameraMode = (sourceConfig_.type == SourceType::Camera);
-    const bool mediaMode = (sourceConfig_.type == SourceType::Media);
+    const bool mediaMode =
+        streamingInfo_.source.type == SourceType::Media ||
+        (streamingInfo_.source.type == SourceType::None && sourceConfig_.type == SourceType::Media);
 
-    // Available media features.
     const bool hasSeek = mediaMode && mediaInfo_.seekable;
     const bool hasAudio = mediaMode && mediaInfo_.hasAudio;
 
-    //
-    // Widgets that only make sense for a specific source type.
-    //
+    // Media playback controls are only available for media sources.
+    playPauseButton_->setVisible(mediaMode);
+    playbackPositionLabel_->setVisible(mediaMode);
+    playbackSeparatorLabel_->setVisible(mediaMode);
+    playbackDurationLabel_->setVisible(mediaMode);
+    playbackSlider_->setVisible(mediaMode);
+    volumeButton_->setVisible(mediaMode);
 
+    // Seeking controls remain visible but are disabled when seeking
+    // is not supported by the current media.
+    playPauseButton_->setEnabled(hasSeek);
+    playbackPositionLabel_->setEnabled(hasSeek);
+    playbackSeparatorLabel_->setEnabled(hasSeek);
+    playbackDurationLabel_->setEnabled(hasSeek);
+    playbackSlider_->setEnabled(hasSeek);
+
+    // Volume controls remain visible for media sources but are disabled
+    // when the current media has no audio track.
+    volumeButton_->setEnabled(hasAudio);
+}
+
+void VideoWindow::updateFullscreenBar()
+{
+    const bool mediaMode =
+        streamingInfo_.source.type == SourceType::Media ||
+        (streamingInfo_.source.type == SourceType::None && sourceConfig_.type == SourceType::Media);
+
+    const bool cameraMode = streamingInfo_.source.type == SourceType::Camera ||
+                            (streamingInfo_.source.type == SourceType::None &&
+                             sourceConfig_.type == SourceType::Camera);
+
+    const bool hasSeek = mediaMode && mediaInfo_.seekable;
+    const bool hasAudio = mediaMode && mediaInfo_.hasAudio;
+
+    // Camera controls are only relevant for live camera sources.
     fullscreenBar_->cameraSelector()->setVisible(cameraMode);
-    fullscreenBar_->volumeController()->setControlsEnabled(hasAudio);
 
-    //
-    // Playback controls keep their place in the layout.
-    // They are disabled instead of being hidden to avoid layout jumps.
-    //
-
+    // Media playback controls are only available for media sources.
     fullscreenBar_->playPauseButton()->setVisible(mediaMode);
     fullscreenBar_->positionLabel()->setVisible(mediaMode);
     fullscreenBar_->durationLabel()->setVisible(mediaMode);
     fullscreenBar_->playbackSlider()->setVisible(mediaMode);
+    fullscreenBar_->volumeController()->setControlsVisible(mediaMode);
 
+    // Seeking controls remain visible but are disabled when seeking
+    // is not supported by the current media.
     fullscreenBar_->playPauseButton()->setEnabled(hasSeek);
     fullscreenBar_->positionLabel()->setEnabled(hasSeek);
     fullscreenBar_->durationLabel()->setEnabled(hasSeek);
     fullscreenBar_->playbackSlider()->setEnabled(hasSeek);
 
-    //
-    // Display controls are always available.
-    //
-
-    fullscreenBar_->mirrorButton()->setEnabled(true);
-    fullscreenBar_->smoothButton()->setEnabled(true);
-    fullscreenBar_->overlayButton()->setEnabled(true);
-}
-
-void VideoWindow::updateFullscreenLayout()
-{
-    updateFullscreenBar();
-
-    fullscreenBar_->adjustSize();
-
-    positionFullscreenBar();
+    // Volume controls remain visible for media sources but are disabled
+    // when the current media has no audio track.
+    fullscreenBar_->volumeController()->setControlsEnabled(hasAudio);
 }
 
 } // namespace fluvel

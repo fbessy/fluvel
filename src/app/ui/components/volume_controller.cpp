@@ -107,4 +107,10 @@ void VolumeController::setControlsEnabled(bool enabled)
     slider_->setEnabled(enabled);
 }
 
+void VolumeController::setControlsVisible(bool visible)
+{
+    button_->setVisible(visible);
+    slider_->setVisible(visible);
+}
+
 } // namespace fluvel

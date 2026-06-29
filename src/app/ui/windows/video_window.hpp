@@ -274,10 +274,9 @@ private:
     QString buildSourceTitle() const;
     void appendStreamingInfo(QString& title, const StreamingInfo& info) const;
 
-    void updateMediaControls();
+    void updateMediaBar();
 
     void onPlaybackPositionChanged(qint64 pos);
-    void setSeekControlsVisible(bool visible);
 
     void updatePlayPauseButton(bool paused);
     void togglePause();
@@ -292,14 +291,12 @@ private:
     void leaveFullscreen();
 
     void positionFullscreenBar();
-    // void updateButtons(const ControlTheme& theme, WorkerState state);
     void onActivityDetected(const QPoint& pos);
     void onIdle();
 
     void toggleTimeDisplayMode();
     void updateDurationLabel();
     void updateFullscreenBar();
-    void updateFullscreenLayout();
 
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
