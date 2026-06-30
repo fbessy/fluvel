@@ -21,6 +21,7 @@ inline const QColor kAccentHoverColor = kAccentColor.lighter(110);
 
 inline const QColor kTextColor(Qt::white);
 inline const QColor kDisabledTextColor(255, 255, 255, 70);
+inline const QColor kPopupBorderColor(60, 60, 60);
 
 // ============================================================================
 // Panel colors

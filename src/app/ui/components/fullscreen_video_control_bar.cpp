@@ -4,6 +4,7 @@
 
 #include "clickable_label.hpp"
 #include "icon_loader.hpp"
+#include "qcolor_utils.hpp"
 #include "timeline_slider.hpp"
 #include "ui_theme.hpp"
 #include "volume_controller.hpp"
@@ -33,33 +34,32 @@ FullscreenVideoControlBar::FullscreenVideoControlBar(QWidget* parent)
 }
 )");
 
-    setStyleSheet(R"(
+    setStyleSheet(QString(R"(
 QLabel {
-    color: white;
-}
-QComboBox {
-    min-width: 220px;
+    color: %1;
 }
 
 QLabel:disabled {
-    color: rgba(255,255,255,70);
+    color: %2;
 }
 
 QComboBox {
-    color: white;
-    background-color: rgba(255,255,255,20);
-    border: 1px solid rgba(255,255,255,35);
+    min-width: 220px;
+
+    color: %1;
+    background-color: %3;
+    border: 1px solid %4;
     border-radius: 15px;
     padding: 4px 28px 4px 10px;
     min-height: 30px;
 }
 
 QComboBox:hover {
-    background-color: rgba(255,255,255,30);
+    background-color: %5;
 }
 
 QComboBox:focus {
-    border: 1px solid #8B5CF6;
+    border: 1px solid %6;
 }
 
 QComboBox::drop-down {
@@ -72,25 +72,24 @@ QComboBox::down-arrow {
 }
 
 QComboBox QAbstractItemView {
-    background: rgb(32,36,42);
-    color: white;
-    border: 1px solid rgb(60,60,60);
+    background: %7;
+    color: %1;
+    border: 1px solid %10;
     border-radius: 12px;
-    selection-background-color: rgba(255,255,255,25);
+    selection-background-color: %8;
     outline: 0;
 }
 
 QComboBox QAbstractItemView::viewport {
-    background: rgb(32,36,42);
+    background: %7;
 }
 
-
 QComboBox QAbstractItemView::item:selected {
-    background-color: rgba(255,255,255,25);
+    background-color: %8;
 }
 
 QComboBox QAbstractItemView::item:hover {
-    background-color: rgba(255,255,255,15);
+    background-color: %9;
 }
 
 QScrollBar:vertical {
@@ -100,7 +99,17 @@ QScrollBar:vertical {
 QScrollBar:horizontal {
     height: 0px;
 }
-)");
+)")
+                      .arg(qcolor_utils::rgba(ui::kTextColor))
+                      .arg(qcolor_utils::rgba(ui::kDisabledTextColor))
+                      .arg(qcolor_utils::rgba(ui::kControlBackground))
+                      .arg(qcolor_utils::rgba(ui::kControlBorder))
+                      .arg(qcolor_utils::rgba(ui::kControlHover))
+                      .arg(qcolor_utils::rgba(ui::kAccentColor))
+                      .arg(qcolor_utils::rgba(ui::kPanelBackground))
+                      .arg(qcolor_utils::rgba(ui::kSelectionBackground))
+                      .arg(qcolor_utils::rgba(ui::kSelectionHover))
+                      .arg(qcolor_utils::rgba(ui::kPopupBorderColor)));
 
     cameraSelector_ = new QComboBox(this);
     cameraSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
