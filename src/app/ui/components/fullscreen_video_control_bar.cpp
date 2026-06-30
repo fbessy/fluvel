@@ -165,50 +165,32 @@ QScrollBar:horizontal {
     playbackSlider_->setMaximumWidth(520);
     playbackSlider_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    auto* transportLayout = new QHBoxLayout;
-    transportLayout->setContentsMargins(0, 0, 0, 0);
-    transportLayout->setSpacing(6);
-
-    transportLayout->addWidget(cameraSelector_);
-    transportLayout->addWidget(startStopButton_);
-    transportLayout->addWidget(volumeController_->button());
-    transportLayout->addWidget(playPauseButton_);
-
-    auto* mediaLayout = new QVBoxLayout;
-    mediaLayout->setContentsMargins(0, 0, 0, 0);
-    mediaLayout->setSpacing(2);
-
-    mediaLayout->addWidget(volumeController_->slider());
-    mediaLayout->addLayout(transportLayout);
+    auto* volumeLayout = new QHBoxLayout;
+    volumeLayout->setSpacing(2);
+    volumeLayout->addWidget(volumeController_->button());
+    volumeLayout->addWidget(volumeController_->slider());
 
     auto* topLayout = new QHBoxLayout;
-    topLayout->setSpacing(6);
+    topLayout->setSpacing(ui::kControlSpacing);
 
     topLayout->addWidget(cameraSelector_);
     topLayout->addWidget(startStopButton_);
-
-    topLayout->addSpacing(8);
-
     topLayout->addWidget(playPauseButton_);
-
-    topLayout->addSpacing(8);
-
-    topLayout->addWidget(volumeController_->button());
-    topLayout->addWidget(volumeController_->slider());
+    topLayout->addLayout(volumeLayout);
 
     topLayout->addWidget(mirrorButton_);
     topLayout->addWidget(smoothButton_);
     topLayout->addWidget(overlayButton_);
 
     auto* bottomLayout = new QHBoxLayout;
-    bottomLayout->setSpacing(6);
+    bottomLayout->setSpacing(ui::kControlSpacing);
 
     bottomLayout->addWidget(positionLabel_);
     bottomLayout->addWidget(playbackSlider_, 1);
     bottomLayout->addWidget(durationLabel_);
 
     auto* layout = new QVBoxLayout;
-    layout->setContentsMargins(18, 10, 18, 10);
+    layout->setContentsMargins(18, 8, 18, 8);
     layout->setSpacing(0);
 
     layout->addLayout(topLayout);
