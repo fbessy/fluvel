@@ -143,6 +143,9 @@ set(app_src
     ${UI_COMP_DIR}/ui_theme.hpp
     ${UI_COMP_DIR}/slider_style.hpp
 
+    ${UI_COMP_DIR}/animated_icon.cpp
+    ${UI_COMP_DIR}/animated_icon.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 

@@ -7,15 +7,6 @@
 
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
-#include <QtMath>
-
-namespace
-{
-
-constexpr int kFlipDurationMs = 220;
-constexpr qreal kFlipAngle = 80.0;
-
-} // namespace
 
 namespace fluvel
 {
@@ -23,6 +14,7 @@ namespace fluvel
 StyledToolButton::StyledToolButton(QWidget* parent, ui::Appearance appearance)
     : QToolButton(parent)
     , appearance_(appearance)
+    , animatedIcon_(this)
 {
     updateStyle();
 
@@ -120,125 +112,14 @@ void StyledToolButton::paintEvent(QPaintEvent*)
 
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
 
-    const QPointF center(width() / 2.0, height() / 2.0);
-
-    // Draw one icon of the animated transition.
-    // The 3D flip illusion is produced by combining
-    // a slight rotation with a horizontal compression.
-    auto drawIcon = [&](const QIcon& icon, qreal opacity, qreal angle)
-    {
-        if (icon.isNull() || opacity <= 0.0)
-            return;
-
-        const QPixmap pixmap = icon.pixmap(iconSize());
-
-        const qreal sx = std::abs(std::cos(qDegreesToRadians(angle)));
-
-        painter.save();
-
-        painter.translate(center);
-
-        painter.rotate(angle);
-
-        painter.scale(sx, 1.0);
-
-        painter.setOpacity(opacity);
-
-        painter.translate(-pixmap.width() / 2.0, -pixmap.height() / 2.0);
-
-        painter.drawPixmap(QPointF(), pixmap);
-
-        painter.restore();
-    };
-
-    if (currentIcon_.isNull())
-    {
-        drawIcon(icon(), 1.0, 0.0);
-        return;
-    }
-
-    const qreal p = transitionProgress_;
-
-    const qreal angle = transitionDirection_ * kFlipAngle * std::sin(p * M_PI);
-
-    drawIcon(currentIcon_, 1.0 - p, angle);
-
-    drawIcon(nextIcon_, p, -angle);
+    animatedIcon_.paint(painter, rect(), iconSize(), icon());
 }
 
-void StyledToolButton::setAnimatedIcon(const QIcon& icon, FlipDirection direction)
+void StyledToolButton::setAnimatedIcon(const QIcon& icon, AnimatedIcon::FlipDirection direction)
 {
-    const QIcon current = this->icon();
+    animatedIcon_.setAnimatedIcon(this->icon(), icon, direction);
 
-    if (icon.cacheKey() == current.cacheKey())
-        return;
-
-    currentIcon_ = current;
-    nextIcon_ = icon;
-
-    updateTransitionDirection(direction);
-
-    if (transitionAnimation_)
-    {
-        transitionAnimation_->stop();
-        transitionProgress_ = 0.0;
-    }
-
-    transitionAnimation_ = new QPropertyAnimation(this, "transitionProgress");
-
-    transitionAnimation_->setDuration(kFlipDurationMs);
-    transitionAnimation_->setStartValue(0.0);
-    transitionAnimation_->setEndValue(1.0);
-    transitionAnimation_->setEasingCurve(QEasingCurve::InOutSine);
-
-    connect(transitionAnimation_, &QPropertyAnimation::finished, this,
-            [this]()
-            {
-                setIcon(nextIcon_);
-
-                currentIcon_ = {};
-                nextIcon_ = {};
-
-                transitionProgress_ = 0.0;
-
-                transitionAnimation_ = nullptr;
-
-                update();
-            });
-
-    transitionAnimation_->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-qreal StyledToolButton::transitionProgress() const
-{
-    return transitionProgress_;
-}
-
-void StyledToolButton::setTransitionProgress(qreal progress)
-{
-    if (qFuzzyCompare(progress, transitionProgress_))
-        return;
-
-    transitionProgress_ = progress;
-    update();
-}
-
-void StyledToolButton::updateTransitionDirection(FlipDirection direction)
-{
-    switch (direction)
-    {
-        case FlipDirection::Left:
-            transitionDirection_ = -1.0;
-            break;
-
-        case FlipDirection::Right:
-            transitionDirection_ = 1.0;
-            break;
-
-        case FlipDirection::Auto:
-            transitionDirection_ *= -1.0;
-            break;
-    }
+    setIcon(icon);
 }
 
 } // namespace fluvel

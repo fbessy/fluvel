@@ -3,10 +3,9 @@
 
 #pragma once
 
+#include "animated_icon.hpp"
 #include "ui_appearance.hpp"
 
-#include <QPointer>
-#include <QPropertyAnimation>
 #include <QToolButton>
 
 namespace fluvel
@@ -21,22 +20,6 @@ namespace fluvel
 class StyledToolButton : public QToolButton
 {
     Q_OBJECT
-    Q_PROPERTY(qreal transitionProgress READ transitionProgress WRITE setTransitionProgress)
-
-    /**
-     * @brief Direction of the icon flip animation.
-     */
-    enum class FlipDirection
-    {
-        /// Alternate the flip direction automatically.
-        Auto,
-
-        /// Always flip to the left.
-        Left,
-
-        /// Always flip to the right.
-        Right
-    };
 
 public:
     /**
@@ -67,38 +50,24 @@ public:
      * @param icon Target icon.
      * @param direction Flip direction.
      */
-    void setAnimatedIcon(const QIcon& icon, FlipDirection direction = FlipDirection::Auto);
+    void setAnimatedIcon(const QIcon& icon,
+                         AnimatedIcon::FlipDirection direction = AnimatedIcon::FlipDirection::Auto);
 
 protected:
     /**
      * @brief Draws the styled button.
      *
-     * The button itself is rendered using the current Qt style,
-     * while the icon is drawn manually to support animated
-     * transitions between icons.
+     * The button frame is rendered using the current Qt style,
+     * while icon rendering is delegated to AnimatedIcon to support
+     * animated transitions.
      */
     void paintEvent(QPaintEvent*) override;
 
 private:
     void updateStyle();
-    qreal transitionProgress() const;
-    void setTransitionProgress(qreal progress);
-
-    /**
-     * @brief Updates the direction of the next flip animation.
-     *
-     * @param direction Requested flip direction.
-     */
-    void updateTransitionDirection(FlipDirection direction);
 
     ui::Appearance appearance_;
-
-    QIcon currentIcon_;
-    QIcon nextIcon_;
-
-    qreal transitionProgress_{0.0};
-    qreal transitionDirection_{-1.0};
-    QPointer<QPropertyAnimation> transitionAnimation_;
+    AnimatedIcon animatedIcon_;
 };
 
 } // namespace fluvel
