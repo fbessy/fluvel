@@ -44,8 +44,6 @@ QLabel:disabled {
 }
 
 QComboBox {
-    min-width: 220px;
-
     color: %1;
     background-color: %3;
     border: 1px solid %4;
@@ -112,7 +110,9 @@ QScrollBar:horizontal {
                       .arg(qcolor_utils::rgba(ui::kPopupBorderColor)));
 
     cameraSelector_ = new QComboBox(this);
+    static constexpr int kCameraIconSize{13};
     cameraSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cameraSelector_->setIconSize(QSize(kCameraIconSize, kCameraIconSize));
 
     auto* view = new QListView(cameraSelector_);
     view->setFrameShape(QFrame::NoFrame);
