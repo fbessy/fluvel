@@ -741,8 +741,14 @@ void VideoWindow::setupConnections()
                 videoController_->seek(value);
             });
 
-    connect(fullscreenBar_->cameraSelector(), &QComboBox::currentIndexChanged, deviceSelector_,
-            &QComboBox::setCurrentIndex);
+    connect(fullscreenBar_->cameraSelector(), &QComboBox::currentIndexChanged, this,
+            [this](int index)
+            {
+                deviceSelector_->setCurrentIndex(index);
+
+                if (hasPendingConfiguration())
+                    onApplySelection();
+            });
 
     connect(deviceSelector_, &QComboBox::currentIndexChanged, fullscreenBar_->cameraSelector(),
             &QComboBox::setCurrentIndex);
