@@ -1995,7 +1995,7 @@ void VideoWindow::leaveFullscreen()
 
 void VideoWindow::positionFullscreenBar()
 {
-    constexpr int kBottomMargin = 12;
+    constexpr int kBottomMargin = 16;
 
     fullscreenBar_->adjustSize();
 
