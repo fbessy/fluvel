@@ -67,7 +67,7 @@ inline const QColor kTooltipTextColor = kTextColor;
 // ============================================================================
 
 constexpr int kButtonSize = 34;
-constexpr int kButtonIconSize = 24;
+constexpr int kButtonIconSize = 22;
 
 constexpr int kControlRadius = 15;
 constexpr int kPopupRadius = 12;
