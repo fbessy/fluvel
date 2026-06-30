@@ -3,8 +3,8 @@
      viewBox="0 0 22 22">
     <path
         fill="currentColor"
-        d="m3 3
-        v16
-        l16-8
+        d="m4 3
+        v19
+        l18-11
         z"/>
     </svg>
