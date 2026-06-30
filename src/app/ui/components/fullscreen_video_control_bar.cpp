@@ -77,7 +77,13 @@ QComboBox QAbstractItemView {
     border: 1px solid rgb(60,60,60);
     border-radius: 12px;
     selection-background-color: rgba(255,255,255,25);
+    outline: 0;
 }
+
+QComboBox QAbstractItemView::viewport {
+    background: rgb(32,36,42);
+}
+
 
 QComboBox QAbstractItemView::item:selected {
     background-color: rgba(255,255,255,25);
@@ -101,6 +107,7 @@ QScrollBar:horizontal {
 
     auto* view = new QListView(cameraSelector_);
     view->setFrameShape(QFrame::NoFrame);
+    view->viewport()->setAutoFillBackground(false);
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     cameraSelector_->setView(view);
