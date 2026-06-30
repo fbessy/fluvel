@@ -96,7 +96,8 @@ QScrollBar:horizontal {
 }
 )");
 
-    cameraSelector_ = new QComboBox;
+    cameraSelector_ = new QComboBox(this);
+    cameraSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     auto* view = new QListView(cameraSelector_);
     view->setFrameShape(QFrame::NoFrame);
