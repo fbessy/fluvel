@@ -28,6 +28,7 @@
 #include "volume_controller.hpp"
 #include "volume_slider.hpp"
 
+#include <QAbstractItemView>
 #include <QCameraDevice>
 #include <QComboBox>
 #include <QCompleter>
@@ -2040,6 +2041,9 @@ void VideoWindow::onIdle()
         return;
 
     if (fullscreenBar_->underMouse())
+        return;
+
+    if (fullscreenBar_->cameraSelector()->view()->isVisible())
         return;
 
     showAnimation_->stop();
