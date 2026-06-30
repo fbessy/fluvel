@@ -120,7 +120,7 @@ void StyledToolButton::paintEvent(QPaintEvent*)
 
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
 
-    const QPointF center = rect().center();
+    const QPointF center(width() / 2.0, height() / 2.0);
 
     // Draw one icon of the animated transition.
     // The 3D flip illusion is produced by combining
