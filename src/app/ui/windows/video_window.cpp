@@ -540,9 +540,6 @@ void VideoWindow::setupConnections()
                 refreshSourceUi();
 
                 refreshUi();
-
-                fullscreenBar_->adjustSize();
-                positionFullscreenBar();
             });
 
     connect(deviceSelector_, &QComboBox::currentIndexChanged, this, &VideoWindow::onDeviceChanged);
@@ -2023,8 +2020,6 @@ void VideoWindow::onActivityDetected(const QPoint& pos)
 
     if (!inBottomZone)
         return;
-
-    fullscreenBar_->adjustSize();
 
     positionFullscreenBar();
 

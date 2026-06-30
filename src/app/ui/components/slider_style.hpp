@@ -13,11 +13,11 @@ namespace fluvel
 // Default timeline slider metrics
 // ============================================================================
 
-constexpr int kSliderHeight = 82;
+constexpr int kSliderHeight = 64;
 
 constexpr int kSliderSideMargin = 16;
-constexpr int kSliderTopMargin = 16;
-constexpr int kSliderBottomMargin = 6;
+constexpr int kSliderTopMargin = 0;
+constexpr int kSliderBottomMargin = 0;
 
 constexpr int kSliderGrooveHeight = 8;
 constexpr int kSliderGrooveHoverHeight = 11;
@@ -26,10 +26,10 @@ constexpr int kSliderHandleRadius = 11;
 constexpr int kSliderHandleHoverRadius = 13;
 
 constexpr int kSliderHoverFontPointSize = 10;
-constexpr int kSliderHoverBubbleRadius = 8;
-constexpr int kSliderHoverBubbleOffset = 22;
+constexpr int kSliderHoverBubbleRadius = 6;
+constexpr int kSliderHoverBubbleOffset = 16;
 
-inline const QMargins kSliderHoverBubbleMargins{10, 4, 10, 4};
+inline const QMargins kSliderHoverBubbleMargins{6, 2, 6, 2};
 
 // ============================================================================
 // Volume slider metrics

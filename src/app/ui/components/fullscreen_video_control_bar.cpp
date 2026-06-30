@@ -148,24 +148,6 @@ QScrollBar:horizontal {
     playbackSlider_->setMaximumWidth(520);
     playbackSlider_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-    QWidget* widgets[] = {startStopButton_,
-                          playPauseButton_,
-                          volumeController_->button(),
-                          volumeController_->slider(),
-                          positionLabel_,
-                          playbackSlider_,
-                          durationLabel_,
-                          mirrorButton_,
-                          smoothButton_,
-                          overlayButton_};
-
-    for (QWidget* widget : widgets)
-    {
-        auto sp = widget->sizePolicy();
-        sp.setRetainSizeWhenHidden(true);
-        widget->setSizePolicy(sp);
-    }
-
     auto* transportLayout = new QHBoxLayout;
     transportLayout->setContentsMargins(0, 0, 0, 0);
     transportLayout->setSpacing(6);
@@ -182,38 +164,44 @@ QScrollBar:horizontal {
     mediaLayout->addWidget(volumeController_->slider());
     mediaLayout->addLayout(transportLayout);
 
-    auto* leftLayout = new QHBoxLayout;
-    leftLayout->setContentsMargins(0, 0, 0, 0);
-    leftLayout->setSpacing(6);
-    leftLayout->addLayout(mediaLayout);
+    auto* topLayout = new QHBoxLayout;
+    topLayout->setSpacing(6);
 
-    auto* centerLayout = new QHBoxLayout;
-    centerLayout->setSpacing(6);
+    topLayout->addWidget(cameraSelector_);
+    topLayout->addWidget(startStopButton_);
 
-    centerLayout->addWidget(positionLabel_);
-    centerLayout->addWidget(playbackSlider_, 1);
-    centerLayout->addWidget(durationLabel_);
+    topLayout->addSpacing(8);
 
-    auto* rightLayout = new QHBoxLayout;
-    rightLayout->setSpacing(6);
+    topLayout->addWidget(playPauseButton_);
 
-    rightLayout->addWidget(mirrorButton_);
-    rightLayout->addWidget(smoothButton_);
-    rightLayout->addWidget(overlayButton_);
+    topLayout->addSpacing(8);
 
-    auto* layout = new QHBoxLayout;
+    topLayout->addWidget(volumeController_->button());
+    topLayout->addWidget(volumeController_->slider());
+
+    topLayout->addWidget(mirrorButton_);
+    topLayout->addWidget(smoothButton_);
+    topLayout->addWidget(overlayButton_);
+
+    auto* bottomLayout = new QHBoxLayout;
+    bottomLayout->setSpacing(6);
+
+    bottomLayout->addWidget(positionLabel_);
+    bottomLayout->addWidget(playbackSlider_, 1);
+    bottomLayout->addWidget(durationLabel_);
+
+    auto* layout = new QVBoxLayout;
     layout->setContentsMargins(18, 10, 18, 10);
-    layout->setSpacing(14);
+    layout->setSpacing(0);
 
-    layout->addLayout(leftLayout);
-    layout->addLayout(centerLayout, 1);
-    layout->addLayout(rightLayout);
+    layout->addLayout(topLayout);
+    layout->addLayout(bottomLayout);
 
     background->setLayout(layout);
 
     auto* root = new QHBoxLayout(this);
     root->setContentsMargins(0, 0, 0, 0);
-    root->addWidget(background);
+    root->addWidget(background, 0, Qt::AlignCenter);
 }
 
 QComboBox* FullscreenVideoControlBar::cameraSelector() const
