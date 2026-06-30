@@ -1470,7 +1470,7 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Start"));
             toggleStreamingButton_->setToolTip(tr("Start selected source."));
             toggleStreamingButton_->setIcon(startIcon_);
-            fullscreenBar_->startStopButton()->setIcon(startIconLight_);
+            fullscreenBar_->startStopButton()->setAnimatedIcon(startIconLight_);
             break;
 
         case StreamingState::Streaming:
@@ -1478,7 +1478,6 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Stop"));
             toggleStreamingButton_->setToolTip(tr("Stop active source."));
             toggleStreamingButton_->setIcon(stopIcon_);
-            fullscreenBar_->startStopButton()->setIcon(stopIconLight_);
             break;
 
         case StreamingState::Starting:
@@ -1486,7 +1485,7 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Starting..."));
             toggleStreamingButton_->setToolTip(tr("Camera startup in progress."));
             toggleStreamingButton_->setIcon(QIcon());
-            fullscreenBar_->startStopButton()->setIcon(stopIconLight_);
+            fullscreenBar_->startStopButton()->setAnimatedIcon(stopIconLight_);
             break;
     }
 }
@@ -1946,7 +1945,7 @@ void VideoWindow::updatePlayPauseButton(bool paused)
 {
     playPauseButton_->setIcon(paused ? resumeIcon_ : pauseIcon_);
 
-    fullscreenBar_->playPauseButton()->setIcon(paused ? resumeIconLight_ : pauseIconLight_);
+    fullscreenBar_->playPauseButton()->setAnimatedIcon(paused ? resumeIconLight_ : pauseIconLight_);
 }
 
 void VideoWindow::togglePause()
