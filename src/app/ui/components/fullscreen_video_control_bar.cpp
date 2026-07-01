@@ -122,7 +122,11 @@ QScrollBar:horizontal {
     cameraSelector_->setView(view);
 
     startStopButton_ = new StyledToolButton(this, ui::Appearance::Modern);
+    startStopButton_->setTransitionEffect(StyledToolButton::TransitionEffect::Slide);
+
     playPauseButton_ = new StyledToolButton(this, ui::Appearance::Modern);
+    playPauseButton_->setTransitionEffect(StyledToolButton::TransitionEffect::Flip);
+
     volumeController_ = new VolumeController(this, ui::Appearance::Modern);
 
     mirrorButton_ = new StyledToolButton(this, ui::Appearance::Modern);

@@ -42,6 +42,11 @@ void StyledToolButton::setAppearance(ui::Appearance appearance)
     updateStyle();
 }
 
+void StyledToolButton::setTransitionEffect(TransitionEffect effect)
+{
+    animatedIcon_.setTransitionEffect(effect);
+}
+
 void StyledToolButton::updateStyle()
 {
     if (appearance_ == ui::Appearance::Native)
@@ -115,11 +120,16 @@ void StyledToolButton::paintEvent(QPaintEvent*)
     animatedIcon_.paint(painter, rect(), iconSize(), icon());
 }
 
-void StyledToolButton::setAnimatedIcon(const QIcon& icon, AnimatedIcon::FlipDirection direction)
+void StyledToolButton::setAnimatedIcon(const QIcon& icon, TransitionDirection direction)
 {
     animatedIcon_.setAnimatedIcon(this->icon(), icon, direction);
 
     setIcon(icon);
+}
+
+AnimatedIcon::TransitionEffect StyledToolButton::transitionEffect() const
+{
+    return animatedIcon_.transitionEffect();
 }
 
 } // namespace fluvel

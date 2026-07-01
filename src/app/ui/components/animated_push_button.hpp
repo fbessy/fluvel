@@ -26,9 +26,14 @@ class AnimatedPushButton : public QPushButton
 
 public:
     /**
-     * @brief Alias for the icon flip direction.
+     * @brief Alias for the icon transition direction.
      */
-    using FlipDirection = AnimatedIcon::FlipDirection;
+    using TransitionDirection = AnimatedIcon::TransitionDirection;
+
+    /**
+     * @brief Alias for the icon transition effect.
+     */
+    using TransitionEffect = AnimatedIcon::TransitionEffect;
 
     /**
      * @brief Constructs an animated push button.
@@ -38,15 +43,28 @@ public:
     explicit AnimatedPushButton(QWidget* parent = nullptr);
 
     /**
+     * @brief Returns the current transition effect.
+     */
+    TransitionEffect transitionEffect() const;
+
+    /**
+     * @brief Sets the transition effect.
+     *
+     * @param effect New transition effect.
+     */
+    void setTransitionEffect(TransitionEffect effect);
+
+    /**
      * @brief Changes the button icon using an animated transition.
      *
-     * The current icon smoothly transitions to the new icon using
-     * a perspective-like flip animation combined with a cross-fade.
+     * The visual effect depends on the currently selected
+     * transition effect.
      *
      * @param icon Target icon.
-     * @param direction Flip direction.
+     * @param direction Transition direction.
      */
-    void setAnimatedIcon(const QIcon& icon, FlipDirection direction = FlipDirection::Auto);
+    void setAnimatedIcon(const QIcon& icon,
+                         TransitionDirection direction = TransitionDirection::Auto);
 
 protected:
     /**

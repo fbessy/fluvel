@@ -22,6 +22,9 @@ class StyledToolButton : public QToolButton
     Q_OBJECT
 
 public:
+    using TransitionEffect = AnimatedIcon::TransitionEffect;
+    using TransitionDirection = AnimatedIcon::TransitionDirection;
+
     /**
      * @brief Constructs a styled tool button.
      *
@@ -42,16 +45,28 @@ public:
     void setAppearance(ui::Appearance appearance);
 
     /**
-     * @brief Changes the button icon using an animated flip transition.
+     * @brief Returns the current transition effect.
+     */
+    TransitionEffect transitionEffect() const;
+
+    /**
+     * @brief Sets the transition effect.
      *
-     * The current icon smoothly transitions to the new icon using
-     * a perspective-like flip animation combined with a cross-fade.
+     * @param effect New transition effect.
+     */
+    void setTransitionEffect(TransitionEffect effect);
+
+    /**
+     * @brief Changes the button icon using an animated transition.
+     *
+     * The visual effect depends on the currently selected
+     * transition effect.
      *
      * @param icon Target icon.
-     * @param direction Flip direction.
+     * @param direction Transition direction.
      */
     void setAnimatedIcon(const QIcon& icon,
-                         AnimatedIcon::FlipDirection direction = AnimatedIcon::FlipDirection::Auto);
+                         TransitionDirection direction = TransitionDirection::Auto);
 
 protected:
     /**

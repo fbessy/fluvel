@@ -308,6 +308,7 @@ void VideoWindow::createUi()
         il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light);
 
     playPauseButton_ = new AnimatedPushButton;
+    playPauseButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Flip);
     playPauseButton_->setIcon(resumeIcon_);
 
     // --- Playback widgets ---

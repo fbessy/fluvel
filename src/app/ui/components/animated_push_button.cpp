@@ -29,11 +29,21 @@ void AnimatedPushButton::paintEvent(QPaintEvent*)
     animatedIcon_.paint(painter, rect(), iconSize(), icon());
 }
 
-void AnimatedPushButton::setAnimatedIcon(const QIcon& icon, FlipDirection direction)
+void AnimatedPushButton::setAnimatedIcon(const QIcon& icon, TransitionDirection direction)
 {
     animatedIcon_.setAnimatedIcon(this->icon(), icon, direction);
 
     setIcon(icon);
+}
+
+AnimatedPushButton::TransitionEffect AnimatedPushButton::transitionEffect() const
+{
+    return animatedIcon_.transitionEffect();
+}
+
+void AnimatedPushButton::setTransitionEffect(TransitionEffect effect)
+{
+    animatedIcon_.setTransitionEffect(effect);
 }
 
 } // namespace fluvel

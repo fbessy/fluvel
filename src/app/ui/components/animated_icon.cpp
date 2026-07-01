@@ -3,6 +3,7 @@
 
 #include "animated_icon.hpp"
 
+#include <QEasingCurve>
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QWidget>
@@ -28,37 +29,26 @@ AnimatedIcon::AnimatedIcon(QWidget* owner)
 void AnimatedIcon::paint(QPainter& painter, const QRect& rect, const QSize& iconSize,
                          const QIcon& defaultIcon) const
 {
-    const QPointF center(rect.width() / 2.0, rect.height() / 2.0);
-
-    auto drawIcon = [&](const QIcon& icon, qreal opacity, qreal angle)
+    switch (transitionEffect_)
     {
-        if (icon.isNull() || opacity <= 0.0)
-            return;
+        case TransitionEffect::Flip:
+            paintFlip(painter, rect, iconSize, defaultIcon);
+            break;
 
-        const QPixmap pixmap = icon.pixmap(iconSize);
+        case TransitionEffect::Slide:
+            paintSlide(painter, rect, iconSize, defaultIcon);
+            break;
+    }
+}
 
-        const qreal sx = std::abs(std::cos(qDegreesToRadians(angle)));
-
-        painter.save();
-
-        painter.translate(center);
-
-        painter.rotate(angle);
-
-        painter.scale(sx, 1.0);
-
-        painter.setOpacity(opacity);
-
-        painter.translate(-pixmap.width() / 2.0, -pixmap.height() / 2.0);
-
-        painter.drawPixmap(QPointF(), pixmap);
-
-        painter.restore();
-    };
+void AnimatedIcon::paintFlip(QPainter& painter, const QRect& rect, const QSize& iconSize,
+                             const QIcon& defaultIcon) const
+{
+    const QPointF center = rectCenter(rect);
 
     if (currentIcon_.isNull())
     {
-        drawIcon(defaultIcon, 1.0, 0.0);
+        drawIcon(painter, center, iconSize, defaultIcon, 1.0, 0.0, 0.0, 1.0);
         return;
     }
 
@@ -66,12 +56,78 @@ void AnimatedIcon::paint(QPainter& painter, const QRect& rect, const QSize& icon
 
     const qreal angle = transitionDirection_ * kFlipAngle * std::sin(p * M_PI);
 
-    drawIcon(currentIcon_, 1.0 - p, angle);
+    drawIcon(painter, center, iconSize, currentIcon_, 1.0 - p, angle, 0.0, 1.0);
 
-    drawIcon(nextIcon_, p, -angle);
+    drawIcon(painter, center, iconSize, nextIcon_, p, -angle, 0.0, 1.0);
 }
 
-void AnimatedIcon::setAnimatedIcon(const QIcon& current, const QIcon& next, FlipDirection direction)
+void AnimatedIcon::paintSlide(QPainter& painter, const QRect& rect, const QSize& iconSize,
+                              const QIcon& defaultIcon) const
+{
+    const QPointF center = rectCenter(rect);
+
+    if (currentIcon_.isNull())
+    {
+        drawIcon(painter, center, iconSize, defaultIcon, 1.0, 0.0, 0.0, 1.0);
+        return;
+    }
+
+    const qreal p = transitionProgress_;
+
+    static const QEasingCurve easing(QEasingCurve::InOutCubic);
+
+    const qreal t = easing.valueForProgress(p);
+
+    constexpr qreal kSlideDistance = 10.0;
+    constexpr qreal kScaleMin = 0.90;
+
+    // Outgoing icon
+    drawIcon(painter, center, iconSize, currentIcon_, 1.0 - t, 0.0,
+             transitionDirection_ * kSlideDistance * t, 1.0 - (1.0 - kScaleMin) * t);
+
+    // Incoming icon
+    drawIcon(painter, center, iconSize, nextIcon_, t, 0.0,
+             -transitionDirection_ * kSlideDistance * (1.0 - t), kScaleMin + (1.0 - kScaleMin) * t);
+}
+
+void AnimatedIcon::drawIcon(QPainter& painter, const QPointF& center, const QSize& iconSize,
+                            const QIcon& icon, qreal opacity, qreal angle, qreal offsetX,
+                            qreal scale)
+{
+    if (icon.isNull() || opacity <= 0.0)
+        return;
+
+    const QPixmap pixmap = icon.pixmap(iconSize);
+
+    painter.save();
+
+    painter.translate(center);
+
+    if (angle != 0.0)
+    {
+        painter.rotate(angle);
+
+        const qreal sx = std::abs(std::cos(qDegreesToRadians(angle)));
+
+        painter.scale(sx, 1.0);
+    }
+
+    // scale indépendant de l'effet Flip
+    painter.scale(scale, scale);
+
+    painter.setOpacity(opacity);
+
+    painter.translate(offsetX, 0.0);
+
+    painter.translate(-pixmap.width() / 2.0, -pixmap.height() / 2.0);
+
+    painter.drawPixmap(QPointF(), pixmap);
+
+    painter.restore();
+}
+
+void AnimatedIcon::setAnimatedIcon(const QIcon& current, const QIcon& next,
+                                   TransitionDirection direction)
 {
     if (current.cacheKey() == next.cacheKey())
         return;
@@ -133,22 +189,37 @@ void AnimatedIcon::setTransitionProgress(qreal progress)
         owner_->update();
 }
 
-void AnimatedIcon::updateTransitionDirection(FlipDirection direction)
+void AnimatedIcon::updateTransitionDirection(TransitionDirection direction)
 {
     switch (direction)
     {
-        case FlipDirection::Left:
+        case TransitionDirection::Left:
             transitionDirection_ = -1.0;
             break;
 
-        case FlipDirection::Right:
+        case TransitionDirection::Right:
             transitionDirection_ = 1.0;
             break;
 
-        case FlipDirection::Auto:
+        case TransitionDirection::Auto:
             transitionDirection_ *= -1.0;
             break;
     }
+}
+
+AnimatedIcon::TransitionEffect AnimatedIcon::transitionEffect() const
+{
+    return transitionEffect_;
+}
+
+void AnimatedIcon::setTransitionEffect(TransitionEffect effect)
+{
+    transitionEffect_ = effect;
+}
+
+QPointF AnimatedIcon::rectCenter(const QRect& rect)
+{
+    return QPointF(rect.width() / 2.0, rect.height() / 2.0);
 }
 
 } // namespace fluvel

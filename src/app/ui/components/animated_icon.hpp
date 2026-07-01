@@ -33,17 +33,29 @@ class AnimatedIcon : public QObject
 
 public:
     /**
-     * @brief Direction of the flip animation.
+     * @brief Visual effect used for icon transitions.
      */
-    enum class FlipDirection
+    enum class TransitionEffect
     {
-        /// Alternate the flip direction automatically.
+        /// Perspective-like flip animation.
+        Flip,
+
+        /// Horizontal slide animation.
+        Slide
+    };
+
+    /**
+     * @brief Direction of the transition animation.
+     */
+    enum class TransitionDirection
+    {
+        /// Alternate the transition direction automatically.
         Auto,
 
-        /// Always flip to the left.
+        /// Always animate toward the left.
         Left,
 
-        /// Always flip to the right.
+        /// Always animate toward the right.
         Right
     };
 
@@ -53,6 +65,18 @@ public:
      * @param owner Widget updated while the animation is running.
      */
     explicit AnimatedIcon(QWidget* owner);
+
+    /**
+     * @brief Returns the current transition effect.
+     */
+    TransitionEffect transitionEffect() const;
+
+    /**
+     * @brief Sets the transition effect.
+     *
+     * @param effect New transition effect.
+     */
+    void setTransitionEffect(TransitionEffect effect);
 
     /**
      * @brief Draws the current icon or the animated transition.
@@ -74,10 +98,10 @@ public:
      *
      * @param current Currently displayed icon.
      * @param next Target icon.
-     * @param direction Flip direction.
+     * @param direction Transition direction.
      */
     void setAnimatedIcon(const QIcon& current, const QIcon& next,
-                         FlipDirection direction = FlipDirection::Auto);
+                         TransitionDirection direction = TransitionDirection::Auto);
 
     /**
      * @brief Returns whether a transition is currently running.
@@ -101,13 +125,28 @@ private:
     void setTransitionProgress(qreal progress);
 
     /**
-     * @brief Updates the flip direction.
-     *
-     * @param direction Requested flip direction.
+     * @brief Updates the transition direction.
      */
-    void updateTransitionDirection(FlipDirection direction);
+    void updateTransitionDirection(TransitionDirection direction);
 
 private:
+    /**
+     * @brief Paints the flip transition.
+     */
+    void paintFlip(QPainter& painter, const QRect& rect, const QSize& iconSize,
+                   const QIcon& defaultIcon) const;
+
+    /**
+     * @brief Paints the slide transition.
+     */
+    void paintSlide(QPainter& painter, const QRect& rect, const QSize& iconSize,
+                    const QIcon& defaultIcon) const;
+
+    static void drawIcon(QPainter& painter, const QPointF& center, const QSize& iconSize,
+                         const QIcon& icon, qreal opacity, qreal angle, qreal offsetX, qreal scale);
+
+    static QPointF rectCenter(const QRect& rect);
+
     /// Widget repainted during the animation.
     QPointer<QWidget> owner_;
 
@@ -120,11 +159,14 @@ private:
     /// Animation progress in the range [0, 1].
     qreal transitionProgress_{0.0};
 
-    /// Horizontal flip direction.
-    qreal transitionDirection_{1.0};
+    /// Direction used by transition effects.
+    qreal transitionDirection_{-1.0};
 
     /// Transition animation.
     QPointer<QPropertyAnimation> animation_;
+
+    /// Visual effect used for icon transitions.
+    TransitionEffect transitionEffect_{TransitionEffect::Slide};
 };
 
 } // namespace fluvel
