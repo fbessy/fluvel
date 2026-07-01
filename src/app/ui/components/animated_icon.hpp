@@ -163,7 +163,7 @@ private:
      * @param scale Additional scale factor.
      */
     void drawIcon(QPainter& painter, const QPointF& center, const QSize& iconSize,
-                  const QIcon& icon, qreal opacity, qreal angle, qreal offsetX, qreal scale);
+                  const QIcon& icon, qreal opacity, qreal angle, qreal offsetX, qreal scale) const;
 
     static QPointF rectCenter(const QRect& rect);
 

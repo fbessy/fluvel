@@ -93,7 +93,7 @@ void AnimatedIcon::paintSlide(QPainter& painter, const QRect& rect, const QSize&
 
 void AnimatedIcon::drawIcon(QPainter& painter, const QPointF& center, const QSize& iconSize,
                             const QIcon& icon, qreal opacity, qreal angle, qreal offsetX,
-                            qreal scale)
+                            qreal scale) const
 {
     if (icon.isNull() || opacity <= 0.0)
         return;
