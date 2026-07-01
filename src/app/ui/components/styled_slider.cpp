@@ -69,18 +69,41 @@ void StyledSlider::paintEvent(QPaintEvent* event)
         const QPoint handle = handleCenter();
 
         const int grooveHeight = groove.height();
-        const int currentHandleRadius = hover_ ? style_.handleHoverRadius : style_.handleRadius;
+
+        const bool hovered = isEnabled() && hover_;
+        const int currentHandleRadius = hovered ? style_.handleHoverRadius : style_.handleRadius;
+
+        QColor grooveColor = ui::kSliderGrooveColor;
+        QColor progressColor = ui::kSliderProgressColor;
+        QColor handleColor = ui::kSliderHandleColor;
+        QColor borderColor = ui::kSliderHandleBorderColor;
+
+        if (!isEnabled())
+        {
+            constexpr qreal kDisabledOpacity = 0.45;
+
+            auto dim = [=](QColor c)
+            {
+                c.setAlphaF(c.alphaF() * kDisabledOpacity);
+                return c;
+            };
+
+            grooveColor = dim(grooveColor);
+            progressColor = dim(progressColor);
+            handleColor = dim(handleColor);
+            borderColor = dim(borderColor);
+        }
 
         painter.setPen(Qt::NoPen);
 
-        painter.setBrush(ui::kSliderGrooveColor);
+        painter.setBrush(grooveColor);
         painter.drawRoundedRect(groove, grooveHeight / 2, grooveHeight / 2);
 
-        painter.setBrush(ui::kSliderProgressColor);
+        painter.setBrush(progressColor);
         painter.drawRoundedRect(progress, grooveHeight / 2, grooveHeight / 2);
 
-        painter.setBrush(ui::kSliderHandleColor);
-        painter.setPen(QPen(ui::kSliderHandleBorderColor, 1));
+        painter.setBrush(handleColor);
+        painter.setPen(QPen(borderColor, 1));
 
         painter.drawEllipse(handle, currentHandleRadius, currentHandleRadius);
 
