@@ -3,6 +3,7 @@
 
 #include "animated_icon.hpp"
 
+#include <QAbstractButton>
 #include <QEasingCurve>
 #include <QPainter>
 #include <QPropertyAnimation>
@@ -27,7 +28,7 @@ AnimatedIcon::AnimatedIcon(QWidget* owner)
 }
 
 void AnimatedIcon::paint(QPainter& painter, const QRect& rect, const QSize& iconSize,
-                         const QIcon& defaultIcon) const
+                         const QIcon& defaultIcon)
 {
     switch (transitionEffect_)
     {
@@ -42,7 +43,7 @@ void AnimatedIcon::paint(QPainter& painter, const QRect& rect, const QSize& icon
 }
 
 void AnimatedIcon::paintFlip(QPainter& painter, const QRect& rect, const QSize& iconSize,
-                             const QIcon& defaultIcon) const
+                             const QIcon& defaultIcon)
 {
     const QPointF center = rectCenter(rect);
 
@@ -62,7 +63,7 @@ void AnimatedIcon::paintFlip(QPainter& painter, const QRect& rect, const QSize& 
 }
 
 void AnimatedIcon::paintSlide(QPainter& painter, const QRect& rect, const QSize& iconSize,
-                              const QIcon& defaultIcon) const
+                              const QIcon& defaultIcon)
 {
     const QPointF center = rectCenter(rect);
 
@@ -97,7 +98,22 @@ void AnimatedIcon::drawIcon(QPainter& painter, const QPointF& center, const QSiz
     if (icon.isNull() || opacity <= 0.0)
         return;
 
-    const QPixmap pixmap = icon.pixmap(iconSize);
+    QIcon::Mode mode = QIcon::Normal;
+    QIcon::State state = QIcon::Off;
+
+    if (owner_)
+    {
+        if (!owner_->isEnabled())
+            mode = QIcon::Disabled;
+
+        if (const auto* button = qobject_cast<const QAbstractButton*>(owner_))
+        {
+            if (button->isChecked())
+                state = QIcon::On;
+        }
+    }
+
+    const QPixmap pixmap = icon.pixmap(iconSize, mode, state);
 
     painter.save();
 

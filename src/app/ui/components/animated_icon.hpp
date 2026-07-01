@@ -19,8 +19,9 @@ namespace fluvel
 /**
  * @brief Animates transitions between two icons.
  *
- * AnimatedIcon renders a smooth transition between two icons using
- * a perspective-like flip animation combined with a cross-fade.
+ * AnimatedIcon renders animated transitions between icons while
+ * preserving the visual state (enabled/disabled and checked/unchecked)
+ * of the owning widget.
  *
  * The class is independent from any specific button type and can be
  * reused by QToolButton, QPushButton or any custom widget able to
@@ -85,13 +86,16 @@ public:
      * Otherwise the internal animation state is used to draw
      * the outgoing and incoming icons.
      *
+     * The icon is rendered using the current visual state of the
+     * owner widget (enabled/disabled and checked/unchecked).
+     *
      * @param painter Painter used for rendering.
      * @param rect Drawing rectangle.
      * @param iconSize Requested icon size.
      * @param defaultIcon Icon displayed when no animation is active.
      */
     void paint(QPainter& painter, const QRect& rect, const QSize& iconSize,
-               const QIcon& defaultIcon) const;
+               const QIcon& defaultIcon);
 
     /**
      * @brief Starts an animated transition between two icons.
@@ -134,20 +138,36 @@ private:
      * @brief Paints the flip transition.
      */
     void paintFlip(QPainter& painter, const QRect& rect, const QSize& iconSize,
-                   const QIcon& defaultIcon) const;
+                   const QIcon& defaultIcon);
 
     /**
      * @brief Paints the slide transition.
      */
     void paintSlide(QPainter& painter, const QRect& rect, const QSize& iconSize,
-                    const QIcon& defaultIcon) const;
+                    const QIcon& defaultIcon);
 
-    static void drawIcon(QPainter& painter, const QPointF& center, const QSize& iconSize,
-                         const QIcon& icon, qreal opacity, qreal angle, qreal offsetX, qreal scale);
+    /**
+     * @brief Draws an icon with the requested transform.
+     *
+     * The icon variant is selected automatically according to the
+     * current state of the owner widget (enabled/disabled and
+     * checked/unchecked).
+     *
+     * @param painter Painter used for rendering.
+     * @param center Icon center.
+     * @param iconSize Requested icon size.
+     * @param icon Icon to draw.
+     * @param opacity Icon opacity.
+     * @param angle Rotation angle in degrees.
+     * @param offsetX Horizontal translation.
+     * @param scale Additional scale factor.
+     */
+    void drawIcon(QPainter& painter, const QPointF& center, const QSize& iconSize,
+                  const QIcon& icon, qreal opacity, qreal angle, qreal offsetX, qreal scale);
 
     static QPointF rectCenter(const QRect& rect);
 
-    /// Widget repainted during the animation.
+    /// Owner widget used for repaint requests and icon state.
     QPointer<QWidget> owner_;
 
     /// Icon leaving the screen.
