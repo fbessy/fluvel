@@ -51,6 +51,7 @@ class TimelineSlider;
 class VolumeSlider;
 class FullscreenVideoControlBar;
 class ClickableLabel;
+class AnimatedPushButton;
 
 /**
  * @brief Streaming status for a camera device.
@@ -372,7 +373,7 @@ private:
 
     QWidget* mediaControlsWidget_{nullptr};
 
-    QPushButton* playPauseButton_{nullptr};
+    AnimatedPushButton* playPauseButton_{nullptr};
     QIcon resumeIcon_;
     QIcon pauseIcon_;
 

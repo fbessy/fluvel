@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_window.hpp"
+#include "animated_push_button.hpp"
 #include "application_settings.hpp"
 #include "autofit_behavior.hpp"
 #include "camera_format_utils.hpp"
@@ -306,7 +307,7 @@ void VideoWindow::createUi()
     pauseIconLight_ =
         il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light);
 
-    playPauseButton_ = new QPushButton;
+    playPauseButton_ = new AnimatedPushButton;
     playPauseButton_->setIcon(resumeIcon_);
 
     // --- Playback widgets ---
@@ -1943,7 +1944,7 @@ void VideoWindow::updateVolumeIcon(int volume)
 
 void VideoWindow::updatePlayPauseButton(bool paused)
 {
-    playPauseButton_->setIcon(paused ? resumeIcon_ : pauseIcon_);
+    playPauseButton_->setAnimatedIcon(paused ? resumeIcon_ : pauseIcon_);
 
     fullscreenBar_->playPauseButton()->setAnimatedIcon(paused ? resumeIconLight_ : pauseIconLight_);
 }
