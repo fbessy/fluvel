@@ -457,6 +457,11 @@ SourceInfo VideoController::activeSource() const
     return streamingInfo_.source;
 }
 
+bool VideoController::isMediaActive() const
+{
+    return activeSource().type == SourceType::Media;
+}
+
 QList<QCameraDevice> VideoController::videoInputs() const
 {
     return QMediaDevices::videoInputs();
@@ -464,6 +469,9 @@ QList<QCameraDevice> VideoController::videoInputs() const
 
 void VideoController::seek(qint64 posMs)
 {
+    if (!isMediaActive())
+        return;
+
     watchdogArmed_ = false;
 
     mediaPlayer_.setPosition(posMs);
@@ -523,11 +531,14 @@ void VideoController::updateMediaInfo()
 
 bool VideoController::isPaused() const
 {
-    return mediaPlayer_.playbackState() == QMediaPlayer::PausedState;
+    return isMediaActive() && mediaPlayer_.playbackState() == QMediaPlayer::PausedState;
 }
 
 void VideoController::pause()
 {
+    if (!isMediaActive())
+        return;
+
     watchdogArmed_ = false;
 
     mediaPlayer_.pause();
@@ -535,6 +546,9 @@ void VideoController::pause()
 
 void VideoController::resume()
 {
+    if (!isMediaActive())
+        return;
+
     mediaPlayer_.play();
 }
 

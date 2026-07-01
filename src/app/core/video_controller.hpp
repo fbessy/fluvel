@@ -285,6 +285,14 @@ private:
     void updateMediaInfo();
 
     /**
+     * @brief Returns whether a media source is currently active.
+     *
+     * Media-specific operations such as pause(), resume() and seek()
+     * are only valid when this function returns @c true.
+     */
+    bool isMediaActive() const;
+
+    /**
      * @brief Determine whether a media title is suitable for display.
      *
      * Filters out empty or non-informative titles returned by multimedia
