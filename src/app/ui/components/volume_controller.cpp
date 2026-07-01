@@ -9,6 +9,8 @@
 
 #include <QToolButton>
 
+#include <algorithm>
+
 namespace fluvel
 {
 
@@ -36,12 +38,9 @@ int VolumeController::volume() const
 
 void VolumeController::setVolume(int volume)
 {
+    volume = std::clamp(volume, 0, 100);
+
     slider_->setValue(volume);
-
-    if (volume > 0)
-        lastNonZeroVolume_ = volume;
-
-    updateIcon();
 }
 
 StyledToolButton* VolumeController::button() const
@@ -81,15 +80,17 @@ void VolumeController::updateIcon()
 {
     QIcon icon;
 
-    if (slider_->value() == 0)
+    const int volume = slider_->value();
+
+    if (volume == 0)
     {
         icon = il::loadIcon(":/icons/status/audio-volume-muted.svg", il::IconMode::Light);
     }
-    else if (slider_->value() < 33)
+    else if (volume < 33)
     {
         icon = il::loadIcon(":/icons/status/audio-volume-low.svg", il::IconMode::Light);
     }
-    else if (slider_->value() < 66)
+    else if (volume < 66)
     {
         icon = il::loadIcon(":/icons/status/audio-volume-medium.svg", il::IconMode::Light);
     }
