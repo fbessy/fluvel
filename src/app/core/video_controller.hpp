@@ -151,6 +151,14 @@ public:
      */
     void resume();
 
+    /**
+     * @brief Returns whether a media source is currently active.
+     *
+     * Media-specific operations such as pause(), resume() and seek()
+     * are only valid when this function returns @c true.
+     */
+    bool isMediaActive() const;
+
 signals:
     /// Emitted when available video inputs change.
     void videoInputsChanged(const QList<QCameraDevice>& devices);
@@ -283,14 +291,6 @@ private:
      * @brief Refresh media information from the active source.
      */
     void updateMediaInfo();
-
-    /**
-     * @brief Returns whether a media source is currently active.
-     *
-     * Media-specific operations such as pause(), resume() and seek()
-     * are only valid when this function returns @c true.
-     */
-    bool isMediaActive() const;
 
     /**
      * @brief Determine whether a media title is suitable for display.

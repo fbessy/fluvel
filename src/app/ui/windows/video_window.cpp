@@ -2070,6 +2070,7 @@ void VideoWindow::updateMediaBar()
         streamingInfo_.source.type == SourceType::Media ||
         (streamingInfo_.source.type == SourceType::None && sourceConfig_.type == SourceType::Media);
 
+    const bool hasPlayPause = videoController_->isMediaActive();
     const bool hasSeek = mediaMode && mediaInfo_.seekable;
     const bool hasAudio = mediaMode && mediaInfo_.hasAudio;
 
@@ -2083,7 +2084,7 @@ void VideoWindow::updateMediaBar()
 
     // Seeking controls remain visible but are disabled when seeking
     // is not supported by the current media.
-    playPauseButton_->setEnabled(hasSeek);
+    playPauseButton_->setEnabled(hasPlayPause);
     playbackPositionLabel_->setEnabled(hasSeek);
     playbackSeparatorLabel_->setEnabled(hasSeek);
     playbackDurationLabel_->setEnabled(hasSeek);
@@ -2104,6 +2105,7 @@ void VideoWindow::updateFullscreenBar()
                             (streamingInfo_.source.type == SourceType::None &&
                              sourceConfig_.type == SourceType::Camera);
 
+    const bool hasPlayPause = videoController_->isMediaActive();
     const bool hasSeek = mediaMode && mediaInfo_.seekable;
     const bool hasAudio = mediaMode && mediaInfo_.hasAudio;
 
@@ -2119,7 +2121,7 @@ void VideoWindow::updateFullscreenBar()
 
     // Seeking controls remain visible but are disabled when seeking
     // is not supported by the current media.
-    fullscreenBar_->playPauseButton()->setEnabled(hasSeek);
+    fullscreenBar_->playPauseButton()->setEnabled(hasPlayPause);
     fullscreenBar_->positionLabel()->setEnabled(hasSeek);
     fullscreenBar_->durationLabel()->setEnabled(hasSeek);
     fullscreenBar_->playbackSlider()->setEnabled(hasSeek);
