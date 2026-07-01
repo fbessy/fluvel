@@ -100,11 +100,15 @@ void AnimatedIcon::drawIcon(QPainter& painter, const QPointF& center, const QSiz
 
     QIcon::Mode mode = QIcon::Normal;
     QIcon::State state = QIcon::Off;
+    qreal finalOpacity = opacity;
 
     if (owner_)
     {
         if (!owner_->isEnabled())
+        {
             mode = QIcon::Disabled;
+            finalOpacity *= 0.45;
+        }
 
         if (const auto* button = qobject_cast<const QAbstractButton*>(owner_))
         {
@@ -131,7 +135,7 @@ void AnimatedIcon::drawIcon(QPainter& painter, const QPointF& center, const QSiz
     // scale indépendant de l'effet Flip
     painter.scale(scale, scale);
 
-    painter.setOpacity(opacity);
+    painter.setOpacity(finalOpacity);
 
     painter.translate(offsetX, 0.0);
 
