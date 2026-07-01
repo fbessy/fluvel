@@ -1465,13 +1465,17 @@ void VideoWindow::updateStreamingButton()
 {
     assert(videoController_ && toggleStreamingButton_ && deviceSelector_);
 
+    const bool canStart = canStartSource();
+
     switch (videoController_->streamingState())
     {
         case StreamingState::Stopped:
-            toggleStreamingButton_->setEnabled(canStartSource());
+            toggleStreamingButton_->setEnabled(canStart);
             toggleStreamingButton_->setText(tr("Start"));
             toggleStreamingButton_->setToolTip(tr("Start selected source."));
             toggleStreamingButton_->setIcon(startIcon_);
+
+            fullscreenBar_->startStopButton()->setEnabled(canStart);
             fullscreenBar_->startStopButton()->setAnimatedIcon(startIconLight_);
             break;
 
@@ -1480,6 +1484,8 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Stop"));
             toggleStreamingButton_->setToolTip(tr("Stop active source."));
             toggleStreamingButton_->setIcon(stopIcon_);
+
+            fullscreenBar_->startStopButton()->setAnimatedIcon(stopIconLight_);
             break;
 
         case StreamingState::Starting:
@@ -1487,7 +1493,6 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setText(tr("Starting..."));
             toggleStreamingButton_->setToolTip(tr("Camera startup in progress."));
             toggleStreamingButton_->setIcon(QIcon());
-            fullscreenBar_->startStopButton()->setAnimatedIcon(stopIconLight_);
             break;
     }
 }
