@@ -484,7 +484,9 @@ float VideoController::volume() const
 
 void VideoController::setVolume(float volume)
 {
-    audioOutput_.setVolume(std::clamp(volume, 0.0f, 1.0f));
+    volume = std::clamp(volume, 0.0f, 1.0f);
+
+    audioOutput_.setVolume(volume);
 }
 
 void VideoController::onMetaDataChanged()
