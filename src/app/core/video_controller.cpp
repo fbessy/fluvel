@@ -220,6 +220,8 @@ void VideoController::stop()
     if (state_ == StreamingState::Stopped)
         return;
 
+    resetWatchdog();
+
     startupTimer_.stop();
     watchdogTimer_.stop();
     diagnosticsTimer_.stop();
@@ -262,8 +264,10 @@ void VideoController::onFrameReceived(const QVideoFrame& frame)
 #endif
 
     const int64_t now = FrameClock::nowNs();
+
     lastValidFrameTsNs_ = now;
-    watchdogArmed_ = true;
+
+    tryArmWatchdog();
 
     if (state_ == StreamingState::Starting)
     {
@@ -329,8 +333,40 @@ void VideoController::onStartupTimeout()
     emit startupTimeout(startupInfo_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
 }
 
+void VideoController::resetWatchdog()
+{
+    watchdogArmed_ = false;
+    watchdogStabilizing_ = false;
+    watchdogStableSinceNs_ = 0;
+    stableFrameCount_ = 0;
+}
+
+void VideoController::tryArmWatchdog()
+{
+    if (watchdogArmed_)
+        return;
+
+    ++stableFrameCount_;
+
+    if (!watchdogStabilizing_)
+    {
+        watchdogStabilizing_ = true;
+        watchdogStableSinceNs_ = lastValidFrameTsNs_;
+    }
+    else if (stableFrameCount_ >= kWatchdogMinFrames &&
+             lastValidFrameTsNs_ - watchdogStableSinceNs_ >= kWatchdogStabilizationNs)
+    {
+        watchdogArmed_ = true;
+        watchdogStabilizing_ = false;
+        watchdogStableSinceNs_ = 0;
+        stableFrameCount_ = 0;
+    }
+}
+
 void VideoController::checkWatchdog()
 {
+    assert(!(watchdogArmed_ && watchdogStabilizing_));
+
     if (!watchdogArmed_)
         return;
 
@@ -472,7 +508,7 @@ void VideoController::seek(qint64 posMs)
     if (!isMediaActive())
         return;
 
-    watchdogArmed_ = false;
+    resetWatchdog();
 
     mediaPlayer_.setPosition(posMs);
 }
@@ -541,7 +577,7 @@ void VideoController::pause()
     if (!isMediaActive())
         return;
 
-    watchdogArmed_ = false;
+    resetWatchdog();
 
     mediaPlayer_.pause();
 }

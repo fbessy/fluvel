@@ -281,6 +281,26 @@ private:
      */
     void onMetaDataChanged();
 
+    /**
+     * @brief Reset the watchdog state.
+     *
+     * Cancels any ongoing stabilization phase and disarms
+     * stream-loss detection.
+     */
+    void resetWatchdog();
+
+    /**
+     * @brief Attempt to arm the watchdog.
+     *
+     * The watchdog becomes active only after a stable
+     * stream has been observed for a minimum duration
+     * and number of valid frames.
+     *
+     * This function should be called whenever a valid
+     * video frame is received.
+     */
+    void tryArmWatchdog();
+
     /// Periodic watchdog to detect stream loss.
     void checkWatchdog();
 
@@ -331,6 +351,11 @@ private:
     static constexpr int kWatchdogPeriodMs{200};                  // 0.2 sec
     static constexpr int kDiagnosticsPeriodMs{500};               // 0.5 sec
 
+    // --- Watchdog stabilization policy ---
+
+    static constexpr int64_t kWatchdogStabilizationNs{500'000'000};
+    static constexpr int kWatchdogMinFrames{5};
+
     /// Timer used to detect startup timeout.
     QTimer startupTimer_;
 
@@ -359,8 +384,19 @@ private:
     int testFrameCounter_{0};
 #endif
 
-    /// Whether the watchdog is allowed to report stream loss.
-    bool watchdogArmed_{true};
+    /// Whether stream-loss detection is currently enabled.
+    /// Mutually exclusive with watchdogStabilizing_.
+    bool watchdogArmed_{false};
+
+    /// Whether the watchdog is waiting for a stable stream
+    /// before being armed.
+    bool watchdogStabilizing_{false};
+
+    /// Timestamp of the first valid frame of the stabilization period.
+    int64_t watchdogStableSinceNs_{0};
+
+    /// Number of valid frames received during stabilization.
+    int stableFrameCount_{0};
 };
 
 /**
