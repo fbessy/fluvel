@@ -341,6 +341,14 @@ void VideoController::resetWatchdog()
     stableFrameCount_ = 0;
 }
 
+void VideoController::armWatchdog()
+{
+    watchdogArmed_ = true;
+    watchdogStabilizing_ = false;
+    watchdogStableSinceNs_ = 0;
+    stableFrameCount_ = 0;
+}
+
 void VideoController::tryArmWatchdog()
 {
     if (watchdogArmed_)
@@ -356,10 +364,7 @@ void VideoController::tryArmWatchdog()
     else if (stableFrameCount_ >= kWatchdogMinFrames &&
              lastValidFrameTsNs_ - watchdogStableSinceNs_ >= kWatchdogStabilizationNs)
     {
-        watchdogArmed_ = true;
-        watchdogStabilizing_ = false;
-        watchdogStableSinceNs_ = 0;
-        stableFrameCount_ = 0;
+        armWatchdog();
     }
 }
 

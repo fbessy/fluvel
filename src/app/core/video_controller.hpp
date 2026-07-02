@@ -284,10 +284,18 @@ private:
     /**
      * @brief Reset the watchdog state.
      *
-     * Cancels any ongoing stabilization phase and disarms
-     * stream-loss detection.
+     * Disarms the watchdog and clears any pending
+     * stabilization state.
      */
     void resetWatchdog();
+
+    /**
+     * @brief Arm the watchdog.
+     *
+     * Enables stream-loss detection and clears the
+     * stabilization state.
+     */
+    void armWatchdog();
 
     /**
      * @brief Attempt to arm the watchdog.
