@@ -10,9 +10,12 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QGroupBox>
+#include <QPointer>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QWidget>
+
+class QPropertyAnimation;
 
 namespace fluvel
 {
@@ -108,7 +111,7 @@ private:
      */
     void animate(bool open);
 
-    bool isAnimating_{false};
+    QPointer<QPropertyAnimation> animation_;
 
     QGroupBox* displayModeGroupBox_{nullptr};
     QRadioButton* sourceRadioButton_{nullptr};
@@ -124,6 +127,7 @@ private:
     QCheckBox* miniMapCheckBox_{nullptr};
 
     DisplayConfig config_{};
+    bool panelVisible_{true};
 };
 
 } // namespace fluvel

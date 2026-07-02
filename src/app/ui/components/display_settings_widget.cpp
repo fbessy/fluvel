@@ -188,15 +188,12 @@ void DisplaySettingsWidget::updateDisplayModeAvailability(bool hasPreprocessing)
 
 void DisplaySettingsWidget::setPanelVisible(bool visible)
 {
-    if (isAnimating_)
+    if (panelVisible_ == visible)
         return;
 
-    const bool open = (maximumWidth() > 0);
+    panelVisible_ = visible;
 
-    if (visible == open)
-        return;
-
-    animate(visible);
+    animate(panelVisible_);
 }
 
 void DisplaySettingsWidget::setMirrorModeEnabled(bool enabled)
@@ -216,35 +213,40 @@ void DisplaySettingsWidget::setAlgorithmOverlayEnabled(bool enabled)
 
 void DisplaySettingsWidget::animate(bool open)
 {
-    isAnimating_ = true;
+    if (animation_)
+        animation_->stop();
 
-    // On s'assure que le widget est visible avant de calculer
+    // Ensure the widget is visible before measuring its preferred width.
     if (open)
         show();
 
-    // Calcul dynamique basé sur le layout
+    // Compute the preferred width from the current layout.
     adjustSize();
     const int targetWidth = minimumSizeHint().width();
 
-    const int start = open ? 0 : width();
+    const int start = maximumWidth();
     const int end = open ? targetWidth : 0;
 
-    auto* anim = new QPropertyAnimation(this, "maximumWidth");
-    anim->setDuration(200);
-    anim->setStartValue(start);
-    anim->setEndValue(end);
-    anim->setEasingCurve(open ? QEasingCurve::OutCubic : QEasingCurve::InCubic);
+    animation_ = new QPropertyAnimation(this, "maximumWidth");
 
-    connect(anim, &QPropertyAnimation::finished, this,
-            [this, open]()
+    animation_->setDuration(200);
+    animation_->setStartValue(start);
+    animation_->setEndValue(end);
+    animation_->setEasingCurve(open ? QEasingCurve::OutCubic : QEasingCurve::InCubic);
+
+    connect(animation_, &QPropertyAnimation::finished, this,
+            [this, open, anim = animation_]()
             {
+                if (animation_ != anim)
+                    return;
+
                 if (!open)
                     hide();
 
-                isAnimating_ = false;
+                animation_ = nullptr;
             });
 
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    animation_->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 } // namespace fluvel
