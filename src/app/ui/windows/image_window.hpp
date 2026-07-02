@@ -47,22 +47,6 @@ struct ControlButtons
 };
 
 /**
- * @brief Icons used by a control button set.
- *
- * Different presentations may use different icon themes
- * (for example standard system icons versus fullscreen
- * light-colored icons) while sharing the same behavior.
- */
-struct ControlIcons
-{
-    QIcon startResume;
-    QIcon pause;
-    QIcon restart;
-    QIcon step;
-    QIcon converge;
-};
-
-/**
  * @brief Visual presentation of a control button set.
  *
  * A control theme combines:
@@ -76,7 +60,6 @@ struct ControlIcons
 struct ControlTheme
 {
     ControlButtons buttons;
-    ControlIcons icons;
 
     bool showText{true};
     bool showToolTips{true};
@@ -186,7 +169,8 @@ private:
     void leaveFullscreen();
 
     void positionFullscreenBar();
-    void updateButtons(const ControlTheme& theme, WorkerState state);
+    void updateButtonState(const ControlTheme& theme, WorkerState state);
+    void updateButtonIcons(WorkerState state);
     void onActivityDetected(const QPoint& pos);
     void onIdle();
 
@@ -207,11 +191,6 @@ private:
     QPushButton* stepButton_{nullptr};
     QPushButton* convergeButton_{nullptr};
 
-    QPushButton* restartButtonLight_{nullptr};
-    QPushButton* togglePauseLightButton_{nullptr};
-    QPushButton* stepButtonLight_{nullptr};
-    QPushButton* convergeButtonLight_{nullptr};
-
     RightPanelToggleButton* rightPanelToggle_{nullptr};
     QPushButton* settingsButton_{nullptr};
 
@@ -220,6 +199,12 @@ private:
     QIcon startResumeIcon_;
     QIcon restartIcon_;
     QIcon pauseIcon_;
+
+    /// Icons used by the fullscreen control bar.
+    QIcon startResumeIconFs_;
+    QIcon restartIconFs_;
+    QIcon pauseIconFs_;
+
     QIcon settingsIcon_;
 
     DisplaySettingsWidget* displayBar_{nullptr};

@@ -11,6 +11,8 @@ class QHBoxLayout;
 namespace fluvel
 {
 
+class AnimatedPushButton;
+
 /**
  * @brief Fullscreen control overlay for image sessions.
  *
@@ -42,12 +44,12 @@ public:
     /**
      * @brief Returns the start/restart button.
      */
-    QPushButton* restartButton() const;
+    AnimatedPushButton* restartButton() const;
 
     /**
      * @brief Returns the pause/resume button.
      */
-    QPushButton* pauseButton() const;
+    AnimatedPushButton* pauseButton() const;
 
     /**
      * @brief Returns the single-step execution button.
@@ -60,8 +62,8 @@ public:
     QPushButton* convergeButton() const;
 
 private:
-    QPushButton* restartButton_{nullptr};
-    QPushButton* pauseButton_{nullptr};
+    AnimatedPushButton* restartButton_{nullptr};
+    AnimatedPushButton* pauseButton_{nullptr};
     QPushButton* stepButton_{nullptr};
     QPushButton* convergeButton_{nullptr};
 };

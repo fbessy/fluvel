@@ -8,6 +8,7 @@
 #include "language_dialog.hpp"
 #include "settings_dialog.hpp"
 
+#include "animated_push_button.hpp"
 #include "display_settings_widget.hpp"
 #include "fullscreen_image_control_bar.hpp"
 #include "icon_loader.hpp"
@@ -82,12 +83,17 @@ void ImageWindow::setupUi()
 
     startResumeIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                                     ":/icons/media/media-playback-start-symbolic.svg");
-
     restartIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaylistRepeat,
                                 ":/icons/media/media-playlist-repeat-symbolic.svg");
-
     pauseIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackPause,
                               ":/icons/media/media-playback-pause-symbolic.svg");
+
+    startResumeIconFs_ =
+        il::loadIcon(":/icons/media/media-playback-start-symbolic.svg", il::IconMode::Light);
+    restartIconFs_ =
+        il::loadIcon(":/icons/media/media-playlist-repeat-symbolic.svg", il::IconMode::Light);
+    pauseIconFs_ =
+        il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light);
 
     restartButton_ = new QPushButton(tr("Start"));
     restartButton_->setToolTip(tr("Run the active contour."));
@@ -101,6 +107,7 @@ void ImageWindow::setupUi()
     stepButton_->setToolTip(tr("Advance the active contour by one iteration."));
 
     QIcon stepIcon = il::loadIcon(QIcon::ThemeIcon::GoNext, ":/icons/actions/go-next-symbolic.svg");
+    QIcon stepIconFs = il::loadIcon(":/icons/actions/go-next-symbolic.svg", il::IconMode::Light);
 
     stepButton_->setIcon(stepIcon);
 
@@ -113,6 +120,8 @@ void ImageWindow::setupUi()
 
     QIcon convergeIcon = il::loadIcon(QIcon::ThemeIcon::MediaSeekForward,
                                       ":/icons/media/media-seek-forward-symbolic.svg");
+    QIcon convergeIconFs =
+        il::loadIcon(":/icons/media/media-seek-forward-symbolic.svg", il::IconMode::Light);
 
     convergeButton_->setIcon(convergeIcon);
 
@@ -122,7 +131,6 @@ void ImageWindow::setupUi()
     convergeButton_->setEnabled(false);
 
     normalTheme_.buttons = {restartButton_, togglePauseButton_, stepButton_, convergeButton_};
-    normalTheme_.icons = {startResumeIcon_, pauseIcon_, restartIcon_, stepIcon, convergeIcon};
     normalTheme_.showText = true;
     normalTheme_.showToolTips = true;
 
@@ -190,12 +198,10 @@ void ImageWindow::setupUi()
     fullscreenTheme_.buttons = {fullscreenBar_->restartButton(), fullscreenBar_->pauseButton(),
                                 fullscreenBar_->stepButton(), fullscreenBar_->convergeButton()};
 
-    fullscreenTheme_.icons = {
-        il::loadIcon(":/icons/media/media-playback-start-symbolic.svg", il::IconMode::Light),
-        il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light),
-        il::loadIcon(":/icons/media/media-playlist-repeat-symbolic.svg", il::IconMode::Light),
-        il::loadIcon(":/icons/actions/go-next-symbolic.svg", il::IconMode::Light),
-        il::loadIcon(":/icons/media/media-seek-forward-symbolic.svg", il::IconMode::Light)};
+    fullscreenBar_->restartButton()->setIcon(startResumeIconFs_);
+    fullscreenBar_->pauseButton()->setIcon(startResumeIconFs_);
+    fullscreenBar_->stepButton()->setIcon(stepIconFs);
+    fullscreenBar_->convergeButton()->setIcon(convergeIconFs);
 
     fullscreenTheme_.showText = false;
     fullscreenTheme_.showToolTips = false;
@@ -863,8 +869,9 @@ void ImageWindow::saveDisplayed()
 
 void ImageWindow::onStateChanged(WorkerState state)
 {
-    updateButtons(normalTheme_, state);
-    updateButtons(fullscreenTheme_, state);
+    updateButtonState(normalTheme_, state);
+    updateButtonState(fullscreenTheme_, state);
+    updateButtonIcons(state);
 }
 
 void ImageWindow::onVideoWindowShown()
@@ -984,7 +991,7 @@ void ImageWindow::positionFullscreenBar()
     fullscreenBar_->move(x, y);
 }
 
-void ImageWindow::updateButtons(const ControlTheme& theme, WorkerState state)
+void ImageWindow::updateButtonState(const ControlTheme& theme, WorkerState state)
 {
     const bool enabled = state != WorkerState::Uninitialized && state != WorkerState::Initializing;
 
@@ -1012,16 +1019,12 @@ void ImageWindow::updateButtons(const ControlTheme& theme, WorkerState state)
         setText(theme.buttons.restart, tr("Restart"));
 
         setToolTip(theme.buttons.restart, tr("Restart the active contour from its initial state."));
-
-        theme.buttons.restart->setIcon(theme.icons.restart);
     }
     else if (state == WorkerState::Ready)
     {
         setText(theme.buttons.restart, tr("Start"));
 
         setToolTip(theme.buttons.restart, tr("Run the active contour."));
-
-        theme.buttons.restart->setIcon(theme.icons.startResume);
     }
 
     //
@@ -1033,23 +1036,17 @@ void ImageWindow::updateButtons(const ControlTheme& theme, WorkerState state)
         setText(theme.buttons.pause, tr("Pause"));
 
         setToolTip(theme.buttons.pause, tr("Suspend execution and display the current state."));
-
-        theme.buttons.pause->setIcon(theme.icons.pause);
     }
     else if (state == WorkerState::Ready || state == WorkerState::Suspended)
     {
         setText(theme.buttons.pause, tr("Resume"));
 
         setToolTip(theme.buttons.pause, tr("Resume the active contour execution."));
-
-        theme.buttons.pause->setIcon(theme.icons.startResume);
     }
 
     //
     // Step
     //
-
-    theme.buttons.step->setIcon(theme.icons.step);
 
     setText(theme.buttons.step, tr("Step"));
 
@@ -1059,12 +1056,44 @@ void ImageWindow::updateButtons(const ControlTheme& theme, WorkerState state)
     // Converge
     //
 
-    theme.buttons.converge->setIcon(theme.icons.converge);
-
     setText(theme.buttons.converge, tr("Converge"));
 
     setToolTip(theme.buttons.converge,
                tr("Run until completion without displaying intermediate steps."));
+}
+
+void ImageWindow::updateButtonIcons(WorkerState state)
+{
+    //
+    // Start / Restart
+    //
+    if (state == WorkerState::Ready)
+    {
+        restartButton_->setIcon(startResumeIcon_);
+        fullscreenBar_->restartButton()->setAnimatedIcon(
+            startResumeIconFs_, AnimatedPushButton::TransitionDirection::Right);
+    }
+    else if (state == WorkerState::Running || state == WorkerState::Suspended)
+    {
+        restartButton_->setIcon(restartIcon_);
+        fullscreenBar_->restartButton()->setAnimatedIcon(
+            restartIconFs_, AnimatedPushButton::TransitionDirection::Right);
+    }
+
+    //
+    // Pause / Resume
+    //
+
+    if (state == WorkerState::Running)
+    {
+        togglePauseButton_->setIcon(pauseIcon_);
+        fullscreenBar_->pauseButton()->setAnimatedIcon(pauseIconFs_);
+    }
+    else if (state == WorkerState::Ready || state == WorkerState::Suspended)
+    {
+        togglePauseButton_->setIcon(startResumeIcon_);
+        fullscreenBar_->pauseButton()->setAnimatedIcon(startResumeIconFs_);
+    }
 }
 
 void ImageWindow::onActivityDetected(const QPoint& pos)

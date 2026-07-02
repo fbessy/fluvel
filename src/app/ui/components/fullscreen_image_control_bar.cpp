@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "fullscreen_image_control_bar.hpp"
+#include "animated_push_button.hpp"
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -52,8 +53,11 @@ QPushButton:disabled
 }
 )");
 
-    restartButton_ = new QPushButton;
-    pauseButton_ = new QPushButton;
+    restartButton_ = new AnimatedPushButton;
+    restartButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Slide);
+
+    pauseButton_ = new AnimatedPushButton;
+    pauseButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Flip);
 
     stepButton_ = new QPushButton;
     stepButton_->setAutoRepeat(true);
@@ -84,12 +88,12 @@ QPushButton:disabled
     setLayout(layout);
 }
 
-QPushButton* FullscreenImageControlBar::restartButton() const
+AnimatedPushButton* FullscreenImageControlBar::restartButton() const
 {
     return restartButton_;
 }
 
-QPushButton* FullscreenImageControlBar::pauseButton() const
+AnimatedPushButton* FullscreenImageControlBar::pauseButton() const
 {
     return pauseButton_;
 }
