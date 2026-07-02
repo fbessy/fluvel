@@ -4,17 +4,22 @@
 #include "right_panel_toggle_button.hpp"
 #include "icon_loader.hpp"
 
+#include <QPushButton>
+
 namespace fluvel
 {
 
 RightPanelToggleButton::RightPanelToggleButton(QWidget* parent)
-    : QPushButton(parent)
+    : AnimatedPushButton(parent)
     , iconOn_(il::loadIcon(":/icons/view/sidebar-right-show.svg"))
     , iconOff_(il::loadIcon(":/icons/view/sidebar-right-hide.svg"))
 {
     setCheckable(true);
     setChecked(true);
     setFocusPolicy(Qt::NoFocus);
+
+    setTransitionEffect(TransitionEffect::Slide);
+    setClickAnimation(ClickAnimation::None);
 
     // Initial state
     updateAppearance(isChecked());
@@ -24,7 +29,10 @@ RightPanelToggleButton::RightPanelToggleButton(QWidget* parent)
 
 void RightPanelToggleButton::updateAppearance(bool checked)
 {
-    setIcon(checked ? iconOn_ : iconOff_);
+    if (checked)
+        setAnimatedIcon(iconOn_, TransitionDirection::Left);
+    else
+        setAnimatedIcon(iconOff_, TransitionDirection::Right);
 
     setToolTip(checked ? tr("Hide right panel.") : tr("Show right panel."));
 }

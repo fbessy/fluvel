@@ -4,8 +4,9 @@
 #pragma once
 
 #include <QIcon>
-#include <QPushButton>
 #include <QWidget>
+
+#include "animated_push_button.hpp"
 
 namespace fluvel
 {
@@ -20,7 +21,7 @@ namespace fluvel
  * - iconOn_ when checked
  * - iconOff_ when unchecked
  */
-class RightPanelToggleButton : public QPushButton
+class RightPanelToggleButton : public AnimatedPushButton
 {
     Q_OBJECT
 

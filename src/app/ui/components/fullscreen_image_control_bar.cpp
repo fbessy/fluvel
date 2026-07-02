@@ -5,7 +5,6 @@
 #include "animated_push_button.hpp"
 
 #include <QHBoxLayout>
-#include <QPushButton>
 
 namespace fluvel
 {
@@ -32,7 +31,7 @@ QPushButton
 
 QPushButton:hover
 {
-    background-color: rgba(0,0,0,220);
+    background-color: rgba(0,0,0,210);
     border: 1px solid rgba(255,255,255,80);
 
     border-radius: 8px;
@@ -40,8 +39,8 @@ QPushButton:hover
 
 QPushButton:pressed
 {
-    background-color: rgba(255,255,255,120);
-    color: black;
+    background-color: rgba(0,0,0,240);
+    border: 1px solid rgba(255,255,255,120);
 
     border-radius: 8px;
 }
@@ -55,16 +54,18 @@ QPushButton:disabled
 
     restartButton_ = new AnimatedPushButton;
     restartButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Slide);
+    restartButton_->setClickAnimation(ClickAnimation::None);
 
     pauseButton_ = new AnimatedPushButton;
     pauseButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Flip);
+    pauseButton_->setClickAnimation(ClickAnimation::None);
 
-    stepButton_ = new QPushButton;
+    stepButton_ = new AnimatedPushButton;
     stepButton_->setAutoRepeat(true);
     stepButton_->setAutoRepeatDelay(300);
     stepButton_->setAutoRepeatInterval(100);
 
-    convergeButton_ = new QPushButton;
+    convergeButton_ = new AnimatedPushButton;
 
     constexpr QSize kIconSize(32, 32);
 
@@ -72,8 +73,6 @@ QPushButton:disabled
     pauseButton_->setIconSize(kIconSize);
     stepButton_->setIconSize(kIconSize);
     convergeButton_->setIconSize(kIconSize);
-
-    pauseButton_->setStyleSheet("QPushButton { color: white; }");
 
     auto* layout = new QHBoxLayout(this);
 
@@ -98,12 +97,12 @@ AnimatedPushButton* FullscreenImageControlBar::pauseButton() const
     return pauseButton_;
 }
 
-QPushButton* FullscreenImageControlBar::stepButton() const
+AnimatedPushButton* FullscreenImageControlBar::stepButton() const
 {
     return stepButton_;
 }
 
-QPushButton* FullscreenImageControlBar::convergeButton() const
+AnimatedPushButton* FullscreenImageControlBar::convergeButton() const
 {
     return convergeButton_;
 }

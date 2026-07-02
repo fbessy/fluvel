@@ -27,6 +27,53 @@ StyledToolButton::StyledToolButton(QWidget* parent, ui::Appearance appearance)
     setIconSize(QSize(iSize, iSize));
 }
 
+void StyledToolButton::setAnimatedIcon(const QIcon& icon, TransitionDirection direction)
+{
+    animatedIcon_.setAnimatedIcon(this->icon(), icon, direction);
+
+    setIcon(icon);
+}
+
+void StyledToolButton::paintEvent(QPaintEvent*)
+{
+    QStylePainter painter(this);
+
+    const qreal s = scaleAnimation_.scale();
+
+    if (!qFuzzyCompare(s, 1.0))
+    {
+        painter.save();
+
+        const QPointF center(rect().width() / 2.0, rect().height() / 2.0);
+
+        painter.translate(center);
+        painter.scale(s, s);
+        painter.translate(-center);
+    }
+
+    QStyleOptionToolButton option;
+    initStyleOption(&option);
+
+    // Draw the button using the current Qt style but
+    // suppress the icon since it will be rendered manually.
+    option.icon = {};
+
+    painter.drawComplexControl(QStyle::CC_ToolButton, option);
+
+    animatedIcon_.paint(painter, rect(), iconSize(), icon());
+
+    if (!qFuzzyCompare(s, 1.0))
+        painter.restore();
+}
+
+void StyledToolButton::mousePressEvent(QMouseEvent* event)
+{
+    if (clickAnimation_ == ClickAnimation::Scale)
+        scaleAnimation_.start();
+
+    QToolButton::mousePressEvent(event);
+}
+
 ui::Appearance StyledToolButton::appearance() const
 {
     return appearance_;
@@ -42,7 +89,22 @@ void StyledToolButton::setAppearance(ui::Appearance appearance)
     updateStyle();
 }
 
-void StyledToolButton::setTransitionEffect(TransitionEffect effect)
+ClickAnimation StyledToolButton::clickAnimation() const
+{
+    return clickAnimation_;
+}
+
+void StyledToolButton::setClickAnimation(ClickAnimation animation)
+{
+    clickAnimation_ = animation;
+}
+
+StyledToolButton::TransitionEffect StyledToolButton::transitionEffect() const
+{
+    return animatedIcon_.transitionEffect();
+}
+
+void StyledToolButton::setTransitionEffect(StyledToolButton::TransitionEffect effect)
 {
     animatedIcon_.setTransitionEffect(effect);
 }
@@ -102,34 +164,6 @@ QToolButton:checked:hover
                       .arg(qcolor_utils::rgba(ui::kControlDisabledBorder))
                       .arg(qcolor_utils::rgba(ui::kAccentColor))
                       .arg(qcolor_utils::rgba(ui::kAccentHoverColor)));
-}
-
-void StyledToolButton::paintEvent(QPaintEvent*)
-{
-    QStylePainter painter(this);
-
-    QStyleOptionToolButton option;
-    initStyleOption(&option);
-
-    // Draw the button using the current Qt style but
-    // suppress the icon since it will be rendered manually.
-    option.icon = {};
-
-    painter.drawComplexControl(QStyle::CC_ToolButton, option);
-
-    animatedIcon_.paint(painter, rect(), iconSize(), icon());
-}
-
-void StyledToolButton::setAnimatedIcon(const QIcon& icon, TransitionDirection direction)
-{
-    animatedIcon_.setAnimatedIcon(this->icon(), icon, direction);
-
-    setIcon(icon);
-}
-
-AnimatedIcon::TransitionEffect StyledToolButton::transitionEffect() const
-{
-    return animatedIcon_.transitionEffect();
 }
 
 } // namespace fluvel

@@ -3,6 +3,9 @@
 
 #include "color_selector_widget.hpp"
 
+#include "animated_push_button.hpp"
+#include "icon_loader.hpp"
+
 #include <QColorDialog>
 #include <QComboBox>
 #include <QHBoxLayout>
@@ -10,8 +13,6 @@
 #include <QPushButton>
 #include <QSignalBlocker>
 #include <QString>
-
-#include "icon_loader.hpp"
 
 namespace fluvel
 {
@@ -34,7 +35,7 @@ ColorSelectorWidget::ColorSelectorWidget(QWidget* parent, QColor initialColor)
     QIcon pickerIcon =
         il::loadIcon("color-picker-symbolic", ":/icons/actions/color-picker-symbolic.svg");
 
-    custom_pb_ = new QPushButton;
+    custom_pb_ = new AnimatedPushButton;
     custom_pb_->setIcon(pickerIcon);
 
     auto* layout = new QHBoxLayout(this);

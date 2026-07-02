@@ -4,6 +4,7 @@
 #pragma once
 
 #include "animated_icon.hpp"
+#include "scale_animation.hpp"
 #include "ui_appearance.hpp"
 
 #include <QToolButton>
@@ -35,28 +36,6 @@ public:
                               ui::Appearance appearance = ui::Appearance::Modern);
 
     /**
-     * @brief Returns the current appearance.
-     */
-    ui::Appearance appearance() const;
-
-    /**
-     * @brief Changes the button appearance.
-     */
-    void setAppearance(ui::Appearance appearance);
-
-    /**
-     * @brief Returns the current transition effect.
-     */
-    TransitionEffect transitionEffect() const;
-
-    /**
-     * @brief Sets the transition effect.
-     *
-     * @param effect New transition effect.
-     */
-    void setTransitionEffect(TransitionEffect effect);
-
-    /**
      * @brief Changes the button icon using an animated transition.
      *
      * The visual effect depends on the currently selected
@@ -68,6 +47,43 @@ public:
     void setAnimatedIcon(const QIcon& icon,
                          TransitionDirection direction = TransitionDirection::Auto);
 
+    /**
+     * @brief Returns the current appearance.
+     */
+    [[nodiscard]]
+    ui::Appearance appearance() const;
+
+    /**
+     * @brief Changes the button appearance.
+     */
+    void setAppearance(ui::Appearance appearance);
+
+    /**
+     * @brief Returns the current transition effect.
+     */
+    [[nodiscard]]
+    StyledToolButton::TransitionEffect transitionEffect() const;
+
+    /**
+     * @brief Sets the transition effect.
+     *
+     * @param effect New transition effect.
+     */
+    void setTransitionEffect(StyledToolButton::TransitionEffect effect);
+
+    /**
+     * @brief Returns the current click animation.
+     */
+    [[nodiscard]]
+    ClickAnimation clickAnimation() const;
+
+    /**
+     * @brief Sets the click animation.
+     *
+     * @param animation Click animation to play when the button is pressed.
+     */
+    void setClickAnimation(ClickAnimation animation);
+
 protected:
     /**
      * @brief Draws the styled button.
@@ -78,11 +94,31 @@ protected:
      */
     void paintEvent(QPaintEvent*) override;
 
+    /**
+     * @brief Handles mouse press events.
+     *
+     * Starts the optional click feedback animation before
+     * forwarding the event to QToolButton.
+     */
+    void mousePressEvent(QMouseEvent* event) override;
+
 private:
+    /**
+     * @brief Applies the current visual appearance.
+     */
     void updateStyle();
 
+    /// Current visual appearance.
     ui::Appearance appearance_;
+
+    /// Animated icon renderer.
     AnimatedIcon animatedIcon_;
+
+    /// Click feedback animation.
+    ScaleAnimation scaleAnimation_{this};
+
+    /// Selected click feedback effect.
+    ClickAnimation clickAnimation_{ClickAnimation::Scale};
 };
 
 } // namespace fluvel

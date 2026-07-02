@@ -192,7 +192,7 @@ private:
     QPushButton* convergeButton_{nullptr};
 
     RightPanelToggleButton* rightPanelToggle_{nullptr};
-    QPushButton* settingsButton_{nullptr};
+    AnimatedPushButton* settingsButton_{nullptr};
 
     QWidget* controlBar_{nullptr};
 

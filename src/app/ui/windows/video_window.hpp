@@ -331,7 +331,7 @@ private:
     RightPanelToggleButton* rightPanelToggle_{nullptr};
 
     QIcon settingsIcon_;
-    QPushButton* settingsButton_{nullptr};
+    AnimatedPushButton* settingsButton_{nullptr};
 
     QWidget* configRightBlockWidget_{nullptr};
 

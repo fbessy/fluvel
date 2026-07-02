@@ -7,11 +7,12 @@
 #include <QWidget>
 
 class QComboBox;
-class QPushButton;
 class QString;
 
 namespace fluvel
 {
+
+class AnimatedPushButton;
 
 /**
  * @brief Widget for selecting a color.
@@ -66,7 +67,7 @@ private:
     void addColorItem(const QColor& color, const QString& name);
 
     QComboBox* color_cb_{nullptr};
-    QPushButton* custom_pb_{nullptr};
+    AnimatedPushButton* custom_pb_{nullptr};
 };
 
 } // namespace fluvel

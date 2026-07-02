@@ -123,9 +123,11 @@ QScrollBar:horizontal {
 
     startStopButton_ = new StyledToolButton(this, ui::Appearance::Modern);
     startStopButton_->setTransitionEffect(StyledToolButton::TransitionEffect::Slide);
+    startStopButton_->setClickAnimation(ClickAnimation::None);
 
     playPauseButton_ = new StyledToolButton(this, ui::Appearance::Modern);
     playPauseButton_->setTransitionEffect(StyledToolButton::TransitionEffect::Flip);
+    playPauseButton_->setClickAnimation(ClickAnimation::None);
 
     volumeController_ = new VolumeController(this, ui::Appearance::Modern);
 

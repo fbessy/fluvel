@@ -54,18 +54,18 @@ public:
     /**
      * @brief Returns the single-step execution button.
      */
-    QPushButton* stepButton() const;
+    AnimatedPushButton* stepButton() const;
 
     /**
      * @brief Returns the convergence button.
      */
-    QPushButton* convergeButton() const;
+    AnimatedPushButton* convergeButton() const;
 
 private:
     AnimatedPushButton* restartButton_{nullptr};
     AnimatedPushButton* pauseButton_{nullptr};
-    QPushButton* stepButton_{nullptr};
-    QPushButton* convergeButton_{nullptr};
+    AnimatedPushButton* stepButton_{nullptr};
+    AnimatedPushButton* convergeButton_{nullptr};
 };
 
 } // namespace fluvel

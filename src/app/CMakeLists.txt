@@ -149,6 +149,9 @@ set(app_src
     ${UI_COMP_DIR}/animated_push_button.hpp
     ${UI_COMP_DIR}/animated_push_button.cpp
 
+    ${UI_COMP_DIR}/scale_animation.cpp
+    ${UI_COMP_DIR}/scale_animation.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 

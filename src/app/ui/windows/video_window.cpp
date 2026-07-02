@@ -248,7 +248,7 @@ void VideoWindow::createUi()
 
     rightPanelToggle_ = new RightPanelToggleButton;
 
-    settingsButton_ = new QPushButton;
+    settingsButton_ = new AnimatedPushButton;
     settingsButton_->setToolTip(tr("Open video session settings."));
     settingsButton_->setFlat(true);
     settingsButton_->setFocusPolicy(Qt::NoFocus);
@@ -309,6 +309,7 @@ void VideoWindow::createUi()
 
     playPauseButton_ = new AnimatedPushButton;
     playPauseButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Flip);
+    playPauseButton_->setClickAnimation(ClickAnimation::None);
     playPauseButton_->setIcon(resumeIcon_);
 
     // --- Playback widgets ---

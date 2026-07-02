@@ -4,6 +4,7 @@
 #pragma once
 
 #include "animated_icon.hpp"
+#include "scale_animation.hpp"
 
 #include <QPushButton>
 
@@ -11,14 +12,15 @@ namespace fluvel
 {
 
 /**
- * @brief Push button supporting animated icon transitions.
+ * @brief Push button supporting animated interactions.
  *
  * AnimatedPushButton behaves like a standard QPushButton while
- * adding smooth animated transitions between icons.
+ * providing smooth icon transitions and optional click feedback
+ * animations.
  *
- * Icon rendering is delegated to AnimatedIcon, allowing the
- * button to display a perspective-like flip animation combined
- * with a cross-fade whenever the icon changes.
+ * Icon rendering is delegated to AnimatedIcon, while click
+ * feedback is handled independently by ScaleAnimation.
+ * Both effects can be enabled or disabled separately.
  */
 class AnimatedPushButton : public QPushButton
 {
@@ -43,18 +45,6 @@ public:
     explicit AnimatedPushButton(QWidget* parent = nullptr);
 
     /**
-     * @brief Returns the current transition effect.
-     */
-    TransitionEffect transitionEffect() const;
-
-    /**
-     * @brief Sets the transition effect.
-     *
-     * @param effect New transition effect.
-     */
-    void setTransitionEffect(TransitionEffect effect);
-
-    /**
      * @brief Changes the button icon using an animated transition.
      *
      * The visual effect depends on the currently selected
@@ -66,6 +56,32 @@ public:
     void setAnimatedIcon(const QIcon& icon,
                          TransitionDirection direction = TransitionDirection::Auto);
 
+    /**
+     * @brief Returns the current transition effect.
+     */
+    [[nodiscard]]
+    AnimatedPushButton::TransitionEffect transitionEffect() const;
+
+    /**
+     * @brief Sets the transition effect.
+     *
+     * @param effect New transition effect.
+     */
+    void setTransitionEffect(AnimatedPushButton::TransitionEffect effect);
+
+    /**
+     * @brief Returns the current click animation.
+     */
+    [[nodiscard]]
+    ClickAnimation clickAnimation() const;
+
+    /**
+     * @brief Sets the click animation.
+     *
+     * @param animation Click animation to play when the button is pressed.
+     */
+    void setClickAnimation(ClickAnimation animation);
+
 protected:
     /**
      * @brief Draws the push button.
@@ -76,9 +92,23 @@ protected:
      */
     void paintEvent(QPaintEvent*) override;
 
+    /**
+     * @brief Handles mouse press events.
+     *
+     * Starts the optional click feedback animation before
+     * forwarding the event to QPushButton.
+     */
+    void mousePressEvent(QMouseEvent* event) override;
+
 private:
     /// Animated icon renderer.
     AnimatedIcon animatedIcon_;
+
+    /// Click feedback animation.
+    ScaleAnimation scaleAnimation_{this};
+
+    /// Current click feedback animation.
+    ClickAnimation clickAnimation_{ClickAnimation::Scale};
 };
 
 } // namespace fluvel
