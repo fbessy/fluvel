@@ -155,6 +155,9 @@ set(app_src
     ${UI_COMP_DIR}/checked_animation.cpp
     ${UI_COMP_DIR}/checked_animation.hpp
 
+    ${UI_COMP_DIR}/video_shortcut_manager.cpp
+    ${UI_COMP_DIR}/video_shortcut_manager.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 

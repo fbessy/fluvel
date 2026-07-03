@@ -24,11 +24,19 @@ VolumeController::VolumeController(QWidget* parent, ui::Appearance appearance)
     slider_->setRange(0, 100);
     slider_->setValue(50);
 
-    connect(button_, &QToolButton::clicked, this, &VolumeController::onMuteButtonClicked);
-
-    connect(slider_, &QSlider::valueChanged, this, &VolumeController::onSliderChanged);
-
     updateIcon();
+
+    connect(button_, &QToolButton::clicked, this,
+            [this]()
+            {
+                emit toggleMuteRequested();
+            });
+
+    connect(slider_, &QSlider::valueChanged, this,
+            [this](int volume)
+            {
+                emit volumeRequested(volume);
+            });
 }
 
 int VolumeController::volume() const
@@ -38,9 +46,23 @@ int VolumeController::volume() const
 
 void VolumeController::setVolume(int volume)
 {
+    QSignalBlocker blocker(slider_);
+
     volume = std::clamp(volume, 0, 100);
 
     slider_->setValue(volume);
+
+    updateIcon();
+}
+
+void VolumeController::setMuted(bool muted)
+{
+    if (muted_ == muted)
+        return;
+
+    muted_ = muted;
+
+    updateIcon();
 }
 
 StyledToolButton* VolumeController::button() const
@@ -53,36 +75,25 @@ VolumeSlider* VolumeController::slider() const
     return slider_;
 }
 
-void VolumeController::onMuteButtonClicked()
+void VolumeController::setControlsEnabled(bool enabled)
 {
-    if (slider_->value() == 0)
-    {
-        slider_->setValue(lastNonZeroVolume_);
-    }
-    else
-    {
-        lastNonZeroVolume_ = slider_->value();
-        slider_->setValue(0);
-    }
+    button_->setEnabled(enabled);
+    slider_->setEnabled(enabled);
 }
 
-void VolumeController::onSliderChanged(int value)
+void VolumeController::setControlsVisible(bool visible)
 {
-    if (value > 0)
-        lastNonZeroVolume_ = value;
-
-    updateIcon();
-
-    emit volumeChanged(value);
+    button_->setVisible(visible);
+    slider_->setVisible(visible);
 }
 
-void VolumeController::updateIcon()
+void VolumeController::updateIcon() const
 {
     QIcon icon;
 
     const int volume = slider_->value();
 
-    if (volume == 0)
+    if (muted_ || volume == 0)
     {
         icon = il::loadIcon(":/icons/status/audio-volume-muted.svg", il::IconMode::Light);
     }
@@ -100,18 +111,6 @@ void VolumeController::updateIcon()
     }
 
     button_->setIcon(icon);
-}
-
-void VolumeController::setControlsEnabled(bool enabled)
-{
-    button_->setEnabled(enabled);
-    slider_->setEnabled(enabled);
-}
-
-void VolumeController::setControlsVisible(bool visible)
-{
-    button_->setVisible(visible);
-    slider_->setVisible(visible);
 }
 
 } // namespace fluvel

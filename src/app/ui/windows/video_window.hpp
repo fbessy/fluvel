@@ -7,6 +7,7 @@
 #include "application_settings_types.hpp"
 #endif
 
+#include "video_shortcut_manager.hpp"
 #include "video_types.hpp"
 
 #include <QMainWindow>
@@ -282,10 +283,11 @@ private:
     void updatePlayPauseButton(bool paused);
     void togglePause();
 
-    void setVolume(int value);
-    void updateVolumeIcon(int volume);
+    void volumeRequested(int value);
+    void updateVolumeIcon(int volume, bool muted);
     void toggleMute();
-    void saveVolume();
+    void applyInitialAudioSettings();
+    void saveAudioSettings();
 
     void toggleFullscreen();
     void enterFullscreen();
@@ -298,6 +300,11 @@ private:
     void toggleTimeDisplayMode();
     void updateDurationLabel();
     void updateFullscreenBar();
+
+    void stepPlayback(qint64 deltaMs);
+    void stepVolume(int delta);
+    void onVolumeChanged(float volume);
+    void onMutedChanged(bool muted);
 
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
@@ -397,8 +404,6 @@ private:
 
     QWidget* controlBar_{nullptr};
 
-    int lastNonZeroVolume_{50};
-
     bool isFullScreen_{false};
 
     FullscreenVideoControlBar* fullscreenBar_{nullptr};
@@ -416,6 +421,10 @@ private:
 
     TimeDisplayMode timeDisplayMode_{TimeDisplayMode::TotalDuration};
     QLabel* playbackSeparatorLabel_{nullptr};
+
+    VideoShortcutManager shortcutManager_;
+
+    QTimer saveAudioSettingsTimer_;
 };
 
 } // namespace fluvel

@@ -79,21 +79,25 @@ public:
     /**
      * @brief Check whether streaming is active.
      */
+    [[nodiscard]]
     bool isStreaming() const;
 
     /**
      * @brief Check the streaming state.
      */
+    [[nodiscard]]
     StreamingState streamingState() const;
 
     /**
      * @brief Getter for active source info.
      */
+    [[nodiscard]]
     SourceInfo activeSource() const;
 
     /**
      * @brief List available video input devices.
      */
+    [[nodiscard]]
     QList<QCameraDevice> videoInputs() const;
 
     /**
@@ -114,17 +118,26 @@ public:
     void onFrameDisplayed(const FrameTimestamps& ts);
 
     /**
+     * @brief Returns the current playback position in the active media.
+     *
+     * @return Playback position, in milliseconds from the beginning of the media.
+     */
+    [[nodiscard]]
+    qint64 positionMs() const;
+
+    /**
      * @brief Seek to a position in the current media.
      *
-     * @param posMs Target position in milliseconds.
+     * @param positionMs Target position in milliseconds.
      */
-    void seek(qint64 posMs);
+    void seek(qint64 positionMs);
 
     /**
      * @brief Returns the current audio volume.
      *
      * @return Volume in the range [0.0, 1.0].
      */
+    [[nodiscard]]
     float volume() const;
 
     /**
@@ -135,10 +148,26 @@ public:
     void setVolume(float volume);
 
     /**
+     * @brief Returns whether the audio output is currently muted.
+     *
+     * @return @c true if the audio output is muted, @c false otherwise.
+     */
+    [[nodiscard]]
+    bool isMuted() const;
+
+    /**
+     * @brief Sets whether the audio output is muted.
+     *
+     * @param muted @c true to mute the audio output, @c false to unmute it.
+     */
+    void setMuted(bool muted);
+
+    /**
      * @brief Check whether media playback is currently paused.
      *
      * @return True if playback is paused, false otherwise.
      */
+    [[nodiscard]]
     bool isPaused() const;
 
     /**
@@ -157,6 +186,7 @@ public:
      * Media-specific operations such as pause(), resume() and seek()
      * are only valid when this function returns @c true.
      */
+    [[nodiscard]]
     bool isMediaActive() const;
 
 signals:
@@ -228,6 +258,28 @@ signals:
      * @param paused Current pause state.
      */
     void pausedChanged(bool paused);
+
+    /**
+     * @brief Emitted when the playback volume changes.
+     *
+     * This signal is emitted whenever the output volume is modified,
+     * regardless of whether the change originates from the user interface,
+     * a keyboard shortcut, or another component.
+     *
+     * @param volume Playback volume in the range [0.0, 1.0].
+     */
+    void volumeChanged(float volume);
+
+    /**
+     * @brief Emitted when the muted state changes.
+     *
+     * This signal is emitted whenever the audio output is muted or unmuted,
+     * regardless of whether the change originates from the user interface,
+     * a keyboard shortcut, or another component.
+     *
+     * @param muted @c true if the audio output is muted, @c false otherwise.
+     */
+    void mutedChanged(bool muted);
 
 private:
     /**

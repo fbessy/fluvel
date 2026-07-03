@@ -32,32 +32,48 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     onVideoSettingsChanged(session);
     onVideoDisplaySettingsChanged(session.display);
 
-    mediaPlayer_.setAudioOutput(&audioOutput_);
-
     startupTimer_.setSingleShot(true);
     watchdogTimer_.setInterval(kWatchdogPeriodMs);
     diagnosticsTimer_.setInterval(kDiagnosticsPeriodMs);
 
+    mediaPlayer_.setAudioOutput(&audioOutput_);
+
+    //
+    // Audio
+    //
+    connect(&audioOutput_, &QAudioOutput::volumeChanged, this,
+            [this](float volume)
+            {
+                emit volumeChanged(volume);
+            });
+
+    connect(&audioOutput_, &QAudioOutput::mutedChanged, this,
+            [this](bool muted)
+            {
+                emit mutedChanged(muted);
+            });
+
+    //
+    // Devices
+    //
     connect(mediaDevices, &QMediaDevices::videoInputsChanged, this,
             &VideoController::onVideoInputsChanged);
 
-    connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
-            &VideoController::onDisplayFrameReady, Qt::QueuedConnection);
-
+    //
+    // Timers
+    //
     connect(&startupTimer_, &QTimer::timeout, this, &VideoController::onStartupTimeout);
     connect(&watchdogTimer_, &QTimer::timeout, this, &VideoController::checkWatchdog);
     connect(&diagnosticsTimer_, &QTimer::timeout, this, &VideoController::updateDiagnostics);
 
-    connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
-            &VideoController::onFrameProcessed);
-
+    //
+    // Media player
+    //
     connect(&mediaPlayer_, &QMediaPlayer::errorOccurred, this,
             &VideoController::onMediaPlayerError);
 
     connect(&mediaPlayer_, &QMediaPlayer::mediaStatusChanged, this,
             &VideoController::onMediaStatusChanged);
-
-    connect(&videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
 
     connect(&mediaPlayer_, &QMediaPlayer::positionChanged, this,
             &VideoController::playbackPositionChanged);
@@ -70,6 +86,17 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
             {
                 emit pausedChanged(state == QMediaPlayer::PausedState);
             });
+
+    connect(&videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
+
+    //
+    // Processing thread
+    //
+    connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
+            &VideoController::onDisplayFrameReady, Qt::QueuedConnection);
+
+    connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
+            &VideoController::onFrameProcessed);
 
     activeContourThread_.start();
 }
@@ -508,14 +535,22 @@ QList<QCameraDevice> VideoController::videoInputs() const
     return QMediaDevices::videoInputs();
 }
 
-void VideoController::seek(qint64 posMs)
+qint64 VideoController::positionMs() const
+{
+    if (!isMediaActive())
+        return 0;
+
+    return mediaPlayer_.position();
+}
+
+void VideoController::seek(qint64 positionMs)
 {
     if (!isMediaActive())
         return;
 
     resetWatchdog();
 
-    mediaPlayer_.setPosition(posMs);
+    mediaPlayer_.setPosition(positionMs);
 }
 
 float VideoController::volume() const
@@ -527,7 +562,24 @@ void VideoController::setVolume(float volume)
 {
     volume = std::clamp(volume, 0.0f, 1.0f);
 
+    if (qFuzzyCompare(audioOutput_.volume(), volume))
+        return;
+
+    audioOutput_.setMuted(false);
     audioOutput_.setVolume(volume);
+}
+
+bool VideoController::isMuted() const
+{
+    return audioOutput_.isMuted();
+}
+
+void VideoController::setMuted(bool muted)
+{
+    if (audioOutput_.isMuted() == muted)
+        return;
+
+    audioOutput_.setMuted(muted);
 }
 
 void VideoController::onMetaDataChanged()

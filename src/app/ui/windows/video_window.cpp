@@ -66,6 +66,13 @@ constexpr auto kCameraFormatsKey = "camera/formats";
 constexpr auto kSourceHistoryKey = "sources/history";
 constexpr auto kLastVideoDirectory = "video/last_directory";
 
+constexpr auto kVolumeKey = "media/volume";
+constexpr auto kMutedKey = "media/muted";
+
+constexpr int kDefaultVolume = 50;
+constexpr bool kDefaultMuted = false;
+constexpr int kSaveAudioSettingsDelayMs = 3000;
+
 constexpr int kControlSpacing = 6;
 constexpr int kSectionSpacing = 12;
 constexpr int kGroupSpacing = 20;
@@ -78,8 +85,11 @@ namespace fluvel
 
 VideoWindow::VideoWindow(QWidget* parent)
     : QMainWindow(parent)
+    , shortcutManager_(this)
 
 {
+    saveAudioSettingsTimer_.setSingleShot(true);
+
     setupWindow();
     restoreSettings();
 
@@ -693,15 +703,7 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::mediaInfoChanged, this,
             &VideoWindow::onMediaInfoChanged);
 
-    connect(volumeSlider_, &QSlider::valueChanged, this, &VideoWindow::setVolume);
-
-    connect(volumeSlider_, &QSlider::sliderReleased, this, &VideoWindow::saveVolume);
-
-    connect(volumeSlider_, &QSlider::valueChanged, volumeLabel_,
-            [this](int value)
-            {
-                volumeLabel_->setText(QString("%1%").arg(value));
-            });
+    connect(volumeSlider_, &QSlider::valueChanged, this, &VideoWindow::volumeRequested);
 
     connect(volumeButton_, &QPushButton::clicked, this,
             [this]()
@@ -782,8 +784,35 @@ void VideoWindow::setupConnections()
     connect(fullscreenBar_->overlayButton(), &QToolButton::toggled, displayBar_,
             &DisplaySettingsWidget::setAlgorithmOverlayEnabled);
 
-    connect(fullscreenBar_->volumeController(), &VolumeController::volumeChanged, this,
-            &VideoWindow::setVolume);
+    connect(fullscreenBar_->volumeController(), &VolumeController::volumeRequested, this,
+            &VideoWindow::volumeRequested);
+
+    connect(fullscreenBar_->volumeController(), &VolumeController::toggleMuteRequested, this,
+            &VideoWindow::toggleMute);
+
+    connect(&shortcutManager_, &VideoShortcutManager::playPauseRequested, this,
+            &VideoWindow::togglePause);
+
+    connect(&shortcutManager_, &VideoShortcutManager::toggleMuteRequested, this,
+            &VideoWindow::toggleMute);
+
+    connect(&shortcutManager_, &VideoShortcutManager::toggleFullscreenRequested, this,
+            &VideoWindow::toggleFullscreen);
+
+    connect(&shortcutManager_, &VideoShortcutManager::escapeRequested, this,
+            &VideoWindow::leaveFullscreen);
+
+    connect(&shortcutManager_, &VideoShortcutManager::seekRequested, this,
+            &VideoWindow::stepPlayback);
+
+    connect(&shortcutManager_, &VideoShortcutManager::volumeRequested, this,
+            &VideoWindow::stepVolume);
+
+    connect(videoController_, &VideoController::volumeChanged, this, &VideoWindow::onVolumeChanged);
+
+    connect(videoController_, &VideoController::mutedChanged, this, &VideoWindow::onMutedChanged);
+
+    connect(&saveAudioSettingsTimer_, &QTimer::timeout, this, &VideoWindow::saveAudioSettings);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -801,13 +830,7 @@ void VideoWindow::applyInitialSettings()
 
     displayBar_->updateDisplayModeAvailability(preprocessing);
 
-    QSettings settings;
-    const int volume = settings.value("media/volume", 50).toInt();
-    volumeSlider_->setValue(volume);
-    volumeLabel_->setText(QString("%1%").arg(volume));
-
-    updateVolumeIcon(volume);
-    videoController_->setVolume(volume / 100.f);
+    applyInitialAudioSettings();
 
     loadLastSourceType();
 
@@ -1147,6 +1170,7 @@ void VideoWindow::closeEvent(QCloseEvent* event)
 
     saveSelectedCameraId();
     savePreferredFormats();
+    saveAudioSettings();
 
     QSettings settings;
 
@@ -1536,6 +1560,23 @@ QByteArray VideoWindow::loadSelectedCameraId()
     return settings.value(kCameraDeviceKey).toByteArray();
 }
 
+void VideoWindow::applyInitialAudioSettings()
+{
+    QSettings settings;
+    int volume = settings.value(kVolumeKey, kDefaultVolume).toInt();
+    volume = std::clamp(volume, 0, 100);
+
+    const bool muted = settings.value(kMutedKey, kDefaultMuted).toBool();
+
+    // Reuse the runtime UI update handlers to initialize the audio widgets.
+    // Signal connections are established afterwards, so no feedback loop occurs.
+    onVolumeChanged(volume);
+    onMutedChanged(muted);
+
+    videoController_->setVolume(static_cast<float>(volume) / 100.f);
+    videoController_->setMuted(muted);
+}
+
 void VideoWindow::loadLastSourceType()
 {
     QSettings settings;
@@ -1916,37 +1957,32 @@ void VideoWindow::appendStreamingInfo(QString& title, const StreamingInfo& info)
     }
 }
 
-void VideoWindow::setVolume(int value)
+void VideoWindow::volumeRequested(int value)
 {
-    if (value > 0)
-        lastNonZeroVolume_ = value;
+    value = std::clamp(value, 0, 100);
 
-    videoController_->setVolume(value / 100.f);
-    updateVolumeIcon(value);
+    videoController_->setVolume(static_cast<float>(value) / 100.f);
 }
 
 void VideoWindow::toggleMute()
 {
-    if (volumeSlider_->value() == 0)
-    {
-        volumeSlider_->setValue(lastNonZeroVolume_);
-    }
-    else
-    {
-        lastNonZeroVolume_ = volumeSlider_->value();
-        volumeSlider_->setValue(0);
-    }
+    videoController_->setMuted(!videoController_->isMuted());
 }
 
-void VideoWindow::saveVolume()
+void VideoWindow::saveAudioSettings()
 {
     QSettings settings;
-    settings.setValue("media/volume", volumeSlider_->value());
+
+    settings.setValue(kVolumeKey, qRound(videoController_->volume() * 100.f));
+
+    settings.setValue(kMutedKey, videoController_->isMuted());
 }
 
-void VideoWindow::updateVolumeIcon(int volume)
+void VideoWindow::updateVolumeIcon(int volume, bool muted)
 {
-    if (volume == 0)
+    volume = std::clamp(volume, 0, 100);
+
+    if (muted || volume == 0)
     {
         volumeButton_->setIcon(volumeMuteIcon_);
     }
@@ -2147,6 +2183,48 @@ void VideoWindow::updateFullscreenBar()
     // Volume controls remain visible for media sources but are disabled
     // when the current media has no audio track.
     fullscreenBar_->volumeController()->setControlsEnabled(hasAudio);
+}
+
+void VideoWindow::stepPlayback(qint64 deltaMs)
+{
+    videoController_->seek(videoController_->positionMs() + deltaMs);
+}
+
+void VideoWindow::stepVolume(int delta)
+{
+    int value = qRound(videoController_->volume() * 100.f);
+
+    value = std::clamp(value + delta, 0, 100);
+
+    videoController_->setVolume(static_cast<float>(value) / 100.f);
+}
+
+void VideoWindow::onVolumeChanged(float volume)
+{
+    const int value = qRound(volume * 100.f);
+
+    QSignalBlocker b1(volumeSlider_);
+    QSignalBlocker b2(fullscreenBar_->volumeController());
+
+    volumeSlider_->setValue(value);
+    fullscreenBar_->volumeController()->setVolume(value);
+
+    volumeLabel_->setText(QString("%1%").arg(value));
+
+    updateVolumeIcon(value, videoController_->isMuted());
+
+    saveAudioSettingsTimer_.start(kSaveAudioSettingsDelayMs);
+}
+
+void VideoWindow::onMutedChanged(bool muted)
+{
+    fullscreenBar_->volumeController()->setMuted(muted);
+
+    const int volume = qRound(videoController_->volume() * 100.f);
+
+    updateVolumeIcon(volume, muted);
+
+    saveAudioSettingsTimer_.start(kSaveAudioSettingsDelayMs);
 }
 
 } // namespace fluvel

@@ -16,10 +16,10 @@ class VolumeSlider;
 class StyledToolButton;
 
 /**
- * @brief Controls audio volume widgets.
+ * @brief Provides a volume button and slider.
  *
- * VolumeController owns a volume button and a slider and
- * synchronizes their state (mute, icon and current volume).
+ * VolumeController owns a volume button and a slider, emits user
+ * interaction requests and updates their visual state.
  *
  * Layout is intentionally left to the caller.
  */
@@ -40,14 +40,28 @@ public:
     /**
      * @brief Returns the current volume.
      */
+    [[nodiscard]]
     int volume() const;
 
     /**
-     * @brief Sets the current volume.
+     * @brief Updates the displayed volume.
      *
-     * @param volume Volume in percent.
+     * This function updates the widget state without emitting
+     * volumeRequested().
+     *
+     * @param volume Volume in the range [0, 100].
      */
     void setVolume(int volume);
+
+    /**
+     * @brief Updates the displayed muted state.
+     *
+     * This function updates the mute button appearance without emitting
+     * toggleMuteRequested().
+     *
+     * @param muted @c true to display the muted state, @c false otherwise.
+     */
+    void setMuted(bool muted);
 
     /**
      * @brief Enables or disables the volume controls.
@@ -72,29 +86,35 @@ public:
     /**
      * @brief Returns the volume button.
      */
+    [[nodiscard]]
     StyledToolButton* button() const;
 
     /**
      * @brief Returns the slider.
      */
+    [[nodiscard]]
     VolumeSlider* slider() const;
 
 signals:
     /**
-     * @brief Emitted when the volume changes.
+     * @brief Emitted when the user requests a volume change.
+     *
+     * @param volume Requested volume in the range [0, 100].
      */
-    void volumeChanged(int volume);
+    void volumeRequested(int volume);
+
+    /**
+     * @brief Emitted when the user requests to toggle the muted state.
+     */
+    void toggleMuteRequested();
 
 private:
-    void onMuteButtonClicked();
-    void onSliderChanged(int value);
-    void updateIcon();
+    void updateIcon() const;
 
     StyledToolButton* button_{nullptr};
     VolumeSlider* slider_{nullptr};
 
-    /// Volume restored after unmuting.
-    int lastNonZeroVolume_{50};
+    bool muted_{false};
 };
 
 } // namespace fluvel
