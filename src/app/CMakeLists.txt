@@ -152,6 +152,9 @@ set(app_src
     ${UI_COMP_DIR}/scale_animation.cpp
     ${UI_COMP_DIR}/scale_animation.hpp
 
+    ${UI_COMP_DIR}/checked_animation.cpp
+    ${UI_COMP_DIR}/checked_animation.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 

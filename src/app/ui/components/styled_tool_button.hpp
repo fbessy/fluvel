@@ -4,6 +4,7 @@
 #pragma once
 
 #include "animated_icon.hpp"
+#include "checked_animation.hpp"
 #include "scale_animation.hpp"
 #include "ui_appearance.hpp"
 
@@ -84,6 +85,22 @@ public:
      */
     void setClickAnimation(ClickAnimation animation);
 
+    /**
+     * @brief Returns the current checked-state animation.
+     */
+    [[nodiscard]]
+    CheckAnimation checkAnimation() const;
+
+    /**
+     * @brief Sets the checked-state animation.
+     *
+     * Enabling a checked-state animation automatically disables
+     * the click animation, since both effects are mutually exclusive.
+     *
+     * @param animation Checked-state animation.
+     */
+    void setCheckAnimation(CheckAnimation animation);
+
 protected:
     /**
      * @brief Draws the styled button.
@@ -102,6 +119,14 @@ protected:
      */
     void mousePressEvent(QMouseEvent* event) override;
 
+    /**
+     * @brief Handles checked-state changes.
+     *
+     * Starts the optional checked-state animation before
+     * forwarding the state change to QToolButton.
+     */
+    void nextCheckState() override;
+
 private:
     /**
      * @brief Applies the current visual appearance.
@@ -119,6 +144,12 @@ private:
 
     /// Selected click feedback effect.
     ClickAnimation clickAnimation_{ClickAnimation::Scale};
+
+    /// Checked-state feedback animation.
+    CheckedAnimation checkedAnimation_{this};
+
+    /// Current checked-state animation.
+    CheckAnimation checkAnimation_{CheckAnimation::None};
 };
 
 } // namespace fluvel

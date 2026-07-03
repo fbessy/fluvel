@@ -132,8 +132,13 @@ QScrollBar:horizontal {
     volumeController_ = new VolumeController(this, ui::Appearance::Modern);
 
     mirrorButton_ = new StyledToolButton(this, ui::Appearance::Modern);
+    mirrorButton_->setCheckAnimation(CheckAnimation::Pop);
+
     smoothButton_ = new StyledToolButton(this, ui::Appearance::Modern);
+    smoothButton_->setCheckAnimation(CheckAnimation::Pop);
+
     overlayButton_ = new StyledToolButton(this, ui::Appearance::Modern);
+    overlayButton_->setCheckAnimation(CheckAnimation::Pop);
 
     mirrorButton_->setCheckable(true);
     smoothButton_->setCheckable(true);

@@ -38,7 +38,12 @@ void StyledToolButton::paintEvent(QPaintEvent*)
 {
     QStylePainter painter(this);
 
-    const qreal s = scaleAnimation_.scale();
+    qreal s = 1.0;
+
+    if (clickAnimation_ != ClickAnimation::None)
+        s = scaleAnimation_.scale();
+    else if (checkAnimation_ != CheckAnimation::None)
+        s = checkedAnimation_.scale();
 
     if (!qFuzzyCompare(s, 1.0))
     {
@@ -74,6 +79,21 @@ void StyledToolButton::mousePressEvent(QMouseEvent* event)
     QToolButton::mousePressEvent(event);
 }
 
+void StyledToolButton::nextCheckState()
+{
+    const bool next = !isChecked();
+
+    if (checkAnimation_ != CheckAnimation::None)
+    {
+        if (next)
+            checkedAnimation_.check();
+        else
+            checkedAnimation_.uncheck();
+    }
+
+    QToolButton::nextCheckState();
+}
+
 ui::Appearance StyledToolButton::appearance() const
 {
     return appearance_;
@@ -97,6 +117,22 @@ ClickAnimation StyledToolButton::clickAnimation() const
 void StyledToolButton::setClickAnimation(ClickAnimation animation)
 {
     clickAnimation_ = animation;
+
+    if (clickAnimation_ != ClickAnimation::None)
+        checkAnimation_ = CheckAnimation::None;
+}
+
+CheckAnimation StyledToolButton::checkAnimation() const
+{
+    return checkAnimation_;
+}
+
+void StyledToolButton::setCheckAnimation(CheckAnimation animation)
+{
+    checkAnimation_ = animation;
+
+    if (checkAnimation_ != CheckAnimation::None)
+        clickAnimation_ = ClickAnimation::None;
 }
 
 StyledToolButton::TransitionEffect StyledToolButton::transitionEffect() const
