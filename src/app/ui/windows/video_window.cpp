@@ -1570,10 +1570,10 @@ void VideoWindow::applyInitialAudioSettings()
 
     // Reuse the runtime UI update handlers to initialize the audio widgets.
     // Signal connections are established afterwards, so no feedback loop occurs.
-    onVolumeChanged(volume);
+    onVolumeChanged(static_cast<float>(volume) / 100.f);
     onMutedChanged(muted);
 
-    videoController_->setVolume(static_cast<float>(volume) / 100.f);
+    volumeRequested(volume);
     videoController_->setMuted(muted);
 }
 
@@ -1966,6 +1966,9 @@ void VideoWindow::volumeRequested(int value)
 
 void VideoWindow::toggleMute()
 {
+    if (!mediaInfo_.hasAudio)
+        return;
+
     videoController_->setMuted(!videoController_->isMuted());
 }
 
@@ -2011,6 +2014,9 @@ void VideoWindow::updatePlayPauseButton(bool paused)
 
 void VideoWindow::togglePause()
 {
+    if (!videoController_->isMediaActive())
+        return;
+
     if (videoController_->isPaused())
     {
         videoController_->resume();
@@ -2187,11 +2193,17 @@ void VideoWindow::updateFullscreenBar()
 
 void VideoWindow::stepPlayback(qint64 deltaMs)
 {
+    if (!videoController_->isMediaActive() || !mediaInfo_.seekable)
+        return;
+
     videoController_->seek(videoController_->positionMs() + deltaMs);
 }
 
 void VideoWindow::stepVolume(int delta)
 {
+    if (!mediaInfo_.hasAudio)
+        return;
+
     int value = qRound(videoController_->volume() * 100.f);
 
     value = std::clamp(value + delta, 0, 100);
