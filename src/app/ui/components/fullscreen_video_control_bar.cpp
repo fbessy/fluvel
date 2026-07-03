@@ -161,8 +161,11 @@ QScrollBar:horizontal {
         b->setCursor(Qt::PointingHandCursor);
     }
 
-    positionLabel_ = new QLabel("00:00");
-    durationLabel_ = new ClickableLabel("-00:00");
+    const QString positionPlaceholder("0:00:00");
+    const QString durationPlaceholder("-0:00:00");
+
+    positionLabel_ = new QLabel(positionPlaceholder);
+    durationLabel_ = new ClickableLabel(durationPlaceholder);
 
     QFont font = positionLabel_->font();
     font.setBold(true);
@@ -170,6 +173,19 @@ QScrollBar:horizontal {
 
     positionLabel_->setFont(font);
     durationLabel_->setFont(font);
+
+    QFontMetrics fm(font);
+
+    // Reserve enough space to avoid layout shifts when the
+    // displayed time format changes (e.g. when crossing one hour).
+    const int positionTextWidth = fm.horizontalAdvance(positionPlaceholder);
+    positionLabel_->setMinimumWidth(positionTextWidth);
+
+    const int durationTextWidth = fm.horizontalAdvance(durationPlaceholder);
+    durationLabel_->setMinimumWidth(durationTextWidth);
+
+    positionLabel_->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    durationLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     playbackSlider_ = new TimelineSlider(this, ui::Appearance::Modern);
     playbackSlider_->setMinimumWidth(260);

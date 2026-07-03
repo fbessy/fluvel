@@ -316,9 +316,26 @@ void VideoWindow::createUi()
     playbackSlider_ = new TimelineSlider(this, ui::Appearance::Native);
     playbackSlider_->setMinimumWidth(250);
 
-    playbackPositionLabel_ = new QLabel("00:00");
+    const QString positionPlaceholder("0:00:00");
+    const QString durationPlaceholder("-0:00:00");
+
+    playbackPositionLabel_ = new QLabel(positionPlaceholder);
+    playbackDurationLabel_ = new ClickableLabel(durationPlaceholder);
+
+    QFontMetrics fm(font());
+
+    // Reserve enough space to avoid layout shifts when the
+    // displayed time format changes (e.g. when crossing one hour).
+    const int positionTextWidth = fm.horizontalAdvance(positionPlaceholder);
+    playbackPositionLabel_->setMinimumWidth(positionTextWidth);
+
+    const int durationTextWidth = fm.horizontalAdvance(durationPlaceholder);
+    playbackDurationLabel_->setMinimumWidth(durationTextWidth);
+
+    playbackPositionLabel_->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    playbackDurationLabel_->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
     playbackSeparatorLabel_ = new QLabel("/");
-    playbackDurationLabel_ = new ClickableLabel("-00:00");
 
     // --- Volume widgets ---
     volumeMuteIcon_ =
