@@ -137,6 +137,15 @@ void ImageWindow::setupUi()
     normalTheme_.showText = true;
     normalTheme_.showToolTips = true;
 
+    const int w = AnimatedPushButton::recommendedWidth(
+        *restartButton_,
+        {tr("Start"), tr("Restart"), tr("Pause"), tr("Resume"), tr("Step"), tr("Converge")});
+
+    restartButton_->setFixedWidth(w);
+    togglePauseButton_->setFixedWidth(w);
+    stepButton_->setFixedWidth(w);
+    convergeButton_->setFixedWidth(w);
+
     rightPanelToggle_ = new RightPanelToggleButton;
 
     settingsButton_ = new AnimatedPushButton;

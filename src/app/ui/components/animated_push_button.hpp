@@ -91,6 +91,24 @@ public:
      */
     void setClickAnimation(ClickAnimation animation);
 
+    /**
+     * @brief Computes a recommended fixed width for animated buttons.
+     *
+     * The returned width is large enough to accommodate the longest label
+     * from @p labels together with the button icon and style-dependent
+     * margins. Using the same width for a group of buttons prevents visual
+     * resizing when their text changes (for example "Start" ↔ "Restart").
+     *
+     * The computation uses the font, icon size and style metrics of the
+     * reference button to ensure consistent rendering across platforms and
+     * styles.
+     *
+     * @param reference Button providing the font, icon size and style metrics.
+     * @param labels Candidate translated labels.
+     * @return Recommended button width in pixels.
+     */
+    static int recommendedWidth(const QPushButton& reference, const QStringList& labels);
+
 protected:
     /**
      * @brief Draws the push button.

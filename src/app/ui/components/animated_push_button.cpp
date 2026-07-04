@@ -3,6 +3,7 @@
 
 #include "animated_push_button.hpp"
 
+#include <QApplication>
 #include <QStyleOptionButton>
 #include <QStylePainter>
 
@@ -158,6 +159,24 @@ AnimatedPushButton::ButtonLayout AnimatedPushButton::calculateLayout() const
     }
 
     return layout;
+}
+
+int AnimatedPushButton::recommendedWidth(const QPushButton& reference, const QStringList& labels)
+{
+    QFontMetrics fm(reference.font());
+
+    int textWidth = 0;
+
+    for (const QString& label : labels)
+        textWidth = std::max(textWidth, fm.horizontalAdvance(label));
+
+    const QStyle* style = reference.style();
+
+    const int iconWidth = reference.iconSize().width();
+    const int margin = style->pixelMetric(QStyle::PM_ButtonMargin, nullptr, &reference);
+    const int spacing = 6;
+
+    return textWidth + iconWidth + spacing + margin * 4;
 }
 
 } // namespace fluvel
