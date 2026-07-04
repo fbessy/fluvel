@@ -314,6 +314,8 @@ void SettingsDialog::setupUiDownscaleTab()
     downscaleFactorCb_ = new QComboBox;
     downscaleFactorCb_->addItem("2", 2);
     downscaleFactorCb_->addItem("4", 4);
+    downscaleFactorCb_->addItem("8", 8);
+    downscaleFactorCb_->addItem("16", 16);
 
     auto* label = new QLabel(tr("Factor: "));
 

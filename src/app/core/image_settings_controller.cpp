@@ -177,7 +177,7 @@ void ImageSettingsController::applyDownscale()
     {
         const int df = editedDownscaleParams_.downscaleFactor;
 
-        assert(df == 2 || df == 4);
+        assert(df == 2 || df == 4 || df == 8 || df == 16);
 
         downscaled_ = input_.scaled(input_.width() / df, input_.height() / df,
                                     Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

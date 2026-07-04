@@ -98,7 +98,7 @@ QImage VideoActiveContourThread::applyDownscale(const QImage& input,
 
     const int factor = config.downscaleFactor;
 
-    assert(factor == 2 || factor == 4);
+    assert(factor == 2 || factor == 4 || factor == 8 || factor == 16);
 
     return input.scaled(input.width() / factor, input.height() / factor, Qt::IgnoreAspectRatio,
                         Qt::SmoothTransformation);

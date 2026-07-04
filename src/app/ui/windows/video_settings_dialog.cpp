@@ -121,6 +121,8 @@ void VideoSettingsDialog::setupDownscaleGroup()
     downscaleFactorCb_ = new QComboBox;
     downscaleFactorCb_->addItem("2", 2);
     downscaleFactorCb_->addItem("4", 4);
+    downscaleFactorCb_->addItem("8", 8);
+    downscaleFactorCb_->addItem("16", 16);
 
     auto* fl = new QFormLayout;
     fl->addRow(tr("Factor: "), downscaleFactorCb_);
