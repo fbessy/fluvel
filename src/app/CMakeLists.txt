@@ -125,6 +125,7 @@ set(app_src
 
     ${UI_COMP_DIR}/image_viewer_listener.hpp
 
+    ${UI_COMP_DIR}/animated_tab_widget.cpp
     ${UI_COMP_DIR}/animated_tab_widget.hpp
 
     ${UI_COMP_DIR}/clickable_label.cpp

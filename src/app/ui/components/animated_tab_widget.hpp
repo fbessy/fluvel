@@ -3,72 +3,42 @@
 
 #pragma once
 
-#include <QGraphicsOpacityEffect>
-#include <QParallelAnimationGroup>
-#include <QPropertyAnimation>
 #include <QTabWidget>
 
 namespace fluvel
 {
 
+/**
+ * @brief Tab widget providing animated page transitions.
+ *
+ * AnimatedTabWidget extends QTabWidget by applying a short slide
+ * and fade animation whenever the current page changes.
+ *
+ * The animation is intentionally subtle to improve perceived
+ * responsiveness while preserving the native Qt widget appearance.
+ */
 class AnimatedTabWidget : public QTabWidget
 {
     Q_OBJECT
 
 public:
-    explicit AnimatedTabWidget(QWidget* parent = nullptr)
-        : QTabWidget(parent)
-    {
-        connect(this, &QTabWidget::currentChanged, this, &AnimatedTabWidget::animateCurrentPage);
-    }
+    /**
+     * @brief Constructs an animated tab widget.
+     *
+     * @param parent Parent widget.
+     */
+    explicit AnimatedTabWidget(QWidget* parent = nullptr);
 
 private slots:
-    void animateCurrentPage(int index)
-    {
-        QWidget* page = widget(index);
-
-        if (!page)
-            return;
-
-        const QPoint finalPos = page->pos();
-
-        //
-        // Slide animation
-        //
-        page->move(finalPos.x() + 10, finalPos.y());
-
-        auto* slideAnim = new QPropertyAnimation(page, "pos");
-        slideAnim->setDuration(100);
-        slideAnim->setStartValue(page->pos());
-        slideAnim->setEndValue(finalPos);
-        slideAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-        //
-        // Fade animation
-        //
-        auto* effect = new QGraphicsOpacityEffect(page);
-        page->setGraphicsEffect(effect);
-
-        effect->setOpacity(0.90);
-
-        auto* fadeAnim = new QPropertyAnimation(effect, "opacity");
-        fadeAnim->setDuration(100);
-        fadeAnim->setStartValue(0.90);
-        fadeAnim->setEndValue(1.0);
-        fadeAnim->setEasingCurve(QEasingCurve::OutCubic);
-
-        //
-        // Run both animations together
-        //
-        auto* group = new QParallelAnimationGroup(this);
-
-        group->addAnimation(slideAnim);
-        group->addAnimation(fadeAnim);
-
-        connect(group, &QParallelAnimationGroup::finished, effect, &QObject::deleteLater);
-
-        group->start(QAbstractAnimation::DeleteWhenStopped);
-    }
+    /**
+     * @brief Animates the newly selected page.
+     *
+     * A short slide and fade animation is applied to the page
+     * corresponding to @p index.
+     *
+     * @param index Index of the current page.
+     */
+    void animateCurrentPage(int index);
 };
 
 } // namespace fluvel
