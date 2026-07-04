@@ -169,19 +169,40 @@ QString buildVideoFilter();
 bool isSupportedVideoFile(const QString& path);
 
 /**
- * @brief Returns supported video file formats as human-readable names.
+ * @brief Returns the list of supported media container formats.
  *
- * The formats are derived from the multimedia backend capabilities
- * reported by Qt Multimedia for media decoding.
+ * The returned list is built from the multimedia backend and
+ * contains the supported file container extensions (for example
+ * MP4, MKV or AVI).
  *
- * Unlike supportedVideoExtensions(), this function returns
- * uppercase format names intended for display in the user interface.
- *
- * Example:
- * "AVI, M4V, MKV, MOV, MP4, WEBM"
- *
- * @return Comma-separated list of supported video formats.
+ * @return Comma-separated list of supported video containers.
  */
-QString supportedVideoFormats();
+QString supportedMediaContainers();
+
+/**
+ * @brief Returns the list of supported video codecs.
+ *
+ * The returned list depends on the multimedia backend available
+ * on the current system (Qt Multimedia / FFmpeg backend).
+ *
+ * Codec names are returned in a human-readable form and sorted
+ * alphabetically.
+ *
+ * @return Comma-separated list of supported video codecs.
+ */
+QString supportedVideoCodecs();
+
+/**
+ * @brief Returns the list of supported audio codecs.
+ *
+ * The returned list depends on the multimedia backend available
+ * on the current system (Qt Multimedia / FFmpeg backend).
+ *
+ * Codec names are returned in a human-readable form and sorted
+ * alphabetically.
+ *
+ * @return Comma-separated list of supported audio codecs.
+ */
+QString supportedAudioCodecs();
 
 } // namespace fluvel::file_utils

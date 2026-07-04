@@ -489,15 +489,23 @@ QString AboutDialog::buildTechnicalSection()
 
     html += "<div style='margin-left:12px; font-size:9pt; color:#444; margin-bottom:6px;'>";
     html += tr("Media source support is provided by Fluvel and Qt Multimedia.") + "<br>";
-    html += tr("Available video formats depend on the platform and multimedia backend.");
+    html += tr("Available features depend on the platform and multimedia backend.");
     html += "</div>";
 
     html += "<div style='font-family:monospace; margin-bottom:8px;'>";
     html += tr("Camera devices") + "<br>";
     html += "HTTP / HTTPS<br>";
     html += "RTSP<br>";
-    html += "HLS (M3U8)<br>";
-    html += tr("Local files (") + file_utils::supportedVideoFormats() + ")";
+    html += "HLS (M3U8)";
+    html += "</div>";
+
+    html += "<div style='margin-bottom:4px;'><b>" + tr("Local video files") + "</b></div>";
+
+    html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word; "
+            "margin-bottom:8px;'>";
+    html += tr("Video codecs") + ": " + file_utils::supportedVideoCodecs() + "<br>";
+    html += tr("Audio codecs") + ": " + file_utils::supportedAudioCodecs() + "<br>";
+    html += tr("File formats") + ": " + file_utils::supportedMediaContainers();
     html += "</div>";
 
     html += "</div>"; // end Application block

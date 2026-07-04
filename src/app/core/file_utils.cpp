@@ -170,7 +170,7 @@ bool isSupportedVideoFile(const QString& path)
     return extensions.contains(suffix, Qt::CaseInsensitive);
 }
 
-QString supportedVideoFormats()
+QString supportedMediaContainers()
 {
     QStringList formats;
 
@@ -192,5 +192,139 @@ QString supportedVideoFormats()
     formats.sort();
 
     return formats.join(", ");
+}
+
+static QString codecName(QMediaFormat::VideoCodec codec)
+{
+    return QMediaFormat::videoCodecName(codec);
+}
+
+static QString prettyVideoCodecName(QMediaFormat::VideoCodec codec)
+{
+    switch (codec)
+    {
+        case QMediaFormat::VideoCodec::MPEG1:
+            return "MPEG-1";
+
+        case QMediaFormat::VideoCodec::MPEG2:
+            return "MPEG-2";
+
+        case QMediaFormat::VideoCodec::MPEG4:
+            return "MPEG-4";
+
+        case QMediaFormat::VideoCodec::H264:
+            return "H.264 / AVC";
+
+        case QMediaFormat::VideoCodec::H265:
+            return "H.265 / HEVC";
+
+        case QMediaFormat::VideoCodec::VP8:
+            return "VP8";
+
+        case QMediaFormat::VideoCodec::VP9:
+            return "VP9";
+
+        case QMediaFormat::VideoCodec::AV1:
+            return "AV1";
+
+        case QMediaFormat::VideoCodec::Theora:
+            return "Theora";
+
+        case QMediaFormat::VideoCodec::WMV:
+            return "WMV";
+
+        case QMediaFormat::VideoCodec::MotionJPEG:
+            return "Motion JPEG";
+
+        case QMediaFormat::VideoCodec::Unspecified:
+            return QObject::tr("Unspecified");
+
+        default:
+            return QMediaFormat::videoCodecName(codec);
+    }
+}
+
+QString supportedVideoCodecs()
+{
+    QStringList codecs;
+
+    QMediaFormat format;
+
+    const auto supported = format.supportedVideoCodecs(QMediaFormat::Decode);
+
+    for (auto codec : supported)
+        codecs << prettyVideoCodecName(codec);
+
+    codecs.removeDuplicates();
+    codecs.sort();
+
+    return codecs.join(", ");
+}
+
+static QString codecName(QMediaFormat::AudioCodec codec)
+{
+    return QMediaFormat::audioCodecName(codec);
+}
+
+static QString prettyAudioCodecName(QMediaFormat::AudioCodec codec)
+{
+    switch (codec)
+    {
+        case QMediaFormat::AudioCodec::MP3:
+            return "MP3";
+
+        case QMediaFormat::AudioCodec::AAC:
+            return "AAC";
+
+        case QMediaFormat::AudioCodec::AC3:
+            return "AC-3";
+
+        case QMediaFormat::AudioCodec::EAC3:
+            return "E-AC-3";
+
+        case QMediaFormat::AudioCodec::FLAC:
+            return "FLAC";
+
+        case QMediaFormat::AudioCodec::DolbyTrueHD:
+            return "Dolby TrueHD";
+
+        case QMediaFormat::AudioCodec::Opus:
+            return "Opus";
+
+        case QMediaFormat::AudioCodec::Vorbis:
+            return "Vorbis";
+
+        case QMediaFormat::AudioCodec::Wave:
+            return "Wave";
+
+        case QMediaFormat::AudioCodec::WMA:
+            return "WMA";
+
+        case QMediaFormat::AudioCodec::ALAC:
+            return "Apple Lossless (ALAC)";
+
+        case QMediaFormat::AudioCodec::Unspecified:
+            return QObject::tr("Unspecified");
+
+        default:
+            return QMediaFormat::audioCodecName(codec);
+    }
+}
+
+QString supportedAudioCodecs()
+{
+    QStringList codecs;
+
+    QMediaFormat format;
+
+    const auto supported = format.supportedAudioCodecs(QMediaFormat::Decode);
+
+    for (auto codec : supported)
+        codecs << prettyAudioCodecName(codec);
+
+    codecs.removeDuplicates();
+    codecs.sort();
+
+    return codecs.join(", ");
 }
 }
