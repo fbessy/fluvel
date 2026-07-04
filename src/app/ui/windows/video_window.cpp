@@ -195,7 +195,7 @@ void VideoWindow::createUi()
     formatActiveIcon_ = createActiveFormatIcon();
     formatAvailableIcon_ = il::createEmpty(kFormatIconSize);
 
-    openFileButton_ = new QPushButton(tr("Open..."));
+    openFileButton_ = new AnimatedPushButton(tr("Open..."));
     openFileButton_->setIcon(videoIcon);
     openFileButton_->setToolTip(tr("Select a local video file."));
 
@@ -287,7 +287,9 @@ void VideoWindow::createUi()
     stopIconLight_ =
         il::loadIcon(":/icons/media/media-playback-stop-symbolic.svg", il::IconMode::Light);
 
-    toggleStreamingButton_ = new QPushButton;
+    toggleStreamingButton_ = new AnimatedPushButton;
+    toggleStreamingButton_->setTransitionEffect(TransitionEffect::Slide);
+    toggleStreamingButton_->setClickAnimation(ClickAnimation::None);
 
     QIcon applyIcon = createActiveFormatIcon();
 
@@ -318,7 +320,7 @@ void VideoWindow::createUi()
         il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light);
 
     playPauseButton_ = new AnimatedPushButton;
-    playPauseButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Flip);
+    playPauseButton_->setTransitionEffect(TransitionEffect::Flip);
     playPauseButton_->setClickAnimation(ClickAnimation::None);
     playPauseButton_->setIcon(resumeIcon_);
 
@@ -1515,26 +1517,28 @@ void VideoWindow::updateStreamingButton()
             toggleStreamingButton_->setEnabled(canStart);
             toggleStreamingButton_->setText(tr("Start"));
             toggleStreamingButton_->setToolTip(tr("Start selected source."));
-            toggleStreamingButton_->setIcon(startIcon_);
+            toggleStreamingButton_->setAnimatedIcon(startIcon_);
 
             fullscreenBar_->startStopButton()->setEnabled(canStart);
-            fullscreenBar_->startStopButton()->setAnimatedIcon(startIconLight_);
+            fullscreenBar_->startStopButton()->setAnimatedIcon(startIconLight_,
+                                                               TransitionDirection::Left);
             break;
 
         case StreamingState::Streaming:
             toggleStreamingButton_->setEnabled(true);
             toggleStreamingButton_->setText(tr("Stop"));
             toggleStreamingButton_->setToolTip(tr("Stop active source."));
-            toggleStreamingButton_->setIcon(stopIcon_);
+            toggleStreamingButton_->setAnimatedIcon(stopIcon_);
 
-            fullscreenBar_->startStopButton()->setAnimatedIcon(stopIconLight_);
+            fullscreenBar_->startStopButton()->setAnimatedIcon(stopIconLight_,
+                                                               TransitionDirection::Right);
             break;
 
         case StreamingState::Starting:
             toggleStreamingButton_->setEnabled(false);
             toggleStreamingButton_->setText(tr("Starting..."));
             toggleStreamingButton_->setToolTip(tr("Camera startup in progress."));
-            toggleStreamingButton_->setIcon(QIcon());
+            // toggleStreamingButton_->setIcon(QIcon());
             break;
     }
 }

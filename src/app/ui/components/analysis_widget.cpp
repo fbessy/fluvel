@@ -4,6 +4,7 @@
 #include "analysis_widget.hpp"
 
 #include "analysis_window.hpp"
+#include "animated_push_button.hpp"
 #include "color_adapters.hpp"
 #include "color_picker_behavior.hpp"
 #include "drag_drop_behavior.hpp"
@@ -65,7 +66,7 @@ AnalysisWidget::AnalysisWidget(QWidget* parent)
 
     QIcon imageIcon = il::loadIcon("image-x-generic-symbolic", ":/icons/file/image-symbolic.svg");
 
-    openButton_ = new QPushButton(tr("Open..."));
+    openButton_ = new AnimatedPushButton(tr("Open..."));
     openButton_->setIcon(imageIcon);
 
     QVBoxLayout* img_layout = new QVBoxLayout;

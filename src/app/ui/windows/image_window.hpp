@@ -186,10 +186,10 @@ private:
     QMenu* sessionMenu_{nullptr};
     QMenu* helpMenu_{nullptr};
 
-    QPushButton* restartButton_{nullptr};
-    QPushButton* togglePauseButton_{nullptr};
-    QPushButton* stepButton_{nullptr};
-    QPushButton* convergeButton_{nullptr};
+    AnimatedPushButton* restartButton_{nullptr};
+    AnimatedPushButton* togglePauseButton_{nullptr};
+    AnimatedPushButton* stepButton_{nullptr};
+    AnimatedPushButton* convergeButton_{nullptr};
 
     RightPanelToggleButton* rightPanelToggle_{nullptr};
     AnimatedPushButton* settingsButton_{nullptr};

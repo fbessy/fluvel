@@ -227,7 +227,7 @@ void AnimatedIcon::updateTransitionDirection(TransitionDirection direction)
     }
 }
 
-AnimatedIcon::TransitionEffect AnimatedIcon::transitionEffect() const
+TransitionEffect AnimatedIcon::transitionEffect() const
 {
     return transitionEffect_;
 }
@@ -239,7 +239,7 @@ void AnimatedIcon::setTransitionEffect(TransitionEffect effect)
 
 QPointF AnimatedIcon::rectCenter(const QRect& rect)
 {
-    return QPointF(rect.width() / 2.0, rect.height() / 2.0);
+    return QPointF(rect.left() + rect.width() * 0.5, rect.top() + rect.height() * 0.5);
 }
 
 } // namespace fluvel

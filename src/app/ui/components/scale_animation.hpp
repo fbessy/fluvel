@@ -13,22 +13,6 @@ namespace fluvel
 {
 
 /**
- * @brief Click feedback animation.
- *
- * This animation is played when the user presses the button.
- * It is independent from icon transition animations and affects
- * the whole button, including both the icon and the text.
- */
-enum class ClickAnimation
-{
-    /// No click animation.
-    None,
-
-    /// Brief scale animation providing a press feedback.
-    Scale
-};
-
-/**
  * @brief Animated scale feedback for clickable widgets.
  *
  * ScaleAnimation provides a short press animation by temporarily

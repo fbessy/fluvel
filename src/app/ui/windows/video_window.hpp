@@ -327,7 +327,7 @@ private:
 
     QWidget* cameraConfigWidget_{nullptr};
 
-    QPushButton* openFileButton_{nullptr};
+    AnimatedPushButton* openFileButton_{nullptr};
     QComboBox* urlCombo_{nullptr};
     QIcon clearHistoryIcon_;
     QWidget* fileUrlConfigWidget_{nullptr};
@@ -344,7 +344,7 @@ private:
 
     QIcon startIcon_;
     QIcon stopIcon_;
-    QPushButton* toggleStreamingButton_{nullptr};
+    AnimatedPushButton* toggleStreamingButton_{nullptr};
 
     QPushButton* applyButton_{nullptr};
 

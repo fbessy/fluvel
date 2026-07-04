@@ -126,6 +126,7 @@ void ActiveContourWorker::step()
         else
         {
             performStep();
+            setState(WorkerState::Suspended);
         }
     }
 }

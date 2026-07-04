@@ -4,6 +4,7 @@
 #include "analysis_window.hpp"
 
 #include "analysis_widget.hpp"
+#include "animated_push_button.hpp"
 #include "color_adapters.hpp"
 #include "elapsed_timer.hpp"
 #include "hausdorff_distance.hpp"
@@ -52,7 +53,7 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
 
     QIcon measureIcon = il::loadIcon(":/icons/actions/measure-symbolic.svg");
 
-    computeButton_ = new QPushButton(tr("Compute Hausdorff Distance"));
+    computeButton_ = new AnimatedPushButton(tr("Compute Hausdorff Distance"));
     computeButton_->setEnabled(false);
     computeButton_->setIcon(measureIcon);
 

@@ -53,11 +53,9 @@ QPushButton:disabled
 )");
 
     restartButton_ = new AnimatedPushButton;
-    restartButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Slide);
-    restartButton_->setClickAnimation(ClickAnimation::None);
 
     pauseButton_ = new AnimatedPushButton;
-    pauseButton_->setTransitionEffect(AnimatedPushButton::TransitionEffect::Flip);
+    pauseButton_->setTransitionEffect(TransitionEffect::Flip);
     pauseButton_->setClickAnimation(ClickAnimation::None);
 
     stepButton_ = new AnimatedPushButton;

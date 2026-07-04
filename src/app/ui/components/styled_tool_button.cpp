@@ -135,12 +135,12 @@ void StyledToolButton::setCheckAnimation(CheckAnimation animation)
         clickAnimation_ = ClickAnimation::None;
 }
 
-StyledToolButton::TransitionEffect StyledToolButton::transitionEffect() const
+TransitionEffect StyledToolButton::transitionEffect() const
 {
     return animatedIcon_.transitionEffect();
 }
 
-void StyledToolButton::setTransitionEffect(StyledToolButton::TransitionEffect effect)
+void StyledToolButton::setTransitionEffect(TransitionEffect effect)
 {
     animatedIcon_.setTransitionEffect(effect);
 }

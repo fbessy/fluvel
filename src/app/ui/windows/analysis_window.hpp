@@ -11,7 +11,6 @@
 
 class QWidget;
 class QCloseEvent;
-class QPushButton;
 class QLabel;
 class QSpinBox;
 class QDialog;
@@ -20,6 +19,7 @@ namespace fluvel
 {
 
 class AnalysisWidget;
+class AnimatedPushButton;
 
 /**
  * @brief Main window for comparing analysis results between two images.
@@ -57,7 +57,7 @@ private:
 
     AnalysisWidget* widget1_{nullptr};
     AnalysisWidget* widget2_{nullptr};
-    QPushButton* computeButton_{nullptr};
+    AnimatedPushButton* computeButton_{nullptr};
 
     fluvel_ip::PointSet intersection_;
 

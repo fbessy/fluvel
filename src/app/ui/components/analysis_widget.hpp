@@ -20,13 +20,13 @@
 
 class QSpinBox;
 class QLabel;
-class QPushButton;
 class QGroupBox;
 
 namespace fluvel
 {
 
 class ImageViewerWidget;
+class AnimatedPushButton;
 
 /**
  * @brief Widget for image analysis and shape extraction.
@@ -125,7 +125,7 @@ private:
     QString absoluteName_;
     QLabel* nameLabel_{nullptr};
     ImageViewerWidget* imageViewer_{nullptr};
-    QPushButton* openButton_{nullptr};
+    AnimatedPushButton* openButton_{nullptr};
 
     ColorSelectorWidget* colorSelector_{nullptr};
     fluvel_ip::Rgb_uc selectedColor_;

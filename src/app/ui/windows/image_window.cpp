@@ -95,15 +95,18 @@ void ImageWindow::setupUi()
     pauseIconFs_ =
         il::loadIcon(":/icons/media/media-playback-pause-symbolic.svg", il::IconMode::Light);
 
-    restartButton_ = new QPushButton(tr("Start"));
+    restartButton_ = new AnimatedPushButton(tr("Start"));
     restartButton_->setToolTip(tr("Run the active contour."));
     restartButton_->setIcon(startResumeIcon_);
 
-    togglePauseButton_ = new QPushButton(tr("Resume"));
-    togglePauseButton_->setToolTip(tr("Resume the active contour execution."));
-    togglePauseButton_->setIcon(startResumeIcon_);
+    togglePauseButton_ = new AnimatedPushButton(tr("Resume"));
+    togglePauseButton_->setTransitionEffect(TransitionEffect::Flip);
+    togglePauseButton_->setClickAnimation(ClickAnimation::None);
 
-    stepButton_ = new QPushButton(tr("Step"));
+    togglePauseButton_->setToolTip(tr("Resume the active contour execution."));
+    togglePauseButton_->setIcon(pauseIcon_);
+
+    stepButton_ = new AnimatedPushButton(tr("Step"));
     stepButton_->setToolTip(tr("Advance the active contour by one iteration."));
 
     QIcon stepIcon = il::loadIcon(QIcon::ThemeIcon::GoNext, ":/icons/actions/go-next-symbolic.svg");
@@ -115,7 +118,7 @@ void ImageWindow::setupUi()
     stepButton_->setAutoRepeatDelay(300);
     stepButton_->setAutoRepeatInterval(100);
 
-    convergeButton_ = new QPushButton(tr("Converge"));
+    convergeButton_ = new AnimatedPushButton(tr("Converge"));
     convergeButton_->setToolTip(tr("Run until completion without displaying intermediate steps."));
 
     QIcon convergeIcon = il::loadIcon(QIcon::ThemeIcon::MediaSeekForward,
@@ -199,7 +202,7 @@ void ImageWindow::setupUi()
                                 fullscreenBar_->stepButton(), fullscreenBar_->convergeButton()};
 
     fullscreenBar_->restartButton()->setIcon(startResumeIconFs_);
-    fullscreenBar_->pauseButton()->setIcon(startResumeIconFs_);
+    fullscreenBar_->pauseButton()->setIcon(pauseIconFs_);
     fullscreenBar_->stepButton()->setIcon(stepIconFs);
     fullscreenBar_->convergeButton()->setIcon(convergeIconFs);
 
@@ -993,10 +996,13 @@ void ImageWindow::positionFullscreenBar()
 
 void ImageWindow::updateButtonState(const ControlTheme& theme, WorkerState state)
 {
-    const bool enabled = state != WorkerState::Uninitialized && state != WorkerState::Initializing;
+    const bool enabled =
+        (state != WorkerState::Uninitialized && state != WorkerState::Initializing);
+
+    const bool pauseEnabled = (state == WorkerState::Running || state == WorkerState::Suspended);
 
     theme.buttons.restart->setEnabled(enabled);
-    theme.buttons.pause->setEnabled(enabled);
+    theme.buttons.pause->setEnabled(pauseEnabled);
     theme.buttons.step->setEnabled(enabled);
     theme.buttons.converge->setEnabled(enabled);
 
@@ -1037,7 +1043,7 @@ void ImageWindow::updateButtonState(const ControlTheme& theme, WorkerState state
 
         setToolTip(theme.buttons.pause, tr("Suspend execution and display the current state."));
     }
-    else if (state == WorkerState::Ready || state == WorkerState::Suspended)
+    else if (state == WorkerState::Suspended)
     {
         setText(theme.buttons.pause, tr("Resume"));
 
@@ -1070,14 +1076,12 @@ void ImageWindow::updateButtonIcons(WorkerState state)
     if (state == WorkerState::Ready)
     {
         restartButton_->setIcon(startResumeIcon_);
-        fullscreenBar_->restartButton()->setAnimatedIcon(
-            startResumeIconFs_, AnimatedPushButton::TransitionDirection::Right);
+        fullscreenBar_->restartButton()->setIcon(startResumeIconFs_);
     }
     else if (state == WorkerState::Running || state == WorkerState::Suspended)
     {
         restartButton_->setIcon(restartIcon_);
-        fullscreenBar_->restartButton()->setAnimatedIcon(
-            restartIconFs_, AnimatedPushButton::TransitionDirection::Right);
+        fullscreenBar_->restartButton()->setIcon(restartIconFs_);
     }
 
     //
@@ -1086,12 +1090,18 @@ void ImageWindow::updateButtonIcons(WorkerState state)
 
     if (state == WorkerState::Running)
     {
-        togglePauseButton_->setIcon(pauseIcon_);
+        togglePauseButton_->setEnabled(true);
+        fullscreenBar_->pauseButton()->setEnabled(true);
+
+        togglePauseButton_->setAnimatedIcon(pauseIcon_);
         fullscreenBar_->pauseButton()->setAnimatedIcon(pauseIconFs_);
     }
-    else if (state == WorkerState::Ready || state == WorkerState::Suspended)
+    else if (state == WorkerState::Suspended)
     {
-        togglePauseButton_->setIcon(startResumeIcon_);
+        togglePauseButton_->setEnabled(true);
+        fullscreenBar_->pauseButton()->setEnabled(true);
+
+        togglePauseButton_->setAnimatedIcon(startResumeIcon_);
         fullscreenBar_->pauseButton()->setAnimatedIcon(startResumeIconFs_);
     }
 }

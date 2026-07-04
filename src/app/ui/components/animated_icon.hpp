@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "animated_types.hpp"
+
 #include <QIcon>
 #include <QObject>
 #include <QPointer>
@@ -26,6 +28,9 @@ namespace fluvel
  * The class is independent from any specific button type and can be
  * reused by QToolButton, QPushButton or any custom widget able to
  * delegate icon painting.
+ *
+ * @note The transition progress is exposed as a Qt property to allow
+ * QPropertyAnimation to drive the animation automatically.
  */
 class AnimatedIcon : public QObject
 {
@@ -33,33 +38,6 @@ class AnimatedIcon : public QObject
     Q_PROPERTY(qreal transitionProgress READ transitionProgress WRITE setTransitionProgress)
 
 public:
-    /**
-     * @brief Visual effect used for icon transitions.
-     */
-    enum class TransitionEffect
-    {
-        /// Perspective-like flip animation.
-        Flip,
-
-        /// Horizontal slide animation.
-        Slide
-    };
-
-    /**
-     * @brief Direction of the transition animation.
-     */
-    enum class TransitionDirection
-    {
-        /// Alternate the transition direction automatically.
-        Auto,
-
-        /// Always animate toward the left.
-        Left,
-
-        /// Always animate toward the right.
-        Right
-    };
-
     /**
      * @brief Constructs an animated icon renderer.
      *
@@ -80,7 +58,7 @@ public:
     void setTransitionEffect(TransitionEffect effect);
 
     /**
-     * @brief Draws the current icon or the animated transition.
+     * @brief Draws either the current icon or the animated transition.
      *
      * If no transition is active, @p defaultIcon is rendered.
      * Otherwise the internal animation state is used to draw
@@ -135,19 +113,19 @@ private:
 
 private:
     /**
-     * @brief Paints the flip transition.
+     * @brief Paints the icon transition using a flip animation.
      */
     void paintFlip(QPainter& painter, const QRect& rect, const QSize& iconSize,
                    const QIcon& defaultIcon);
 
     /**
-     * @brief Paints the slide transition.
+     * @brief Paints the icon transition using a horizontal slide animation.
      */
     void paintSlide(QPainter& painter, const QRect& rect, const QSize& iconSize,
                     const QIcon& defaultIcon);
 
     /**
-     * @brief Draws an icon with the requested transform.
+     * @brief Draws an icon using the specified visual transformation.
      *
      * The icon variant is selected automatically according to the
      * current state of the owner widget (enabled/disabled and
@@ -165,6 +143,15 @@ private:
     void drawIcon(QPainter& painter, const QPointF& center, const QSize& iconSize,
                   const QIcon& icon, qreal opacity, qreal angle, qreal offsetX, qreal scale) const;
 
+    /**
+     * @brief Returns the geometric center of a rectangle using floating-point coordinates.
+     *
+     * Unlike QRect::center(), this function preserves subpixel precision,
+     * which produces smoother icon animations.
+     *
+     * @param rect Source rectangle.
+     * @return Rectangle center.
+     */
     static QPointF rectCenter(const QRect& rect);
 
     /// Owner widget used for repaint requests and icon state.

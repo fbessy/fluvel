@@ -4,6 +4,7 @@
 #pragma once
 
 #include "animated_icon.hpp"
+#include "animated_types.hpp"
 #include "scale_animation.hpp"
 
 #include <QPushButton>
@@ -27,15 +28,6 @@ class AnimatedPushButton : public QPushButton
     Q_OBJECT
 
 public:
-    /**
-     * @brief Alias for the icon transition direction.
-     */
-    using TransitionDirection = AnimatedIcon::TransitionDirection;
-
-    /**
-     * @brief Alias for the icon transition effect.
-     */
-    using TransitionEffect = AnimatedIcon::TransitionEffect;
 
     /**
      * @brief Constructs an animated push button.
@@ -45,7 +37,24 @@ public:
     explicit AnimatedPushButton(QWidget* parent = nullptr);
 
     /**
-     * @brief Changes the button icon using an animated transition.
+     * @brief Constructs an animated push button with text.
+     *
+     * @param text Button text.
+     * @param parent Parent widget.
+     */
+    explicit AnimatedPushButton(const QString& text, QWidget* parent = nullptr);
+
+    /**
+     * @brief Constructs an animated push button with an icon and text.
+     *
+     * @param icon Button icon.
+     * @param text Button text.
+     * @param parent Parent widget.
+     */
+    explicit AnimatedPushButton(const QIcon& icon, const QString& text, QWidget* parent = nullptr);
+
+    /**
+     * @brief Changes the button icon and starts an animated transition.
      *
      * The visual effect depends on the currently selected
      * transition effect.
@@ -60,14 +69,14 @@ public:
      * @brief Returns the current transition effect.
      */
     [[nodiscard]]
-    AnimatedPushButton::TransitionEffect transitionEffect() const;
+    TransitionEffect transitionEffect() const;
 
     /**
      * @brief Sets the transition effect.
      *
      * @param effect New transition effect.
      */
-    void setTransitionEffect(AnimatedPushButton::TransitionEffect effect);
+    void setTransitionEffect(TransitionEffect effect);
 
     /**
      * @brief Returns the current click animation.
@@ -86,9 +95,9 @@ protected:
     /**
      * @brief Draws the push button.
      *
-     * The button itself is rendered using the current Qt style,
-     * while icon rendering is delegated to AnimatedIcon to support
-     * animated transitions.
+     * The button bevel is rendered using the current Qt style,
+     * while the icon and text are laid out and painted separately
+     * to support animated icon rendering.
      */
     void paintEvent(QPaintEvent*) override;
 
@@ -101,6 +110,31 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
 
 private:
+    /**
+     * @brief Layout information used to render a push button.
+     */
+    struct ButtonLayout
+    {
+        /// Button contents rectangle.
+        QRect contentsRect;
+
+        /// Icon drawing rectangle.
+        QRect iconRect;
+
+        /// Text drawing rectangle.
+        QRect textRect;
+    };
+
+    /**
+     * @brief Computes the layout of the button contents.
+     *
+     * Calculates the rectangles used to render the icon and the text
+     * according to the current button state and style metrics.
+     *
+     * @return Button layout information.
+     */
+    ButtonLayout calculateLayout() const;
+
     /// Animated icon renderer.
     AnimatedIcon animatedIcon_;
 

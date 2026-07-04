@@ -4,6 +4,7 @@
 #pragma once
 
 #include "animated_icon.hpp"
+#include "animated_types.hpp"
 #include "checked_animation.hpp"
 #include "scale_animation.hpp"
 #include "ui_appearance.hpp"
@@ -24,8 +25,6 @@ class StyledToolButton : public QToolButton
     Q_OBJECT
 
 public:
-    using TransitionEffect = AnimatedIcon::TransitionEffect;
-    using TransitionDirection = AnimatedIcon::TransitionDirection;
 
     /**
      * @brief Constructs a styled tool button.
@@ -63,14 +62,14 @@ public:
      * @brief Returns the current transition effect.
      */
     [[nodiscard]]
-    StyledToolButton::TransitionEffect transitionEffect() const;
+    TransitionEffect transitionEffect() const;
 
     /**
      * @brief Sets the transition effect.
      *
      * @param effect New transition effect.
      */
-    void setTransitionEffect(StyledToolButton::TransitionEffect effect);
+    void setTransitionEffect(TransitionEffect effect);
 
     /**
      * @brief Returns the current click animation.
