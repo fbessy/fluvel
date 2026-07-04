@@ -256,8 +256,7 @@ void ImageWindow::setupActions()
     imageSessionAct_ = new QAction(tr("&Image"), this);
     imageSessionAct_->setShortcut(tr("Ctrl+I"));
 
-    QIcon imageIcon =
-        il::loadIcon("image-x-generic-symbolic", ":/icons/actions/image-session-symbolic.svg");
+    QIcon imageIcon = il::loadIcon(":/icons/actions/image-session-symbolic.svg");
 
     imageSessionAct_->setIcon(imageIcon);
     imageSessionAct_->setCheckable(true);
@@ -269,7 +268,7 @@ void ImageWindow::setupActions()
     videoSessionAct_->setEnabled(true);
     videoSessionAct_->setShortcut(tr("Ctrl+V"));
 
-    QIcon videoIcon = il::loadIcon("video-x-generic-symbolic", ":/icons/file/video-symbolic.svg");
+    QIcon videoIcon = il::loadIcon(":/icons/file/video-symbolic.svg");
 
     videoSessionAct_->setIcon(videoIcon);
 
