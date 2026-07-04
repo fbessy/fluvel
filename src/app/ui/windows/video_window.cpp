@@ -148,10 +148,12 @@ void VideoWindow::createUi()
     sourceTypeWidget_->setLayout(sourceTypeLayout);
 
     deviceLabel_ = new QLabel(tr("Device: "));
-    deviceSelector_ = new QComboBox(this);
 
-    // Adjust width to contents (needed when items have icons)
-    deviceSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    deviceSelector_ = new QComboBox(this);
+    deviceSelector_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    deviceSelector_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+    deviceSelector_->setMinimumContentsLength(15);
+
     static constexpr int kCameraIconSize{13};
     deviceSelector_->setIconSize(QSize(kCameraIconSize, kCameraIconSize));
 
@@ -170,8 +172,12 @@ void VideoWindow::createUi()
     deviceErrorIcon_ = il::createDisk(orangeError);
 
     formatLabel_ = new QLabel(tr("Format: "));
+
     formatSelector_ = new QComboBox(this);
-    formatSelector_->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    formatSelector_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    formatSelector_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+    formatSelector_->setMinimumContentsLength(15);
+
     static constexpr int kFormatIconSize{16};
     formatSelector_->setIconSize(QSize(kFormatIconSize, kFormatIconSize));
     formatSelector_->setToolTip(tr("Camera resolution, frame rate and pixel format."));
@@ -202,6 +208,11 @@ void VideoWindow::createUi()
     QIcon networkIcon = il::loadIcon(":/icons/actions/globe-symbolic.svg");
 
     urlCombo_ = new QComboBox(this);
+
+    urlCombo_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    urlCombo_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+    urlCombo_->setMinimumContentsLength(30);
+
     urlCombo_->setEditable(true);
 
     urlCombo_->lineEdit()->addAction(networkIcon, QLineEdit::LeadingPosition);
