@@ -503,9 +503,9 @@ QString AboutDialog::buildTechnicalSection()
 
     html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word; "
             "margin-bottom:8px;'>";
-    html += tr("Video codecs") + ": " + file_utils::supportedVideoCodecs() + "<br>";
-    html += tr("Audio codecs") + ": " + file_utils::supportedAudioCodecs() + "<br>";
-    html += tr("File formats") + ": " + file_utils::supportedMediaContainers();
+    html += tr("Video codecs: %1").arg(file_utils::supportedVideoCodecs()) + "<br>";
+    html += tr("Audio codecs: %1").arg(file_utils::supportedAudioCodecs()) + "<br>";
+    html += tr("File formats: %1").arg(file_utils::supportedMediaContainers());
     html += "</div>";
 
     html += "</div>"; // end Application block
