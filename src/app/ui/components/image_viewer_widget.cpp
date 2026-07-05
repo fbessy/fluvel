@@ -430,6 +430,9 @@ void ImageViewerWidget::enterFullscreenMode()
     applyAutoFit();
 
     moveOverlay(infoOverlay_, overlayPos);
+
+    showNotification(tr("Auto Fit"));
+
     updateMiniMap();
 
     isFullscreen_ = true;
@@ -479,6 +482,14 @@ void ImageViewerWidget::leaveFullscreenMode()
             verticalScrollBar()->setValue(previousVScroll_);
 
             autoFitEnabled_ = false;
+
+            const int zoomPercent = qRound(currentZoom() * 100.0);
+
+            QTimer::singleShot(0, this,
+                               [this, zoomPercent]
+                               {
+                                   showZoomHud(zoomPercent);
+                               });
         }
     }
 
@@ -608,6 +619,9 @@ bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
 void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoint& overlayPosition)
 {
     moveOverlay(infoOverlay_, overlayPosition);
+
+    if (notificationOverlayItem_ && notificationOverlayItem_->isVisible())
+        anchorOverlay(notificationOverlayItem_);
 
     // zoom overlay
     double newZoom = currentZoom();
