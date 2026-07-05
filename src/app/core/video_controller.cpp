@@ -84,6 +84,7 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     connect(&mediaPlayer_, &QMediaPlayer::playbackStateChanged, this,
             [this](QMediaPlayer::PlaybackState state)
             {
+                emit playbackStateChanged(state);
                 emit pausedChanged(state == QMediaPlayer::PausedState);
             });
 
@@ -543,10 +544,20 @@ qint64 VideoController::positionMs() const
     return mediaPlayer_.position();
 }
 
+qint64 VideoController::durationMs() const
+{
+    if (!isMediaActive())
+        return 0;
+
+    return mediaPlayer_.duration();
+}
+
 void VideoController::seek(qint64 positionMs)
 {
     if (!isMediaActive())
         return;
+
+    positionMs = std::clamp(positionMs, 0LL, durationMs());
 
     resetWatchdog();
 

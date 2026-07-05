@@ -3,6 +3,14 @@
 
 #include "overlay_text_item.hpp"
 
+#include <QFontMetrics>
+#include <QPainter>
+
+namespace
+{
+constexpr int kMaxTextWidth = 1000;
+}
+
 namespace fluvel
 {
 
@@ -15,10 +23,10 @@ OverlayTextItem::OverlayTextItem(QGraphicsItem* parent)
 
     setAcceptedMouseButtons(Qt::LeftButton);
 
-    QFont font; // police par défaut
+    QFont font;
     font.setStyleHint(QFont::SansSerif);
 
-    // active les chiffres tabulaires
+    // Enable tabular figures when supported by the font.
     font.setFeature("tnum", 1);
 
     font_ = font;
@@ -30,25 +38,111 @@ void OverlayTextItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     painter->setFont(font_);
 
-    // Fond semi-transparent
-    painter->setBrush(QColor(0, 0, 0, 180));
+    // Background
+    painter->setBrush(backgroundColor_);
     painter->setPen(Qt::NoPen);
-    painter->drawRoundedRect(boundingRect(), 5, 5);
 
-    // Texte
-    painter->setPen(Qt::white);
-    painter->drawText(boundingRect().adjusted(8, 6, -8, -6), static_cast<int>(alignment_), text_);
+    painter->drawRoundedRect(boundingRect(), cornerRadius_, cornerRadius_);
+
+    // Text
+    painter->setPen(textColor_);
+
+    painter->drawText(boundingRect().adjusted(padding_, padding_, -padding_, -padding_),
+                      static_cast<int>(alignment_), text_);
 }
 
-void OverlayTextItem::setAlignment(Qt::Alignment align)
+const QFont& OverlayTextItem::font() const
 {
-    alignment_ = align;
-    update(); // redraw
+    return font_;
 }
 
-void OverlayTextItem::setMinWidth(qreal w)
+void OverlayTextItem::setFont(const QFont& font)
 {
-    minWidth_ = w;
+    if (font_ == font)
+        return;
+
+    font_ = font;
+
+    updateGeometry();
+}
+
+void OverlayTextItem::setAlignment(Qt::Alignment alignment)
+{
+    if (alignment_ == alignment)
+        return;
+
+    alignment_ = alignment;
+
+    update();
+}
+
+void OverlayTextItem::setMinWidth(qreal width)
+{
+    if (qFuzzyCompare(minWidth_, width))
+        return;
+
+    minWidth_ = width;
+
+    updateGeometry();
+}
+
+int OverlayTextItem::padding() const
+{
+    return padding_;
+}
+
+void OverlayTextItem::setPadding(int padding)
+{
+    if (padding_ == padding)
+        return;
+
+    padding_ = padding;
+
+    updateGeometry();
+}
+
+qreal OverlayTextItem::cornerRadius() const
+{
+    return cornerRadius_;
+}
+
+void OverlayTextItem::setCornerRadius(qreal radius)
+{
+    if (qFuzzyCompare(cornerRadius_, radius))
+        return;
+
+    cornerRadius_ = radius;
+
+    update();
+}
+
+const QColor& OverlayTextItem::backgroundColor() const
+{
+    return backgroundColor_;
+}
+
+void OverlayTextItem::setBackgroundColor(const QColor& color)
+{
+    if (backgroundColor_ == color)
+        return;
+
+    backgroundColor_ = color;
+
+    update();
+}
+
+const QColor& OverlayTextItem::textColor() const
+{
+    return textColor_;
+}
+
+void OverlayTextItem::setTextColor(const QColor& color)
+{
+    if (textColor_ == color)
+        return;
+
+    textColor_ = color;
+
     update();
 }
 
@@ -64,15 +158,28 @@ void OverlayTextItem::setText(const QString& text)
 
     text_ = text;
 
+    updateGeometry();
+}
+
+void OverlayTextItem::updateGeometry()
+{
+    if (text_.isEmpty())
+    {
+        prepareGeometryChange();
+        rect_ = QRectF{};
+        update();
+        return;
+    }
+
     QFontMetrics fm(font_);
 
-    QRect textRect = fm.boundingRect(QRect(0, 0, 1000, 1000), // zone large
-                                     Qt::TextWordWrap, text_);
+    QRect textRect =
+        fm.boundingRect(QRect(0, 0, kMaxTextWidth, kMaxTextWidth), Qt::TextWordWrap, text_);
 
     prepareGeometryChange();
 
-    qreal width = textRect.width() + 2 * padding_;
-    qreal height = textRect.height() + 2 * padding_;
+    const qreal width = textRect.width() + 2 * padding_;
+    const qreal height = textRect.height() + 2 * padding_;
 
     rect_ = QRectF(0, 0, std::max(width, minWidth_), height);
 

@@ -586,7 +586,8 @@ void VideoWindow::setupConnections()
                 refreshUi();
             });
 
-    connect(deviceSelector_, &QComboBox::currentIndexChanged, this, &VideoWindow::onDeviceChanged);
+    connect(deviceSelector_, &QComboBox::currentIndexChanged, this,
+            &VideoWindow::onWindowDeviceChanged);
 
     connect(formatSelector_, &QComboBox::currentIndexChanged, this,
             [this]()
@@ -679,10 +680,6 @@ void VideoWindow::setupConnections()
 
                 displayBar_->updateDisplayModeAvailability(hasPreprocessing);
             });
-
-    // refresh button in function of user action
-    connect(deviceSelector_, &QComboBox::currentIndexChanged, this,
-            &VideoWindow::updateApplyButton);
 
     connect(videoController_, &VideoController::downscaleChanged, this,
             &VideoWindow::onDownscaleChanged);
@@ -777,13 +774,7 @@ void VideoWindow::setupConnections()
             });
 
     connect(fullscreenBar_->cameraSelector(), &QComboBox::currentIndexChanged, this,
-            [this](int index)
-            {
-                deviceSelector_->setCurrentIndex(index);
-
-                if (hasPendingConfiguration())
-                    onApplySelection();
-            });
+            &VideoWindow::onFullscreenDeviceChanged);
 
     connect(deviceSelector_, &QComboBox::currentIndexChanged, fullscreenBar_->cameraSelector(),
             &QComboBox::setCurrentIndex);
@@ -826,6 +817,9 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::mutedChanged, this, &VideoWindow::onMutedChanged);
 
     connect(&saveAudioSettingsTimer_, &QTimer::timeout, this, &VideoWindow::saveAudioSettings);
+
+    connect(videoController_, &VideoController::playbackStateChanged, this,
+            &VideoWindow::onPlaybackStateChanged);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -983,7 +977,7 @@ void VideoWindow::updateDeviceList(const QList<QCameraDevice>& devices)
     qt_utils::copyComboBox(deviceSelector_, fullscreenBar_->cameraSelector());
 
     if (currentIndex >= 0)
-        onDeviceChanged(currentIndex);
+        refreshFormatListFromSelection();
 }
 
 int VideoWindow::computeBestDeviceIndex(const QByteArray& previousSelection,
@@ -1053,9 +1047,26 @@ void VideoWindow::onApplySelection()
     stopSource();
 }
 
-void VideoWindow::onDeviceChanged(int /*index*/)
+void VideoWindow::onWindowDeviceChanged(int index)
 {
+    QSignalBlocker blocker(fullscreenBar_->cameraSelector());
+
+    fullscreenBar_->cameraSelector()->setCurrentIndex(index);
+
     refreshFormatListFromSelection();
+    updateApplyButton();
+}
+
+void VideoWindow::onFullscreenDeviceChanged(int index)
+{
+    QSignalBlocker blocker(deviceSelector_);
+
+    deviceSelector_->setCurrentIndex(index);
+
+    refreshFormatListFromSelection();
+
+    if (hasPendingConfiguration())
+        onApplySelection();
 }
 
 void VideoWindow::refreshFormatListFromSelection()
@@ -1301,6 +1312,9 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
         addSourceToHistory(info.source.sourceUrl);
     }
 
+    if (streamingInfo_.source.type == SourceType::Camera)
+        imageViewer_->showNotification(tr("Started"));
+
     restartPending_ = false;
 }
 
@@ -1378,6 +1392,8 @@ void VideoWindow::onStreamingStopped()
 
         refreshUi();
         updateWindowTitle();
+
+        imageViewer_->showNotification(tr("Stopped"));
     }
 }
 
@@ -2083,16 +2099,25 @@ void VideoWindow::leaveFullscreen()
 
 void VideoWindow::positionFullscreenBar()
 {
-    constexpr int kBottomMargin = 16;
+    constexpr int kBottomMargin = 0;
 
     fullscreenBar_->adjustSize();
 
     const QSize size = fullscreenBar_->sizeHint();
-
     fullscreenBar_->resize(size);
 
+    const QRect imageRect = imageViewer_->displayedImageRect();
+
     const int x = (imageViewer_->width() - size.width()) / 2;
-    const int y = imageViewer_->height() - size.height() - kBottomMargin;
+
+    const int imageBottom = imageRect.y() + imageRect.height();
+    const int bottomBandHeight = imageViewer_->height() - imageBottom;
+
+    const int idealY = imageBottom + (bottomBandHeight - size.height()) / 2;
+
+    const int maxY = imageViewer_->height() - size.height() - kBottomMargin;
+
+    const int y = std::min(idealY, maxY);
 
     fullscreenBar_->move(x, y);
 }
@@ -2172,6 +2197,8 @@ void VideoWindow::updateMediaBar()
 
 void VideoWindow::updateFullscreenBar()
 {
+    assert(videoController_ && fullscreenBar_);
+
     const bool mediaMode =
         streamingInfo_.source.type == SourceType::Media ||
         (streamingInfo_.source.type == SourceType::None && sourceConfig_.type == SourceType::Media);
@@ -2208,50 +2235,100 @@ void VideoWindow::updateFullscreenBar()
 
 void VideoWindow::stepPlayback(qint64 deltaMs)
 {
+    assert(videoController_);
+
     if (!videoController_->isMediaActive() || !mediaInfo_.seekable)
         return;
 
-    videoController_->seek(videoController_->positionMs() + deltaMs);
+    const qint64 newPositionMs =
+        std::clamp(videoController_->positionMs() + deltaMs, 0LL, videoController_->durationMs());
+
+    videoController_->seek(newPositionMs);
+
+    // Display the requested seek position immediately to provide
+    // responsive user feedback. The actual playback position is
+    // updated asynchronously by the media backend.
+    imageViewer_->showNotification(
+        tr("%1 / %2")
+            .arg(time_utils::formatDuration(newPositionMs))
+            .arg(time_utils::formatDuration(videoController_->durationMs())));
 }
 
-void VideoWindow::stepVolume(int delta)
+void VideoWindow::stepVolume(int deltaPercent)
 {
+    assert(videoController_);
+
     if (!mediaInfo_.hasAudio)
         return;
 
-    int value = qRound(videoController_->volume() * 100.f);
+    const int volumePercent = qRound(videoController_->volume() * 100.f);
 
-    value = std::clamp(value + delta, 0, 100);
+    const int newVolumePercent = std::clamp(volumePercent + deltaPercent, 0, 100);
 
-    videoController_->setVolume(static_cast<float>(value) / 100.f);
+    if (newVolumePercent == volumePercent)
+    {
+        imageViewer_->showNotification(tr("Volume %1%").arg(volumePercent));
+        return;
+    }
+
+    videoController_->setVolume(static_cast<float>(newVolumePercent) / 100.f);
 }
 
 void VideoWindow::onVolumeChanged(float volume)
 {
-    const int value = qRound(volume * 100.f);
+    assert(volumeSlider_ && fullscreenBar_ && volumeLabel_);
+    assert(volume >= 0.f && volume <= 1.f);
+
+    const int percent = qRound(volume * 100.f);
 
     QSignalBlocker b1(volumeSlider_);
     QSignalBlocker b2(fullscreenBar_->volumeController());
 
-    volumeSlider_->setValue(value);
-    fullscreenBar_->volumeController()->setVolume(value);
+    volumeSlider_->setValue(percent);
+    fullscreenBar_->volumeController()->setVolume(percent);
 
-    volumeLabel_->setText(QString("%1%").arg(value));
+    volumeLabel_->setText(QString("%1%").arg(percent));
 
-    updateVolumeIcon(value, videoController_->isMuted());
+    updateVolumeIcon(percent, videoController_->isMuted());
+
+    if (!videoController_->isMuted())
+        imageViewer_->showNotification(tr("Volume %1%").arg(percent));
 
     saveAudioSettingsTimer_.start(kSaveAudioSettingsDelayMs);
 }
 
 void VideoWindow::onMutedChanged(bool muted)
 {
+    assert(fullscreenBar_ && videoController_);
+
     fullscreenBar_->volumeController()->setMuted(muted);
 
     const int volume = qRound(videoController_->volume() * 100.f);
 
     updateVolumeIcon(volume, muted);
 
+    imageViewer_->showNotification(muted ? tr("Muted") : tr("Unmuted"));
+
     saveAudioSettingsTimer_.start(kSaveAudioSettingsDelayMs);
+}
+
+void VideoWindow::onPlaybackStateChanged(QMediaPlayer::PlaybackState state)
+{
+    assert(imageViewer_);
+
+    switch (state)
+    {
+        case QMediaPlayer::PlayingState:
+            imageViewer_->showNotification(tr("Play"));
+            break;
+
+        case QMediaPlayer::PausedState:
+            imageViewer_->showNotification(tr("Pause"));
+            break;
+
+        case QMediaPlayer::StoppedState:
+            break;
+    }
 }
 
 } // namespace fluvel

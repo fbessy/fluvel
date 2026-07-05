@@ -126,6 +126,14 @@ public:
     qint64 positionMs() const;
 
     /**
+     * @brief Returns the total duration of the active media.
+     *
+     * @return Total media duration, in milliseconds.
+     */
+    [[nodiscard]]
+    qint64 durationMs() const;
+
+    /**
      * @brief Seek to a position in the current media.
      *
      * @param positionMs Target position in milliseconds.
@@ -237,6 +245,16 @@ signals:
 
     /// Emitted when downscale parameters change.
     void downscaleChanged(const fluvel::DownscaleParams& downscaleParams);
+
+    /**
+     * @brief Emitted when the playback state changes.
+     *
+     * This signal is emitted whenever the underlying media player enters a new
+     * playback state (playing, paused or stopped).
+     *
+     * @param state New playback state.
+     */
+    void playbackStateChanged(QMediaPlayer::PlaybackState state);
 
     /**
      * @brief Emitted when the playback position changes.

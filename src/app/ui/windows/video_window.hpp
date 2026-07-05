@@ -226,7 +226,9 @@ private:
     void onToggleStreaming();
     void onApplySelection();
 
-    void onDeviceChanged(int index);
+    void onWindowDeviceChanged(int index);
+    void onFullscreenDeviceChanged(int index);
+
     void refreshFormatListFromSelection();
     void updateFormatList(const QList<QCameraFormat>& formats);
     bool hasPendingConfiguration() const;
@@ -301,10 +303,24 @@ private:
     void updateDurationLabel();
     void updateFullscreenBar();
 
+    /**
+     * @brief Seeks the current media by a relative time offset.
+     *
+     * The target position is clamped to the valid playback range before
+     * requesting the seek. A HUD notification is displayed immediately
+     * using the requested position to provide responsive user feedback,
+     * while the actual playback position is updated asynchronously by
+     * the media backend.
+     *
+     * @param deltaMs Relative seek offset, in milliseconds.
+     */
     void stepPlayback(qint64 deltaMs);
-    void stepVolume(int delta);
+
+    void stepVolume(int deltaPercent);
     void onVolumeChanged(float volume);
     void onMutedChanged(bool muted);
+
+    void onPlaybackStateChanged(QMediaPlayer::PlaybackState state);
 
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};

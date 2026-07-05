@@ -35,7 +35,7 @@ public:
     bool mouseRelease(ImageViewerWidget& view, QMouseEvent* event) override;
 
 private:
-    Qt::MouseButton button_;
+    Qt::MouseButton button_{Qt::MiddleButton};
 };
 
 } // namespace fluvel

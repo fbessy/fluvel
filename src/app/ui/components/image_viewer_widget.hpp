@@ -36,7 +36,7 @@ namespace fluvel
 constexpr int kUserIdleTimeoutMs = 2000;
 
 class ImageViewerInteraction;
-class ZoomOverlayController;
+class HudOverlayController;
 class MiniMapWidget;
 
 /**
@@ -170,7 +170,6 @@ public:
      * @brief Shows or hides a placeholder effect.
      */
     void showPlaceholder(bool showEffect);
-    /** @} */
 
     /**
      * @brief Returns the current image.
@@ -181,6 +180,50 @@ public:
      * @brief Renders the current view to an image.
      */
     QImage renderToImage() const;
+
+    /**
+     * @brief Displays a temporary notification.
+     *
+     * Shows a transient HUD message using the notification preset.
+     *
+     * @param text Message to display.
+     */
+    void showNotification(const QString& text);
+
+    /**
+     * @brief Displays a temporary message near the mouse cursor.
+     *
+     * Shows a transient HUD message using the cursor preset.
+     *
+     * @param text Message to display.
+     */
+    void showCursorMessage(const QString& text);
+
+    /**
+     * @brief Displays the current zoom level.
+     *
+     * Shows a transient HUD message near the mouse cursor containing the
+     * specified zoom percentage.
+     *
+     * @param percent Zoom level expressed as a percentage.
+     */
+    void showZoomHud(int percent);
+
+    void positionCursorOverlay();
+
+    /**
+     * @brief Returns the displayed image rectangle in viewport coordinates.
+     *
+     * The returned rectangle corresponds to the visible image area inside
+     * the viewport, after applying the current view transformation.
+     *
+     * This is useful for positioning UI elements relative to the displayed
+     * image rather than the whole viewport (e.g. fullscreen controls or
+     * image overlays).
+     *
+     * @return Displayed image rectangle in viewport coordinates.
+     */
+    QRect displayedImageRect() const;
 
     /**
      * @name Internal API
@@ -285,6 +328,15 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private:
+    enum class OverlayPosition
+    {
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
+        Center
+    };
+
     // internal init
     void initializeView();
 
@@ -314,11 +366,8 @@ private:
     bool handleInteractionWheel(QWheelEvent* event);
     double computeZoomFactor(QWheelEvent* event) const;
     bool applyZoom(QWheelEvent* event, double factor);
-    void updateOverlays(const QPoint& cursorPosition, const QPoint& textPosition);
+    void updateOverlays(const QPoint& cursorPosition, const QPoint& overlayPosition);
     void updateInteractionAfterZoom();
-
-    QPoint textPosition(const OverlayTextItem* textOverlay) const;
-    void setTextPosition(QPoint position, OverlayTextItem* textOverlay);
 
     void updateCursor(const QMouseEvent* e);
     double currentZoom() const;
@@ -335,6 +384,44 @@ private:
 
     void notifyUserActivity(const QPoint& viewPos);
 
+    OverlayTextItem* createOverlayItem();
+
+    /**
+     * @brief Returns the current viewport position of an overlay.
+     *
+     * Converts the overlay scene position to viewport coordinates.
+     *
+     * @param overlay Overlay item.
+     * @return Current overlay position in viewport coordinates.
+     */
+    QPoint overlayPosition(const OverlayTextItem* overlay) const;
+
+    /**
+     * @brief Moves an overlay to a specific viewport position.
+     *
+     * The specified position is expressed in viewport coordinates and is
+     * internally converted to scene coordinates before moving the overlay.
+     *
+     * @param overlay Overlay item to move.
+     * @param position Desired position in viewport coordinates.
+     */
+    void moveOverlay(OverlayTextItem* overlay, const QPoint& position);
+
+    /**
+     * @brief Anchors an overlay to a predefined viewport location.
+     *
+     * Positions the overlay relative to one of the predefined viewport
+     * anchors (top-left, top-right, bottom-left, bottom-right or center).
+     * An optional offset can be supplied to fine-tune the final placement.
+     *
+     * @param overlay Overlay item to position.
+     * @param position Desired viewport anchor.
+     * @param offset Additional offset applied after anchoring.
+     */
+    void anchorOverlay(OverlayTextItem* overlay,
+                       OverlayPosition position = OverlayPosition::TopRight,
+                       const QPointF& offset = {});
+
     QGraphicsScene* scene_{nullptr};
     QGraphicsItemGroup* contentRoot_{nullptr};
     QGraphicsPixmapItem* pixmapItem_{nullptr};
@@ -348,8 +435,11 @@ private:
 
     OverlayTextItem* infoOverlay_{nullptr};
 
-    OverlayTextItem* zoomOverlayItem_{nullptr};
-    ZoomOverlayController* zoomOverlayController_{nullptr};
+    OverlayTextItem* cursorOverlayItem_{nullptr};
+    HudOverlayController* cursorOverlayController_{nullptr};
+
+    OverlayTextItem* notificationOverlayItem_{nullptr};
+    HudOverlayController* notificationOverlayController_{nullptr};
 
     MiniMapWidget* miniMap_{nullptr};
     QImage thumbnail_;

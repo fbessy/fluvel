@@ -5,13 +5,13 @@
 #include "color_adapters.hpp"
 #include "drag_drop_behavior.hpp"
 #include "frame_clock.hpp"
+#include "hud_overlay_controller.hpp"
 #include "image_viewer_interaction.hpp"
 #include "interaction_set.hpp"
 #include "mini_map_widget.hpp"
 #include "overlay_text_item.hpp"
 #include "qcolor_utils.hpp"
 #include "qimage_utils.hpp"
-#include "zoom_overlay_controller.hpp"
 
 #include <QMouseEvent>
 #include <QPainter>
@@ -21,6 +21,11 @@
 #include <QWheelEvent>
 
 #include <cassert>
+
+namespace
+{
+constexpr QPoint kCursorOverlayOffset{20, -26};
+}
 
 namespace fluvel
 {
@@ -100,16 +105,28 @@ void ImageViewerWidget::setupItems()
 
 void ImageViewerWidget::setupGlobalOverlays()
 {
-    zoomOverlayItem_ = new OverlayTextItem;
-    zoomOverlayItem_->setAcceptedMouseButtons(Qt::NoButton);
-    zoomOverlayItem_->setFlag(QGraphicsItem::ItemIsSelectable, false);
-    zoomOverlayItem_->setFlag(QGraphicsItem::ItemIsMovable, false);
-    zoomOverlayItem_->setAcceptHoverEvents(false);
-    zoomOverlayItem_->setZValue(1000);
+    cursorOverlayItem_ = createOverlayItem();
+    cursorOverlayController_ = new HudOverlayController(cursorOverlayItem_, this);
+    cursorOverlayItem_->hide();
 
-    scene_->addItem(zoomOverlayItem_);
+    notificationOverlayItem_ = createOverlayItem();
+    notificationOverlayController_ = new HudOverlayController(notificationOverlayItem_, this);
+    notificationOverlayItem_->hide();
+}
 
-    zoomOverlayController_ = new ZoomOverlayController(zoomOverlayItem_, this);
+OverlayTextItem* ImageViewerWidget::createOverlayItem()
+{
+    OverlayTextItem* item = new OverlayTextItem;
+
+    item->setAcceptedMouseButtons(Qt::NoButton);
+    item->setFlag(QGraphicsItem::ItemIsSelectable, false);
+    item->setFlag(QGraphicsItem::ItemIsMovable, false);
+    item->setAcceptHoverEvents(false);
+    item->setZValue(1000);
+
+    scene_->addItem(item);
+
+    return item;
 }
 
 void ImageViewerWidget::setupMiniMap()
@@ -345,32 +362,35 @@ void ImageViewerWidget::handleImageSizeChanged()
     if (infoOverlay_)
     {
         constexpr QPoint kDefaultOverlayPos{10, 20};
-        setTextPosition(kDefaultOverlayPos, infoOverlay_);
+        moveOverlay(infoOverlay_, kDefaultOverlayPos);
     }
 
     if (useEnhancedDisplayConfig_)
         updateDisplayWithConfig();
 
     applyAutoFit();
+
+    if (notificationOverlayItem_)
+        anchorOverlay(notificationOverlayItem_);
 }
 
 void ImageViewerWidget::scaleView(double sx, double sy)
 {
-    const QPoint overlayPosition = textPosition(infoOverlay_);
+    const QPoint overlayPos = overlayPosition(infoOverlay_);
 
     scale(sx, sy);
 
-    setTextPosition(overlayPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPos);
     updateMiniMap();
 }
 
 void ImageViewerWidget::translateView(double dx, double dy)
 {
-    const QPoint overlayPosition = textPosition(infoOverlay_);
+    const QPoint overlayPos = overlayPosition(infoOverlay_);
 
     translate(dx, dy);
 
-    setTextPosition(overlayPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPos);
     updateMiniMap();
 }
 
@@ -386,7 +406,7 @@ void ImageViewerWidget::toggleFullscreen()
 
 void ImageViewerWidget::enterFullscreenMode()
 {
-    const QPoint overlayPosition = textPosition(infoOverlay_);
+    const QPoint overlayPos = overlayPosition(infoOverlay_);
 
     previousAutoFitEnabled_ = autoFitEnabled_;
     previousTransform_ = transform();
@@ -409,7 +429,7 @@ void ImageViewerWidget::enterFullscreenMode()
 
     applyAutoFit();
 
-    setTextPosition(overlayPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPos);
     updateMiniMap();
 
     isFullscreen_ = true;
@@ -417,7 +437,7 @@ void ImageViewerWidget::enterFullscreenMode()
 
 void ImageViewerWidget::leaveFullscreenMode()
 {
-    const QPoint overlayPosition = textPosition(infoOverlay_);
+    const QPoint overlayPos = overlayPosition(infoOverlay_);
 
     setBackgroundBrush(previousBackgroundBrush_);
     setHorizontalScrollBarPolicy(previousHScrollPolicy_);
@@ -462,7 +482,7 @@ void ImageViewerWidget::leaveFullscreenMode()
         }
     }
 
-    setTextPosition(overlayPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPos);
     updateMiniMap();
 
     isFullscreen_ = false;
@@ -470,17 +490,18 @@ void ImageViewerWidget::leaveFullscreenMode()
 
 void ImageViewerWidget::applyAutoFit()
 {
-    const QPoint overlayPosition = textPosition(infoOverlay_);
+    const QPoint overlayPos = overlayPosition(infoOverlay_);
 
     if (!pixmapItem_)
         return;
 
+    const bool previousAutoFitEnabled = autoFitEnabled_;
     autoFitEnabled_ = true;
     resetTransform();
 
     fitInView(pixmapItem_, Qt::KeepAspectRatio);
 
-    setTextPosition(overlayPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPos);
 
     updateMiniMap();
 }
@@ -490,25 +511,25 @@ void ImageViewerWidget::userInteracted()
     autoFitEnabled_ = false;
 }
 
-QPoint ImageViewerWidget::textPosition(const OverlayTextItem* textOverlay) const
+QPoint ImageViewerWidget::overlayPosition(const OverlayTextItem* textOverlay) const
 {
-    QPoint overlayPosition = {0, 0};
+    QPoint overlayPos = {0, 0};
 
     if (textOverlay)
     {
-        overlayPosition = mapFromScene(textOverlay->pos());
+        overlayPos = mapFromScene(textOverlay->pos());
 
-        if (overlayPosition.x() < 0 || overlayPosition.x() >= width() || overlayPosition.y() < 0 ||
-            overlayPosition.y() >= height())
+        if (overlayPos.x() < 0 || overlayPos.x() >= width() || overlayPos.y() < 0 ||
+            overlayPos.y() >= height())
         {
-            overlayPosition = {10, 20};
+            overlayPos = {10, 20};
         }
     }
 
-    return overlayPosition;
+    return overlayPos;
 }
 
-void ImageViewerWidget::setTextPosition(QPoint position, OverlayTextItem* textOverlay)
+void ImageViewerWidget::moveOverlay(OverlayTextItem* textOverlay, const QPoint& position)
 {
     if (textOverlay)
         textOverlay->setPos(mapToScene(position));
@@ -532,7 +553,7 @@ void ImageViewerWidget::wheelEvent(QWheelEvent* event)
 
     double factor = computeZoomFactor(event);
 
-    const QPoint textPos = textPosition(infoOverlay_);
+    const QPoint textPos = overlayPosition(infoOverlay_);
     const QPoint cursorPos = event->position().toPoint();
 
     if (!applyZoom(event, factor))
@@ -584,19 +605,16 @@ bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
     return true;
 }
 
-void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoint& textPosition)
+void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoint& overlayPosition)
 {
-    setTextPosition(textPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPosition);
 
     // zoom overlay
     double newZoom = currentZoom();
     int percent = static_cast<int>(std::round(newZoom * 100.0));
 
-    zoomOverlayController_->show(percent);
+    showZoomHud(percent);
 
-    const QPoint zoomOverlayPosition = cursorPosition + QPoint(20, -26);
-
-    setTextPosition(zoomOverlayPosition, zoomOverlayItem_);
     updateMiniMap();
 }
 
@@ -625,14 +643,16 @@ double ImageViewerWidget::computeZoomFactor(QWheelEvent* event) const
 
 void ImageViewerWidget::resizeEvent(QResizeEvent* event)
 {
-    const QPoint overlayPosition = textPosition(infoOverlay_);
+    const QPoint overlayPos = overlayPosition(infoOverlay_);
 
     QGraphicsView::resizeEvent(event);
 
     if (autoFitEnabled_)
         applyAutoFit();
 
-    setTextPosition(overlayPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPos);
+    anchorOverlay(notificationOverlayItem_);
+
     positionMiniMap();
     updateMiniMap();
 }
@@ -1152,12 +1172,12 @@ void ImageViewerWidget::positionMiniMap()
 
 void ImageViewerWidget::onMiniMapCenterRequested(const QPointF& scenePoint)
 {
-    const QPoint overlayPosition = textPosition(infoOverlay_);
+    const QPoint overlayPos = overlayPosition(infoOverlay_);
 
     centerOn(scenePoint);
     updateMiniMap();
 
-    setTextPosition(overlayPosition, infoOverlay_);
+    moveOverlay(infoOverlay_, overlayPos);
 }
 
 void ImageViewerWidget::updateMiniMapThumbnail()
@@ -1188,6 +1208,93 @@ void ImageViewerWidget::notifyUserActivity(const QPoint& viewPos)
     isUserActive_ = true;
     inactivityTimer_.start(kUserIdleTimeoutMs);
     emit activityDetected(viewPos);
+}
+
+void ImageViewerWidget::showNotification(const QString& text)
+{
+    assert(notificationOverlayController_);
+
+    notificationOverlayController_->show(text, HudPreset::Notification);
+
+    anchorOverlay(notificationOverlayItem_);
+}
+
+void ImageViewerWidget::showCursorMessage(const QString& text)
+{
+    assert(cursorOverlayController_);
+
+    cursorOverlayController_->show(text, HudPreset::Cursor);
+
+    positionCursorOverlay();
+}
+
+void ImageViewerWidget::showZoomHud(int percent)
+{
+    assert(cursorOverlayController_);
+
+    cursorOverlayController_->show(QString("%1%").arg(percent), HudPreset::Cursor);
+
+    positionCursorOverlay();
+}
+
+void ImageViewerWidget::positionCursorOverlay()
+{
+    const QPoint localPos = mapFromGlobal(QCursor::pos());
+
+    moveOverlay(cursorOverlayItem_, localPos + kCursorOverlayOffset);
+}
+
+void ImageViewerWidget::anchorOverlay(OverlayTextItem* overlay, OverlayPosition position,
+                                      const QPointF& offset)
+{
+    if (!overlay)
+        return;
+
+    static constexpr int kMargin = 10;
+
+    const QRect viewportRect = viewport()->rect();
+
+    const QSize overlaySize{static_cast<int>(std::ceil(overlay->boundingRect().width())),
+                            static_cast<int>(std::ceil(overlay->boundingRect().height()))};
+
+    QPoint pos;
+
+    switch (position)
+    {
+        case OverlayPosition::TopLeft:
+            pos = QPoint(kMargin, kMargin);
+            break;
+
+        case OverlayPosition::TopRight:
+            pos = QPoint(viewportRect.width() - overlaySize.width() - kMargin, kMargin);
+            break;
+
+        case OverlayPosition::BottomLeft:
+            pos = QPoint(kMargin, viewportRect.height() - overlaySize.height() - kMargin);
+            break;
+
+        case OverlayPosition::BottomRight:
+            pos = QPoint(viewportRect.width() - overlaySize.width() - kMargin,
+                         viewportRect.height() - overlaySize.height() - kMargin);
+            break;
+
+        case OverlayPosition::Center:
+            pos = QPoint((viewportRect.width() - overlaySize.width()) / 2,
+                         (viewportRect.height() - overlaySize.height()) / 2);
+            break;
+    }
+
+    const QPointF scenePos = mapToScene(pos) + offset;
+
+    overlay->setPos(scenePos);
+}
+
+QRect ImageViewerWidget::displayedImageRect() const
+{
+    if (!pixmapItem_ || pixmapItem_->pixmap().isNull())
+        return {};
+
+    return mapFromScene(pixmapItem_->sceneBoundingRect()).boundingRect();
 }
 
 } // namespace fluvel
