@@ -34,14 +34,14 @@ Gray: 888</source>
 Intensité : 888</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="63"/>
+        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="65"/>
         <source>(%1, %2)
 Gray: %3</source>
         <translation>(%1, %2)
 Intensité : %3</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="69"/>
+        <location filename="../src/app/ui/components/pixel_info_overlay.cpp" line="71"/>
         <source>(%1, %2)
 R: %3  G: %4  B: %5</source>
         <translation>(%1, %2)
@@ -56,6 +56,11 @@ R : %3  G : %4  B : %5</translation>
         <location filename="../src/app/core/video_format_utils.cpp" line="129"/>
         <source>Other</source>
         <translation>Autre</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/autofit_behavior.cpp" line="24"/>
+        <source>Auto Fit</source>
+        <translation>Ajustement automatique</translation>
     </message>
 </context>
 <context>
@@ -815,6 +820,34 @@ ou cliquez sur Ouvrir...</translation>
     </message>
 </context>
 <context>
+    <name>fluvel::ImageViewerWidget</name>
+    <message>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="434"/>
+        <source>Auto Fit</source>
+        <translation>Ajustement automatique</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1009"/>
+        <source>Mirror On</source>
+        <translation>Miroir activé</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1009"/>
+        <source>Mirror Off</source>
+        <translation>Miroir désactivé</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1014"/>
+        <source>Smooth Display On</source>
+        <translation>Affichage lissé activé</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1015"/>
+        <source>Smooth Display Off</source>
+        <translation>Affichage lissé désactivé</translation>
+    </message>
+</context>
+<context>
     <name>fluvel::ImageWindow</name>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="98"/>
@@ -1136,7 +1169,7 @@ ou choisissez Fichier → Ouvrir</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/settings_dialog.cpp" line="96"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="550"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="552"/>
         <source>Processing</source>
         <translation>Traitement</translation>
     </message>
@@ -1243,194 +1276,194 @@ ou choisissez Fichier → Ouvrir</translation>
         <translation>Effacer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="338"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="340"/>
         <source>Gaussian Noise</source>
         <translation>Bruit gaussien</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="340"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="342"/>
         <source>Additive Gaussian (white) noise applied independently to each pixel.</source>
         <translation>Bruit gaussien additif (blanc) appliqué indépendamment à chaque pixel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="347"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="377"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="349"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="379"/>
         <source>Standard deviation.</source>
         <translation>Écart-type.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="350"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="380"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="352"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="382"/>
         <source>σ: </source>
         <translation>σ : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="363"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="365"/>
         <source>Density or probability of impulse noise per pixel.</source>
         <translation>Densité ou probabilité de bruit impulsionnel par pixel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="366"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="368"/>
         <source>d: </source>
         <translation>d : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="477"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="479"/>
         <source>White top-hat</source>
         <translation>Top-hat blanc</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="479"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="481"/>
         <source>Black top-hat</source>
         <translation>Top-hat noir</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="439"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="441"/>
         <source>λ: </source>
         <translation>λ : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="440"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="442"/>
         <source>κ: </source>
         <translation>κ : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="454"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="467"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="486"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="456"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="469"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="488"/>
         <source>The structuring element is a square centered at its origin.</source>
         <translation>L&apos;élément structurant est un carré centré sur son origine.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="457"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="470"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="491"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="459"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="472"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="493"/>
         <source>SE size: </source>
         <translation>Taille de l&apos;ES : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="352"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="354"/>
         <source>Impulsive Noise</source>
         <translation>Bruit impulsionnel</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="318"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="320"/>
         <source>Factor: </source>
         <translation>Facteur : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="354"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="356"/>
         <source>Random pixel corruption. Grayscale: salt &amp; pepper (black or white pixels). Color: each channel can be independently corrupted.</source>
         <translation>Corruption aléatoire des pixels. Niveaux de gris : sel et poivre (pixels noirs ou blancs). Couleur : chaque canal peut être corrompu indépendamment.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="368"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="370"/>
         <source>Speckle Noise</source>
         <translation>Bruit speckle</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="370"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="372"/>
         <source>Multiplicative noise applied to pixel intensities. Based on a gamma distribution (commonly used to model speckle in imaging systems).</source>
         <translation>Bruit multiplicatif appliqué aux intensités des pixels. Basé sur une distribution gamma (couramment utilisée pour modéliser le bruit de speckle dans les systèmes d’imagerie).</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="394"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="396"/>
         <source>Mean filter</source>
         <translation>Filtre moyenneur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="403"/>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="417"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="405"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="419"/>
         <source>Kernel size: </source>
         <translation>Taille du noyau : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="407"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="409"/>
         <source>Median filter</source>
         <translation>Filtre médian</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="419"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="421"/>
         <source>Perona-Malik anisotropic diffusion</source>
         <translation>Diffusion anisotrope de Perona–Malik</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="438"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="440"/>
         <source>Iterations: </source>
         <translation>Itérations : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="441"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="443"/>
         <source>Function 1: </source>
         <translation>Fonction 1 : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="442"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="444"/>
         <source>Function 2: </source>
         <translation>Fonction 2 : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="446"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="448"/>
         <source>Opening</source>
         <translation>Ouverture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="459"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="461"/>
         <source>Closing</source>
         <translation>Fermeture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="474"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="476"/>
         <source>Top-hat transform</source>
         <translation>Transformation top-hat</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="478"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="480"/>
         <source>Difference between the input image and the opened result.</source>
         <translation>Différence entre l&apos;image d&apos;origine et le résultat de l&apos;ouverture.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="480"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="482"/>
         <source>Difference between the closed result and the input image.</source>
         <translation>Différence entre le résultat de la fermeture et l&apos;image d&apos;origine.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="543"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="545"/>
         <source>Linear</source>
         <translation>Linéaire</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="544"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="546"/>
         <source>Edge preserving</source>
         <translation>Préservation contour</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="545"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="547"/>
         <source>Math morpho</source>
         <translation>Morpho math</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="547"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="549"/>
         <source>Noise generators</source>
         <translation>Bruit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="548"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="550"/>
         <source>Filters</source>
         <translation>Filtres</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="555"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="557"/>
         <source>Time: </source>
         <translation>Temps : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="556"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="558"/>
         <source>Processing time</source>
         <translation>Temps de calcul</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="808"/>
+        <location filename="../src/app/ui/windows/settings_dialog.cpp" line="810"/>
         <source>%1 s</source>
         <translation>%1 s</translation>
     </message>
@@ -1438,12 +1471,12 @@ ou choisissez Fichier → Ouvrir</translation>
 <context>
     <name>fluvel::VideoController</name>
     <message>
-        <location filename="../src/app/core/video_controller.cpp" line="199"/>
+        <location filename="../src/app/core/video_controller.cpp" line="200"/>
         <source>Camera not found</source>
         <translation>Caméra introuvable</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_controller.cpp" line="423"/>
+        <location filename="../src/app/core/video_controller.cpp" line="424"/>
         <source>In | Proc | Disp: %1 | %2 | %3 fps
 Lat: %4 ms (proc %5) | Drop: %6 %
 Contour: %7 pts</source>
@@ -1485,7 +1518,7 @@ Contour : %7 pts</translation>
         <translation>Réduction d’échelle</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_settings_dialog.cpp" line="126"/>
+        <location filename="../src/app/ui/windows/video_settings_dialog.cpp" line="128"/>
         <source>Factor: </source>
         <translation>Facteur : </translation>
     </message>
@@ -1588,13 +1621,23 @@ or click Open...</source>
 ou cliquez sur Ouvrir...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1130"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1141"/>
         <source>Recommended format</source>
         <translation>Format recommandé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1394"/>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1416"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1316"/>
+        <source>Started</source>
+        <translation>Démarré</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1396"/>
+        <source>Stopped</source>
+        <translation>Arrêté</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1410"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1432"/>
         <source>Source: %1
 
 %2</source>
@@ -1603,87 +1646,113 @@ ou cliquez sur Ouvrir...</translation>
 %2</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1396"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1412"/>
         <source>Camera error</source>
         <translation>Erreur de caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1418"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1434"/>
         <source>Media error</source>
         <translation>Erreur multimédia</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1452"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1468"/>
         <source>Camera startup failed</source>
         <translation>Échec du démarrage de la caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1453"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1469"/>
         <source>The camera did not produce a valid frame within %1 seconds.
 The device may be busy or not responding.</source>
         <translation>La caméra n’a produit aucune image valide dans un délai de %1 secondes.
 Le périphérique est peut-être occupé ou ne répond pas.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1471"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1487"/>
         <source>Camera stream lost</source>
         <translation>Flux de la caméra perdu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1472"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1488"/>
         <source>No valid frame received for %1 seconds.
 The camera stream may have stalled.</source>
         <translation>Aucune image valide reçue pendant %1 secondes.
 Le flux de la caméra est peut-être interrompu.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1529"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1545"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1530"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1546"/>
         <source>Start selected source.</source>
         <translation>Démarrer la source sélectionnée.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1541"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1557"/>
         <source>Stop active source.</source>
         <translation>Arrêter la source active.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2020"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2036"/>
         <source>Volume: %1%</source>
         <translation>Volume : %1 %</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1346"/>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1780"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2270"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2295"/>
+        <source>Volume %1%</source>
+        <translation>Volume : %1 %</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2310"/>
+        <source>Muted</source>
+        <translation>Son coupé</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2310"/>
+        <source>Unmuted</source>
+        <translation>Son réactivé</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2322"/>
+        <source>Play</source>
+        <translation>Lecture</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2326"/>
+        <source>Pause</source>
+        <translation>Pause</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1360"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1796"/>
         <source>Video</source>
         <translation>Vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1795"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1811"/>
         <source>Open Video File</source>
         <translation>Ouvrir un fichier vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1848"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1864"/>
         <source>Clear source history</source>
         <translation>Effacer l&apos;historique des sources</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1540"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1556"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1550"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1566"/>
         <source>Starting...</source>
         <translation>Démarrage…</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1551"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1567"/>
         <source>Camera startup in progress.</source>
         <translation>Démarrage de la caméra en cours.</translation>
     </message>

@@ -2249,7 +2249,7 @@ void VideoWindow::stepPlayback(qint64 deltaMs)
     // responsive user feedback. The actual playback position is
     // updated asynchronously by the media backend.
     imageViewer_->showNotification(
-        tr("%1 / %2")
+        QStringLiteral("%1 / %2")
             .arg(time_utils::formatDuration(newPositionMs))
             .arg(time_utils::formatDuration(videoController_->durationMs())));
 }
