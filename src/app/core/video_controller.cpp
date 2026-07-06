@@ -16,6 +16,7 @@
 #include <QMediaPlayer>
 #include <QUrl>
 #include <QVideoSink>
+#include <QtNumeric>
 
 #include <cassert>
 #include <utility>

@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QStyleOptionButton>
 #include <QStylePainter>
+#include <QtNumeric>
 
 namespace fluvel
 {

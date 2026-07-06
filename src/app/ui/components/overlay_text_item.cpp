@@ -5,6 +5,7 @@
 
 #include <QFontMetrics>
 #include <QPainter>
+#include <QtNumeric>
 
 namespace
 {

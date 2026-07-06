@@ -6,6 +6,7 @@
 #include <QEasingCurve>
 #include <QPropertyAnimation>
 #include <QWidget>
+#include <QtNumeric>
 
 namespace
 {

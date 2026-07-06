@@ -9,6 +9,7 @@
 #include <QPropertyAnimation>
 #include <QWidget>
 #include <QtMath>
+#include <QtNumeric>
 
 namespace
 {
