@@ -488,7 +488,7 @@ void ImageViewerWidget::leaveFullscreenMode()
             QTimer::singleShot(0, this,
                                [this, zoomPercent]
                                {
-                                   showZoomHud(zoomPercent);
+                                   showNotification(QString("%1%").arg(zoomPercent));
                                });
         }
     }
