@@ -268,7 +268,7 @@ signals:
      *
      * @param info Updated media information.
      */
-    void mediaInfoChanged(const MediaInfo& info);
+    void mediaInfoChanged(const fluvel::MediaInfo& info);
 
     /**
      * @brief Emitted when media playback is paused or resumed.

@@ -164,8 +164,8 @@ void VideoWindow::createUi()
     deviceWidget_ = new QWidget;
     deviceWidget_->setLayout(deviceLayout);
 
-    QColor greenActive("#4FC98A");
-    QColor orangeError("#FF9F0A");
+    const QColor greenActive = QColor::fromRgb(0x4FC98A);
+    const QColor orangeError = QColor::fromRgb(0xFF9F0A);
 
     deviceActiveIcon_ = il::createDisk(greenActive);
     deviceIdleIcon_ = il::createEmpty(kCameraIconSize);
@@ -2249,9 +2249,8 @@ void VideoWindow::stepPlayback(qint64 deltaMs)
     // responsive user feedback. The actual playback position is
     // updated asynchronously by the media backend.
     imageViewer_->showNotification(
-        QStringLiteral("%1 / %2")
-            .arg(time_utils::formatDuration(newPositionMs))
-            .arg(time_utils::formatDuration(videoController_->durationMs())));
+        QStringLiteral("%1 / %2").arg(time_utils::formatDuration(newPositionMs),
+                                      time_utils::formatDuration(videoController_->durationMs())));
 }
 
 void VideoWindow::stepVolume(int deltaPercent)
