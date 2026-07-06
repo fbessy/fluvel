@@ -226,6 +226,22 @@ public:
     QRect displayedImageRect() const;
 
     /**
+     * @brief Adjusts an overlay position to keep it fully visible.
+     *
+     * The overlay is initially placed relative to an anchor point using the
+     * preferred offset. If it would extend outside the viewport, its position
+     * is adjusted to keep it fully visible.
+     *
+     * @param anchorViewPos Anchor position in viewport coordinates.
+     * @param overlaySize Overlay size in viewport coordinates.
+     * @param preferredOffset Preferred offset from the anchor position.
+     * @return Adjusted position in viewport coordinates.
+     */
+    [[nodiscard]]
+    QPoint adjustOverlayPosition(const QPoint& anchorViewPos, const QSize& overlaySize,
+                                 const QPoint& preferredOffset) const;
+
+    /**
      * @name Internal API
      * @brief Functions used by behaviors and interaction system.
      * @{

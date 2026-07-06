@@ -93,7 +93,7 @@ private:
      *
      * @param maxStr Reference string used to estimate maximum size.
      */
-    void calc_bounding(const QString& maxStr);
+    void calcBounding(const QString& maxStr);
 
     /// Full text displayed (coordinates + values).
     QString text_;

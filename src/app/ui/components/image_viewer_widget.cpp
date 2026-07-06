@@ -24,7 +24,7 @@
 
 namespace
 {
-constexpr QPoint kCursorOverlayOffset{20, -26};
+constexpr QPoint kCursorOverlayOffset{8, -8};
 }
 
 namespace fluvel
@@ -994,9 +994,26 @@ void ImageViewerWidget::upscaleItems()
 
 void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
 {
+    const bool previousMirrorMode = displayConfig_.mirrorMode;
+    const bool previousSmoothDisplay = displayConfig_.smoothDisplay;
+
     displayConfig_ = display;
 
     updateDisplayWithConfig();
+
+    if (!hasImage())
+        return;
+
+    if (previousMirrorMode != displayConfig_.mirrorMode)
+    {
+        showNotification(displayConfig_.mirrorMode ? tr("Mirror On") : tr("Mirror Off"));
+    }
+
+    if (previousSmoothDisplay != displayConfig_.smoothDisplay)
+    {
+        showNotification(displayConfig_.smoothDisplay ? tr("Smooth Display On")
+                                                      : tr("Smooth Display Off"));
+    }
 }
 
 void ImageViewerWidget::updateDisplayWithConfig()
@@ -1255,7 +1272,16 @@ void ImageViewerWidget::positionCursorOverlay()
 {
     const QPoint localPos = mapFromGlobal(QCursor::pos());
 
-    moveOverlay(cursorOverlayItem_, localPos + kCursorOverlayOffset);
+    const QSize overlaySize{
+        static_cast<int>(std::ceil(cursorOverlayItem_->boundingRect().width())),
+        static_cast<int>(std::ceil(cursorOverlayItem_->boundingRect().height()))};
+
+    QPoint preferred = kCursorOverlayOffset;
+    preferred.ry() -= overlaySize.height();
+
+    const QPoint pos = adjustOverlayPosition(localPos, overlaySize, preferred);
+
+    moveOverlay(cursorOverlayItem_, pos);
 }
 
 void ImageViewerWidget::anchorOverlay(OverlayTextItem* overlay, OverlayPosition position,
@@ -1301,6 +1327,30 @@ void ImageViewerWidget::anchorOverlay(OverlayTextItem* overlay, OverlayPosition 
     const QPointF scenePos = mapToScene(pos) + offset;
 
     overlay->setPos(scenePos);
+}
+
+QPoint ImageViewerWidget::adjustOverlayPosition(const QPoint& anchorViewPos,
+                                                const QSize& overlaySize,
+                                                const QPoint& preferredOffset) const
+{
+    constexpr int kMargin = 8;
+
+    const QRect viewportRect = viewport()->rect();
+
+    QPoint pos = anchorViewPos + preferredOffset;
+
+    QRect overlayRect(pos, overlaySize);
+
+    if (overlayRect.right() > viewportRect.right())
+        pos.setX(anchorViewPos.x() - overlaySize.width() - preferredOffset.x());
+
+    if (overlayRect.bottom() > viewportRect.bottom())
+        pos.setY(anchorViewPos.y() - overlaySize.height() - preferredOffset.y());
+
+    pos.setX(std::max(pos.x(), viewportRect.left() + kMargin));
+    pos.setY(std::max(pos.y(), viewportRect.top() + kMargin));
+
+    return pos;
 }
 
 QRect ImageViewerWidget::displayedImageRect() const

@@ -34,23 +34,25 @@ PixelInfoOverlay::PixelInfoOverlay(QGraphicsScene* scene)
     setVisible(false);
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
 
-    QFont font; // police par défaut
+    QFont font;
     font.setStyleHint(QFont::SansSerif);
+    font.setPointSize(13);
+    font.setBold(true);
 
-    // active les chiffres tabulaires
+    // chiffres tabulaires
     font.setFeature("tnum", 1);
 
     font_ = font;
 }
 
-void PixelInfoOverlay::calc_bounding(const QString& maxStr)
+void PixelInfoOverlay::calcBounding(const QString& maxStr)
 {
     QFontMetrics fm(font_);
 
     QRect textRect =
         fm.boundingRect(QRect(0, 0, 1000, 1000), Qt::AlignLeft | Qt::TextWordWrap, maxStr);
 
-    boundingRect_ = QRectF(0, 0, textRect.width() + 16, textRect.height() + 12);
+    boundingRect_ = QRectF(0, 0, textRect.width() + 20, textRect.height() + 16);
 }
 
 void PixelInfoOverlay::updateInfo(const QPoint& pixel, const QRgb& color, bool isGrayImg,
@@ -58,13 +60,13 @@ void PixelInfoOverlay::updateInfo(const QPoint& pixel, const QRgb& color, bool i
 {
     if (isGrayImg)
     {
-        calc_bounding(maxGrayText());
+        calcBounding(maxGrayText());
 
         text_ = QObject::tr("(%1, %2)\nGray: %3").arg(pixel.x()).arg(pixel.y()).arg(qRed(color));
     }
     else
     {
-        calc_bounding(maxText());
+        calcBounding(maxText());
 
         text_ = QObject::tr("(%1, %2)\nR: %3  G: %4  B: %5")
                     .arg(pixel.x())
@@ -81,37 +83,13 @@ void PixelInfoOverlay::updatePlacement(const QPointF& anchorScenePos, ImageViewe
 {
     constexpr int margin = 8;
 
-    // Taille flottante réelle de l’overlay
-    const QSizeF overlaySizeF = boundingRect().size();
-
-    // Conversion explicite et géométriquement correcte
-    const int overlayW = static_cast<int>(std::ceil(overlaySizeF.width()));
-    const int overlayH = static_cast<int>(std::ceil(overlaySizeF.height()));
-
-    const QRect viewRect = view.viewport()->rect();
-
     const QPoint anchorViewPos = view.mapFromScene(anchorScenePos);
 
-    QPoint pos = anchorViewPos + QPoint(margin, margin);
+    const QSize overlaySize{static_cast<int>(std::ceil(boundingRect().width())),
+                            static_cast<int>(std::ceil(boundingRect().height()))};
 
-    QRect rect(pos, QSize(overlayW, overlayH));
-
-    if (rect.right() > viewRect.right())
-    {
-        const int newX = anchorViewPos.x() - overlayW - margin;
-
-        pos.setX(newX);
-    }
-
-    if (rect.bottom() > viewRect.bottom())
-    {
-        const int newY = anchorViewPos.y() - overlayH - margin;
-
-        pos.setY(newY);
-    }
-
-    pos.setX(std::max(pos.x(), viewRect.left()));
-    pos.setY(std::max(pos.y(), viewRect.top()));
+    const QPoint pos =
+        view.adjustOverlayPosition(anchorViewPos, overlaySize, QPoint(margin, margin));
 
     setPos(view.mapToScene(pos));
 }
@@ -144,7 +122,7 @@ void PixelInfoOverlay::paint(QPainter* painter, const QStyleOptionGraphicsItem*,
 
     // Texte
     painter->setPen(Qt::white);
-    painter->drawText(boundingRect_.adjusted(8, 6, -8, -6), Qt::AlignCenter | Qt::AlignVCenter,
+    painter->drawText(boundingRect_.adjusted(10, 8, -10, -8), Qt::AlignCenter | Qt::AlignVCenter,
                       text_);
 }
 
