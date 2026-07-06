@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
+/**
+ * @file video_types.hpp
+ * @brief Common data structures exchanged between the video controller,
+ *        user interface and streaming components.
+ */
+
 #pragma once
 
 #include <QCamera>

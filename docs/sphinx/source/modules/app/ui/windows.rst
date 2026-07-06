@@ -9,23 +9,24 @@ video processing, analysis and application configuration workflows.
 They assemble reusable UI components, controllers and processing services
 into complete user-facing interfaces.
 
+Main Windows
+------------
+
 .. doxygenfile:: image_window.hpp
 
-
-.. doxygenfile:: camera_window.hpp
-
+.. doxygenfile:: video_window.hpp
 
 .. doxygenfile:: analysis_window.hpp
 
 
-.. doxygenfile:: settings_window.hpp
+Dialogs
+-------
 
+.. doxygenfile:: settings_dialog.hpp
 
-.. doxygenfile:: camera_settings_window.hpp
+.. doxygenfile:: video_settings_dialog.hpp
 
+.. doxygenfile:: language_dialog.hpp
 
-.. doxygenfile:: language_window.hpp
-
-
-.. doxygenfile:: about_window.hpp
+.. doxygenfile:: about_dialog.hpp
 

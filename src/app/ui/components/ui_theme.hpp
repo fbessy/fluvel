@@ -1,10 +1,23 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
+/**
+ * @file ui_theme.hpp
+ * @brief Shared UI theme definitions including colors, metrics, spacing and
+ * animation durations.
+ */
+
 #pragma once
 
 #include <QColor>
 
+/**
+ * @brief Shared user interface theme constants.
+ *
+ * This namespace centralizes the visual appearance of the application,
+ * including colors, dimensions, spacing and animation timings used by
+ * reusable widgets.
+ */
 namespace fluvel::ui
 {
 
