@@ -10,11 +10,13 @@
 namespace fluvel
 {
 
-HudOverlayController::HudOverlayController(OverlayTextItem* item, QObject* parent)
+HudOverlayController::HudOverlayController(OverlayTextItem* item, HudPreset preset, QObject* parent)
     : QObject(parent)
     , item_(item)
 {
     assert(item_);
+
+    applyPreset(preset);
 
     timer_.setSingleShot(true);
 
@@ -29,11 +31,9 @@ HudOverlayController::HudOverlayController(OverlayTextItem* item, QObject* paren
     item_->setVisible(false);
 }
 
-void HudOverlayController::show(const QString& text, HudPreset preset)
+void HudOverlayController::show(const QString& text)
 {
     anim_.stop();
-
-    applyPreset(preset);
 
     item_->setOpacity(1.0);
     item_->setText(text);

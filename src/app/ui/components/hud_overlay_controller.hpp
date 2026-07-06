@@ -57,11 +57,14 @@ public:
      * @brief Constructs the controller.
      *
      * @param item Pointer to the overlay text item to control.
+     * @param preset Visual preset controlling the appearance and behavior of the
+     *               overlay.
      * @param parent Optional QObject parent.
      *
      * @pre item must not be null.
      */
-    explicit HudOverlayController(OverlayTextItem* item, QObject* parent = nullptr);
+    explicit HudOverlayController(OverlayTextItem* item, HudPreset preset = HudPreset::Cursor,
+                                  QObject* parent = nullptr);
 
     /**
      * @brief Displays a temporary HUD message.
@@ -70,10 +73,8 @@ public:
      * the display/fade sequence.
      *
      * @param text Text to display.
-     * @param preset Visual preset controlling the appearance and behavior of the
-     *               overlay.
      */
-    void show(const QString& text, HudPreset preset = HudPreset::Cursor);
+    void show(const QString& text);
 
 private slots:
     /**

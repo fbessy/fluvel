@@ -106,11 +106,13 @@ void ImageViewerWidget::setupItems()
 void ImageViewerWidget::setupGlobalOverlays()
 {
     cursorOverlayItem_ = createOverlayItem();
-    cursorOverlayController_ = new HudOverlayController(cursorOverlayItem_, this);
+    cursorOverlayController_ =
+        new HudOverlayController(cursorOverlayItem_, HudPreset::Cursor, this);
     cursorOverlayItem_->hide();
 
     notificationOverlayItem_ = createOverlayItem();
-    notificationOverlayController_ = new HudOverlayController(notificationOverlayItem_, this);
+    notificationOverlayController_ =
+        new HudOverlayController(notificationOverlayItem_, HudPreset::Notification, this);
     notificationOverlayItem_->hide();
 }
 
@@ -1245,7 +1247,7 @@ void ImageViewerWidget::showNotification(const QString& text)
 {
     assert(notificationOverlayController_);
 
-    notificationOverlayController_->show(text, HudPreset::Notification);
+    notificationOverlayController_->show(text);
 
     anchorOverlay(notificationOverlayItem_);
 }
@@ -1254,7 +1256,7 @@ void ImageViewerWidget::showCursorMessage(const QString& text)
 {
     assert(cursorOverlayController_);
 
-    cursorOverlayController_->show(text, HudPreset::Cursor);
+    cursorOverlayController_->show(text);
 
     positionCursorOverlay();
 }
@@ -1263,7 +1265,7 @@ void ImageViewerWidget::showZoomHud(int percent)
 {
     assert(cursorOverlayController_);
 
-    cursorOverlayController_->show(QString("%1%").arg(percent), HudPreset::Cursor);
+    cursorOverlayController_->show(QString("%1%").arg(percent));
 
     positionCursorOverlay();
 }
