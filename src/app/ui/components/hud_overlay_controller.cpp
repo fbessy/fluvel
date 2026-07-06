@@ -16,19 +16,18 @@ HudOverlayController::HudOverlayController(OverlayTextItem* item, HudPreset pres
 {
     assert(item_);
 
-    applyPreset(preset);
+    item_->setOpacity(1.0);
+    item_->setVisible(false);
 
     timer_.setSingleShot(true);
-
-    connect(&timer_, &QTimer::timeout, this, &HudOverlayController::onTimeout);
 
     anim_.setTargetObject(item_);
     anim_.setPropertyName("opacity");
 
-    connect(&anim_, &QPropertyAnimation::finished, this, &HudOverlayController::onFadeFinished);
+    applyPreset(preset);
 
-    item_->setOpacity(1.0);
-    item_->setVisible(false);
+    connect(&timer_, &QTimer::timeout, this, &HudOverlayController::onTimeout);
+    connect(&anim_, &QPropertyAnimation::finished, this, &HudOverlayController::onFadeFinished);
 }
 
 void HudOverlayController::show(const QString& text)

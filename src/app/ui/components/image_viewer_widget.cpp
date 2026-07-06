@@ -1250,6 +1250,11 @@ void ImageViewerWidget::showNotification(const QString& text)
     notificationOverlayController_->show(text);
 
     anchorOverlay(notificationOverlayItem_);
+
+    // Force a viewport repaint when replacing an already visible notification.
+    // Without this, some Qt backends may leave text rendering artifacts until the
+    // next viewport update (e.g. zoom or pan).
+    viewport()->update();
 }
 
 void ImageViewerWidget::showCursorMessage(const QString& text)

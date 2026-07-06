@@ -42,7 +42,8 @@ void OverlayTextItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     painter->setBrush(backgroundColor_);
     painter->setPen(Qt::NoPen);
 
-    painter->drawRoundedRect(boundingRect(), cornerRadius_, cornerRadius_);
+    const QRectF r = boundingRect().adjusted(0.5, 0.5, -0.5, -0.5);
+    painter->drawRoundedRect(r, cornerRadius_, cornerRadius_);
 
     // Text
     painter->setPen(textColor_);
