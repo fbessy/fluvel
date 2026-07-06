@@ -134,12 +134,6 @@ struct LastReportedError
     QElapsedTimer timer;
 };
 
-enum class TimeDisplayMode
-{
-    TotalDuration,
-    RemainingTime
-};
-
 /**
  * @brief Main window for video source selection, streaming and visualization.
  *
@@ -191,8 +185,16 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
+    /**
+     * @brief Defines how the media duration label is displayed.
+     */
+    enum class TimeDisplayMode
+    {
+        TotalDuration, ///< Show the total media duration.
+        RemainingTime  ///< Show the remaining playback time.
+    };
+
     void onDownscaleChanged(const DownscaleParams& downscaleParams);
-    void updateWindowTitle();
 
     void setupWindow();
     void restoreSettings();
@@ -206,7 +208,6 @@ private:
     void bindApplicationSettingsToController();
     void bindApplicationSettingsToView();
     void bindUiToApplicationSettings();
-    void connectFrameToView();
 
     void refreshSourceUi();
     void updateSourceConfigFromUi(int sourceTypeComboIndex);
@@ -234,25 +235,26 @@ private:
     bool hasPendingConfiguration() const;
     QCameraFormat getSelectedFormat() const;
 
-    void loadPreferredFormats();
-    void savePreferredFormats();
+    void connectFrameToView();
 
-    void addSourceToHistory(const QUrl& url);
-    void loadSourceHistory();
-    void saveSourceHistory();
-
-    QString lastVideoDirectory() const;
-    void saveLastVideoDirectory(const QString& directory);
+    void startSource();
+    void stopSource();
 
     void onStreamingStarting();
     void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
 
+    //
+    // Error handling
+    //
+
+    // Backend errors
     void onCameraError(const CameraErrorInfo& errorInfo);
     void onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo);
 
     bool shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo);
 
+    // Application-level errors
     void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
     void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
 
@@ -260,36 +262,40 @@ private:
     void ensureCameraPermission();
 #endif
 
-    void startSource();
-    void stopSource();
-
-    void loadLastSourceType();
-    void saveLastSourceType();
-
-    static QByteArray loadSelectedCameraId();
-    void saveSelectedCameraId();
-
-    QString sourceTitle(const StreamingInfo& info) const;
-
     void updateSourceCompleter();
     void onSourceContextMenuRequested(const QPoint& pos);
 
     void onMediaInfoChanged(const MediaInfo& info);
-    QString buildSourceTitle() const;
-    void appendStreamingInfo(QString& title, const StreamingInfo& info) const;
 
-    void updateMediaBar();
+    //
+    // Media playback
+    //
+
+    void togglePause();
+    void onPlaybackStateChanged(QMediaPlayer::PlaybackState state);
+    void updatePlayPauseButton(bool paused);
 
     void onPlaybackPositionChanged(qint64 pos);
 
-    void updatePlayPauseButton(bool paused);
-    void togglePause();
+    void toggleTimeDisplayMode();
+    void updateDurationLabel();
+
+    void updateMediaBar();
+
+    //
+    // Audio
+    //
 
     void volumeRequested(int value);
+    void onVolumeChanged(float volume);
     void updateVolumeIcon(int volume, bool muted);
+
     void toggleMute();
-    void applyInitialAudioSettings();
-    void saveAudioSettings();
+    void onMutedChanged(bool muted);
+
+    //
+    // Fullscreen
+    //
 
     void toggleFullscreen();
     void enterFullscreen();
@@ -299,9 +305,11 @@ private:
     void onActivityDetected(const QPoint& pos);
     void onIdle();
 
-    void toggleTimeDisplayMode();
-    void updateDurationLabel();
     void updateFullscreenBar();
+
+    //
+    // Shortcut actions
+    //
 
     /**
      * @brief Seeks the current media by a relative time offset.
@@ -317,10 +325,38 @@ private:
     void stepPlayback(qint64 deltaMs);
 
     void stepVolume(int deltaPercent);
-    void onVolumeChanged(float volume);
-    void onMutedChanged(bool muted);
 
-    void onPlaybackStateChanged(QMediaPlayer::PlaybackState state);
+    //
+    // Persistent settings
+    //
+
+    void loadPreferredFormats();
+    void savePreferredFormats();
+
+    void addSourceToHistory(const QUrl& url);
+    void loadSourceHistory();
+    void saveSourceHistory();
+
+    void loadLastSourceType();
+    void saveLastSourceType();
+
+    static QByteArray loadSelectedCameraId();
+    void saveSelectedCameraId();
+
+    QString lastVideoDirectory() const;
+    void saveLastVideoDirectory(const QString& directory);
+
+    void applyInitialAudioSettings();
+    void saveAudioSettings();
+
+    //
+    // Window title
+    //
+
+    void updateWindowTitle();
+    QString buildSourceTitle() const;
+    QString sourceTitle(const StreamingInfo& info) const;
+    void appendStreamingInfo(QString& title, const StreamingInfo& info) const;
 
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
@@ -394,19 +430,23 @@ private:
 
     LastReportedError lastReportedError_{};
 
+    StreamingInfo streamingInfo_{};
+    MediaInfo mediaInfo_{};
+
     QWidget* mediaControlsWidget_{nullptr};
 
     AnimatedPushButton* playPauseButton_{nullptr};
     QIcon resumeIcon_;
     QIcon pauseIcon_;
 
+    // Playback
+
     TimelineSlider* playbackSlider_{nullptr};
 
     QLabel* playbackPositionLabel_{nullptr};
     ClickableLabel* playbackDurationLabel_{nullptr};
 
-    StreamingInfo streamingInfo_{};
-    MediaInfo mediaInfo_{};
+    // Audio
 
     QPushButton* volumeButton_{nullptr};
     VolumeSlider* volumeSlider_{nullptr};
@@ -418,12 +458,15 @@ private:
     QIcon volumeMediumIcon_;
     QIcon volumeHighIcon_;
 
+    QTimer saveAudioSettingsTimer_;
+
     QWidget* controlBar_{nullptr};
+
+    // Fullscreen
 
     bool isFullScreen_{false};
 
     FullscreenVideoControlBar* fullscreenBar_{nullptr};
-
     QGraphicsOpacityEffect* fullscreenOpacity_{nullptr};
 
     QPropertyAnimation* showAnimation_{nullptr};
@@ -439,8 +482,6 @@ private:
     QLabel* playbackSeparatorLabel_{nullptr};
 
     VideoShortcutManager shortcutManager_;
-
-    QTimer saveAudioSettingsTimer_;
 };
 
 } // namespace fluvel
