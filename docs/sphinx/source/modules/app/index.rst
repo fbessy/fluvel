@@ -21,4 +21,3 @@ The application is organized into three main areas:
    ui/index
    app_core
    app_interop
-   ui

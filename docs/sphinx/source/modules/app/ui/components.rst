@@ -57,7 +57,11 @@ Image Viewer
 Overlays
 --------
 
-.. doxygenfile:: overlay_text_item.hpp
+..
+   Temporarily excluded because current Breathe releases do not support
+   Qt Q_PROPERTY members.
+
+   .. doxygenfile:: overlay_text_item.hpp
 
 .. doxygenfile:: hud_overlay_controller.hpp
 
@@ -97,15 +101,16 @@ Animated Controls
 
 .. doxygenfile:: animated_push_button.hpp
 
-.. doxygenfile:: animated_icon.hpp
-
-.. doxygenfile:: scale_animation.hpp
-
-.. doxygenfile:: checked_animation.hpp
-
 .. doxygenfile:: animated_tab_widget.hpp
 
-.. doxygenfile:: animated_types.hpp
+.. NOTE::
+   The following files are temporarily excluded because current
+   Breathe releases do not support Qt Q_PROPERTY members.
+
+   .. doxygenfile:: animated_icon.hpp
+   .. doxygenfile:: scale_animation.hpp
+   .. doxygenfile:: checked_animation.hpp
+   .. doxygenfile:: animated_types.hpp
 
 
 Custom Graphics Items
@@ -118,8 +123,6 @@ Custom Graphics Items
 
 Miscellaneous Widgets
 ---------------------
-
-.. doxygenfile:: frame_stats_view.hpp
 
 .. doxygenfile:: right_panel_toggle_button.hpp
 
@@ -135,7 +138,28 @@ UI Infrastructure
 
 .. doxygenfile:: ui_appearance.hpp
 
-.. doxygenfile:: ui_theme.hpp
+..
+   Temporarily excluded due to Doxygen/Breathe limitations when
+   documenting global UI theme constants.
+
+   .. doxygenfile:: ui_theme.hpp
 
 .. doxygenfile:: slider_style.hpp
+
+
+UI Theme
+========
+
+The UI theme centralizes the colors, metrics and animation constants
+used throughout the application.
+
+It defines:
+
+- Accent colors
+- Text colors
+- Panel colors
+- Control colors
+- Slider colors
+- Layout metrics
+- Animation durations
 
