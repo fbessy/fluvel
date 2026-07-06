@@ -5,6 +5,10 @@
 
 #include "styled_tool_button.hpp"
 
+#ifndef Q_MOC_RUN
+#include "application_settings_types.hpp"
+#endif
+
 #include <QWidget>
 
 class QLabel;
@@ -34,9 +38,10 @@ public:
     /**
      * @brief Constructs a fullscreen video control bar.
      *
+     * @param config Initial display configuration.
      * @param parent Parent widget.
      */
-    explicit FullscreenVideoControlBar(QWidget* parent = nullptr);
+    explicit FullscreenVideoControlBar(const DisplayConfig& config, QWidget* parent = nullptr);
 
     /**
      * @brief Returns the camera selection combo box.

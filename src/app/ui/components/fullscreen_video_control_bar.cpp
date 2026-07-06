@@ -19,7 +19,7 @@
 namespace fluvel
 {
 
-FullscreenVideoControlBar::FullscreenVideoControlBar(QWidget* parent)
+FullscreenVideoControlBar::FullscreenVideoControlBar(const DisplayConfig& config, QWidget* parent)
     : QWidget(parent)
 {
     setAttribute(Qt::WA_StyledBackground);
@@ -143,6 +143,10 @@ QScrollBar:horizontal {
     mirrorButton_->setCheckable(true);
     smoothButton_->setCheckable(true);
     overlayButton_->setCheckable(true);
+
+    mirrorButton_->setChecked(config.mirrorMode);
+    smoothButton_->setChecked(config.smoothDisplay);
+    overlayButton_->setChecked(config.algorithmOverlayEnabled);
 
     mirrorButton_->setIcon(il::loadIcon(":/icons/view/mirror-symbolic.svg", il::IconMode::Light));
     smoothButton_->setIcon(

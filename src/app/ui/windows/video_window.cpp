@@ -447,7 +447,8 @@ void VideoWindow::setupView()
         DragDropContent::Videos, tr("Drop a video here\n\nor click Open...")));
     imageViewer_->setInteraction(interaction.release());
 
-    fullscreenBar_ = new FullscreenVideoControlBar(imageViewer_);
+    const auto& config = ApplicationSettings::instance().videoSettings();
+    fullscreenBar_ = new FullscreenVideoControlBar(config.display, imageViewer_);
     fullscreenBar_->hide();
 
     fullscreenBar_->startStopButton()->setIcon(startIconLight_);
