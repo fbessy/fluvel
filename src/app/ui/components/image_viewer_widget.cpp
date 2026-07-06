@@ -433,7 +433,10 @@ void ImageViewerWidget::enterFullscreenMode()
 
     moveOverlay(infoOverlay_, overlayPos);
 
-    showNotification(tr("Auto Fit"));
+    if (!previousAutoFitEnabled_)
+    {
+        showNotification(tr("Auto Fit"));
+    }
 
     updateMiniMap();
 
