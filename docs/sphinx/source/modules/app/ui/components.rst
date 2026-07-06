@@ -107,6 +107,7 @@ Animated Controls
    The following files are temporarily excluded because current
    Breathe releases do not support Qt Q_PROPERTY members.
 
+..
    .. doxygenfile:: animated_icon.hpp
    .. doxygenfile:: scale_animation.hpp
    .. doxygenfile:: checked_animation.hpp
