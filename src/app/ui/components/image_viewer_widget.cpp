@@ -511,7 +511,6 @@ void ImageViewerWidget::applyAutoFit()
     if (!pixmapItem_)
         return;
 
-    const bool previousAutoFitEnabled = autoFitEnabled_;
     autoFitEnabled_ = true;
     resetTransform();
 
@@ -570,12 +569,11 @@ void ImageViewerWidget::wheelEvent(QWheelEvent* event)
     double factor = computeZoomFactor(event);
 
     const QPoint textPos = overlayPosition(infoOverlay_);
-    const QPoint cursorPos = event->position().toPoint();
 
     if (!applyZoom(event, factor))
         return;
 
-    updateOverlays(cursorPos, textPos);
+    updateOverlays(textPos);
     updateInteractionAfterZoom();
 
     updateCursor(nullptr);
@@ -621,7 +619,7 @@ bool ImageViewerWidget::applyZoom(QWheelEvent* event, double factor)
     return true;
 }
 
-void ImageViewerWidget::updateOverlays(const QPoint& cursorPosition, const QPoint& overlayPosition)
+void ImageViewerWidget::updateOverlays(const QPoint& overlayPosition)
 {
     moveOverlay(infoOverlay_, overlayPosition);
 

@@ -382,7 +382,7 @@ private:
     bool handleInteractionWheel(QWheelEvent* event);
     double computeZoomFactor(QWheelEvent* event) const;
     bool applyZoom(QWheelEvent* event, double factor);
-    void updateOverlays(const QPoint& cursorPosition, const QPoint& overlayPosition);
+    void updateOverlays(const QPoint& overlayPosition);
     void updateInteractionAfterZoom();
 
     void updateCursor(const QMouseEvent* e);

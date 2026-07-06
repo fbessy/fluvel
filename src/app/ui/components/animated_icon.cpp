@@ -123,7 +123,7 @@ void AnimatedIcon::drawIcon(QPainter& painter, const QPointF& center, const QSiz
 
     painter.translate(center);
 
-    if (angle != 0.0)
+    if (!qFuzzyIsNull(angle))
     {
         painter.rotate(angle);
 

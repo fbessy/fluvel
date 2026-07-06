@@ -194,11 +194,6 @@ QString supportedMediaContainers()
     return formats.join(", ");
 }
 
-static QString codecName(QMediaFormat::VideoCodec codec)
-{
-    return QMediaFormat::videoCodecName(codec);
-}
-
 static QString prettyVideoCodecName(QMediaFormat::VideoCodec codec)
 {
     switch (codec)
@@ -259,11 +254,6 @@ QString supportedVideoCodecs()
     codecs.sort();
 
     return codecs.join(", ");
-}
-
-static QString codecName(QMediaFormat::AudioCodec codec)
-{
-    return QMediaFormat::audioCodecName(codec);
 }
 
 static QString prettyAudioCodecName(QMediaFormat::AudioCodec codec)
