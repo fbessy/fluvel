@@ -2099,8 +2099,9 @@ void VideoWindow::leaveFullscreen()
 
 void VideoWindow::positionFullscreenBar()
 {
-    constexpr int kBottomMargin = 0;
+    constexpr int kBottomMargin = 12;
 
+    fullscreenBar_->layout()->activate();
     fullscreenBar_->adjustSize();
 
     const QSize size = fullscreenBar_->sizeHint();
@@ -2113,11 +2114,9 @@ void VideoWindow::positionFullscreenBar()
     const int imageBottom = imageRect.y() + imageRect.height();
     const int bottomBandHeight = imageViewer_->height() - imageBottom;
 
-    const int idealY = imageBottom + (bottomBandHeight - size.height()) / 2;
-
-    const int maxY = imageViewer_->height() - size.height() - kBottomMargin;
-
-    const int y = std::min(idealY, maxY);
+    const int y = (bottomBandHeight >= size.height())
+                      ? imageBottom + (bottomBandHeight - size.height()) / 2
+                      : imageViewer_->height() - size.height() - kBottomMargin;
 
     fullscreenBar_->move(x, y);
 }
