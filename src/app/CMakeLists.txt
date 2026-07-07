@@ -7,6 +7,7 @@ set(UI_WIN_DIR ${APP_DIR}/ui/windows)
 set(UI_COMP_DIR ${APP_DIR}/ui/components)
 set(CORE_DIR ${APP_DIR}/core)
 set(INTEROP_DIR ${APP_DIR}/interop)
+set(MEDIA_DIR ${FLUVEL_ROOT_DIR}/src/media)
 
 set(app_src
 
@@ -223,6 +224,21 @@ set(app_src
     ${INTEROP_DIR}/contour_adapters.hpp
 )
 
+if(FLUVEL_HAS_FFMPEG)
+
+    list(APPEND app_src
+        ${MEDIA_DIR}/video_export_settings.hpp
+        ${MEDIA_DIR}/video_exporter_backend.hpp
+
+        ${MEDIA_DIR}/video_exporter.cpp
+        ${MEDIA_DIR}/video_exporter.hpp
+
+        ${MEDIA_DIR}/ffmpeg/ffmpeg_video_exporter.cpp
+        ${MEDIA_DIR}/ffmpeg/ffmpeg_video_exporter.hpp
+    )
+
+endif()
+
 qt_add_executable(${APP_TARGET_NAME}
     ${app_src})
 
@@ -348,7 +364,19 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
     ${UI_COMP_DIR}
     ${UI_WIN_DIR}
     ${INTEROP_DIR}
+    ${MEDIA_DIR}
 )
+
+if(FLUVEL_HAS_FFMPEG)
+
+    target_include_directories(${APP_TARGET_NAME} PRIVATE
+        ${AVFORMAT_INCLUDE_DIRS}
+        ${AVCODEC_INCLUDE_DIRS}
+        ${AVUTIL_INCLUDE_DIRS}
+        ${SWSCALE_INCLUDE_DIRS}
+    )
+
+endif()
 
 fluvel_configure_target(${APP_TARGET_NAME})
 
@@ -372,6 +400,17 @@ target_link_libraries(${APP_TARGET_NAME} PRIVATE
     ${APP_QT_LIBS}
     fluvel::image_processing
 )
+
+if(FLUVEL_HAS_FFMPEG)
+
+    target_link_libraries(${APP_TARGET_NAME} PRIVATE
+        ${AVFORMAT_LIBRARIES}
+        ${AVCODEC_LIBRARIES}
+        ${AVUTIL_LIBRARIES}
+        ${SWSCALE_LIBRARIES}
+    )
+
+endif()
 
 include(${FLUVEL_ROOT_DIR}/cmake/fluvel_compile_definitions.cmake)
 include(${FLUVEL_ROOT_DIR}/cmake/fluvel_build_info.cmake)

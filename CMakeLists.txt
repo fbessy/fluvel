@@ -33,6 +33,14 @@ set(FLUVEL_LOCAL_DEFAULT_ASAN OFF)
 set(FLUVEL_LOCAL_DEFAULT_TSAN OFF)
 
 # =========================
+# Video export option
+# =========================
+
+option(FLUVEL_ENABLE_FFMPEG
+       "Enable FFmpeg video export"
+       ON)
+
+# =========================
 # Experimental UI options
 # =========================
 
@@ -76,6 +84,11 @@ set(PYTHON_TARGET_NAME fluvel_py)
 add_subdirectory(src/image_processing)
 
 if(FLUVEL_BUILD_APP)
+
+    if(FLUVEL_ENABLE_FFMPEG)
+        include(cmake/fluvel_ffmpeg.cmake)
+    endif()
+
     include(cmake/fluvel_qt.cmake)
     set(CMAKE_AUTOMOC_VERBOSE ON)
     add_subdirectory(src/app)
