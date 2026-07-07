@@ -7,6 +7,14 @@
 
 #include <QImage>
 
+extern "C"
+{
+#include <libavformat/avformat.h>
+
+#include <libavformat/avformat.h>
+#include <libavformat/avio.h>
+}
+
 namespace fluvel
 {
 
@@ -15,7 +23,7 @@ struct FFmpegVideoExporter::Context
     //
     // TODO
     //
-    // AVFormatContext* formatContext = nullptr;
+    AVFormatContext* formatContext = nullptr;
     // AVCodecContext* codecContext = nullptr;
     // AVStream* stream = nullptr;
     // AVFrame* frame = nullptr;
@@ -152,16 +160,35 @@ void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) cons
 
 bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& settings)
 {
-    Q_UNUSED(settings);
+    const char* format = nullptr;
 
-    //
-    // TODO
-    //
-    // av_guess_format(...)
-    // avformat_alloc_output_context2(...)
-    //
+    switch (settings.container)
+    {
+        case VideoContainer::Matroska:
+            format = "matroska";
+            break;
 
-    return true;
+        case VideoContainer::Mp4:
+            format = "mp4";
+            break;
+
+        case VideoContainer::Avi:
+            format = "avi";
+            break;
+
+        case VideoContainer::Mov:
+            format = "mov";
+            break;
+
+        case VideoContainer::WebM:
+            format = "webm";
+            break;
+    }
+
+    const int ret = avformat_alloc_output_context2(&context_->formatContext, nullptr, format,
+                                                   settings.filename.toUtf8().constData());
+
+    return ret >= 0 && context_->formatContext != nullptr;
 }
 
 bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
@@ -194,13 +221,17 @@ bool FFmpegVideoExporter::initializeStream()
 
 bool FFmpegVideoExporter::openOutputFile()
 {
-    //
-    // TODO
-    //
-    // avio_open(...)
-    //
+    if (context_->formatContext == nullptr)
+        return false;
 
-    return true;
+    if (context_->formatContext->oformat->flags & AVFMT_NOFILE)
+        return true;
+
+    const QByteArray filename = settings_.filename.toUtf8();
+
+    const int ret = avio_open(&context_->formatContext->pb, filename.constData(), AVIO_FLAG_WRITE);
+
+    return ret >= 0;
 }
 
 bool FFmpegVideoExporter::writeHeader()
