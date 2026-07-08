@@ -134,6 +134,13 @@ private:
     void release();
 
 private:
+    bool allocateFrame();
+    bool allocatePacket();
+    bool initializeScaler();
+    bool makeFrameWritable();
+
+    bool receivePackets();
+
     VideoExportSettings settings_;
 
     bool isOpen_{false};

@@ -84,15 +84,60 @@ namespace fluvel
 
   /**
    * @brief Supported video codecs.
+   *
+   * The codecs are ordered by their typical usage rather than
+   * by their release date.
    */
   enum class VideoCodec
   {
-    FFV1,
-    H264,
-    H265,
-    MPEG4,
-    VP9,
-    AV1
+      /**
+       * @brief FFV1 lossless codec.
+       *
+       * Best suited for scientific image processing and archival.
+       * Provides mathematically lossless compression.
+       */
+      FFV1,
+
+      /**
+       * @brief H.264 / AVC codec.
+       *
+       * Excellent compatibility across operating systems,
+       * web browsers and media players.
+       */
+      H264,
+
+      /**
+       * @brief H.265 / HEVC codec.
+       *
+       * Better compression efficiency than H.264 at the cost
+       * of increased encoding complexity.
+       */
+      H265,
+
+      /**
+       * @brief AV1 codec.
+       *
+       * State-of-the-art open video codec providing excellent
+       * compression efficiency. Encoding is computationally
+       * demanding.
+       */
+      AV1,
+
+      /**
+       * @brief VP9 codec.
+       *
+       * Open codec mainly used with the WebM container.
+       */
+      VP9,
+
+      /**
+       * @brief MPEG-4 Part 2 Visual codec.
+       *
+       * Legacy codec historically used by DivX and Xvid.
+       * Mostly kept for compatibility with older software
+       * and hardware.
+       */
+      MPEG4Part2
   };
 
   /**
@@ -100,11 +145,38 @@ namespace fluvel
    */
   enum class VideoContainer
   {
-    Matroska,
-    Mp4,
-    Avi,
-    Mov,
-    WebM
+      /**
+       * @brief Matroska container (.mkv).
+       *
+       * Recommended for lossless codecs such as FFV1.
+       */
+      Matroska,
+
+      /**
+       * @brief MPEG-4 container (.mp4).
+       *
+       * Widely supported by modern media players and devices.
+       */
+      Mp4,
+
+      /**
+       * @brief WebM container.
+       *
+       * Typically used with VP8 or VP9.
+       */
+      WebM,
+
+      /**
+       * @brief QuickTime container (.mov).
+       */
+      Mov,
+
+      /**
+       * @brief AVI container.
+       *
+       * Legacy multimedia container.
+       */
+      Avi
   };
 
   /**
@@ -180,6 +252,12 @@ namespace fluvel
      * Interpretation depends on the selected codec.
      */
     std::uint32_t quality{23};
+
+    int width = 1920;
+
+    int height = 1080;
+
+    int frameRate = 30;
   };
 
 } // namespace fluvel

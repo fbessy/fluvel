@@ -11,8 +11,10 @@ extern "C"
 {
 #include <libavformat/avformat.h>
 
+#include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
 #include <libavformat/avio.h>
+#include <libswscale/swscale.h>
 }
 
 namespace fluvel
@@ -20,16 +22,18 @@ namespace fluvel
 
 struct FFmpegVideoExporter::Context
 {
-    //
-    // TODO
-    //
-    AVFormatContext* formatContext = nullptr;
-    // AVCodecContext* codecContext = nullptr;
-    // AVStream* stream = nullptr;
-    // AVFrame* frame = nullptr;
-    // AVPacket* packet = nullptr;
-    // SwsContext* swsContext = nullptr;
-    //
+    AVFormatContext* formatContext{nullptr};
+
+    const AVCodec* codec{nullptr};
+    AVCodecContext* codecContext{nullptr};
+
+    AVStream* stream{nullptr};
+
+    AVFrame* frame{nullptr};
+    AVPacket* packet{nullptr};
+    SwsContext* swsContext{nullptr};
+
+    int64_t nextPts{0};
 };
 
 FFmpegVideoExporter::FFmpegVideoExporter()
@@ -66,6 +70,24 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
         return false;
     }
 
+    if (!allocateFrame())
+    {
+        release();
+        return false;
+    }
+
+    if (!allocatePacket())
+    {
+        release();
+        return false;
+    }
+
+    if (!initializeScaler())
+    {
+        release();
+        return false;
+    }
+
     if (!openOutputFile())
     {
         release();
@@ -77,6 +99,8 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
         release();
         return false;
     }
+
+    context_->nextPts = 0;
 
     isOpen_ = true;
 
@@ -108,12 +132,21 @@ bool FFmpegVideoExporter::close()
     if (!isOpen_)
         return false;
 
-    flushEncoder();
+    if (!flushEncoder())
+    {
+        release();
+        isOpen_ = false;
+        return false;
+    }
 
-    writeTrailer();
+    if (!writeTrailer())
+    {
+        release();
+        isOpen_ = false;
+        return false;
+    }
 
     release();
-
     isOpen_ = false;
 
     return true;
@@ -153,7 +186,7 @@ void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) cons
             break;
 
         case ExportProfile::Custom:
-
+            // No override.
             break;
     }
 }
@@ -193,30 +226,100 @@ bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& setting
 
 bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
 {
-    Q_UNUSED(settings);
+    AVCodecID codecId = AV_CODEC_ID_NONE;
+
+    switch (settings.codec)
+    {
+        case VideoCodec::FFV1:
+            codecId = AV_CODEC_ID_FFV1;
+            break;
+
+        case VideoCodec::H264:
+            codecId = AV_CODEC_ID_H264;
+            break;
+
+        case VideoCodec::H265:
+            codecId = AV_CODEC_ID_HEVC;
+            break;
+
+        case VideoCodec::MPEG4Part2:
+            codecId = AV_CODEC_ID_MPEG4;
+            break;
+
+        case VideoCodec::VP9:
+            codecId = AV_CODEC_ID_VP9;
+            break;
+
+        case VideoCodec::AV1:
+            codecId = AV_CODEC_ID_AV1;
+            break;
+
+        default:
+            Q_UNREACHABLE();
+            return false;
+    }
+
+    context_->codec = avcodec_find_encoder(codecId);
+
+    if (context_->codec == nullptr)
+        return false;
+
+    context_->codecContext = avcodec_alloc_context3(context_->codec);
+
+    if (context_->codecContext == nullptr)
+        return false;
+
+    auto* c = context_->codecContext;
+
+    c->codec_id = codecId;
+
+    c->codec_type = AVMEDIA_TYPE_VIDEO;
+
+    c->width = settings.width;
+
+    c->height = settings.height;
+
+    c->time_base = AVRational{1, settings.frameRate};
+
+    c->framerate = AVRational{settings.frameRate, 1};
 
     //
-    // TODO
+    // TODO:
+    // Select the best pixel format supported by the encoder.
     //
-    // avcodec_find_encoder(...)
-    // avcodec_alloc_context3(...)
-    // configure codec
-    // avcodec_open2(...)
-    //
+    switch (settings.codec)
+    {
+        case VideoCodec::FFV1:
+            c->pix_fmt = AV_PIX_FMT_BGR0;
+            break;
 
-    return true;
+        default:
+            c->pix_fmt = AV_PIX_FMT_YUV420P;
+    }
+
+    if (context_->formatContext->oformat->flags & AVFMT_GLOBALHEADER)
+    {
+        c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+    }
+
+    const int ret = avcodec_open2(c, context_->codec, nullptr);
+
+    return ret >= 0;
 }
 
 bool FFmpegVideoExporter::initializeStream()
 {
-    //
-    // TODO
-    //
-    // avformat_new_stream(...)
-    // avcodec_parameters_from_context(...)
-    //
+    context_->stream = avformat_new_stream(context_->formatContext, nullptr);
 
-    return true;
+    if (context_->stream == nullptr)
+        return false;
+
+    context_->stream->time_base = context_->codecContext->time_base;
+
+    const int ret =
+        avcodec_parameters_from_context(context_->stream->codecpar, context_->codecContext);
+
+    return ret >= 0;
 }
 
 bool FFmpegVideoExporter::openOutputFile()
@@ -236,50 +339,143 @@ bool FFmpegVideoExporter::openOutputFile()
 
 bool FFmpegVideoExporter::writeHeader()
 {
-    //
-    // TODO
-    //
-    // avformat_write_header(...)
-    //
+    const int ret = avformat_write_header(context_->formatContext, nullptr);
 
-    return true;
+    return ret >= 0;
 }
 
 bool FFmpegVideoExporter::flushEncoder()
 {
     //
-    // TODO
+    // Signal end-of-stream to the encoder.
     //
-    // avcodec_send_frame(nullptr)
-    // receive remaining packets
-    //
+    const int ret = avcodec_send_frame(context_->codecContext, nullptr);
 
-    return true;
+    if (ret < 0)
+        return false;
+
+    return receivePackets();
 }
 
 bool FFmpegVideoExporter::writeTrailer()
 {
-    //
-    // TODO
-    //
-    // av_write_trailer(...)
-    //
-
-    return true;
+    return av_write_trailer(context_->formatContext) >= 0;
 }
 
 void FFmpegVideoExporter::release()
 {
     //
-    // TODO
+    // Most FFmpeg deallocation helpers taking a pointer-to-pointer automatically
+    // reset the pointer to nullptr.
     //
-    // sws_freeContext(...)
-    // av_frame_free(...)
-    // av_packet_free(...)
-    // avcodec_free_context(...)
-    // avio_closep(...)
-    // avformat_free_context(...)
+
+    if (context_->swsContext != nullptr)
+        sws_freeContext(context_->swsContext);
+
+    if (context_->frame != nullptr)
+        av_frame_free(&context_->frame);
+
+    if (context_->packet != nullptr)
+        av_packet_free(&context_->packet);
+
+    if (context_->codecContext != nullptr)
+        avcodec_free_context(&context_->codecContext);
+
+    if (context_->formatContext != nullptr)
+    {
+        if (!(context_->formatContext->oformat->flags & AVFMT_NOFILE))
+        {
+            avio_closep(&context_->formatContext->pb);
+        }
+
+        avformat_free_context(context_->formatContext);
+        context_->formatContext = nullptr;
+    }
+
     //
+    // Runtime state
+    //
+    context_->codec = nullptr;
+    context_->stream = nullptr;
+    context_->nextPts = 0;
+}
+
+bool FFmpegVideoExporter::allocateFrame()
+{
+    context_->frame = av_frame_alloc();
+
+    if (context_->frame == nullptr)
+        return false;
+
+    auto* frame = context_->frame;
+    auto* codec = context_->codecContext;
+
+    frame->format = codec->pix_fmt;
+    frame->width = codec->width;
+    frame->height = codec->height;
+
+    const int ret = av_frame_get_buffer(frame, 32);
+
+    return ret >= 0;
+}
+
+bool FFmpegVideoExporter::allocatePacket()
+{
+    context_->packet = av_packet_alloc();
+
+    return context_->packet != nullptr;
+}
+
+bool FFmpegVideoExporter::initializeScaler()
+{
+    //
+    // FFV1 in BGR0 does not require any conversion.
+    //
+    if (settings_.codec == VideoCodec::FFV1)
+        return true;
+
+    auto* c = context_->codecContext;
+
+    context_->swsContext = sws_getContext(c->width, c->height, AV_PIX_FMT_BGRA, c->width, c->height,
+                                          c->pix_fmt, SWS_BILINEAR, nullptr, nullptr, nullptr);
+
+    return context_->swsContext != nullptr;
+}
+
+bool FFmpegVideoExporter::makeFrameWritable()
+{
+    return av_frame_make_writable(context_->frame) >= 0;
+}
+
+bool FFmpegVideoExporter::receivePackets()
+{
+    //
+    // Retrieve all available encoded packets.
+    //
+    while (true)
+    {
+        const int receiveRet = avcodec_receive_packet(context_->codecContext, context_->packet);
+
+        if (receiveRet == AVERROR(EAGAIN) || receiveRet == AVERROR_EOF)
+            break;
+
+        if (receiveRet < 0)
+            return false;
+
+        av_packet_rescale_ts(context_->packet, context_->codecContext->time_base,
+                             context_->stream->time_base);
+
+        context_->packet->stream_index = context_->stream->index;
+
+        const int writeRet = av_interleaved_write_frame(context_->formatContext, context_->packet);
+
+        av_packet_unref(context_->packet);
+
+        if (writeRet < 0)
+            return false;
+    }
+
+    return true;
 }
 
 } // namespace fluvel
