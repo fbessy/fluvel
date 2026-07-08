@@ -112,19 +112,10 @@ bool FFmpegVideoExporter::addFrame(const QImage& image)
     if (!isOpen_)
         return false;
 
-    Q_UNUSED(image);
+    if (!fillFrame(image))
+        return false;
 
-    //
-    // TODO
-    //
-    // 1. Convert QImage to AVFrame
-    // 2. RGB -> YUV
-    // 3. avcodec_send_frame()
-    // 4. avcodec_receive_packet()
-    // 5. av_interleaved_write_frame()
-    //
-
-    return true;
+    return encodeFrame();
 }
 
 bool FFmpegVideoExporter::close()
@@ -476,6 +467,91 @@ bool FFmpegVideoExporter::receivePackets()
     }
 
     return true;
+}
+
+bool FFmpegVideoExporter::fillFrame(const QImage& image)
+{
+    if (!makeFrameWritable())
+        return false;
+
+    switch (context_->codecContext->pix_fmt)
+    {
+        case AV_PIX_FMT_BGR0:
+            return fillFrameBgr0(image);
+
+        case AV_PIX_FMT_YUV420P:
+            return fillFrameYuv420(image);
+
+        default:
+            return false;
+    }
+}
+
+bool FFmpegVideoExporter::fillFrameBgr0(const QImage& image)
+{
+    const QImage* src = &image;
+
+    QImage converted;
+
+    if (image.format() != QImage::Format_ARGB32)
+    {
+        converted = image.convertToFormat(QImage::Format_ARGB32);
+        src = &converted;
+    }
+
+    auto* frame = context_->frame;
+
+    constexpr int kBytesPerPixel = 4;
+    const int bytesPerRow = src->width() * kBytesPerPixel;
+
+    //
+    // QImage::Format_ARGB32 is stored as BGRA in memory, which is compatible
+    // with AV_PIX_FMT_BGR0.
+    //
+    // Copy the image one scanline at a time to correctly handle different source
+    // and destination strides. QImage::constScanLine() accounts for the source
+    // stride, while AVFrame::linesize specifies the destination stride.
+    //
+    for (int y = 0; y < src->height(); ++y)
+    {
+        std::memcpy(frame->data[0] + y * frame->linesize[0], src->constScanLine(y),
+                    static_cast<std::size_t>(bytesPerRow));
+    }
+
+    return true;
+}
+
+bool FFmpegVideoExporter::fillFrameYuv420(const QImage& image)
+{
+    QImage src = image;
+
+    if (src.format() != QImage::Format_ARGB32)
+    {
+        src = src.convertToFormat(QImage::Format_ARGB32);
+    }
+
+    const uint8_t* srcData[1] = {src.constBits()};
+
+    const int srcStride[1] = {src.bytesPerLine()};
+
+    sws_scale(context_->swsContext, srcData, srcStride, 0, src.height(), context_->frame->data,
+              context_->frame->linesize);
+
+    return true;
+}
+
+bool FFmpegVideoExporter::encodeFrame()
+{
+    auto* frame = context_->frame;
+
+    frame->pts = context_->nextPts++;
+
+    const int ret = avcodec_send_frame(context_->codecContext, frame);
+
+    if (ret < 0)
+        return false;
+
+    return receivePackets();
 }
 
 } // namespace fluvel

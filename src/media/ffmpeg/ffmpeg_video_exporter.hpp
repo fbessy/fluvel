@@ -52,6 +52,8 @@ public:
     [[nodiscard]]
     bool addFrame(const QImage& image) override;
 
+    // bool addFrame(const QVideoFrame& frame);
+
     /**
      * @copydoc IVideoExporter::close
      */
@@ -133,13 +135,18 @@ private:
      */
     void release();
 
-private:
     bool allocateFrame();
     bool allocatePacket();
     bool initializeScaler();
     bool makeFrameWritable();
 
     bool receivePackets();
+
+    bool fillFrame(const QImage& image);
+    bool fillFrameBgr0(const QImage& image);
+    bool fillFrameYuv420(const QImage& image);
+
+    bool encodeFrame();
 
     VideoExportSettings settings_;
 
