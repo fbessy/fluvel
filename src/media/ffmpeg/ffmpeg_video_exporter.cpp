@@ -3,9 +3,14 @@
 
 #include "ffmpeg_video_exporter.hpp"
 
+#include "ffmpeg_codec_utils.hpp"
+#include "ffmpeg_utils.hpp"
 #include "video_export_settings.hpp"
 
+#include <QDebug>
 #include <QImage>
+
+#include <cassert>
 
 extern "C"
 {
@@ -22,6 +27,9 @@ namespace fluvel
 
 struct FFmpegVideoExporter::Context
 {
+    //
+    // FFmpeg objects
+    //
     AVFormatContext* formatContext{nullptr};
 
     const AVCodec* codec{nullptr};
@@ -31,8 +39,12 @@ struct FFmpegVideoExporter::Context
 
     AVFrame* frame{nullptr};
     AVPacket* packet{nullptr};
+
     SwsContext* swsContext{nullptr};
 
+    //
+    // Encoding state
+    //
     int64_t nextPts{0};
 };
 
@@ -51,6 +63,9 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
     if (isOpen_)
         return false;
 
+    //
+    // Store the effective export settings.
+    //
     settings_ = settings;
 
     applyExportProfile(settings_);
@@ -111,6 +126,14 @@ bool FFmpegVideoExporter::addFrame(const QImage& image)
 {
     if (!isOpen_)
         return false;
+
+    if (image.width() != settings_.width || image.height() != settings_.height)
+    {
+        qWarning() << "FFmpegVideoExporter: frame size" << image.size()
+                   << "does not match export size" << QSize(settings_.width, settings_.height);
+
+        return false;
+    }
 
     if (!fillFrame(image))
         return false;
@@ -184,76 +207,29 @@ void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) cons
 
 bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& settings)
 {
-    const char* format = nullptr;
-
-    switch (settings.container)
-    {
-        case VideoContainer::Matroska:
-            format = "matroska";
-            break;
-
-        case VideoContainer::Mp4:
-            format = "mp4";
-            break;
-
-        case VideoContainer::Avi:
-            format = "avi";
-            break;
-
-        case VideoContainer::Mov:
-            format = "mov";
-            break;
-
-        case VideoContainer::WebM:
-            format = "webm";
-            break;
-    }
+    const char* format = ffmpeg_utils::containerName(settings.container);
 
     const int ret = avformat_alloc_output_context2(&context_->formatContext, nullptr, format,
                                                    settings.filename.toUtf8().constData());
 
-    return ret >= 0 && context_->formatContext != nullptr;
+    if (ret < 0 || context_->formatContext == nullptr)
+    {
+        qWarning() << "avformat_alloc_output_context2 failed:" << ffmpeg_utils::errorString(ret);
+
+        return false;
+    }
+
+    return true;
 }
 
 bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
 {
-    AVCodecID codecId = AV_CODEC_ID_NONE;
+    const auto codecInfo = FFmpegCodecUtils::codecInfo(settings.codec);
 
-    switch (settings.codec)
-    {
-        case VideoCodec::FFV1:
-            codecId = AV_CODEC_ID_FFV1;
-            break;
-
-        case VideoCodec::H264:
-            codecId = AV_CODEC_ID_H264;
-            break;
-
-        case VideoCodec::H265:
-            codecId = AV_CODEC_ID_HEVC;
-            break;
-
-        case VideoCodec::MPEG4Part2:
-            codecId = AV_CODEC_ID_MPEG4;
-            break;
-
-        case VideoCodec::VP9:
-            codecId = AV_CODEC_ID_VP9;
-            break;
-
-        case VideoCodec::AV1:
-            codecId = AV_CODEC_ID_AV1;
-            break;
-
-        default:
-            Q_UNREACHABLE();
-            return false;
-    }
-
-    context_->codec = avcodec_find_encoder(codecId);
-
-    if (context_->codec == nullptr)
+    if (!codecInfo)
         return false;
+
+    context_->codec = codecInfo->encoder;
 
     context_->codecContext = avcodec_alloc_context3(context_->codec);
 
@@ -262,31 +238,16 @@ bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
 
     auto* c = context_->codecContext;
 
-    c->codec_id = codecId;
-
+    c->codec_id = context_->codec->id;
     c->codec_type = AVMEDIA_TYPE_VIDEO;
 
     c->width = settings.width;
-
     c->height = settings.height;
 
     c->time_base = AVRational{1, settings.frameRate};
-
     c->framerate = AVRational{settings.frameRate, 1};
 
-    //
-    // TODO:
-    // Select the best pixel format supported by the encoder.
-    //
-    switch (settings.codec)
-    {
-        case VideoCodec::FFV1:
-            c->pix_fmt = AV_PIX_FMT_BGR0;
-            break;
-
-        default:
-            c->pix_fmt = AV_PIX_FMT_YUV420P;
-    }
+    c->pix_fmt = codecInfo->pixelFormat;
 
     if (context_->formatContext->oformat->flags & AVFMT_GLOBALHEADER)
     {
@@ -295,7 +256,14 @@ bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
 
     const int ret = avcodec_open2(c, context_->codec, nullptr);
 
-    return ret >= 0;
+    if (ret < 0)
+    {
+        qWarning() << "avcodec_open2 failed:" << ffmpeg_utils::errorString(ret);
+
+        return false;
+    }
+
+    return true;
 }
 
 bool FFmpegVideoExporter::initializeStream()
@@ -310,85 +278,14 @@ bool FFmpegVideoExporter::initializeStream()
     const int ret =
         avcodec_parameters_from_context(context_->stream->codecpar, context_->codecContext);
 
-    return ret >= 0;
-}
-
-bool FFmpegVideoExporter::openOutputFile()
-{
-    if (context_->formatContext == nullptr)
-        return false;
-
-    if (context_->formatContext->oformat->flags & AVFMT_NOFILE)
-        return true;
-
-    const QByteArray filename = settings_.filename.toUtf8();
-
-    const int ret = avio_open(&context_->formatContext->pb, filename.constData(), AVIO_FLAG_WRITE);
-
-    return ret >= 0;
-}
-
-bool FFmpegVideoExporter::writeHeader()
-{
-    const int ret = avformat_write_header(context_->formatContext, nullptr);
-
-    return ret >= 0;
-}
-
-bool FFmpegVideoExporter::flushEncoder()
-{
-    //
-    // Signal end-of-stream to the encoder.
-    //
-    const int ret = avcodec_send_frame(context_->codecContext, nullptr);
-
     if (ret < 0)
-        return false;
-
-    return receivePackets();
-}
-
-bool FFmpegVideoExporter::writeTrailer()
-{
-    return av_write_trailer(context_->formatContext) >= 0;
-}
-
-void FFmpegVideoExporter::release()
-{
-    //
-    // Most FFmpeg deallocation helpers taking a pointer-to-pointer automatically
-    // reset the pointer to nullptr.
-    //
-
-    if (context_->swsContext != nullptr)
-        sws_freeContext(context_->swsContext);
-
-    if (context_->frame != nullptr)
-        av_frame_free(&context_->frame);
-
-    if (context_->packet != nullptr)
-        av_packet_free(&context_->packet);
-
-    if (context_->codecContext != nullptr)
-        avcodec_free_context(&context_->codecContext);
-
-    if (context_->formatContext != nullptr)
     {
-        if (!(context_->formatContext->oformat->flags & AVFMT_NOFILE))
-        {
-            avio_closep(&context_->formatContext->pb);
-        }
+        qWarning() << "avcodec_parameters_from_context failed:" << ffmpeg_utils::errorString(ret);
 
-        avformat_free_context(context_->formatContext);
-        context_->formatContext = nullptr;
+        return false;
     }
 
-    //
-    // Runtime state
-    //
-    context_->codec = nullptr;
-    context_->stream = nullptr;
-    context_->nextPts = 0;
+    return true;
 }
 
 bool FFmpegVideoExporter::allocateFrame()
@@ -407,7 +304,14 @@ bool FFmpegVideoExporter::allocateFrame()
 
     const int ret = av_frame_get_buffer(frame, 32);
 
-    return ret >= 0;
+    if (ret < 0)
+    {
+        qWarning() << "av_frame_get_buffer failed:" << ffmpeg_utils::errorString(ret);
+
+        return false;
+    }
+
+    return true;
 }
 
 bool FFmpegVideoExporter::allocatePacket()
@@ -420,50 +324,68 @@ bool FFmpegVideoExporter::allocatePacket()
 bool FFmpegVideoExporter::initializeScaler()
 {
     //
-    // FFV1 in BGR0 does not require any conversion.
+    // BGR0 does not require any conversion.
     //
-    if (settings_.codec == VideoCodec::FFV1)
+    // All other pixel formats are generated from the BGRA QImage
+    // using libswscale.
+    //
+
+    if (context_->codecContext->pix_fmt == AV_PIX_FMT_BGR0)
         return true;
 
     auto* c = context_->codecContext;
 
     context_->swsContext = sws_getContext(c->width, c->height, AV_PIX_FMT_BGRA, c->width, c->height,
-                                          c->pix_fmt, SWS_BILINEAR, nullptr, nullptr, nullptr);
+                                          c->pix_fmt, SWS_FAST_BILINEAR, nullptr, nullptr, nullptr);
 
     return context_->swsContext != nullptr;
 }
 
-bool FFmpegVideoExporter::makeFrameWritable()
+bool FFmpegVideoExporter::openOutputFile()
 {
-    return av_frame_make_writable(context_->frame) >= 0;
+    if (context_->formatContext == nullptr)
+        return false;
+
+    if (context_->formatContext->oformat->flags & AVFMT_NOFILE)
+        return true;
+
+    const QByteArray filename = settings_.filename.toUtf8();
+
+    const int ret = avio_open(&context_->formatContext->pb, filename.constData(), AVIO_FLAG_WRITE);
+
+    if (ret < 0)
+    {
+        qWarning() << "avio_open failed:" << ffmpeg_utils::errorString(ret);
+
+        return false;
+    }
+
+    return true;
 }
 
-bool FFmpegVideoExporter::receivePackets()
+bool FFmpegVideoExporter::writeHeader()
 {
-    //
-    // Retrieve all available encoded packets.
-    //
-    while (true)
+    const int ret = avformat_write_header(context_->formatContext, nullptr);
+
+    if (ret < 0)
     {
-        const int receiveRet = avcodec_receive_packet(context_->codecContext, context_->packet);
+        qWarning() << "avformat_write_header failed:" << ffmpeg_utils::errorString(ret);
 
-        if (receiveRet == AVERROR(EAGAIN) || receiveRet == AVERROR_EOF)
-            break;
+        return false;
+    }
 
-        if (receiveRet < 0)
-            return false;
+    return true;
+}
 
-        av_packet_rescale_ts(context_->packet, context_->codecContext->time_base,
-                             context_->stream->time_base);
+bool FFmpegVideoExporter::makeFrameWritable()
+{
+    const int ret = av_frame_make_writable(context_->frame);
 
-        context_->packet->stream_index = context_->stream->index;
+    if (ret < 0)
+    {
+        qWarning() << "av_frame_make_writable failed:" << ffmpeg_utils::errorString(ret);
 
-        const int writeRet = av_interleaved_write_frame(context_->formatContext, context_->packet);
-
-        av_packet_unref(context_->packet);
-
-        if (writeRet < 0)
-            return false;
+        return false;
     }
 
     return true;
@@ -473,6 +395,10 @@ bool FFmpegVideoExporter::fillFrame(const QImage& image)
 {
     if (!makeFrameWritable())
         return false;
+
+    //
+    // Dispatch according to the encoder pixel format.
+    //
 
     switch (context_->codecContext->pix_fmt)
     {
@@ -505,8 +431,8 @@ bool FFmpegVideoExporter::fillFrameBgr0(const QImage& image)
     const int bytesPerRow = src->width() * kBytesPerPixel;
 
     //
-    // QImage::Format_ARGB32 is stored as BGRA in memory, which is compatible
-    // with AV_PIX_FMT_BGR0.
+    // QImage::Format_ARGB32 is stored as BGRA in memory on little-endian systems,
+    // which is compatible with AV_PIX_FMT_BGR0.
     //
     // Copy the image one scanline at a time to correctly handle different source
     // and destination strides. QImage::constScanLine() accounts for the source
@@ -525,6 +451,9 @@ bool FFmpegVideoExporter::fillFrameYuv420(const QImage& image)
 {
     QImage src = image;
 
+    assert(src.width() == context_->frame->width);
+    assert(src.height() == context_->frame->height);
+
     if (src.format() != QImage::Format_ARGB32)
     {
         src = src.convertToFormat(QImage::Format_ARGB32);
@@ -532,10 +461,20 @@ bool FFmpegVideoExporter::fillFrameYuv420(const QImage& image)
 
     const uint8_t* srcData[1] = {src.constBits()};
 
-    const int srcStride[1] = {src.bytesPerLine()};
+    const int srcStride[1] = {static_cast<int>(src.bytesPerLine())};
 
-    sws_scale(context_->swsContext, srcData, srcStride, 0, src.height(), context_->frame->data,
-              context_->frame->linesize);
+    assert(context_->swsContext != nullptr);
+    assert(context_->frame != nullptr);
+
+    const int ret = sws_scale(context_->swsContext, srcData, srcStride, 0, src.height(),
+                              context_->frame->data, context_->frame->linesize);
+
+    if (ret != src.height())
+    {
+        qWarning() << "sws_scale failed.";
+
+        return false;
+    }
 
     return true;
 }
@@ -549,9 +488,131 @@ bool FFmpegVideoExporter::encodeFrame()
     const int ret = avcodec_send_frame(context_->codecContext, frame);
 
     if (ret < 0)
+    {
+        qWarning() << "avcodec_send_frame failed:" << ffmpeg_utils::errorString(ret);
+
         return false;
+    }
 
     return receivePackets();
+}
+
+bool FFmpegVideoExporter::receivePackets()
+{
+    auto* packet = context_->packet;
+
+    //
+    // Retrieve all available encoded packets.
+    //
+
+    while (true)
+    {
+        const int receiveRet = avcodec_receive_packet(context_->codecContext, packet);
+
+        if (receiveRet == AVERROR(EAGAIN) || receiveRet == AVERROR_EOF)
+            break;
+
+        if (receiveRet < 0)
+        {
+            qWarning() << "avcodec_receive_packet failed:" << ffmpeg_utils::errorString(receiveRet);
+
+            return false;
+        }
+
+        av_packet_rescale_ts(packet, context_->codecContext->time_base,
+                             context_->stream->time_base);
+
+        packet->stream_index = context_->stream->index;
+
+        const int writeRet = av_interleaved_write_frame(context_->formatContext, packet);
+
+        av_packet_unref(packet);
+
+        if (writeRet < 0)
+        {
+            qWarning() << "av_interleaved_write_frame failed:"
+                       << ffmpeg_utils::errorString(writeRet);
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool FFmpegVideoExporter::flushEncoder()
+{
+    //
+    // Signal end-of-stream to the encoder.
+    //
+    const int ret = avcodec_send_frame(context_->codecContext, nullptr);
+
+    if (ret < 0)
+    {
+        qWarning() << "avcodec_send_frame failed:" << ffmpeg_utils::errorString(ret);
+
+        return false;
+    }
+
+    //
+    // Drain all remaining packets.
+    //
+    return receivePackets();
+}
+
+bool FFmpegVideoExporter::writeTrailer()
+{
+    const int ret = av_write_trailer(context_->formatContext);
+
+    if (ret < 0)
+    {
+        qWarning() << "av_write_trailer failed:" << ffmpeg_utils::errorString(ret);
+
+        return false;
+    }
+
+    return true;
+}
+
+void FFmpegVideoExporter::release()
+{
+    //
+    // Most FFmpeg deallocation helpers taking a pointer-to-pointer automatically
+    // reset the pointer to nullptr.
+    //
+
+    if (context_->swsContext != nullptr)
+    {
+        sws_freeContext(context_->swsContext);
+        context_->swsContext = nullptr;
+    }
+
+    if (context_->frame != nullptr)
+        av_frame_free(&context_->frame);
+
+    if (context_->packet != nullptr)
+        av_packet_free(&context_->packet);
+
+    if (context_->codecContext != nullptr)
+        avcodec_free_context(&context_->codecContext);
+
+    if (context_->formatContext != nullptr)
+    {
+        if (!(context_->formatContext->oformat->flags & AVFMT_NOFILE))
+        {
+            avio_closep(&context_->formatContext->pb);
+        }
+
+        avformat_free_context(context_->formatContext);
+        context_->formatContext = nullptr;
+    }
+
+    //
+    // Runtime state
+    //
+    context_->codec = nullptr;
+    context_->stream = nullptr;
+    context_->nextPts = 0;
 }
 
 } // namespace fluvel

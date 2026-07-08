@@ -233,8 +233,16 @@ if(FLUVEL_HAS_FFMPEG)
         ${MEDIA_DIR}/video_exporter.cpp
         ${MEDIA_DIR}/video_exporter.hpp
 
+        ${MEDIA_DIR}/video_exporter_utils.hpp
+
         ${MEDIA_DIR}/ffmpeg/ffmpeg_video_exporter.cpp
         ${MEDIA_DIR}/ffmpeg/ffmpeg_video_exporter.hpp
+
+        ${MEDIA_DIR}/ffmpeg/ffmpeg_codec_utils.cpp
+        ${MEDIA_DIR}/ffmpeg/ffmpeg_codec_utils.hpp
+
+        ${MEDIA_DIR}/ffmpeg/ffmpeg_utils.cpp
+        ${MEDIA_DIR}/ffmpeg/ffmpeg_utils.hpp
     )
 
 endif()
@@ -365,6 +373,7 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
     ${UI_WIN_DIR}
     ${INTEROP_DIR}
     ${MEDIA_DIR}
+    ${MEDIA_DIR}/ffmpeg
 )
 
 if(FLUVEL_HAS_FFMPEG)

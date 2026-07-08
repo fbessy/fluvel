@@ -6,6 +6,13 @@
 #include "video_export_settings.hpp"
 #include "video_exporter_backend.hpp"
 
+extern "C"
+{
+// #include <libavutil/pixfmt.h>
+#include <libavcodec/avcodec.h>
+#include <libavutil/pixdesc.h>
+}
+
 #include <memory>
 
 class QImage;
@@ -81,8 +88,7 @@ private:
      * @brief Initializes the output container.
      *
      * @param settings Export settings.
-     *
-     * @return True on success.
+     * @return @c true on success, @c false otherwise.
      */
     bool initializeContainer(const VideoExportSettings& settings);
 
@@ -90,43 +96,113 @@ private:
      * @brief Initializes the video codec.
      *
      * @param settings Export settings.
-     *
-     * @return True on success.
+     * @return @c true on success, @c false otherwise.
      */
     bool initializeCodec(const VideoExportSettings& settings);
 
     /**
-     * @brief Initializes the video stream.
+     * @brief Initializes the output stream.
      *
-     * @return True on success.
+     * @return @c true on success, @c false otherwise.
      */
     bool initializeStream();
 
     /**
+     * @brief Allocates the video frame.
+     *
+     * @return @c true on success, @c false otherwise.
+     */
+    bool allocateFrame();
+
+    /**
+     * @brief Allocates the packet used for encoded data.
+     *
+     * @return @c true on success, @c false otherwise.
+     */
+    bool allocatePacket();
+
+    /**
+     * @brief Initializes the pixel format conversion context.
+     *
+     * Creates the libswscale context when a conversion from the input image
+     * format to the encoder pixel format is required.
+     *
+     * @return @c true on success, @c false otherwise.
+     */
+    bool initializeScaler();
+
+    /**
      * @brief Opens the output file.
      *
-     * @return True on success.
+     * @return @c true on success, @c false otherwise.
      */
     bool openOutputFile();
 
     /**
      * @brief Writes the container header.
      *
-     * @return True on success.
+     * @return @c true on success, @c false otherwise.
      */
     bool writeHeader();
 
     /**
+     * @brief Makes the frame writable.
+     *
+     * @return @c true on success, @c false otherwise.
+     */
+    bool makeFrameWritable();
+
+    /**
+     * @brief Fills the encoder frame from an image.
+     *
+     * Dispatches the operation according to the encoder pixel format.
+     *
+     * @param image Source image.
+     * @return @c true on success, @c false otherwise.
+     */
+    bool fillFrame(const QImage& image);
+
+    /**
+     * @brief Copies a BGRA image into the encoder frame.
+     *
+     * @param image Source image.
+     * @return @c true on success, @c false otherwise.
+     */
+    bool fillFrameBgr0(const QImage& image);
+
+    /**
+     * @brief Converts an image to YUV420 and fills the encoder frame.
+     *
+     * @param image Source image.
+     * @return @c true on success, @c false otherwise.
+     */
+    bool fillFrameYuv420(const QImage& image);
+
+    /**
+     * @brief Encodes the current frame.
+     *
+     * @return @c true on success, @c false otherwise.
+     */
+    bool encodeFrame();
+
+    /**
+     * @brief Retrieves and writes all available encoded packets.
+     *
+     * @return @c true on success, @c false otherwise.
+     */
+    bool receivePackets();
+
+    /**
      * @brief Flushes the encoder.
      *
-     * @return True on success.
+     * @return @c true on success, @c false otherwise.
      */
     bool flushEncoder();
 
     /**
      * @brief Writes the container trailer.
      *
-     * @return True on success.
+     * @return @c true on success, @c false otherwise.
      */
     bool writeTrailer();
 
@@ -134,19 +210,6 @@ private:
      * @brief Releases all FFmpeg resources.
      */
     void release();
-
-    bool allocateFrame();
-    bool allocatePacket();
-    bool initializeScaler();
-    bool makeFrameWritable();
-
-    bool receivePackets();
-
-    bool fillFrame(const QImage& image);
-    bool fillFrameBgr0(const QImage& image);
-    bool fillFrameYuv420(const QImage& image);
-
-    bool encodeFrame();
 
     VideoExportSettings settings_;
 

@@ -3,7 +3,7 @@
 
 #include "video_exporter.hpp"
 
-#include "ffmpeg/ffmpeg_video_exporter.hpp"
+#include "ffmpeg_video_exporter.hpp"
 
 #include <QImage>
 #include <memory>
