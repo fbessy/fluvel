@@ -17,10 +17,14 @@ namespace
 {
 
 /**
- * @brief Codec mapping used by FFmpegCodecUtils.
+ * @brief Associates a Fluvel video codec with its preferred FFmpeg encoders.
  *
- * Each entry associates a Fluvel video codec with the corresponding FFmpeg
- * codec identifier and the preferred encoder name.
+ * The encoders are ordered by preference. Fluvel always selects the first
+ * encoder that is available and can be successfully initialized on the
+ * current system.
+ *
+ * Hardware-accelerated encoders are preferred over software implementations
+ * whenever possible.
  */
 struct CodecEntry
 {
@@ -30,29 +34,58 @@ struct CodecEntry
     /// FFmpeg codec identifier.
     AVCodecID codecId;
 
-    /// Preferred FFmpeg software encoder.
-    const char* preferredEncoder;
+    /// Preferred FFmpeg encoders ordered by priority.
+    std::initializer_list<const char*> preferredEncoders;
+
+    /// Indicates whether the codec uses lossless compression.
+    bool lossless;
 };
 
+//
+// Preferred FFmpeg encoders.
+//
+// Encoders are ordered by Fluvel preference.
+//
+// Vendor-specific hardware encoders are preferred over generic hardware
+// APIs and software implementations. The order between vendor-specific
+// encoders provides deterministic selection only; in practice, most of
+// them are mutually exclusive depending on the operating system and the
+// available hardware.
+//
 static constexpr CodecEntry kCodecTable[] = {
-    {VideoCodec::FFV1, AV_CODEC_ID_FFV1, "ffv1"},
-    {VideoCodec::MPEG4Part2, AV_CODEC_ID_MPEG4, "mpeg4"},
-    {VideoCodec::H264, AV_CODEC_ID_H264, "libx264"},
-    {VideoCodec::H265, AV_CODEC_ID_HEVC, "libx265"},
-    {VideoCodec::VP9, AV_CODEC_ID_VP9, "libvpx-vp9"},
-    {VideoCodec::AV1, AV_CODEC_ID_AV1, "libsvtav1"},
+    {VideoCodec::FFV1, AV_CODEC_ID_FFV1, {"ffv1"}, true},
+    {VideoCodec::MPEG4Part2, AV_CODEC_ID_MPEG4, {"mpeg4"}, false},
+    {VideoCodec::H264,
+     AV_CODEC_ID_H264,
+     {
+         "h264_nvenc",        // NVIDIA
+         "h264_amf",          // AMD
+         "h264_qsv",          // Intel
+         "h264_videotoolbox", // Apple
+         "h264_vaapi",        // Generic Linux
+         "libx264"            // Software
+     },
+     false},
+    {VideoCodec::H265,
+     AV_CODEC_ID_HEVC,
+     {"hevc_nvenc", "hevc_amf", "hevc_qsv", "hevc_videotoolbox", "hevc_vaapi", "libx265"},
+     false},
+    {VideoCodec::VP9, AV_CODEC_ID_VP9, {"vp9_vaapi", "libvpx-vp9"}, false},
+    {VideoCodec::AV1,
+     AV_CODEC_ID_AV1,
+     {"av1_nvenc", "av1_amf", "av1_qsv", "av1_videotoolbox", "av1_vaapi", "libsvtav1", "librav1e",
+      "libaom-av1"},
+     false},
 };
 
-const CodecEntry* findCodecEntry(VideoCodec codec)
-{
-    for (const CodecEntry& entry : kCodecTable)
-    {
-        if (entry.codec == codec)
-            return &entry;
-    }
-
-    return nullptr;
-}
+//
+// Preferred pixel formats.
+//
+// The formats are ordered to minimize conversions from the current
+// input representation. The first compatible format is selected.
+//
+static constexpr AVPixelFormat kPreferredPixelFormats[] = {AV_PIX_FMT_BGR0, AV_PIX_FMT_BGRA,
+                                                           AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE};
 
 } // namespace
 
@@ -85,27 +118,42 @@ QList<CodecInfo> FFmpegCodecUtils::detectAvailableCodecs()
 
     for (const CodecEntry& entry : kCodecTable)
     {
-        const AVCodec* encoder = findEncoder(entry.codec);
+        bool found = false;
 
-        if (encoder == nullptr)
-            continue;
+        for (const char* encoderName : entry.preferredEncoders)
+        {
+            const AVCodec* encoder = avcodec_find_encoder_by_name(encoderName);
 
-        const AVPixelFormat pixelFormat = selectPixelFormat(encoder);
+            if (encoder == nullptr)
+                continue;
 
-        if (pixelFormat == AV_PIX_FMT_NONE)
-            continue;
+            for (AVPixelFormat pixelFormat : kPreferredPixelFormats)
+            {
+                if (pixelFormat == AV_PIX_FMT_NONE)
+                    break;
 
-        if (!isEncoderUsable(encoder, entry.codecId, pixelFormat))
-            continue;
+                if (!supportsPixelFormat(encoder, pixelFormat))
+                    continue;
 
-        CodecInfo info;
+                if (!isEncoderUsable(encoder, entry.codecId, pixelFormat))
+                    continue;
 
-        info.codec = entry.codec;
-        info.encoder = encoder;
-        info.pixelFormat = pixelFormat;
-        info.lossless = (entry.codec == VideoCodec::FFV1);
+                CodecInfo info;
 
-        codecs.push_back(std::move(info));
+                info.codec = entry.codec;
+                info.lossless = entry.lossless;
+                info.encoder = encoder;
+                info.pixelFormat = pixelFormat;
+
+                codecs.push_back(std::move(info));
+
+                found = true;
+                break;
+            }
+
+            if (found)
+                break;
+        }
     }
 
     return codecs;
@@ -142,76 +190,21 @@ bool FFmpegCodecUtils::isEncoderUsable(const AVCodec* encoder, AVCodecID codecId
     return ret >= 0;
 }
 
-const AVCodec* FFmpegCodecUtils::findEncoder(VideoCodec codec)
+bool FFmpegCodecUtils::supportsPixelFormat(const AVCodec* encoder, AVPixelFormat pixelFormat)
 {
-    const CodecEntry* entry = findCodecEntry(codec);
+    assert(encoder != nullptr);
 
-    if (entry == nullptr)
-        return nullptr;
+    if (encoder->pix_fmts == nullptr)
+        return false;
 
-    //
-    // Prefer the configured encoder. If it is unavailable, fall back to
-    // FFmpeg's default encoder for the requested codec.
-    //
-    if (const AVCodec* encoder = avcodec_find_encoder_by_name(entry->preferredEncoder))
+    for (const AVPixelFormat* supported = encoder->pix_fmts; *supported != AV_PIX_FMT_NONE;
+         ++supported)
     {
-        return encoder;
+        if (*supported == pixelFormat)
+            return true;
     }
 
-    //
-    // Fallback to FFmpeg default encoder.
-    //
-    return avcodec_find_encoder(entry->codecId);
-}
-
-AVPixelFormat FFmpegCodecUtils::selectPixelFormat(const AVCodec* encoder)
-{
-    if (encoder == nullptr || encoder->pix_fmts == nullptr)
-    {
-        //
-        // Encoder does not advertise supported pixel formats.
-        //
-        return AV_PIX_FMT_NONE;
-    }
-
-    //
-    // Search formats in order of preference.
-    //
-    // The current input source is a QImage, whose memory layout is
-    // closest to BGRA/BGR0. Those formats are therefore preferred over
-    // formats requiring a color space conversion.
-    //
-    for (const AVPixelFormat* pixFmt = encoder->pix_fmts; *pixFmt != AV_PIX_FMT_NONE; ++pixFmt)
-    {
-        switch (*pixFmt)
-        {
-            case AV_PIX_FMT_BGR0:
-                return *pixFmt;
-
-            case AV_PIX_FMT_BGRA:
-                return *pixFmt;
-
-            case AV_PIX_FMT_YUV420P:
-                //
-                // Fallback requiring a BGRA -> YUV conversion.
-                //
-                return *pixFmt;
-
-            default:
-                break;
-        }
-    }
-    //
-    // TODO:
-    // When exporting QVideoFrame objects, extend the selection policy to
-    // choose the pixel format that is closest to the input frame format
-    // rather than assuming a BGRA source.
-    //
-
-    //
-    // No suitable format found.
-    //
-    return AV_PIX_FMT_NONE;
+    return false;
 }
 
 } // namespace fluvel

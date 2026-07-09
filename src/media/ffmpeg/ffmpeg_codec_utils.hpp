@@ -64,8 +64,10 @@ private:
     /**
      * @brief Detects all video codecs available on the current system.
      *
-     * The detection verifies that a suitable encoder exists, selects a
-     * compatible pixel format and ensures that the encoder can be opened.
+     * For each codec, the detection tries the preferred FFmpeg encoders
+     * in priority order. For each encoder, it tries the preferred pixel
+     * formats until a compatible combination that can be successfully
+     * initialized is found.
      *
      * @return List of available codec descriptions.
      */
@@ -83,32 +85,13 @@ private:
                                 AVPixelFormat pixelFormat);
 
     /**
-     * @brief Returns the preferred encoder for a video codec.
-     *
-     * The preferred software encoder is used when available. Otherwise,
-     * FFmpeg's default encoder for the codec is returned.
-     *
-     * @param codec Fluvel video codec.
-     * @return Selected FFmpeg encoder, or @c nullptr if none is available.
-     */
-    static const AVCodec* findEncoder(VideoCodec codec);
-
-    /**
-     * @brief Selects the pixel format used for video encoding.
-     *
-     * The selected format is the closest supported format to the current
-     * input image representation in order to minimize pixel conversions.
-     *
-     * At the moment, Fluvel exports QImage frames only. The selection
-     * therefore favors formats directly compatible with the in-memory
-     * BGRA representation before falling back to formats requiring a
-     * conversion.
+     * @brief Checks whether an encoder supports a pixel format.
      *
      * @param encoder FFmpeg video encoder.
-     * @return Selected pixel format, or @c AV_PIX_FMT_NONE if no suitable
-     *         format is available.
+     * @param pixelFormat Pixel format to test.
+     * @return True if the encoder supports the pixel format, false otherwise.
      */
-    static AVPixelFormat selectPixelFormat(const AVCodec* encoder);
+    static bool supportsPixelFormat(const AVCodec* encoder, AVPixelFormat pixelFormat);
 };
 
 } // namespace fluvel
