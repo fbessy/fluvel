@@ -39,4 +39,30 @@ inline QString toString(VideoCodec codec)
     return {};
 }
 
+/**
+ * @brief Returns the display name of a video container.
+ *
+ * @param container Video container.
+ * @return Human-readable container name.
+ */
+[[nodiscard]]
+inline QString toString(VideoContainer container)
+{
+    switch (container)
+    {
+        case VideoContainer::Matroska:
+            return "Matroska";
+        case VideoContainer::Mp4:
+            return "MP4";
+        case VideoContainer::WebM:
+            return "WebM";
+        case VideoContainer::Mov:
+            return "QuickTime";
+        case VideoContainer::Avi:
+            return "AVI";
+    }
+
+    std::unreachable();
+}
+
 } // namespace fluvel::exporter_utils

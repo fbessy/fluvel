@@ -211,6 +211,15 @@ private:
      */
     void release();
 
+    /**
+     * @brief Checks whether a filename extension matches a video container.
+     *
+     * @param filename Output filename.
+     * @param container Video container.
+     * @return True if the filename extension matches the container, false otherwise.
+     */
+    static bool hasExpectedExtension(const QString& filename, VideoContainer container);
+
     VideoExportSettings settings_;
 
     bool isOpen_{false};

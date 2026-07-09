@@ -6,8 +6,10 @@
 #include "ffmpeg_codec_utils.hpp"
 #include "ffmpeg_utils.hpp"
 #include "video_export_settings.hpp"
+#include "video_exporter_utils.hpp"
 
 #include <QDebug>
+#include <QFileInfo>
 #include <QImage>
 
 #include <cassert>
@@ -58,6 +60,31 @@ FFmpegVideoExporter::~FFmpegVideoExporter()
     release();
 }
 
+bool FFmpegVideoExporter::hasExpectedExtension(const QString& filename, VideoContainer container)
+{
+    const QString extension = QFileInfo(filename).suffix().toLower();
+
+    switch (container)
+    {
+        case VideoContainer::Matroska:
+            return extension == "mkv";
+
+        case VideoContainer::Mp4:
+            return extension == "mp4";
+
+        case VideoContainer::WebM:
+            return extension == "webm";
+
+        case VideoContainer::Mov:
+            return extension == "mov";
+
+        case VideoContainer::Avi:
+            return extension == "avi";
+    }
+
+    return true;
+}
+
 bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
 {
     if (isOpen_)
@@ -69,6 +96,13 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
     settings_ = settings;
 
     applyExportProfile(settings_);
+
+    if (!hasExpectedExtension(settings_.filename, settings_.container))
+    {
+        qWarning() << "Filename extension" << QFileInfo(settings_.filename).suffix()
+                   << "does not match the selected" << exporter_utils::toString(settings_.container)
+                   << "container.";
+    }
 
     if (!initializeContainer(settings_))
         return false;
@@ -200,6 +234,25 @@ void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) cons
             break;
 
         case ExportProfile::Custom:
+
+            if (settings.codec == VideoCodec::FFV1 &&
+                settings.container != VideoContainer::Matroska)
+            {
+                qWarning() << "FFV1 is typically stored in a Matroska container.";
+            }
+
+            if (settings.codec == VideoCodec::VP9 && settings.container != VideoContainer::WebM)
+            {
+                qWarning() << "VP9 is typically stored in a WebM container.";
+            }
+
+            if ((settings.codec == VideoCodec::H264 || settings.codec == VideoCodec::H265) &&
+                settings.container != VideoContainer::Mp4)
+            {
+                qInfo() << exporter_utils::toString(settings.codec)
+                        << "is commonly stored in an MP4 container.";
+            }
+
             // No override.
             break;
     }
