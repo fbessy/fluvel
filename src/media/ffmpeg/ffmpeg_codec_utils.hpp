@@ -94,13 +94,21 @@ private:
     static const AVCodec* findEncoder(VideoCodec codec);
 
     /**
-     * @brief Selects the preferred pixel format for an encoder.
+     * @brief Selects the pixel format used for video encoding.
      *
-     * @param encoder FFmpeg encoder.
-     * @return Preferred pixel format, or @c AV_PIX_FMT_NONE if no suitable
-     *         format is supported.
+     * The selected format is the closest supported format to the current
+     * input image representation in order to minimize pixel conversions.
+     *
+     * At the moment, Fluvel exports QImage frames only. The selection
+     * therefore favors formats directly compatible with the in-memory
+     * BGRA representation before falling back to formats requiring a
+     * conversion.
+     *
+     * @param encoder FFmpeg video encoder.
+     * @return Selected pixel format, or @c AV_PIX_FMT_NONE if no suitable
+     *         format is available.
      */
-    static AVPixelFormat preferredPixelFormat(const AVCodec* encoder);
+    static AVPixelFormat selectPixelFormat(const AVCodec* encoder);
 };
 
 } // namespace fluvel

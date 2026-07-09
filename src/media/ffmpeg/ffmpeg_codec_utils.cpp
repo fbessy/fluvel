@@ -90,7 +90,7 @@ QList<CodecInfo> FFmpegCodecUtils::detectAvailableCodecs()
         if (encoder == nullptr)
             continue;
 
-        const AVPixelFormat pixelFormat = preferredPixelFormat(encoder);
+        const AVPixelFormat pixelFormat = selectPixelFormat(encoder);
 
         if (pixelFormat == AV_PIX_FMT_NONE)
             continue;
@@ -164,7 +164,7 @@ const AVCodec* FFmpegCodecUtils::findEncoder(VideoCodec codec)
     return avcodec_find_encoder(entry->codecId);
 }
 
-AVPixelFormat FFmpegCodecUtils::preferredPixelFormat(const AVCodec* encoder)
+AVPixelFormat FFmpegCodecUtils::selectPixelFormat(const AVCodec* encoder)
 {
     if (encoder == nullptr || encoder->pix_fmts == nullptr)
     {
@@ -175,7 +175,11 @@ AVPixelFormat FFmpegCodecUtils::preferredPixelFormat(const AVCodec* encoder)
     }
 
     //
-    // Select the preferred pixel format supported by the encoder.
+    // Search formats in order of preference.
+    //
+    // The current input source is a QImage, whose memory layout is
+    // closest to BGRA/BGR0. Those formats are therefore preferred over
+    // formats requiring a color space conversion.
     //
     for (const AVPixelFormat* pixFmt = encoder->pix_fmts; *pixFmt != AV_PIX_FMT_NONE; ++pixFmt)
     {
@@ -188,12 +192,21 @@ AVPixelFormat FFmpegCodecUtils::preferredPixelFormat(const AVCodec* encoder)
                 return *pixFmt;
 
             case AV_PIX_FMT_YUV420P:
+                //
+                // Fallback requiring a BGRA -> YUV conversion.
+                //
                 return *pixFmt;
 
             default:
                 break;
         }
     }
+    //
+    // TODO:
+    // When exporting QVideoFrame objects, extend the selection policy to
+    // choose the pixel format that is closest to the input frame format
+    // rather than assuming a BGRA source.
+    //
 
     //
     // No suitable format found.
