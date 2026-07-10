@@ -35,9 +35,6 @@ struct CodecInfo
 
     /// Selected FFmpeg encoder.
     const AVCodec* encoder;
-
-    /// Preferred pixel format for the encoder.
-    AVPixelFormat pixelFormat;
 };
 
 class FFmpegCodecUtils
@@ -59,6 +56,15 @@ public:
      * @return Codec information if available, std::nullopt otherwise.
      */
     static std::optional<CodecInfo> codecInfo(VideoCodec codec);
+
+    /**
+     * @brief Checks whether an encoder supports a pixel format.
+     *
+     * @param encoder FFmpeg video encoder.
+     * @param pixelFormat Pixel format to test.
+     * @return True if the encoder supports the pixel format, false otherwise.
+     */
+    static bool supportsPixelFormat(const AVCodec* encoder, AVPixelFormat pixelFormat);
 
 private:
     /**
@@ -83,15 +89,6 @@ private:
      */
     static bool isEncoderUsable(const AVCodec* encoder, AVCodecID codecId,
                                 AVPixelFormat pixelFormat);
-
-    /**
-     * @brief Checks whether an encoder supports a pixel format.
-     *
-     * @param encoder FFmpeg video encoder.
-     * @param pixelFormat Pixel format to test.
-     * @return True if the encoder supports the pixel format, false otherwise.
-     */
-    static bool supportsPixelFormat(const AVCodec* encoder, AVPixelFormat pixelFormat);
 };
 
 } // namespace fluvel

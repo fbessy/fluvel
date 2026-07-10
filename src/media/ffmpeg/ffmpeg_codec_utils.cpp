@@ -78,15 +78,6 @@ static constexpr CodecEntry kCodecTable[] = {
      false},
 };
 
-//
-// Preferred pixel formats.
-//
-// The formats are ordered to minimize conversions from the current
-// input representation. The first compatible format is selected.
-//
-static constexpr AVPixelFormat kPreferredPixelFormats[] = {AV_PIX_FMT_BGR0, AV_PIX_FMT_BGRA,
-                                                           AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE};
-
 } // namespace
 
 const QList<CodecInfo>& FFmpegCodecUtils::availableCodecs()
@@ -118,8 +109,6 @@ QList<CodecInfo> FFmpegCodecUtils::detectAvailableCodecs()
 
     for (const CodecEntry& entry : kCodecTable)
     {
-        bool found = false;
-
         for (const char* encoderName : entry.preferredEncoders)
         {
             const AVCodec* encoder = avcodec_find_encoder_by_name(encoderName);
@@ -127,32 +116,33 @@ QList<CodecInfo> FFmpegCodecUtils::detectAvailableCodecs()
             if (encoder == nullptr)
                 continue;
 
-            for (AVPixelFormat pixelFormat : kPreferredPixelFormats)
+            bool usable = false;
+
+            for (const AVPixelFormat* fmt = encoder->pix_fmts;
+                 fmt != nullptr && *fmt != AV_PIX_FMT_NONE; ++fmt)
             {
-                if (pixelFormat == AV_PIX_FMT_NONE)
+                if (isEncoderUsable(encoder, entry.codecId, *fmt))
+                {
+                    usable = true;
                     break;
-
-                if (!supportsPixelFormat(encoder, pixelFormat))
-                    continue;
-
-                if (!isEncoderUsable(encoder, entry.codecId, pixelFormat))
-                    continue;
-
-                CodecInfo info;
-
-                info.codec = entry.codec;
-                info.lossless = entry.lossless;
-                info.encoder = encoder;
-                info.pixelFormat = pixelFormat;
-
-                codecs.push_back(std::move(info));
-
-                found = true;
-                break;
+                }
             }
 
-            if (found)
-                break;
+            if (!usable)
+                continue;
+
+            CodecInfo info;
+
+            info.codec = entry.codec;
+            info.lossless = entry.lossless;
+            info.encoder = encoder;
+
+            codecs.push_back(std::move(info));
+
+            //
+            // The first usable encoder in the preference list wins.
+            //
+            break;
         }
     }
 

@@ -10,7 +10,6 @@
 
 #include <QDebug>
 #include <QFileInfo>
-#include <QImage>
 
 #include <cassert>
 
@@ -23,6 +22,72 @@ extern "C"
 #include <libavformat/avio.h>
 #include <libswscale/swscale.h>
 }
+
+namespace
+{
+
+//
+// Preferred pixel formats.
+//
+// The formats are ordered to minimize conversions from the current
+// input representation. The first compatible format is selected.
+//
+static constexpr AVPixelFormat kGray8Formats[] = {AV_PIX_FMT_GRAY8, AV_PIX_FMT_YUV420P,
+                                                  AV_PIX_FMT_NONE};
+
+static constexpr AVPixelFormat kBgraFormats[] = {AV_PIX_FMT_BGR0, AV_PIX_FMT_BGRA,
+                                                 AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE};
+
+/**
+ * @brief Returns the preferred FFmpeg pixel formats for a QImage format.
+ *
+ * The returned null-terminated list is ordered by Fluvel preference.
+ *
+ * @param format Source QImage pixel format.
+ * @return Preferred FFmpeg pixel formats, or @c nullptr if the format is unsupported.
+ */
+const AVPixelFormat* preferredPixelFormats(QImage::Format format)
+{
+    switch (format)
+    {
+        case QImage::Format_Grayscale8:
+            return kGray8Formats;
+
+        case QImage::Format_RGB32:
+        case QImage::Format_ARGB32:
+        case QImage::Format_ARGB32_Premultiplied:
+            return kBgraFormats;
+
+        default:
+            return nullptr;
+    }
+}
+
+/**
+ * @brief Selects the best encoder pixel format for the input image.
+ *
+ * The preferred pixel formats are evaluated in order until one supported
+ * by the encoder is found.
+ *
+ * @param encoder FFmpeg encoder.
+ * @param preferredPixelFormats Null-terminated list of preferred pixel formats.
+ * @return Selected pixel format, or @c AV_PIX_FMT_NONE if none is compatible.
+ */
+AVPixelFormat selectPixelFormat(const AVCodec* encoder, const AVPixelFormat* preferredPixelFormats)
+{
+    assert(encoder != nullptr);
+    assert(preferredPixelFormats != nullptr);
+
+    for (const AVPixelFormat* fmt = preferredPixelFormats; *fmt != AV_PIX_FMT_NONE; ++fmt)
+    {
+        if (fluvel::FFmpegCodecUtils::supportsPixelFormat(encoder, *fmt))
+            return *fmt;
+    }
+
+    return AV_PIX_FMT_NONE;
+}
+
+} // namespace
 
 namespace fluvel
 {
@@ -129,6 +194,14 @@ bool FFmpegVideoExporter::addFrame(const QImage& image)
         return false;
     }
 
+    if (image.format() != frameFormat_)
+    {
+        qWarning() << "Frame format" << image.format() << "does not match initial frame format"
+                   << frameFormat_;
+
+        return false;
+    }
+
     if (!fillFrame(image) || !encodeFrame())
     {
         release();
@@ -148,10 +221,19 @@ bool FFmpegVideoExporter::initializeFromFirstFrame(const QImage& firstFrame)
         return false;
 
     frameSize_ = firstFrame.size();
+    frameFormat_ = firstFrame.format();
 
-    if (!initializeContainer(settings_) || !initializeCodec(settings_) || !initializeStream() ||
-        !allocateFrame() || !allocatePacket() || !initializeScaler() || !openOutputFile() ||
-        !writeHeader())
+    const AVPixelFormat* preferredFormats = preferredPixelFormats(frameFormat_);
+
+    if (preferredFormats == nullptr)
+    {
+        qWarning() << "Unsupported QImage format:" << frameFormat_;
+        return false;
+    }
+
+    if (!initializeContainer(settings_) || !initializeCodec(settings_, preferredFormats) ||
+        !initializeStream() || !allocateFrame() || !allocatePacket() || !initializeScaler() ||
+        !openOutputFile() || !writeHeader())
     {
         release();
         state_ = ExportState::Closed;
@@ -260,7 +342,8 @@ bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& setting
     return true;
 }
 
-bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
+bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings,
+                                          const AVPixelFormat* preferredPixelFormats)
 {
     const auto codecInfo = FFmpegCodecUtils::codecInfo(settings.codec);
 
@@ -285,19 +368,23 @@ bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
     c->time_base = AVRational{1, settings.frameRate};
     c->framerate = AVRational{settings.frameRate, 1};
 
-    c->pix_fmt = codecInfo->pixelFormat;
+    c->pix_fmt = selectPixelFormat(context_->codec, preferredPixelFormats);
+
+    if (c->pix_fmt == AV_PIX_FMT_NONE)
+    {
+        qWarning() << "No compatible pixel format found for encoder" << context_->codec->name;
+
+        return false;
+    }
 
     if (context_->formatContext->oformat->flags & AVFMT_GLOBALHEADER)
-    {
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
-    }
 
     const int ret = avcodec_open2(c, context_->codec, nullptr);
 
     if (ret < 0)
     {
         qWarning() << "avcodec_open2 failed:" << ffmpeg_utils::errorString(ret);
-
         return false;
     }
 
@@ -364,8 +451,10 @@ bool FFmpegVideoExporter::initializeScaler()
     //
     // BGR0 does not require any conversion.
     //
-    // All other pixel formats are generated from the BGRA QImage
-    // using libswscale.
+    //
+    // All other supported pixel formats are generated from the
+    // BGRA input image using libswscale.
+    //
     //
 
     if (context_->codecContext->pix_fmt == AV_PIX_FMT_BGR0)
@@ -652,13 +741,14 @@ void FFmpegVideoExporter::release()
     }
 
     //
-    // Runtime state
+    // Runtime export state
     //
     context_->codec = nullptr;
     context_->stream = nullptr;
     context_->nextPts = 0;
 
-    frameSize_ = {};
+    frameSize_ = {-1, -1};
+    frameFormat_ = QImage::Format_Invalid;
 }
 
 } // namespace fluvel

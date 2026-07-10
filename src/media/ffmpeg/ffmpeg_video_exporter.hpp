@@ -14,7 +14,7 @@ extern "C"
 
 #include <memory>
 
-class QImage;
+#include <QImage>
 
 namespace fluvel
 {
@@ -32,7 +32,8 @@ enum class ExportState
     /// No export session is active.
     Closed,
 
-    /// Waiting for the first frame to initialize FFmpeg.
+    /// Waiting for the first frame to determine the output format
+    /// and to initialize FFmpeg.
     WaitingForFirstFrame,
 
     /// Export session initialized and ready to encode frames.
@@ -96,9 +97,9 @@ private:
     /**
      * @brief Initializes the exporter from the first input frame.
      *
-     * The first frame determines the output frame size and triggers the
-     * FFmpeg initialization (container, codec, stream, frame allocation,
-     * scaler, output file and header).
+     * The first frame defines the output image characteristics and
+     * triggers the FFmpeg initialization (container, codec, stream,
+     * frame allocation, scaler, output file and header).
      *
      * @param firstFrame First frame to export.
      * @return @c true on success, @c false otherwise.
@@ -121,7 +122,7 @@ private:
      * @param filename Output filename.
      * @param container Video container.
      * @return @c true if the filename extension matches the container,
-        @c false otherwise.
+     *         @c false otherwise.
      */
     static bool hasExpectedExtension(const QString& filename, VideoContainer container);
 
@@ -137,9 +138,11 @@ private:
      * @brief Initializes the video codec.
      *
      * @param settings Export settings.
+     * @param preferredFormats Preferred pixel formats ordered by priority.
      * @return @c true on success, @c false otherwise.
      */
-    bool initializeCodec(const VideoExportSettings& settings);
+    bool initializeCodec(const VideoExportSettings& settings,
+                         const AVPixelFormat* preferredFormats);
 
     /**
      * @brief Initializes the output stream.
@@ -258,7 +261,8 @@ private:
 
     ExportState state_{ExportState::Closed};
 
-    QSize frameSize_;
+    QSize frameSize_{-1, -1};
+    QImage::Format frameFormat_{QImage::Format_Invalid};
 
     struct Context;
     std::unique_ptr<Context> context_;
