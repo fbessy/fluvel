@@ -59,7 +59,7 @@ public:
     /**
      * @brief Returns whether the exporter is opened.
      */
-    virtual bool isOpen() const = 0;
+    virtual bool isRecording() const = 0;
 };
 
 } // namespace fluvel

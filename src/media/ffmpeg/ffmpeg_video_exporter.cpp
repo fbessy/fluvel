@@ -60,34 +60,9 @@ FFmpegVideoExporter::~FFmpegVideoExporter()
     release();
 }
 
-bool FFmpegVideoExporter::hasExpectedExtension(const QString& filename, VideoContainer container)
-{
-    const QString extension = QFileInfo(filename).suffix().toLower();
-
-    switch (container)
-    {
-        case VideoContainer::Matroska:
-            return extension == "mkv";
-
-        case VideoContainer::Mp4:
-            return extension == "mp4";
-
-        case VideoContainer::WebM:
-            return extension == "webm";
-
-        case VideoContainer::Mov:
-            return extension == "mov";
-
-        case VideoContainer::Avi:
-            return extension == "avi";
-    }
-
-    return true;
-}
-
 bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
 {
-    if (isOpen_)
+    if (state_ != ExportState::Closed)
         return false;
 
     //
@@ -104,105 +79,90 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
                    << "container.";
     }
 
-    if (!initializeContainer(settings_))
+    state_ = ExportState::WaitingForFirstFrame;
+
+    return true;
+}
+
+bool FFmpegVideoExporter::close()
+{
+    if (state_ == ExportState::Closed)
         return false;
 
-    if (!initializeCodec(settings_))
+    bool success = true;
+
+    if (state_ == ExportState::Recording)
     {
-        release();
+        success = flushEncoder() && writeTrailer();
+    }
+
+    release();
+    state_ = ExportState::Closed;
+
+    return success;
+}
+
+bool FFmpegVideoExporter::isRecording() const
+{
+    return state_ == ExportState::Recording;
+}
+
+bool FFmpegVideoExporter::addFrame(const QImage& image)
+{
+    if (image.isNull() || image.size().isEmpty())
+        return false;
+
+    if (state_ == ExportState::WaitingForFirstFrame)
+    {
+        if (!initializeFromFirstFrame(image))
+            return false;
+    }
+
+    if (state_ != ExportState::Recording)
+        return false;
+
+    if (image.size() != frameSize_)
+    {
+        qWarning() << "Frame size" << image.size() << "does not match initial frame size"
+                   << frameSize_;
+
         return false;
     }
 
-    if (!initializeStream())
+    if (!fillFrame(image) || !encodeFrame())
     {
         release();
+        state_ = ExportState::Closed;
         return false;
     }
 
-    if (!allocateFrame())
-    {
-        release();
-        return false;
-    }
+    return true;
+}
 
-    if (!allocatePacket())
-    {
-        release();
-        return false;
-    }
+bool FFmpegVideoExporter::initializeFromFirstFrame(const QImage& firstFrame)
+{
+    assert(!firstFrame.isNull());
+    assert(!firstFrame.size().isEmpty());
 
-    if (!initializeScaler())
-    {
-        release();
+    if (state_ != ExportState::WaitingForFirstFrame)
         return false;
-    }
 
-    if (!openOutputFile())
+    frameSize_ = firstFrame.size();
+
+    if (!initializeContainer(settings_) || !initializeCodec(settings_) || !initializeStream() ||
+        !allocateFrame() || !allocatePacket() || !initializeScaler() || !openOutputFile() ||
+        !writeHeader())
     {
         release();
-        return false;
-    }
-
-    if (!writeHeader())
-    {
-        release();
+        state_ = ExportState::Closed;
         return false;
     }
 
     context_->nextPts = 0;
 
-    isOpen_ = true;
+    state_ = ExportState::Recording;
 
     return true;
-}
-
-bool FFmpegVideoExporter::addFrame(const QImage& image)
-{
-    if (!isOpen_)
-        return false;
-
-    if (image.width() != settings_.width || image.height() != settings_.height)
-    {
-        qWarning() << "FFmpegVideoExporter: frame size" << image.size()
-                   << "does not match export size" << QSize(settings_.width, settings_.height);
-
-        return false;
-    }
-
-    if (!fillFrame(image))
-        return false;
-
-    return encodeFrame();
-}
-
-bool FFmpegVideoExporter::close()
-{
-    if (!isOpen_)
-        return false;
-
-    if (!flushEncoder())
-    {
-        release();
-        isOpen_ = false;
-        return false;
-    }
-
-    if (!writeTrailer())
-    {
-        release();
-        isOpen_ = false;
-        return false;
-    }
-
-    release();
-    isOpen_ = false;
-
-    return true;
-}
-
-bool FFmpegVideoExporter::isOpen() const
-{
-    return isOpen_;
 }
 
 void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) const
@@ -258,6 +218,31 @@ void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) cons
     }
 }
 
+bool FFmpegVideoExporter::hasExpectedExtension(const QString& filename, VideoContainer container)
+{
+    const QString extension = QFileInfo(filename).suffix().toLower();
+
+    switch (container)
+    {
+        case VideoContainer::Matroska:
+            return extension == "mkv";
+
+        case VideoContainer::Mp4:
+            return extension == "mp4";
+
+        case VideoContainer::WebM:
+            return extension == "webm";
+
+        case VideoContainer::Mov:
+            return extension == "mov";
+
+        case VideoContainer::Avi:
+            return extension == "avi";
+    }
+
+    return true;
+}
+
 bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& settings)
 {
     const char* format = ffmpeg_utils::containerName(settings.container);
@@ -294,8 +279,8 @@ bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings)
     c->codec_id = context_->codec->id;
     c->codec_type = AVMEDIA_TYPE_VIDEO;
 
-    c->width = settings.width;
-    c->height = settings.height;
+    c->width = frameSize_.width();
+    c->height = frameSize_.height();
 
     c->time_base = AVRational{1, settings.frameRate};
     c->framerate = AVRational{settings.frameRate, 1};
@@ -446,6 +431,8 @@ bool FFmpegVideoExporter::makeFrameWritable()
 
 bool FFmpegVideoExporter::fillFrame(const QImage& image)
 {
+    assert(state_ == ExportState::Recording);
+
     if (!makeFrameWritable())
         return false;
 
@@ -462,6 +449,8 @@ bool FFmpegVideoExporter::fillFrame(const QImage& image)
             return fillFrameYuv420(image);
 
         default:
+            qWarning() << "Unsupported pixel format:"
+                       << av_get_pix_fmt_name(context_->codecContext->pix_fmt);
             return false;
     }
 }
@@ -534,6 +523,8 @@ bool FFmpegVideoExporter::fillFrameYuv420(const QImage& image)
 
 bool FFmpegVideoExporter::encodeFrame()
 {
+    assert(state_ == ExportState::Recording);
+
     auto* frame = context_->frame;
 
     frame->pts = context_->nextPts++;
@@ -666,6 +657,8 @@ void FFmpegVideoExporter::release()
     context_->codec = nullptr;
     context_->stream = nullptr;
     context_->nextPts = 0;
+
+    frameSize_ = {};
 }
 
 } // namespace fluvel

@@ -83,7 +83,7 @@ public:
      * @return True if a video is currently opened.
      */
     [[nodiscard]]
-    bool isOpen() const;
+    bool isRecording() const;
 
 private:
     std::unique_ptr<IVideoExporter> exporter_;

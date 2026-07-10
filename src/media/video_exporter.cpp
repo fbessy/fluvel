@@ -37,9 +37,9 @@ bool VideoExporter::close()
     return exporter_->close();
 }
 
-bool VideoExporter::isOpen() const
+bool VideoExporter::isRecording() const
 {
-    return exporter_->isOpen();
+    return exporter_->isRecording();
 }
 
 } // namespace fluvel

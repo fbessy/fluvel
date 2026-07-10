@@ -202,11 +202,6 @@ namespace fluvel
     QString filename;
 
     /**
-     * @brief Frame size.
-     */
-    QSize frameSize;
-
-    /**
      * @brief Frames per second.
      */
     std::uint32_t fps{30};

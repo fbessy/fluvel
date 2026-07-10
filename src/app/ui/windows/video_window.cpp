@@ -302,6 +302,9 @@ void VideoWindow::createUi()
     toggleStreamingButton_->setTransitionEffect(TransitionEffect::Slide);
     toggleStreamingButton_->setClickAnimation(ClickAnimation::None);
 
+    recordingButton_ = new QPushButton;
+    recordingButton_->setCheckable(true);
+
     QIcon applyIcon = createActiveFormatIcon();
 
     applyButton_ = new QPushButton;
@@ -498,6 +501,7 @@ void VideoWindow::setupLayout()
 
     sourceTypeColumn->addWidget(sourceTypeWidget_);
     sourceTypeColumn->addWidget(toggleStreamingButton_);
+    sourceTypeColumn->addWidget(recordingButton_);
 
     //
     // Apply column
@@ -618,6 +622,8 @@ void VideoWindow::setupConnections()
 
     connect(toggleStreamingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleStreaming);
 
+    connect(recordingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleRecording);
+
     connect(applyButton_, &QPushButton::clicked, this, &VideoWindow::onApplySelection);
 
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
@@ -642,6 +648,12 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::streamingStopped, this,
             &VideoWindow::onStreamingStopped);
+
+    connect(videoController_, &VideoController::recordingStarted, this,
+            &VideoWindow::onRecordingStarted);
+
+    connect(videoController_, &VideoController::recordingStopped, this,
+            &VideoWindow::onRecordingStopped);
 
     connect(videoController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
     connect(videoController_, &VideoController::mediaPlayerError, this,
@@ -2328,6 +2340,28 @@ void VideoWindow::onPlaybackStateChanged(QMediaPlayer::PlaybackState state)
         case QMediaPlayer::StoppedState:
             break;
     }
+}
+
+void VideoWindow::onToggleRecording()
+{
+    if (recordingButton_->isChecked())
+        videoController_->startRecording();
+    else
+        videoController_->stopRecording();
+}
+
+void VideoWindow::onRecordingStarted()
+{
+    recordingButton_->setChecked(true);
+
+    // icône rouge
+}
+
+void VideoWindow::onRecordingStopped()
+{
+    recordingButton_->setChecked(false);
+
+    // icône normale
 }
 
 } // namespace fluvel

@@ -6,9 +6,12 @@
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
 #include "streaming_stats.hpp"
+#include "video_export_settings.hpp"
+#include "video_exporter.hpp"
 
 #include <QAudioOutput>
 #include <QCamera>
+#include <QDir>
 #include <QFileInfo>
 #include <QMediaCaptureSession>
 #include <QMediaDevices>
@@ -352,6 +355,8 @@ void VideoController::onDisplayFrameReady(const DisplayFrame& displayFrame)
     uiDisplayFrame.receiveTimestampNs = displayFrame.receiveTimestampNs;
     uiDisplayFrame.processTimestampNs = displayFrame.processTimestampNs;
 
+    submitFrame(displayFrame.image.copy());
+
     emit imageAndContourUpdated(uiDisplayFrame);
 }
 
@@ -657,6 +662,35 @@ void VideoController::resume()
         return;
 
     mediaPlayer_.play();
+}
+
+void VideoController::startRecording()
+{
+    VideoExportSettings settings;
+
+    settings.profile = ExportProfile::Archive;
+    settings.filename = QDir::homePath() + "/test.mkv";
+
+    if (!recorder_.start(settings))
+        return;
+
+    emit recordingStarted();
+}
+
+void VideoController::stopRecording()
+{
+    if (!recorder_.stop())
+        return;
+
+    emit recordingStopped();
+}
+
+void VideoController::submitFrame(const QImage& image)
+{
+    if (!recorder_.isRecording())
+        return;
+
+    recorder_.addFrame(image);
 }
 
 } // namespace fluvel

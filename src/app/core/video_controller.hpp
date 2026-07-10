@@ -10,6 +10,7 @@
 #include "frame_pipeline.hpp"
 #include "frame_stats_collector.hpp"
 #include "video_active_contour_thread.hpp"
+#include "video_recorder.hpp"
 #include "video_types.hpp"
 
 #include <QAudioOutput>
@@ -197,6 +198,9 @@ public:
     [[nodiscard]]
     bool isMediaActive() const;
 
+    void startRecording();
+    void stopRecording();
+
 signals:
     /// Emitted when available video inputs change.
     void videoInputsChanged(const QList<QCameraDevice>& devices);
@@ -299,6 +303,9 @@ signals:
      */
     void mutedChanged(bool muted);
 
+    void recordingStarted();
+    void recordingStopped();
+
 private:
     /**
      * @brief Start streaming using a specific device.
@@ -390,6 +397,8 @@ private:
      */
     void updateMediaInfo();
 
+    void submitFrame(const QImage& image);
+
     /**
      * @brief Determine whether a media title is suitable for display.
      *
@@ -475,6 +484,8 @@ private:
 
     /// Number of valid frames received during stabilization.
     int stableFrameCount_{0};
+
+    VideoRecorder recorder_;
 };
 
 /**

@@ -8,7 +8,6 @@
 
 extern "C"
 {
-// #include <libavutil/pixfmt.h>
 #include <libavcodec/avcodec.h>
 #include <libavutil/pixdesc.h>
 }
@@ -19,6 +18,26 @@ class QImage;
 
 namespace fluvel
 {
+
+/**
+ * @brief Internal state of the exporter.
+ *
+ * The exporter is initially closed. Calling open() starts a new export
+ * session but defers the FFmpeg initialization until the first frame is
+ * received. Once initialized, frames can be encoded until close() is
+ * called.
+ */
+enum class ExportState
+{
+    /// No export session is active.
+    Closed,
+
+    /// Waiting for the first frame to initialize FFmpeg.
+    WaitingForFirstFrame,
+
+    /// Export session initialized and ready to encode frames.
+    Recording
+};
 
 /**
  * @brief FFmpeg implementation of the video exporter.
@@ -68,12 +87,24 @@ public:
     bool close() override;
 
     /**
-     * @copydoc IVideoExporter::isOpen
+     * @copydoc IVideoExporter::isRecording
      */
     [[nodiscard]]
-    bool isOpen() const override;
+    bool isRecording() const override;
 
 private:
+    /**
+     * @brief Initializes the exporter from the first input frame.
+     *
+     * The first frame determines the output frame size and triggers the
+     * FFmpeg initialization (container, codec, stream, frame allocation,
+     * scaler, output file and header).
+     *
+     * @param firstFrame First frame to export.
+     * @return @c true on success, @c false otherwise.
+     */
+    bool initializeFromFirstFrame(const QImage& firstFrame);
+
     /**
      * @brief Applies an export profile.
      *
@@ -83,6 +114,16 @@ private:
      * @param settings Export settings to update.
      */
     void applyExportProfile(VideoExportSettings& settings) const;
+
+    /**
+     * @brief Checks whether a filename extension matches a video container.
+     *
+     * @param filename Output filename.
+     * @param container Video container.
+     * @return @c true if the filename extension matches the container,
+        @c false otherwise.
+     */
+    static bool hasExpectedExtension(const QString& filename, VideoContainer container);
 
     /**
      * @brief Initializes the output container.
@@ -207,29 +248,17 @@ private:
     bool writeTrailer();
 
     /**
-     * @brief Releases all FFmpeg resources.
+     * @brief Releases all allocated FFmpeg resources.
+     *
+     * Restores the exporter to an uninitialized state.
      */
     void release();
 
-    /**
-     * @brief Checks whether a filename extension matches a video container.
-     *
-     * @param filename Output filename.
-     * @param container Video container.
-     * @return True if the filename extension matches the container, false otherwise.
-     */
-    static bool hasExpectedExtension(const QString& filename, VideoContainer container);
-
     VideoExportSettings settings_;
 
-    bool isOpen_{false};
+    ExportState state_{ExportState::Closed};
 
-    //
-    // FFmpeg objects
-    //
-    // They are intentionally hidden from the public header.
-    // Concrete FFmpeg types will appear only in the .cpp.
-    //
+    QSize frameSize_;
 
     struct Context;
     std::unique_ptr<Context> context_;

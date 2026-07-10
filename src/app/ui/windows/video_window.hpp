@@ -225,6 +225,7 @@ private:
     void openMediaFile(const QString& filename);
 
     void onToggleStreaming();
+    void onToggleRecording();
     void onApplySelection();
 
     void onWindowDeviceChanged(int index);
@@ -243,6 +244,9 @@ private:
     void onStreamingStarting();
     void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
+
+    void onRecordingStarted();
+    void onRecordingStopped();
 
     //
     // Error handling
@@ -397,6 +401,8 @@ private:
     QIcon startIcon_;
     QIcon stopIcon_;
     AnimatedPushButton* toggleStreamingButton_{nullptr};
+
+    QPushButton* recordingButton_{nullptr};
 
     QPushButton* applyButton_{nullptr};
 
