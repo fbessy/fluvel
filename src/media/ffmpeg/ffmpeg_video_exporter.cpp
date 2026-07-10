@@ -365,8 +365,8 @@ bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings,
     c->width = frameSize_.width();
     c->height = frameSize_.height();
 
-    c->time_base = AVRational{1, settings.frameRate};
-    c->framerate = AVRational{settings.frameRate, 1};
+    c->time_base = AVRational{1, settings.fps};
+    c->framerate = AVRational{settings.fps, 1};
 
     c->pix_fmt = selectPixelFormat(context_->codec, preferredPixelFormats);
 

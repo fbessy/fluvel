@@ -192,6 +192,19 @@ namespace fluvel
   };
 
   /**
+   * @brief Timestamp policy used when assigning presentation timestamps to frames.
+   *
+   * - ConstantFrameRate   : each frame is assigned a timestamp according to the
+   *                         configured frame rate.
+   * - ExplicitTimestamps  : each frame uses the timestamp provided by the caller.
+   */
+  enum class TimestampMode
+  {
+      ConstantFrameRate, ///< Constant frame rate.
+      ExplicitTimestamps ///< Caller-provided timestamps.
+  };
+
+  /**
    * @brief Video export settings.
    */
   struct VideoExportSettings
@@ -202,9 +215,14 @@ namespace fluvel
     QString filename;
 
     /**
+     * @brief Timestamp mode.
+     */
+    TimestampMode timestampMode{TimestampMode::ConstantFrameRate};
+
+    /**
      * @brief Frames per second.
      */
-    std::uint32_t fps{30};
+    int fps{30};
 
     /**
      * @brief Export profile.
@@ -238,7 +256,7 @@ namespace fluvel
      *
      * Used by lossy codecs.
      */
-    std::uint32_t bitrate{8'000'000};
+    int bitrate{8'000'000};
 
     /**
      * @brief Compression quality.
@@ -246,13 +264,7 @@ namespace fluvel
      * Lower values generally produce higher quality.
      * Interpretation depends on the selected codec.
      */
-    std::uint32_t quality{23};
-
-    int width = 1920;
-
-    int height = 1080;
-
-    int frameRate = 30;
+    int quality{23};
   };
 
 } // namespace fluvel
