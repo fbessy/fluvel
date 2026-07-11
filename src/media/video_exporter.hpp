@@ -7,7 +7,7 @@
 
 #include <memory>
 
-class QImage;
+class VideoFrame;
 
 namespace fluvel
 {
@@ -55,16 +55,18 @@ public:
     bool open(const VideoExportSettings& settings);
 
     /**
-     * @brief Adds a frame to the video.
+     * @brief Encodes a video frame.
      *
      * Frames are encoded in the order they are received.
      *
-     * @param image Source image.
+     * Depending on the selected timestamp mode, the presentation timestamp
+     * contained in the frame may be ignored and generated automatically.
      *
-     * @return True on success, false otherwise.
+     * @param frame Video frame to encode.
+     * @return @c true on success, @c false otherwise.
      */
     [[nodiscard]]
-    bool addFrame(const QImage& image);
+    bool addFrame(const VideoFrame& frame);
 
     /**
      * @brief Finalizes the video.

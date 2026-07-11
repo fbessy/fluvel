@@ -262,6 +262,10 @@ private:
     void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
     void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
 
+    // Recording warnings and errors
+    void onRecordingWarning(const QString& message);
+    void onRecordingError(const QString& message);
+
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
 #endif

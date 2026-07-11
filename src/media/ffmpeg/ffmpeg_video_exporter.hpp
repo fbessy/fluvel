@@ -77,9 +77,7 @@ public:
      * @copydoc IVideoExporter::addFrame
      */
     [[nodiscard]]
-    bool addFrame(const QImage& image) override;
-
-    // bool addFrame(const QVideoFrame& frame);
+    bool addFrame(const VideoFrame& frame) override;
 
     /**
      * @copydoc IVideoExporter::close

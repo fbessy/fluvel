@@ -103,6 +103,21 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
             &VideoController::onFrameProcessed);
 
+    //
+    // Recording worker
+    //
+    connect(&recorder_, &VideoRecorderWorker::recordingStarted, this,
+            &VideoController::recordingStarted);
+
+    connect(&recorder_, &VideoRecorderWorker::recordingStopped, this,
+            &VideoController::recordingStopped);
+
+    connect(&recorder_, &VideoRecorderWorker::warningOccurred, this,
+            &VideoController::recordingWarning);
+
+    connect(&recorder_, &VideoRecorderWorker::errorOccurred, this,
+            &VideoController::recordingError);
+
     activeContourThread_.start();
 }
 
@@ -355,7 +370,11 @@ void VideoController::onDisplayFrameReady(const DisplayFrame& displayFrame)
     uiDisplayFrame.receiveTimestampNs = displayFrame.receiveTimestampNs;
     uiDisplayFrame.processTimestampNs = displayFrame.processTimestampNs;
 
-    submitFrame(displayFrame.image.copy());
+    VideoFrame frame;
+    frame.image = displayFrame.image;
+    frame.presentationTimestampNs = uiDisplayFrame.receiveTimestampNs;
+
+    submitFrame(frame);
 
     emit imageAndContourUpdated(uiDisplayFrame);
 }
@@ -671,26 +690,20 @@ void VideoController::startRecording()
     settings.profile = ExportProfile::Archive;
     settings.filename = QDir::homePath() + "/test.mkv";
 
-    if (!recorder_.start(settings))
-        return;
-
-    emit recordingStarted();
+    recorder_.start(settings);
 }
 
 void VideoController::stopRecording()
 {
-    if (!recorder_.stop())
-        return;
-
-    emit recordingStopped();
+    recorder_.stop();
 }
 
-void VideoController::submitFrame(const QImage& image)
+void VideoController::submitFrame(const VideoFrame& frame)
 {
     if (!recorder_.isRecording())
         return;
 
-    recorder_.addFrame(image);
+    recorder_.addFrame(frame);
 }
 
 } // namespace fluvel

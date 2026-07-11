@@ -9,6 +9,7 @@ namespace fluvel
 {
 
 class VideoExportSettings;
+class VideoFrame;
 
 /**
  * @brief Video exporter backend interface.
@@ -41,11 +42,13 @@ public:
      *
      * Frames are encoded in the order they are received.
      *
-     * @param image Source image.
+     * Depending on the selected timestamp mode, the presentation timestamp
+     * contained in the frame may be ignored and generated automatically.
      *
-     * @return True on success.
+     * @param frame Video frame to encode.
+     * @return @c true on success, @c false otherwise.
      */
-    virtual bool addFrame(const QImage& image) = 0;
+    virtual bool addFrame(const VideoFrame& frame) = 0;
 
     /**
      * @brief Finalizes the video.

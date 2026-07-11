@@ -10,7 +10,7 @@
 #include "frame_pipeline.hpp"
 #include "frame_stats_collector.hpp"
 #include "video_active_contour_thread.hpp"
-#include "video_recorder.hpp"
+#include "video_recorder_worker.hpp"
 #include "video_types.hpp"
 
 #include <QAudioOutput>
@@ -303,8 +303,32 @@ signals:
      */
     void mutedChanged(bool muted);
 
+    /**
+     * @brief Emitted when video recording starts.
+     */
     void recordingStarted();
+
+    /**
+     * @brief Emitted when video recording has fully stopped.
+     *
+     * At this point, queued frames have been encoded and the output video
+     * has been finalized.
+     */
     void recordingStopped();
+
+    /**
+     * @brief Emitted when a non-fatal video recording warning occurs.
+     *
+     * @param message Warning message.
+     */
+    void recordingWarning(const QString& message);
+
+    /**
+     * @brief Emitted when a video recording error occurs.
+     *
+     * @param message Error message.
+     */
+    void recordingError(const QString& message);
 
 private:
     /**
@@ -397,7 +421,7 @@ private:
      */
     void updateMediaInfo();
 
-    void submitFrame(const QImage& image);
+    void submitFrame(const VideoFrame& frame);
 
     /**
      * @brief Determine whether a media title is suitable for display.
@@ -427,6 +451,9 @@ private:
 
     /// Processing thread running active contour.
     VideoActiveContourThread activeContourThread_;
+
+    /// Processing worker for video creation feature.
+    VideoRecorderWorker recorder_;
 
     /// Frame statistics and diagnostics view.
     FrameStatsCollector frameStats_;
@@ -484,8 +511,6 @@ private:
 
     /// Number of valid frames received during stabilization.
     int stableFrameCount_{0};
-
-    VideoRecorder recorder_;
 };
 
 /**

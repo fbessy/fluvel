@@ -833,6 +833,12 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::playbackStateChanged, this,
             &VideoWindow::onPlaybackStateChanged);
+
+    connect(videoController_, &VideoController::recordingWarning, this,
+            &VideoWindow::onRecordingWarning);
+
+    connect(videoController_, &VideoController::recordingError, this,
+            &VideoWindow::onRecordingError);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -2362,6 +2368,16 @@ void VideoWindow::onRecordingStopped()
     recordingButton_->setChecked(false);
 
     // icône normale
+}
+
+void VideoWindow::onRecordingWarning(const QString& message)
+{
+    QMessageBox::warning(this, tr("Recording warning"), message);
+}
+
+void VideoWindow::onRecordingError(const QString& message)
+{
+    QMessageBox::critical(this, tr("Recording error"), message);
 }
 
 } // namespace fluvel

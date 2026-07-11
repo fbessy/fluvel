@@ -145,4 +145,25 @@ struct FrameTimestamps
     int64_t displayTimestampNs{0};
 };
 
+/**
+ * @brief Frame ready for video encoding.
+ *
+ * Contains the rendered image together with the presentation timestamp
+ * used by the video exporter.
+ */
+struct VideoFrame
+{
+    /**
+     * @brief Rendered image.
+     */
+    QImage image;
+
+    /**
+     * @brief Presentation timestamp (ns).
+     *
+     * Used only when TimestampMode::ExplicitTimestamps is selected.
+     */
+    int64_t presentationTimestampNs{0};
+};
+
 } // namespace fluvel

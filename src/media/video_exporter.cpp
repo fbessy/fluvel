@@ -27,9 +27,9 @@ bool VideoExporter::open(const VideoExportSettings& settings)
     return exporter_->open(settings);
 }
 
-bool VideoExporter::addFrame(const QImage& image)
+bool VideoExporter::addFrame(const VideoFrame& frame)
 {
-    return exporter_->addFrame(image);
+    return exporter_->addFrame(frame);
 }
 
 bool VideoExporter::close()

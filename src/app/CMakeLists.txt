@@ -219,8 +219,8 @@ set(app_src
     ${CORE_DIR}/time_utils.cpp
     ${CORE_DIR}/time_utils.hpp
 
-    ${CORE_DIR}/video_recorder.cpp
-    ${CORE_DIR}/video_recorder.hpp
+    ${CORE_DIR}/video_recorder_worker.cpp
+    ${CORE_DIR}/video_recorder_worker.hpp
 
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp

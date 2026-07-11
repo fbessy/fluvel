@@ -5,6 +5,7 @@
 
 #include "ffmpeg_codec_utils.hpp"
 #include "ffmpeg_utils.hpp"
+#include "frame_pipeline.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter_utils.hpp"
 
@@ -172,8 +173,10 @@ bool FFmpegVideoExporter::isRecording() const
     return state_ == ExportState::Recording;
 }
 
-bool FFmpegVideoExporter::addFrame(const QImage& image)
+bool FFmpegVideoExporter::addFrame(const VideoFrame& frame)
 {
+    QImage image = frame.image;
+
     if (image.isNull() || image.size().isEmpty())
         return false;
 
