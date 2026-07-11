@@ -272,4 +272,19 @@ struct MediaPlayerErrorInfo
     StreamingState state{StreamingState::Stopped};
 };
 
+/**
+ * @brief Internal state of the video recorder.
+ */
+enum class RecorderState
+{
+    /// No recording session is active.
+    Stopped,
+
+    /// Frames are accepted and encoded asynchronously.
+    Recording,
+
+    /// Recording has stopped accepting new frames and the queue is being drained.
+    Draining
+};
+
 } // namespace fluvel

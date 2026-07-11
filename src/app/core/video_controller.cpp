@@ -106,11 +106,8 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     //
     // Recording worker
     //
-    connect(&recorder_, &VideoRecorderWorker::recordingStarted, this,
-            &VideoController::recordingStarted);
-
-    connect(&recorder_, &VideoRecorderWorker::recordingStopped, this,
-            &VideoController::recordingStopped);
+    connect(&recorder_, &VideoRecorderWorker::stateChanged, this,
+            &VideoController::recordingStateChanged);
 
     connect(&recorder_, &VideoRecorderWorker::warningOccurred, this,
             &VideoController::recordingWarning);
@@ -696,6 +693,11 @@ void VideoController::startRecording()
 void VideoController::stopRecording()
 {
     recorder_.stop();
+}
+
+bool VideoController::isRecording() const
+{
+    return recorder_.isRecording();
 }
 
 void VideoController::submitFrame(const VideoFrame& frame)

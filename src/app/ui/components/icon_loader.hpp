@@ -107,18 +107,46 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback, IconMode mode
 QIcon loadIcon(const QString& svgResourceName, IconMode mode = IconMode::Auto);
 
 /**
- * @brief Creates a circular color icon.
+ * @brief Creates a filled circular color icon.
  *
- * The icon is rendered at a higher resolution and then downscaled
- * to improve visual quality and antialiasing when displayed at
- * small sizes.
+ * The disk is centered within the icon and rendered at a higher
+ * resolution before being downscaled to improve visual quality
+ * and antialiasing at small sizes.
  *
  * @param color Fill color of the disk.
  * @param size Final icon size in pixels.
+ * @param diameter Disk diameter in pixels. A negative value uses
+ *        the full icon size.
  *
- * @return A circular color icon.
+ * @return A filled circular color icon.
  */
-QIcon createDisk(const QColor& color, int size = 13);
+QIcon createDisk(const QColor& color, int size = 13, int diameter = -1);
+
+/**
+ * @brief Creates an outlined circular icon.
+ *
+ * The circle is centered within the icon and rendered using the
+ * specified outline color.
+ *
+ * @param color Outline color of the circle.
+ * @param size Final icon size in pixels.
+ *
+ * @return An outlined circular icon.
+ */
+QIcon createCircle(const QColor& color, int size = 13);
+
+/**
+ * @brief Creates a recording indicator icon.
+ *
+ * The icon consists of a filled disk surrounded by an outline
+ * using the current application palette.
+ *
+ * @param color Fill color of the recording disk.
+ * @param size Final icon size in pixels.
+ *
+ * @return A recording indicator icon.
+ */
+QIcon createRecordDisk(const QColor& color, int size = 13);
 
 /**
  * @brief Creates a rounded square color icon.

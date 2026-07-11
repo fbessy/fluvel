@@ -221,6 +221,18 @@ private:
     bool fillFrameYuv420(const QImage& image);
 
     /**
+     * @brief Updates the presentation timestamp of the encoder frame.
+     *
+     * The timestamp is generated from the configured frame rate or derived
+     * from the timestamp provided by the input frame, depending on the
+     * configured timestamp mode.
+     *
+     * @param frame Input video frame.
+     * @return @c true on success, @c false otherwise.
+     */
+    bool updateFrameTimestamp(const VideoFrame& frame);
+
+    /**
      * @brief Encodes the current frame.
      *
      * @return @c true on success, @c false otherwise.

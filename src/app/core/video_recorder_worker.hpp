@@ -6,6 +6,7 @@
 #include "frame_pipeline.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
+#include "video_types.hpp"
 
 #include <QImage>
 #include <QMutex>
@@ -19,21 +20,6 @@
 
 namespace fluvel
 {
-
-/**
- * @brief Internal state of the video recorder.
- */
-enum class RecorderState
-{
-    /// No recording session is active.
-    Stopped,
-
-    /// Frames are accepted and encoded asynchronously.
-    Recording,
-
-    /// Recording has stopped accepting new frames and the queue is being drained.
-    Draining
-};
 
 /**
  * @brief Records video frames asynchronously.
@@ -97,17 +83,11 @@ public:
 
 signals:
     /**
-     * @brief Emitted when a recording session starts.
-     */
-    void recordingStarted();
-
-    /**
-     * @brief Emitted when a recording session has fully stopped.
+     * @brief Emitted when the recorder state changes.
      *
-     * At this point, queued frames have been encoded and the output video
-     * has been finalized.
+     * @param state New recorder state.
      */
-    void recordingStopped();
+    void stateChanged(RecorderState state);
 
     /**
      * @brief Emitted when a non-fatal recording warning occurs.

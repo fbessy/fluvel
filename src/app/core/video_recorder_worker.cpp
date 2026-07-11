@@ -40,7 +40,7 @@ void VideoRecorderWorker::start(const VideoExportSettings& settings)
 
     workerThread_ = std::thread(&VideoRecorderWorker::processQueue, this);
 
-    emit recordingStarted();
+    emit stateChanged(RecorderState::Recording);
 }
 
 void VideoRecorderWorker::stop()
@@ -48,13 +48,15 @@ void VideoRecorderWorker::stop()
     {
         QMutexLocker locker(&mutex_);
 
-        if (state_ == RecorderState::Stopped)
+        if (state_ != RecorderState::Recording)
             return;
 
         state_ = RecorderState::Draining;
     }
 
     condition_.wakeOne();
+
+    emit stateChanged(RecorderState::Draining);
 }
 
 bool VideoRecorderWorker::isRecording() const
@@ -112,6 +114,7 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
             break;
 
         case EnqueueStatus::MemoryLimitExceeded:
+            emit stateChanged(RecorderState::Draining);
             emit errorOccurred(tr("Video recording stopped because the encoder cannot keep up "
                                   "with the incoming frame rate."));
             break;
@@ -147,6 +150,7 @@ void VideoRecorderWorker::processQueue()
                 state_ = RecorderState::Draining;
             }
 
+            emit stateChanged(RecorderState::Draining);
             emit errorOccurred(tr("Failed to encode video frame."));
 
             break;
@@ -160,7 +164,7 @@ void VideoRecorderWorker::processQueue()
     if (!success)
         emit errorOccurred(tr("Failed to finalize video recording."));
 
-    emit recordingStopped();
+    emit stateChanged(RecorderState::Stopped);
 }
 
 std::size_t VideoRecorderWorker::frameSize(const QImage& image)

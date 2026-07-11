@@ -304,6 +304,13 @@ void VideoWindow::createUi()
 
     recordingButton_ = new QPushButton;
     recordingButton_->setCheckable(true);
+    recordingButton_->setEnabled(false);
+
+    constexpr int kIconSize = 22;
+
+    stoppedIcon_ = il::createCircle(palette().color(QPalette::WindowText), kIconSize);
+    recordingIcon_ = il::createRecordDisk(Qt::red, kIconSize);
+    drainingIcon_ = il::createDisk(Qt::red, kIconSize, 6);
 
     QIcon applyIcon = createActiveFormatIcon();
 
@@ -501,7 +508,6 @@ void VideoWindow::setupLayout()
 
     sourceTypeColumn->addWidget(sourceTypeWidget_);
     sourceTypeColumn->addWidget(toggleStreamingButton_);
-    sourceTypeColumn->addWidget(recordingButton_);
 
     //
     // Apply column
@@ -510,7 +516,7 @@ void VideoWindow::setupLayout()
     applyColumn->setContentsMargins(0, 0, 0, 0);
     applyColumn->setSpacing(kVerticalSpacing);
 
-    applyColumn->addStretch(); // vide au dessus
+    applyColumn->addStretch();
     applyColumn->addWidget(applyButton_);
 
     //
@@ -532,7 +538,7 @@ void VideoWindow::setupLayout()
 
     configColumn->addWidget(sourceConfigWidget_);
     configColumn->addStretch();
-    configColumn->addWidget(mediaControlsWidget_);
+    configColumn->addWidget(recordingButton_, 0, Qt::AlignLeft);
 
     //
     // Right column
@@ -542,12 +548,11 @@ void VideoWindow::setupLayout()
     rightColumn->setSpacing(kVerticalSpacing);
 
     rightColumn->addWidget(configRightBlockWidget_);
-    rightColumn->addStretch(); // vide dessous
+    rightColumn->addStretch();
 
     //
     // Main top bar layout
     //
-
     auto* topBarLayout = new QHBoxLayout(controlBar_);
     topBarLayout->setContentsMargins(8, 4, 8, 4);
     topBarLayout->setSpacing(kGroupSpacing);
@@ -557,14 +562,24 @@ void VideoWindow::setupLayout()
     topBarLayout->addLayout(rightColumn);
 
     //
-    // Video area
+    // Image area
+    //
+    auto* imageLayout = new QVBoxLayout;
+    imageLayout->setContentsMargins(0, 0, 0, 0);
+    imageLayout->setSpacing(0);
+
+    imageLayout->addWidget(imageViewer_, 1);
+    imageLayout->addWidget(mediaControlsWidget_);
+
+    //
+    // Content area
     //
     auto* contentLayout = new QHBoxLayout;
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
 
-    contentLayout->addWidget(imageViewer_, 1);
-    contentLayout->addWidget(displayBar_, 0);
+    contentLayout->addLayout(imageLayout, 1);
+    contentLayout->addWidget(displayBar_);
 
     //
     // Main layout
@@ -649,11 +664,8 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::streamingStopped, this,
             &VideoWindow::onStreamingStopped);
 
-    connect(videoController_, &VideoController::recordingStarted, this,
-            &VideoWindow::onRecordingStarted);
-
-    connect(videoController_, &VideoController::recordingStopped, this,
-            &VideoWindow::onRecordingStopped);
+    connect(videoController_, &VideoController::recordingStateChanged, this,
+            &VideoWindow::onRecordingStateChanged);
 
     connect(videoController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
     connect(videoController_, &VideoController::mediaPlayerError, this,
@@ -731,7 +743,10 @@ void VideoWindow::setupConnections()
     connect(volumeButton_, &QPushButton::clicked, this,
             [this]()
             {
-                volumeMenu_->popup(volumeButton_->mapToGlobal(QPoint(0, volumeButton_->height())));
+                const QPoint pos =
+                    volumeButton_->mapToGlobal(QPoint(0, -volumeMenu_->sizeHint().height()));
+
+                volumeMenu_->popup(pos);
             });
 
     connect(volumeButton_, &QWidget::customContextMenuRequested, this,
@@ -862,6 +877,8 @@ void VideoWindow::applyInitialSettings()
 
     refreshSourceUi();
     refreshUi();
+
+    onRecordingStateChanged(RecorderState::Stopped);
 
     onDownscaleChanged(downscaleParams);
 }
@@ -1517,6 +1534,7 @@ void VideoWindow::updateActionBar()
 {
     updateStreamingButton();
     updateApplyButton();
+    updateRecordingButton();
 }
 
 bool VideoWindow::canStartSource() const
@@ -2094,6 +2112,7 @@ void VideoWindow::enterFullscreen()
     imageViewer_->enterFullscreenMode();
 
     controlBar_->hide();
+    mediaControlsWidget_->hide();
     displayBar_->hide();
 
     showFullScreen();
@@ -2111,6 +2130,7 @@ void VideoWindow::leaveFullscreen()
     showNormal();
 
     controlBar_->show();
+    mediaControlsWidget_->show();
     displayBar_->show();
 
     isFullScreen_ = false;
@@ -2350,24 +2370,40 @@ void VideoWindow::onPlaybackStateChanged(QMediaPlayer::PlaybackState state)
 
 void VideoWindow::onToggleRecording()
 {
-    if (recordingButton_->isChecked())
-        videoController_->startRecording();
-    else
+    if (videoController_->isRecording())
         videoController_->stopRecording();
+    else
+        videoController_->startRecording();
 }
 
-void VideoWindow::onRecordingStarted()
+void VideoWindow::updateRecordingButton()
 {
-    recordingButton_->setChecked(true);
+    const bool streaming = videoController_->isStreaming();
 
-    // icône rouge
+    recordingButton_->setEnabled(streaming);
 }
 
-void VideoWindow::onRecordingStopped()
+void VideoWindow::onRecordingStateChanged(RecorderState state)
 {
-    recordingButton_->setChecked(false);
+    switch (state)
+    {
+        case RecorderState::Stopped:
+            recordingButton_->setChecked(false);
+            recordingButton_->setIcon(stoppedIcon_);
+            break;
 
-    // icône normale
+        case RecorderState::Recording:
+            recordingButton_->setChecked(true);
+            recordingButton_->setIcon(recordingIcon_);
+            break;
+
+        case RecorderState::Draining:
+            recordingButton_->setChecked(true);
+            recordingButton_->setIcon(drainingIcon_);
+            break;
+    }
+
+    updateRecordingButton();
 }
 
 void VideoWindow::onRecordingWarning(const QString& message)

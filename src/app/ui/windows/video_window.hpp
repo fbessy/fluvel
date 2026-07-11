@@ -219,6 +219,7 @@ private:
     void updateActionBar();
     void updateStreamingButton();
     void updateApplyButton();
+    void updateRecordingButton();
     void refreshUi();
 
     void openFile();
@@ -245,8 +246,7 @@ private:
     void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
 
-    void onRecordingStarted();
-    void onRecordingStopped();
+    void onRecordingStateChanged(RecorderState state);
 
     //
     // Error handling
@@ -407,6 +407,9 @@ private:
     AnimatedPushButton* toggleStreamingButton_{nullptr};
 
     QPushButton* recordingButton_{nullptr};
+    QIcon stoppedIcon_;
+    QIcon recordingIcon_;
+    QIcon drainingIcon_;
 
     QPushButton* applyButton_{nullptr};
 

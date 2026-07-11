@@ -93,27 +93,48 @@ AVPixelFormat selectPixelFormat(const AVCodec* encoder, const AVPixelFormat* pre
 namespace fluvel
 {
 
+/**
+ * @brief Internal FFmpeg exporter context.
+ *
+ * Stores the FFmpeg objects and runtime state required during a video
+ * export session.
+ */
 struct FFmpegVideoExporter::Context
 {
     //
     // FFmpeg objects
     //
+
+    /// Output format context.
     AVFormatContext* formatContext{nullptr};
 
+    /// Selected video encoder.
     const AVCodec* codec{nullptr};
+
+    /// Video encoder context.
     AVCodecContext* codecContext{nullptr};
 
+    /// Output video stream.
     AVStream* stream{nullptr};
 
+    /// Video frame submitted to the encoder.
     AVFrame* frame{nullptr};
+
+    /// Packet containing encoded data.
     AVPacket* packet{nullptr};
 
+    /// Pixel format conversion context.
     SwsContext* swsContext{nullptr};
 
     //
     // Encoding state
     //
-    int64_t nextPts{0};
+
+    /// Index of the next frame in constant frame rate mode.
+    int64_t frameIndex{0};
+
+    /// Timestamp of the first frame in explicit timestamp mode (ns).
+    int64_t firstTimestampNs{-1};
 };
 
 FFmpegVideoExporter::FFmpegVideoExporter()
@@ -205,7 +226,7 @@ bool FFmpegVideoExporter::addFrame(const VideoFrame& frame)
         return false;
     }
 
-    if (!fillFrame(image) || !encodeFrame())
+    if (!fillFrame(image) || !updateFrameTimestamp(frame) || !encodeFrame())
     {
         release();
         state_ = ExportState::Closed;
@@ -242,8 +263,6 @@ bool FFmpegVideoExporter::initializeFromFirstFrame(const QImage& firstFrame)
         state_ = ExportState::Closed;
         return false;
     }
-
-    context_->nextPts = 0;
 
     state_ = ExportState::Recording;
 
@@ -613,15 +632,36 @@ bool FFmpegVideoExporter::fillFrameYuv420(const QImage& image)
     return true;
 }
 
+bool FFmpegVideoExporter::updateFrameTimestamp(const VideoFrame& frame)
+{
+    switch (settings_.timestampMode)
+    {
+        case TimestampMode::ConstantFrameRate:
+            context_->frame->pts = context_->frameIndex++;
+            return true;
+
+        case TimestampMode::ExplicitTimestamps:
+        {
+            if (context_->firstTimestampNs < 0)
+                context_->firstTimestampNs = frame.presentationTimestampNs;
+
+            const int64_t timestampNs = frame.presentationTimestampNs - context_->firstTimestampNs;
+
+            context_->frame->pts = av_rescale_q(timestampNs, AVRational{1, 1'000'000'000},
+                                                context_->codecContext->time_base);
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool FFmpegVideoExporter::encodeFrame()
 {
     assert(state_ == ExportState::Recording);
 
-    auto* frame = context_->frame;
-
-    frame->pts = context_->nextPts++;
-
-    const int ret = avcodec_send_frame(context_->codecContext, frame);
+    const int ret = avcodec_send_frame(context_->codecContext, context_->frame);
 
     if (ret < 0)
     {
@@ -748,7 +788,9 @@ void FFmpegVideoExporter::release()
     //
     context_->codec = nullptr;
     context_->stream = nullptr;
-    context_->nextPts = 0;
+
+    context_->frameIndex = 0;
+    context_->firstTimestampNs = -1;
 
     frameSize_ = {-1, -1};
     frameFormat_ = QImage::Format_Invalid;

@@ -198,8 +198,33 @@ public:
     [[nodiscard]]
     bool isMediaActive() const;
 
+    /**
+     * @brief Starts a new video recording session.
+     *
+     * Initializes the video exporter and starts asynchronous frame encoding.
+     *
+     * @param settings Video export settings.
+     */
     void startRecording();
+
+    /**
+     * @brief Stops the current video recording session.
+     *
+     * Stops accepting new frames and asynchronously drains queued frames
+     * before finalizing the output video.
+     */
     void stopRecording();
+
+    /**
+     * @brief Checks whether a recording session is active.
+     *
+     * A recording session remains active while queued frames are being
+     * drained.
+     *
+     * @return @c true if recording or draining, @c false otherwise.
+     */
+    [[nodiscard]]
+    bool isRecording() const;
 
 signals:
     /// Emitted when available video inputs change.
@@ -304,17 +329,11 @@ signals:
     void mutedChanged(bool muted);
 
     /**
-     * @brief Emitted when video recording starts.
-     */
-    void recordingStarted();
-
-    /**
-     * @brief Emitted when video recording has fully stopped.
+     * @brief Emitted when the recorder state changes.
      *
-     * At this point, queued frames have been encoded and the output video
-     * has been finalized.
+     * @param state New recorder state.
      */
-    void recordingStopped();
+    void recordingStateChanged(RecorderState state);
 
     /**
      * @brief Emitted when a non-fatal video recording warning occurs.
