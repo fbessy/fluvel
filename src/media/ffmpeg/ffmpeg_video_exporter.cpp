@@ -159,7 +159,10 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
 
     applyExportProfile(settings_);
 
-    if (!hasExpectedExtension(settings_.filename, settings_.container))
+    if (settings_.profile != ExportProfile::Custom)
+        exporter_utils::ensureExpectedExtension(settings_.filename, settings_.container);
+
+    if (!exporter_utils::hasExpectedExtension(settings_.filename, settings_.container))
     {
         qWarning() << "Filename extension" << QFileInfo(settings_.filename).suffix()
                    << "does not match the selected" << exporter_utils::toString(settings_.container)
@@ -320,31 +323,6 @@ void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) cons
             // No override.
             break;
     }
-}
-
-bool FFmpegVideoExporter::hasExpectedExtension(const QString& filename, VideoContainer container)
-{
-    const QString extension = QFileInfo(filename).suffix().toLower();
-
-    switch (container)
-    {
-        case VideoContainer::Matroska:
-            return extension == "mkv";
-
-        case VideoContainer::Mp4:
-            return extension == "mp4";
-
-        case VideoContainer::WebM:
-            return extension == "webm";
-
-        case VideoContainer::Mov:
-            return extension == "mov";
-
-        case VideoContainer::Avi:
-            return extension == "avi";
-    }
-
-    return true;
 }
 
 bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& settings)

@@ -236,6 +236,7 @@ if(FLUVEL_HAS_FFMPEG)
         ${MEDIA_DIR}/video_exporter.cpp
         ${MEDIA_DIR}/video_exporter.hpp
 
+        ${MEDIA_DIR}/video_exporter_utils.cpp
         ${MEDIA_DIR}/video_exporter_utils.hpp
 
         ${MEDIA_DIR}/ffmpeg/ffmpeg_video_exporter.cpp

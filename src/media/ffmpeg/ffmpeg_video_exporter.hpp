@@ -115,16 +115,6 @@ private:
     void applyExportProfile(VideoExportSettings& settings) const;
 
     /**
-     * @brief Checks whether a filename extension matches a video container.
-     *
-     * @param filename Output filename.
-     * @param container Video container.
-     * @return @c true if the filename extension matches the container,
-     *         @c false otherwise.
-     */
-    static bool hasExpectedExtension(const QString& filename, VideoContainer container);
-
-    /**
      * @brief Initializes the output container.
      *
      * @param settings Export settings.

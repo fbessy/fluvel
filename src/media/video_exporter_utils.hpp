@@ -17,27 +17,7 @@ namespace fluvel::exporter_utils
  * @return Human-readable codec name.
  */
 [[nodiscard]]
-inline QString toString(VideoCodec codec)
-{
-    switch (codec)
-    {
-        case VideoCodec::FFV1:
-            return "FFV1";
-        case VideoCodec::MPEG4Part2:
-            return "MPEG-4 Part 2";
-        case VideoCodec::H264:
-            return "H.264";
-        case VideoCodec::H265:
-            return "H.265";
-        case VideoCodec::VP9:
-            return "VP9";
-        case VideoCodec::AV1:
-            return "AV1";
-    }
-
-    std::unreachable();
-    return {};
-}
+QString toString(VideoCodec codec);
 
 /**
  * @brief Returns the display name of a video container.
@@ -46,23 +26,41 @@ inline QString toString(VideoCodec codec)
  * @return Human-readable container name.
  */
 [[nodiscard]]
-inline QString toString(VideoContainer container)
-{
-    switch (container)
-    {
-        case VideoContainer::Matroska:
-            return "Matroska";
-        case VideoContainer::Mp4:
-            return "MP4";
-        case VideoContainer::WebM:
-            return "WebM";
-        case VideoContainer::Mov:
-            return "QuickTime";
-        case VideoContainer::Avi:
-            return "AVI";
-    }
+QString toString(VideoContainer container);
 
-    std::unreachable();
-}
+/**
+ * @brief Ensures that a filename extension matches a video container.
+ *
+ * If the current extension does not match the selected container,
+ * it is replaced with the expected extension.
+ *
+ * @param filename Output filename to update.
+ * @param container Video container.
+ */
+void ensureExpectedExtension(QString& filename, VideoContainer container);
+
+/**
+ * @brief Returns the expected filename extension for a video container.
+ *
+ * @param container Video container.
+ *
+ * @return Expected filename extension without the leading dot.
+ */
+[[nodiscard]]
+QString expectedExtension(VideoContainer container);
+
+/**
+ * @brief Checks whether a filename extension matches a video container.
+ *
+ * The comparison is case-insensitive.
+ *
+ * @param filename Output filename.
+ * @param container Video container.
+ *
+ * @return @c true if the filename extension matches the container,
+ *         @c false otherwise.
+ */
+[[nodiscard]]
+bool hasExpectedExtension(const QString& filename, VideoContainer container);
 
 } // namespace fluvel::exporter_utils
