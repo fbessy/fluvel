@@ -7,6 +7,7 @@
 #include "styled_tool_button.hpp"
 #include "volume_slider.hpp"
 
+#include <QMouseEvent>
 #include <QToolButton>
 
 #include <algorithm>
@@ -18,6 +19,7 @@ VolumeController::VolumeController(QWidget* parent, ui::Appearance appearance)
     : QObject(parent)
 {
     button_ = new StyledToolButton(parent, appearance);
+    button_->installEventFilter(this);
 
     slider_ = new VolumeSlider(parent, appearance);
 
@@ -111,6 +113,22 @@ void VolumeController::updateIcon() const
     }
 
     button_->setIcon(icon);
+}
+
+bool VolumeController::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == button_ && event->type() == QEvent::MouseButtonRelease)
+    {
+        const auto* mouseEvent = static_cast<QMouseEvent*>(event);
+
+        if (mouseEvent->button() == Qt::RightButton)
+        {
+            emit toggleMuteRequested();
+            return true;
+        }
+    }
+
+    return QObject::eventFilter(watched, event);
 }
 
 } // namespace fluvel

@@ -8,6 +8,7 @@
 #include <QObject>
 
 class QWidget;
+class QEvent;
 
 namespace fluvel
 {
@@ -107,6 +108,9 @@ signals:
      * @brief Emitted when the user requests to toggle the muted state.
      */
     void toggleMuteRequested();
+
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
     void updateIcon() const;
