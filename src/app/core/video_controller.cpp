@@ -98,8 +98,8 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     //
     // Processing thread
     //
-    connect(&activeContourThread_, &VideoActiveContourThread::displayFrameReady, this,
-            &VideoController::onDisplayFrameReady, Qt::QueuedConnection);
+    connect(&activeContourThread_, &VideoActiveContourThread::processedFrameReady, this,
+            &VideoController::onProcessedFrameReady, Qt::QueuedConnection);
 
     connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
             &VideoController::onFrameProcessed);
@@ -362,28 +362,28 @@ void VideoController::onFrameDisplayed(const FrameTimestamps& ts)
     frameStats_.frameDisplayed(ts);
 }
 
-void VideoController::onDisplayFrameReady(const DisplayFrame& displayFrame)
+void VideoController::onProcessedFrameReady(const ProcessedFrame& frame)
 {
-    UiFrame uiDisplayFrame;
+    DisplayFrame displayFrame;
 
-    uiDisplayFrame.image = displayFrame.image;
+    displayFrame.image = frame.image;
 
-    if (uiDisplayFrame.image.isNull())
+    if (displayFrame.image.isNull())
         return;
 
-    uiDisplayFrame.outerContour = convertToQVector(displayFrame.outerContour);
-    uiDisplayFrame.innerContour = convertToQVector(displayFrame.innerContour);
+    displayFrame.outerContour = convertToQVector(frame.outerContour);
+    displayFrame.innerContour = convertToQVector(frame.innerContour);
 
-    uiDisplayFrame.receiveTimestampNs = displayFrame.receiveTimestampNs;
-    uiDisplayFrame.processTimestampNs = displayFrame.processTimestampNs;
+    displayFrame.receiveTimestampNs = frame.receiveTimestampNs;
+    displayFrame.processTimestampNs = frame.processTimestampNs;
 
-    VideoFrame frame;
-    frame.image = displayFrame.image;
-    frame.presentationTimestampNs = uiDisplayFrame.receiveTimestampNs;
+    VideoFrame videoFrame;
+    videoFrame.image = frame.image;
+    videoFrame.presentationTimestampNs = frame.receiveTimestampNs;
 
-    submitRecordingFrame(frame);
+    submitRecordingFrame(videoFrame);
 
-    emit imageAndContourUpdated(uiDisplayFrame);
+    emit displayFrameReady(displayFrame);
 }
 
 void VideoController::onStartupTimeout()

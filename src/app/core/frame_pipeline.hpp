@@ -48,17 +48,24 @@ struct ReceivedFrame
 };
 
 /**
- * @brief Frame after processing, before UI conversion.
+ * @brief Frame representation produced by the processing stage.
  *
- * Contains the processed image together with extracted contours
- * represented using core Fluvel types.
+ * Contains the image representation associated with the processing
+ * stage together with the extracted contours represented using core
+ * Fluvel types.
  *
- * This structure is typically produced by the processing thread.
+ * The image is not necessarily a processed image. Depending on the
+ * selected representation mode, it may contain the source image or
+ * an explicitly processed representation. The contours, however,
+ * always originate from the processing stage.
+ *
+ * This structure is typically produced by the processing thread before
+ * conversion to a display-specific representation.
  */
-struct DisplayFrame
+struct ProcessedFrame
 {
     /**
-     * @brief Processed image.
+     * @brief Image representation associated with the processed frame.
      */
     QImage image;
 
@@ -91,7 +98,7 @@ struct DisplayFrame
  *
  * This structure is intended for direct consumption by the UI layer.
  */
-struct UiFrame
+struct DisplayFrame
 {
     /**
      * @brief Display image.

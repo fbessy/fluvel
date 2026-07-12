@@ -41,7 +41,7 @@ namespace fluvel
  *
  * Internally, the thread maintains the following pipeline:
  *
- * ReceivedFrame → preprocessing → active contour → DisplayFrame
+ * ReceivedFrame → preprocessing → active contour → ProcessedFrame
  *
  * Thread-safety is ensured through mutexes, condition variables
  * and atomic synchronization primitives.
@@ -85,8 +85,8 @@ signals:
     /// Emitted after processing a frame (contour size for diagnostics).
     void frameProcessed(quint64 contourSize);
 
-    /// Emitted when a display-ready frame is available.
-    void displayFrameReady(fluvel::DisplayFrame displayFrame);
+    /// Emitted when a processed frame is available.
+    void processedFrameReady(fluvel::ProcessedFrame frame);
 
 protected:
     /**
@@ -110,17 +110,17 @@ private:
     /**
      * @brief Process a single frame through the pipeline.
      */
-    DisplayFrame processFrame(const QVideoFrame& inputFrame);
+    ProcessedFrame processFrame(const QVideoFrame& inputFrame);
 
     /**
      * @brief Export processed image to display frame.
      */
-    void exportFilteredImage(const fluvel_ip::ImageView& algoImage, DisplayFrame& displayFrame);
+    void exportFilteredImage(const fluvel_ip::ImageView& algoImage, ProcessedFrame& displayFrame);
 
     /**
      * @brief Export contours to display frame.
      */
-    void exportContours(DisplayFrame& displayFrame);
+    void exportContours(ProcessedFrame& displayFrame);
 
     /// Maximum processing time slice per iteration.
     static constexpr std::chrono::milliseconds kTimeSliceMs{20};

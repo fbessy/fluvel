@@ -56,7 +56,7 @@ class MiniMapWidget;
  * - External callbacks are forwarded through ImageViewerListener
  *
  * The widget supports both direct image updates and frame-based updates
- * (UiFrame), with optional throttling for performance control.
+ * (DisplayFrame), with optional throttling for performance control.
  *
  * @note Interaction and listener are not owned by this class.
  *       Their lifetime must exceed the widget.
@@ -129,9 +129,13 @@ public:
     void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
 
     /**
-     * @brief Sets both image and contour from a frame.
+     * @brief Sets the current display frame.
+     *
+     * Submits display-ready image and contour data to the rendering pipeline.
+     *
+     * @param frame Display frame to render.
      */
-    void setImageAndContour(const UiFrame& uiFrame);
+    void setDisplayFrame(const DisplayFrame& frame);
 
     /**
      * @brief Clears contour overlays.
@@ -366,13 +370,13 @@ private:
     void setupTimers();
 
     // internal image display
-    void submitFrame(const UiFrame& frame);
+    void submitFrame(const DisplayFrame& frame);
     bool shouldDisplayImmediately() const;
     void schedulePendingFrame();
     void displayPendingFrame();
 
     void flushPendingFrame();
-    void displayFrameNow(const UiFrame& f);
+    void displayFrameNow(const DisplayFrame& f);
     void updatePixmap(const QImage& img);
     void updatePixmapItem(const QImage& img);
     void updateSceneRect(const QImage& img);
@@ -464,7 +468,7 @@ private:
     ImageViewerListener* listener_{nullptr};
 
     // --- Throttling ---
-    UiFrame pendingFrame_;
+    DisplayFrame pendingFrame_;
     bool hasPendingFrame_{false};
 
     QElapsedTimer displayTimer_;

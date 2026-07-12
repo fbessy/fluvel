@@ -60,12 +60,12 @@ void VideoActiveContourThread::run()
             hasNewFrame_ = false;
         }
 
-        DisplayFrame df = processFrame(cf.frame);
+        ProcessedFrame df = processFrame(cf.frame);
 
         df.receiveTimestampNs = cf.receiveTimestampNs;
 
         emit frameProcessed(df.outerContour.size() + df.innerContour.size());
-        emit displayFrameReady(df);
+        emit processedFrameReady(df);
     }
 }
 
@@ -104,7 +104,7 @@ QImage VideoActiveContourThread::applyDownscale(const QImage& input,
                         Qt::SmoothTransformation);
 }
 
-DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
+ProcessedFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 {
     VideoComputeConfig config;
     ImageDisplayMode displayMode;
@@ -115,7 +115,7 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
         displayMode = displayMode_;
     }
 
-    DisplayFrame df;
+    ProcessedFrame df;
     QImage inputImage = convertFrame(frame);
 
     if (inputImage.isNull())
@@ -202,12 +202,12 @@ DisplayFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
 }
 
 void VideoActiveContourThread::exportFilteredImage(const fluvel_ip::ImageView& algoImage,
-                                                   DisplayFrame& displayFrame)
+                                                   ProcessedFrame& displayFrame)
 {
     displayFrame.image = toQImageCopy(algoImage);
 }
 
-void VideoActiveContourThread::exportContours(DisplayFrame& displayFrame)
+void VideoActiveContourThread::exportContours(ProcessedFrame& displayFrame)
 {
     if (activeContour_)
     {

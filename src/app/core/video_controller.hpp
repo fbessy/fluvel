@@ -270,7 +270,7 @@ signals:
     void textStatsUpdated(const QString& textStats);
 
     /// Emitted with processed frame and contour overlay.
-    void imageAndContourUpdated(const fluvel::UiFrame& uiFrame);
+    void displayFrameReady(const fluvel::DisplayFrame& frame);
 
     /// Emitted when downscale parameters change.
     void downscaleChanged(const fluvel::DownscaleParams& downscaleParams);
@@ -404,8 +404,8 @@ private:
     /// Called when frame processing has completed.
     void onFrameProcessed(quint64 contourSize);
 
-    /// Called when a display-ready frame is available.
-    void onDisplayFrameReady(const DisplayFrame& displayFrame);
+    /// Called when a processed frame is available.
+    void onProcessedFrameReady(const ProcessedFrame& frame);
 
     /// Triggered when startup timeout is reached.
     void onStartupTimeout();

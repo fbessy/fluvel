@@ -1280,8 +1280,8 @@ void VideoWindow::ensureCameraPermission()
 void VideoWindow::connectFrameToView()
 {
     disconnect(frameToViewConnection_);
-    frameToViewConnection_ = connect(videoController_, &VideoController::imageAndContourUpdated,
-                                     imageViewer_, &ImageViewerWidget::setImageAndContour);
+    frameToViewConnection_ = connect(videoController_, &VideoController::displayFrameReady,
+                                     imageViewer_, &ImageViewerWidget::setDisplayFrame);
 }
 
 QCameraFormat VideoWindow::getSelectedFormat() const

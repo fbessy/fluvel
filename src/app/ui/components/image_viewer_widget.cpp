@@ -207,7 +207,7 @@ void ImageViewerWidget::setMaxDisplayFps(double fps)
     minDisplayIntervalMs_ = static_cast<int>(1000.0 / fps);
 }
 
-void ImageViewerWidget::displayFrameNow(const UiFrame& f)
+void ImageViewerWidget::displayFrameNow(const DisplayFrame& f)
 {
     updatePixmap(f.image);
 
@@ -226,7 +226,7 @@ void ImageViewerWidget::displayFrameNow(const UiFrame& f)
                        });
 }
 
-void ImageViewerWidget::submitFrame(const UiFrame& frame)
+void ImageViewerWidget::submitFrame(const DisplayFrame& frame)
 {
     pendingFrame_ = frame;
     hasPendingFrame_ = true;
@@ -271,7 +271,7 @@ void ImageViewerWidget::displayPendingFrame()
 
 void ImageViewerWidget::setImage(const QImage& img)
 {
-    UiFrame f;
+    DisplayFrame f;
     f.image = img;
 
     int64_t now = FrameClock::nowNs();
@@ -290,7 +290,7 @@ void ImageViewerWidget::setContour(const QVector<QPointF>& outerContour,
     innerContour_->setPoints(innerContour);
 }
 
-void ImageViewerWidget::setImageAndContour(const UiFrame& frame)
+void ImageViewerWidget::setDisplayFrame(const DisplayFrame& frame)
 {
     submitFrame(frame);
 }
