@@ -30,7 +30,7 @@ namespace fluvel
 
 VideoController::VideoController(const VideoSessionSettings& session, QObject* parent)
     : QObject(parent)
-    , activeContourThread_(this)
+    , processingThread_(this)
 {
     auto mediaDevices = new QMediaDevices(this);
 
@@ -98,10 +98,10 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     //
     // Processing thread
     //
-    connect(&activeContourThread_, &VideoActiveContourThread::processedFrameReady, this,
+    connect(&processingThread_, &VideoProcessingThread::processedFrameReady, this,
             &VideoController::onProcessedFrameReady, Qt::QueuedConnection);
 
-    connect(&activeContourThread_, &VideoActiveContourThread::frameProcessed, this,
+    connect(&processingThread_, &VideoProcessingThread::frameProcessed, this,
             &VideoController::onFrameProcessed);
 
     //
@@ -125,14 +125,14 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     connect(&recorder_, &VideoRecorderWorker::errorOccurred, this,
             &VideoController::recordingError);
 
-    activeContourThread_.start();
+    processingThread_.start();
 }
 
 VideoController::~VideoController()
 {
     stop();
-    activeContourThread_.stop();
-    activeContourThread_.wait();
+    processingThread_.stop();
+    processingThread_.wait();
 }
 
 void VideoController::start(const SourceConfig& sourceConfig)
@@ -349,7 +349,7 @@ void VideoController::onFrameReceived(const QVideoFrame& frame)
     cf.frame = frame;
     cf.receiveTimestampNs = now;
 
-    activeContourThread_.submitFrame(cf);
+    processingThread_.submitFrame(cf);
 }
 
 void VideoController::onFrameProcessed(quint64 contourSize)
@@ -530,14 +530,14 @@ void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QStrin
 
 void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
-    activeContourThread_.setAlgoConfig(session.compute);
+    processingThread_.setAlgoConfig(session.compute);
 
     emit downscaleChanged(session.compute.downscale);
 }
 
 void VideoController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
 {
-    activeContourThread_.setDisplayMode(display.displayMode);
+    processingThread_.setDisplayMode(display.displayMode);
 }
 
 bool VideoController::isStreaming() const

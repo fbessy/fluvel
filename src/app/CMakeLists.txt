@@ -174,11 +174,11 @@ set(app_src
     ${CORE_DIR}/video_types.cpp
     ${CORE_DIR}/video_types.hpp
 
-    ${CORE_DIR}/active_contour_worker.cpp
-    ${CORE_DIR}/active_contour_worker.hpp
+    ${CORE_DIR}/image_processing_worker.cpp
+    ${CORE_DIR}/image_processing_worker.hpp
 
-    ${CORE_DIR}/video_active_contour_thread.cpp
-    ${CORE_DIR}/video_active_contour_thread.hpp
+    ${CORE_DIR}/video_processing_thread.cpp
+    ${CORE_DIR}/video_processing_thread.hpp
 
     ${CORE_DIR}/frame_pipeline.hpp
 

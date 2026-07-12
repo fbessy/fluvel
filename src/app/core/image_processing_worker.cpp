@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "active_contour_worker.hpp"
+#include "image_processing_worker.hpp"
 
 #include "region_gray_speed_model.hpp"
 #include "region_color_speed_model.hpp"
@@ -25,14 +25,14 @@
 namespace fluvel
 {
 
-ActiveContourWorker::ActiveContourWorker()
+ImageProcessingWorker::ImageProcessingWorker()
     : QObject(nullptr)
 {
     workerTimer_.setInterval(kWorkerPeriodMs);
-    connect(&workerTimer_, &QTimer::timeout, this, &ActiveContourWorker::onTimeout);
+    connect(&workerTimer_, &QTimer::timeout, this, &ImageProcessingWorker::onTimeout);
 }
 
-void ActiveContourWorker::restart()
+void ImageProcessingWorker::restart()
 {
     if (state_ == WorkerState::Initializing)
         return;
@@ -59,7 +59,7 @@ void ActiveContourWorker::restart()
     start();
 }
 
-void ActiveContourWorker::start()
+void ImageProcessingWorker::start()
 {
     if (state_ == WorkerState::Uninitialized || state_ == WorkerState::Initializing)
         return;
@@ -68,7 +68,7 @@ void ActiveContourWorker::start()
     workerTimer_.start();
 }
 
-void ActiveContourWorker::togglePause()
+void ImageProcessingWorker::togglePause()
 {
     if (state_ == WorkerState::Uninitialized || state_ == WorkerState::Initializing)
         return;
@@ -99,7 +99,7 @@ void ActiveContourWorker::togglePause()
     }
 }
 
-void ActiveContourWorker::step()
+void ImageProcessingWorker::step()
 {
     if (state_ == WorkerState::Uninitialized || state_ == WorkerState::Initializing)
         return;
@@ -131,7 +131,7 @@ void ActiveContourWorker::step()
     }
 }
 
-void ActiveContourWorker::performStep()
+void ImageProcessingWorker::performStep()
 {
     if (!stepOnceAlgo())
     {
@@ -144,7 +144,7 @@ void ActiveContourWorker::performStep()
     }
 }
 
-void ActiveContourWorker::converge()
+void ImageProcessingWorker::converge()
 {
     if (state_ == WorkerState::Uninitialized || state_ == WorkerState::Initializing)
         return;
@@ -163,7 +163,7 @@ void ActiveContourWorker::converge()
         start();
 }
 
-bool ActiveContourWorker::stepOnceAlgo()
+bool ImageProcessingWorker::stepOnceAlgo()
 {
     assert(activeContour_ != nullptr);
 
@@ -185,7 +185,7 @@ bool ActiveContourWorker::stepOnceAlgo()
     return !activeContour_->isStopped();
 }
 
-void ActiveContourWorker::applyProcessing()
+void ImageProcessingWorker::applyProcessing()
 {
     workerTimer_.stop();
     setState(WorkerState::Initializing);
@@ -219,7 +219,7 @@ void ActiveContourWorker::applyProcessing()
     processingDirty_ = false;
 }
 
-void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConfig& config)
+void ImageProcessingWorker::initialize(const QImage& image, const ImageComputeConfig& config)
 {
     workerTimer_.stop();
     setState(WorkerState::Initializing);
@@ -241,7 +241,7 @@ void ActiveContourWorker::initialize(const QImage& image, const ImageComputeConf
     initialShown_ = true;
 }
 
-void ActiveContourWorker::initializeActiveContour()
+void ImageProcessingWorker::initializeActiveContour()
 {
     if (processedImage_.isNull())
         return;
@@ -291,13 +291,13 @@ void ActiveContourWorker::initializeActiveContour()
     initialShown_ = false;
 }
 
-void ActiveContourWorker::finish()
+void ImageProcessingWorker::finish()
 {
     workerTimer_.stop();
     setState(WorkerState::Finished);
 }
 
-void ActiveContourWorker::finalizeAndPrepareNextRun()
+void ImageProcessingWorker::finalizeAndPrepareNextRun()
 {
     finish();
 
@@ -307,7 +307,7 @@ void ActiveContourWorker::finalizeAndPrepareNextRun()
     initializeActiveContour();
 }
 
-void ActiveContourWorker::suspend()
+void ImageProcessingWorker::suspend()
 {
     if (state_ == WorkerState::Running)
     {
@@ -319,13 +319,13 @@ void ActiveContourWorker::suspend()
     }
 }
 
-void ActiveContourWorker::resume()
+void ImageProcessingWorker::resume()
 {
     if (state_ == WorkerState::Suspended || state_ == WorkerState::Ready)
         start();
 }
 
-void ActiveContourWorker::onTimeout()
+void ImageProcessingWorker::onTimeout()
 {
     assert(activeContour_ != nullptr);
     assert(state_ == WorkerState::Running);
@@ -349,7 +349,7 @@ void ActiveContourWorker::onTimeout()
     }
 }
 
-void ActiveContourWorker::updateDiagnostics()
+void ImageProcessingWorker::updateDiagnostics()
 {
     if (!activeContour_)
         return;
@@ -366,7 +366,7 @@ void ActiveContourWorker::updateDiagnostics()
     emit diagnosticsUpdated(diag);
 }
 
-void ActiveContourWorker::emitContour()
+void ImageProcessingWorker::emitContour()
 {
     if (!activeContour_)
         return;
@@ -375,7 +375,7 @@ void ActiveContourWorker::emitContour()
                         activeContour_->exportInnerBoundary());
 }
 
-void ActiveContourWorker::setMode(RunMode mode)
+void ImageProcessingWorker::setMode(RunMode mode)
 {
     mode_ = mode;
 
@@ -385,13 +385,13 @@ void ActiveContourWorker::setMode(RunMode mode)
         timeSliceMs_ = kTimeSliceConvergeMs;
 }
 
-void ActiveContourWorker::setState(WorkerState state)
+void ImageProcessingWorker::setState(WorkerState state)
 {
     state_ = state;
     emit stateChanged(state);
 }
 
-void ActiveContourWorker::resetMeasurement()
+void ImageProcessingWorker::resetMeasurement()
 {
     isMeasuring_ = false;
 }

@@ -36,7 +36,7 @@ enum class RunMode
 };
 
 /**
- * @brief Internal state of the ActiveContourWorker.
+ * @brief Internal state of the ImageProcessingWorker.
  */
 enum class WorkerState
 {
@@ -49,25 +49,25 @@ enum class WorkerState
 };
 
 /**
- * @brief Qt worker managing the lifecycle and execution of an active contour.
+ * @brief Qt worker managing image processing and segmentation execution.
  *
- * This class acts as a bridge between the UI layer and the core active contour
- * algorithm. It handles initialization, execution control (start, pause, step),
- * and result propagation through Qt signals.
+ * This class acts as a bridge between the UI layer and the image processing
+ * pipeline. It handles processing initialization, execution control
+ * (start, pause, step), and result propagation through Qt signals.
  *
  * Execution is driven by a QTimer in interactive mode, allowing periodic updates
- * suitable for UI rendering. In converge mode, the algorithm runs continuously
+ * suitable for UI rendering. In converge mode, processing runs continuously
  * until completion without intermediate updates.
  *
  * Responsibilities:
- * - Manage active contour lifecycle
+ * - Manage image processing and segmentation lifecycle
  * - Control execution flow (interactive vs converge)
  * - Emit processed images and contour updates
  * - Provide diagnostics and performance measurements
  *
  * @note This class is intended to be used from the Qt event loop.
  */
-class ActiveContourWorker : public QObject
+class ImageProcessingWorker : public QObject
 {
     Q_OBJECT
 
@@ -75,7 +75,7 @@ public:
     /**
      * @brief Construct the worker.
      */
-    ActiveContourWorker();
+    ImageProcessingWorker();
 
     /**
      * @brief Initialize the worker with an input image and configuration.

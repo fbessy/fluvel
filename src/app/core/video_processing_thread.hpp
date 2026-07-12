@@ -25,37 +25,37 @@ namespace fluvel
 {
 
 /**
- * @brief Worker thread for video-based active contour processing.
+ * @brief Thread for asynchronous video processing and segmentation.
  *
- * VideoActiveContourThread executes the active contour pipeline
+ * VideoProcessingThread executes the video processing pipeline
  * asynchronously on incoming video frames.
  *
  * The processing pipeline includes:
  * - frame reception from the active video source
  * - optional preprocessing (downscaling and filtering)
  * - active contour computation
- * - conversion to display-ready data
+ * - production of processing-stage results
  *
- * Processed frames are emitted to the UI layer while frame reception
- * continues independently.
+ * Processed frames are emitted while frame reception continues
+ * independently.
  *
  * Internally, the thread maintains the following pipeline:
  *
  * ReceivedFrame → preprocessing → active contour → ProcessedFrame
  *
- * Thread-safety is ensured through mutexes, condition variables
+ * Thread-safety is ensured through mutexes, condition variables,
  * and atomic synchronization primitives.
  *
  * @note Designed for real-time processing with bounded processing latency.
  */
-class VideoActiveContourThread : public QThread
+class VideoProcessingThread : public QThread
 {
     Q_OBJECT
 public:
     /**
      * @brief Construct the processing thread.
      */
-    VideoActiveContourThread(QObject* parent);
+    VideoProcessingThread(QObject* parent);
 
     /**
      * @brief Submit a new frame for processing.

@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "active_contour_worker.hpp"
+#include "image_processing_worker.hpp"
 
 #ifndef Q_MOC_RUN
 #include "application_settings_types.hpp"
@@ -149,7 +149,7 @@ private:
     ImageComputeConfig computeConfig_{};
 
     /// Active contour processing worker.
-    ActiveContourWorker activeContourWorker_;
+    ImageProcessingWorker processingWorker_;
 };
 
 } // namespace fluvel

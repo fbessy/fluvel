@@ -9,7 +9,7 @@
 
 #include "frame_pipeline.hpp"
 #include "frame_stats_collector.hpp"
-#include "video_active_contour_thread.hpp"
+#include "video_processing_thread.hpp"
 #include "video_recorder_worker.hpp"
 #include "video_types.hpp"
 
@@ -508,7 +508,7 @@ private:
     QVideoSink videoSink_;
 
     /// Processing thread running active contour.
-    VideoActiveContourThread activeContourThread_;
+    VideoProcessingThread processingThread_;
 
     /// Processing worker for video creation feature.
     VideoRecorderWorker recorder_;

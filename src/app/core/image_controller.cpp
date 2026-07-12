@@ -21,16 +21,16 @@ ImageController::ImageController(const ImageSessionSettings& session, QObject* p
     onImageSettingsChanged(session);
     onImageDisplaySettingsChanged(session.display);
 
-    connect(&activeContourWorker_, &ActiveContourWorker::processedImageReady, this,
+    connect(&processingWorker_, &ImageProcessingWorker::processedImageReady, this,
             &ImageController::onProcessedImageReady);
 
-    connect(&activeContourWorker_, &ActiveContourWorker::contourUpdated, this,
+    connect(&processingWorker_, &ImageProcessingWorker::contourUpdated, this,
             &ImageController::onContourUpdated, Qt::QueuedConnection);
 
-    connect(&activeContourWorker_, &ActiveContourWorker::stateChanged, this,
+    connect(&processingWorker_, &ImageProcessingWorker::stateChanged, this,
             &ImageController::onStateChanged);
 
-    connect(&activeContourWorker_, &ActiveContourWorker::diagnosticsUpdated, this,
+    connect(&processingWorker_, &ImageProcessingWorker::diagnosticsUpdated, this,
             &ImageController::onDiagnosticsUpdated);
 }
 
@@ -136,7 +136,7 @@ void ImageController::reinitializeWorker()
              << "phi:" << image_debug::describeImage(config.initialPhi);
 #endif
 
-    activeContourWorker_.initialize(downscaledImage_, config);
+    processingWorker_.initialize(downscaledImage_, config);
 }
 
 void ImageController::onProcessedImageReady(const QImage& processed)
@@ -189,22 +189,22 @@ void ImageController::onContourUpdated(const fluvel_ip::Contour& outerContour,
 
 void ImageController::restart()
 {
-    activeContourWorker_.restart();
+    processingWorker_.restart();
 }
 
 void ImageController::togglePause()
 {
-    activeContourWorker_.togglePause();
+    processingWorker_.togglePause();
 }
 
 void ImageController::step()
 {
-    activeContourWorker_.step();
+    processingWorker_.step();
 }
 
 void ImageController::converge()
 {
-    activeContourWorker_.converge();
+    processingWorker_.converge();
 }
 
 void ImageController::onStateChanged(fluvel::WorkerState state)

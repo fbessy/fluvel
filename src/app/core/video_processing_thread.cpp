@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
-#include "video_active_contour_thread.hpp"
 #include "region_color_speed_model.hpp"
 #include "speed_model.hpp"
+#include "video_processing_thread.hpp"
 
 #include "elapsed_timer.hpp"
 #include "frame_clock.hpp"
@@ -12,13 +12,13 @@
 namespace fluvel
 {
 
-VideoActiveContourThread::VideoActiveContourThread(QObject* parent)
+VideoProcessingThread::VideoProcessingThread(QObject* parent)
     : QThread(parent)
 
 {
 }
 
-void VideoActiveContourThread::submitFrame(const ReceivedFrame& frame)
+void VideoProcessingThread::submitFrame(const ReceivedFrame& frame)
 {
     QMutexLocker locker(&frameMutex_);
 
@@ -32,7 +32,7 @@ void VideoActiveContourThread::submitFrame(const ReceivedFrame& frame)
     condition_.wakeOne();
 }
 
-void VideoActiveContourThread::run()
+void VideoProcessingThread::run()
 {
     running_ = true;
 
@@ -69,7 +69,7 @@ void VideoActiveContourThread::run()
     }
 }
 
-QImage VideoActiveContourThread::convertFrame(QVideoFrame frame) const
+QImage VideoProcessingThread::convertFrame(QVideoFrame frame) const
 {
     QImage img = frame.toImage();
 
@@ -87,7 +87,7 @@ QImage VideoActiveContourThread::convertFrame(QVideoFrame frame) const
     }
 }
 
-QImage VideoActiveContourThread::applyDownscale(const QImage& input,
+QImage VideoProcessingThread::applyDownscale(const QImage& input,
                                                 const DownscaleParams& config) const
 {
     if (input.isNull())
@@ -104,7 +104,7 @@ QImage VideoActiveContourThread::applyDownscale(const QImage& input,
                         Qt::SmoothTransformation);
 }
 
-ProcessedFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
+ProcessedFrame VideoProcessingThread::processFrame(const QVideoFrame& frame)
 {
     VideoComputeConfig config;
     ImageDisplayMode displayMode;
@@ -201,13 +201,13 @@ ProcessedFrame VideoActiveContourThread::processFrame(const QVideoFrame& frame)
     return df;
 }
 
-void VideoActiveContourThread::exportFilteredImage(const fluvel_ip::ImageView& algoImage,
+void VideoProcessingThread::exportFilteredImage(const fluvel_ip::ImageView& algoImage,
                                                    ProcessedFrame& displayFrame)
 {
     displayFrame.image = toQImageCopy(algoImage);
 }
 
-void VideoActiveContourThread::exportContours(ProcessedFrame& displayFrame)
+void VideoProcessingThread::exportContours(ProcessedFrame& displayFrame)
 {
     if (activeContour_)
     {
@@ -216,7 +216,7 @@ void VideoActiveContourThread::exportContours(ProcessedFrame& displayFrame)
     }
 }
 
-void VideoActiveContourThread::stop()
+void VideoProcessingThread::stop()
 {
     QMutexLocker locker(&frameMutex_);
 
@@ -225,14 +225,14 @@ void VideoActiveContourThread::stop()
     condition_.wakeAll();
 }
 
-void VideoActiveContourThread::setAlgoConfig(const VideoComputeConfig& config)
+void VideoProcessingThread::setAlgoConfig(const VideoComputeConfig& config)
 {
     QMutexLocker locker(&configMutex_);
     config_ = config;
     configChanged_ = true;
 }
 
-void VideoActiveContourThread::setDisplayMode(ImageDisplayMode mode)
+void VideoProcessingThread::setDisplayMode(ImageDisplayMode mode)
 {
     QMutexLocker locker(&configMutex_);
     displayMode_ = mode;

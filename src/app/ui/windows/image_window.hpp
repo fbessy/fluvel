@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "active_contour_worker.hpp"
+#include "image_processing_worker.hpp"
 #include "analysis_window.hpp"
 #include "video_window.hpp"
 
