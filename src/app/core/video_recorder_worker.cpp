@@ -80,7 +80,10 @@ void VideoRecorderWorker::addFrame(const VideoFrame& frame)
 
 void VideoRecorderWorker::enqueue(const VideoFrame& frame)
 {
-    const std::size_t bytes = frameSize(frame.image);
+    VideoFrame queuedFrame = frame;
+    queuedFrame.image = frame.image.copy();
+
+    const std::size_t bytes = frameSize(queuedFrame.image);
 
     EnqueueStatus status = EnqueueStatus::Success;
 
@@ -103,7 +106,7 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
                 status = EnqueueStatus::MemoryWarning;
             }
 
-            queue_.enqueue(frame);
+            queue_.enqueue(queuedFrame);
             queuedBytes_ += bytes;
             ++inputFrameCount_;
         }
