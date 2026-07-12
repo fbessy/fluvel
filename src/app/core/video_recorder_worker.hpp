@@ -90,6 +90,18 @@ signals:
     void stateChanged(RecorderState state);
 
     /**
+     * @brief Emitted when recorder statistics are updated.
+     *
+     * @param stats Current recorder statistics.
+     */
+    void statsChanged(const RecorderStats& stats);
+
+    /**
+     * @brief Emitted when the output video has been successfully finalized.
+     */
+    void recordingFinalized();
+
+    /**
      * @brief Emitted when a non-fatal recording warning occurs.
      *
      * @param message Warning message.
@@ -116,6 +128,8 @@ private:
 
     void resetSession();
 
+    void updateStats();
+
     static std::size_t frameSize(const QImage& image);
 
     VideoExporter exporter_;
@@ -134,6 +148,13 @@ private:
     static constexpr std::size_t kWarningMemoryBytes = 1200ull * 1024 * 1024; // 1200 MiB
 
     static constexpr std::size_t kMaxMemoryBytes = 2000ull * 1024 * 1024; // 2000 MiB
+
+    std::size_t inputFrameCount_{0};
+    std::size_t encodedFrameCount_{0};
+
+    int64_t statsTimestampNs_{0};
+
+    static constexpr int64_t kStatsIntervalNs = 1'000'000'000;
 };
 
 } // namespace fluvel

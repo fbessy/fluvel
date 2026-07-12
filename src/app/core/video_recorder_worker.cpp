@@ -1,5 +1,6 @@
 #include "video_recorder_worker.hpp"
 
+#include "frame_clock.hpp"
 #include "video_exporter.hpp"
 
 namespace fluvel
@@ -99,6 +100,7 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
 
             queue_.enqueue(frame);
             queuedBytes_ += bytes;
+            ++inputFrameCount_;
         }
     }
 
@@ -155,6 +157,13 @@ void VideoRecorderWorker::processQueue()
 
             break;
         }
+
+        {
+            QMutexLocker locker(&mutex_);
+            ++encodedFrameCount_;
+        }
+
+        updateStats();
     }
 
     const bool success = exporter_.close();
@@ -162,7 +171,13 @@ void VideoRecorderWorker::processQueue()
     state_ = RecorderState::Stopped;
 
     if (!success)
+    {
         emit errorOccurred(tr("Failed to finalize video recording."));
+    }
+    else
+    {
+        emit recordingFinalized();
+    }
 
     emit stateChanged(RecorderState::Stopped);
 }
@@ -175,8 +190,42 @@ std::size_t VideoRecorderWorker::frameSize(const QImage& image)
 void VideoRecorderWorker::resetSession()
 {
     memoryWarningEmitted_ = false;
+
     queuedBytes_ = 0;
     queue_.clear();
+
+    inputFrameCount_ = 0;
+    encodedFrameCount_ = 0;
+
+    statsTimestampNs_ = FrameClock::nowNs();
+}
+
+void VideoRecorderWorker::updateStats()
+{
+    const int64_t nowNs = FrameClock::nowNs();
+    const int64_t elapsedNs = nowNs - statsTimestampNs_;
+
+    if (elapsedNs < kStatsIntervalNs)
+        return;
+
+    RecorderStats stats;
+
+    {
+        QMutexLocker locker(&mutex_);
+
+        const double elapsedSec = static_cast<double>(elapsedNs) * 1e-9;
+
+        stats.queuedFrames = static_cast<std::size_t>(queue_.size());
+        stats.queuedBytes = queuedBytes_;
+        stats.inputFps = static_cast<double>(inputFrameCount_) / elapsedSec;
+        stats.encodingFps = static_cast<double>(encodedFrameCount_) / elapsedSec;
+
+        inputFrameCount_ = 0;
+        encodedFrameCount_ = 0;
+        statsTimestampNs_ = nowNs;
+    }
+
+    emit statsChanged(stats);
 }
 
 } // namespace fluvel

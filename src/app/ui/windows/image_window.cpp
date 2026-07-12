@@ -868,11 +868,9 @@ void ImageWindow::saveDisplayed()
 
     fileName = file_utils::makeUniqueFileName(fileName);
 
-    displayed.save(fileName);
-
     if (!displayed.save(fileName))
     {
-        statusBar()->showMessage(tr("Failed to save image: %1").arg(fileName));
+        statusBar()->showMessage(tr("Failed to save image: %1").arg(fileName), 5000);
 
         return;
     }

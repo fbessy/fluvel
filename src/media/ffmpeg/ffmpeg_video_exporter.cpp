@@ -157,11 +157,6 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
     //
     settings_ = settings;
 
-    applyExportProfile(settings_);
-
-    if (settings_.profile != ExportProfile::Custom)
-        exporter_utils::ensureExpectedExtension(settings_.filename, settings_.container);
-
     if (!exporter_utils::hasExpectedExtension(settings_.filename, settings_.container))
     {
         qWarning() << "Filename extension" << QFileInfo(settings_.filename).suffix()
@@ -270,59 +265,6 @@ bool FFmpegVideoExporter::initializeFromFirstFrame(const QImage& firstFrame)
     state_ = ExportState::Recording;
 
     return true;
-}
-
-void FFmpegVideoExporter::applyExportProfile(VideoExportSettings& settings) const
-{
-    switch (settings.profile)
-    {
-        case ExportProfile::Archive:
-
-            settings.codec = VideoCodec::FFV1;
-            settings.container = VideoContainer::Matroska;
-            break;
-
-        case ExportProfile::Compatible:
-
-            settings.codec = VideoCodec::H264;
-            settings.container = VideoContainer::Mp4;
-            break;
-
-        case ExportProfile::Balanced:
-
-            settings.codec = VideoCodec::H265;
-            settings.container = VideoContainer::Mp4;
-            break;
-
-        case ExportProfile::Efficient:
-
-            settings.codec = VideoCodec::AV1;
-            settings.container = VideoContainer::Mp4;
-            break;
-
-        case ExportProfile::Custom:
-
-            if (settings.codec == VideoCodec::FFV1 &&
-                settings.container != VideoContainer::Matroska)
-            {
-                qWarning() << "FFV1 is typically stored in a Matroska container.";
-            }
-
-            if (settings.codec == VideoCodec::VP9 && settings.container != VideoContainer::WebM)
-            {
-                qWarning() << "VP9 is typically stored in a WebM container.";
-            }
-
-            if ((settings.codec == VideoCodec::H264 || settings.codec == VideoCodec::H265) &&
-                settings.container != VideoContainer::Mp4)
-            {
-                qInfo() << exporter_utils::toString(settings.codec)
-                        << "is commonly stored in an MP4 container.";
-            }
-
-            // No override.
-            break;
-    }
 }
 
 bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& settings)

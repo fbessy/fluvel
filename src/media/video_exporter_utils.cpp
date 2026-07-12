@@ -5,6 +5,8 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QLoggingCategory>
+#include <QStandardPaths>
 
 namespace fluvel::exporter_utils
 {
@@ -50,7 +52,77 @@ QString toString(VideoContainer container)
     std::unreachable();
 }
 
-void ensureExpectedExtension(QString& filename, VideoContainer container)
+/**
+ * @brief Applies an export profile.
+ *
+ * Converts high-level export profiles into explicit codec
+ * and container selections.
+ *
+ * @param settings Export settings to update.
+ */
+static void applyExportProfile(VideoExportSettings& settings)
+{
+    switch (settings.profile)
+    {
+        case ExportProfile::Archive:
+
+            settings.codec = VideoCodec::FFV1;
+            settings.container = VideoContainer::Matroska;
+            break;
+
+        case ExportProfile::Compatible:
+
+            settings.codec = VideoCodec::H264;
+            settings.container = VideoContainer::Mp4;
+            break;
+
+        case ExportProfile::Balanced:
+
+            settings.codec = VideoCodec::H265;
+            settings.container = VideoContainer::Mp4;
+            break;
+
+        case ExportProfile::Efficient:
+
+            settings.codec = VideoCodec::AV1;
+            settings.container = VideoContainer::Mp4;
+            break;
+
+        case ExportProfile::Custom:
+
+            if (settings.codec == VideoCodec::FFV1 &&
+                settings.container != VideoContainer::Matroska)
+            {
+                qWarning() << "FFV1 is typically stored in a Matroska container.";
+            }
+
+            if (settings.codec == VideoCodec::VP9 && settings.container != VideoContainer::WebM)
+            {
+                qWarning() << "VP9 is typically stored in a WebM container.";
+            }
+
+            if ((settings.codec == VideoCodec::H264 || settings.codec == VideoCodec::H265) &&
+                settings.container != VideoContainer::Mp4)
+            {
+                qInfo() << exporter_utils::toString(settings.codec)
+                        << "is commonly stored in an MP4 container.";
+            }
+
+            // No override.
+            break;
+    }
+}
+
+/**
+ * @brief Ensures that a filename extension matches a video container.
+ *
+ * If the current extension does not match the selected container,
+ * it is replaced with the expected extension.
+ *
+ * @param filename Output filename to update.
+ * @param container Video container.
+ */
+static void ensureExpectedExtension(QString& filename, VideoContainer container)
 {
     if (hasExpectedExtension(filename, container))
         return;
@@ -59,6 +131,27 @@ void ensureExpectedExtension(QString& filename, VideoContainer container)
 
     filename =
         fileInfo.dir().filePath(fileInfo.completeBaseName() + "." + expectedExtension(container));
+}
+
+VideoExportSettings resolveSettings(const VideoExportSettings& settings)
+{
+    VideoExportSettings resolved = settings;
+
+    applyExportProfile(resolved);
+
+    if (resolved.filename.isEmpty())
+    {
+        const QString filename = "video." + expectedExtension(resolved.container);
+
+        resolved.filename = QDir(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
+                                .filePath(filename);
+    }
+    else if (resolved.profile != ExportProfile::Custom)
+    {
+        ensureExpectedExtension(resolved.filename, resolved.container);
+    }
+
+    return resolved;
 }
 
 QString expectedExtension(VideoContainer container)

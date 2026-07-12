@@ -17,6 +17,8 @@
 #include <QUrl>
 #include <QVideoFrameFormat>
 
+#include <cstddef>
+
 namespace fluvel
 {
 
@@ -285,6 +287,32 @@ enum class RecorderState
 
     /// Recording has stopped accepting new frames and the queue is being drained.
     Draining
+};
+
+/**
+ * @brief Runtime statistics of the video recorder.
+ */
+struct RecorderStats
+{
+    /**
+     * @brief Number of frames currently waiting for encoding.
+     */
+    std::size_t queuedFrames{0};
+
+    /**
+     * @brief Estimated memory used by queued frames, in bytes.
+     */
+    std::size_t queuedBytes{0};
+
+    /**
+     * @brief Rate at which frames are submitted to the recorder.
+     */
+    double inputFps{0.0};
+
+    /**
+     * @brief Rate at which frames are encoded.
+     */
+    double encodingFps{0.0};
 };
 
 } // namespace fluvel

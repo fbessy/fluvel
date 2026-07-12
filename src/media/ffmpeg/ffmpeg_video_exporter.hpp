@@ -105,16 +105,6 @@ private:
     bool initializeFromFirstFrame(const QImage& firstFrame);
 
     /**
-     * @brief Applies an export profile.
-     *
-     * Converts high-level export profiles into explicit codec
-     * and container selections.
-     *
-     * @param settings Export settings to update.
-     */
-    void applyExportProfile(VideoExportSettings& settings) const;
-
-    /**
      * @brief Initializes the output container.
      *
      * @param settings Export settings.

@@ -45,6 +45,7 @@
 #include <QSettings>
 #include <QSlider>
 #include <QStackedLayout>
+#include <QStatusBar>
 #include <QStringListModel>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -154,9 +155,6 @@ void VideoWindow::createUi()
     deviceSelector_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     deviceSelector_->setMinimumContentsLength(15);
 
-    static constexpr int kCameraIconSize{13};
-    deviceSelector_->setIconSize(QSize(kCameraIconSize, kCameraIconSize));
-
     auto* deviceLayout = new QHBoxLayout;
     deviceLayout->setContentsMargins(0, 0, 0, 0);
     deviceLayout->addWidget(deviceLabel_);
@@ -168,7 +166,7 @@ void VideoWindow::createUi()
     const QColor orangeError = QColor::fromRgb(0xFF9F0A);
 
     deviceActiveIcon_ = il::createDisk(greenActive);
-    deviceIdleIcon_ = il::createEmpty(kCameraIconSize);
+    deviceIdleIcon_ = il::createEmpty();
     deviceErrorIcon_ = il::createDisk(orangeError);
 
     formatLabel_ = new QLabel(tr("Format: "));
@@ -177,9 +175,6 @@ void VideoWindow::createUi()
     formatSelector_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     formatSelector_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
     formatSelector_->setMinimumContentsLength(15);
-
-    static constexpr int kFormatIconSize{16};
-    formatSelector_->setIconSize(QSize(kFormatIconSize, kFormatIconSize));
     formatSelector_->setToolTip(tr("Camera resolution, frame rate and pixel format."));
 
     auto* formatLayout = new QHBoxLayout;
@@ -199,7 +194,7 @@ void VideoWindow::createUi()
     cameraConfigWidget_->setLayout(cameraConfigLayout);
 
     formatActiveIcon_ = createActiveFormatIcon();
-    formatAvailableIcon_ = il::createEmpty(kFormatIconSize);
+    formatAvailableIcon_ = il::createEmpty();
 
     openFileButton_ = new AnimatedPushButton(tr("Open..."));
     openFileButton_->setIcon(videoIcon);
@@ -306,11 +301,11 @@ void VideoWindow::createUi()
     recordingButton_->setCheckable(true);
     recordingButton_->setEnabled(false);
 
-    constexpr int kIconSize = 22;
+    const QColor redRecording = QColor::fromRgb(0xFF453A);
 
-    stoppedIcon_ = il::createCircle(palette().color(QPalette::WindowText), kIconSize);
-    recordingIcon_ = il::createRecordDisk(Qt::red, kIconSize);
-    drainingIcon_ = il::createDisk(Qt::red, kIconSize, 6);
+    stoppedIcon_ = il::createDisk(palette().color(QPalette::WindowText));
+    recordingIcon_ = il::createSquare(redRecording);
+    drainingIcon_ = il::createSmallSquare(redRecording);
 
     QIcon applyIcon = createActiveFormatIcon();
 
@@ -424,6 +419,13 @@ void VideoWindow::createUi()
     mediaLayout->addWidget(playbackSeparatorLabel_);
     mediaLayout->addWidget(playbackDurationLabel_);
     mediaLayout->addWidget(playbackSlider_, 1);
+
+    setStatusBar(new QStatusBar(this));
+
+    recordingStatsLabel_ = new QLabel(this);
+    recordingStatsLabel_->hide();
+
+    statusBar()->addPermanentWidget(recordingStatsLabel_);
 }
 
 QIcon VideoWindow::createActiveFormatIcon()
@@ -667,6 +669,9 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::recordingStateChanged, this,
             &VideoWindow::onRecordingStateChanged);
 
+    connect(videoController_, &VideoController::recordingStatsChanged, this,
+            &VideoWindow::onRecordingStatsChanged);
+
     connect(videoController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
     connect(videoController_, &VideoController::mediaPlayerError, this,
             &VideoWindow::onMediaPlayerError);
@@ -854,6 +859,12 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::recordingError, this,
             &VideoWindow::onRecordingError);
+
+    connect(videoController_, &VideoController::recordingStarted, this,
+            &VideoWindow::onRecordingStarted);
+
+    connect(videoController_, &VideoController::recordingFinalized, this,
+            &VideoWindow::onRecordingFinalized);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -1350,6 +1361,27 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
 
     if (streamingInfo_.source.type == SourceType::Camera)
         imageViewer_->showNotification(tr("Started"));
+
+    switch (info.source.type)
+    {
+        case SourceType::Camera:
+            statusBar()->showMessage(tr("Camera started: %1").arg(info.source.description), 5000);
+            break;
+
+        case SourceType::Media:
+        {
+            const QString source = info.source.sourceUrl.isLocalFile()
+                                       ? info.source.sourceUrl.toLocalFile()
+                                       : info.source.sourceUrl.toDisplayString();
+
+            statusBar()->showMessage(tr("Opened video: %1").arg(source), 5000);
+
+            break;
+        }
+
+        case SourceType::None:
+            break;
+    }
 
     restartPending_ = false;
 }
@@ -2114,6 +2146,7 @@ void VideoWindow::enterFullscreen()
     controlBar_->hide();
     mediaControlsWidget_->hide();
     displayBar_->hide();
+    statusBar()->hide();
 
     showFullScreen();
 
@@ -2132,6 +2165,7 @@ void VideoWindow::leaveFullscreen()
     controlBar_->show();
     mediaControlsWidget_->show();
     displayBar_->show();
+    statusBar()->show();
 
     isFullScreen_ = false;
 }
@@ -2390,20 +2424,54 @@ void VideoWindow::onRecordingStateChanged(RecorderState state)
         case RecorderState::Stopped:
             recordingButton_->setChecked(false);
             recordingButton_->setIcon(stoppedIcon_);
+            recordingButton_->setToolTip(tr("Start video recording."));
+
+            recordingStatsLabel_->clear();
+            recordingStatsLabel_->hide();
+
             break;
 
         case RecorderState::Recording:
             recordingButton_->setChecked(true);
             recordingButton_->setIcon(recordingIcon_);
+            recordingButton_->setToolTip(tr("Stop video recording."));
+
+            recordingStatsLabel_->show();
+
             break;
 
         case RecorderState::Draining:
             recordingButton_->setChecked(true);
             recordingButton_->setIcon(drainingIcon_);
+            recordingButton_->setToolTip(tr("Finalizing video recording..."));
+
+            recordingStatsLabel_->show();
+
             break;
     }
 
     updateRecordingButton();
+}
+
+void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
+{
+    const double queuedMiB = static_cast<double>(stats.queuedBytes) / (1024.0 * 1024.0);
+
+    const double behindSec =
+        stats.encodingFps > 0.0 ? static_cast<double>(stats.queuedFrames) / stats.encodingFps : 0.0;
+
+    recordingStatsLabel_->setText(
+        tr("Queue: %1 MiB · ~%2 s behind").arg(queuedMiB, 0, 'f', 0).arg(behindSec, 0, 'f', 1));
+}
+
+void VideoWindow::onRecordingStarted(const QString& filename)
+{
+    statusBar()->showMessage(tr("Recording to: %1").arg(filename), 5000);
+}
+
+void VideoWindow::onRecordingFinalized(const QString& filename)
+{
+    statusBar()->showMessage(tr("Video saved: %1").arg(filename), 5000);
 }
 
 void VideoWindow::onRecordingWarning(const QString& message)

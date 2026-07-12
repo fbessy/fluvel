@@ -8,6 +8,7 @@
 #include "streaming_stats.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
+#include "video_exporter_utils.hpp"
 
 #include <QAudioOutput>
 #include <QCamera>
@@ -107,7 +108,16 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     // Recording worker
     //
     connect(&recorder_, &VideoRecorderWorker::stateChanged, this,
-            &VideoController::recordingStateChanged);
+            &VideoController::onRecordingStateChanged);
+
+    connect(&recorder_, &VideoRecorderWorker::statsChanged, this,
+            &VideoController::recordingStatsChanged);
+
+    connect(&recorder_, &VideoRecorderWorker::recordingFinalized, this,
+            [this]()
+            {
+                emit recordingFinalized(recordingSettings_.filename);
+            });
 
     connect(&recorder_, &VideoRecorderWorker::warningOccurred, this,
             &VideoController::recordingWarning);
@@ -687,7 +697,9 @@ void VideoController::startRecording()
     settings.profile = ExportProfile::Archive;
     settings.filename = QDir::homePath() + "/test.mkv";
 
-    recorder_.start(settings);
+    recordingSettings_ = exporter_utils::resolveSettings(settings);
+
+    recorder_.start(recordingSettings_);
 }
 
 void VideoController::stopRecording()
@@ -706,6 +718,14 @@ void VideoController::submitFrame(const VideoFrame& frame)
         return;
 
     recorder_.addFrame(frame);
+}
+
+void VideoController::onRecordingStateChanged(RecorderState state)
+{
+    emit recordingStateChanged(state);
+
+    if (state == RecorderState::Recording)
+        emit recordingStarted(recordingSettings_.filename);
 }
 
 } // namespace fluvel

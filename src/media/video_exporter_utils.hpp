@@ -29,15 +29,20 @@ QString toString(VideoCodec codec);
 QString toString(VideoContainer container);
 
 /**
- * @brief Ensures that a filename extension matches a video container.
+ * @brief Resolves the effective video export settings.
  *
- * If the current extension does not match the selected container,
- * it is replaced with the expected extension.
+ * Applies the selected export profile and ensures that the output
+ * filename extension matches the resolved container when using a
+ * predefined profile.
  *
- * @param filename Output filename to update.
- * @param container Video container.
+ * Custom settings are preserved and the filename is left unchanged.
+ *
+ * @param settings Requested video export settings.
+ *
+ * @return Resolved video export settings.
  */
-void ensureExpectedExtension(QString& filename, VideoContainer container);
+[[nodiscard]]
+VideoExportSettings resolveSettings(const VideoExportSettings& settings);
 
 /**
  * @brief Returns the expected filename extension for a video container.

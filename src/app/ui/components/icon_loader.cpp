@@ -13,6 +13,106 @@
 // to check fallbacks icons
 // #define FLUVEL_FORCE_EMBEDDED_ICONS
 
+namespace
+{
+
+enum class IconShape
+{
+    Disk,
+    Circle,
+    Square,
+    SmallSquare
+};
+
+constexpr std::array kIconSizes{16, 22, 24, 32, 48, 64};
+
+QIcon createShapeIcon(const QColor& color, IconShape shape)
+{
+    constexpr int kRenderScale = 4;
+    constexpr qreal kPenWidth = 1.5;
+    constexpr qreal kCornerRadiusRatio = 0.15;
+
+    QIcon icon;
+
+    for (const int size : kIconSizes)
+    {
+        const int renderSize = size * kRenderScale;
+
+        QPixmap pixmap(renderSize, renderSize);
+        pixmap.fill(Qt::transparent);
+
+        QPainter painter(&pixmap);
+        painter.setRenderHint(QPainter::Antialiasing);
+
+        qreal shapeRatio;
+
+        switch (shape)
+        {
+            case IconShape::Disk:
+                shapeRatio = 0.75;
+                break;
+
+            case IconShape::Circle:
+                shapeRatio = 0.75;
+                break;
+
+            case IconShape::Square:
+                shapeRatio = 0.75;
+                break;
+
+            case IconShape::SmallSquare:
+                shapeRatio = 0.45;
+                break;
+        }
+
+        const qreal shapeSize = renderSize * shapeRatio;
+        const qreal offset = (renderSize - shapeSize) * 0.5;
+
+        QRectF rect(offset, offset, shapeSize, shapeSize);
+
+        switch (shape)
+        {
+            case IconShape::Disk:
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(color);
+                painter.drawEllipse(rect);
+                break;
+
+            case IconShape::Circle:
+            {
+                const qreal penWidth = kPenWidth * kRenderScale;
+
+                rect.adjust(penWidth * 0.5, penWidth * 0.5, -penWidth * 0.5, -penWidth * 0.5);
+
+                QPen pen(color);
+                pen.setWidthF(penWidth);
+
+                painter.setPen(pen);
+                painter.setBrush(Qt::NoBrush);
+                painter.drawEllipse(rect);
+                break;
+            }
+
+            case IconShape::Square:
+            case IconShape::SmallSquare:
+            {
+                const qreal radius = shapeSize * kCornerRadiusRatio;
+
+                painter.setPen(Qt::NoPen);
+                painter.setBrush(color);
+                painter.drawRoundedRect(rect, radius, radius);
+                break;
+            }
+        }
+
+        icon.addPixmap(pixmap.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+    }
+
+    return icon;
+}
+
+} // namespace
+
 namespace fluvel::il
 {
 
@@ -63,7 +163,7 @@ static QIcon loadSvgWithPalette(const QString& path, IconMode mode)
 
     QIcon icon;
 
-    for (int size : {16, 22, 24, 32})
+    for (const int size : kIconSizes)
     {
         QPixmap pixmap(size, size);
         pixmap.fill(Qt::transparent);
@@ -145,106 +245,39 @@ QIcon loadIcon(const QString& svgResourceName, IconMode mode)
     return loadSvgWithPalette(svgResourceName, mode);
 }
 
-QIcon createDisk(const QColor& color, int size, int diameter)
+QIcon createDisk(const QColor& color)
 {
-    if (diameter < 0)
-        diameter = size;
-
-    constexpr int kRenderScale = 4;
-
-    QPixmap pix(size * kRenderScale, size * kRenderScale);
-    pix.fill(Qt::transparent);
-
-    QPainter p(&pix);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    const qreal scaledDiameter = diameter * kRenderScale;
-    const qreal x = (pix.width() - scaledDiameter) * 0.5;
-    const qreal y = (pix.height() - scaledDiameter) * 0.5;
-
-    p.setBrush(color);
-    p.setPen(Qt::NoPen);
-
-    p.drawEllipse(QRectF(x, y, scaledDiameter, scaledDiameter));
-
-    return QIcon(pix.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    return createShapeIcon(color, IconShape::Disk);
 }
 
-QIcon createSquare(const QColor& color, int size)
+QIcon createCircle(const QColor& color)
 {
-    constexpr int kRenderScale = 4;
-
-    QPixmap pix(size * kRenderScale, size * kRenderScale);
-
-    pix.fill(Qt::transparent);
-
-    QPainter p(&pix);
-
-    p.setRenderHint(QPainter::Antialiasing);
-
-    p.setBrush(color);
-    p.setPen(Qt::NoPen);
-
-    const QRect rect = pix.rect().adjusted(2, 2, -2, -2);
-
-    p.drawRoundedRect(rect, rect.width() * 0.15, rect.height() * 0.15);
-
-    return QIcon(pix.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    return createShapeIcon(color, IconShape::Circle);
 }
 
-QIcon createEmpty(int size)
+QIcon createSquare(const QColor& color)
 {
-    QPixmap pix(size, size);
-    pix.fill(Qt::transparent);
-    return QIcon(pix);
+    return createShapeIcon(color, IconShape::Square);
 }
 
-QIcon createCircle(const QColor& color, int size)
+QIcon createSmallSquare(const QColor& color)
 {
-    constexpr int kRenderScale = 4;
-
-    QPixmap pix(size * kRenderScale, size * kRenderScale);
-    pix.fill(Qt::transparent);
-
-    QPainter p(&pix);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    const qreal margin = size * kRenderScale * 0.25;
-    const QRectF rect = QRectF(pix.rect()).adjusted(margin, margin, -margin, -margin);
-
-    QPen pen(color);
-    pen.setWidthF(1.5 * kRenderScale);
-
-    p.setBrush(Qt::NoBrush);
-    p.setPen(pen);
-
-    p.drawEllipse(rect);
-
-    return QIcon(pix.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    return createShapeIcon(color, IconShape::SmallSquare);
 }
 
-QIcon createRecordDisk(const QColor& color, int size)
+QIcon createEmpty()
 {
-    constexpr int kRenderScale = 4;
+    QIcon icon;
 
-    QPixmap pix(size * kRenderScale, size * kRenderScale);
-    pix.fill(Qt::transparent);
+    for (const int size : kIconSizes)
+    {
+        QPixmap pixmap(size, size);
+        pixmap.fill(Qt::transparent);
 
-    QPainter p(&pix);
-    p.setRenderHint(QPainter::Antialiasing);
+        icon.addPixmap(pixmap);
+    }
 
-    const qreal margin = size * kRenderScale * 0.25;
-    const QRectF rect = QRectF(pix.rect()).adjusted(margin, margin, -margin, -margin);
-
-    QPen pen(qApp->palette().color(QPalette::WindowText));
-    pen.setWidthF(1.5 * kRenderScale);
-
-    p.setBrush(color);
-    p.setPen(pen);
-
-    p.drawEllipse(rect);
-
-    return QIcon(pix.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    return icon;
 }
 
 } // namespace fluvel::il

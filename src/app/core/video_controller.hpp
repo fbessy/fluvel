@@ -336,6 +336,27 @@ signals:
     void recordingStateChanged(RecorderState state);
 
     /**
+     * @brief Emitted when video recording starts.
+     *
+     * @param filename Output video filename.
+     */
+    void recordingStarted(const QString& filename);
+
+    /**
+     * @brief Emitted when a video recording has been successfully finalized.
+     *
+     * @param filename Output video filename.
+     */
+    void recordingFinalized(const QString& filename);
+
+    /**
+     * @brief Emitted when video recorder statistics are updated.
+     *
+     * @param stats Current video recorder statistics.
+     */
+    void recordingStatsChanged(const RecorderStats& stats);
+
+    /**
      * @brief Emitted when a non-fatal video recording warning occurs.
      *
      * @param message Warning message.
@@ -440,7 +461,25 @@ private:
      */
     void updateMediaInfo();
 
+    /**
+     * @brief Submits a video frame to the recorder.
+     *
+     * The frame is forwarded to the recorder only while a recording
+     * session is active.
+     *
+     * @param frame Video frame to record.
+     */
     void submitFrame(const VideoFrame& frame);
+
+    /**
+     * @brief Handles video recorder state changes.
+     *
+     * Propagates the recorder state and emits recording-related events
+     * when appropriate.
+     *
+     * @param state Current video recorder state.
+     */
+    void onRecordingStateChanged(RecorderState state);
 
     /**
      * @brief Determine whether a media title is suitable for display.
@@ -530,6 +569,8 @@ private:
 
     /// Number of valid frames received during stabilization.
     int stableFrameCount_{0};
+
+    VideoExportSettings recordingSettings_;
 };
 
 /**

@@ -107,71 +107,66 @@ QIcon loadIcon(QIcon::ThemeIcon iconEnum, const QString& fallback, IconMode mode
 QIcon loadIcon(const QString& svgResourceName, IconMode mode = IconMode::Auto);
 
 /**
- * @brief Creates a filled circular color icon.
+ * @brief Creates a filled circular icon.
  *
- * The disk is centered within the icon and rendered at a higher
- * resolution before being downscaled to improve visual quality
- * and antialiasing at small sizes.
+ * The icon is generated at multiple resolutions and rendered using
+ * supersampling to improve antialiasing at small sizes.
  *
  * @param color Fill color of the disk.
- * @param size Final icon size in pixels.
- * @param diameter Disk diameter in pixels. A negative value uses
- *        the full icon size.
  *
- * @return A filled circular color icon.
+ * @return A centered filled circular icon.
  */
-QIcon createDisk(const QColor& color, int size = 13, int diameter = -1);
+QIcon createDisk(const QColor& color);
 
 /**
  * @brief Creates an outlined circular icon.
  *
- * The circle is centered within the icon and rendered using the
- * specified outline color.
+ * The icon is generated at multiple resolutions and rendered using
+ * supersampling to improve antialiasing at small sizes.
  *
  * @param color Outline color of the circle.
- * @param size Final icon size in pixels.
  *
- * @return An outlined circular icon.
+ * @return A centered outlined circular icon.
  */
-QIcon createCircle(const QColor& color, int size = 13);
+QIcon createCircle(const QColor& color);
 
 /**
- * @brief Creates a recording indicator icon.
+ * @brief Creates a filled rounded square icon.
  *
- * The icon consists of a filled disk surrounded by an outline
- * using the current application palette.
- *
- * @param color Fill color of the recording disk.
- * @param size Final icon size in pixels.
- *
- * @return A recording indicator icon.
- */
-QIcon createRecordDisk(const QColor& color, int size = 13);
-
-/**
- * @brief Creates a rounded square color icon.
- *
- * The icon is rendered at a higher resolution and then downscaled
- * to improve visual quality and antialiasing when displayed at
- * small sizes.
+ * The icon is generated at multiple resolutions and rendered using
+ * supersampling to improve antialiasing at small sizes.
  *
  * @param color Fill color of the square.
- * @param size Final icon size in pixels.
  *
- * @return A rounded square color icon.
+ * @return A centered filled rounded square icon.
  */
-QIcon createSquare(const QColor& color, int size = 13);
+QIcon createSquare(const QColor& color);
+
+/**
+ * @brief Creates a small filled rounded square icon.
+ *
+ * The icon is generated at multiple resolutions and rendered using
+ * supersampling to improve antialiasing at small sizes.
+ *
+ * The square uses a reduced visual footprint compared to the regular
+ * square icon while remaining centered within the icon.
+ *
+ * @param color Fill color of the square.
+ *
+ * @return A centered small filled rounded square icon.
+ */
+QIcon createSmallSquare(const QColor& color);
 
 /**
  * @brief Creates an empty transparent icon.
  *
- * This helper can be used to reserve icon space in item views,
- * menus or toolbars when no visible icon is required.
+ * The icon is generated at multiple resolutions to preserve the same
+ * icon layout behavior as visible application icons.
  *
- * @param size Icon size in pixels.
+ * It can be used to hide an icon while preserving its allocated space.
  *
- * @return A transparent icon of the requested size.
+ * @return An empty transparent icon.
  */
-QIcon createEmpty(int size = 13);
+QIcon createEmpty();
 
 } // namespace fluvel::il

@@ -247,6 +247,9 @@ private:
     void onStreamingStopped();
 
     void onRecordingStateChanged(RecorderState state);
+    void onRecordingStatsChanged(const RecorderStats& stats);
+    void onRecordingStarted(const QString& filename);
+    void onRecordingFinalized(const QString& filename);
 
     //
     // Error handling
@@ -495,6 +498,8 @@ private:
     QLabel* playbackSeparatorLabel_{nullptr};
 
     VideoShortcutManager shortcutManager_;
+
+    QLabel* recordingStatsLabel_{nullptr};
 };
 
 } // namespace fluvel
