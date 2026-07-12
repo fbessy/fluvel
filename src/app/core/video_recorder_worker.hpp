@@ -75,6 +75,17 @@ public:
     bool isRecording() const;
 
     /**
+     * @brief Checks whether the recorder is accepting video frames.
+     *
+     * Frames are accepted only while the recorder is actively recording.
+     *
+     * @return @c true if the recorder is accepting frames,
+     *         @c false otherwise.
+     */
+    [[nodiscard]]
+    bool isAcceptingFrames() const;
+
+    /**
      * @brief Queues a video frame for encoding.
      *
      * @param frame Video frame to encode.

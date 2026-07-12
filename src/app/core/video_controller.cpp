@@ -381,7 +381,7 @@ void VideoController::onDisplayFrameReady(const DisplayFrame& displayFrame)
     frame.image = displayFrame.image;
     frame.presentationTimestampNs = uiDisplayFrame.receiveTimestampNs;
 
-    submitFrame(frame);
+    submitRecordingFrame(frame);
 
     emit imageAndContourUpdated(uiDisplayFrame);
 }
@@ -712,9 +712,9 @@ bool VideoController::isRecording() const
     return recorder_.isRecording();
 }
 
-void VideoController::submitFrame(const VideoFrame& frame)
+void VideoController::submitRecordingFrame(const VideoFrame& frame)
 {
-    if (!recorder_.isRecording())
+    if (!recorder_.isAcceptingFrames())
         return;
 
     recorder_.addFrame(frame);

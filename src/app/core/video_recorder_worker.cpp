@@ -65,6 +65,11 @@ bool VideoRecorderWorker::isRecording() const
     return state_ != RecorderState::Stopped;
 }
 
+bool VideoRecorderWorker::isAcceptingFrames() const
+{
+    return state_ == RecorderState::Recording;
+}
+
 void VideoRecorderWorker::addFrame(const VideoFrame& frame)
 {
     if (state_ != RecorderState::Recording)

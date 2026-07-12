@@ -462,14 +462,14 @@ private:
     void updateMediaInfo();
 
     /**
-     * @brief Submits a video frame to the recorder.
+     * @brief Submits a video frame for recording.
      *
      * The frame is forwarded to the recorder only while a recording
      * session is active.
      *
      * @param frame Video frame to record.
      */
-    void submitFrame(const VideoFrame& frame);
+    void submitRecordingFrame(const VideoFrame& frame);
 
     /**
      * @brief Handles video recorder state changes.
