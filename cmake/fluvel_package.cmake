@@ -43,6 +43,12 @@ if(FLUVEL_PLATFORM_LINUX)
          qt6-image-formats-plugins"
     )
 
+    if(FLUVEL_USE_FFMPEG)
+        string(APPEND CPACK_DEBIAN_PACKAGE_DEPENDS
+            ", libavformat60, libavcodec60, libavutil58, libswscale7"
+        )
+    endif()
+
     # =====================================================
     # Linux install directories (FHS)
     # =====================================================
