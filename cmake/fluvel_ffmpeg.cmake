@@ -7,7 +7,7 @@ endif()
 
 find_package(PkgConfig QUIET)
 
-set(FLUVEL_HAS_FFMPEG FALSE)
+set(FLUVEL_USE_FFMPEG OFF)
 
 if(PkgConfig_FOUND)
 
@@ -21,7 +21,7 @@ if(PkgConfig_FOUND)
        AND AVUTIL_FOUND
        AND SWSCALE_FOUND)
 
-        set(FLUVEL_HAS_FFMPEG TRUE)
+        set(FLUVEL_USE_FFMPEG ON)
 
     endif()
 

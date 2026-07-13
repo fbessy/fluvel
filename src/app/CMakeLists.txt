@@ -230,7 +230,7 @@ set(app_src
     ${INTEROP_DIR}/contour_adapters.hpp
 )
 
-if(FLUVEL_HAS_FFMPEG)
+if(FLUVEL_USE_FFMPEG)
 
     list(APPEND app_src
         ${MEDIA_DIR}/video_export_settings.hpp
@@ -383,7 +383,7 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
     ${MEDIA_DIR}/ffmpeg
 )
 
-if(FLUVEL_HAS_FFMPEG)
+if(FLUVEL_USE_FFMPEG)
 
     target_include_directories(${APP_TARGET_NAME} PRIVATE
         ${AVFORMAT_INCLUDE_DIRS}
@@ -417,7 +417,7 @@ target_link_libraries(${APP_TARGET_NAME} PRIVATE
     fluvel::image_processing
 )
 
-if(FLUVEL_HAS_FFMPEG)
+if(FLUVEL_USE_FFMPEG)
 
     target_link_libraries(${APP_TARGET_NAME} PRIVATE
         ${AVFORMAT_LIBRARIES}

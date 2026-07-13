@@ -33,6 +33,10 @@ if(Qt6_FOUND)
     target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_USE_QT)
 endif()
 
+if(FLUVEL_USE_FFMPEG)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_USE_FFMPEG)
+endif()
+
 if(FLUVEL_UI_DESKTOP)
     target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_UI_DESKTOP)
 endif()

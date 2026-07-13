@@ -6,6 +6,18 @@
 #include "file_utils.hpp"
 #include "icon_loader.hpp"
 
+#ifdef FLUVEL_USE_FFMPEG
+#include "ffmpeg_codec_utils.hpp"
+
+extern "C"
+{
+#include <libavutil/avutil.h>
+}
+
+#include <utility>
+
+#endif
+
 #include <QCryptographicHash>
 #include <QDateTime>
 #include <QDesktopServices>
@@ -99,10 +111,6 @@ QString compilerInfo()
 #endif
 }
 
-#include <QDateTime>
-#include <QLocale>
-#include <QTimeZone>
-
 QString formattedBuildDate()
 {
     QString raw = FLUVEL_BUILD_TIMESTAMP;
@@ -138,6 +146,57 @@ QString buildFingerprint()
 
     return hash.toHex().left(16).toUpper();
 }
+
+#ifdef FLUVEL_USE_FFMPEG
+
+QString videoCodecName(VideoCodec codec)
+{
+    switch (codec)
+    {
+        case VideoCodec::FFV1:
+            return QStringLiteral("FFV1");
+
+        case VideoCodec::H264:
+            return QStringLiteral("H.264");
+
+        case VideoCodec::H265:
+            return QStringLiteral("H.265");
+
+        case VideoCodec::AV1:
+            return QStringLiteral("AV1");
+
+        case VideoCodec::VP9:
+            return QStringLiteral("VP9");
+
+        case VideoCodec::MPEG4Part2:
+            return QStringLiteral("MPEG-4 Part 2");
+    }
+
+    std::unreachable();
+}
+
+QString ffmpegVersionString()
+{
+    return QString::fromLatin1(av_version_info());
+}
+
+QString availableVideoEncoders()
+{
+    QStringList encoders;
+
+    for (const CodecInfo& codec : FFmpegCodecUtils::availableCodecs())
+    {
+        if (codec.encoder == nullptr)
+            continue;
+
+        encoders.append(QStringLiteral("%1 (%2)").arg(videoCodecName(codec.codec),
+                                                      QString::fromLatin1(codec.encoder->name)));
+    }
+
+    return encoders.join(QStringLiteral(", "));
+}
+
+#endif
 
 } // namespace
 
@@ -507,6 +566,24 @@ QString AboutDialog::buildTechnicalSection()
     html += tr("Audio codecs: %1").arg(file_utils::supportedAudioCodecs()) + "<br>";
     html += tr("File formats: %1").arg(file_utils::supportedMediaContainers());
     html += "</div>";
+
+#ifdef FLUVEL_USE_FFMPEG
+    html += "<div style='margin-bottom:4px;'><b>" + tr("Video export") + "</b></div>";
+
+    html += "<div style='margin-left:12px; font-size:9pt; color:#444; margin-bottom:6px;'>";
+    html += tr("Video export support is provided by FFmpeg.") + "<br>";
+    html += tr("Available encoders depend on the FFmpeg build bundled with the application, "
+               "the platform, and available hardware.");
+    html += "</div>";
+
+    html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word; "
+            "margin-bottom:8px;'>";
+
+    html += tr("FFmpeg") + ": " + ffmpegVersionString() + "<br>";
+    html += tr("Encoders") + ": " + availableVideoEncoders();
+
+    html += "</div>";
+#endif
 
     html += "</div>"; // end Application block
 
