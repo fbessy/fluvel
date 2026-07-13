@@ -5,6 +5,7 @@
 
 extern "C"
 {
+#include <libavcodec/version.h>
 #include <libavutil/pixdesc.h>
 }
 
@@ -90,6 +91,8 @@ static const AVPixelFormat* encoderPixelFormats(const AVCodec* encoder)
 {
     assert(encoder != nullptr);
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(61, 13, 100)
+
     const AVPixelFormat* formats = nullptr;
 
     const int ret = avcodec_get_supported_config(nullptr, encoder, AV_CODEC_CONFIG_PIX_FORMAT, 0,
@@ -99,6 +102,12 @@ static const AVPixelFormat* encoderPixelFormats(const AVCodec* encoder)
         return nullptr;
 
     return formats;
+
+#else
+
+    return encoder->pix_fmts;
+
+#endif
 }
 
 } // namespace
