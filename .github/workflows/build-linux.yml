@@ -78,6 +78,10 @@ jobs:
 
               mkdir -p repo
 
+              echo \"=== KDE runtime base ===\"
+              flatpak remote-info flathub -m org.kde.Platform//6.9 | \
+                grep -A 5 -F '[Extension org.freedesktop.Platform.GL]' || true
+
               flatpak-builder --repo=repo --force-clean build-flatpak fluvel.ci.json
               flatpak build-export repo build-flatpak
               flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.Fluvel
@@ -153,6 +157,7 @@ jobs:
                 \
                 -DFLUVEL_BUILD_APP=ON \
                 -DFLUVEL_BUILD_BIND=OFF \
+                -DFLUVEL_ENABLE_FFMPEG=ON \
                 \
                 -DFLUVEL_BUILD_VERSION=$APP_VERSION \
                 -DFLUVEL_GIT_COMMIT=$COMMIT_SHORT \
@@ -261,6 +266,7 @@ jobs:
                 \
                 -DFLUVEL_BUILD_APP=ON \
                 -DFLUVEL_BUILD_BIND=OFF \
+                -DFLUVEL_ENABLE_FFMPEG=ON \
                 \
                 -DFLUVEL_BUILD_VERSION=$APP_VERSION \
                 -DFLUVEL_GIT_COMMIT=$COMMIT_SHORT \

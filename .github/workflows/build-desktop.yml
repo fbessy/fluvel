@@ -175,6 +175,9 @@ jobs:
           target: 'desktop'
           modules: 'qtmultimedia'
 
+      - name: Install FFmpeg
+        run: brew install ffmpeg pkg-config
+
       - name: Configure
         run: >
           BUILD_TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S")
@@ -185,6 +188,7 @@ jobs:
             \
             -DFLUVEL_BUILD_APP=ON \
             -DFLUVEL_BUILD_BIND=OFF \
+            -DFLUVEL_ENABLE_FFMPEG=ON \
             \
             -DFLUVEL_BUILD_VERSION=${{ env.VERSION }} \
             -DFLUVEL_GIT_COMMIT=${{ github.sha }} \

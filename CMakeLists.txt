@@ -32,13 +32,15 @@ set(FLUVEL_LOCAL_DEFAULT_UNITY OFF)
 set(FLUVEL_LOCAL_DEFAULT_ASAN OFF)
 set(FLUVEL_LOCAL_DEFAULT_TSAN OFF)
 
+set(FLUVEL_LOCAL_DEFAULT_FFMPEG OFF)
+
 # =========================
 # Video export option
 # =========================
 
 option(FLUVEL_ENABLE_FFMPEG
        "Enable FFmpeg video export"
-       ON)
+       ${FLUVEL_LOCAL_DEFAULT_FFMPEG})
 
 # =========================
 # Experimental UI options

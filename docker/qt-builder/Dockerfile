@@ -17,6 +17,7 @@ RUN apt update && apt install -y \
     build-essential \
     cmake \
     ninja-build \
+    pkg-config \
     ccache \
     clang \
     git \
@@ -61,6 +62,12 @@ RUN apt update && apt install -y \
     libfreetype6 \
     libegl1 \
     libwayland-client0 \
+    \
+    libavformat-dev \
+    libavcodec-dev \
+    libavutil-dev \
+    libswscale-dev \
+    \
     && rm -rf /var/lib/apt/lists/*
 
 # =========================
