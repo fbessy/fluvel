@@ -386,11 +386,8 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
 
 if(FLUVEL_USE_FFMPEG)
 
-    target_include_directories(${APP_TARGET_NAME} PRIVATE
-        ${AVFORMAT_INCLUDE_DIRS}
-        ${AVCODEC_INCLUDE_DIRS}
-        ${AVUTIL_INCLUDE_DIRS}
-        ${SWSCALE_INCLUDE_DIRS}
+    target_link_libraries(${APP_TARGET_NAME} PRIVATE
+        PkgConfig::FFMPEG
     )
 
 endif()

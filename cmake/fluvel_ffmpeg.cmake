@@ -5,9 +5,9 @@ if(NOT FLUVEL_BUILD_APP)
     return()
 endif()
 
-find_package(PkgConfig QUIET)
-
 set(FLUVEL_USE_FFMPEG OFF)
+
+find_package(PkgConfig QUIET)
 
 if(PkgConfig_FOUND)
 

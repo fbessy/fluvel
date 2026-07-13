@@ -87,6 +87,8 @@ add_subdirectory(src/image_processing)
 
 if(FLUVEL_BUILD_APP)
 
+    set(FLUVEL_USE_FFMPEG OFF)
+
     if(FLUVEL_ENABLE_FFMPEG)
         include(cmake/fluvel_ffmpeg.cmake)
     endif()
