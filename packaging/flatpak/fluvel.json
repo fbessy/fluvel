@@ -24,7 +24,10 @@
     "--socket=pulseaudio",
     "--device=dri",
     "--device=all",
-    "--filesystem=home"
+    "--filesystem=home",
+    "--filesystem=/media",
+    "--filesystem=/run/media",
+    "--filesystem=/mnt"
   ],
 
   "modules": [
