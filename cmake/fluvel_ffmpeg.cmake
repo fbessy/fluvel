@@ -11,18 +11,15 @@ set(FLUVEL_USE_FFMPEG OFF)
 
 if(PkgConfig_FOUND)
 
-    pkg_check_modules(AVFORMAT QUIET libavformat)
-    pkg_check_modules(AVCODEC QUIET libavcodec)
-    pkg_check_modules(AVUTIL QUIET libavutil)
-    pkg_check_modules(SWSCALE QUIET libswscale)
+    pkg_check_modules(FFMPEG QUIET IMPORTED_TARGET
+        libavformat
+        libavcodec
+        libavutil
+        libswscale
+    )
 
-    if(AVFORMAT_FOUND
-       AND AVCODEC_FOUND
-       AND AVUTIL_FOUND
-       AND SWSCALE_FOUND)
-
+    if(FFMPEG_FOUND)
         set(FLUVEL_USE_FFMPEG ON)
-
     endif()
 
 endif()

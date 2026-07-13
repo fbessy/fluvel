@@ -85,8 +85,6 @@ set(PYTHON_TARGET_NAME fluvel_py)
 
 add_subdirectory(src/image_processing)
 
-set(FLUVEL_USE_FFMPEG OFF)
-
 if(FLUVEL_BUILD_APP)
 
     if(FLUVEL_ENABLE_FFMPEG)
