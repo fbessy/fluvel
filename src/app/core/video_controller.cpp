@@ -7,9 +7,12 @@
 #include "frame_clock.hpp"
 #include "frame_rendering_utils.hpp"
 #include "streaming_stats.hpp"
+
+#ifdef FLUVEL_USE_FFMPEG
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
 #include "video_exporter_utils.hpp"
+#endif
 
 #include <QAudioOutput>
 #include <QCamera>
@@ -105,6 +108,8 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     connect(&processingThread_, &VideoProcessingThread::frameProcessed, this,
             &VideoController::onFrameProcessed);
 
+#ifdef FLUVEL_USE_FFMPEG
+
     //
     // Recording worker
     //
@@ -125,6 +130,8 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
 
     connect(&recorder_, &VideoRecorderWorker::errorOccurred, this,
             &VideoController::recordingError);
+
+#endif
 
     processingThread_.start();
 }
@@ -378,6 +385,8 @@ void VideoController::onProcessedFrameReady(const ProcessedFrame& frame)
     displayFrame.receiveTimestampNs = frame.receiveTimestampNs;
     displayFrame.processTimestampNs = frame.processTimestampNs;
 
+#ifdef FLUVEL_USE_FFMPEG
+
     if (recorder_.isAcceptingFrames())
     {
         VideoFrame videoFrame;
@@ -389,6 +398,8 @@ void VideoController::onProcessedFrameReady(const ProcessedFrame& frame)
 
         submitRecordingFrame(videoFrame);
     }
+
+#endif
 
     emit displayFrameReady(displayFrame);
 }
@@ -701,6 +712,8 @@ void VideoController::resume()
     mediaPlayer_.play();
 }
 
+#ifdef FLUVEL_USE_FFMPEG
+
 void VideoController::startRecording()
 {
     VideoExportSettings settings;
@@ -738,5 +751,7 @@ void VideoController::onRecordingStateChanged(RecorderState state)
     if (state == RecorderState::Recording)
         emit recordingStarted(recordingSettings_.filename);
 }
+
+#endif
 
 } // namespace fluvel

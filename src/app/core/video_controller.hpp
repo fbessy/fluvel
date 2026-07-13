@@ -10,7 +10,11 @@
 #include "frame_pipeline.hpp"
 #include "frame_stats_collector.hpp"
 #include "video_processing_thread.hpp"
+
+#ifdef FLUVEL_USE_FFMPEG
 #include "video_recorder_worker.hpp"
+#endif
+
 #include "video_types.hpp"
 
 #include <QAudioOutput>
@@ -198,6 +202,8 @@ public:
     [[nodiscard]]
     bool isMediaActive() const;
 
+#ifdef FLUVEL_USE_FFMPEG
+
     /**
      * @brief Starts a new video recording session.
      *
@@ -225,6 +231,8 @@ public:
      */
     [[nodiscard]]
     bool isRecording() const;
+
+#endif
 
 signals:
     /// Emitted when available video inputs change.
@@ -328,6 +336,8 @@ signals:
      */
     void mutedChanged(bool muted);
 
+#ifdef FLUVEL_USE_FFMPEG
+
     /**
      * @brief Emitted when the recorder state changes.
      *
@@ -369,6 +379,8 @@ signals:
      * @param message Error message.
      */
     void recordingError(const QString& message);
+
+#endif
 
 private:
     /**
@@ -461,6 +473,8 @@ private:
      */
     void updateMediaInfo();
 
+#ifdef FLUVEL_USE_FFMPEG
+
     /**
      * @brief Submits a video frame for recording.
      *
@@ -480,6 +494,8 @@ private:
      * @param state Current video recorder state.
      */
     void onRecordingStateChanged(RecorderState state);
+
+#endif
 
     /**
      * @brief Determine whether a media title is suitable for display.
@@ -510,11 +526,13 @@ private:
     /// Processing thread running active contour.
     VideoProcessingThread processingThread_;
 
+#ifdef FLUVEL_USE_FFMPEG
     /// Processing worker for video creation feature.
     VideoRecorderWorker recorder_;
+#endif
 
     /// Frame statistics and diagnostics view.
-    FrameStatsCollector frameStats_;
+    FrameStatsCollector frameStats_{};
 
     // --- Timing configuration ---
 
@@ -570,10 +588,16 @@ private:
     /// Number of valid frames received during stabilization.
     int stableFrameCount_{0};
 
-    VideoExportSettings recordingSettings_;
+#ifdef FLUVEL_USE_FFMPEG
+    /// Video export settings used for the current recording session.
+    VideoExportSettings recordingSettings_{};
+#endif
 
-    DisplayConfig displayConfig_;
-    DownscaleParams downscaleParams_;
+    /// Current video display configuration.
+    DisplayConfig displayConfig_{};
+
+    /// Current image downscaling parameters used by the processing pipeline.
+    DownscaleParams downscaleParams_{};
 };
 
 /**

@@ -219,14 +219,18 @@ private:
     void updateActionBar();
     void updateStreamingButton();
     void updateApplyButton();
+#ifdef FLUVEL_USE_FFMPEG
     void updateRecordingButton();
+#endif
     void refreshUi();
 
     void openFile();
     void openMediaFile(const QString& filename);
 
     void onToggleStreaming();
+#ifdef FLUVEL_USE_FFMPEG
     void onToggleRecording();
+#endif
     void onApplySelection();
 
     void onWindowDeviceChanged(int index);
@@ -246,10 +250,12 @@ private:
     void onStreamingStarted(const StreamingInfo& info);
     void onStreamingStopped();
 
+#ifdef FLUVEL_USE_FFMPEG
     void onRecordingStateChanged(RecorderState state);
     void onRecordingStatsChanged(const RecorderStats& stats);
     void onRecordingStarted(const QString& filename);
     void onRecordingFinalized(const QString& filename);
+#endif
 
     //
     // Error handling
@@ -265,9 +271,11 @@ private:
     void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
     void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
 
+#ifdef FLUVEL_USE_FFMPEG
     // Recording warnings and errors
     void onRecordingWarning(const QString& message);
     void onRecordingError(const QString& message);
+#endif
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
@@ -409,10 +417,12 @@ private:
     QIcon stopIcon_;
     AnimatedPushButton* toggleStreamingButton_{nullptr};
 
+#ifdef FLUVEL_USE_FFMPEG
     QPushButton* recordingButton_{nullptr};
     QIcon stoppedIcon_;
     QIcon recordingIcon_;
     QIcon drainingIcon_;
+#endif
 
     QPushButton* applyButton_{nullptr};
 
@@ -499,7 +509,9 @@ private:
 
     VideoShortcutManager shortcutManager_;
 
+#ifdef FLUVEL_USE_FFMPEG
     QLabel* recordingStatsLabel_{nullptr};
+#endif
 };
 
 } // namespace fluvel

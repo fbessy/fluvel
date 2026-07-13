@@ -297,6 +297,8 @@ void VideoWindow::createUi()
     toggleStreamingButton_->setTransitionEffect(TransitionEffect::Slide);
     toggleStreamingButton_->setClickAnimation(ClickAnimation::None);
 
+#ifdef FLUVEL_USE_FFMPEG
+
     recordingButton_ = new QPushButton;
     recordingButton_->setCheckable(true);
     recordingButton_->setEnabled(false);
@@ -306,6 +308,8 @@ void VideoWindow::createUi()
     stoppedIcon_ = il::createDisk(palette().color(QPalette::WindowText));
     recordingIcon_ = il::createSquare(redRecording);
     drainingIcon_ = il::createSmallSquare(redRecording);
+
+#endif
 
     QIcon applyIcon = createActiveFormatIcon();
 
@@ -422,10 +426,12 @@ void VideoWindow::createUi()
 
     setStatusBar(new QStatusBar(this));
 
+#ifdef FLUVEL_USE_FFMPEG
     recordingStatsLabel_ = new QLabel(this);
     recordingStatsLabel_->hide();
 
     statusBar()->addPermanentWidget(recordingStatsLabel_);
+#endif
 }
 
 QIcon VideoWindow::createActiveFormatIcon()
@@ -540,7 +546,12 @@ void VideoWindow::setupLayout()
 
     configColumn->addWidget(sourceConfigWidget_);
     configColumn->addStretch();
+
+#ifdef FLUVEL_USE_FFMPEG
+
     configColumn->addWidget(recordingButton_, 0, Qt::AlignLeft);
+
+#endif
 
     //
     // Right column
@@ -639,7 +650,9 @@ void VideoWindow::setupConnections()
 
     connect(toggleStreamingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleStreaming);
 
+#ifdef FLUVEL_USE_FFMPEG
     connect(recordingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleRecording);
+#endif
 
     connect(applyButton_, &QPushButton::clicked, this, &VideoWindow::onApplySelection);
 
@@ -666,11 +679,13 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::streamingStopped, this,
             &VideoWindow::onStreamingStopped);
 
+#ifdef FLUVEL_USE_FFMPEG
     connect(videoController_, &VideoController::recordingStateChanged, this,
             &VideoWindow::onRecordingStateChanged);
 
     connect(videoController_, &VideoController::recordingStatsChanged, this,
             &VideoWindow::onRecordingStatsChanged);
+#endif
 
     connect(videoController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
     connect(videoController_, &VideoController::mediaPlayerError, this,
@@ -854,6 +869,7 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::playbackStateChanged, this,
             &VideoWindow::onPlaybackStateChanged);
 
+#ifdef FLUVEL_USE_FFMPEG
     connect(videoController_, &VideoController::recordingWarning, this,
             &VideoWindow::onRecordingWarning);
 
@@ -865,6 +881,7 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::recordingFinalized, this,
             &VideoWindow::onRecordingFinalized);
+#endif
 }
 
 void VideoWindow::applyInitialSettings()
@@ -889,7 +906,9 @@ void VideoWindow::applyInitialSettings()
     refreshSourceUi();
     refreshUi();
 
+#ifdef FLUVEL_USE_FFMPEG
     onRecordingStateChanged(RecorderState::Stopped);
+#endif
 
     onDownscaleChanged(downscaleParams);
 }
@@ -1566,7 +1585,10 @@ void VideoWindow::updateActionBar()
 {
     updateStreamingButton();
     updateApplyButton();
+
+#ifdef FLUVEL_USE_FFMPEG
     updateRecordingButton();
+#endif
 }
 
 bool VideoWindow::canStartSource() const
@@ -2402,6 +2424,8 @@ void VideoWindow::onPlaybackStateChanged(QMediaPlayer::PlaybackState state)
     }
 }
 
+#ifdef FLUVEL_USE_FFMPEG
+
 void VideoWindow::onToggleRecording()
 {
     if (videoController_->isRecording())
@@ -2483,5 +2507,7 @@ void VideoWindow::onRecordingError(const QString& message)
 {
     QMessageBox::critical(this, tr("Recording error"), message);
 }
+
+#endif
 
 } // namespace fluvel

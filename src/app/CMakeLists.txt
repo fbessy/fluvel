@@ -219,9 +219,6 @@ set(app_src
     ${CORE_DIR}/time_utils.cpp
     ${CORE_DIR}/time_utils.hpp
 
-    ${CORE_DIR}/video_recorder_worker.cpp
-    ${CORE_DIR}/video_recorder_worker.hpp
-
     ${CORE_DIR}/frame_rendering_utils.cpp
     ${CORE_DIR}/frame_rendering_utils.hpp
 
@@ -233,6 +230,10 @@ set(app_src
 if(FLUVEL_USE_FFMPEG)
 
     list(APPEND app_src
+
+        ${CORE_DIR}/video_recorder_worker.cpp
+        ${CORE_DIR}/video_recorder_worker.hpp
+
         ${MEDIA_DIR}/video_export_settings.hpp
         ${MEDIA_DIR}/video_exporter_backend.hpp
 
