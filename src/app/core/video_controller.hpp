@@ -571,6 +571,9 @@ private:
     int stableFrameCount_{0};
 
     VideoExportSettings recordingSettings_;
+
+    DisplayConfig displayConfig_;
+    DownscaleParams downscaleParams_;
 };
 
 /**

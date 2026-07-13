@@ -222,6 +222,9 @@ set(app_src
     ${CORE_DIR}/video_recorder_worker.cpp
     ${CORE_DIR}/video_recorder_worker.hpp
 
+    ${CORE_DIR}/frame_rendering_utils.cpp
+    ${CORE_DIR}/frame_rendering_utils.hpp
+
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
     ${INTEROP_DIR}/contour_adapters.hpp

@@ -5,6 +5,7 @@
 #include "camera_format_utils.hpp"
 #include "contour_adapters.hpp"
 #include "frame_clock.hpp"
+#include "frame_rendering_utils.hpp"
 #include "streaming_stats.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
@@ -377,11 +378,17 @@ void VideoController::onProcessedFrameReady(const ProcessedFrame& frame)
     displayFrame.receiveTimestampNs = frame.receiveTimestampNs;
     displayFrame.processTimestampNs = frame.processTimestampNs;
 
-    VideoFrame videoFrame;
-    videoFrame.image = frame.image;
-    videoFrame.presentationTimestampNs = frame.receiveTimestampNs;
+    if (recorder_.isAcceptingFrames())
+    {
+        VideoFrame videoFrame;
+        videoFrame.image = displayFrame.image;
+        videoFrame.presentationTimestampNs = displayFrame.receiveTimestampNs;
 
-    submitRecordingFrame(videoFrame);
+        frame_rendering_utils::drawContourOverlay(videoFrame.image, displayFrame, displayConfig_,
+                                                  downscaleParams_);
+
+        submitRecordingFrame(videoFrame);
+    }
 
     emit displayFrameReady(displayFrame);
 }
@@ -530,6 +537,8 @@ void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QStrin
 
 void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session)
 {
+    downscaleParams_ = session.compute.downscale;
+
     processingThread_.setAlgoConfig(session.compute);
 
     emit downscaleChanged(session.compute.downscale);
@@ -537,6 +546,8 @@ void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session
 
 void VideoController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
 {
+    displayConfig_ = display;
+
     processingThread_.setDisplayMode(display.displayMode);
 }
 

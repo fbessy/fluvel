@@ -24,6 +24,8 @@
 #include <QVideoFrame>
 #include <QtCore/qglobal.h>
 
+#include <optional>
+
 namespace fluvel
 {
 
@@ -166,11 +168,12 @@ struct VideoFrame
     QImage image;
 
     /**
-     * @brief Presentation timestamp (ns).
+     * @brief Presentation timestamp in nanoseconds.
      *
-     * Used only when TimestampMode::ExplicitTimestamps is selected.
+     * When specified, the frame is exported using explicit presentation
+     * timestamps. Otherwise, constant frame rate timing is used.
      */
-    int64_t presentationTimestampNs{0};
+    std::optional<int64_t> presentationTimestampNs;
 };
 
 } // namespace fluvel

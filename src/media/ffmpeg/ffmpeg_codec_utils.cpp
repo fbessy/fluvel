@@ -78,35 +78,27 @@ static constexpr CodecEntry kCodecTable[] = {
      false},
 };
 
-struct PixelFormatConfig
-{
-    const AVPixelFormat* formats{nullptr};
-    int count{0};
-};
-
 /**
  * @brief Retrieves the pixel formats supported by an FFmpeg encoder.
  *
- * A null format list indicates that all pixel formats are supported.
- *
  * @param encoder FFmpeg encoder.
  *
- * @return Supported pixel format configuration.
+ * @return Null-terminated list of supported pixel formats, or @c nullptr
+ *         if no explicit pixel format restriction is reported.
  */
-static std::optional<PixelFormatConfig> supportedPixelFormats(const AVCodec* encoder)
+static const AVPixelFormat* encoderPixelFormats(const AVCodec* encoder)
 {
     assert(encoder != nullptr);
 
-    PixelFormatConfig config;
+    const AVPixelFormat* formats = nullptr;
 
     const int ret = avcodec_get_supported_config(nullptr, encoder, AV_CODEC_CONFIG_PIX_FORMAT, 0,
-                                                 reinterpret_cast<const void**>(&config.formats),
-                                                 &config.count);
+                                                 reinterpret_cast<const void**>(&formats), nullptr);
 
     if (ret < 0)
-        return std::nullopt;
+        return nullptr;
 
-    return config;
+    return formats;
 }
 
 } // namespace
@@ -147,26 +139,19 @@ QList<CodecInfo> FFmpegCodecUtils::detectAvailableCodecs()
             if (encoder == nullptr)
                 continue;
 
-            const auto pixelFormats = supportedPixelFormats(encoder);
+            const AVPixelFormat* pixelFormats = encoderPixelFormats(encoder);
 
-            if (!pixelFormats)
+            if (pixelFormats == nullptr)
                 continue;
 
             bool usable = false;
 
-            if (pixelFormats->formats == nullptr)
+            for (const AVPixelFormat* fmt = pixelFormats; *fmt != AV_PIX_FMT_NONE; ++fmt)
             {
-                usable = isEncoderUsable(encoder, entry.codecId, AV_PIX_FMT_YUV420P);
-            }
-            else
-            {
-                for (int i = 0; i < pixelFormats->count; ++i)
+                if (isEncoderUsable(encoder, entry.codecId, *fmt))
                 {
-                    if (isEncoderUsable(encoder, entry.codecId, pixelFormats->formats[i]))
-                    {
-                        usable = true;
-                        break;
-                    }
+                    usable = true;
+                    break;
                 }
             }
 
@@ -226,17 +211,14 @@ bool FFmpegCodecUtils::supportsPixelFormat(const AVCodec* encoder, AVPixelFormat
 {
     assert(encoder != nullptr);
 
-    const auto pixelFormats = supportedPixelFormats(encoder);
+    const AVPixelFormat* pixelFormats = encoderPixelFormats(encoder);
 
-    if (!pixelFormats)
+    if (pixelFormats == nullptr)
         return false;
 
-    if (pixelFormats->formats == nullptr)
-        return true;
-
-    for (int i = 0; i < pixelFormats->count; ++i)
+    for (const AVPixelFormat* fmt = pixelFormats; *fmt != AV_PIX_FMT_NONE; ++fmt)
     {
-        if (pixelFormats->formats[i] == pixelFormat)
+        if (*fmt == pixelFormat)
             return true;
     }
 

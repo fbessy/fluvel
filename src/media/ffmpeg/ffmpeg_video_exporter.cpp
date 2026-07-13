@@ -492,9 +492,9 @@ bool FFmpegVideoExporter::fillFrameBgr0(const QImage& image)
 
     QImage converted;
 
-    if (image.format() != QImage::Format_ARGB32)
+    if (image.format() != QImage::Format_RGB32)
     {
-        converted = image.convertToFormat(QImage::Format_ARGB32);
+        converted = image.convertToFormat(QImage::Format_RGB32);
         src = &converted;
     }
 
@@ -504,7 +504,7 @@ bool FFmpegVideoExporter::fillFrameBgr0(const QImage& image)
     const int bytesPerRow = src->width() * kBytesPerPixel;
 
     //
-    // QImage::Format_ARGB32 is stored as BGRA in memory on little-endian systems,
+    // QImage::Format_RGB32 is stored as BGRX in memory on little-endian systems,
     // which is compatible with AV_PIX_FMT_BGR0.
     //
     // Copy the image one scanline at a time to correctly handle different source
@@ -527,9 +527,9 @@ bool FFmpegVideoExporter::fillFrameYuv420(const QImage& image)
     assert(src.width() == context_->frame->width);
     assert(src.height() == context_->frame->height);
 
-    if (src.format() != QImage::Format_ARGB32)
+    if (src.format() != QImage::Format_RGB32)
     {
-        src = src.convertToFormat(QImage::Format_ARGB32);
+        src = src.convertToFormat(QImage::Format_RGB32);
     }
 
     const uint8_t* srcData[1] = {src.constBits()};
@@ -554,27 +554,23 @@ bool FFmpegVideoExporter::fillFrameYuv420(const QImage& image)
 
 bool FFmpegVideoExporter::updateFrameTimestamp(const VideoFrame& frame)
 {
-    switch (settings_.timestampMode)
+    // Use constant frame rate timing when no explicit timestamp is provided.
+    if (!frame.presentationTimestampNs)
     {
-        case TimestampMode::ConstantFrameRate:
-            context_->frame->pts = context_->frameIndex++;
-            return true;
-
-        case TimestampMode::ExplicitTimestamps:
-        {
-            if (context_->firstTimestampNs < 0)
-                context_->firstTimestampNs = frame.presentationTimestampNs;
-
-            const int64_t timestampNs = frame.presentationTimestampNs - context_->firstTimestampNs;
-
-            context_->frame->pts = av_rescale_q(timestampNs, AVRational{1, 1'000'000'000},
-                                                context_->codecContext->time_base);
-
-            return true;
-        }
+        context_->frame->pts = context_->frameIndex++;
+        return true;
     }
 
-    return false;
+    // Normalize explicit timestamps relative to the first frame.
+    if (context_->firstTimestampNs < 0)
+        context_->firstTimestampNs = *frame.presentationTimestampNs;
+
+    const int64_t timestampNs = *frame.presentationTimestampNs - context_->firstTimestampNs;
+
+    context_->frame->pts =
+        av_rescale_q(timestampNs, AVRational{1, 1'000'000'000}, context_->codecContext->time_base);
+
+    return true;
 }
 
 bool FFmpegVideoExporter::encodeFrame()

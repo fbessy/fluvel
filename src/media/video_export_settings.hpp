@@ -192,19 +192,6 @@ namespace fluvel
   };
 
   /**
-   * @brief Timestamp policy used when assigning presentation timestamps to frames.
-   *
-   * - ConstantFrameRate   : each frame is assigned a timestamp according to the
-   *                         configured frame rate.
-   * - ExplicitTimestamps  : each frame uses the timestamp provided by the caller.
-   */
-  enum class TimestampMode
-  {
-      ConstantFrameRate, ///< Constant frame rate.
-      ExplicitTimestamps ///< Caller-provided timestamps.
-  };
-
-  /**
    * @brief Video export settings.
    */
   struct VideoExportSettings
@@ -213,11 +200,6 @@ namespace fluvel
      * @brief Output filename.
      */
     QString filename;
-
-    /**
-     * @brief Timestamp mode.
-     */
-    TimestampMode timestampMode{TimestampMode::ConstantFrameRate};
 
     /**
      * @brief Frames per second.

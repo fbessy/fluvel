@@ -71,9 +71,9 @@ private:
      * @brief Detects all video codecs available on the current system.
      *
      * For each codec, the detection tries the preferred FFmpeg encoders
-     * in priority order. For each encoder, it tries the preferred pixel
-     * formats until a compatible combination that can be successfully
-     * initialized is found.
+     * in priority order. For each encoder, it tests the supported pixel
+     * formats until a compatible configuration can be successfully
+     * initialized.
      *
      * @return List of available codec descriptions.
      */
