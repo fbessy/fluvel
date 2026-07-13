@@ -83,6 +83,8 @@ set(PYTHON_TARGET_NAME fluvel_py)
 
 add_subdirectory(src/image_processing)
 
+set(FLUVEL_USE_FFMPEG OFF)
+
 if(FLUVEL_BUILD_APP)
 
     if(FLUVEL_ENABLE_FFMPEG)
@@ -93,6 +95,10 @@ if(FLUVEL_BUILD_APP)
     set(CMAKE_AUTOMOC_VERBOSE ON)
     add_subdirectory(src/app)
 endif()
+
+message(STATUS
+    "FFmpeg video export: requested=${FLUVEL_ENABLE_FFMPEG}, available=${FLUVEL_USE_FFMPEG}"
+)
 
 if(FLUVEL_BUILD_BIND)
     include(cmake/fluvel_python.cmake)
