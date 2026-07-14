@@ -255,8 +255,8 @@ void VideoController::start(const QUrl& url)
 
     mediaInfo_ = {};
 
-    mediaPlayer_.setSource(url);
     mediaPlayer_.setVideoSink(&videoSink_);
+    mediaPlayer_.setSource(url);
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     testFrameCounter_ = 0;
@@ -299,6 +299,7 @@ void VideoController::stop()
     captureSession_.setCamera(nullptr);
 
     mediaPlayer_.stop();
+    mediaPlayer_.setSource({});
     mediaPlayer_.setVideoSink(nullptr);
 
     if (camera_)
