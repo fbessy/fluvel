@@ -410,7 +410,7 @@ void VideoWindow::createUi()
     mediaControlsWidget_ = new QWidget(this);
 
     auto* mediaLayout = new QHBoxLayout(mediaControlsWidget_);
-    mediaLayout->setContentsMargins(0, 0, 0, 0);
+    mediaLayout->setContentsMargins(6, 4, 0, 0);
     mediaLayout->setSpacing(kControlSpacing);
 
     mediaLayout->addWidget(playPauseButton_);
