@@ -19,8 +19,11 @@
 #include "contour_types.hpp"
 #include "processing_params.hpp"
 #include "speed_model_types.hpp"
+#include "video_export_settings.hpp"
 
+#include <QByteArray>
 #include <QImage>
+#include <QString>
 #include <string_view>
 
 namespace fluvel
@@ -34,6 +37,28 @@ enum class Language
     System,  ///< Use system locale
     English, ///< English language
     French   ///< French language
+};
+
+/**
+ * @brief Persistent snapshot preferences.
+ */
+struct SnapshotPreferences
+{
+    QString directory;
+    QString baseName{"image"};
+    QByteArray preferredFormat{"png"};
+    bool appendTimestamp{false};
+};
+
+/**
+ * @brief Persistent video recording preferences.
+ */
+struct VideoRecordingPreferences
+{
+    QString directory;
+    QString baseName{"video"};
+    VideoCodec preferredCodec{VideoCodec::FFV1};
+    bool appendTimestamp{false};
 };
 
 /**

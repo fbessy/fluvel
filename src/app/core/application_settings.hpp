@@ -104,6 +104,44 @@ public:
      */
     void setVideoDisplayConfig(const DisplayConfig& displayConfig);
 
+    /**
+     * @brief Get persistent snapshot preferences.
+     *
+     * @return Current snapshot preferences.
+     */
+    const SnapshotPreferences& snapshotPreferences() const;
+
+    /**
+     * @brief Get persistent video recording preferences.
+     *
+     * @return Current video recording preferences.
+     */
+    const VideoRecordingPreferences& videoRecordingPreferences() const;
+
+    /**
+     * @brief Set persistent snapshot preferences.
+     *
+     * @param preferences Snapshot preferences to apply.
+     */
+    void setSnapshotPreferences(const SnapshotPreferences& preferences);
+
+    /**
+     * @brief Set persistent video recording preferences.
+     *
+     * @param preferences Video recording preferences to apply.
+     */
+    void setVideoRecordingPreferences(const VideoRecordingPreferences& preferences);
+
+    /**
+     * @brief Load persistent user preferences from storage.
+     */
+    void loadUserPreferences();
+
+    /**
+     * @brief Save persistent user preferences to storage.
+     */
+    void saveUserPreferences();
+
 signals:
     /**
      * @brief Emitted when image session settings change.
@@ -178,6 +216,12 @@ private:
 
     /// Current application language.
     Language appLanguage_;
+
+    /// Current persistent snapshot preferences.
+    SnapshotPreferences snapshotPreferences_{};
+
+    /// Current persistent video recording preferences.
+    VideoRecordingPreferences videoRecordingPreferences_{};
 };
 
 } // namespace fluvel

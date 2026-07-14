@@ -15,8 +15,6 @@
 #include <QSize>
 #include <QString>
 
-#include <cstdint>
-
 namespace fluvel
 {
 
@@ -180,18 +178,6 @@ namespace fluvel
   };
 
   /**
-   * @brief Encoding speed / compression trade-off.
-   */
-  enum class VideoPreset
-  {
-      UltraFast,
-      Fast,
-      Medium,
-      Slow,
-      VerySlow
-  };
-
-  /**
    * @brief Video export settings.
    */
   struct VideoExportSettings
@@ -227,26 +213,6 @@ namespace fluvel
      * Used only when profile is Custom.
      */
     VideoContainer container{VideoContainer::Matroska};
-
-    /**
-     * @brief Encoding preset.
-     */
-    VideoPreset preset{VideoPreset::Medium};
-
-    /**
-     * @brief Target bitrate.
-     *
-     * Used by lossy codecs.
-     */
-    int bitrate{8'000'000};
-
-    /**
-     * @brief Compression quality.
-     *
-     * Lower values generally produce higher quality.
-     * Interpretation depends on the selected codec.
-     */
-    int quality{23};
   };
 
 } // namespace fluvel

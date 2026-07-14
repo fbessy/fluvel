@@ -93,22 +93,14 @@ ApplicationSettings& ApplicationSettings::instance()
 
 ApplicationSettings::ApplicationSettings()
 {
-    QSettings settings = userSettings();
-
-    const QString s = settings.value("ui/language", "system").toString();
-
-    appLanguage_ = language_from_string(s.toStdString());
-
+    loadUserPreferences();
     loadImageSessionSettings();
     loadVideoSessionSettings();
 }
 
 void ApplicationSettings::save()
 {
-    QSettings settings = userSettings();
-
-    settings.setValue("ui/language", to_string(appLanguage_));
-
+    saveUserPreferences();
     saveImageSessionSettings();
     saveVideoSessionSettings();
 }
@@ -658,6 +650,85 @@ Language ApplicationSettings::appLanguage() const
 void ApplicationSettings::setAppLanguage(Language language)
 {
     appLanguage_ = language;
+}
+
+void ApplicationSettings::loadUserPreferences()
+{
+    QSettings settings = userSettings();
+
+    const QString language = settings.value("ui/language", "system").toString();
+    appLanguage_ = language_from_string(language.toStdString());
+
+    snapshotPreferences_.directory =
+        settings
+            .value("preferences/snapshot/directory",
+                   QStandardPaths::writableLocation(QStandardPaths::PicturesLocation))
+            .toString();
+
+    snapshotPreferences_.baseName =
+        settings.value("preferences/snapshot/base_name", "image").toString();
+
+    snapshotPreferences_.preferredFormat =
+        settings.value("preferences/snapshot/format", QByteArray("png")).toByteArray();
+
+    snapshotPreferences_.appendTimestamp =
+        settings.value("preferences/snapshot/append_timestamp", false).toBool();
+
+    videoRecordingPreferences_.directory =
+        settings
+            .value("preferences/video_recording/directory",
+                   QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
+            .toString();
+
+    videoRecordingPreferences_.baseName =
+        settings.value("preferences/video_recording/base_name", "video").toString();
+
+    videoRecordingPreferences_.preferredCodec = static_cast<VideoCodec>(
+        settings.value("preferences/video_recording/codec", int(VideoCodec::FFV1)).toInt());
+
+    videoRecordingPreferences_.appendTimestamp =
+        settings.value("preferences/video_recording/append_timestamp", false).toBool();
+}
+
+void ApplicationSettings::saveUserPreferences()
+{
+    QSettings settings = userSettings();
+
+    settings.setValue("ui/language", to_string(appLanguage_));
+
+    settings.setValue("preferences/snapshot/directory", snapshotPreferences_.directory);
+    settings.setValue("preferences/snapshot/base_name", snapshotPreferences_.baseName);
+    settings.setValue("preferences/snapshot/format", snapshotPreferences_.preferredFormat);
+    settings.setValue("preferences/snapshot/append_timestamp",
+                      snapshotPreferences_.appendTimestamp);
+
+    settings.setValue("preferences/video_recording/directory",
+                      videoRecordingPreferences_.directory);
+    settings.setValue("preferences/video_recording/base_name", videoRecordingPreferences_.baseName);
+    settings.setValue("preferences/video_recording/codec",
+                      int(videoRecordingPreferences_.preferredCodec));
+    settings.setValue("preferences/video_recording/append_timestamp",
+                      videoRecordingPreferences_.appendTimestamp);
+}
+
+const SnapshotPreferences& ApplicationSettings::snapshotPreferences() const
+{
+    return snapshotPreferences_;
+}
+
+const VideoRecordingPreferences& ApplicationSettings::videoRecordingPreferences() const
+{
+    return videoRecordingPreferences_;
+}
+
+void ApplicationSettings::setSnapshotPreferences(const SnapshotPreferences& preferences)
+{
+    snapshotPreferences_ = preferences;
+}
+
+void ApplicationSettings::setVideoRecordingPreferences(const VideoRecordingPreferences& preferences)
+{
+    videoRecordingPreferences_ = preferences;
 }
 
 } // namespace fluvel
