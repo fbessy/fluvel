@@ -223,6 +223,18 @@ set(app_src
     ${CORE_DIR}/frame_rendering_utils.cpp
     ${CORE_DIR}/frame_rendering_utils.hpp
 
+    ${CORE_DIR}/video_recorder_worker.cpp
+    ${CORE_DIR}/video_recorder_worker.hpp
+
+    ${MEDIA_DIR}/video_export_settings.hpp
+    ${MEDIA_DIR}/video_exporter_backend.hpp
+
+    ${MEDIA_DIR}/video_exporter.cpp
+    ${MEDIA_DIR}/video_exporter.hpp
+
+    ${MEDIA_DIR}/video_exporter_utils.cpp
+    ${MEDIA_DIR}/video_exporter_utils.hpp
+
     ${INTEROP_DIR}/image_adapters.hpp
     ${INTEROP_DIR}/color_adapters.hpp
     ${INTEROP_DIR}/contour_adapters.hpp
@@ -231,18 +243,6 @@ set(app_src
 if(FLUVEL_USE_FFMPEG)
 
     list(APPEND app_src
-
-        ${CORE_DIR}/video_recorder_worker.cpp
-        ${CORE_DIR}/video_recorder_worker.hpp
-
-        ${MEDIA_DIR}/video_export_settings.hpp
-        ${MEDIA_DIR}/video_exporter_backend.hpp
-
-        ${MEDIA_DIR}/video_exporter.cpp
-        ${MEDIA_DIR}/video_exporter.hpp
-
-        ${MEDIA_DIR}/video_exporter_utils.cpp
-        ${MEDIA_DIR}/video_exporter_utils.hpp
 
         ${FFMPEG_DIR}/ffmpeg_video_exporter.cpp
         ${FFMPEG_DIR}/ffmpeg_video_exporter.hpp

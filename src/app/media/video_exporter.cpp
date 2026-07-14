@@ -3,7 +3,11 @@
 
 #include "video_exporter.hpp"
 
+#ifdef FLUVEL_USE_FFMPEG
+
 #include "ffmpeg_video_exporter.hpp"
+
+#endif
 
 #include <QImage>
 #include <memory>
@@ -12,8 +16,10 @@ namespace fluvel
 {
 
 VideoExporter::VideoExporter()
-    : exporter_(std::make_unique<FFmpegVideoExporter>())
 {
+#ifdef FLUVEL_USE_FFMPEG
+    exporter_ = std::make_unique<FFmpegVideoExporter>();
+#endif
 }
 
 VideoExporter::~VideoExporter() = default;
@@ -24,22 +30,22 @@ VideoExporter& VideoExporter::operator=(VideoExporter&&) noexcept = default;
 
 bool VideoExporter::open(const VideoExportSettings& settings)
 {
-    return exporter_->open(settings);
+    return exporter_ && exporter_->open(settings);
 }
 
 bool VideoExporter::addFrame(const VideoFrame& frame)
 {
-    return exporter_->addFrame(frame);
+    return exporter_ && exporter_->addFrame(frame);
 }
 
 bool VideoExporter::close()
 {
-    return exporter_->close();
+    return exporter_ && exporter_->close();
 }
 
 bool VideoExporter::isRecording() const
 {
-    return exporter_->isRecording();
+    return exporter_ && exporter_->isRecording();
 }
 
 } // namespace fluvel
