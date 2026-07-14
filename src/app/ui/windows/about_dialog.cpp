@@ -5,6 +5,7 @@
 #include "application_settings.hpp"
 #include "file_utils.hpp"
 #include "icon_loader.hpp"
+#include "video_exporter_utils.hpp"
 
 #ifdef FLUVEL_USE_FFMPEG
 #include "ffmpeg_codec_utils.hpp"
@@ -13,8 +14,6 @@ extern "C"
 {
 #include <libavutil/avutil.h>
 }
-
-#include <utility>
 
 #endif
 
@@ -149,32 +148,6 @@ QString buildFingerprint()
 
 #ifdef FLUVEL_USE_FFMPEG
 
-QString videoCodecName(VideoCodec codec)
-{
-    switch (codec)
-    {
-        case VideoCodec::FFV1:
-            return QStringLiteral("FFV1");
-
-        case VideoCodec::H264:
-            return QStringLiteral("H.264");
-
-        case VideoCodec::H265:
-            return QStringLiteral("H.265");
-
-        case VideoCodec::AV1:
-            return QStringLiteral("AV1");
-
-        case VideoCodec::VP9:
-            return QStringLiteral("VP9");
-
-        case VideoCodec::MPEG4Part2:
-            return QStringLiteral("MPEG-4 Part 2");
-    }
-
-    std::unreachable();
-}
-
 QString ffmpegVersionString()
 {
     return QString::fromLatin1(av_version_info());
@@ -184,16 +157,20 @@ QString availableVideoEncoders()
 {
     QStringList encoders;
 
+#ifdef FLUVEL_USE_FFMPEG
+
     for (const CodecInfo& codec : FFmpegCodecUtils::availableCodecs())
     {
         if (codec.encoder == nullptr)
             continue;
 
-        encoders.append(QStringLiteral("%1 (%2)").arg(videoCodecName(codec.codec),
+        encoders.append(QStringLiteral("%1 (%2)").arg(exporter_utils::toString(codec.codec),
                                                       QString::fromLatin1(codec.encoder->name)));
     }
 
-    return encoders.join(QStringLiteral(", "));
+#endif
+
+    return encoders.isEmpty() ? QObject::tr("None") : encoders.join(QStringLiteral(", "));
 }
 
 #endif
