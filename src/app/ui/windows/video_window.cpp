@@ -628,11 +628,12 @@ void VideoWindow::setupConnections()
                 if (isUpdatingUi_)
                     return;
 
-                auto fmt = getSelectedFormat();
+                const auto fmt = getSelectedFormat();
 
                 if (!fmt.isNull() && !sourceConfig_.cameraId.isEmpty())
                 {
                     sourceConfig_.cameraFormat = fmt;
+                    preferredFormats_[sourceConfig_.cameraId] = fmt;
                     savePreferredFormats();
                 }
 

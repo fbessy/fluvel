@@ -269,12 +269,13 @@ void VideoController::start(const QUrl& url)
 
 void VideoController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
+    if (startupInfo_.type != SourceType::Media)
+        return;
+
     updateMediaInfo();
 
     if (status == QMediaPlayer::EndOfMedia)
-    {
         stop();
-    }
 }
 
 void VideoController::stop()
@@ -298,6 +299,7 @@ void VideoController::stop()
     captureSession_.setCamera(nullptr);
 
     mediaPlayer_.stop();
+    mediaPlayer_.setVideoSink(nullptr);
 
     if (camera_)
     {
@@ -496,7 +498,7 @@ void VideoController::onVideoInputsChanged()
 
 void VideoController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devices)
 {
-    if (state_ == StreamingState::Stopped)
+    if (state_ == StreamingState::Stopped || startupInfo_.type != SourceType::Camera)
         return;
 
     const bool cameraStillExists = std::any_of(devices.begin(), devices.end(),
