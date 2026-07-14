@@ -406,6 +406,8 @@ void VideoController::onProcessedFrameReady(const ProcessedFrame& frame)
 
 #endif
 
+    lastDisplayFrame_ = displayFrame;
+
     emit displayFrameReady(displayFrame);
 }
 
@@ -766,5 +768,33 @@ void VideoController::onRecordingStateChanged(RecorderState state)
 }
 
 #endif
+
+void VideoController::takeSnapshot()
+{
+    if (lastDisplayFrame_.image.isNull())
+    {
+        emit snapshotError(tr("No frame available."));
+        return;
+    }
+
+    const auto& preferences = ApplicationSettings::instance().snapshotPreferences();
+
+    const QString fileName = file_utils::buildOutputFileName(
+        preferences.directory, preferences.baseName,
+        QString::fromLatin1(preferences.preferredFormat), preferences.appendTimestamp);
+
+    QImage image = lastDisplayFrame_.image;
+
+    frame_rendering_utils::drawContourOverlay(image, lastDisplayFrame_, displayConfig_,
+                                              downscaleParams_);
+
+    if (!image.save(fileName, preferences.preferredFormat.constData()))
+    {
+        emit snapshotError(tr("Failed to save snapshot: %1").arg(fileName));
+        return;
+    }
+
+    emit snapshotSaved(fileName);
+}
 
 } // namespace fluvel

@@ -234,6 +234,14 @@ public:
 
 #endif
 
+    /**
+     * @brief Saves a snapshot of the latest processed video frame.
+     *
+     * The snapshot is rendered using the current display configuration
+     * and saved according to the persistent snapshot preferences.
+     */
+    void takeSnapshot();
+
 signals:
     /// Emitted when available video inputs change.
     void videoInputsChanged(const QList<QCameraDevice>& devices);
@@ -381,6 +389,20 @@ signals:
     void recordingError(const QString& message);
 
 #endif
+
+    /**
+     * @brief Emitted when a snapshot has been successfully saved.
+     *
+     * @param filename Path of the saved snapshot file.
+     */
+    void snapshotSaved(const QString& filename);
+
+    /**
+     * @brief Emitted when a snapshot cannot be saved.
+     *
+     * @param message Description of the snapshot error.
+     */
+    void snapshotError(const QString& message);
 
 private:
     /**
@@ -598,6 +620,9 @@ private:
 
     /// Current image downscaling parameters used by the processing pipeline.
     DownscaleParams downscaleParams_{};
+
+    /// Last processed frame available for snapshot capture.
+    DisplayFrame lastDisplayFrame_{};
 };
 
 /**

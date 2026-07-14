@@ -297,6 +297,15 @@ void VideoWindow::createUi()
     toggleStreamingButton_->setTransitionEffect(TransitionEffect::Slide);
     toggleStreamingButton_->setClickAnimation(ClickAnimation::None);
 
+    QIcon applyIcon = createActiveFormatIcon();
+
+    applyButton_ = new QPushButton;
+    applyButton_->setIcon(applyIcon);
+    applyButton_->setEnabled(false);
+    applyButton_->setFlat(true);
+    applyButton_->setText(tr("Apply"));
+    applyButton_->setToolTip(tr("Restart the active source using the selected configuration."));
+
 #ifdef FLUVEL_USE_FFMPEG
 
     recordingButton_ = new QPushButton;
@@ -311,14 +320,12 @@ void VideoWindow::createUi()
 
 #endif
 
-    QIcon applyIcon = createActiveFormatIcon();
+    snapshotButton_ = new AnimatedPushButton;
+    snapshotButton_->setEnabled(false);
 
-    applyButton_ = new QPushButton;
-    applyButton_->setIcon(applyIcon);
-    applyButton_->setEnabled(false);
-    applyButton_->setFlat(true);
-    applyButton_->setText(tr("Apply"));
-    applyButton_->setToolTip(tr("Restart the active source using the selected configuration."));
+    snapshotButton_->setIcon(
+        il::loadIcon(QIcon::ThemeIcon::CameraPhoto, ":icons/actions/camera-photo-symbolic.svg"));
+    snapshotButton_->setToolTip(tr("Take snapshot"));
 
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
@@ -548,11 +555,18 @@ void VideoWindow::setupLayout()
     configColumn->addWidget(sourceConfigWidget_);
     configColumn->addStretch();
 
+    auto* actionLayout = new QHBoxLayout;
+    actionLayout->setContentsMargins(0, 0, 0, 0);
+    actionLayout->setSpacing(kControlSpacing);
+
 #ifdef FLUVEL_USE_FFMPEG
-
-    configColumn->addWidget(recordingButton_, 0, Qt::AlignLeft);
-
+    actionLayout->addWidget(recordingButton_);
 #endif
+
+    actionLayout->addWidget(snapshotButton_);
+    actionLayout->addStretch();
+
+    configColumn->addLayout(actionLayout);
 
     //
     // Right column
@@ -652,11 +666,14 @@ void VideoWindow::setupConnections()
 
     connect(toggleStreamingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleStreaming);
 
+    connect(applyButton_, &QPushButton::clicked, this, &VideoWindow::onApplySelection);
+
 #ifdef FLUVEL_USE_FFMPEG
     connect(recordingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleRecording);
 #endif
 
-    connect(applyButton_, &QPushButton::clicked, this, &VideoWindow::onApplySelection);
+    connect(snapshotButton_, &QPushButton::clicked, videoController_,
+            &VideoController::takeSnapshot);
 
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
@@ -884,6 +901,9 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::recordingFinalized, this,
             &VideoWindow::onRecordingFinalized);
 #endif
+
+    connect(videoController_, &VideoController::snapshotSaved, this, &VideoWindow::onSnapshotSaved);
+    connect(videoController_, &VideoController::snapshotError, this, &VideoWindow::onSnapshotError);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -1591,6 +1611,8 @@ void VideoWindow::updateActionBar()
 #ifdef FLUVEL_USE_FFMPEG
     updateRecordingButton();
 #endif
+
+    updateSnapshotButton();
 }
 
 bool VideoWindow::canStartSource() const
@@ -2511,5 +2533,22 @@ void VideoWindow::onRecordingError(const QString& message)
 }
 
 #endif
+
+void VideoWindow::updateSnapshotButton()
+{
+    const bool streaming = videoController_->isStreaming();
+
+    snapshotButton_->setEnabled(streaming);
+}
+
+void VideoWindow::onSnapshotSaved(const QString& filename)
+{
+    statusBar()->showMessage(tr("Snapshot saved: %1").arg(filename), 5000);
+}
+
+void VideoWindow::onSnapshotError(const QString& message)
+{
+    statusBar()->showMessage(message, 5000);
+}
 
 } // namespace fluvel

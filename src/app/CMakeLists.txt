@@ -333,6 +333,7 @@ set(APP_RESOURCES
     ${FLUVEL_RESOURCES_DIR}/icons/actions/go-next-symbolic.svg
 
     ${FLUVEL_RESOURCES_DIR}/icons/actions/camera-video-symbolic.svg
+    ${FLUVEL_RESOURCES_DIR}/icons/actions/camera-photo-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/actions/globe-symbolic.svg
     ${FLUVEL_RESOURCES_DIR}/icons/actions/smooth_rendering-symbolic.svg
 

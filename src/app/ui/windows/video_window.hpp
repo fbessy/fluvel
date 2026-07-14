@@ -222,6 +222,7 @@ private:
 #ifdef FLUVEL_USE_FFMPEG
     void updateRecordingButton();
 #endif
+    void updateSnapshotButton();
     void refreshUi();
 
     void openFile();
@@ -276,6 +277,9 @@ private:
     void onRecordingWarning(const QString& message);
     void onRecordingError(const QString& message);
 #endif
+
+    void onSnapshotSaved(const QString& filename);
+    void onSnapshotError(const QString& message);
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
@@ -417,6 +421,8 @@ private:
     QIcon stopIcon_;
     AnimatedPushButton* toggleStreamingButton_{nullptr};
 
+    QPushButton* applyButton_{nullptr};
+
 #ifdef FLUVEL_USE_FFMPEG
     QPushButton* recordingButton_{nullptr};
     QIcon stoppedIcon_;
@@ -424,7 +430,7 @@ private:
     QIcon drainingIcon_;
 #endif
 
-    QPushButton* applyButton_{nullptr};
+    AnimatedPushButton* snapshotButton_{nullptr};
 
     DisplaySettingsWidget* displayBar_{nullptr};
 
