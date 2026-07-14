@@ -185,6 +185,28 @@ private:
     bool fillFrame(const QImage& image);
 
     /**
+     * @brief Fills the encoder frame with grayscale image data.
+     *
+     * The source image is converted to @c QImage::Format_Grayscale8 when required
+     * and copied into the @c AV_PIX_FMT_GRAY8 frame buffer.
+     *
+     * @param image Source image.
+     * @return @c true on success, otherwise @c false.
+     */
+    bool fillFrameGray8(const QImage& image);
+
+    /**
+     * @brief Fills the encoder frame with RGB24 image data.
+     *
+     * The source image is converted to @c QImage::Format_RGB888 when required
+     * and copied into the @c AV_PIX_FMT_RGB24 frame buffer.
+     *
+     * @param image Source image.
+     * @return @c true on success, otherwise @c false.
+     */
+    bool fillFrameRgb24(const QImage& image);
+
+    /**
      * @brief Copies a BGRA image into the encoder frame.
      *
      * @param image Source image.

@@ -33,11 +33,14 @@ namespace
 // The formats are ordered to minimize conversions from the current
 // input representation. The first compatible format is selected.
 //
-static constexpr AVPixelFormat kGray8Formats[] = {AV_PIX_FMT_GRAY8, AV_PIX_FMT_YUV420P,
+static constexpr AVPixelFormat kRgb32Formats[] = {AV_PIX_FMT_BGR0, AV_PIX_FMT_YUV420P,
                                                   AV_PIX_FMT_NONE};
 
-static constexpr AVPixelFormat kBgraFormats[] = {AV_PIX_FMT_BGR0, AV_PIX_FMT_BGRA,
-                                                 AV_PIX_FMT_YUV420P, AV_PIX_FMT_NONE};
+static constexpr AVPixelFormat kRgb888Formats[] = {AV_PIX_FMT_RGB24, AV_PIX_FMT_YUV420P,
+                                                   AV_PIX_FMT_NONE};
+
+static constexpr AVPixelFormat kGray8Formats[] = {AV_PIX_FMT_GRAY8, AV_PIX_FMT_YUV420P,
+                                                  AV_PIX_FMT_NONE};
 
 /**
  * @brief Returns the preferred FFmpeg pixel formats for a QImage format.
@@ -51,13 +54,14 @@ const AVPixelFormat* preferredPixelFormats(QImage::Format format)
 {
     switch (format)
     {
+        case QImage::Format_RGB32:
+            return kRgb32Formats;
+
+        case QImage::Format_RGB888:
+            return kRgb888Formats;
+
         case QImage::Format_Grayscale8:
             return kGray8Formats;
-
-        case QImage::Format_RGB32:
-        case QImage::Format_ARGB32:
-        case QImage::Format_ARGB32_Premultiplied:
-            return kBgraFormats;
 
         default:
             return nullptr;
@@ -473,6 +477,12 @@ bool FFmpegVideoExporter::fillFrame(const QImage& image)
 
     switch (context_->codecContext->pix_fmt)
     {
+        case AV_PIX_FMT_GRAY8:
+            return fillFrameGray8(image);
+
+        case AV_PIX_FMT_RGB24:
+            return fillFrameRgb24(image);
+
         case AV_PIX_FMT_BGR0:
             return fillFrameBgr0(image);
 
@@ -484,6 +494,56 @@ bool FFmpegVideoExporter::fillFrame(const QImage& image)
                        << av_get_pix_fmt_name(context_->codecContext->pix_fmt);
             return false;
     }
+}
+
+bool FFmpegVideoExporter::fillFrameGray8(const QImage& image)
+{
+    const QImage* src = &image;
+
+    QImage converted;
+
+    if (image.format() != QImage::Format_Grayscale8)
+    {
+        converted = image.convertToFormat(QImage::Format_Grayscale8);
+        src = &converted;
+    }
+
+    auto* frame = context_->frame;
+
+    const int bytesPerRow = src->width();
+
+    for (int y = 0; y < src->height(); ++y)
+    {
+        std::memcpy(frame->data[0] + y * frame->linesize[0], src->constScanLine(y),
+                    static_cast<std::size_t>(bytesPerRow));
+    }
+
+    return true;
+}
+
+bool FFmpegVideoExporter::fillFrameRgb24(const QImage& image)
+{
+    const QImage* src = &image;
+
+    QImage converted;
+
+    if (image.format() != QImage::Format_RGB888)
+    {
+        converted = image.convertToFormat(QImage::Format_RGB888);
+        src = &converted;
+    }
+
+    auto* frame = context_->frame;
+
+    const int bytesPerRow = src->width() * 3;
+
+    for (int y = 0; y < src->height(); ++y)
+    {
+        std::memcpy(frame->data[0] + y * frame->linesize[0], src->constScanLine(y),
+                    static_cast<std::size_t>(bytesPerRow));
+    }
+
+    return true;
 }
 
 bool FFmpegVideoExporter::fillFrameBgr0(const QImage& image)
