@@ -25,9 +25,11 @@ Controllers
 Execution
 ---------
 
-.. doxygenfile:: active_contour_worker.hpp
+.. doxygenfile:: image_processing_worker.hpp
 
-.. doxygenfile:: video_active_contour_thread.hpp
+.. doxygenfile:: video_processing_thread.hpp
+
+.. doxygenfile:: video_recorder_worker.hpp
 
 .. doxygenfile:: frame_pipeline.hpp
 
@@ -52,6 +54,8 @@ Video
 .. doxygenfile:: camera_format_utils.hpp
 
 .. doxygenfile:: video_format_utils.hpp
+
+.. doxygenfile:: frame_rendering_utils.hpp
 
 
 Image Editing

@@ -7,7 +7,8 @@ set(UI_WIN_DIR ${APP_DIR}/ui/windows)
 set(UI_COMP_DIR ${APP_DIR}/ui/components)
 set(CORE_DIR ${APP_DIR}/core)
 set(INTEROP_DIR ${APP_DIR}/interop)
-set(MEDIA_DIR ${FLUVEL_ROOT_DIR}/src/media)
+set(MEDIA_DIR ${APP_DIR}/media)
+set(FFMPEG_DIR ${MEDIA_DIR}/ffmpeg)
 
 set(app_src
 
@@ -243,14 +244,14 @@ if(FLUVEL_USE_FFMPEG)
         ${MEDIA_DIR}/video_exporter_utils.cpp
         ${MEDIA_DIR}/video_exporter_utils.hpp
 
-        ${MEDIA_DIR}/ffmpeg/ffmpeg_video_exporter.cpp
-        ${MEDIA_DIR}/ffmpeg/ffmpeg_video_exporter.hpp
+        ${FFMPEG_DIR}/ffmpeg_video_exporter.cpp
+        ${FFMPEG_DIR}/ffmpeg_video_exporter.hpp
 
-        ${MEDIA_DIR}/ffmpeg/ffmpeg_codec_utils.cpp
-        ${MEDIA_DIR}/ffmpeg/ffmpeg_codec_utils.hpp
+        ${FFMPEG_DIR}/ffmpeg_codec_utils.cpp
+        ${FFMPEG_DIR}/ffmpeg_codec_utils.hpp
 
-        ${MEDIA_DIR}/ffmpeg/ffmpeg_utils.cpp
-        ${MEDIA_DIR}/ffmpeg/ffmpeg_utils.hpp
+        ${FFMPEG_DIR}/ffmpeg_utils.cpp
+        ${FFMPEG_DIR}/ffmpeg_utils.hpp
     )
 
 endif()
@@ -381,7 +382,7 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
     ${UI_WIN_DIR}
     ${INTEROP_DIR}
     ${MEDIA_DIR}
-    ${MEDIA_DIR}/ffmpeg
+    ${FFMPEG_DIR}
 )
 
 if(FLUVEL_USE_FFMPEG)

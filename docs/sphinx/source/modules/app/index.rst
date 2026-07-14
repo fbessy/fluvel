@@ -8,10 +8,11 @@ It is responsible for user interaction, session management, camera and
 image workflows, and integration with the underlying Fluvel IP image
 processing library.
 
-The application is organized into three main areas:
+The application is organized into four main areas:
 
 - **UI**: windows, dialogs and reusable user interface components.
 - **Application Core**: controllers, settings management and execution workflows.
+- **Media**: video export infrastructure and media backend integrations.
 - **Interoperability**: adapters and integration layers connecting the application
   to external libraries and processing backends.
 
@@ -20,4 +21,5 @@ The application is organized into three main areas:
 
    ui/index
    app_core
+   app_media
    app_interop
