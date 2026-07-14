@@ -1553,9 +1553,9 @@ bool VideoWindow::shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo)
 
 void VideoWindow::onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec)
 {
-    QMessageBox::warning(this, tr("Camera startup failed"),
-                         tr("The camera did not produce a valid frame within %1 seconds.\n"
-                            "The device may be busy or not responding.")
+    QMessageBox::warning(this, tr("Source startup failed"),
+                         tr("The source did not produce a valid frame within %1 seconds.\n"
+                            "The source may be unavailable or not responding.")
                              .arg(timeoutSec, 0, 'f', 1));
 
     if (sourceInfo.type == SourceType::Camera)
@@ -1571,10 +1571,10 @@ void VideoWindow::onStreamingLost(const StreamingInfo& streamingInfo, double fra
     disconnect(frameToViewConnection_);
     imageViewer_->showPlaceholder(true);
 
-    QMessageBox::warning(
-        this, tr("Camera stream lost"),
-        tr("No valid frame received for %1 seconds.\nThe camera stream may have stalled.")
-            .arg(frameAgeSec, 0, 'f', 1));
+    QMessageBox::warning(this, tr("Source stream lost"),
+                         tr("No valid frame was received for %1 seconds.\n"
+                            "The source stream may have stalled or become unavailable.")
+                             .arg(frameAgeSec, 0, 'f', 1));
 
     if (streamingInfo.source.type == SourceType::Camera)
         deviceStreamingStatus_[streamingInfo.source.deviceId] = DeviceStreamingStatus::Error;
