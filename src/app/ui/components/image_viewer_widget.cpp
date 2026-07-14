@@ -521,6 +521,11 @@ void ImageViewerWidget::applyAutoFit()
     updateMiniMap();
 }
 
+bool ImageViewerWidget::isAutoFitEnabled() const
+{
+    return autoFitEnabled_;
+}
+
 void ImageViewerWidget::userInteracted()
 {
     autoFitEnabled_ = false;

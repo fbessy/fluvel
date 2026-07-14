@@ -20,8 +20,11 @@ bool AutoFitBehavior::mouseRelease(ImageViewerWidget& view, QMouseEvent* event)
     if (event->button() != button_)
         return false;
 
-    view.applyAutoFit();
-    view.showCursorMessage(QObject::tr("Auto Fit"));
+    if (!view.isAutoFitEnabled())
+    {
+        view.applyAutoFit();
+        view.showCursorMessage(QObject::tr("Auto Fit"));
+    }
 
     event->accept();
     return true;

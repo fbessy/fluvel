@@ -256,6 +256,7 @@ public:
     void leaveFullscreenMode();
 
     void applyAutoFit();
+    bool isAutoFitEnabled() const;
 
     bool isPanRelevant() const;
     void userInteracted();
