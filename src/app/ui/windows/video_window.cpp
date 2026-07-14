@@ -425,6 +425,7 @@ void VideoWindow::createUi()
     mediaLayout->addWidget(playbackSlider_, 1);
 
     setStatusBar(new QStatusBar(this));
+    statusBar()->setStyleSheet("border: none;");
 
 #ifdef FLUVEL_USE_FFMPEG
     recordingStatsLabel_ = new QLabel(this);

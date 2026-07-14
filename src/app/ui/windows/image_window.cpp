@@ -254,6 +254,7 @@ void ImageWindow::setupUi()
     setCentralWidget(central);
 
     setStatusBar(new QStatusBar(this));
+    statusBar()->setStyleSheet("border: none;");
 }
 
 void ImageWindow::setupActions()
