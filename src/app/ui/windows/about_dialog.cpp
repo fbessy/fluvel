@@ -579,7 +579,7 @@ QString AboutDialog::buildTechnicalSection()
     html += "<div style='font-family:monospace; white-space:normal; word-wrap:break-word; "
             "margin-bottom:8px;'>";
 
-    html += tr("FFmpeg") + ": " + ffmpegVersionString() + "<br>";
+    html += QString("FFmpeg") + ": " + ffmpegVersionString() + "<br>";
     html += tr("Encoders") + ": " + availableVideoEncoders();
 
     html += "</div>";
