@@ -87,6 +87,16 @@ public:
     [[nodiscard]]
     bool isRecording() const;
 
+    /**
+     * @brief Returns the video codecs available for export.
+     *
+     * The available codecs depend on the active export backend and the
+     * encoders available on the current system.
+     *
+     * @return Available video codecs.
+     */
+    QList<VideoCodec> availableCodecs() const;
+
 private:
     std::unique_ptr<IVideoExporter> exporter_;
 };

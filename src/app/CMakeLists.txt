@@ -29,8 +29,8 @@ set(app_src
     ${UI_WIN_DIR}/video_settings_dialog.cpp
     ${UI_WIN_DIR}/video_settings_dialog.hpp
 
-    ${UI_WIN_DIR}/language_dialog.cpp
-    ${UI_WIN_DIR}/language_dialog.hpp
+    ${UI_WIN_DIR}/preferences_dialog.cpp
+    ${UI_WIN_DIR}/preferences_dialog.hpp
 
     ${UI_WIN_DIR}/about_dialog.cpp
     ${UI_WIN_DIR}/about_dialog.hpp

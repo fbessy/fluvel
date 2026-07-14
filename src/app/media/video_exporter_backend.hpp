@@ -3,12 +3,13 @@
 
 #pragma once
 
+#include "video_export_settings.hpp"
+
 class QImage;
 
 namespace fluvel
 {
 
-class VideoExportSettings;
 class VideoFrame;
 
 /**
@@ -63,6 +64,12 @@ public:
      * @brief Returns whether the exporter is opened.
      */
     virtual bool isRecording() const = 0;
+
+    /**
+     * @brief Returns the video codecs available through this export backend.
+     *      * @return Available video codecs.
+     */
+    virtual QList<VideoCodec> availableCodecs() const = 0;
 };
 
 } // namespace fluvel

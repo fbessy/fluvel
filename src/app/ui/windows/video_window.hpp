@@ -380,7 +380,7 @@ private:
     QStringListModel* sourceCompleterModel_{nullptr};
     QCompleter* sourceCompleter_{nullptr};
 
-    VideoSettingsDialog* videoSettingsWindow_{nullptr};
+    VideoSettingsDialog* videoSettingsDialog_{nullptr};
 
     QWidget* central_{nullptr};
 

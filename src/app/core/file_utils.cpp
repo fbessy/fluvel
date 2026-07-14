@@ -1,5 +1,6 @@
 #include "file_utils.hpp"
 
+#include <QDateTime>
 #include <QDir>
 #include <QFileInfo>
 #include <QImageReader>
@@ -61,16 +62,12 @@ QString buildWritableImageFilter()
 {
     QStringList filters;
 
-    const auto formats = QImageWriter::supportedImageFormats();
-
-    for (const QByteArray& format : formats)
+    for (const QByteArray& format : writableImageFormats())
     {
         const QString ext = QString::fromLatin1(format).toLower();
 
         filters << QString("%1 (*.%2)").arg(ext.toUpper(), ext);
     }
-
-    filters.sort();
 
     return filters.join(";;");
 }
@@ -316,5 +313,25 @@ QString supportedAudioCodecs()
     codecs.sort();
 
     return codecs.join(", ");
+}
+
+QList<QByteArray> writableImageFormats()
+{
+    auto formats = QImageWriter::supportedImageFormats();
+
+    std::sort(formats.begin(), formats.end());
+
+    return formats;
+}
+
+QString buildOutputFileName(const QString& directory, const QString& baseName,
+                            const QString& extension, bool appendTimestamp)
+{
+    QString name = baseName;
+
+    if (appendTimestamp)
+        name += QDateTime::currentDateTime().toString("_yyyy-MM-dd_HH-mm-ss");
+
+    return makeUniqueFileName(QDir(directory).filePath(name + "." + extension));
 }
 }

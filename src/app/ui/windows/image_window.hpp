@@ -67,7 +67,7 @@ struct ControlTheme
 
 class SettingsDialog;
 class AboutDialog;
-class LanguageDialog;
+class PreferencesDialog;
 
 class RightPanelToggleButton;
 class DisplaySettingsWidget;
@@ -177,9 +177,9 @@ private:
     // --- UI ---
     std::unique_ptr<VideoWindow> videoWindow_;
     std::unique_ptr<AnalysisWindow> analysisWindow_;
-    SettingsDialog* settingsWindow_{nullptr};
+    SettingsDialog* settingsDialog_{nullptr};
     AboutDialog* AboutDialog_{nullptr};
-    LanguageDialog* languageWindow_{nullptr};
+    PreferencesDialog* preferencesDialog_{nullptr};
 
     QMenu* fileMenu_{nullptr};
     QMenu* segmentationMenu_{nullptr};
@@ -227,7 +227,7 @@ private:
     QAction* settingsAct_{nullptr};
 
     QAction* aboutAct_{nullptr};
-    QAction* languageAct_{nullptr};
+    QAction* preferencesAct_{nullptr};
 
     // --- VIEW - CONTROLLER ---
     ImageViewerWidget* imageViewer_{nullptr};

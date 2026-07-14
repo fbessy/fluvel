@@ -183,4 +183,24 @@ bool hasExpectedExtension(const QString& filename, VideoContainer container)
                                                 Qt::CaseInsensitive) == 0;
 }
 
+VideoContainer preferredContainer(VideoCodec codec)
+{
+    switch (codec)
+    {
+        case VideoCodec::FFV1:
+            return VideoContainer::Matroska;
+
+        case VideoCodec::VP9:
+            return VideoContainer::WebM;
+
+        case VideoCodec::H264:
+        case VideoCodec::H265:
+        case VideoCodec::AV1:
+        case VideoCodec::MPEG4Part2:
+            return VideoContainer::Mp4;
+    }
+
+    std::unreachable();
+}
+
 } // namespace fluvel::exporter_utils

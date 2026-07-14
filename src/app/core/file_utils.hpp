@@ -205,4 +205,27 @@ QString supportedVideoCodecs();
  */
 QString supportedAudioCodecs();
 
+/**
+ * @brief Returns the image formats available for writing.
+ *
+ * @return Supported writable image formats.
+ */
+QList<QByteArray> writableImageFormats();
+
+/**
+ * @brief Builds a unique output filename.
+ *
+ * Constructs a filename from a directory, base name and extension.
+ * A timestamp is optionally appended to the base name, and the resulting
+ * path is made unique if a file with the same name already exists.
+ *
+ * @param directory Output directory.
+ * @param baseName Base filename without extension.
+ * @param extension File extension without leading dot.
+ * @param appendTimestamp Whether to append a timestamp to the base name.
+ * @return Unique output file path.
+ */
+QString buildOutputFileName(const QString& directory, const QString& baseName,
+                            const QString& extension, bool appendTimestamp);
+
 } // namespace fluvel::file_utils

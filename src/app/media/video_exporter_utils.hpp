@@ -68,4 +68,12 @@ QString expectedExtension(VideoContainer container);
 [[nodiscard]]
 bool hasExpectedExtension(const QString& filename, VideoContainer container);
 
+/**
+ * @brief Returns the preferred container for a video codec.
+ *
+ * @param codec Video codec.
+ * @return Preferred video container.
+ */
+VideoContainer preferredContainer(VideoCodec codec);
+
 } // namespace fluvel::exporter_utils

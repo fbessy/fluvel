@@ -323,7 +323,7 @@ void VideoWindow::createUi()
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 
-    videoSettingsWindow_ = new VideoSettingsDialog(config.compute, this);
+    videoSettingsDialog_ = new VideoSettingsDialog(config.compute, this);
 
     // --- Play/Pause button ---
 
@@ -661,7 +661,7 @@ void VideoWindow::setupConnections()
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, videoSettingsWindow_,
+    connect(settingsButton_, &QPushButton::clicked, videoSettingsDialog_,
             &VideoSettingsDialog::show);
 
     // when the user drag and drop a video in the view of the video window.
@@ -946,7 +946,7 @@ void VideoWindow::bindApplicationSettingsToView()
 
 void VideoWindow::bindUiToApplicationSettings()
 {
-    assert(displayBar_ && videoSettingsWindow_);
+    assert(displayBar_ && videoSettingsDialog_);
 
     const auto& app = ApplicationSettings::instance();
 
@@ -954,7 +954,7 @@ void VideoWindow::bindUiToApplicationSettings()
             &ApplicationSettings::setVideoDisplayConfig);
 
     // commit settings
-    connect(videoSettingsWindow_, &VideoSettingsDialog::videoComputeSettingsAccepted, &app,
+    connect(videoSettingsDialog_, &VideoSettingsDialog::videoComputeSettingsAccepted, &app,
             &ApplicationSettings::setVideoComputeSettings);
 }
 

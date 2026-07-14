@@ -772,4 +772,18 @@ void FFmpegVideoExporter::release()
     frameFormat_ = QImage::Format_Invalid;
 }
 
+QList<VideoCodec> FFmpegVideoExporter::availableCodecs() const
+{
+    QList<VideoCodec> codecs;
+
+    const auto& availableCodecs = FFmpegCodecUtils::availableCodecs();
+
+    codecs.reserve(availableCodecs.size());
+
+    for (const CodecInfo& info : availableCodecs)
+        codecs.push_back(info.codec);
+
+    return codecs;
+}
+
 } // namespace fluvel

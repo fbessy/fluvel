@@ -5,7 +5,7 @@
 
 #include "about_dialog.hpp"
 #include "application_settings.hpp"
-#include "language_dialog.hpp"
+#include "preferences_dialog.hpp"
 #include "settings_dialog.hpp"
 
 #include "animated_push_button.hpp"
@@ -354,13 +354,13 @@ void ImageWindow::setupActions()
 
     aboutAct_->setIcon(aboutIcon);
 
-    languageAct_ = new QAction(tr("&Language"), this);
-    languageAct_->setStatusTip(tr("Choose the application language."));
+    preferencesAct_ = new QAction(tr("&Preferences"), this);
+    preferencesAct_->setStatusTip(tr("Choose the user preferences."));
 
-    QIcon languageIcon =
+    QIcon preferencesIcon =
         il::loadIcon("preferences-desktop-locale", ":/icons/actions/language-symbolic.svg");
 
-    languageAct_->setIcon(languageIcon);
+    preferencesAct_->setIcon(preferencesIcon);
 }
 
 void ImageWindow::setupMenus()
@@ -392,7 +392,7 @@ void ImageWindow::setupMenus()
 
     helpMenu_ = new QMenu(tr("&Help"), this);
     helpMenu_->addAction(aboutAct_);
-    helpMenu_->addAction(languageAct_);
+    helpMenu_->addAction(preferencesAct_);
 
     menuBar()->addMenu(sessionMenu_);
     menuBar()->addMenu(fileMenu_);
@@ -413,9 +413,9 @@ void ImageWindow::setupChildWindows()
     videoWindow_ = std::make_unique<VideoWindow>();
     analysisWindow_ = std::make_unique<AnalysisWindow>();
 
-    settingsWindow_ = new SettingsDialog(config.compute, this);
+    settingsDialog_ = new SettingsDialog(config.compute, this);
     AboutDialog_ = new AboutDialog(this);
-    languageWindow_ = new LanguageDialog(this);
+    preferencesDialog_ = new PreferencesDialog(this);
 }
 
 void ImageWindow::applyInitialSettings()
@@ -482,7 +482,7 @@ void ImageWindow::setupConnections()
     bindUiToApplicationSettings();
 
     // to forward a new image for the image settings window view (preview)
-    connect(imageController_, &ImageController::inputImageReady, settingsWindow_,
+    connect(imageController_, &ImageController::inputImageReady, settingsDialog_,
             &SettingsDialog::handleInputImageReady);
 
     // to retrieve worker events and refresh the buttons states (start/restart, pause/resume)
@@ -566,7 +566,7 @@ void ImageWindow::bindUiToApplicationSettings()
 {
     const auto& config = ApplicationSettings::instance();
 
-    connect(settingsWindow_, &SettingsDialog::imageComputeSettingsAccepted, &config,
+    connect(settingsDialog_, &SettingsDialog::imageComputeSettingsAccepted, &config,
             &ApplicationSettings::setImageComputeSettings);
 
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &config,
@@ -632,13 +632,13 @@ void ImageWindow::setupUserActionsConnections()
 
     connect(analysisAct_, &QAction::triggered, analysisWindow_.get(), &AnalysisWindow::show);
 
-    connect(settingsAct_, &QAction::triggered, settingsWindow_, &SettingsDialog::show);
+    connect(settingsAct_, &QAction::triggered, settingsDialog_, &SettingsDialog::show);
 
     // ---   4th menu   ---
 
     connect(aboutAct_, &QAction::triggered, AboutDialog_, &AboutDialog::show);
 
-    connect(languageAct_, &QAction::triggered, languageWindow_, &LanguageDialog::show);
+    connect(preferencesAct_, &QAction::triggered, preferencesDialog_, &PreferencesDialog::show);
 
     // ---   6 buttons   ---
 
@@ -654,7 +654,7 @@ void ImageWindow::setupUserActionsConnections()
     connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, settingsWindow_, &SettingsDialog::show);
+    connect(settingsButton_, &QPushButton::clicked, settingsDialog_, &SettingsDialog::show);
 
     // when the user drag and drop an image in the view of the image window.
     connect(imageViewer_, &ImageViewerWidget::imageDropped, imageController_,
@@ -776,7 +776,7 @@ void ImageWindow::onFileOpened(const QString& path)
 
     updateWindowTitle();
 
-    statusBar()->showMessage(tr("Opened image: %1").arg(path));
+    statusBar()->showMessage(tr("Opened image: %1").arg(path), 5000);
 
     saveAct_->setEnabled(true);
 }

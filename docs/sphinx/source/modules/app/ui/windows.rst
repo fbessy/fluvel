@@ -26,7 +26,7 @@ Dialogs
 
 .. doxygenfile:: video_settings_dialog.hpp
 
-.. doxygenfile:: language_dialog.hpp
+.. doxygenfile:: preferences_dialog.hpp
 
 .. doxygenfile:: about_dialog.hpp
 

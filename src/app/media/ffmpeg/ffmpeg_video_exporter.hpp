@@ -91,6 +91,13 @@ public:
     [[nodiscard]]
     bool isRecording() const override;
 
+    /**
+     * @brief Returns the video codecs available through the FFmpeg backend.
+     *
+     * @return Available video codecs.
+     */
+    QList<VideoCodec> availableCodecs() const override;
+
 private:
     /**
      * @brief Initializes the exporter from the first input frame.

@@ -48,4 +48,9 @@ bool VideoExporter::isRecording() const
     return exporter_ && exporter_->isRecording();
 }
 
+QList<VideoCodec> VideoExporter::availableCodecs() const
+{
+    return exporter_ ? exporter_->availableCodecs() : QList<VideoCodec>{};
+}
+
 } // namespace fluvel

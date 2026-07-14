@@ -2,8 +2,10 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_controller.hpp"
+#include "application_settings.hpp"
 #include "camera_format_utils.hpp"
 #include "contour_adapters.hpp"
+#include "file_utils.hpp"
 #include "frame_clock.hpp"
 #include "frame_rendering_utils.hpp"
 #include "streaming_stats.hpp"
@@ -719,10 +721,18 @@ void VideoController::resume()
 
 void VideoController::startRecording()
 {
+    const auto& preferences = ApplicationSettings::instance().videoRecordingPreferences();
+
     VideoExportSettings settings;
 
-    settings.profile = ExportProfile::Archive;
-    settings.filename = QDir::homePath() + "/test.mkv";
+    settings.profile = ExportProfile::Custom;
+    settings.codec = preferences.preferredCodec;
+    settings.container = exporter_utils::preferredContainer(settings.codec);
+
+    const QString extension = exporter_utils::expectedExtension(settings.container);
+
+    settings.filename = file_utils::buildOutputFileName(preferences.directory, preferences.baseName,
+                                                        extension, preferences.appendTimestamp);
 
     recordingSettings_ = exporter_utils::resolveSettings(settings);
 
