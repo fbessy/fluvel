@@ -9,7 +9,6 @@
 
 #include "image_adapters.hpp"
 #include "image_pipeline.hpp"
-#include "image_view.hpp"
 
 #include "elapsed_timer.hpp"
 
