@@ -71,7 +71,15 @@ jobs:
 
 
       - name: Build
-        run: cmake --build build --config Release --parallel
+        shell: cmd
+        run: |
+          cmake --build build --config Release --parallel || (
+            for /r build %%f in (video_exporter.obj) do (
+              echo ==== %%f ====
+              dumpbin /symbols "%%f" | findstr addFrame
+            )
+            exit /b 1
+          )
 
       - name: Deploy Qt
         shell: pwsh
