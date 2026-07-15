@@ -22,6 +22,8 @@ extern "C"
 #include <libavformat/avformat.h>
 #include <libavformat/avio.h>
 #include <libswscale/swscale.h>
+
+#include <libavutil/opt.h>
 }
 
 namespace
@@ -325,6 +327,13 @@ bool FFmpegVideoExporter::initializeCodec(const VideoExportSettings& settings,
 
     if (context_->formatContext->oformat->flags & AVFMT_GLOBALHEADER)
         c->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+
+    if (settings.codec == VideoCodec::AV1)
+    {
+        av_opt_set_int(c->priv_data, "cpu-used", 6, 0);
+        av_opt_set_int(c->priv_data, "row-mt", 1, 0);
+        av_opt_set_int(c->priv_data, "lag-in-frames", 0, 0);
+    }
 
     const int ret = avcodec_open2(c, context_->codec, nullptr);
 
@@ -694,54 +703,22 @@ bool FFmpegVideoExporter::receivePackets()
 
 bool FFmpegVideoExporter::flushEncoder()
 {
-    int ret = avcodec_send_frame(context_->codecContext, nullptr);
+    //
+    // Signal end-of-stream to the encoder.
+    //
+    const int ret = avcodec_send_frame(context_->codecContext, nullptr);
 
     if (ret < 0)
     {
-        qWarning() << "avcodec_send_frame flush failed:" << ffmpeg_utils::errorString(ret);
+        qWarning() << "avcodec_send_frame failed:" << ffmpeg_utils::errorString(ret);
 
         return false;
     }
 
-    auto* packet = context_->packet;
-
-    while (true)
-    {
-        ret = avcodec_receive_packet(context_->codecContext, packet);
-
-        if (ret == AVERROR_EOF)
-            return true;
-
-        if (ret == AVERROR(EAGAIN))
-        {
-            qWarning() << "Encoder returned EAGAIN while flushing.";
-            return false;
-        }
-
-        if (ret < 0)
-        {
-            qWarning() << "avcodec_receive_packet flush failed:" << ffmpeg_utils::errorString(ret);
-
-            return false;
-        }
-
-        av_packet_rescale_ts(packet, context_->codecContext->time_base,
-                             context_->stream->time_base);
-
-        packet->stream_index = context_->stream->index;
-
-        const int writeRet = av_interleaved_write_frame(context_->formatContext, packet);
-
-        av_packet_unref(packet);
-
-        if (writeRet < 0)
-        {
-            qWarning() << "av_interleaved_write_frame flush failed:"
-                       << ffmpeg_utils::errorString(writeRet);
-
-            return false;
-        }
-    }
+    //
+    // Drain all remaining packets.
+    //
+    return receivePackets();
 }
 
 bool FFmpegVideoExporter::writeTrailer()
