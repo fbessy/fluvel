@@ -694,22 +694,54 @@ bool FFmpegVideoExporter::receivePackets()
 
 bool FFmpegVideoExporter::flushEncoder()
 {
-    //
-    // Signal end-of-stream to the encoder.
-    //
-    const int ret = avcodec_send_frame(context_->codecContext, nullptr);
+    int ret = avcodec_send_frame(context_->codecContext, nullptr);
 
     if (ret < 0)
     {
-        qWarning() << "avcodec_send_frame failed:" << ffmpeg_utils::errorString(ret);
+        qWarning() << "avcodec_send_frame flush failed:" << ffmpeg_utils::errorString(ret);
 
         return false;
     }
 
-    //
-    // Drain all remaining packets.
-    //
-    return receivePackets();
+    auto* packet = context_->packet;
+
+    while (true)
+    {
+        ret = avcodec_receive_packet(context_->codecContext, packet);
+
+        if (ret == AVERROR_EOF)
+            return true;
+
+        if (ret == AVERROR(EAGAIN))
+        {
+            qWarning() << "Encoder returned EAGAIN while flushing.";
+            return false;
+        }
+
+        if (ret < 0)
+        {
+            qWarning() << "avcodec_receive_packet flush failed:" << ffmpeg_utils::errorString(ret);
+
+            return false;
+        }
+
+        av_packet_rescale_ts(packet, context_->codecContext->time_base,
+                             context_->stream->time_base);
+
+        packet->stream_index = context_->stream->index;
+
+        const int writeRet = av_interleaved_write_frame(context_->formatContext, packet);
+
+        av_packet_unref(packet);
+
+        if (writeRet < 0)
+        {
+            qWarning() << "av_interleaved_write_frame flush failed:"
+                       << ffmpeg_utils::errorString(writeRet);
+
+            return false;
+        }
+    }
 }
 
 bool FFmpegVideoExporter::writeTrailer()
