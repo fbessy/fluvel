@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_exporter.hpp"
+#include "frame_pipeline.hpp"
 
 #ifdef FLUVEL_USE_FFMPEG
 
@@ -9,7 +10,6 @@
 
 #endif
 
-#include <QImage>
 #include <memory>
 
 namespace fluvel
