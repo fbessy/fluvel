@@ -10,8 +10,8 @@
 namespace fluvel
 {
 
-class VideoExportSettings;
-class VideoFrame;
+struct VideoExportSettings;
+struct VideoFrame;
 
 /**
  * @brief High-level video exporter.

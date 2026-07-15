@@ -8,7 +8,7 @@
 namespace fluvel
 {
 
-class VideoFrame;
+struct VideoFrame;
 
 /**
  * @brief Video exporter backend interface.

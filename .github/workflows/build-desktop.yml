@@ -73,15 +73,7 @@ jobs:
       - name: Build
         shell: cmd
         run: |
-          cmake --build build --config Release --parallel || (
-            for /f "usebackq delims=" %%d in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -find VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe`) do (
-              for /r build %%f in (video_exporter.obj) do (
-                echo ==== %%f ====
-                "%%d" /symbols "%%f" | findstr addFrame
-              )
-            )
-            exit /b 1
-          )
+          cmake --build build --config Release --parallel
 
       - name: Deploy Qt
         shell: pwsh
