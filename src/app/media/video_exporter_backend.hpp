@@ -5,8 +5,6 @@
 
 #include "video_export_settings.hpp"
 
-class QImage;
-
 namespace fluvel
 {
 
