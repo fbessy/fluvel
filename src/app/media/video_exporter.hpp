@@ -7,12 +7,11 @@
 
 #include <memory>
 
-class VideoFrame;
-
 namespace fluvel
 {
 
 class VideoExportSettings;
+class VideoFrame;
 
 /**
  * @brief High-level video exporter.
