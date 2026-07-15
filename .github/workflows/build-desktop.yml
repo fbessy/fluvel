@@ -74,9 +74,11 @@ jobs:
         shell: cmd
         run: |
           cmake --build build --config Release --parallel || (
-            for /r build %%f in (video_exporter.obj) do (
-              echo ==== %%f ====
-              dumpbin /symbols "%%f" | findstr addFrame
+            for /f "usebackq delims=" %%d in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -find VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe`) do (
+              for /r build %%f in (video_exporter.obj) do (
+                echo ==== %%f ====
+                "%%d" /symbols "%%f" | findstr addFrame
+              )
             )
             exit /b 1
           )
