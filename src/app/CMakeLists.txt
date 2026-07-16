@@ -226,6 +226,9 @@ set(app_src
     ${CORE_DIR}/video_recorder_worker.cpp
     ${CORE_DIR}/video_recorder_worker.hpp
 
+    ${CORE_DIR}/video_frame_buffer.cpp
+    ${CORE_DIR}/video_frame_buffer.hpp
+
     ${MEDIA_DIR}/video_export_settings.hpp
     ${MEDIA_DIR}/video_exporter_backend.hpp
 
