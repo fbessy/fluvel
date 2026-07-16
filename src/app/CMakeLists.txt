@@ -229,6 +229,13 @@ set(app_src
     ${CORE_DIR}/video_frame_buffer.cpp
     ${CORE_DIR}/video_frame_buffer.hpp
 
+    ${CORE_DIR}/video_frame_spool.cpp
+    ${CORE_DIR}/video_frame_spool.hpp
+
+    ${CORE_DIR}/video_frame_header.hpp
+
+    ${CORE_DIR}/recording_buffer_settings.hpp
+
     ${MEDIA_DIR}/video_export_settings.hpp
     ${MEDIA_DIR}/video_exporter_backend.hpp
 

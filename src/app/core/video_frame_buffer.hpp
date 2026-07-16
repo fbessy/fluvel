@@ -4,6 +4,7 @@
 #pragma once
 
 #include "frame_pipeline.hpp"
+#include "video_frame_spool.hpp"
 
 #include <QQueue>
 
@@ -111,6 +112,10 @@ private:
     static constexpr std::size_t kWarningMemoryBytes = 1200ull * 1024 * 1024;
 
     static constexpr std::size_t kMaxMemoryBytes = 2000ull * 1024 * 1024;
+
+    VideoFrameSpool spool_;
+
+    bool spoolEnabled_{false};
 };
 
 } // namespace fluvel
