@@ -6,6 +6,13 @@
 namespace fluvel
 {
 
+VideoFrameBuffer::VideoFrameBuffer()
+    : spoolAvailable_(spool_.open())
+{
+    if (!spoolAvailable_)
+        qWarning() << "Failed to initialize video frame spool.";
+}
+
 VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
 {
     VideoFrame queuedFrame = frame;
@@ -24,7 +31,12 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
         memoryWarning = true;
     }
 
-    queue_.enqueue(std::move(queuedFrame));
+    BufferedFrame bufferedFrame;
+
+    bufferedFrame.storage = StorageType::Memory;
+    bufferedFrame.frame = std::move(queuedFrame);
+
+    queue_.enqueue(std::move(bufferedFrame));
     queuedBytes_ += bytes;
 
     return memoryWarning ? PushStatus::MemoryWarning : PushStatus::Success;
@@ -35,18 +47,35 @@ std::optional<VideoFrame> VideoFrameBuffer::pop()
     if (queue_.isEmpty())
         return std::nullopt;
 
-    VideoFrame frame = std::move(queue_.head());
+    auto bufferedFrame = queue_.dequeue();
 
-    queue_.dequeue();
+    queuedBytes_ -= frameSize(bufferedFrame.frame.image);
 
-    queuedBytes_ -= frameSize(frame.image);
+    switch (bufferedFrame.storage)
+    {
+        case StorageType::Memory:
+            return std::move(bufferedFrame.frame);
 
-    return frame;
+        case StorageType::Disk:
+
+            if (!spoolAvailable_)
+            {
+                qWarning() << "Video frame spool is unavailable.";
+
+                return std::nullopt;
+            }
+
+            return spool_.read(bufferedFrame.location);
+    }
+
+    return std::nullopt;
 }
 
 void VideoFrameBuffer::clear()
 {
     queue_.clear();
+
+    spool_.clear();
 
     queuedBytes_ = 0;
     memoryWarningEmitted_ = false;

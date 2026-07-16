@@ -15,6 +15,57 @@ namespace fluvel
 {
 
 /**
+ * @brief Storage location of a buffered video frame.
+ *
+ * This enumeration identifies where a buffered frame is currently
+ * stored.
+ */
+enum class StorageType
+{
+    /**
+     * @brief Frame stored in main memory.
+     */
+    Memory,
+
+    /**
+     * @brief Frame stored in the temporary spool file.
+     */
+    Disk
+};
+
+/**
+ * @brief Video frame stored by the recording buffer.
+ *
+ * A buffered frame may either reside in memory or in the temporary
+ * spool file. When the frame is stored in memory, @ref frame contains
+ * the complete video frame. Otherwise, @ref location identifies the
+ * corresponding frame stored on disk.
+ */
+struct BufferedFrame
+{
+    /**
+     * @brief Storage location of the buffered frame.
+     */
+    StorageType storage{StorageType::Memory};
+
+    /**
+     * @brief Video frame stored in memory.
+     *
+     * This member is valid only when @ref storage is equal to
+     * StorageType::Memory.
+     */
+    VideoFrame frame;
+
+    /**
+     * @brief Location of the frame in the spool file.
+     *
+     * This member is valid only when @ref storage is equal to
+     * StorageType::Disk.
+     */
+    FrameLocation location;
+};
+
+/**
  * @brief Buffers video frames before encoding.
  *
  * This class stores video frames awaiting encoding and tracks the
@@ -41,6 +92,13 @@ public:
         /// Memory limit reached. The frame was not queued.
         MemoryLimitExceeded
     };
+
+    /**
+     * @brief Constructs an empty video frame buffer.
+     *
+     * The temporary spool is initialized during construction.
+     */
+    VideoFrameBuffer();
 
     /**
      * @brief Queues a video frame.
@@ -103,19 +161,18 @@ private:
      */
     static std::size_t frameSize(const QImage& image);
 
-    QQueue<VideoFrame> queue_;
+    static constexpr std::size_t kWarningMemoryBytes = 1200ull * 1024 * 1024;
+    static constexpr std::size_t kMaxMemoryBytes = 2000ull * 1024 * 1024;
+
+    QQueue<BufferedFrame> queue_;
+
+    VideoFrameSpool spool_;
+
+    bool spoolAvailable_{false};
 
     std::size_t queuedBytes_{0};
 
     bool memoryWarningEmitted_{false};
-
-    static constexpr std::size_t kWarningMemoryBytes = 1200ull * 1024 * 1024;
-
-    static constexpr std::size_t kMaxMemoryBytes = 2000ull * 1024 * 1024;
-
-    VideoFrameSpool spool_;
-
-    bool spoolEnabled_{false};
 };
 
 } // namespace fluvel
