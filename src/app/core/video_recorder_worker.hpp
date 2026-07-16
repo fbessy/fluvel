@@ -6,6 +6,7 @@
 #include "frame_pipeline.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
+#include "video_frame_buffer.hpp"
 #include "video_types.hpp"
 
 #include <QImage>
@@ -127,12 +128,6 @@ signals:
     void errorOccurred(const QString& message);
 
 private:
-    enum class EnqueueStatus
-    {
-        Success,
-        MemoryWarning,
-        MemoryLimitExceeded
-    };
 
     void enqueue(const VideoFrame& frame);
     void processQueue();
@@ -141,24 +136,13 @@ private:
 
     void updateStats();
 
-    static std::size_t frameSize(const QImage& image);
-
     VideoExporter exporter_;
     std::thread workerThread_;
-    QQueue<VideoFrame> queue_;
 
     QMutex mutex_;
     QWaitCondition condition_;
 
     std::atomic<RecorderState> state_{RecorderState::Stopped};
-
-    std::size_t queuedBytes_{0};
-
-    bool memoryWarningEmitted_{false};
-
-    static constexpr std::size_t kWarningMemoryBytes = 1200ull * 1024 * 1024; // 1200 MiB
-
-    static constexpr std::size_t kMaxMemoryBytes = 2000ull * 1024 * 1024; // 2000 MiB
 
     std::size_t inputFrameCount_{0};
     std::size_t encodedFrameCount_{0};
@@ -166,6 +150,8 @@ private:
     int64_t statsTimestampNs_{0};
 
     static constexpr int64_t kStatsIntervalNs = 1'000'000'000;
+
+    VideoFrameBuffer frameBuffer_;
 };
 
 } // namespace fluvel

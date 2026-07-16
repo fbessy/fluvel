@@ -80,12 +80,7 @@ void VideoRecorderWorker::addFrame(const VideoFrame& frame)
 
 void VideoRecorderWorker::enqueue(const VideoFrame& frame)
 {
-    VideoFrame queuedFrame = frame;
-    queuedFrame.image = frame.image.copy();
-
-    const std::size_t bytes = frameSize(queuedFrame.image);
-
-    EnqueueStatus status = EnqueueStatus::Success;
+    VideoFrameBuffer::PushStatus status;
 
     {
         QMutexLocker locker(&mutex_);
@@ -93,38 +88,29 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
         if (state_ != RecorderState::Recording)
             return;
 
-        if (queuedBytes_ + bytes > kMaxMemoryBytes)
-        {
-            state_ = RecorderState::Draining;
-            status = EnqueueStatus::MemoryLimitExceeded;
-        }
-        else
-        {
-            if (!memoryWarningEmitted_ && queuedBytes_ + bytes > kWarningMemoryBytes)
-            {
-                memoryWarningEmitted_ = true;
-                status = EnqueueStatus::MemoryWarning;
-            }
+        status = frameBuffer_.push(frame);
 
-            queue_.enqueue(queuedFrame);
-            queuedBytes_ += bytes;
+        if (status != VideoFrameBuffer::PushStatus::MemoryLimitExceeded)
             ++inputFrameCount_;
-        }
+
+        if (status == VideoFrameBuffer::PushStatus::MemoryLimitExceeded)
+            state_ = RecorderState::Draining;
     }
 
     condition_.wakeOne();
 
     switch (status)
     {
-        case EnqueueStatus::Success:
+        case VideoFrameBuffer::PushStatus::Success:
             break;
 
-        case EnqueueStatus::MemoryWarning:
+        case VideoFrameBuffer::PushStatus::MemoryWarning:
             emit warningOccurred(tr("Video recorder queue exceeds the recommended memory usage."));
             break;
 
-        case EnqueueStatus::MemoryLimitExceeded:
+        case VideoFrameBuffer::PushStatus::MemoryLimitExceeded:
             emit stateChanged(RecorderState::Draining);
+
             emit errorOccurred(tr("Video recording stopped because the encoder cannot keep up "
                                   "with the incoming frame rate."));
             break;
@@ -135,28 +121,31 @@ void VideoRecorderWorker::processQueue()
 {
     for (;;)
     {
-        VideoFrame frame;
+        std::optional<VideoFrame> frame;
 
         {
             QMutexLocker locker(&mutex_);
 
-            while (queue_.isEmpty() && state_ == RecorderState::Recording)
+            while (state_ == RecorderState::Recording)
+            {
+                frame = frameBuffer_.pop();
+
+                if (frame)
+                    break;
+
                 condition_.wait(&mutex_);
+            }
 
-            if (queue_.isEmpty())
+            if (!frame)
                 break;
-
-            frame = queue_.dequeue();
-            queuedBytes_ -= frameSize(frame.image);
         }
 
-        if (!exporter_.addFrame(frame))
+        if (!exporter_.addFrame(*frame))
         {
             {
                 QMutexLocker locker(&mutex_);
 
-                queue_.clear();
-                queuedBytes_ = 0;
+                frameBuffer_.clear();
                 state_ = RecorderState::Draining;
             }
 
@@ -190,17 +179,9 @@ void VideoRecorderWorker::processQueue()
     emit stateChanged(RecorderState::Stopped);
 }
 
-std::size_t VideoRecorderWorker::frameSize(const QImage& image)
-{
-    return static_cast<std::size_t>(image.sizeInBytes());
-}
-
 void VideoRecorderWorker::resetSession()
 {
-    memoryWarningEmitted_ = false;
-
-    queuedBytes_ = 0;
-    queue_.clear();
+    frameBuffer_.clear();
 
     inputFrameCount_ = 0;
     encodedFrameCount_ = 0;
@@ -223,8 +204,8 @@ void VideoRecorderWorker::updateStats()
 
         const double elapsedSec = static_cast<double>(elapsedNs) * 1e-9;
 
-        stats.queuedFrames = static_cast<std::size_t>(queue_.size());
-        stats.queuedBytes = queuedBytes_;
+        stats.queuedFrames = frameBuffer_.queuedFrames();
+        stats.queuedBytes = frameBuffer_.queuedBytes();
         stats.inputFps = static_cast<double>(inputFrameCount_) / elapsedSec;
         stats.encodingFps = static_cast<double>(encodedFrameCount_) / elapsedSec;
 
