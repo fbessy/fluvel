@@ -7,9 +7,8 @@ namespace fluvel
 {
 
 VideoFrameBuffer::VideoFrameBuffer()
-    : spoolAvailable_(spool_.open())
 {
-    if (!spoolAvailable_)
+    if (!spool_.open())
         qWarning() << "Failed to initialize video frame spool.";
 }
 
@@ -21,14 +20,26 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
     const std::size_t bytes = frameSize(queuedFrame.image);
 
     if (queuedBytes_ + bytes > kMaxMemoryBytes)
-        return PushStatus::MemoryLimitExceeded;
-
-    bool memoryWarning = false;
-
-    if (!memoryWarningEmitted_ && queuedBytes_ + bytes > kWarningMemoryBytes)
     {
-        memoryWarningEmitted_ = true;
-        memoryWarning = true;
+        auto location = spool_.write(queuedFrame);
+
+        if (!location)
+            return PushStatus::BufferLimitExceeded;
+
+        BufferedFrame bufferedFrame;
+
+        bufferedFrame.storage = StorageType::Disk;
+        bufferedFrame.location = *location;
+
+        queue_.enqueue(std::move(bufferedFrame));
+
+        if (!usingTemporaryStorage_)
+        {
+            usingTemporaryStorage_ = true;
+            return PushStatus::TemporaryStorageActivated;
+        }
+
+        return PushStatus::Success;
     }
 
     BufferedFrame bufferedFrame;
@@ -39,7 +50,7 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
     queue_.enqueue(std::move(bufferedFrame));
     queuedBytes_ += bytes;
 
-    return memoryWarning ? PushStatus::MemoryWarning : PushStatus::Success;
+    return PushStatus::Success;
 }
 
 std::optional<VideoFrame> VideoFrameBuffer::pop()
@@ -57,14 +68,6 @@ std::optional<VideoFrame> VideoFrameBuffer::pop()
             return std::move(bufferedFrame.frame);
 
         case StorageType::Disk:
-
-            if (!spoolAvailable_)
-            {
-                qWarning() << "Video frame spool is unavailable.";
-
-                return std::nullopt;
-            }
-
             return spool_.read(bufferedFrame.location);
     }
 
@@ -75,10 +78,11 @@ void VideoFrameBuffer::clear()
 {
     queue_.clear();
 
-    spool_.clear();
+    if (!spool_.clear())
+        qWarning() << "Failed to clear temporary storage.";
 
     queuedBytes_ = 0;
-    memoryWarningEmitted_ = false;
+    usingTemporaryStorage_ = false;
 }
 
 bool VideoFrameBuffer::empty() const

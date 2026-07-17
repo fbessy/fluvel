@@ -79,18 +79,35 @@ class VideoFrameBuffer
 {
 public:
     /**
-     * @brief Result of a frame insertion.
+     * @brief Result of inserting a video frame into the recording buffer.
      */
     enum class PushStatus
     {
-        /// Frame successfully queued.
+        /**
+         * @brief Frame successfully queued.
+         *
+         * The frame was stored either in memory or in the temporary storage.
+         */
         Success,
 
-        /// Memory usage exceeded the recommended threshold.
-        MemoryWarning,
+        /**
+         * @brief Recording buffer switched to temporary storage.
+         *
+         * The frame has been accepted, but the recording buffer has reached
+         * its configured RAM limit and is now using temporary storage.
+         *
+         * This status is emitted only once per recording session.
+         */
+        TemporaryStorageActivated,
 
-        /// Memory limit reached. The frame was not queued.
-        MemoryLimitExceeded
+        /**
+         * @brief Recording buffer capacity exceeded.
+         *
+         * The frame could not be stored because both the in-memory buffer
+         * and the temporary storage have reached their configured limits,
+         * or because temporary storage is unavailable.
+         */
+        BufferLimitExceeded
     };
 
     /**
@@ -161,18 +178,15 @@ private:
      */
     static std::size_t frameSize(const QImage& image);
 
-    static constexpr std::size_t kWarningMemoryBytes = 1200ull * 1024 * 1024;
-    static constexpr std::size_t kMaxMemoryBytes = 2000ull * 1024 * 1024;
+    static constexpr std::size_t kMaxMemoryBytes = 200ull * 1024 * 1024;
 
     QQueue<BufferedFrame> queue_;
 
     VideoFrameSpool spool_;
 
-    bool spoolAvailable_{false};
-
     std::size_t queuedBytes_{0};
 
-    bool memoryWarningEmitted_{false};
+    bool usingTemporaryStorage_{false};
 };
 
 } // namespace fluvel

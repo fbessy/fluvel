@@ -90,10 +90,10 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
 
         status = frameBuffer_.push(frame);
 
-        if (status != VideoFrameBuffer::PushStatus::MemoryLimitExceeded)
+        if (status != VideoFrameBuffer::PushStatus::BufferLimitExceeded)
             ++inputFrameCount_;
 
-        if (status == VideoFrameBuffer::PushStatus::MemoryLimitExceeded)
+        if (status == VideoFrameBuffer::PushStatus::BufferLimitExceeded)
             state_ = RecorderState::Draining;
     }
 
@@ -104,15 +104,14 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
         case VideoFrameBuffer::PushStatus::Success:
             break;
 
-        case VideoFrameBuffer::PushStatus::MemoryWarning:
-            emit warningOccurred(tr("Video recorder queue exceeds the recommended memory usage."));
+        case VideoFrameBuffer::PushStatus::TemporaryStorageActivated:
+            emit warningOccurred(tr("Recording buffer switched to temporary storage."));
             break;
 
-        case VideoFrameBuffer::PushStatus::MemoryLimitExceeded:
+        case VideoFrameBuffer::PushStatus::BufferLimitExceeded:
             emit stateChanged(RecorderState::Draining);
 
-            emit errorOccurred(tr("Video recording stopped because the encoder cannot keep up "
-                                  "with the incoming frame rate."));
+            emit errorOccurred(tr("Video recording stopped because the recording buffer is full."));
             break;
     }
 }
@@ -126,11 +125,14 @@ void VideoRecorderWorker::processQueue()
         {
             QMutexLocker locker(&mutex_);
 
-            while (state_ == RecorderState::Recording)
+            for (;;)
             {
                 frame = frameBuffer_.pop();
 
                 if (frame)
+                    break;
+
+                if (state_ != RecorderState::Recording)
                     break;
 
                 condition_.wait(&mutex_);
@@ -168,13 +170,9 @@ void VideoRecorderWorker::processQueue()
     state_ = RecorderState::Stopped;
 
     if (!success)
-    {
         emit errorOccurred(tr("Failed to finalize video recording."));
-    }
     else
-    {
         emit recordingFinalized();
-    }
 
     emit stateChanged(RecorderState::Stopped);
 }
