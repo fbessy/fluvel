@@ -4,7 +4,6 @@
 #pragma once
 
 #include "frame_pipeline.hpp"
-#include "video_frame_header.hpp"
 
 #include <QFile>
 #include <QTemporaryDir>

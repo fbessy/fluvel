@@ -16,7 +16,7 @@ enum class BufferOverflowPolicy
     /**
      * @brief Stop the recording.
      *
-     * Recording stops once the maximum disk usage has been reached.
+     * Recording stops when the recording buffer becomes full.
      */
     StopRecording,
 
@@ -24,7 +24,7 @@ enum class BufferOverflowPolicy
      * @brief Use a circular recording buffer.
      *
      * The oldest buffered frames are discarded to make room for newly
-     * recorded frames.
+     * buffered frames.
      */
     Circular
 };
@@ -36,8 +36,7 @@ enum class BufferOverflowPolicy
  * temporary disk storage during video recording.
  *
  * Video frames are initially buffered in RAM. Once @ref maxRamUsage is
- * reached, additional frames are transparently written to temporary files
- * located in the operating system temporary directory.
+ * reached, additional frames are transparently written to temporary storage.
  *
  * Recording continues until @ref maxDiskUsage is reached. The action taken
  * when this limit is exceeded is controlled by @ref overflowPolicy.
@@ -50,20 +49,19 @@ struct RecordingBufferSettings
      * Once this limit is reached, newly buffered frames are temporarily
      * written to disk.
      */
-    std::size_t maxRamUsage = 1ull * 1024 * 1024 * 1024; // 1 GiB
+    std::size_t maxRamUsage{1024ull * 1024 * 1024}; // 1 GiB
 
     /**
      * @brief Maximum amount of temporary disk space used for buffering.
      *
-     * This limit applies only to temporary spool files created while
-     * recording.
+     * This limit applies only to the temporary storage used while recording.
      */
-    std::size_t maxDiskUsage = 5ull * 1024 * 1024 * 1024; // 5 GiB
+    std::size_t maxDiskUsage{5ull * 1024 * 1024 * 1024}; // 5 GiB
 
     /**
      * @brief Behavior when the disk usage limit is reached.
      */
-    BufferOverflowPolicy overflowPolicy = BufferOverflowPolicy::StopRecording;
+    BufferOverflowPolicy overflowPolicy{BufferOverflowPolicy::StopRecording};
 };
 
 } // namespace fluvel

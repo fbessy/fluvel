@@ -19,7 +19,7 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
 
     const std::size_t bytes = frameSize(queuedFrame.image);
 
-    if (queuedBytes_ + bytes > kMaxMemoryBytes)
+    if (queuedBytes_ + bytes > settings_.maxRamUsage)
     {
         auto location = spool_.write(queuedFrame);
 

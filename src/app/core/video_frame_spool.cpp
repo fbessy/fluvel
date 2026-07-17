@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_frame_spool.hpp"
+#include "video_frame_header.hpp"
 
 #include <QDebug>
 #include <QImage>

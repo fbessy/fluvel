@@ -4,6 +4,7 @@
 #pragma once
 
 #include "frame_pipeline.hpp"
+#include "recording_buffer_settings.hpp"
 #include "video_frame_spool.hpp"
 
 #include <QQueue>
@@ -178,7 +179,7 @@ private:
      */
     static std::size_t frameSize(const QImage& image);
 
-    static constexpr std::size_t kMaxMemoryBytes = 200ull * 1024 * 1024;
+    RecordingBufferSettings settings_;
 
     QQueue<BufferedFrame> queue_;
 
