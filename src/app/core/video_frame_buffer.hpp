@@ -179,14 +179,34 @@ private:
      */
     static std::size_t frameSize(const QImage& image);
 
+    /**
+     * @brief Recording buffer configuration.
+     */
     RecordingBufferSettings settings_;
 
+    /**
+     * @brief Buffered video frames waiting to be encoded.
+     */
     QQueue<BufferedFrame> queue_;
 
+    /**
+     * @brief Temporary storage used when the RAM buffer is full.
+     */
     VideoFrameSpool spool_;
 
+    /**
+     * @brief Amount of RAM currently used by buffered frames.
+     */
     std::size_t queuedBytes_{0};
 
+    /**
+     * @brief Amount of temporary storage currently used by buffered frames.
+     */
+    std::size_t queuedDiskBytes_{0};
+
+    /**
+     * @brief Indicates whether temporary storage is currently being used.
+     */
     bool usingTemporaryStorage_{false};
 };
 

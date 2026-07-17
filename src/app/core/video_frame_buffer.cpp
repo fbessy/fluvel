@@ -17,10 +17,23 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
     VideoFrame queuedFrame = frame;
     queuedFrame.image = frame.image.copy();
 
-    const std::size_t bytes = frameSize(queuedFrame.image);
+    const auto frameBytes = frameSize(queuedFrame.image);
 
-    if (queuedBytes_ + bytes > settings_.maxRamUsage)
+    if (queuedBytes_ + frameBytes > settings_.maxRamUsage)
     {
+        if (queuedDiskBytes_ + frameBytes > settings_.maxDiskUsage)
+        {
+            switch (settings_.overflowPolicy)
+            {
+                case BufferOverflowPolicy::StopRecording:
+                    return PushStatus::BufferLimitExceeded;
+
+                case BufferOverflowPolicy::Circular:
+                    // TODO
+                    return PushStatus::BufferLimitExceeded;
+            }
+        }
+
         auto location = spool_.write(queuedFrame);
 
         if (!location)
@@ -32,6 +45,7 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
         bufferedFrame.location = *location;
 
         queue_.enqueue(std::move(bufferedFrame));
+        queuedDiskBytes_ += frameBytes;
 
         if (!usingTemporaryStorage_)
         {
@@ -48,7 +62,7 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
     bufferedFrame.frame = std::move(queuedFrame);
 
     queue_.enqueue(std::move(bufferedFrame));
-    queuedBytes_ += bytes;
+    queuedBytes_ += frameBytes;
 
     return PushStatus::Success;
 }
@@ -60,15 +74,21 @@ std::optional<VideoFrame> VideoFrameBuffer::pop()
 
     auto bufferedFrame = queue_.dequeue();
 
-    queuedBytes_ -= frameSize(bufferedFrame.frame.image);
-
     switch (bufferedFrame.storage)
     {
         case StorageType::Memory:
+            queuedBytes_ -= frameSize(bufferedFrame.frame.image);
             return std::move(bufferedFrame.frame);
 
         case StorageType::Disk:
-            return spool_.read(bufferedFrame.location);
+        {
+            auto frame = spool_.read(bufferedFrame.location);
+
+            if (frame)
+                queuedDiskBytes_ -= frameSize(frame->image);
+
+            return frame;
+        }
     }
 
     return std::nullopt;
@@ -82,6 +102,7 @@ void VideoFrameBuffer::clear()
         qWarning() << "Failed to clear temporary storage.";
 
     queuedBytes_ = 0;
+    queuedDiskBytes_ = 0;
     usingTemporaryStorage_ = false;
 }
 
@@ -97,7 +118,7 @@ std::size_t VideoFrameBuffer::queuedFrames() const
 
 std::size_t VideoFrameBuffer::queuedBytes() const
 {
-    return queuedBytes_;
+    return queuedBytes_ + queuedDiskBytes_;
 }
 
 std::size_t VideoFrameBuffer::frameSize(const QImage& image)
