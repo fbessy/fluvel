@@ -10,6 +10,7 @@
 #include <QQueue>
 
 #include <cstddef>
+#include <cstdint>
 #include <optional>
 
 namespace fluvel
@@ -146,6 +147,15 @@ public:
     void clear();
 
     /**
+     * @brief Removes all buffered frames and deletes the temporary spool file.
+     *
+     * Clears the in-memory queue, releases any temporary storage used on disk,
+     * and resets the internal buffer state. The temporary spool file is removed
+     * and will be recreated automatically when a new recording session starts.
+     */
+    void removeTemporaryStorage();
+
+    /**
      * @brief Checks whether the buffer is empty.
      *
      * @return @c true if no frame is queued.
@@ -162,12 +172,25 @@ public:
     std::size_t queuedFrames() const;
 
     /**
-     * @brief Returns the total memory occupied by queued frames.
-     *
-     * @return Memory usage in bytes.
+     * @brief Returns the total amount of memory currently occupied by queued frames.
+     *      * @return Total memory usage in bytes.
      */
     [[nodiscard]]
-    std::size_t queuedBytes() const;
+    uint64_t queuedBytes() const;
+
+    /**
+     * @brief Returns the amount of RAM currently occupied by queued frames.
+     *      * @return RAM usage in bytes.
+     */
+    [[nodiscard]]
+    uint64_t queuedMemoryBytes() const;
+
+    /**
+     * @brief Returns the amount of temporary storage currently occupied by queued frames.
+     *      * @return Temporary storage usage in bytes.
+     */
+    [[nodiscard]]
+    uint64_t queuedDiskBytes() const;
 
 private:
     /**
@@ -177,12 +200,12 @@ private:
      *
      * @return Image size in bytes.
      */
-    static std::size_t frameSize(const QImage& image);
+    static uint64_t frameSize(const QImage& image);
 
     /**
      * @brief Recording buffer configuration.
      */
-    RecordingBufferSettings settings_;
+    RecordingBufferSettings settings_{};
 
     /**
      * @brief Buffered video frames waiting to be encoded.
@@ -197,12 +220,12 @@ private:
     /**
      * @brief Amount of RAM currently used by buffered frames.
      */
-    std::size_t queuedBytes_{0};
+    uint64_t queuedBytes_{0};
 
     /**
      * @brief Amount of temporary storage currently used by buffered frames.
      */
-    std::size_t queuedDiskBytes_{0};
+    uint64_t queuedDiskBytes_{0};
 
     /**
      * @brief Indicates whether temporary storage is currently being used.

@@ -140,7 +140,7 @@ struct FFmpegVideoExporter::Context
     int64_t frameIndex{0};
 
     /// Timestamp of the first frame in explicit timestamp mode (ns).
-    int64_t firstTimestampNs{-1};
+    int64_t firstTimestampNs{AV_NOPTS_VALUE};
 };
 
 FFmpegVideoExporter::FFmpegVideoExporter()
@@ -184,7 +184,22 @@ bool FFmpegVideoExporter::close()
 
     if (state_ == ExportState::Recording)
     {
-        success = flushEncoder() && writeTrailer();
+        const bool flushSucceeded = flushEncoder();
+
+        if (!flushSucceeded)
+            qWarning() << "Failed to flush encoder.";
+
+        bool trailerSucceeded = false;
+
+        if (flushSucceeded)
+        {
+            trailerSucceeded = writeTrailer();
+
+            if (!trailerSucceeded)
+                qWarning() << "Failed to write trailer.";
+        }
+
+        success = flushSucceeded && trailerSucceeded;
     }
 
     release();
@@ -639,6 +654,15 @@ bool FFmpegVideoExporter::updateFrameTimestamp(const VideoFrame& frame)
     context_->frame->pts =
         av_rescale_q(timestampNs, AVRational{1, 1'000'000'000}, context_->codecContext->time_base);
 
+    if (lastPts_ != AV_NOPTS_VALUE && context_->frame->pts <= lastPts_)
+    {
+        qWarning() << "PTS not monotonic!"
+                   << "timestampNs =" << timestampNs << "pts =" << context_->frame->pts
+                   << "lastPts =" << lastPts_;
+    }
+
+    lastPts_ = context_->frame->pts;
+
     return true;
 }
 
@@ -775,7 +799,8 @@ void FFmpegVideoExporter::release()
     context_->stream = nullptr;
 
     context_->frameIndex = 0;
-    context_->firstTimestampNs = -1;
+    context_->firstTimestampNs = AV_NOPTS_VALUE;
+    lastPts_ = AV_NOPTS_VALUE;
 
     frameSize_ = {-1, -1};
     frameFormat_ = QImage::Format_Invalid;

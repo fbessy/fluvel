@@ -3,6 +3,8 @@
 #include "frame_clock.hpp"
 #include "video_exporter.hpp"
 
+#include <QThread>
+
 namespace fluvel
 {
 
@@ -105,7 +107,6 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
             break;
 
         case VideoFrameBuffer::PushStatus::TemporaryStorageActivated:
-            emit warningOccurred(tr("Recording buffer switched to temporary storage."));
             break;
 
         case VideoFrameBuffer::PushStatus::BufferLimitExceeded:
@@ -118,6 +119,8 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
 
 void VideoRecorderWorker::processQueue()
 {
+    constexpr int kMaxEncodingAttempts = 3;
+
     for (;;)
     {
         std::optional<VideoFrame> frame;
@@ -142,12 +145,23 @@ void VideoRecorderWorker::processQueue()
                 break;
         }
 
-        if (!exporter_.addFrame(*frame))
+        bool success = false;
+
+        for (int attempt = 0; attempt < kMaxEncodingAttempts; ++attempt)
+        {
+            if (exporter_.addFrame(*frame))
+            {
+                success = true;
+                break;
+            }
+
+            QThread::msleep(50); // Optionnel
+        }
+
+        if (!success)
         {
             {
                 QMutexLocker locker(&mutex_);
-
-                frameBuffer_.clear();
                 state_ = RecorderState::Draining;
             }
 
@@ -166,6 +180,12 @@ void VideoRecorderWorker::processQueue()
     }
 
     const bool success = exporter_.close();
+
+    {
+        QMutexLocker locker(&mutex_);
+
+        frameBuffer_.removeTemporaryStorage();
+    }
 
     state_ = RecorderState::Stopped;
 
@@ -203,7 +223,8 @@ void VideoRecorderWorker::updateStats()
         const double elapsedSec = static_cast<double>(elapsedNs) * 1e-9;
 
         stats.queuedFrames = frameBuffer_.queuedFrames();
-        stats.queuedBytes = frameBuffer_.queuedBytes();
+        stats.queuedMemoryBytes = frameBuffer_.queuedMemoryBytes();
+        stats.queuedDiskBytes = frameBuffer_.queuedDiskBytes();
         stats.inputFps = static_cast<double>(inputFrameCount_) / elapsedSec;
         stats.encodingFps = static_cast<double>(encodedFrameCount_) / elapsedSec;
 

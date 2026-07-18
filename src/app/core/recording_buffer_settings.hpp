@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstdint>
 
 namespace fluvel
 {
@@ -49,14 +49,14 @@ struct RecordingBufferSettings
      * Once this limit is reached, newly buffered frames are temporarily
      * written to disk.
      */
-    std::size_t maxRamUsage{1024ull * 1024 * 1024}; // 1 GiB
+    std::uint64_t maxRamUsage{1024ull * 1024 * 1024}; // 1 GiB
 
     /**
      * @brief Maximum amount of temporary disk space used for buffering.
      *
      * This limit applies only to the temporary storage used while recording.
      */
-    std::size_t maxDiskUsage{5ull * 1024 * 1024 * 1024}; // 5 GiB
+    std::uint64_t maxDiskUsage{5ull * 1024 * 1024 * 1024}; // 5 GiB
 
     /**
      * @brief Behavior when the disk usage limit is reached.

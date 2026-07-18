@@ -282,6 +282,7 @@ private:
 
     QSize frameSize_{-1, -1};
     QImage::Format frameFormat_{QImage::Format_Invalid};
+    int64_t lastPts_{AV_NOPTS_VALUE}; // last presentation timestamp
 
     struct Context;
     std::unique_ptr<Context> context_;

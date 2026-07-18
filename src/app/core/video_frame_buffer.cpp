@@ -14,10 +14,7 @@ VideoFrameBuffer::VideoFrameBuffer()
 
 VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
 {
-    VideoFrame queuedFrame = frame;
-    queuedFrame.image = frame.image.copy();
-
-    const auto frameBytes = frameSize(queuedFrame.image);
+    const auto frameBytes = frameSize(frame.image);
 
     if (queuedBytes_ + frameBytes > settings_.maxRamUsage)
     {
@@ -34,7 +31,7 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
             }
         }
 
-        auto location = spool_.write(queuedFrame);
+        auto location = spool_.write(frame);
 
         if (!location)
             return PushStatus::BufferLimitExceeded;
@@ -56,8 +53,10 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
         return PushStatus::Success;
     }
 
-    BufferedFrame bufferedFrame;
+    VideoFrame queuedFrame = frame;
+    queuedFrame.image = frame.image.copy();
 
+    BufferedFrame bufferedFrame;
     bufferedFrame.storage = StorageType::Memory;
     bufferedFrame.frame = std::move(queuedFrame);
 
@@ -94,11 +93,23 @@ std::optional<VideoFrame> VideoFrameBuffer::pop()
     return std::nullopt;
 }
 
+void VideoFrameBuffer::removeTemporaryStorage()
+{
+    queue_.clear();
+
+    if (!spool_.remove())
+        qWarning() << "Failed to remove temporary storage.";
+
+    queuedBytes_ = 0;
+    queuedDiskBytes_ = 0;
+    usingTemporaryStorage_ = false;
+}
+
 void VideoFrameBuffer::clear()
 {
     queue_.clear();
 
-    if (!spool_.clear())
+    if (!spool_.reset())
         qWarning() << "Failed to clear temporary storage.";
 
     queuedBytes_ = 0;
@@ -116,14 +127,24 @@ std::size_t VideoFrameBuffer::queuedFrames() const
     return static_cast<std::size_t>(queue_.size());
 }
 
-std::size_t VideoFrameBuffer::queuedBytes() const
+uint64_t VideoFrameBuffer::queuedBytes() const
 {
     return queuedBytes_ + queuedDiskBytes_;
 }
 
-std::size_t VideoFrameBuffer::frameSize(const QImage& image)
+uint64_t VideoFrameBuffer::queuedMemoryBytes() const
 {
-    return static_cast<std::size_t>(image.sizeInBytes());
+    return queuedBytes_;
+}
+
+uint64_t VideoFrameBuffer::queuedDiskBytes() const
+{
+    return queuedDiskBytes_;
+}
+
+uint64_t VideoFrameBuffer::frameSize(const QImage& image)
+{
+    return static_cast<uint64_t>(image.sizeInBytes());
 }
 
 } // namespace fluvel

@@ -18,6 +18,7 @@
 #include <QVideoFrameFormat>
 
 #include <cstddef>
+#include <cstdint>
 
 namespace fluvel
 {
@@ -300,9 +301,14 @@ struct RecorderStats
     std::size_t queuedFrames{0};
 
     /**
-     * @brief Estimated memory used by queued frames, in bytes.
+     * @brief Amount of memory currently used by queued frames, in bytes.
      */
-    std::size_t queuedBytes{0};
+    uint64_t queuedMemoryBytes{0};
+
+    /**
+     * @brief Amount of temporary storage currently used by queued frames, in bytes.
+     */
+    uint64_t queuedDiskBytes{0};
 
     /**
      * @brief Rate at which frames are submitted to the recorder.
