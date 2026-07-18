@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "recording_buffer_settings.hpp"
+
 #include <QSize>
 #include <QString>
 
@@ -213,6 +215,14 @@ namespace fluvel
      * Used only when profile is Custom.
      */
     VideoContainer container{VideoContainer::Matroska};
+
+    /**
+     * @brief Recording buffer settings for this recording session.
+     *
+     * Defines the RAM and temporary storage limits, as well as the overflow
+     * policy used while recording.
+     */
+    RecordingBufferSettings bufferSettings;
   };
 
 } // namespace fluvel

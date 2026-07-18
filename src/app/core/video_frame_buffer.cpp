@@ -147,4 +147,9 @@ uint64_t VideoFrameBuffer::frameSize(const QImage& image)
     return static_cast<uint64_t>(image.sizeInBytes());
 }
 
+void VideoFrameBuffer::setSettings(const RecordingBufferSettings& settings)
+{
+    settings_ = settings;
+}
+
 } // namespace fluvel

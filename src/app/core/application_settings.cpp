@@ -688,6 +688,30 @@ void ApplicationSettings::loadUserPreferences()
 
     videoRecordingPreferences_.appendTimestamp =
         settings.value("preferences/video_recording/append_timestamp", false).toBool();
+
+    recordingBufferSettings_.maxRamUsage =
+        settings
+            .value("preferences/recording_buffer/max_ram_usage",
+                   static_cast<qulonglong>(recordingBufferSettings_.maxRamUsage))
+            .toULongLong();
+
+    recordingBufferSettings_.maxDiskUsage =
+        settings
+            .value("preferences/recording_buffer/max_disk_usage",
+                   static_cast<qulonglong>(recordingBufferSettings_.maxDiskUsage))
+            .toULongLong();
+
+    recordingBufferSettings_.overflowPolicy =
+        static_cast<BufferOverflowPolicy>(settings
+                                              .value("preferences/recording_buffer/overflow_policy",
+                                                     int(BufferOverflowPolicy::StopRecording))
+                                              .toInt());
+
+    recordingBufferSettings_.circularDurationMinutes =
+        settings
+            .value("preferences/recording_buffer/circular_duration_minutes",
+                   recordingBufferSettings_.circularDurationMinutes)
+            .toUInt();
 }
 
 void ApplicationSettings::saveUserPreferences()
@@ -709,6 +733,18 @@ void ApplicationSettings::saveUserPreferences()
                       int(videoRecordingPreferences_.preferredCodec));
     settings.setValue("preferences/video_recording/append_timestamp",
                       videoRecordingPreferences_.appendTimestamp);
+
+    settings.setValue("preferences/recording_buffer/max_ram_usage",
+                      static_cast<qulonglong>(recordingBufferSettings_.maxRamUsage));
+
+    settings.setValue("preferences/recording_buffer/max_disk_usage",
+                      static_cast<qulonglong>(recordingBufferSettings_.maxDiskUsage));
+
+    settings.setValue("preferences/recording_buffer/overflow_policy",
+                      int(recordingBufferSettings_.overflowPolicy));
+
+    settings.setValue("preferences/recording_buffer/circular_duration_minutes",
+                      recordingBufferSettings_.circularDurationMinutes);
 }
 
 const SnapshotPreferences& ApplicationSettings::snapshotPreferences() const
@@ -729,6 +765,16 @@ void ApplicationSettings::setSnapshotPreferences(const SnapshotPreferences& pref
 void ApplicationSettings::setVideoRecordingPreferences(const VideoRecordingPreferences& preferences)
 {
     videoRecordingPreferences_ = preferences;
+}
+
+RecordingBufferSettings ApplicationSettings::recordingBufferSettings() const
+{
+    return recordingBufferSettings_;
+}
+
+void ApplicationSettings::setRecordingBufferSettings(const RecordingBufferSettings& settings)
+{
+    recordingBufferSettings_ = settings;
 }
 
 } // namespace fluvel

@@ -36,6 +36,8 @@ void VideoRecorderWorker::start(const VideoExportSettings& settings)
 
     {
         QMutexLocker locker(&mutex_);
+
+        frameBuffer_.setSettings(settings.bufferSettings);
         resetSession();
     }
 

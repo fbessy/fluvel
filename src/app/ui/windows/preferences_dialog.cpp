@@ -5,6 +5,7 @@
 
 #include "application_settings.hpp"
 #include "file_utils.hpp"
+#include "recording_buffer_settings.hpp"
 #include "video_exporter.hpp"
 #include "video_exporter_utils.hpp"
 
@@ -21,6 +22,7 @@
 #include <QLocale>
 #include <QPushButton>
 #include <QSettings>
+#include <QSpinBox>
 #include <QVBoxLayout>
 #include <QVariant>
 
@@ -66,6 +68,8 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
     layout->addWidget(createLanguageSection());
     layout->addWidget(createSnapshotSection());
     layout->addWidget(createVideoRecordingSection());
+    layout->addWidget(createRecordingBufferSection());
+
     layout->addWidget(dialogButtons);
 
     layout->setSizeConstraint(QLayout::SetMinimumSize);
@@ -212,6 +216,60 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
     return group;
 }
 
+QWidget* PreferencesDialog::createRecordingBufferSection()
+{
+    const auto& bufferSettings = ApplicationSettings::instance().recordingBufferSettings();
+
+    auto* groupBox = new QGroupBox(tr("Recording buffer"));
+
+    auto* layout = new QFormLayout(groupBox);
+
+    recordingRamSpin_ = new QSpinBox(groupBox);
+    recordingRamSpin_->setRange(128, 32768);
+    recordingRamSpin_->setSuffix(tr(" MiB"));
+
+    recordingDiskSpin_ = new QSpinBox(groupBox);
+    recordingDiskSpin_->setRange(1, 1024);
+    recordingDiskSpin_->setSuffix(tr(" GiB"));
+
+    recordingOverflowCombo_ = new QComboBox(groupBox);
+    recordingOverflowCombo_->addItem(tr("Stop recording"),
+                                     int(BufferOverflowPolicy::StopRecording));
+    recordingOverflowCombo_->addItem(tr("Circular buffer"), int(BufferOverflowPolicy::Circular));
+
+    recordingCircularDurationSpin_ = new QSpinBox(groupBox);
+    recordingCircularDurationSpin_->setRange(1, 1440);
+    recordingCircularDurationSpin_->setSuffix(tr(" min"));
+
+    recordingRamSpin_->setValue(int(bufferSettings.maxRamUsage / (1024 * 1024)));
+
+    recordingDiskSpin_->setValue(int(bufferSettings.maxDiskUsage / (1024 * 1024 * 1024)));
+
+    recordingOverflowCombo_->setCurrentIndex(
+        recordingOverflowCombo_->findData(int(bufferSettings.overflowPolicy)));
+
+    recordingCircularDurationSpin_->setValue(int(bufferSettings.circularDurationMinutes));
+
+    layout->addRow(tr("Maximum RAM usage:"), recordingRamSpin_);
+    layout->addRow(tr("Maximum temporary usage:"), recordingDiskSpin_);
+    layout->addRow(tr("When buffer is full:"), recordingOverflowCombo_);
+    layout->addRow(tr("Keep last:"), recordingCircularDurationSpin_);
+
+    connect(
+        recordingOverflowCombo_, &QComboBox::currentIndexChanged, this,
+        [this]
+        {
+            const auto policy =
+                static_cast<BufferOverflowPolicy>(recordingOverflowCombo_->currentData().toInt());
+
+            recordingCircularDurationSpin_->setEnabled(policy == BufferOverflowPolicy::Circular);
+        });
+
+    recordingCircularDurationSpin_->setEnabled(false);
+
+    return groupBox;
+}
+
 void PreferencesDialog::selectSnapshotDirectory()
 {
     const QString directory = QFileDialog::getExistingDirectory(
@@ -283,6 +341,19 @@ void PreferencesDialog::accept()
     videoPreferences.appendTimestamp = videoTimestampCheck_->isChecked();
 
     settings.setVideoRecordingPreferences(videoPreferences);
+
+    auto bufferSettings = settings.recordingBufferSettings();
+
+    bufferSettings.maxRamUsage = std::uint64_t(recordingRamSpin_->value()) * 1024 * 1024;
+
+    bufferSettings.maxDiskUsage = std::uint64_t(recordingDiskSpin_->value()) * 1024 * 1024 * 1024;
+
+    bufferSettings.overflowPolicy =
+        static_cast<BufferOverflowPolicy>(recordingOverflowCombo_->currentData().toInt());
+
+    bufferSettings.circularDurationMinutes = std::uint32_t(recordingCircularDurationSpin_->value());
+
+    settings.setRecordingBufferSettings(bufferSettings);
 
     settings.save();
 

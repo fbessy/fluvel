@@ -7,6 +7,8 @@
 #include "application_settings_types.hpp"
 #endif
 
+#include "recording_buffer_settings.hpp"
+
 #include <QObject>
 #include <QImage>
 #include <QDir>
@@ -133,6 +135,27 @@ public:
     void setVideoRecordingPreferences(const VideoRecordingPreferences& preferences);
 
     /**
+     * @brief Returns the recording buffer settings.
+     *
+     * These settings control the amount of RAM and temporary disk space used
+     * for video recording, as well as the behavior when the recording buffer
+     * becomes full.
+     *
+     * @return The current recording buffer settings.
+     */
+    RecordingBufferSettings recordingBufferSettings() const;
+
+    /**
+     * @brief Updates the recording buffer settings.
+     *
+     * Stores the recording buffer configuration used for subsequent recording
+     * sessions.
+     *
+     * @param settings New recording buffer settings.
+     */
+    void setRecordingBufferSettings(const RecordingBufferSettings& settings);
+
+    /**
      * @brief Load persistent user preferences from storage.
      */
     void loadUserPreferences();
@@ -222,6 +245,15 @@ private:
 
     /// Current persistent video recording preferences.
     VideoRecordingPreferences videoRecordingPreferences_{};
+
+    /**
+     * @brief Current persistent recording buffer settings.
+     *
+     * Stores the user-configurable recording buffer preferences, including
+     * memory limits, temporary storage limits, overflow policy, and circular
+     * buffer duration.
+     */
+    RecordingBufferSettings recordingBufferSettings_{};
 };
 
 } // namespace fluvel

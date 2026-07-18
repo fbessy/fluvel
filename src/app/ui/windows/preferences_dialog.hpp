@@ -11,6 +11,7 @@ class QComboBox;
 class QLabel;
 class QLineEdit;
 class QWidget;
+class QSpinBox;
 
 namespace fluvel
 {
@@ -56,6 +57,9 @@ private:
     /// Creates the video recording preferences section.
     QWidget* createVideoRecordingSection();
 
+    /// Creates the recording buffer preferences section.
+    QWidget* createRecordingBufferSection();
+
     /// Selects an output directory for snapshots.
     void selectSnapshotDirectory();
 
@@ -81,6 +85,11 @@ private:
     QComboBox* videoCodecCombo_{nullptr};
     QCheckBox* videoTimestampCheck_{nullptr};
     QLabel* videoPreviewLabel_{nullptr};
+
+    QSpinBox* recordingRamSpin_{nullptr};
+    QSpinBox* recordingDiskSpin_{nullptr};
+    QComboBox* recordingOverflowCombo_{nullptr};
+    QSpinBox* recordingCircularDurationSpin_{nullptr};
 };
 
 } // namespace fluvel

@@ -62,6 +62,15 @@ struct RecordingBufferSettings
      * @brief Behavior when the disk usage limit is reached.
      */
     BufferOverflowPolicy overflowPolicy{BufferOverflowPolicy::StopRecording};
+
+    /**
+     * @brief Duration of video retained in circular buffer mode.
+     *
+     * When the circular overflow policy is enabled, older frames are discarded
+     * so that only approximately the last @c circularDurationMinutes minutes of
+     * video are kept.
+     */
+    std::uint32_t circularDurationMinutes{10};
 };
 
 } // namespace fluvel

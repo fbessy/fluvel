@@ -192,6 +192,16 @@ public:
     [[nodiscard]]
     uint64_t queuedDiskBytes() const;
 
+    /**
+     * @brief Updates the recording buffer settings.
+     *
+     * The new settings are applied to subsequent recording operations. Existing
+     * buffered frames are not modified.
+     *
+     * @param settings New recording buffer settings.
+     */
+    void setSettings(const RecordingBufferSettings& settings);
+
 private:
     /**
      * @brief Returns the memory occupied by an image.
