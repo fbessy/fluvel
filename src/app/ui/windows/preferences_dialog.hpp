@@ -89,7 +89,6 @@ private:
     QSpinBox* recordingRamSpin_{nullptr};
     QSpinBox* recordingDiskSpin_{nullptr};
     QComboBox* recordingOverflowCombo_{nullptr};
-    QSpinBox* recordingCircularDurationSpin_{nullptr};
 };
 
 } // namespace fluvel

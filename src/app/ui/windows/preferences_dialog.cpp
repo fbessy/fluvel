@@ -237,10 +237,6 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
                                      int(BufferOverflowPolicy::StopRecording));
     recordingOverflowCombo_->addItem(tr("Circular buffer"), int(BufferOverflowPolicy::Circular));
 
-    recordingCircularDurationSpin_ = new QSpinBox(groupBox);
-    recordingCircularDurationSpin_->setRange(1, 1440);
-    recordingCircularDurationSpin_->setSuffix(tr(" min"));
-
     recordingRamSpin_->setValue(int(bufferSettings.maxRamUsage / (1024 * 1024)));
 
     recordingDiskSpin_->setValue(int(bufferSettings.maxDiskUsage / (1024 * 1024 * 1024)));
@@ -248,12 +244,9 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
     recordingOverflowCombo_->setCurrentIndex(
         recordingOverflowCombo_->findData(int(bufferSettings.overflowPolicy)));
 
-    recordingCircularDurationSpin_->setValue(int(bufferSettings.circularDurationMinutes));
-
     layout->addRow(tr("Maximum RAM usage:"), recordingRamSpin_);
     layout->addRow(tr("Maximum temporary usage:"), recordingDiskSpin_);
     layout->addRow(tr("When buffer is full:"), recordingOverflowCombo_);
-    layout->addRow(tr("Keep last:"), recordingCircularDurationSpin_);
 
     connect(
         recordingOverflowCombo_, &QComboBox::currentIndexChanged, this,
@@ -261,11 +254,7 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
         {
             const auto policy =
                 static_cast<BufferOverflowPolicy>(recordingOverflowCombo_->currentData().toInt());
-
-            recordingCircularDurationSpin_->setEnabled(policy == BufferOverflowPolicy::Circular);
         });
-
-    recordingCircularDurationSpin_->setEnabled(false);
 
     return groupBox;
 }
@@ -350,8 +339,6 @@ void PreferencesDialog::accept()
 
     bufferSettings.overflowPolicy =
         static_cast<BufferOverflowPolicy>(recordingOverflowCombo_->currentData().toInt());
-
-    bufferSettings.circularDurationMinutes = std::uint32_t(recordingCircularDurationSpin_->value());
 
     settings.setRecordingBufferSettings(bufferSettings);
 

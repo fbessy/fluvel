@@ -706,12 +706,6 @@ void ApplicationSettings::loadUserPreferences()
                                               .value("preferences/recording_buffer/overflow_policy",
                                                      int(BufferOverflowPolicy::StopRecording))
                                               .toInt());
-
-    recordingBufferSettings_.circularDurationMinutes =
-        settings
-            .value("preferences/recording_buffer/circular_duration_minutes",
-                   recordingBufferSettings_.circularDurationMinutes)
-            .toUInt();
 }
 
 void ApplicationSettings::saveUserPreferences()
@@ -742,9 +736,6 @@ void ApplicationSettings::saveUserPreferences()
 
     settings.setValue("preferences/recording_buffer/overflow_policy",
                       int(recordingBufferSettings_.overflowPolicy));
-
-    settings.setValue("preferences/recording_buffer/circular_duration_minutes",
-                      recordingBufferSettings_.circularDurationMinutes);
 }
 
 const SnapshotPreferences& ApplicationSettings::snapshotPreferences() const
