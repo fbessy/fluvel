@@ -2501,28 +2501,70 @@ void VideoWindow::onRecordingStateChanged(RecorderState state)
     updateRecordingButton();
 }
 
+QString formatDuration(std::chrono::milliseconds duration)
+{
+    const auto totalSeconds = duration.count() / 1000;
+
+    const auto hours = totalSeconds / 3600;
+    const auto minutes = (totalSeconds % 3600) / 60;
+    const auto seconds = totalSeconds % 60;
+
+    if (hours > 0)
+    {
+        return QStringLiteral("%1:%2:%3")
+            .arg(hours)
+            .arg(minutes, 2, 10, QLatin1Char('0'))
+            .arg(seconds, 2, 10, QLatin1Char('0'));
+    }
+
+    return QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0'));
+}
+
 void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
 {
     const double queuedMemoryMiB = static_cast<double>(stats.queuedMemoryBytes) / (1024.0 * 1024.0);
 
     const double queuedDiskMiB = static_cast<double>(stats.queuedDiskBytes) / (1024.0 * 1024.0);
 
-    const double behindSec =
+    // Kept for future diagnostics.
+    [[maybe_unused]] const double behindSec =
         stats.encodingFps > 0.0 ? static_cast<double>(stats.queuedFrames) / stats.encodingFps : 0.0;
+
+    QString text;
+
+    switch (videoController_->recordingState())
+    {
+        case RecorderState::Recording:
+        {
+            text = tr("Recorded: %1").arg(formatDuration(stats.recordedDuration));
+
+            if (stats.estimatedMaxRecordedDuration)
+            {
+                text += tr(" / ~%1").arg(formatDuration(*stats.estimatedMaxRecordedDuration));
+            }
+
+            break;
+        }
+
+        case RecorderState::Draining:
+        {
+            text = tr("Finalizing... Writing remaining %1")
+                       .arg(formatDuration(stats.retainedDuration));
+            break;
+        }
+
+        default:
+            return;
+    }
+
+    text += tr(" · %1 MiB RAM").arg(queuedMemoryMiB, 0, 'f', 0);
 
     if (stats.queuedDiskBytes > 0)
     {
-        recordingStatsLabel_->setText(tr("Queue: %1 MiB RAM + %2 MiB temporary · ~%3 s behind")
-                                          .arg(queuedMemoryMiB, 0, 'f', 0)
-                                          .arg(queuedDiskMiB, 0, 'f', 0)
-                                          .arg(behindSec, 0, 'f', 1));
+        text += tr(" + %1 MiB temporary").arg(queuedDiskMiB, 0, 'f', 0);
     }
-    else
-    {
-        recordingStatsLabel_->setText(tr("Queue: %1 MiB RAM · ~%2 s behind")
-                                          .arg(queuedMemoryMiB, 0, 'f', 0)
-                                          .arg(behindSec, 0, 'f', 1));
-    }
+
+    recordingStatsLabel_->setText(text);
 }
 
 void VideoWindow::onRecordingStarted(const QString& filename)

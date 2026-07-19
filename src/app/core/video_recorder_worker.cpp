@@ -74,6 +74,11 @@ bool VideoRecorderWorker::isAcceptingFrames() const
     return state_ == RecorderState::Recording;
 }
 
+RecorderState VideoRecorderWorker::state() const
+{
+    return state_;
+}
+
 void VideoRecorderWorker::addFrame(const VideoFrame& frame)
 {
     if (state_ != RecorderState::Recording)
@@ -95,7 +100,17 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
         status = frameBuffer_.push(frame);
 
         if (status != VideoFrameBuffer::PushStatus::BufferLimitExceeded)
+        {
             ++inputFrameCount_;
+
+            if (frame.presentationTimestampNs)
+            {
+                if (!firstPresentationTimestampNs_)
+                    firstPresentationTimestampNs_ = *frame.presentationTimestampNs;
+
+                lastPresentationTimestampNs_ = *frame.presentationTimestampNs;
+            }
+        }
 
         if (status == VideoFrameBuffer::PushStatus::BufferLimitExceeded)
             state_ = RecorderState::Draining;
@@ -206,6 +221,9 @@ void VideoRecorderWorker::resetSession()
     inputFrameCount_ = 0;
     encodedFrameCount_ = 0;
 
+    firstPresentationTimestampNs_.reset();
+    lastPresentationTimestampNs_.reset();
+
     statsTimestampNs_ = FrameClock::nowNs();
 }
 
@@ -224,11 +242,31 @@ void VideoRecorderWorker::updateStats()
 
         const double elapsedSec = static_cast<double>(elapsedNs) * 1e-9;
 
-        stats.queuedFrames = frameBuffer_.queuedFrames();
-        stats.queuedMemoryBytes = frameBuffer_.queuedMemoryBytes();
-        stats.queuedDiskBytes = frameBuffer_.queuedDiskBytes();
+        frameBuffer_.fillStats(stats);
+
         stats.inputFps = static_cast<double>(inputFrameCount_) / elapsedSec;
         stats.encodingFps = static_cast<double>(encodedFrameCount_) / elapsedSec;
+
+        // Recording statistics.
+        if (firstPresentationTimestampNs_ && lastPresentationTimestampNs_ &&
+            *lastPresentationTimestampNs_ >= *firstPresentationTimestampNs_)
+        {
+            stats.recordedDuration =
+                std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::nanoseconds(
+                    *lastPresentationTimestampNs_ - *firstPresentationTimestampNs_));
+        }
+
+        if (stats.estimatedMaxRetainedDuration)
+        {
+            const auto writtenDuration = stats.recordedDuration - stats.retainedDuration;
+
+            stats.estimatedMaxRecordedDuration =
+                writtenDuration + *stats.estimatedMaxRetainedDuration;
+        }
+        else
+        {
+            stats.estimatedMaxRecordedDuration.reset();
+        }
 
         inputFrameCount_ = 0;
         encodedFrameCount_ = 0;

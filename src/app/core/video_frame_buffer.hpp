@@ -16,6 +16,8 @@
 namespace fluvel
 {
 
+struct RecorderStats;
+
 /**
  * @brief Storage location of a buffered video frame.
  *
@@ -65,6 +67,15 @@ struct BufferedFrame
      * StorageType::Disk.
      */
     FrameLocation location;
+
+    /**
+     * @brief Presentation timestamp of the buffered frame, in nanoseconds.
+     *
+     * This timestamp is retained regardless of whether the frame is stored
+     * in memory or in the temporary spool file. It is used to compute the
+     * amount of recording history currently available in the buffer.
+     */
+    std::optional<int64_t> presentationTimestampNs;
 };
 
 /**
@@ -201,6 +212,16 @@ public:
      * @param settings New recording buffer settings.
      */
     void setSettings(const RecordingBufferSettings& settings);
+
+    /**
+     * @brief Fills a structure with the current runtime statistics of the buffer.
+     *
+     * All values are captured from the current state of the buffer and can be
+     * safely displayed by the user interface.
+     *
+     * @param[out] stats Structure receiving the current buffer statistics.
+     */
+    void fillStats(RecorderStats& stats) const;
 
 private:
     /**

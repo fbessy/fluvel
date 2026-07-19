@@ -87,6 +87,17 @@ public:
     bool isAcceptingFrames() const;
 
     /**
+     * @brief Returns the current state of the recorder worker.
+     *
+     * The returned state reflects the worker's internal recording lifecycle,
+     * including frame acceptance and finalization.
+     *
+     * @return Current recorder worker state.
+     */
+    [[nodiscard]]
+    RecorderState state() const;
+
+    /**
      * @brief Queues a video frame for encoding.
      *
      * @param frame Video frame to encode.
@@ -152,6 +163,9 @@ private:
     static constexpr int64_t kStatsIntervalNs = 1'000'000'000;
 
     VideoFrameBuffer frameBuffer_;
+
+    std::optional<int64_t> firstPresentationTimestampNs_;
+    std::optional<int64_t> lastPresentationTimestampNs_;
 };
 
 } // namespace fluvel

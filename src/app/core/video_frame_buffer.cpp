@@ -2,6 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_frame_buffer.hpp"
+#include "video_types.hpp"
 
 namespace fluvel
 {
@@ -39,6 +40,7 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
         BufferedFrame bufferedFrame;
 
         bufferedFrame.storage = StorageType::Disk;
+        bufferedFrame.presentationTimestampNs = frame.presentationTimestampNs;
         bufferedFrame.location = *location;
 
         queue_.enqueue(std::move(bufferedFrame));
@@ -58,6 +60,7 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
 
     BufferedFrame bufferedFrame;
     bufferedFrame.storage = StorageType::Memory;
+    bufferedFrame.presentationTimestampNs = frame.presentationTimestampNs;
     bufferedFrame.frame = std::move(queuedFrame);
 
     queue_.enqueue(std::move(bufferedFrame));
@@ -150,6 +153,52 @@ uint64_t VideoFrameBuffer::frameSize(const QImage& image)
 void VideoFrameBuffer::setSettings(const RecordingBufferSettings& settings)
 {
     settings_ = settings;
+}
+
+void VideoFrameBuffer::fillStats(RecorderStats& stats) const
+{
+    stats.queuedFrames = static_cast<std::size_t>(queue_.size());
+    stats.queuedMemoryBytes = queuedBytes_;
+    stats.queuedDiskBytes = queuedDiskBytes_;
+
+    stats.retainedDuration = std::chrono::milliseconds::zero();
+
+    // Duration currently retained by the recorder.
+    if (stats.queuedFrames >= 2)
+    {
+        const auto& oldest = queue_.head();
+        const auto& newest = queue_.back();
+
+        if (oldest.presentationTimestampNs && newest.presentationTimestampNs)
+        {
+            const auto durationNs =
+                *newest.presentationTimestampNs - *oldest.presentationTimestampNs;
+
+            if (durationNs > 0)
+            {
+                stats.retainedDuration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::nanoseconds(durationNs));
+            }
+        }
+    }
+
+    // Estimated maximum retained duration.
+    stats.estimatedMaxRetainedDuration.reset();
+
+    const uint64_t currentBufferedBytes = stats.queuedMemoryBytes + stats.queuedDiskBytes;
+
+    if (currentBufferedBytes > 0 && stats.retainedDuration > std::chrono::milliseconds::zero())
+    {
+        const uint64_t maxBufferedBytes = settings_.maxRamUsage + settings_.maxDiskUsage;
+
+        const double capacityRatio =
+            static_cast<double>(maxBufferedBytes) / static_cast<double>(currentBufferedBytes);
+
+        const auto estimatedMs =
+            static_cast<int64_t>(stats.retainedDuration.count() * capacityRatio);
+
+        stats.estimatedMaxRetainedDuration = std::chrono::milliseconds(estimatedMs);
+    }
 }
 
 } // namespace fluvel

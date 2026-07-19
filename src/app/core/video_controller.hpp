@@ -232,6 +232,17 @@ public:
     [[nodiscard]]
     bool isRecording() const;
 
+    /**
+     * @brief Returns the current recording state.
+     *
+     * The recording state indicates whether recording is stopped, actively
+     * recording, or finalizing previously accepted frames.
+     *
+     * @return Current recording state.
+     */
+    [[nodiscard]]
+    RecorderState recordingState() const;
+
 #endif
 
     /**

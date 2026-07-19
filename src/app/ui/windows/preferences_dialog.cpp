@@ -229,7 +229,7 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
     recordingRamSpin_->setSuffix(tr(" MiB"));
 
     recordingDiskSpin_ = new QSpinBox(groupBox);
-    recordingDiskSpin_->setRange(1, 1024);
+    recordingDiskSpin_->setRange(0, 1024);
     recordingDiskSpin_->setSuffix(tr(" GiB"));
 
     recordingOverflowCombo_ = new QComboBox(groupBox);

@@ -17,6 +17,7 @@
 #include <QUrl>
 #include <QVideoFrameFormat>
 
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 
@@ -316,9 +317,48 @@ struct RecorderStats
     double inputFps{0.0};
 
     /**
-     * @brief Rate at which frames are encoded.
+     * @brief Average rate at which frames are encoded.
      */
     double encodingFps{0.0};
+
+    /**
+     * @brief Duration of recording data currently retained in the recorder's
+     * buffering resources.
+     *
+     * This corresponds to the amount of recorded media that has not yet been
+     * written or discarded. The exact meaning depends on the recorder implementation.
+     */
+    std::chrono::milliseconds retainedDuration{};
+
+    /**
+     * @brief Estimated maximum duration of recording data that can be retained by
+     * the recorder's buffering resources.
+     *
+     * This value is an approximation based on the current recorder configuration
+     * and available buffering resources. It may change as the recording bitrate
+     * changes.
+     */
+    std::optional<std::chrono::milliseconds> estimatedMaxRetainedDuration{};
+
+    /**
+     * @brief Total duration of the recording accumulated so far.
+     *
+     * This corresponds to the duration of the recorded output if recording stopped
+     * immediately. It includes both the portion already written and the portion
+     * still retained by the recorder's buffering resources.
+     */
+    std::chrono::milliseconds recordedDuration{};
+
+    /**
+     * @brief Estimated maximum duration of the recorded output.
+     *
+     * This corresponds to the maximum duration that the recorded output can reach
+     * under the current buffering constraints.
+     *
+     * This value is an approximation based on the current recording settings and
+     * available buffering resources. It may change as the recording bitrate changes.
+     */
+    std::optional<std::chrono::milliseconds> estimatedMaxRecordedDuration{};
 };
 
 } // namespace fluvel

@@ -753,6 +753,11 @@ bool VideoController::isRecording() const
     return recorder_.isRecording();
 }
 
+RecorderState VideoController::recordingState() const
+{
+    return recorder_.state();
+}
+
 void VideoController::submitRecordingFrame(const VideoFrame& frame)
 {
     if (!recorder_.isAcceptingFrames())
