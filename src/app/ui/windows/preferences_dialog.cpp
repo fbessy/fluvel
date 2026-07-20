@@ -235,7 +235,9 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
     recordingOverflowCombo_ = new QComboBox(groupBox);
     recordingOverflowCombo_->addItem(tr("Stop recording"),
                                      int(BufferOverflowPolicy::StopRecording));
-    recordingOverflowCombo_->addItem(tr("Circular buffer"), int(BufferOverflowPolicy::Circular));
+
+    // recordingOverflowCombo_->addItem(tr("Circular buffer"),
+    // int(BufferOverflowPolicy::StopRecording));
 
     recordingRamSpin_->setValue(int(bufferSettings.maxRamUsage / (1024 * 1024)));
 

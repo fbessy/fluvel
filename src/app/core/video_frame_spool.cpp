@@ -84,7 +84,7 @@ bool VideoFrameSpool::reset()
 {
     if (!spoolFile_.isOpen())
     {
-        qWarning() << "Cannot clear spool file: spool file is not open.";
+        qWarning() << "Cannot reset spool file: spool file is not open.";
         return false;
     }
 
@@ -103,25 +103,6 @@ bool VideoFrameSpool::reset()
     if (!spoolFile_.open(QIODevice::ReadWrite | QIODevice::Truncate))
     {
         qWarning() << "Failed to reopen spool file:" << spoolFile_.errorString();
-        return false;
-    }
-
-    writeOffset_ = 0;
-
-    return true;
-}
-
-bool VideoFrameSpool::remove()
-{
-    if (spoolFile_.isOpen())
-        spoolFile_.close();
-
-    if (spoolFile_.fileName().isEmpty())
-        return true;
-
-    if (QFile::exists(spoolFile_.fileName()) && !QFile::remove(spoolFile_.fileName()))
-    {
-        qWarning() << "Failed to remove spool file:" << spoolFile_.fileName();
         return false;
     }
 

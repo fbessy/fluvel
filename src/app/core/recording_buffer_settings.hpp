@@ -19,14 +19,6 @@ enum class BufferOverflowPolicy
      * Recording stops when the recording buffer becomes full.
      */
     StopRecording,
-
-    /**
-     * @brief Use a circular recording buffer.
-     *
-     * The oldest buffered frames are discarded to make room for newly
-     * buffered frames.
-     */
-    Circular
 };
 
 /**

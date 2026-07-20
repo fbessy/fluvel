@@ -656,9 +656,9 @@ bool FFmpegVideoExporter::updateFrameTimestamp(const VideoFrame& frame)
 
     if (lastPts_ != AV_NOPTS_VALUE && context_->frame->pts <= lastPts_)
     {
-        qWarning() << "PTS not monotonic!"
-                   << "timestampNs =" << timestampNs << "pts =" << context_->frame->pts
-                   << "lastPts =" << lastPts_;
+        qWarning() << "timestampNs =" << timestampNs
+                   << "absolute =" << *frame.presentationTimestampNs
+                   << "pts =" << context_->frame->pts << "lastPts =" << lastPts_;
     }
 
     lastPts_ = context_->frame->pts;

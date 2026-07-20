@@ -201,10 +201,9 @@ void VideoRecorderWorker::processQueue()
     {
         QMutexLocker locker(&mutex_);
 
-        frameBuffer_.removeTemporaryStorage();
+        frameBuffer_.reset();
+        state_ = RecorderState::Stopped;
     }
-
-    state_ = RecorderState::Stopped;
 
     if (!success)
         emit errorOccurred(tr("Failed to finalize video recording."));
@@ -216,7 +215,7 @@ void VideoRecorderWorker::processQueue()
 
 void VideoRecorderWorker::resetSession()
 {
-    frameBuffer_.clear();
+    frameBuffer_.reset();
 
     inputFrameCount_ = 0;
     encodedFrameCount_ = 0;

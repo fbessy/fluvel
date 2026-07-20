@@ -89,27 +89,17 @@ public:
     [[nodiscard]] quint64 size() const;
 
     /**
-     * @brief Resets the spool for a new recording session.
+     * @brief Resets the temporary spool storage.
      *
-     * Removes all stored frames, recreates the temporary spool file and resets
-     * the internal write position. The spool remains open and ready to accept
-     * new frames.
+     * Removes all temporary data previously written to the spool and recreates
+     * an empty spool file ready for subsequent read and write operations.
      *
-     * @return @c true on success, @c false otherwise.
+     * After a successful call, the spool remains open and can immediately be
+     * reused for a new recording session.
+     *
+     * @return @c true if the spool was successfully reset, or @c false otherwise.
      */
-    [[nodiscard]]
     bool reset();
-
-    /**
-     * @brief Removes the temporary spool file.
-     *
-     * Closes and deletes the temporary spool file, then resets the internal
-     * write position. The spool can be reopened later by calling open().
-     *
-     * @return @c true on success, @c false otherwise.
-     */
-    [[nodiscard]]
-    bool remove();
 
     /**
      * @brief Stores a video frame in the spool.

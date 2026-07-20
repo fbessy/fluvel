@@ -44,6 +44,11 @@ enum class StorageType
  * spool file. When the frame is stored in memory, @ref frame contains
  * the complete video frame. Otherwise, @ref location identifies the
  * corresponding frame stored on disk.
+ *
+ * The presentation timestamp and frame size are always cached in memory
+ * regardless of the storage location. This allows the recording buffer
+ * to update statistics and discard the oldest frames without reading
+ * back the image data from the temporary spool file.
  */
 struct BufferedFrame
 {
@@ -67,6 +72,15 @@ struct BufferedFrame
      * StorageType::Disk.
      */
     FrameLocation location;
+
+    /**
+     * @brief Size of the buffered frame, in bytes.
+     *
+     * This value is cached regardless of the storage location. It allows
+     * the recording buffer to update its memory and disk usage counters
+     * without reading the frame back from the temporary spool file.
+     */
+    uint64_t sizeBytes{0};
 
     /**
      * @brief Presentation timestamp of the buffered frame, in nanoseconds.
@@ -153,18 +167,16 @@ public:
     std::optional<VideoFrame> pop();
 
     /**
-     * @brief Removes all queued frames.
-     */
-    void clear();
-
-    /**
-     * @brief Removes all buffered frames and deletes the temporary spool file.
+     * @brief Resets the recording buffer to its initial state.
      *
-     * Clears the in-memory queue, releases any temporary storage used on disk,
-     * and resets the internal buffer state. The temporary spool file is removed
-     * and will be recreated automatically when a new recording session starts.
+     * Clears all buffered frames, resets the associated temporary spool
+     * storage, clears the memory and disk usage counters, and restores the
+     * initial buffering state.
+     *
+     * This function is typically called before starting a new recording
+     * session.
      */
-    void removeTemporaryStorage();
+    void reset();
 
     /**
      * @brief Checks whether the buffer is empty.
@@ -224,6 +236,52 @@ public:
     void fillStats(RecorderStats& stats) const;
 
 private:
+    /**
+     * @brief Adds a video frame using the stop recording overflow policy.
+     *
+     * The frame is first stored in memory while sufficient RAM is available.
+     * Once the RAM limit is reached, subsequent frames are written to the
+     * temporary spool storage until the disk usage limit is reached.
+     *
+     * If neither memory nor temporary storage can accommodate the frame,
+     * PushStatus::BufferLimitExceeded is returned.
+     *
+     * @param frame Video frame to buffer.
+     *
+     * @return The result of the buffering operation.
+     */
+    PushStatus pushStopRecording(const VideoFrame& frame);
+
+    /**
+     * @brief Stores a video frame in memory.
+     *
+     * Creates a deep copy of the frame image, appends the frame to the
+     * recording queue, and updates the memory usage counters.
+     *
+     * @param frame Video frame to buffer.
+     * @param frameBytes Size of the frame in bytes.
+     *
+     * @return PushStatus::Success.
+     */
+    PushStatus pushToMemory(const VideoFrame& frame, qsizetype frameBytes);
+
+    /**
+     * @brief Stores a video frame in the temporary spool storage.
+     *
+     * Writes the frame to the temporary spool file, appends its metadata to the
+     * recording queue, and updates the temporary storage usage counters.
+     *
+     * If the temporary spool storage is used for the first time during the
+     * current recording session, PushStatus::TemporaryStorageActivated is
+     * returned.
+     *
+     * @param frame Video frame to buffer.
+     * @param frameBytes Size of the frame in bytes.
+     *
+     * @return The result of the buffering operation.
+     */
+    PushStatus pushToDisk(const VideoFrame& frame, qsizetype frameBytes);
+
     /**
      * @brief Returns the memory occupied by an image.
      *
