@@ -9,7 +9,7 @@ abstractions, and provides FFmpeg-based video encoding support when
 available.
 
 
-Video Export
+Media Export
 ------------
 
 .. doxygenfile:: video_export_settings.hpp

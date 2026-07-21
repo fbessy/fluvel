@@ -4,10 +4,10 @@
 #pragma once
 
 #include "frame_pipeline.hpp"
+#include "recording_types.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
 #include "video_frame_buffer.hpp"
-#include "video_types.hpp"
 
 #include <QImage>
 #include <QMutex>

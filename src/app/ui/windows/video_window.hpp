@@ -7,6 +7,7 @@
 #include "application_settings_types.hpp"
 #endif
 
+#include "recording_types.hpp"
 #include "video_shortcut_manager.hpp"
 #include "video_types.hpp"
 

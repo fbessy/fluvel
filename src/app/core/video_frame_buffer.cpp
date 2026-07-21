@@ -2,7 +2,7 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_frame_buffer.hpp"
-#include "video_types.hpp"
+#include "recording_types.hpp"
 
 namespace fluvel
 {

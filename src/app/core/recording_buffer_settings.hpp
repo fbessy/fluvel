@@ -3,6 +3,11 @@
 
 #pragma once
 
+/**
+ * @file recording_buffer_settings.hpp
+ * @brief Configuration of the recording frame buffer.
+ */
+
 #include <cstdint>
 
 namespace fluvel

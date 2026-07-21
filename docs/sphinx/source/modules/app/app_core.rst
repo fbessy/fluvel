@@ -29,8 +29,6 @@ Execution
 
 .. doxygenfile:: video_processing_thread.hpp
 
-.. doxygenfile:: video_recorder_worker.hpp
-
 .. doxygenfile:: frame_pipeline.hpp
 
 .. doxygenfile:: frame_clock.hpp
@@ -46,8 +44,8 @@ Configuration
 .. doxygenfile:: application_settings_types.hpp
 
 
-Video
------
+Video Processing
+----------------
 
 .. doxygenfile:: video_types.hpp
 
@@ -56,6 +54,22 @@ Video
 .. doxygenfile:: video_format_utils.hpp
 
 .. doxygenfile:: frame_rendering_utils.hpp
+
+
+Recording
+---------
+
+.. doxygenfile:: recording_types.hpp
+
+.. doxygenfile:: recording_buffer_settings.hpp
+
+.. doxygenfile:: video_frame_header.hpp
+
+.. doxygenfile:: video_frame_buffer.hpp
+
+.. doxygenfile:: video_frame_spool.hpp
+
+.. doxygenfile:: video_recorder_worker.hpp
 
 
 Image Editing
