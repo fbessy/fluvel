@@ -47,7 +47,7 @@ struct SnapshotPreferences
     QString directory;
     QString baseName{"image"};
     QByteArray preferredFormat{"png"};
-    bool appendTimestamp{false};
+    bool appendTimestamp{true};
 };
 
 /**
@@ -55,10 +55,21 @@ struct SnapshotPreferences
  */
 struct VideoRecordingPreferences
 {
+    static constexpr int kDefaultRetentionTimeMinutes{30};
+    static constexpr int kDefaultSegmentCount{10};
+
     QString directory;
     QString baseName{"video"};
+
     VideoCodec preferredCodec{VideoCodec::FFV1};
-    bool appendTimestamp{false};
+
+    bool appendTimestamp{true};
+
+    RecordingMode recordingMode{RecordingMode::SingleFile};
+
+    int retentionTimeMinutes{kDefaultRetentionTimeMinutes};
+
+    int segmentCount{kDefaultSegmentCount};
 };
 
 /**

@@ -13,6 +13,7 @@
 #pragma once
 
 #include "recording_buffer_settings.hpp"
+#include "recording_types.hpp"
 
 #include <QSize>
 #include <QString>
@@ -181,48 +182,96 @@ namespace fluvel
 
   /**
    * @brief Video export settings.
+   *
+   * Defines the parameters used to export a recorded video, including
+   * the output file, encoding options and buffering configuration.
    */
   struct VideoExportSettings
   {
-    /**
-     * @brief Output filename.
-     */
-    QString filename;
+      /**
+       * @brief Output filename.
+       *
+       * The filename may be absolute or relative. If no extension is
+       * provided, a suitable one may be automatically selected according
+       * to the chosen export profile or container.
+       */
+      QString filename;
 
-    /**
-     * @brief Frames per second.
-     */
-    int fps{30};
+      /**
+       * @brief Recording mode.
+       *
+       * Defines how the recording is stored.
+       *
+       * - @ref RecordingMode::SingleFile records everything into a single file.
+       * - @ref RecordingMode::Circular records successive video segments and
+       *   automatically removes the oldest ones according to the retention
+       *   settings.
+       */
+      RecordingMode recordingMode{RecordingMode::SingleFile};
 
-    /**
-     * @brief Export profile.
-     *
-     * Fluvel is primarily a computer vision application,
-     * therefore Archive is the default profile.
-     */
-    ExportProfile profile{ExportProfile::Archive};
+      /**
+       * @brief Total retention time.
+       *
+       * In circular recording mode, the oldest recording segments are
+       * automatically removed so that approximately this amount of video
+       * history is preserved.
+       *
+       * Expressed in minutes.
+       *
+       * Ignored in single-file recording mode.
+       */
+      int retentionTimeMinutes{30};
 
-    /**
-     * @brief Video codec.
-     *
-     * Used only when profile is Custom.
-     */
-    VideoCodec codec{VideoCodec::FFV1};
+      /**
+       * @brief Number of recording segments.
+       *
+       * The retention time is divided into this number of segments.
+       *
+       * Larger values produce shorter segments, while smaller values
+       * produce longer segments.
+       *
+       * Ignored in single-file recording mode.
+       */
+      int segmentCount{10};
 
-    /**
-     * @brief Video container.
-     *
-     * Used only when profile is Custom.
-     */
-    VideoContainer container{VideoContainer::Matroska};
+      /**
+       * @brief Target frame rate.
+       *
+       * Specifies the frame rate written to the exported video.
+       * This value should normally match the acquisition frame rate.
+       */
+      int fps{30};
 
-    /**
-     * @brief Recording buffer settings for this recording session.
-     *
-     * Defines the RAM and temporary storage limits, as well as the overflow
-     * policy used while recording.
-     */
-    RecordingBufferSettings bufferSettings;
+      /**
+       * @brief Export profile.
+       *
+       * Fluvel is primarily a computer vision application; therefore,
+       * Archive is the default profile. When set to Custom, the codec
+       * and container specified below are used.
+       */
+      ExportProfile profile{ExportProfile::Archive};
+
+      /**
+       * @brief Video codec.
+       *
+       * Used only when @ref profile is set to @ref ExportProfile::Custom.
+       */
+      VideoCodec codec{VideoCodec::FFV1};
+
+      /**
+       * @brief Video container.
+       *
+       * Used only when @ref profile is set to @ref ExportProfile::Custom.
+       */
+      VideoContainer container{VideoContainer::Matroska};
+
+      /**
+       * @brief Recording buffer configuration.
+       *
+       * Defines the buffering strategy used during recording, including
+       * RAM limits, temporary storage limits and overflow handling.
+       */
+      RecordingBufferSettings bufferSettings;
   };
 
 } // namespace fluvel

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "frame_pipeline.hpp"
+#include "recording_session.hpp"
 #include "recording_types.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
@@ -147,7 +148,7 @@ private:
 
     void updateStats();
 
-    VideoExporter exporter_;
+    RecordingSession recordingSession_;
     std::thread workerThread_;
 
     QMutex mutex_;

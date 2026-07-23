@@ -232,6 +232,9 @@ set(app_src
     ${CORE_DIR}/video_frame_spool.cpp
     ${CORE_DIR}/video_frame_spool.hpp
 
+    ${CORE_DIR}/recording_session.cpp
+    ${CORE_DIR}/recording_session.hpp
+
     ${CORE_DIR}/video_frame_header.hpp
 
     ${CORE_DIR}/recording_types.hpp

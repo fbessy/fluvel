@@ -194,11 +194,47 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
 
     videoTimestampCheck_->setChecked(preferences.appendTimestamp);
 
+    recordingModeCombo_ = new QComboBox(group);
+    recordingModeCombo_->addItem(tr("Single file"), int(RecordingMode::SingleFile));
+    recordingModeCombo_->addItem(tr("Circular"), int(RecordingMode::Circular));
+    recordingModeCombo_->setCurrentIndex(
+        recordingModeCombo_->findData(int(preferences.recordingMode)));
+
+    retentionTimeSpin_ = new QSpinBox(group);
+    retentionTimeSpin_->setRange(1, 24 * 60);
+    retentionTimeSpin_->setSuffix(tr(" min"));
+    retentionTimeSpin_->setValue(preferences.retentionTimeMinutes);
+
+    segmentCountSpin_ = new QSpinBox(group);
+    segmentCountSpin_->setRange(2, 1000);
+    segmentCountSpin_->setValue(preferences.segmentCount);
+
+    segmentDurationLabel_ = new QLabel(group);
+
     layout->addRow(tr("Directory:"), directoryLayout);
     layout->addRow(tr("Base name:"), videoBaseNameEdit_);
     layout->addRow(tr("Codec:"), videoCodecCombo_);
     layout->addRow(QString(), videoTimestampCheck_);
     layout->addRow(tr("Preview:"), videoPreviewLabel_);
+    layout->addRow(tr("Recording mode:"), recordingModeCombo_);
+    layout->addRow(tr("Retention time:"), retentionTimeSpin_);
+    layout->addRow(tr("Segments:"), segmentCountSpin_);
+    layout->addRow(tr("Segment duration:"), segmentDurationLabel_);
+
+    updateVideoPreview();
+    updateSegmentDuration();
+
+    auto updateCircularControls = [this]
+    {
+        const bool circular =
+            recordingModeCombo_->currentData().toInt() == int(RecordingMode::Circular);
+
+        retentionTimeSpin_->setEnabled(circular);
+        segmentCountSpin_->setEnabled(circular);
+        segmentDurationLabel_->setEnabled(circular);
+    };
+
+    updateCircularControls();
 
     connect(browseButton, &QPushButton::clicked, this, &PreferencesDialog::selectVideoDirectory);
 
@@ -211,7 +247,13 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
     connect(videoTimestampCheck_, &QCheckBox::toggled, this,
             &PreferencesDialog::updateVideoPreview);
 
-    updateVideoPreview();
+    connect(retentionTimeSpin_, &QSpinBox::valueChanged, this,
+            &PreferencesDialog::updateSegmentDuration);
+
+    connect(segmentCountSpin_, &QSpinBox::valueChanged, this,
+            &PreferencesDialog::updateSegmentDuration);
+
+    connect(recordingModeCombo_, &QComboBox::currentIndexChanged, this, updateCircularControls);
 
     return group;
 }
@@ -331,6 +373,13 @@ void PreferencesDialog::accept()
 
     videoPreferences.appendTimestamp = videoTimestampCheck_->isChecked();
 
+    videoPreferences.recordingMode =
+        static_cast<RecordingMode>(recordingModeCombo_->currentData().toInt());
+
+    videoPreferences.retentionTimeMinutes = retentionTimeSpin_->value();
+
+    videoPreferences.segmentCount = segmentCountSpin_->value();
+
     settings.setVideoRecordingPreferences(videoPreferences);
 
     auto bufferSettings = settings.recordingBufferSettings();
@@ -355,6 +404,30 @@ void PreferencesDialog::closeEvent(QCloseEvent* event)
     settings.setValue("ui_geometry/preferences_dialog", saveGeometry());
 
     QDialog::closeEvent(event);
+}
+
+void PreferencesDialog::updateSegmentDuration()
+{
+    const int durationSeconds = retentionTimeSpin_->value() * 60 / segmentCountSpin_->value();
+
+    const int minutes = durationSeconds / 60;
+    const int seconds = durationSeconds % 60;
+
+    QString text;
+
+    if (minutes > 0)
+    {
+        text = tr("%1 min").arg(minutes);
+
+        if (seconds > 0)
+            text += tr(" %1 s").arg(seconds);
+    }
+    else
+    {
+        text = tr("%1 s").arg(seconds);
+    }
+
+    segmentDurationLabel_->setText(text);
 }
 
 } // namespace fluvel

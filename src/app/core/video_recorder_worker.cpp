@@ -28,7 +28,7 @@ void VideoRecorderWorker::start(const VideoExportSettings& settings)
     if (workerThread_.joinable())
         workerThread_.join();
 
-    if (!exporter_.open(settings))
+    if (!recordingSession_.open(settings))
     {
         emit errorOccurred(tr("Failed to start video recording."));
         return;
@@ -166,13 +166,13 @@ void VideoRecorderWorker::processQueue()
 
         for (int attempt = 0; attempt < kMaxEncodingAttempts; ++attempt)
         {
-            if (exporter_.addFrame(*frame))
+            if (recordingSession_.addFrame(*frame))
             {
                 success = true;
                 break;
             }
 
-            QThread::msleep(50); // Optionnel
+            QThread::msleep(50);
         }
 
         if (!success)
@@ -196,7 +196,7 @@ void VideoRecorderWorker::processQueue()
         updateStats();
     }
 
-    const bool success = exporter_.close();
+    const bool success = recordingSession_.close();
 
     {
         QMutexLocker locker(&mutex_);

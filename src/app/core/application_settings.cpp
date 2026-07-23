@@ -672,7 +672,23 @@ void ApplicationSettings::loadUserPreferences()
         settings.value("preferences/snapshot/format", QByteArray("png")).toByteArray();
 
     snapshotPreferences_.appendTimestamp =
-        settings.value("preferences/snapshot/append_timestamp", false).toBool();
+        settings.value("preferences/snapshot/append_timestamp", true).toBool();
+
+    videoRecordingPreferences_.recordingMode = static_cast<RecordingMode>(
+        settings.value("preferences/video_recording/recording_mode", int(RecordingMode::SingleFile))
+            .toInt());
+
+    videoRecordingPreferences_.retentionTimeMinutes =
+        settings
+            .value("preferences/video_recording/retention_time_minutes",
+                   VideoRecordingPreferences::kDefaultRetentionTimeMinutes)
+            .toInt();
+
+    videoRecordingPreferences_.segmentCount =
+        settings
+            .value("preferences/video_recording/segment_count",
+                   VideoRecordingPreferences::kDefaultSegmentCount)
+            .toInt();
 
     videoRecordingPreferences_.directory =
         settings
@@ -687,7 +703,7 @@ void ApplicationSettings::loadUserPreferences()
         settings.value("preferences/video_recording/codec", int(VideoCodec::FFV1)).toInt());
 
     videoRecordingPreferences_.appendTimestamp =
-        settings.value("preferences/video_recording/append_timestamp", false).toBool();
+        settings.value("preferences/video_recording/append_timestamp", true).toBool();
 
     recordingBufferSettings_.maxRamUsage =
         settings
@@ -727,6 +743,12 @@ void ApplicationSettings::saveUserPreferences()
                       int(videoRecordingPreferences_.preferredCodec));
     settings.setValue("preferences/video_recording/append_timestamp",
                       videoRecordingPreferences_.appendTimestamp);
+    settings.setValue("preferences/video_recording/recording_mode",
+                      int(videoRecordingPreferences_.recordingMode));
+    settings.setValue("preferences/video_recording/retention_time_minutes",
+                      videoRecordingPreferences_.retentionTimeMinutes);
+    settings.setValue("preferences/video_recording/segment_count",
+                      videoRecordingPreferences_.segmentCount);
 
     settings.setValue("preferences/recording_buffer/max_ram_usage",
                       static_cast<qulonglong>(recordingBufferSettings_.maxRamUsage));

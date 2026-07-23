@@ -736,6 +736,10 @@ void VideoController::startRecording()
     settings.filename = file_utils::buildOutputFileName(preferences.directory, preferences.baseName,
                                                         extension, preferences.appendTimestamp);
 
+    settings.recordingMode = preferences.recordingMode;
+    settings.retentionTimeMinutes = preferences.retentionTimeMinutes;
+    settings.segmentCount = preferences.segmentCount;
+
     settings.bufferSettings = ApplicationSettings::instance().recordingBufferSettings();
 
     recordingSettings_ = exporter_utils::resolveSettings(settings);

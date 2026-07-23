@@ -72,6 +72,14 @@ private:
     /// Updates the video recording filename preview.
     void updateVideoPreview();
 
+    /**
+     * @brief Updates the segment duration preview.
+     *
+     * Computes the duration of each recording segment from the current
+     * retention settings.
+     */
+    void updateSegmentDuration();
+
     QComboBox* languageCombo_{nullptr};
 
     QLineEdit* snapshotDirectoryEdit_{nullptr};
@@ -89,6 +97,13 @@ private:
     QSpinBox* recordingRamSpin_{nullptr};
     QSpinBox* recordingDiskSpin_{nullptr};
     QComboBox* recordingOverflowCombo_{nullptr};
+
+    QComboBox* recordingModeCombo_{nullptr};
+
+    QSpinBox* retentionTimeSpin_{nullptr};
+    QSpinBox* segmentCountSpin_{nullptr};
+
+    QLabel* segmentDurationLabel_{nullptr};
 };
 
 } // namespace fluvel
