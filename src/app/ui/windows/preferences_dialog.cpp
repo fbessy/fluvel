@@ -200,15 +200,18 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
     recordingModeCombo_->setCurrentIndex(
         recordingModeCombo_->findData(int(preferences.recordingMode)));
 
+    retentionTimeLabel_ = new QLabel(tr("Retention time:"), group);
     retentionTimeSpin_ = new QSpinBox(group);
     retentionTimeSpin_->setRange(1, 24 * 60);
     retentionTimeSpin_->setSuffix(tr(" min"));
     retentionTimeSpin_->setValue(preferences.retentionTimeMinutes);
 
+    segmentCountLabel_ = new QLabel(tr("Segments:"), group);
     segmentCountSpin_ = new QSpinBox(group);
     segmentCountSpin_->setRange(2, 1000);
     segmentCountSpin_->setValue(preferences.segmentCount);
 
+    segmentDurationTextLabel_ = new QLabel(tr("Segment duration:"), group);
     segmentDurationLabel_ = new QLabel(group);
 
     layout->addRow(tr("Directory:"), directoryLayout);
@@ -217,9 +220,9 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
     layout->addRow(QString(), videoTimestampCheck_);
     layout->addRow(tr("Preview:"), videoPreviewLabel_);
     layout->addRow(tr("Recording mode:"), recordingModeCombo_);
-    layout->addRow(tr("Retention time:"), retentionTimeSpin_);
-    layout->addRow(tr("Segments:"), segmentCountSpin_);
-    layout->addRow(tr("Segment duration:"), segmentDurationLabel_);
+    layout->addRow(retentionTimeLabel_, retentionTimeSpin_);
+    layout->addRow(segmentCountLabel_, segmentCountSpin_);
+    layout->addRow(segmentDurationTextLabel_, segmentDurationLabel_);
 
     updateVideoPreview();
     updateSegmentDuration();
@@ -229,8 +232,13 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
         const bool circular =
             recordingModeCombo_->currentData().toInt() == int(RecordingMode::Circular);
 
+        retentionTimeLabel_->setEnabled(circular);
         retentionTimeSpin_->setEnabled(circular);
+
+        segmentCountLabel_->setEnabled(circular);
         segmentCountSpin_->setEnabled(circular);
+
+        segmentDurationTextLabel_->setEnabled(circular);
         segmentDurationLabel_->setEnabled(circular);
     };
 
@@ -278,8 +286,8 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
     recordingOverflowCombo_->addItem(tr("Stop recording"),
                                      int(BufferOverflowPolicy::StopRecording));
 
-    // recordingOverflowCombo_->addItem(tr("Circular buffer"),
-    // int(BufferOverflowPolicy::StopRecording));
+    recordingOverflowCombo_->addItem(tr("Discard oldest frames"),
+                                     int(BufferOverflowPolicy::DiscardOldest));
 
     recordingRamSpin_->setValue(int(bufferSettings.maxRamUsage / (1024 * 1024)));
 

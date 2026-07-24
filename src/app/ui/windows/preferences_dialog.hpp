@@ -100,9 +100,13 @@ private:
 
     QComboBox* recordingModeCombo_{nullptr};
 
+    QLabel* retentionTimeLabel_{nullptr};
     QSpinBox* retentionTimeSpin_{nullptr};
+
+    QLabel* segmentCountLabel_{nullptr};
     QSpinBox* segmentCountSpin_{nullptr};
 
+    QLabel* segmentDurationTextLabel_{nullptr};
     QLabel* segmentDurationLabel_{nullptr};
 };
 

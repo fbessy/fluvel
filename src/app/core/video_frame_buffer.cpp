@@ -19,8 +19,12 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
     {
         case BufferOverflowPolicy::StopRecording:
             return pushStopRecording(frame);
+
+        case BufferOverflowPolicy::DiscardOldest:
+            return pushDiscardOldest(frame);
     }
 
+    assert(false);
     return PushStatus::BufferLimitExceeded;
 }
 
@@ -36,6 +40,38 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::pushStopRecording(const VideoFram
         return pushToDisk(frame, frameBytes);
 
     return PushStatus::BufferLimitExceeded;
+}
+
+VideoFrameBuffer::PushStatus VideoFrameBuffer::pushDiscardOldest(const VideoFrame& frame)
+{
+    const auto frameBytes = frameSize(frame.image);
+
+    if (queuedBytes_ + frameBytes <= settings_.maxRamUsage)
+        return pushToMemory(frame, frameBytes);
+
+    if (queuedDiskBytes_ + frameBytes <= settings_.maxDiskUsage)
+        return pushToDisk(frame, frameBytes);
+
+    while (queuedDiskBytes_ + frameBytes > settings_.maxDiskUsage)
+    {
+        if (queue_.isEmpty())
+            return PushStatus::BufferLimitExceeded;
+
+        auto oldest = queue_.dequeue();
+
+        switch (oldest.storage)
+        {
+            case StorageType::Memory:
+                queuedBytes_ -= oldest.sizeBytes;
+                break;
+
+            case StorageType::Disk:
+                queuedDiskBytes_ -= oldest.sizeBytes;
+                break;
+        }
+    }
+
+    return pushToDisk(frame, frameBytes);
 }
 
 VideoFrameBuffer::PushStatus VideoFrameBuffer::pushToMemory(const VideoFrame& frame,

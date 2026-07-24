@@ -24,6 +24,15 @@ enum class BufferOverflowPolicy
      * Recording stops when the recording buffer becomes full.
      */
     StopRecording,
+
+    /**
+     * @brief Discard the oldest buffered frames.
+     *
+     * When the recording buffer becomes full, the oldest buffered frames are
+     * discarded to free space for new frames. Recording continues while always
+     * preserving the most recent frames.
+     */
+    DiscardOldest
 };
 
 /**

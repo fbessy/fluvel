@@ -253,6 +253,19 @@ private:
     PushStatus pushStopRecording(const VideoFrame& frame);
 
     /**
+     * @brief Pushes a frame using the discard-oldest overflow policy.
+     *
+     * The frame is first stored in memory whenever possible, then in temporary
+     * storage. If the recording buffer is full, the oldest buffered frames are
+     * discarded until enough space is available for the new frame, allowing the
+     * recording to continue.
+     *
+     * @param frame Frame to enqueue.
+     * @return Status of the push operation.
+     */
+    PushStatus pushDiscardOldest(const VideoFrame& frame);
+
+    /**
      * @brief Stores a video frame in memory.
      *
      * Creates a deep copy of the frame image, appends the frame to the
