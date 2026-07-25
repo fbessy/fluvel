@@ -2547,7 +2547,7 @@ void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
 
             if (stats.estimatedMaxRecordedDuration)
             {
-                text += tr(" / ~%1").arg(formatDuration(*stats.estimatedMaxRecordedDuration));
+                text += QString(" / ~%1").arg(formatDuration(*stats.estimatedMaxRecordedDuration));
             }
 
             break;

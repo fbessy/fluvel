@@ -355,7 +355,7 @@ void ImageWindow::setupActions()
     aboutAct_->setIcon(aboutIcon);
 
     preferencesAct_ = new QAction(tr("&Preferences"), this);
-    preferencesAct_->setStatusTip(tr("Choose the user preferences."));
+    preferencesAct_->setStatusTip(tr("Open the application preferences."));
 
     QIcon preferencesIcon =
         il::loadIcon("preferences-desktop-locale", ":/icons/actions/language-symbolic.svg");

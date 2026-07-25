@@ -297,7 +297,7 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
         recordingOverflowCombo_->findData(int(bufferSettings.overflowPolicy)));
 
     layout->addRow(tr("Maximum RAM usage:"), recordingRamSpin_);
-    layout->addRow(tr("Maximum temporary usage:"), recordingDiskSpin_);
+    layout->addRow(tr("Maximum temporary storage usage:"), recordingDiskSpin_);
     layout->addRow(tr("When buffer is full:"), recordingOverflowCombo_);
 
     connect(
