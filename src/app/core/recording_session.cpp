@@ -4,6 +4,7 @@
 #include "recording_session.hpp"
 #include "frame_clock.hpp"
 #include "frame_pipeline.hpp"
+#include "video_exporter_utils.hpp"
 
 #include <QDir>
 #include <QFileInfo>
@@ -21,7 +22,7 @@ bool RecordingSession::open(const VideoExportSettings& settings)
 
     if (settings_.recordingMode == RecordingMode::Circular)
     {
-        const QFileInfo info(settings_.filename);
+        const QFileInfo info(settings_.outputPath);
 
         segmentDirectory_ = info.absolutePath() + "/" + info.completeBaseName();
 
@@ -29,7 +30,7 @@ bool RecordingSession::open(const VideoExportSettings& settings)
             return false;
 
         segmentIndex_ = 1;
-        exportSettings.filename = segmentFilename(segmentIndex_);
+        exportSettings.outputPath = segmentFilename(segmentIndex_);
 
         assert(settings_.segmentCount >= 2);
         assert(settings_.retentionTimeMinutes >= 1);
@@ -91,7 +92,7 @@ bool RecordingSession::rotateSegment()
     ++segmentIndex_;
 
     VideoExportSettings exportSettings = settings_;
-    exportSettings.filename = segmentFilename(segmentIndex_);
+    exportSettings.outputPath = segmentFilename(segmentIndex_);
 
     removeOldSegments();
 
@@ -102,10 +103,10 @@ QString RecordingSession::segmentFilename(int index) const
 {
     assert(settings_.recordingMode == RecordingMode::Circular);
 
-    const QFileInfo info(settings_.filename);
+    const QFileInfo info(settings_.outputPath);
 
-    const QString base = info.completeBaseName();
-    const QString ext = info.completeSuffix();
+    const QString base = info.fileName();
+    const QString ext = exporter_utils::expectedExtension(settings_.container);
 
     return QString("%1/%2_%3.%4")
         .arg(segmentDirectory_)

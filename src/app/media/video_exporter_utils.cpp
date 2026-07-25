@@ -139,16 +139,27 @@ VideoExportSettings resolveSettings(const VideoExportSettings& settings)
 
     applyExportProfile(resolved);
 
-    if (resolved.filename.isEmpty())
+    if (resolved.outputPath.isEmpty())
     {
-        const QString filename = "video." + expectedExtension(resolved.container);
+        if (resolved.recordingMode == RecordingMode::SingleFile)
+        {
+            const QString filename = "video." + expectedExtension(resolved.container);
 
-        resolved.filename = QDir(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
-                                .filePath(filename);
+            resolved.outputPath =
+                QDir(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
+                    .filePath(filename);
+        }
+        else
+        {
+            resolved.outputPath =
+                QDir(QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
+                    .filePath("video");
+        }
     }
-    else if (resolved.profile != ExportProfile::Custom)
+    else if (resolved.recordingMode == RecordingMode::SingleFile &&
+             resolved.profile != ExportProfile::Custom)
     {
-        ensureExpectedExtension(resolved.filename, resolved.container);
+        ensureExpectedExtension(resolved.outputPath, resolved.container);
     }
 
     return resolved;

@@ -2581,14 +2581,14 @@ void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
     recordingStatsLabel_->setText(text);
 }
 
-void VideoWindow::onRecordingStarted(const QString& filename)
+void VideoWindow::onRecordingStarted(const QString& outputPath)
 {
-    statusBar()->showMessage(tr("Recording to: %1").arg(filename), 5000);
+    statusBar()->showMessage(tr("Recording to: %1").arg(outputPath), 5000);
 }
 
-void VideoWindow::onRecordingFinalized(const QString& filename)
+void VideoWindow::onRecordingFinalized(const QString& outputPath)
 {
-    statusBar()->showMessage(tr("Video saved: %1").arg(filename), 5000);
+    statusBar()->showMessage(tr("Recording saved: %1").arg(outputPath), 5000);
 }
 
 void VideoWindow::onRecordingWarning(const QString& message)

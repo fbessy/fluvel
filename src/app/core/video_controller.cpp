@@ -124,7 +124,7 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     connect(&recorder_, &VideoRecorderWorker::recordingFinalized, this,
             [this]()
             {
-                emit recordingFinalized(recordingSettings_.filename);
+                emit recordingFinalized(recordingSettings_.outputPath);
             });
 
     connect(&recorder_, &VideoRecorderWorker::warningOccurred, this,
@@ -731,10 +731,12 @@ void VideoController::startRecording()
     settings.codec = preferences.preferredCodec;
     settings.container = exporter_utils::preferredContainer(settings.codec);
 
-    const QString extension = exporter_utils::expectedExtension(settings.container);
+    const QString extension = preferences.recordingMode == RecordingMode::SingleFile
+                                  ? exporter_utils::expectedExtension(settings.container)
+                                  : QString();
 
-    settings.filename = file_utils::buildOutputFileName(preferences.directory, preferences.baseName,
-                                                        extension, preferences.appendTimestamp);
+    settings.outputPath = file_utils::buildOutputFileName(
+        preferences.directory, preferences.baseName, extension, preferences.appendTimestamp);
 
     settings.recordingMode = preferences.recordingMode;
     settings.retentionTimeMinutes = preferences.retentionTimeMinutes;
@@ -775,7 +777,7 @@ void VideoController::onRecordingStateChanged(RecorderState state)
     emit recordingStateChanged(state);
 
     if (state == RecorderState::Recording)
-        emit recordingStarted(recordingSettings_.filename);
+        emit recordingStarted(recordingSettings_.outputPath);
 }
 
 #endif

@@ -367,16 +367,24 @@ signals:
     /**
      * @brief Emitted when video recording starts.
      *
-     * @param filename Output video filename.
+     * @param outputPath Output path of the recording.
+     *
+     * In single-file recording mode, this is the path of the output video file.
+     * In circular recording mode, this is the recording directory (or base path)
+     * containing the generated video segments.
      */
-    void recordingStarted(const QString& filename);
+    void recordingStarted(const QString& outputPath);
 
     /**
      * @brief Emitted when a video recording has been successfully finalized.
      *
-     * @param filename Output video filename.
+     * @param outputPath Output path of the recording.
+     *
+     * In single-file recording mode, this is the path of the output video file.
+     * In circular recording mode, this is the recording directory (or base path)
+     * containing the generated video segments.
      */
-    void recordingFinalized(const QString& filename);
+    void recordingFinalized(const QString& outputPath);
 
     /**
      * @brief Emitted when video recorder statistics are updated.

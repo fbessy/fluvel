@@ -189,13 +189,15 @@ namespace fluvel
   struct VideoExportSettings
   {
       /**
-       * @brief Output filename.
+       * @brief Output path.
        *
-       * The filename may be absolute or relative. If no extension is
-       * provided, a suitable one may be automatically selected according
-       * to the chosen export profile or container.
+       * In single-file recording mode, this is the path of the exported video.
+       *
+       * In circular recording mode, this is the directory (or base path,
+       * depending on the implementation) where the recording segments are
+       * stored.
        */
-      QString filename;
+      QString outputPath;
 
       /**
        * @brief Recording mode.

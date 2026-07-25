@@ -255,8 +255,8 @@ private:
 #ifdef FLUVEL_USE_FFMPEG
     void onRecordingStateChanged(RecorderState state);
     void onRecordingStatsChanged(const RecorderStats& stats);
-    void onRecordingStarted(const QString& filename);
-    void onRecordingFinalized(const QString& filename);
+    void onRecordingStarted(const QString& outputPath);
+    void onRecordingFinalized(const QString& outputPath);
 #endif
 
     //

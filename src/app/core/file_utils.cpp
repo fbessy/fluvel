@@ -332,6 +332,9 @@ QString buildOutputFileName(const QString& directory, const QString& baseName,
     if (appendTimestamp)
         name += QDateTime::currentDateTime().toString("_yyyy-MM-dd_HH-mm-ss");
 
-    return makeUniqueFileName(QDir(directory).filePath(name + "." + extension));
+    if (!extension.isEmpty())
+        name += "." + extension;
+
+    return makeUniqueFileName(QDir(directory).filePath(name));
 }
 }

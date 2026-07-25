@@ -163,9 +163,10 @@ bool FFmpegVideoExporter::open(const VideoExportSettings& settings)
     //
     settings_ = settings;
 
-    if (!exporter_utils::hasExpectedExtension(settings_.filename, settings_.container))
+    if (settings_.recordingMode == RecordingMode::SingleFile &&
+        !exporter_utils::hasExpectedExtension(settings_.outputPath, settings_.container))
     {
-        qWarning() << "Filename extension" << QFileInfo(settings_.filename).suffix()
+        qWarning() << "Filename extension" << QFileInfo(settings_.outputPath).suffix()
                    << "does not match the selected" << exporter_utils::toString(settings_.container)
                    << "container.";
     }
@@ -293,12 +294,11 @@ bool FFmpegVideoExporter::initializeContainer(const VideoExportSettings& setting
     const char* format = ffmpeg_utils::containerName(settings.container);
 
     const int ret = avformat_alloc_output_context2(&context_->formatContext, nullptr, format,
-                                                   settings.filename.toUtf8().constData());
+                                                   settings.outputPath.toUtf8().constData());
 
     if (ret < 0 || context_->formatContext == nullptr)
     {
         qWarning() << "avformat_alloc_output_context2 failed:" << ffmpeg_utils::errorString(ret);
-
         return false;
     }
 
@@ -446,7 +446,7 @@ bool FFmpegVideoExporter::openOutputFile()
     if (context_->formatContext->oformat->flags & AVFMT_NOFILE)
         return true;
 
-    const QByteArray filename = settings_.filename.toUtf8();
+    const QByteArray filename = settings_.outputPath.toUtf8();
 
     const int ret = avio_open(&context_->formatContext->pb, filename.constData(), AVIO_FLAG_WRITE);
 
