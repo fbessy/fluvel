@@ -12,7 +12,9 @@
 #include <QCheckBox>
 #include <QCloseEvent>
 #include <QComboBox>
+#include <QDateTime>
 #include <QDialogButtonBox>
+#include <QDir>
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -32,14 +34,29 @@ namespace fluvel
 namespace
 {
 
-QString filenamePreview(const QString& baseName, const QString& extension, bool appendTimestamp)
+QString previewTimestamp()
+{
+    return "_" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
+}
+
+QString previewBaseName(const QString& baseName, bool appendTimestamp)
 {
     QString name = baseName;
 
     if (appendTimestamp)
-        name += "_2026-07-14_19-30-00";
+        name += previewTimestamp();
 
-    return name + "." + extension;
+    return name;
+}
+
+QString filenamePreview(const QString& baseName, const QString& extension, bool appendTimestamp)
+{
+    return previewBaseName(baseName, appendTimestamp) + "." + extension;
+}
+
+QString directoryPreview(const QString& baseName, bool appendTimestamp)
+{
+    return previewBaseName(baseName, appendTimestamp) + QDir::separator();
 }
 
 } // namespace
@@ -261,6 +278,9 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
     connect(segmentCountSpin_, &QSpinBox::valueChanged, this,
             &PreferencesDialog::updateSegmentDuration);
 
+    connect(recordingModeCombo_, &QComboBox::currentIndexChanged, this,
+            &PreferencesDialog::updateVideoPreview);
+
     connect(recordingModeCombo_, &QComboBox::currentIndexChanged, this, updateCircularControls);
 
     return group;
@@ -346,13 +366,24 @@ void PreferencesDialog::updateVideoPreview()
         return;
     }
 
-    const auto codec = static_cast<VideoCodec>(videoCodecCombo_->currentData().toInt());
+    const bool circular =
+        recordingModeCombo_->currentData().toInt() == int(RecordingMode::Circular);
 
-    const VideoContainer container = exporter_utils::preferredContainer(codec);
+    if (circular)
+    {
+        videoPreviewLabel_->setText(
+            directoryPreview(videoBaseNameEdit_->text(), videoTimestampCheck_->isChecked()));
+    }
+    else
+    {
+        const auto codec = static_cast<VideoCodec>(videoCodecCombo_->currentData().toInt());
 
-    videoPreviewLabel_->setText(filenamePreview(videoBaseNameEdit_->text(),
-                                                exporter_utils::expectedExtension(container),
-                                                videoTimestampCheck_->isChecked()));
+        const VideoContainer container = exporter_utils::preferredContainer(codec);
+
+        videoPreviewLabel_->setText(filenamePreview(videoBaseNameEdit_->text(),
+                                                    exporter_utils::expectedExtension(container),
+                                                    videoTimestampCheck_->isChecked()));
+    }
 }
 
 void PreferencesDialog::accept()
