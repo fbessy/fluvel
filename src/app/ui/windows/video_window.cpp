@@ -2530,6 +2530,13 @@ void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
     [[maybe_unused]] const double behindSec =
         stats.encodingFps > 0.0 ? static_cast<double>(stats.queuedFrames) / stats.encodingFps : 0.0;
 
+    double discardedPercent = 0.0;
+
+    if (stats.submittedFrames != 0)
+    {
+        discardedPercent = 100.0 * stats.discardedFrames / stats.submittedFrames;
+    }
+
     QString text;
 
     switch (videoController_->recordingState())
@@ -2562,6 +2569,13 @@ void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
     if (stats.queuedDiskBytes > 0)
     {
         text += tr(" + %1 MiB temporary").arg(queuedDiskMiB, 0, 'f', 0);
+    }
+
+    if (stats.discardedFrames > 0)
+    {
+        text += tr(" · Discarded frames: %1% (%2)")
+                    .arg(discardedPercent, 0, 'f', 1)
+                    .arg(stats.discardedFrames);
     }
 
     recordingStatsLabel_->setText(text);

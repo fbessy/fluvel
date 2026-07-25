@@ -11,6 +11,8 @@
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
 
+#include <optional>
+
 namespace fluvel
 {
 
@@ -85,7 +87,7 @@ private:
     VideoExportSettings settings_{};
 
     QString segmentDirectory_;
-    int64_t currentSegmentStartNs_{0};
+    std::optional<int64_t> currentSegmentStartNs_;
     int segmentIndex_{1};
     int64_t segmentDurationNs_{0};
 };

@@ -43,8 +43,6 @@ bool RecordingSession::open(const VideoExportSettings& settings)
     if (!exporter_.open(exportSettings))
         return false;
 
-    currentSegmentStartNs_ = FrameClock::nowNs();
-
     return true;
 }
 
@@ -52,14 +50,19 @@ bool RecordingSession::addFrame(const VideoFrame& frame)
 {
     if (settings_.recordingMode == RecordingMode::Circular)
     {
-        const int64_t now = FrameClock::nowNs();
+        const int64_t timestampNs =
+            frame.presentationTimestampNs ? *frame.presentationTimestampNs : FrameClock::nowNs();
 
-        if (now - currentSegmentStartNs_ >= segmentDurationNs_)
+        if (!currentSegmentStartNs_)
+        {
+            currentSegmentStartNs_ = timestampNs;
+        }
+        else if (timestampNs - *currentSegmentStartNs_ >= segmentDurationNs_)
         {
             if (!rotateSegment())
                 return false;
 
-            currentSegmentStartNs_ = now;
+            currentSegmentStartNs_ = timestampNs;
         }
     }
 
@@ -70,7 +73,7 @@ bool RecordingSession::close()
 {
     settings_ = {};
 
-    currentSegmentStartNs_ = 0;
+    currentSegmentStartNs_.reset();
     segmentDurationNs_ = 0;
     segmentIndex_ = 1;
     segmentDirectory_.clear();

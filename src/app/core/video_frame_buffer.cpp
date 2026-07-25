@@ -7,14 +7,10 @@
 namespace fluvel
 {
 
-VideoFrameBuffer::VideoFrameBuffer()
-{
-    if (!spool_.open())
-        qWarning() << "Failed to initialize video frame spool.";
-}
-
 VideoFrameBuffer::PushStatus VideoFrameBuffer::push(const VideoFrame& frame)
 {
+    ++submittedFrames_;
+
     switch (settings_.overflowPolicy)
     {
         case BufferOverflowPolicy::StopRecording:
@@ -32,32 +28,25 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::pushStopRecording(const VideoFram
 {
     const auto frameBytes = frameSize(frame.image);
 
-    // push to RAM in priority if possible
-    if (queuedBytes_ + frameBytes <= settings_.maxRamUsage)
-        return pushToMemory(frame, frameBytes);
-
-    if (queuedDiskBytes_ + frameBytes <= settings_.maxDiskUsage)
-        return pushToDisk(frame, frameBytes);
-
-    return PushStatus::BufferLimitExceeded;
+    return tryPush(frame, frameBytes);
 }
 
 VideoFrameBuffer::PushStatus VideoFrameBuffer::pushDiscardOldest(const VideoFrame& frame)
 {
     const auto frameBytes = frameSize(frame.image);
 
-    if (queuedBytes_ + frameBytes <= settings_.maxRamUsage)
-        return pushToMemory(frame, frameBytes);
-
-    if (queuedDiskBytes_ + frameBytes <= settings_.maxDiskUsage)
-        return pushToDisk(frame, frameBytes);
-
-    while (queuedDiskBytes_ + frameBytes > settings_.maxDiskUsage)
+    while (true)
     {
+        const auto status = tryPush(frame, frameBytes);
+
+        if (status != PushStatus::BufferLimitExceeded)
+            return status;
+
         if (queue_.isEmpty())
-            return PushStatus::BufferLimitExceeded;
+            break;
 
         auto oldest = queue_.dequeue();
+        ++discardedFrames_;
 
         switch (oldest.storage)
         {
@@ -67,11 +56,24 @@ VideoFrameBuffer::PushStatus VideoFrameBuffer::pushDiscardOldest(const VideoFram
 
             case StorageType::Disk:
                 queuedDiskBytes_ -= oldest.sizeBytes;
+                spool_.release(oldest.location);
                 break;
         }
     }
 
-    return pushToDisk(frame, frameBytes);
+    // The queue is now empty. Retry once with all previously buffered frames removed.
+    return tryPush(frame, frameBytes);
+}
+
+VideoFrameBuffer::PushStatus VideoFrameBuffer::tryPush(const VideoFrame& frame, quint64 frameBytes)
+{
+    if (queuedBytes_ + frameBytes <= settings_.maxRamUsage)
+        return pushToMemory(frame, frameBytes);
+
+    if (queuedDiskBytes_ + frameBytes <= settings_.maxDiskUsage)
+        return pushToDisk(frame, frameBytes);
+
+    return PushStatus::BufferLimitExceeded;
 }
 
 VideoFrameBuffer::PushStatus VideoFrameBuffer::pushToMemory(const VideoFrame& frame,
@@ -137,7 +139,11 @@ std::optional<VideoFrame> VideoFrameBuffer::pop()
             auto frame = spool_.read(bufferedFrame.location);
 
             if (frame)
+            {
                 queuedDiskBytes_ -= frameSize(frame->image);
+
+                spool_.release(bufferedFrame.location);
+            }
 
             return frame;
         }
@@ -156,6 +162,9 @@ void VideoFrameBuffer::reset()
     queuedBytes_ = 0;
     queuedDiskBytes_ = 0;
     usingTemporaryStorage_ = false;
+
+    submittedFrames_ = 0;
+    discardedFrames_ = 0;
 }
 
 bool VideoFrameBuffer::empty() const
@@ -191,6 +200,12 @@ uint64_t VideoFrameBuffer::frameSize(const QImage& image)
 void VideoFrameBuffer::setSettings(const RecordingBufferSettings& settings)
 {
     settings_ = settings;
+
+    spool_.close();
+    spool_.setMaximumSize(settings_.maxDiskUsage);
+
+    if (!spool_.open())
+        qWarning() << "Failed to initialize video frame spool.";
 }
 
 void VideoFrameBuffer::fillStats(RecorderStats& stats) const
@@ -198,6 +213,9 @@ void VideoFrameBuffer::fillStats(RecorderStats& stats) const
     stats.queuedFrames = static_cast<std::size_t>(queue_.size());
     stats.queuedMemoryBytes = queuedBytes_;
     stats.queuedDiskBytes = queuedDiskBytes_;
+
+    stats.submittedFrames = submittedFrames_;
+    stats.discardedFrames = discardedFrames_;
 
     stats.retainedDuration = std::chrono::milliseconds::zero();
 

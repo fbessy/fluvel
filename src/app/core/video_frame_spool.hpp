@@ -9,57 +9,75 @@
 #include <QTemporaryDir>
 
 #include <optional>
+#include <vector>
 
 namespace fluvel
 {
 
 /**
- * @brief Location of a video frame stored in the spool file.
+ * @brief Location of a video frame stored in the temporary spool storage.
  *
- * This structure identifies the position of a frame within the spool
- * file so that it can later be restored.
+ * Identifies the spool segment and the byte offset of a video frame,
+ * allowing it to be restored later.
  */
 struct FrameLocation
 {
     /**
-     * @brief Byte offset of the frame in the spool file.
+     * @brief Index of the spool segment containing the frame.
+     *
+     * This value corresponds to an index in the internal spool segment
+     * collection.
+     */
+    int segment{0};
+
+    /**
+     * @brief Byte offset of the frame within the spool segment.
      */
     quint64 offset{0};
 };
 
 /**
- * @brief Temporary storage for video frames.
+ * @brief Segmented temporary spool storage for video frames.
  *
- * Video frames are stored uncompressed in a temporary spool file when
- * the in-memory recording buffer reaches its configured capacity.
+ * Video frames are stored uncompressed in one or more temporary spool
+ * segments when the in-memory recording buffer reaches its configured
+ * capacity.
  *
  * Frames can later be restored transparently and forwarded to the video
  * exporter.
  *
- * The spool file is created in a temporary directory and is automatically
- * removed when the spool is destroyed.
+ * The spool segments are created in a temporary directory and are
+ * automatically removed when the spool is destroyed.
  */
 class VideoFrameSpool
 {
 public:
     /**
-     * @brief Constructs a video frame spool.
-     */
-    VideoFrameSpool();
-
-    /**
      * @brief Destroys the video frame spool.
+     *
+     * Any open spool segments are automatically closed.
      */
     ~VideoFrameSpool();
 
+    VideoFrameSpool() = default;
     VideoFrameSpool(const VideoFrameSpool&) = delete;
     VideoFrameSpool& operator=(const VideoFrameSpool&) = delete;
 
     /**
-     * @brief Opens the spool file.
+     * @brief Sets the maximum temporary disk space used by the spool.
+     *
+     * Updates the maximum storage capacity of the spool and recomputes its
+     * internal segment layout.
+     *
+     * @param bytes Maximum spool size in bytes.
+     */
+    void setMaximumSize(quint64 bytes);
+
+    /**
+     * @brief Creates and opens the temporary spool storage.
      *
      * A temporary directory is created for the current recording session
-     * and a spool file is opened inside it.
+     * and the spool segments are initialized.
      *
      * @return @c true on success, @c false otherwise.
      */
@@ -67,32 +85,33 @@ public:
     bool open();
 
     /**
-     * @brief Closes the spool file.
+     * @brief Closes all spool segments.
      *
-     * Buffered data is flushed before the file is closed.
+     * Any buffered data is flushed before each segment is closed.
      */
     void close();
 
     /**
-     * @brief Returns whether the spool file is opened.
+     * @brief Returns whether the spool is open.
      *
-     * @return @c true if the spool is opened.
+     * @return @c true if all spool segments have been successfully opened.
      */
     [[nodiscard]]
     bool isOpen() const;
 
     /**
-     * @brief Returns the current size of the spool file in bytes.
+     * @brief Returns the amount of data currently stored in the spool.
      *
-     * @return Size of the spool file in bytes, or 0 if the spool file is not open.
+     * @return Number of bytes currently occupied by buffered frames.
      */
     [[nodiscard]] quint64 size() const;
 
     /**
      * @brief Resets the temporary spool storage.
      *
-     * Removes all temporary data previously written to the spool and recreates
-     * an empty spool file ready for subsequent read and write operations.
+     * Removes all temporary data previously written to the spool and
+     * reinitializes all spool segments for subsequent read and write
+     * operations.
      *
      * After a successful call, the spool remains open and can immediately be
      * reused for a new recording session.
@@ -124,12 +143,81 @@ public:
     [[nodiscard]]
     std::optional<VideoFrame> read(const FrameLocation& location);
 
+    /**
+     * @brief Releases a frame previously stored in the spool.
+     *
+     * Decrements the reference count of the segment containing the frame.
+     * When the last referenced frame of a segment has been released,
+     * the segment becomes available for reuse.
+     *
+     * @param location Location previously returned by write().
+     */
+    void release(const FrameLocation& location);
+
 private:
+    /**
+     * @brief Temporary spool segment.
+     *
+     * A spool segment stores video frames sequentially in a temporary file.
+     * Once all buffered frames belonging to the segment have been released,
+     * the segment can be reset and reused for subsequent recordings.
+     */
+    struct SpoolSegment
+    {
+        /**
+         * @brief Temporary file backing this spool segment.
+         *
+         * The file is stored through a unique pointer because QFile is neither
+         * copyable nor movable. Using dynamic allocation allows SpoolSegment to
+         * remain movable while preserving exclusive ownership of the underlying
+         * temporary file.
+         */
+        std::unique_ptr<QFile> file;
+
+        /**
+         * @brief Current write position in the segment.
+         *
+         * Frames are appended sequentially starting from the beginning of the
+         * file. The offset is reset to zero when the segment is recycled.
+         */
+        quint64 writeOffset{0};
+
+        /**
+         * @brief Number of buffered frames currently referencing this segment.
+         *
+         * This counter is incremented whenever a frame is written to the
+         * segment and decremented when the frame leaves the recording buffer.
+         * A value of zero indicates that the segment no longer contains any
+         * referenced frames and may safely be reset and reused.
+         */
+        int refCount{0};
+    };
+
+    /**
+     * @brief Prepares a spool segment for writing.
+     *
+     * If the current segment still has enough free space, it is kept.
+     * Otherwise, the next available reusable segment is searched in cyclic
+     * order. A reusable segment is a segment whose reference count is zero.
+     * Before being reused, the segment is truncated and its write position is
+     * reset to the beginning of the file.
+     *
+     * @param requiredSize Number of bytes that must fit into the selected
+     *        segment.
+     * @return @c true if a writable segment is available, @c false otherwise.
+     */
+    bool prepareWriteSegment(quint64 requiredSize);
+
     QTemporaryDir temporaryDirectory_;
 
-    QFile spoolFile_;
+    std::vector<SpoolSegment> segments_;
 
-    quint64 writeOffset_{0};
+    quint64 maximumSize_{0};
+
+    quint64 segmentSize_{0};
+    int segmentCount_{0};
+
+    int currentWriteSegment_{0};
 };
 
 } // namespace fluvel

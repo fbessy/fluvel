@@ -127,6 +127,19 @@ struct RecorderStats
      * available buffering resources. It may change as the recording bitrate changes.
      */
     std::optional<std::chrono::milliseconds> estimatedMaxRecordedDuration{};
+
+    /**
+     * @brief Total number of frames discarded because of buffer overflow.
+     *
+     * This counter is incremented only when the recording overflow policy
+     * discards the oldest buffered frame to make room for a new one.
+     */
+    uint64_t discardedFrames{0};
+
+    /**
+     * @brief Total number of frames submitted for recording.
+     */
+    uint64_t submittedFrames{0};
 };
 
 } // namespace fluvel
