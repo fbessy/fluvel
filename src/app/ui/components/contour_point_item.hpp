@@ -70,7 +70,7 @@ protected:
 
 private:
     QVector<QPointF> points_;
-    QColor color_ = Qt::red;
+    QColor color_{Qt::red};
 };
 
 } // namespace fluvel
