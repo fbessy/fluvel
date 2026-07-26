@@ -8,8 +8,8 @@ It coordinates image and video processing workflows, manages application
 settings, provides diagnostic and utility facilities, and acts as the
 bridge between the user interface and the underlying Fluvel IP library.
 
-The module includes image and camera controllers, processing workers,
-configuration management, frame-related utilities and editing tools
+The module includes controllers, processing workers, configuration management,
+video processing infrastructure, recording components and shared utilities
 used throughout the application.
 
 Controllers
@@ -29,11 +29,8 @@ Execution
 
 .. doxygenfile:: video_processing_thread.hpp
 
-.. doxygenfile:: frame_pipeline.hpp
+.. doxygenfile:: video_recorder_worker.hpp
 
-.. doxygenfile:: frame_clock.hpp
-
-.. doxygenfile:: streaming_stats.hpp
 
 
 Configuration
@@ -55,6 +52,14 @@ Video Processing
 
 .. doxygenfile:: frame_rendering_utils.hpp
 
+.. doxygenfile:: frame_pipeline.hpp
+
+.. doxygenfile:: frame_clock.hpp
+
+.. doxygenfile:: streaming_stats.hpp
+
+.. doxygenfile:: frame_stats_collector.hpp
+
 
 Recording
 ---------
@@ -68,8 +73,6 @@ Recording
 .. doxygenfile:: video_frame_buffer.hpp
 
 .. doxygenfile:: video_frame_spool.hpp
-
-.. doxygenfile:: video_recorder_worker.hpp
 
 
 Image Editing

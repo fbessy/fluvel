@@ -25,6 +25,8 @@ Configuration
 
 .. doxygenfile:: kernel_size_spinbox.hpp
 
+.. doxygenfile:: configuration_actions_widget.hpp
+
 
 Image Viewer
 ------------

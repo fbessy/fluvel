@@ -92,9 +92,6 @@ set(app_src
     ${UI_COMP_DIR}/contour_point_item.cpp
     ${UI_COMP_DIR}/contour_point_item.hpp
 
-    ${UI_COMP_DIR}/frame_stats_collector.cpp
-    ${UI_COMP_DIR}/frame_stats_collector.hpp
-
     ${UI_COMP_DIR}/phi_view_model.cpp
     ${UI_COMP_DIR}/phi_view_model.hpp
 
@@ -188,6 +185,9 @@ set(app_src
 
     ${CORE_DIR}/frame_clock.cpp
     ${CORE_DIR}/frame_clock.hpp
+
+    ${CORE_DIR}/frame_stats_collector.cpp
+    ${CORE_DIR}/frame_stats_collector.hpp
 
     ${CORE_DIR}/application_settings.cpp
     ${CORE_DIR}/application_settings.hpp
