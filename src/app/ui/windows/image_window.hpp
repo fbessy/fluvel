@@ -69,7 +69,7 @@ class SettingsDialog;
 class AboutDialog;
 class PreferencesDialog;
 
-class RightPanelToggleButton;
+class ConfigurationActionsWidget;
 class DisplaySettingsWidget;
 class FullscreenImageControlBar;
 
@@ -179,7 +179,6 @@ private:
     std::unique_ptr<AnalysisWindow> analysisWindow_;
     SettingsDialog* settingsDialog_{nullptr};
     AboutDialog* AboutDialog_{nullptr};
-    PreferencesDialog* preferencesDialog_{nullptr};
 
     QMenu* fileMenu_{nullptr};
     QMenu* segmentationMenu_{nullptr};
@@ -191,8 +190,7 @@ private:
     AnimatedPushButton* stepButton_{nullptr};
     AnimatedPushButton* convergeButton_{nullptr};
 
-    RightPanelToggleButton* rightPanelToggle_{nullptr};
-    AnimatedPushButton* settingsButton_{nullptr};
+    ConfigurationActionsWidget* configurationActions_{nullptr};
 
     QWidget* controlBar_{nullptr};
 
@@ -204,8 +202,6 @@ private:
     QIcon startResumeIconFs_;
     QIcon restartIconFs_;
     QIcon pauseIconFs_;
-
-    QIcon settingsIcon_;
 
     DisplaySettingsWidget* displayBar_{nullptr};
 
@@ -224,10 +220,8 @@ private:
     QAction* imageSessionAct_{nullptr};
     QAction* videoSessionAct_{nullptr};
     QAction* analysisAct_{nullptr};
-    QAction* settingsAct_{nullptr};
 
     QAction* aboutAct_{nullptr};
-    QAction* preferencesAct_{nullptr};
 
     // --- VIEW - CONTROLLER ---
     ImageViewerWidget* imageViewer_{nullptr};

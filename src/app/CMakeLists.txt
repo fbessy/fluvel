@@ -163,6 +163,9 @@ set(app_src
     ${UI_COMP_DIR}/hud_overlay_controller.cpp
     ${UI_COMP_DIR}/hud_overlay_controller.hpp
 
+    ${UI_COMP_DIR}/configuration_actions_widget.cpp
+    ${UI_COMP_DIR}/configuration_actions_widget.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 

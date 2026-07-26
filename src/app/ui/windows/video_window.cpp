@@ -7,6 +7,7 @@
 #include "autofit_behavior.hpp"
 #include "camera_format_utils.hpp"
 #include "clickable_label.hpp"
+#include "configuration_actions_widget.hpp"
 #include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
 #include "drag_drop_behavior.hpp"
@@ -17,9 +18,9 @@
 #include "interaction_set.hpp"
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
+#include "preferences_dialog.hpp"
 #include "qcolor_utils.hpp"
 #include "qt_utils.hpp"
-#include "right_panel_toggle_button.hpp"
 #include "time_utils.hpp"
 #include "timeline_slider.hpp"
 #include "video_controller.hpp"
@@ -262,24 +263,7 @@ void VideoWindow::createUi()
     sourceConfigWidget_ = new QWidget;
     sourceConfigWidget_->setLayout(sourceConfigStack_);
 
-    rightPanelToggle_ = new RightPanelToggleButton;
-
-    settingsButton_ = new AnimatedPushButton;
-    settingsButton_->setToolTip(tr("Open video session settings."));
-    settingsButton_->setFlat(true);
-    settingsButton_->setFocusPolicy(Qt::NoFocus);
-
-    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
-
-    settingsButton_->setIcon(settingsIcon_);
-
-    auto* configRightBlockLayout = new QHBoxLayout;
-    configRightBlockLayout->setContentsMargins(0, 0, 0, 0);
-    configRightBlockLayout->addWidget(rightPanelToggle_);
-    configRightBlockLayout->addWidget(settingsButton_);
-    configRightBlockWidget_ = new QWidget;
-    configRightBlockWidget_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    configRightBlockWidget_->setLayout(configRightBlockLayout);
+    configurationActions_ = new ConfigurationActionsWidget(this);
 
     startIcon_ = il::loadIcon(QIcon::ThemeIcon::MediaPlaybackStart,
                               ":/icons/media/media-playback-start-symbolic.svg");
@@ -463,6 +447,9 @@ void VideoWindow::setupView()
                                          app.videoSettings().compute.downscale, central_);
 
     imageViewer_->setMaxDisplayFps(30.0);
+    constexpr qreal kDebugOverlayMinWidth = 160.0;
+    imageViewer_->setOverlayMinWidth(kDebugOverlayMinWidth);
+    imageViewer_->setOverlayAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     auto interaction = std::make_unique<InteractionSet>();
     interaction->addBehavior(std::make_unique<AutoFitBehavior>());
@@ -575,7 +562,7 @@ void VideoWindow::setupLayout()
     rightColumn->setContentsMargins(0, 0, 0, 0);
     rightColumn->setSpacing(kVerticalSpacing);
 
-    rightColumn->addWidget(configRightBlockWidget_);
+    rightColumn->addWidget(configurationActions_);
     rightColumn->addStretch();
 
     //
@@ -675,11 +662,17 @@ void VideoWindow::setupConnections()
     connect(snapshotButton_, &QPushButton::clicked, videoController_,
             &VideoController::takeSnapshot);
 
-    connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
+    connect(configurationActions_, &ConfigurationActionsWidget::displayPanelToggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, videoSettingsDialog_,
-            &VideoSettingsDialog::show);
+    connect(configurationActions_, &ConfigurationActionsWidget::sessionSettingsRequested,
+            videoSettingsDialog_, &VideoSettingsDialog::show);
+
+    connect(configurationActions_, &ConfigurationActionsWidget::preferencesRequested, this,
+            []()
+            {
+                PreferencesDialog::showDialog();
+            });
 
     // when the user drag and drop a video in the view of the video window.
     connect(imageViewer_, &ImageViewerWidget::imageDropped, this, &VideoWindow::openMediaFile);

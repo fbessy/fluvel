@@ -17,10 +17,17 @@ namespace fluvel
 {
 
 /**
- * @brief Dialog for configuring persistent user preferences.
+ * @brief Dialog for configuring persistent application preferences.
  *
- * The dialog allows the user to configure the application language,
- * snapshot output settings and video recording settings.
+ * This dialog allows the user to configure application-wide preferences that
+ * are preserved between sessions, including:
+ * - the application language,
+ * - snapshot output settings,
+ * - video recording settings,
+ * - recording buffer behavior.
+ *
+ * Unlike session settings, these preferences are shared by all windows and
+ * apply globally to the application.
  */
 class PreferencesDialog : public QDialog
 {
@@ -28,11 +35,14 @@ class PreferencesDialog : public QDialog
 
 public:
     /**
-     * @brief Constructs the user preferences dialog.
+     * @brief Shows the unique preferences dialog.
      *
-     * @param parent Optional parent widget.
+     * Displays the application's unique preferences dialog. If it is already
+     * visible, the dialog is raised and activated instead of creating a new
+     * instance.
+     *
      */
-    explicit PreferencesDialog(QWidget* parent = nullptr);
+    static void showDialog();
 
 protected:
     /**
@@ -48,6 +58,13 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private:
+    /**
+     * @brief Constructs the user preferences dialog.
+     *
+     * @param parent Optional parent widget.
+     */
+    explicit PreferencesDialog(QWidget* parent = nullptr);
+
     /// Creates the language preferences section.
     QWidget* createLanguageSection();
 
@@ -60,23 +77,23 @@ private:
     /// Creates the recording buffer preferences section.
     QWidget* createRecordingBufferSection();
 
-    /// Selects an output directory for snapshots.
+    /// Opens a directory selection dialog for snapshots.
     void selectSnapshotDirectory();
 
-    /// Selects an output directory for video recordings.
+    /// Opens a directory selection dialog for video recordings.
     void selectVideoDirectory();
 
     /// Updates the snapshot filename preview.
     void updateSnapshotPreview();
 
-    /// Updates the video recording filename preview.
+    /// Updates the video filename preview.
     void updateVideoPreview();
 
     /**
-     * @brief Updates the segment duration preview.
+     * @brief Updates the recording segment duration preview.
      *
-     * Computes the duration of each recording segment from the current
-     * retention settings.
+     * Computes the duration of a recording segment from the current retention
+     * settings.
      */
     void updateSegmentDuration();
 

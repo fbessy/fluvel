@@ -9,10 +9,10 @@
 #include "settings_dialog.hpp"
 
 #include "animated_push_button.hpp"
+#include "configuration_actions_widget.hpp"
 #include "display_settings_widget.hpp"
 #include "fullscreen_image_control_bar.hpp"
 #include "icon_loader.hpp"
-#include "right_panel_toggle_button.hpp"
 
 #include "autofit_behavior.hpp"
 #include "drag_drop_behavior.hpp"
@@ -146,24 +146,7 @@ void ImageWindow::setupUi()
     stepButton_->setFixedWidth(w);
     convergeButton_->setFixedWidth(w);
 
-    rightPanelToggle_ = new RightPanelToggleButton;
-
-    settingsButton_ = new AnimatedPushButton;
-    settingsButton_->setToolTip(tr("Open image session settings."));
-    settingsButton_->setFlat(true);
-    settingsButton_->setFocusPolicy(Qt::NoFocus);
-
-    settingsIcon_ = il::loadIcon("configure", ":/icons/actions/settings-symbolic.svg");
-
-    settingsButton_->setIcon(settingsIcon_);
-
-    auto* configRightBlockLayout = new QHBoxLayout;
-    configRightBlockLayout->setContentsMargins(0, 0, 0, 0);
-    configRightBlockLayout->addWidget(rightPanelToggle_);
-    configRightBlockLayout->addWidget(settingsButton_);
-    auto* configRightBlockWidget = new QWidget;
-    configRightBlockWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    configRightBlockWidget->setLayout(configRightBlockLayout);
+    configurationActions_ = new ConfigurationActionsWidget(this);
 
     // Widget central
     QWidget* central = new QWidget(this);
@@ -184,7 +167,7 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(stepButton_);
     controlLayout->addWidget(convergeButton_);
     controlLayout->addStretch();
-    controlLayout->addWidget(configRightBlockWidget);
+    controlLayout->addWidget(configurationActions_);
 
     // --- Image view ---
 
@@ -339,13 +322,6 @@ void ImageWindow::setupActions()
     QIcon measureIcon = il::loadIcon(":/icons/actions/measure-symbolic.svg");
     analysisAct_->setIcon(measureIcon);
 
-    settingsAct_ = new QAction(tr("&Settings"), this);
-    settingsAct_->setShortcut(QKeySequence::Preferences);
-    settingsAct_->setStatusTip(tr("Image preprocessing and active contour initialization."));
-    settingsAct_->setEnabled(true);
-
-    settingsAct_->setIcon(settingsIcon_);
-
     aboutAct_ = new QAction(tr("&About"), this);
     aboutAct_->setStatusTip(tr("Application information, license and home page."));
 
@@ -353,14 +329,6 @@ void ImageWindow::setupActions()
         il::loadIcon(QIcon::ThemeIcon::HelpAbout, ":/icons/actions/help-about-symbolic.svg");
 
     aboutAct_->setIcon(aboutIcon);
-
-    preferencesAct_ = new QAction(tr("&Preferences"), this);
-    preferencesAct_->setStatusTip(tr("Open the application preferences."));
-
-    QIcon preferencesIcon =
-        il::loadIcon("preferences-desktop-locale", ":/icons/actions/language-symbolic.svg");
-
-    preferencesAct_->setIcon(preferencesIcon);
 }
 
 void ImageWindow::setupMenus()
@@ -388,11 +356,9 @@ void ImageWindow::setupMenus()
 
     segmentationMenu_ = new QMenu(tr("&Segmentation"), this);
     segmentationMenu_->addAction(analysisAct_);
-    segmentationMenu_->addAction(settingsAct_);
 
     helpMenu_ = new QMenu(tr("&Help"), this);
     helpMenu_->addAction(aboutAct_);
-    helpMenu_->addAction(preferencesAct_);
 
     menuBar()->addMenu(sessionMenu_);
     menuBar()->addMenu(fileMenu_);
@@ -415,7 +381,6 @@ void ImageWindow::setupChildWindows()
 
     settingsDialog_ = new SettingsDialog(config.compute, this);
     AboutDialog_ = new AboutDialog(this);
-    preferencesDialog_ = new PreferencesDialog(this);
 }
 
 void ImageWindow::applyInitialSettings()
@@ -632,13 +597,9 @@ void ImageWindow::setupUserActionsConnections()
 
     connect(analysisAct_, &QAction::triggered, analysisWindow_.get(), &AnalysisWindow::show);
 
-    connect(settingsAct_, &QAction::triggered, settingsDialog_, &SettingsDialog::show);
-
     // ---   4th menu   ---
 
     connect(aboutAct_, &QAction::triggered, AboutDialog_, &AboutDialog::show);
-
-    connect(preferencesAct_, &QAction::triggered, preferencesDialog_, &PreferencesDialog::show);
 
     // ---   6 buttons   ---
 
@@ -651,10 +612,17 @@ void ImageWindow::setupUserActionsConnections()
 
     connect(convergeButton_, &QPushButton::clicked, imageController_, &ImageController::converge);
 
-    connect(rightPanelToggle_, &QPushButton::toggled, displayBar_,
+    connect(configurationActions_, &ConfigurationActionsWidget::displayPanelToggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
-    connect(settingsButton_, &QPushButton::clicked, settingsDialog_, &SettingsDialog::show);
+    connect(configurationActions_, &ConfigurationActionsWidget::sessionSettingsRequested,
+            settingsDialog_, &SettingsDialog::show);
+
+    connect(configurationActions_, &ConfigurationActionsWidget::preferencesRequested, this,
+            []()
+            {
+                PreferencesDialog::showDialog();
+            });
 
     // when the user drag and drop an image in the view of the image window.
     connect(imageViewer_, &ImageViewerWidget::imageDropped, imageController_,

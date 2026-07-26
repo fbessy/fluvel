@@ -61,6 +61,15 @@ QString directoryPreview(const QString& baseName, bool appendTimestamp)
 
 } // namespace
 
+void PreferencesDialog::showDialog()
+{
+    static PreferencesDialog dialog;
+
+    dialog.show();
+    dialog.raise();
+    dialog.activateWindow();
+}
+
 PreferencesDialog::PreferencesDialog(QWidget* parent)
     : QDialog(parent)
 {

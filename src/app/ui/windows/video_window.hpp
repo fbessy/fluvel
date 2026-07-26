@@ -46,7 +46,7 @@ namespace fluvel
 struct StreamingInfo;
 class VideoController;
 class VideoSettingsDialog;
-class RightPanelToggleButton;
+class ConfigurationActionsWidget;
 class DisplaySettingsWidget;
 class ImageViewerWidget;
 class TimelineSlider;
@@ -54,6 +54,7 @@ class VolumeSlider;
 class FullscreenVideoControlBar;
 class ClickableLabel;
 class AnimatedPushButton;
+class PreferencesDialog;
 
 /**
  * @brief Streaming status for a camera device.
@@ -411,12 +412,7 @@ private:
     QWidget* sourceConfigWidget_{nullptr};
     QStackedLayout* sourceConfigStack_{nullptr};
 
-    RightPanelToggleButton* rightPanelToggle_{nullptr};
-
-    QIcon settingsIcon_;
-    AnimatedPushButton* settingsButton_{nullptr};
-
-    QWidget* configRightBlockWidget_{nullptr};
+    ConfigurationActionsWidget* configurationActions_{nullptr};
 
     QIcon startIcon_;
     QIcon stopIcon_;
