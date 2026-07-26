@@ -148,10 +148,10 @@ void ImageWindow::setupUi()
 
     configurationActions_ = new ConfigurationActionsWidget(this);
 
-    // Widget central
+    // Central widget
     QWidget* central = new QWidget(this);
 
-    // Layout principal vertical
+    // Main vertical layout
     QVBoxLayout* vLayout = new QVBoxLayout(central);
     vLayout->setContentsMargins(0, 0, 0, 0);
     vLayout->setSpacing(0);
@@ -219,10 +219,10 @@ void ImageWindow::setupUi()
     hideAnimation_->setStartValue(1.0);
     hideAnimation_->setEndValue(0.0);
 
-    // --- Display bar (à droite) ---
+    // --- Display panel (right side) ---
     displayBar_ = new DisplaySettingsWidget(config.display, central);
 
-    // --- Layout horizontal contenu principal ---
+    // --- Main horizontal layout ---
     QHBoxLayout* contentLayout = new QHBoxLayout();
     contentLayout->setContentsMargins(0, 0, 0, 0);
     contentLayout->setSpacing(0);
@@ -230,7 +230,7 @@ void ImageWindow::setupUi()
     contentLayout->addWidget(imageViewer_, 1); // prend tout l'espace
     contentLayout->addWidget(displayBar_, 0); // largeur naturelle
 
-    // Assemblage global
+    // Assemble the main layout
     vLayout->addWidget(controlBar_);
     vLayout->addLayout(contentLayout);
 
@@ -407,7 +407,7 @@ void ImageWindow::setupConnections()
 {
     setupUserActionsConnections();
 
-    // to refresh video session state in the menu
+    // Keep the video session action synchronized with the window state.
     connect(videoWindow_.get(), &VideoWindow::videoWindowShown, this,
             &ImageWindow::onVideoWindowShown);
     connect(videoWindow_.get(), &VideoWindow::videoWindowClosed, this,
@@ -421,7 +421,7 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::displayedImageReady, imageViewer_,
             &ImageViewerWidget::setImage);
 
-    // to refresh the view with a new contour
+    // Update the displayed contour.
     connect(imageController_, &ImageController::contourUpdated, imageViewer_,
             &ImageViewerWidget::setContour, Qt::QueuedConnection);
 
@@ -434,7 +434,7 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::clearContourRequested, imageViewer_,
             &ImageViewerWidget::clearContour);
 
-    // to refresh the image window title
+    // Update the window title.
     connect(imageController_, &ImageController::inputImageReady, this,
             &ImageWindow::onInputImageReady);
 
@@ -459,7 +459,7 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::warningOccurred, this,
             &ImageWindow::showWarningMessage);
 
-    // refresh widget in function of settings
+    // Update the UI to reflect the current settings.
     connect(&ApplicationSettings::instance(), &ApplicationSettings::imgSettingsChanged, this,
             [this](const ImageSessionSettings& conf)
             {
@@ -624,7 +624,7 @@ void ImageWindow::setupUserActionsConnections()
                 PreferencesDialog::showDialog();
             });
 
-    // when the user drag and drop an image in the view of the image window.
+    // Handle images dropped onto the viewer.
     connect(imageViewer_, &ImageViewerWidget::imageDropped, imageController_,
             &ImageController::loadImage);
 
@@ -662,13 +662,13 @@ void ImageWindow::updateRecentFileActions()
     const std::size_t numRecentFiles =
         std::min<std::size_t>(static_cast<std::size_t>(files.size()), kMaxRecentFiles);
 
-    // 🔥 D'abord tout cacher
+    // Hide all recent file actions.
     for (auto& act : recentFileActs_)
     {
         act->setVisible(false);
     }
 
-    // Ensuite afficher ce qu'il faut
+    // Show only the available recent files.
     for (std::size_t i = 0; i < numRecentFiles; ++i)
     {
         const QString& file = files[static_cast<qsizetype>(i)];
@@ -877,7 +877,6 @@ void ImageWindow::showWarningMessage(const QString& msg)
 
     box->setStandardButtons(QMessageBox::Ok);
 
-    // cacher le bouton
     if (auto* okButton = box->button(QMessageBox::Ok))
         okButton->hide();
 

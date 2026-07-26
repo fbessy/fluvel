@@ -674,7 +674,7 @@ void VideoWindow::setupConnections()
                 PreferencesDialog::showDialog();
             });
 
-    // when the user drag and drop a video in the view of the video window.
+    // Load a video dropped onto the viewer.
     connect(imageViewer_, &ImageViewerWidget::imageDropped, this, &VideoWindow::openMediaFile);
 
     // --- Hardware events (camera devices) ---
@@ -727,7 +727,7 @@ void VideoWindow::setupConnections()
 
     const auto& app = ApplicationSettings::instance();
 
-    // refresh widget in function of settings
+    // Update the display settings UI when the configuration changes.
     connect(&app, &ApplicationSettings::videoSettingsChanged, this,
             [this](const VideoSessionSettings& conf)
             {
@@ -966,7 +966,7 @@ void VideoWindow::bindUiToApplicationSettings()
     connect(displayBar_, &DisplaySettingsWidget::displayConfigChanged, &app,
             &ApplicationSettings::setVideoDisplayConfig);
 
-    // commit settings
+    // Apply compute settings.
     connect(videoSettingsDialog_, &VideoSettingsDialog::videoComputeSettingsAccepted, &app,
             &ApplicationSettings::setVideoComputeSettings);
 }
@@ -1166,7 +1166,7 @@ void VideoWindow::refreshFormatListFromSelection()
     QByteArray deviceId = deviceSelector_->itemData(index).toByteArray();
     sourceConfig_.cameraId = deviceId;
 
-    // 👉 récupérer directement depuis la liste actuelle
+    // Retrieve the device directly from the current device list.
     const auto devices = videoController_->videoInputs();
 
     const QCameraDevice* device = nullptr;
@@ -1222,7 +1222,7 @@ void VideoWindow::updateFormatList(const QList<QCameraFormat>& formats)
             formatSelector_->setItemData(i, tr("Recommended format"), Qt::ToolTipRole);
     }
 
-    // 1. PRIORITÉ : format associé à CE device uniquement
+    // 1. Highest priority: the preferred format for this device.
     if (!sourceConfig_.cameraId.isEmpty())
     {
         auto preferred = preferredFormats_.value(sourceConfig_.cameraId);
@@ -1240,7 +1240,7 @@ void VideoWindow::updateFormatList(const QList<QCameraFormat>& formats)
         }
     }
 
-    // 2. fallback best format
+    // 2. Fall back to the recommended format.
     if (indexToSelect < 0 && !formats.isEmpty())
         indexToSelect = bestFormatIndex;
 
@@ -1806,8 +1806,8 @@ void VideoWindow::loadPreferredFormats()
 
         settings.endGroup();
 
-        // 👉 on ne peut pas reconstruire directement un QCameraFormat
-        // donc on stocke une "cible" temporaire et on match plus tard
+        // A QCameraFormat cannot be reconstructed directly.
+        // Store the desired format parameters and match them later against the available formats.
 
         const auto inputs = videoController_->videoInputs();
 
