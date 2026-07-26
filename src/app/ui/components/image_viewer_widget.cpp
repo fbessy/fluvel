@@ -507,8 +507,7 @@ void ImageViewerWidget::leaveFullscreenMode()
 void ImageViewerWidget::applyAutoFit()
 {
     const QPoint overlayPos = overlayPosition(infoOverlay_);
-
-    if (!pixmapItem_)
+    if (!hasImage())
         return;
 
     autoFitEnabled_ = true;
@@ -669,13 +668,27 @@ void ImageViewerWidget::resizeEvent(QResizeEvent* event)
 
     QGraphicsView::resizeEvent(event);
 
+    if (!scene_ || viewport()->size().isEmpty())
+        return;
+
+    positionMiniMap();
+
+    if (!hasImage())
+    {
+        if (notificationOverlayItem_ && notificationOverlayItem_->isVisible())
+            anchorOverlay(notificationOverlayItem_);
+
+        return;
+    }
+
     if (autoFitEnabled_)
         applyAutoFit();
 
     moveOverlay(infoOverlay_, overlayPos);
-    anchorOverlay(notificationOverlayItem_);
 
-    positionMiniMap();
+    if (notificationOverlayItem_ && notificationOverlayItem_->isVisible())
+        anchorOverlay(notificationOverlayItem_);
+
     updateMiniMap();
 }
 
