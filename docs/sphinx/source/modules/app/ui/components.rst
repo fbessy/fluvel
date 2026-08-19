@@ -88,6 +88,14 @@ Video Playback
 .. doxygenfile:: video_shortcut_manager.hpp
 
 
+Capture
+-------
+
+.. doxygenfile:: capture_controls_widget.hpp
+
+.. doxygenfile:: capture_stats_utils.hpp
+
+
 Fullscreen Controls
 -------------------
 

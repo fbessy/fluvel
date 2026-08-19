@@ -21,6 +21,8 @@ Controllers
 
 .. doxygenfile:: video_controller.hpp
 
+.. doxygenfile:: capture_controller.hpp
+
 
 Execution
 ---------
@@ -65,6 +67,8 @@ Recording
 ---------
 
 .. doxygenfile:: recording_types.hpp
+
+.. doxygenfile:: recording_session.hpp
 
 .. doxygenfile:: recording_buffer_settings.hpp
 
