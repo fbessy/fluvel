@@ -55,6 +55,8 @@ class FullscreenVideoControlBar;
 class ClickableLabel;
 class AnimatedPushButton;
 class PreferencesDialog;
+class CaptureController;
+class CaptureControlsWidget;
 
 /**
  * @brief Streaming status for a camera device.
@@ -221,10 +223,6 @@ private:
     void updateActionBar();
     void updateStreamingButton();
     void updateApplyButton();
-#ifdef FLUVEL_USE_FFMPEG
-    void updateRecordingButton();
-#endif
-    void updateSnapshotButton();
     void refreshUi();
 
     void openFile();
@@ -245,6 +243,7 @@ private:
     QCameraFormat getSelectedFormat() const;
 
     void connectFrameToView();
+    void connectFrameToCapture();
 
     void startSource();
     void stopSource();
@@ -420,14 +419,8 @@ private:
 
     QPushButton* applyButton_{nullptr};
 
-#ifdef FLUVEL_USE_FFMPEG
-    QPushButton* recordingButton_{nullptr};
-    QIcon stoppedIcon_;
-    QIcon recordingIcon_;
-    QIcon drainingIcon_;
-#endif
-
-    AnimatedPushButton* snapshotButton_{nullptr};
+    CaptureController* captureController_{nullptr};
+    CaptureControlsWidget* captureWidget_{nullptr};
 
     DisplaySettingsWidget* displayBar_{nullptr};
 
@@ -436,6 +429,7 @@ private:
     ImageViewerWidget* imageViewer_{nullptr};
     VideoController* videoController_{nullptr};
     QMetaObject::Connection frameToViewConnection_;
+    QMetaObject::Connection frameToCaptureConnection_;
 
     QHash<QByteArray, DeviceStreamingStatus> deviceStreamingStatus_;
 

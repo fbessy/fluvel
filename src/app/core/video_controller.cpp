@@ -2,19 +2,11 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "video_controller.hpp"
-#include "application_settings.hpp"
 #include "camera_format_utils.hpp"
 #include "contour_adapters.hpp"
-#include "file_utils.hpp"
 #include "frame_clock.hpp"
 #include "frame_rendering_utils.hpp"
 #include "streaming_stats.hpp"
-
-#ifdef FLUVEL_USE_FFMPEG
-#include "video_export_settings.hpp"
-#include "video_exporter.hpp"
-#include "video_exporter_utils.hpp"
-#endif
 
 #include <QAudioOutput>
 #include <QCamera>
@@ -109,31 +101,6 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
 
     connect(&processingThread_, &VideoProcessingThread::frameProcessed, this,
             &VideoController::onFrameProcessed);
-
-#ifdef FLUVEL_USE_FFMPEG
-
-    //
-    // Recording worker
-    //
-    connect(&recorder_, &VideoRecorderWorker::stateChanged, this,
-            &VideoController::onRecordingStateChanged);
-
-    connect(&recorder_, &VideoRecorderWorker::statsChanged, this,
-            &VideoController::recordingStatsChanged);
-
-    connect(&recorder_, &VideoRecorderWorker::recordingFinalized, this,
-            [this]()
-            {
-                emit recordingFinalized(recordingSettings_.outputPath);
-            });
-
-    connect(&recorder_, &VideoRecorderWorker::warningOccurred, this,
-            &VideoController::recordingWarning);
-
-    connect(&recorder_, &VideoRecorderWorker::errorOccurred, this,
-            &VideoController::recordingError);
-
-#endif
 
     processingThread_.start();
 }
@@ -389,22 +356,6 @@ void VideoController::onProcessedFrameReady(const ProcessedFrame& frame)
 
     displayFrame.receiveTimestampNs = frame.receiveTimestampNs;
     displayFrame.processTimestampNs = frame.processTimestampNs;
-
-#ifdef FLUVEL_USE_FFMPEG
-
-    if (recorder_.isAcceptingFrames())
-    {
-        VideoFrame videoFrame;
-        videoFrame.image = displayFrame.image;
-        videoFrame.presentationTimestampNs = displayFrame.receiveTimestampNs;
-
-        frame_rendering_utils::drawContourOverlay(videoFrame.image, displayFrame, displayConfig_,
-                                                  downscaleParams_);
-
-        submitRecordingFrame(videoFrame);
-    }
-
-#endif
 
     lastDisplayFrame_ = displayFrame;
 
@@ -717,97 +668,6 @@ void VideoController::resume()
         return;
 
     mediaPlayer_.play();
-}
-
-#ifdef FLUVEL_USE_FFMPEG
-
-void VideoController::startRecording()
-{
-    const auto& preferences = ApplicationSettings::instance().videoRecordingPreferences();
-
-    VideoExportSettings settings;
-
-    settings.profile = ExportProfile::Custom;
-    settings.codec = preferences.preferredCodec;
-    settings.container = exporter_utils::preferredContainer(settings.codec);
-
-    const QString extension = preferences.recordingMode == RecordingMode::SingleFile
-                                  ? exporter_utils::expectedExtension(settings.container)
-                                  : QString();
-
-    settings.outputPath = file_utils::buildOutputFileName(
-        preferences.directory, preferences.baseName, extension, preferences.appendTimestamp);
-
-    settings.recordingMode = preferences.recordingMode;
-    settings.retentionTimeMinutes = preferences.retentionTimeMinutes;
-    settings.segmentCount = preferences.segmentCount;
-
-    settings.bufferSettings = ApplicationSettings::instance().recordingBufferSettings();
-
-    recordingSettings_ = exporter_utils::resolveSettings(settings);
-
-    recorder_.start(recordingSettings_);
-}
-
-void VideoController::stopRecording()
-{
-    recorder_.stop();
-}
-
-bool VideoController::isRecording() const
-{
-    return recorder_.isRecording();
-}
-
-RecorderState VideoController::recordingState() const
-{
-    return recorder_.state();
-}
-
-void VideoController::submitRecordingFrame(const VideoFrame& frame)
-{
-    if (!recorder_.isAcceptingFrames())
-        return;
-
-    recorder_.addFrame(frame);
-}
-
-void VideoController::onRecordingStateChanged(RecorderState state)
-{
-    emit recordingStateChanged(state);
-
-    if (state == RecorderState::Recording)
-        emit recordingStarted(recordingSettings_.outputPath);
-}
-
-#endif
-
-void VideoController::takeSnapshot()
-{
-    if (lastDisplayFrame_.image.isNull())
-    {
-        emit snapshotError(tr("No frame available."));
-        return;
-    }
-
-    const auto& preferences = ApplicationSettings::instance().snapshotPreferences();
-
-    const QString fileName = file_utils::buildOutputFileName(
-        preferences.directory, preferences.baseName,
-        QString::fromLatin1(preferences.preferredFormat), preferences.appendTimestamp);
-
-    QImage image = lastDisplayFrame_.image;
-
-    frame_rendering_utils::drawContourOverlay(image, lastDisplayFrame_, displayConfig_,
-                                              downscaleParams_);
-
-    if (!image.save(fileName, preferences.preferredFormat.constData()))
-    {
-        emit snapshotError(tr("Failed to save snapshot: %1").arg(fileName));
-        return;
-    }
-
-    emit snapshotSaved(fileName);
 }
 
 } // namespace fluvel

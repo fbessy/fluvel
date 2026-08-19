@@ -11,10 +11,6 @@
 #include "frame_stats_collector.hpp"
 #include "video_processing_thread.hpp"
 
-#ifdef FLUVEL_USE_FFMPEG
-#include "video_recorder_worker.hpp"
-#endif
-
 #include "video_types.hpp"
 
 #include <QAudioOutput>
@@ -201,57 +197,6 @@ public:
      */
     [[nodiscard]]
     bool isMediaActive() const;
-
-#ifdef FLUVEL_USE_FFMPEG
-
-    /**
-     * @brief Starts a new video recording session.
-     *
-     * Initializes the video exporter and starts asynchronous frame encoding.
-     *
-     * @param settings Video export settings.
-     */
-    void startRecording();
-
-    /**
-     * @brief Stops the current video recording session.
-     *
-     * Stops accepting new frames and asynchronously drains queued frames
-     * before finalizing the output video.
-     */
-    void stopRecording();
-
-    /**
-     * @brief Checks whether a recording session is active.
-     *
-     * A recording session remains active while queued frames are being
-     * drained.
-     *
-     * @return @c true if recording or draining, @c false otherwise.
-     */
-    [[nodiscard]]
-    bool isRecording() const;
-
-    /**
-     * @brief Returns the current recording state.
-     *
-     * The recording state indicates whether recording is stopped, actively
-     * recording, or finalizing previously accepted frames.
-     *
-     * @return Current recording state.
-     */
-    [[nodiscard]]
-    RecorderState recordingState() const;
-
-#endif
-
-    /**
-     * @brief Saves a snapshot of the latest processed video frame.
-     *
-     * The snapshot is rendered using the current display configuration
-     * and saved according to the persistent snapshot preferences.
-     */
-    void takeSnapshot();
 
 signals:
     /// Emitted when available video inputs change.
@@ -566,11 +511,6 @@ private:
 
     /// Processing thread running active contour.
     VideoProcessingThread processingThread_;
-
-#ifdef FLUVEL_USE_FFMPEG
-    /// Processing worker for video creation feature.
-    VideoRecorderWorker recorder_;
-#endif
 
     /// Frame statistics and diagnostics view.
     FrameStatsCollector frameStats_{};

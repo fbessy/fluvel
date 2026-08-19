@@ -6,12 +6,16 @@
 #include "application_settings.hpp"
 #include "autofit_behavior.hpp"
 #include "camera_format_utils.hpp"
+#include "capture_controller.hpp"
+#include "capture_controls_widget.hpp"
+#include "capture_stats_utils.hpp"
 #include "clickable_label.hpp"
 #include "configuration_actions_widget.hpp"
 #include "device_id_utils.hpp"
 #include "display_settings_widget.hpp"
 #include "drag_drop_behavior.hpp"
 #include "file_utils.hpp"
+#include "frame_rendering_utils.hpp"
 #include "fullscreen_behavior.hpp"
 #include "fullscreen_video_control_bar.hpp"
 #include "icon_loader.hpp"
@@ -290,26 +294,9 @@ void VideoWindow::createUi()
     applyButton_->setText(tr("Apply"));
     applyButton_->setToolTip(tr("Restart the active source using the selected configuration."));
 
-#ifdef FLUVEL_USE_FFMPEG
-
-    recordingButton_ = new QPushButton;
-    recordingButton_->setCheckable(true);
-    recordingButton_->setEnabled(false);
-
-    const QColor redRecording = QColor::fromRgb(0xFF453A);
-
-    stoppedIcon_ = il::createDisk(palette().color(QPalette::WindowText));
-    recordingIcon_ = il::createSquare(redRecording);
-    drainingIcon_ = il::createSmallSquare(redRecording);
-
-#endif
-
-    snapshotButton_ = new AnimatedPushButton;
-    snapshotButton_->setEnabled(false);
-
-    snapshotButton_->setIcon(
-        il::loadIcon(QIcon::ThemeIcon::CameraPhoto, ":icons/actions/camera-photo-symbolic.svg"));
-    snapshotButton_->setToolTip(tr("Take snapshot"));
+    captureController_ = new CaptureController(this);
+    captureWidget_ = new CaptureControlsWidget(central_);
+    captureWidget_->setCaptureController(captureController_);
 
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
@@ -546,11 +533,7 @@ void VideoWindow::setupLayout()
     actionLayout->setContentsMargins(0, 0, 0, 0);
     actionLayout->setSpacing(kControlSpacing);
 
-#ifdef FLUVEL_USE_FFMPEG
-    actionLayout->addWidget(recordingButton_);
-#endif
-
-    actionLayout->addWidget(snapshotButton_);
+    actionLayout->addWidget(captureWidget_);
     actionLayout->addStretch();
 
     configColumn->addLayout(actionLayout);
@@ -655,13 +638,6 @@ void VideoWindow::setupConnections()
 
     connect(applyButton_, &QPushButton::clicked, this, &VideoWindow::onApplySelection);
 
-#ifdef FLUVEL_USE_FFMPEG
-    connect(recordingButton_, &QPushButton::clicked, this, &VideoWindow::onToggleRecording);
-#endif
-
-    connect(snapshotButton_, &QPushButton::clicked, videoController_,
-            &VideoController::takeSnapshot);
-
     connect(configurationActions_, &ConfigurationActionsWidget::displayPanelToggled, displayBar_,
             &DisplaySettingsWidget::setPanelVisible);
 
@@ -690,14 +666,6 @@ void VideoWindow::setupConnections()
 
     connect(videoController_, &VideoController::streamingStopped, this,
             &VideoWindow::onStreamingStopped);
-
-#ifdef FLUVEL_USE_FFMPEG
-    connect(videoController_, &VideoController::recordingStateChanged, this,
-            &VideoWindow::onRecordingStateChanged);
-
-    connect(videoController_, &VideoController::recordingStatsChanged, this,
-            &VideoWindow::onRecordingStatsChanged);
-#endif
 
     connect(videoController_, &VideoController::cameraError, this, &VideoWindow::onCameraError);
     connect(videoController_, &VideoController::mediaPlayerError, this,
@@ -881,22 +849,50 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::playbackStateChanged, this,
             &VideoWindow::onPlaybackStateChanged);
 
+    connectFrameToCapture();
+
+    connect(videoController_, &VideoController::streamingStarted, captureController_,
+            [this]
+            {
+                captureController_->setStreaming(true);
+            });
+
+    connect(videoController_, &VideoController::streamingStopped, captureController_,
+            [this]
+            {
+                captureController_->setStreaming(false);
+            });
+
+    connect(videoController_, &VideoController::streamingLost, captureController_,
+            [this]
+            {
+                captureController_->setStreaming(false);
+            });
+
 #ifdef FLUVEL_USE_FFMPEG
-    connect(videoController_, &VideoController::recordingWarning, this,
+
+    connect(captureController_, &CaptureController::recordingStatsChanged, this,
+            &VideoWindow::onRecordingStatsChanged);
+
+    connect(captureController_, &CaptureController::recordingWarning, this,
             &VideoWindow::onRecordingWarning);
 
-    connect(videoController_, &VideoController::recordingError, this,
+    connect(captureController_, &CaptureController::recordingError, this,
             &VideoWindow::onRecordingError);
 
-    connect(videoController_, &VideoController::recordingStarted, this,
+    connect(captureController_, &CaptureController::recordingStarted, this,
             &VideoWindow::onRecordingStarted);
 
-    connect(videoController_, &VideoController::recordingFinalized, this,
+    connect(captureController_, &CaptureController::recordingFinalized, this,
             &VideoWindow::onRecordingFinalized);
+
 #endif
 
-    connect(videoController_, &VideoController::snapshotSaved, this, &VideoWindow::onSnapshotSaved);
-    connect(videoController_, &VideoController::snapshotError, this, &VideoWindow::onSnapshotError);
+    connect(captureController_, &CaptureController::snapshotSaved, this,
+            &VideoWindow::onSnapshotSaved);
+
+    connect(captureController_, &CaptureController::snapshotError, this,
+            &VideoWindow::onSnapshotError);
 }
 
 void VideoWindow::applyInitialSettings()
@@ -920,10 +916,6 @@ void VideoWindow::applyInitialSettings()
 
     refreshSourceUi();
     refreshUi();
-
-#ifdef FLUVEL_USE_FFMPEG
-    onRecordingStateChanged(RecorderState::Stopped);
-#endif
 
     onDownscaleChanged(downscaleParams);
 }
@@ -1318,6 +1310,30 @@ void VideoWindow::connectFrameToView()
                                      imageViewer_, &ImageViewerWidget::setDisplayFrame);
 }
 
+void VideoWindow::connectFrameToCapture()
+{
+    disconnect(frameToCaptureConnection_);
+
+    frameToCaptureConnection_ =
+        connect(videoController_, &VideoController::displayFrameReady, this,
+                [this](const DisplayFrame& displayFrame)
+                {
+                    if (!captureController_->isAcceptingFrames())
+                        return;
+
+                    const auto& config = ApplicationSettings::instance().videoSettings();
+
+                    VideoFrame videoFrame;
+                    videoFrame.image = displayFrame.image;
+                    videoFrame.presentationTimestampNs = displayFrame.receiveTimestampNs;
+
+                    frame_rendering_utils::drawContourOverlay(
+                        videoFrame.image, displayFrame, config.display, config.compute.downscale);
+
+                    captureController_->submitFrame(videoFrame);
+                });
+}
+
 QCameraFormat VideoWindow::getSelectedFormat() const
 {
     assert(formatSelector_);
@@ -1600,12 +1616,6 @@ void VideoWindow::updateActionBar()
 {
     updateStreamingButton();
     updateApplyButton();
-
-#ifdef FLUVEL_USE_FFMPEG
-    updateRecordingButton();
-#endif
-
-    updateSnapshotButton();
 }
 
 bool VideoWindow::canStartSource() const
@@ -2445,133 +2455,10 @@ void VideoWindow::onPlaybackStateChanged(QMediaPlayer::PlaybackState state)
 
 void VideoWindow::onToggleRecording()
 {
-    if (videoController_->isRecording())
-        videoController_->stopRecording();
+    if (captureController_->isRecording())
+        captureController_->stopRecording();
     else
-        videoController_->startRecording();
-}
-
-void VideoWindow::updateRecordingButton()
-{
-    const bool streaming = videoController_->isStreaming();
-
-    recordingButton_->setEnabled(streaming);
-}
-
-void VideoWindow::onRecordingStateChanged(RecorderState state)
-{
-    switch (state)
-    {
-        case RecorderState::Stopped:
-            recordingButton_->setChecked(false);
-            recordingButton_->setIcon(stoppedIcon_);
-            recordingButton_->setToolTip(tr("Start video recording."));
-
-            recordingStatsLabel_->clear();
-            recordingStatsLabel_->hide();
-
-            break;
-
-        case RecorderState::Recording:
-            recordingButton_->setChecked(true);
-            recordingButton_->setIcon(recordingIcon_);
-            recordingButton_->setToolTip(tr("Stop video recording."));
-
-            recordingStatsLabel_->show();
-
-            break;
-
-        case RecorderState::Draining:
-            recordingButton_->setChecked(true);
-            recordingButton_->setIcon(drainingIcon_);
-            recordingButton_->setToolTip(tr("Finalizing video recording..."));
-
-            recordingStatsLabel_->show();
-
-            break;
-    }
-
-    updateRecordingButton();
-}
-
-QString formatDuration(std::chrono::milliseconds duration)
-{
-    const auto totalSeconds = duration.count() / 1000;
-
-    const auto hours = totalSeconds / 3600;
-    const auto minutes = (totalSeconds % 3600) / 60;
-    const auto seconds = totalSeconds % 60;
-
-    if (hours > 0)
-    {
-        return QStringLiteral("%1:%2:%3")
-            .arg(hours)
-            .arg(minutes, 2, 10, QLatin1Char('0'))
-            .arg(seconds, 2, 10, QLatin1Char('0'));
-    }
-
-    return QStringLiteral("%1:%2").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0'));
-}
-
-void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
-{
-    const double queuedMemoryMiB = static_cast<double>(stats.queuedMemoryBytes) / (1024.0 * 1024.0);
-
-    const double queuedDiskMiB = static_cast<double>(stats.queuedDiskBytes) / (1024.0 * 1024.0);
-
-    // Kept for future diagnostics.
-    [[maybe_unused]] const double behindSec =
-        stats.encodingFps > 0.0 ? static_cast<double>(stats.queuedFrames) / stats.encodingFps : 0.0;
-
-    double discardedPercent = 0.0;
-
-    if (stats.submittedFrames != 0)
-    {
-        discardedPercent = 100.0 * stats.discardedFrames / stats.submittedFrames;
-    }
-
-    QString text;
-
-    switch (videoController_->recordingState())
-    {
-        case RecorderState::Recording:
-        {
-            text = tr("Recorded: %1").arg(formatDuration(stats.recordedDuration));
-
-            if (stats.estimatedMaxRecordedDuration)
-            {
-                text += QString(" / ~%1").arg(formatDuration(*stats.estimatedMaxRecordedDuration));
-            }
-
-            break;
-        }
-
-        case RecorderState::Draining:
-        {
-            text = tr("Finalizing... Writing remaining %1")
-                       .arg(formatDuration(stats.retainedDuration));
-            break;
-        }
-
-        default:
-            return;
-    }
-
-    text += tr(" · %1 MiB RAM").arg(queuedMemoryMiB, 0, 'f', 0);
-
-    if (stats.queuedDiskBytes > 0)
-    {
-        text += tr(" + %1 MiB temporary").arg(queuedDiskMiB, 0, 'f', 0);
-    }
-
-    if (stats.discardedFrames > 0)
-    {
-        text += tr(" · Discarded frames: %1% (%2)")
-                    .arg(discardedPercent, 0, 'f', 1)
-                    .arg(stats.discardedFrames);
-    }
-
-    recordingStatsLabel_->setText(text);
+        captureController_->startRecording();
 }
 
 void VideoWindow::onRecordingStarted(const QString& outputPath)
@@ -2581,6 +2468,9 @@ void VideoWindow::onRecordingStarted(const QString& outputPath)
 
 void VideoWindow::onRecordingFinalized(const QString& outputPath)
 {
+    recordingStatsLabel_->clear();
+    recordingStatsLabel_->hide();
+
     statusBar()->showMessage(tr("Recording saved: %1").arg(outputPath), 5000);
 }
 
@@ -2596,13 +2486,6 @@ void VideoWindow::onRecordingError(const QString& message)
 
 #endif
 
-void VideoWindow::updateSnapshotButton()
-{
-    const bool streaming = videoController_->isStreaming();
-
-    snapshotButton_->setEnabled(streaming);
-}
-
 void VideoWindow::onSnapshotSaved(const QString& filename)
 {
     statusBar()->showMessage(tr("Snapshot saved: %1").arg(filename), 5000);
@@ -2611,6 +2494,22 @@ void VideoWindow::onSnapshotSaved(const QString& filename)
 void VideoWindow::onSnapshotError(const QString& message)
 {
     statusBar()->showMessage(message, 5000);
+}
+
+void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
+{
+    const auto status =
+        capture_utils::formatRecordingStatus(captureController_->recordingState(), stats);
+
+    if (status.text.isEmpty())
+    {
+        recordingStatsLabel_->clear();
+        recordingStatsLabel_->hide();
+        return;
+    }
+
+    recordingStatsLabel_->setText(status.text);
+    recordingStatsLabel_->show();
 }
 
 } // namespace fluvel

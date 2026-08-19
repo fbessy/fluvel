@@ -6,18 +6,28 @@
 namespace fluvel::time_utils
 {
 
-QString formatDuration(qint64 ms)
+QString formatDuration(qint64 milliseconds)
 {
-    qint64 sec = ms / 1000;
+    const qint64 seconds = milliseconds / 1000;
 
-    qint64 h = sec / 3600;
-    qint64 m = (sec % 3600) / 60;
-    qint64 s = sec % 60;
+    const qint64 hours = seconds / 3600;
+    const qint64 minutes = (seconds % 3600) / 60;
+    const qint64 secs = seconds % 60;
 
-    if (h > 0)
-        return QString("%1:%2:%3").arg(h).arg(m, 2, 10, QChar('0')).arg(s, 2, 10, QChar('0'));
+    if (hours > 0)
+    {
+        return QStringLiteral("%1:%2:%3")
+            .arg(hours)
+            .arg(minutes, 2, 10, QLatin1Char('0'))
+            .arg(secs, 2, 10, QLatin1Char('0'));
+    }
 
-    return QString("%1:%2").arg(m, 2, 10, QChar('0')).arg(s, 2, 10, QChar('0'));
+    return QStringLiteral("%1:%2").arg(minutes).arg(secs, 2, 10, QLatin1Char('0'));
+}
+
+QString formatDuration(std::chrono::milliseconds duration)
+{
+    return formatDuration(duration.count());
 }
 
 } // namespace fluvel::time_utils

@@ -163,6 +163,12 @@ set(app_src
     ${UI_COMP_DIR}/configuration_actions_widget.cpp
     ${UI_COMP_DIR}/configuration_actions_widget.hpp
 
+    ${UI_COMP_DIR}/capture_controls_widget.cpp
+    ${UI_COMP_DIR}/capture_controls_widget.hpp
+
+    ${UI_COMP_DIR}/capture_stats_utils.cpp
+    ${UI_COMP_DIR}/capture_stats_utils.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 
@@ -171,6 +177,9 @@ set(app_src
 
     ${CORE_DIR}/video_controller.cpp
     ${CORE_DIR}/video_controller.hpp
+
+    ${CORE_DIR}/capture_controller.cpp
+    ${CORE_DIR}/capture_controller.hpp
 
     ${CORE_DIR}/video_types.cpp
     ${CORE_DIR}/video_types.hpp
