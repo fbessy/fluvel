@@ -152,12 +152,9 @@ jobs:
               BUILD_TIMESTAMP=\$(date -u +\"%Y-%m-%d %H:%M:%S\")
 
               echo "=== FFmpeg environment ==="
-              which pkg-config
-              pkg-config --version
-              pkg-config --modversion libavformat
-              pkg-config --modversion libavcodec
-              pkg-config --modversion libavutil
-              pkg-config --modversion libswscale
+              dpkg -l | grep -E 'libav(format|codec|util|swscale)|pkg-config' || true
+              command -v pkg-config || true
+              pkg-config --list-all | grep '^libav' || true
               echo "=========================="
 
               cmake --fresh -S . -B build -G Ninja \
