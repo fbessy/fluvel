@@ -28,6 +28,8 @@ class QPropertyAnimation;
 class QShowEvent;
 class QCloseEvent;
 
+class QLabel;
+
 namespace fluvel
 {
 
@@ -72,6 +74,9 @@ class PreferencesDialog;
 class ConfigurationActionsWidget;
 class DisplaySettingsWidget;
 class FullscreenImageControlBar;
+
+class CaptureController;
+class CaptureControlsWidget;
 
 class ImageViewerWidget;
 class ImageController;
@@ -174,6 +179,16 @@ private:
     void onActivityDetected(const QPoint& pos);
     void onIdle();
 
+#ifdef FLUVEL_USE_FFMPEG
+    void onRecordingStatsChanged(const RecorderStats& stats);
+    void onRecordingStarted(const QString& outputPath);
+    void onRecordingFinalized(const QString& outputPath);
+    void onRecordingWarning(const QString& message);
+    void onRecordingError(const QString& message);
+
+    QLabel* recordingStatsLabel_{nullptr};
+#endif
+
     // --- UI ---
     std::unique_ptr<VideoWindow> videoWindow_;
     std::unique_ptr<AnalysisWindow> analysisWindow_;
@@ -247,6 +262,10 @@ private:
 
     ControlTheme normalTheme_;
     ControlTheme fullscreenTheme_;
+
+    CaptureController* captureController_{nullptr};
+    CaptureControlsWidget* captureWidget_{nullptr};
+    QImage captureImage_;
 };
 
 } // namespace fluvel

@@ -22,6 +22,11 @@
 #include "pan_behavior.hpp"
 #include "pixel_info_behavior.hpp"
 
+#include "capture_controller.hpp"
+#include "capture_controls_widget.hpp"
+#include "capture_stats_utils.hpp"
+#include "frame_rendering_utils.hpp"
+
 #include "file_utils.hpp"
 #include "image_controller.hpp"
 
@@ -33,6 +38,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
 #include <QImageReader>
+#include <QLabel>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -151,6 +157,8 @@ void ImageWindow::setupUi()
     // Central widget
     QWidget* central = new QWidget(this);
 
+    captureWidget_ = new CaptureControlsWidget(central);
+
     // Main vertical layout
     QVBoxLayout* vLayout = new QVBoxLayout(central);
     vLayout->setContentsMargins(0, 0, 0, 0);
@@ -166,6 +174,8 @@ void ImageWindow::setupUi()
     controlLayout->addWidget(togglePauseButton_);
     controlLayout->addWidget(stepButton_);
     controlLayout->addWidget(convergeButton_);
+    controlLayout->addSpacing(kControlSpacing);
+    controlLayout->addWidget(captureWidget_);
     controlLayout->addStretch();
     controlLayout->addWidget(configurationActions_);
 
@@ -238,6 +248,13 @@ void ImageWindow::setupUi()
 
     setStatusBar(new QStatusBar(this));
     statusBar()->setStyleSheet("border: none;");
+
+#ifdef FLUVEL_USE_FFMPEG
+    recordingStatsLabel_ = new QLabel(this);
+    recordingStatsLabel_->hide();
+
+    statusBar()->addPermanentWidget(recordingStatsLabel_);
+#endif
 }
 
 void ImageWindow::setupActions()
@@ -370,6 +387,9 @@ void ImageWindow::setupControllers()
 {
     const auto& config = ApplicationSettings::instance().imageSettings();
     imageController_ = new ImageController(config, this);
+
+    captureController_ = new CaptureController(this);
+    captureWidget_->setCaptureController(captureController_);
 }
 
 void ImageWindow::setupChildWindows()
@@ -421,9 +441,53 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::displayedImageReady, imageViewer_,
             &ImageViewerWidget::setImage);
 
+    connect(imageController_, &ImageController::displayedImageReady, this,
+            [this](const QImage& image)
+            {
+                captureImage_ = image;
+
+                if (!captureImage_.isNull())
+                    captureController_->setStreaming(true);
+            });
+
+    // Record video with the evolving contour.
+    connect(
+        imageController_, &ImageController::contourUpdated, this,
+        [this](const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour)
+        {
+            if (!captureController_->isAcceptingFrames())
+                return;
+
+            if (captureImage_.isNull())
+                return;
+
+            const auto& config = ApplicationSettings::instance().imageSettings();
+
+            DisplayFrame displayFrame;
+            displayFrame.image = captureImage_;
+            displayFrame.outerContour = outerContour;
+            displayFrame.innerContour = innerContour;
+
+            VideoFrame videoFrame;
+            videoFrame.image = captureImage_;
+
+            frame_rendering_utils::drawContourOverlay(videoFrame.image, displayFrame,
+                                                      config.display, config.compute.downscale);
+
+            captureController_->submitFrame(videoFrame);
+        },
+        Qt::QueuedConnection);
+
     // Update the displayed contour.
     connect(imageController_, &ImageController::contourUpdated, imageViewer_,
             &ImageViewerWidget::setContour, Qt::QueuedConnection);
+
+    connect(imageController_, &ImageController::stateChanged, this,
+            [this](WorkerState state)
+            {
+                if (state == WorkerState::Finished && captureController_->isRecording())
+                    captureController_->stopRecording();
+            });
 
     // to refresh the view with a new text info algo overlay (mean out, iterations, ect)
     connect(imageController_, &ImageController::textDiagnosticsUpdated, imageViewer_,
@@ -498,6 +562,25 @@ void ImageWindow::setupConnections()
                 if (fullscreenOpacity_->opacity() < 0.01)
                     fullscreenBar_->hide();
             });
+
+#ifdef FLUVEL_USE_FFMPEG
+
+    connect(captureController_, &CaptureController::recordingStatsChanged, this,
+            &ImageWindow::onRecordingStatsChanged);
+
+    connect(captureController_, &CaptureController::recordingWarning, this,
+            &ImageWindow::onRecordingWarning);
+
+    connect(captureController_, &CaptureController::recordingError, this,
+            &ImageWindow::onRecordingError);
+
+    connect(captureController_, &CaptureController::recordingStarted, this,
+            &ImageWindow::onRecordingStarted);
+
+    connect(captureController_, &CaptureController::recordingFinalized, this,
+            &ImageWindow::onRecordingFinalized);
+
+#endif
 }
 
 void ImageWindow::bindApplicationSettingsToController()
@@ -1118,5 +1201,48 @@ void ImageWindow::onIdle()
 
     hideAnimation_->start();
 }
+
+#ifdef FLUVEL_USE_FFMPEG
+
+void ImageWindow::onRecordingWarning(const QString& message)
+{
+    QMessageBox::warning(this, tr("Recording warning"), message);
+}
+
+void ImageWindow::onRecordingError(const QString& message)
+{
+    QMessageBox::critical(this, tr("Recording error"), message);
+}
+
+void ImageWindow::onRecordingStarted(const QString& outputPath)
+{
+    statusBar()->showMessage(tr("Recording to: %1").arg(outputPath), 5000);
+}
+
+void ImageWindow::onRecordingFinalized(const QString& outputPath)
+{
+    recordingStatsLabel_->clear();
+    recordingStatsLabel_->hide();
+
+    statusBar()->showMessage(tr("Recording saved: %1").arg(outputPath), 5000);
+}
+
+void ImageWindow::onRecordingStatsChanged(const RecorderStats& stats)
+{
+    const auto status =
+        capture_utils::formatRecordingStatus(captureController_->recordingState(), stats);
+
+    if (status.text.isEmpty())
+    {
+        recordingStatsLabel_->clear();
+        recordingStatsLabel_->hide();
+        return;
+    }
+
+    recordingStatsLabel_->setText(status.text);
+    recordingStatsLabel_->show();
+}
+
+#endif
 
 } // namespace fluvel
