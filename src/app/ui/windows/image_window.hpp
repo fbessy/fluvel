@@ -167,8 +167,6 @@ private:
     void onImageSessionActionTriggered();
     void onStartVideoActionTriggered();
 
-    void saveDisplayed();
-
     void toggleFullscreen();
     void enterFullscreen();
     void leaveFullscreen();
@@ -232,7 +230,6 @@ private:
     std::array<QAction*, kMaxRecentFiles> recentFileActs_;
 
     QAction* clearAct_{nullptr};
-    QAction* saveAct_{nullptr};
     QAction* quitAct_{nullptr};
 
     QAction* imageSessionAct_{nullptr};

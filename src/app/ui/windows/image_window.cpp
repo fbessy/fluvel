@@ -315,16 +315,6 @@ void ImageWindow::setupActions()
 
     clearAct_->setIcon(deleteIcon);
 
-    saveAct_ = new QAction(tr("&Save..."), this);
-    saveAct_->setEnabled(false);
-    saveAct_->setShortcut(QKeySequence::Save);
-    saveAct_->setStatusTip(tr("Save the displayed image."));
-
-    QIcon saveIcon = il::loadIcon(QIcon::ThemeIcon::DocumentSaveAs,
-                                  ":/icons/file/document-save-as-symbolic.svg");
-
-    saveAct_->setIcon(saveIcon);
-
     QIcon recentIcon = il::loadIcon(QIcon::ThemeIcon::DocumentOpenRecent,
                                     ":/icons/file/document-open-recent-symbolic.svg");
 
@@ -370,10 +360,6 @@ void ImageWindow::setupMenus()
     }
 
     fileMenu_->addAction(clearAct_);
-
-    fileMenu_->addSeparator();
-
-    fileMenu_->addAction(saveAct_);
 
     segmentationMenu_ = new QMenu(tr("&Segmentation"), this);
     segmentationMenu_->addAction(analysisAct_);
@@ -705,8 +691,6 @@ void ImageWindow::setupUserActionsConnections()
 
     connect(clearAct_, &QAction::triggered, this, &ImageWindow::clearRecentFiles);
 
-    connect(saveAct_, &QAction::triggered, this, &ImageWindow::saveDisplayed);
-
     // ---   3rd menu   ---
 
     connect(analysisAct_, &QAction::triggered, analysisWindow_.get(), &AnalysisWindow::show);
@@ -859,8 +843,6 @@ void ImageWindow::onFileOpened(const QString& path)
     updateWindowTitle();
 
     statusBar()->showMessage(tr("Opened image: %1").arg(path), 5000);
-
-    saveAct_->setEnabled(true);
 }
 
 void ImageWindow::onInputImageReady(const QImage& input)
@@ -918,45 +900,6 @@ void ImageWindow::updateWindowTitle()
     title += " - " + mode;
 
     setWindowTitle(title);
-}
-
-void ImageWindow::saveDisplayed()
-{
-    const QImage displayed = imageViewer_->renderToImage();
-
-    if (displayed.isNull())
-        return;
-
-    const QString baseName =
-        fileName_.isEmpty() ? tr("displayed") : QFileInfo(fileName_).baseName();
-
-    QString selectedFilter;
-
-    QString fileName = QFileDialog::getSaveFileName(
-        this, tr("Save displayed image"), QDir(lastDirectoryUsed_).filePath(baseName),
-        file_utils::buildWritableImageFilter(), &selectedFilter);
-
-    if (fileName.isEmpty())
-        return;
-
-    const QFileInfo fi(fileName);
-
-    if (fi.suffix().isEmpty())
-    {
-        const QString extension = file_utils::defaultExtensionFromFilter(selectedFilter);
-
-        if (!extension.isEmpty())
-            fileName += "." + extension;
-    }
-
-    fileName = file_utils::makeUniqueFileName(fileName);
-
-    if (!displayed.save(fileName))
-    {
-        statusBar()->showMessage(tr("Failed to save image: %1").arg(fileName), 5000);
-
-        return;
-    }
 }
 
 void ImageWindow::onStateChanged(WorkerState state)
