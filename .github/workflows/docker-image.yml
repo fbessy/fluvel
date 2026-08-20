@@ -6,10 +6,6 @@ name: Docker Image
 on:
   workflow_call:
 
-  schedule:
-    # Every month on day 3 at 05:17 UTC
-    - cron: '17 5 3 * *'
-
 permissions:
   contents: read
   packages: write
@@ -39,27 +35,20 @@ jobs:
 
       - name: Ensure image
         run: |
-          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
+          IMAGE=ghcr.io/${{ github.repository }}/qt-builder:qt6.9.3-ubuntu25.10
           CACHE_IMAGE=${IMAGE}-cache
 
           EXISTS=false
-          FORCE_REBUILD=false
 
           if docker manifest inspect $IMAGE > /dev/null 2>&1; then
             EXISTS=true
           fi
 
-          if [ "${{ github.event_name }}" = "schedule" ]; then
-            FORCE_REBUILD=true
-          fi
-
           echo "Image exists: $EXISTS"
           echo "Docker changed: ${{ steps.changes.outputs.docker }}"
-          echo "Force rebuild: $FORCE_REBUILD"
 
           if [ "$EXISTS" = "false" ] || \
-             [ "${{ steps.changes.outputs.docker }}" = "true" ] || \
-             [ "$FORCE_REBUILD" = "true" ]; then
+             [ "${{ steps.changes.outputs.docker }}" = "true" ]; then
 
             echo "Building image..."
 

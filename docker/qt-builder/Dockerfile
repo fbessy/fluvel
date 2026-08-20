@@ -1,14 +1,15 @@
 # syntax=docker/dockerfile:1
 
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # =========================
 # BUILD ARGS (cache control)
 # =========================
-ARG QT_VERSION=6.9.2
-ARG LINUXDEPLOY_VERSION=continuous
+ARG QT_VERSION=6.9.3
+ARG LINUXDEPLOY_VERSION=1-alpha-20251107-1
+ARG LINUXDEPLOY_PLUGIN_QT_VERSION=1-alpha-20250213-1
 
 # =========================
 # SYSTEM DEPENDENCIES (stable layer)
@@ -103,8 +104,10 @@ ENV CCACHE_MAXSIZE=1G
 # LINUXDEPLOY (stable cache)
 # =========================
 RUN mkdir -p /opt/tools && \
-    wget -O /opt/tools/linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VERSION}/linuxdeploy-x86_64.AppImage && \
-    wget -O /opt/tools/linuxdeploy-plugin-qt https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${LINUXDEPLOY_VERSION}/linuxdeploy-plugin-qt-x86_64.AppImage && \
+    wget -O /opt/tools/linuxdeploy.AppImage \
+      https://github.com/linuxdeploy/linuxdeploy/releases/download/${LINUXDEPLOY_VERSION}/linuxdeploy-x86_64.AppImage && \
+    wget -O /opt/tools/linuxdeploy-plugin-qt \
+      https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/${LINUXDEPLOY_PLUGIN_QT_VERSION}/linuxdeploy-plugin-qt-x86_64.AppImage && \
     chmod +x /opt/tools/*
 
 ENV LINUXDEPLOY_PLUGIN_PATH=/opt/tools
