@@ -26,8 +26,7 @@ cat > latest.json <<EOF
 
   "linux": {
     "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-    "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak",
-    "deb": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.deb"
+    "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
   },
 
   "checksums": $ALL_CHECKSUMS

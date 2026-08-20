@@ -43,7 +43,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.3-ubuntu25.10
 
       # 📦 Build Flatpak dans Docker
       - name: Build Flatpak
@@ -51,7 +51,7 @@ jobs:
           docker run --rm \
             --privileged \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2 \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.3-ubuntu25.10 \
             bash -c "
               cd /workspace
               git config --global --add safe.directory /workspace
@@ -132,14 +132,14 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
+        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.3-ubuntu25.10
 
       # 📦 Build AppImage dans Docker
       - name: Build AppImage
         run: |
           docker run --rm \
             -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2 \
+            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.3-ubuntu25.10 \
             bash -c "
               cd /workspace
 
@@ -216,91 +216,3 @@ jobs:
             Fluvel-linux.AppImage
             Fluvel-linux.AppImage.sha256
             commit-linux-appimage.txt
-
-
-  # =========================
-  # Linux DEB BUILD
-  # =========================
-  linux-deb:
-    needs: prepare-docker
-
-    runs-on: ubuntu-24.04
-
-    if: startsWith(github.ref, 'refs/tags/') || github.ref_name == 'release'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      # 🧠 Compute version
-      - name: Compute version
-        run: |
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
-          else
-            VERSION="dev-${GITHUB_SHA::7}"
-          fi
-
-          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "COMMIT_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
-
-      - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Pull Docker image
-        run: docker pull ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2
-
-      # 📦 Build DEB dans Docker
-      - name: Build DEB
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/workspace \
-            ghcr.io/${{ github.repository }}/qt-builder:qt6.9.2 \
-            bash -c "
-              cd /workspace
-
-              echo \"Version = $APP_VERSION\"
-
-              unset LD_LIBRARY_PATH
-              unset QT_PLUGIN_PATH
-              unset QML2_IMPORT_PATH
-
-              BUILD_TIMESTAMP=\$(date -u +\"%Y-%m-%d %H:%M:%S\")
-
-              cmake --fresh -S . -B build-deb -G Ninja \
-                -DCMAKE_BUILD_TYPE=Release \
-                -DQt6_DIR=\$Qt6_DIR \
-                \
-                -DFLUVEL_BUILD_APP=ON \
-                -DFLUVEL_BUILD_BIND=OFF \
-                -DFLUVEL_ENABLE_FFMPEG=ON \
-                \
-                -DFLUVEL_BUILD_VERSION=$APP_VERSION \
-                -DFLUVEL_GIT_COMMIT=$COMMIT_SHORT \
-                -DFLUVEL_BUILD_TIMESTAMP=\"\$BUILD_TIMESTAMP\" \
-                -DFLUVEL_BUILD_ORIGIN=\"GitHub Actions\"
-
-              cmake --build build-deb
-
-              cd build-deb
-
-              cpack
-
-              mv *.deb /workspace/Fluvel-linux.deb
-            "
-
-      - name: Generate checksum
-        run: |
-          sha256sum Fluvel-linux.deb > Fluvel-linux.deb.sha256
-
-      - name: Generate commit info
-        run: |
-          echo "${GITHUB_SHA}" > commit-linux-deb.txt
-
-      # 📤 Upload artifact
-      - uses: actions/upload-artifact@v4
-        with:
-          name: linux-deb
-          path: |
-            Fluvel-linux.deb
-            Fluvel-linux.deb.sha256
-            commit-linux-deb.txt

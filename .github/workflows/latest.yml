@@ -107,11 +107,6 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: linux-deb
-          path: linux
-
-      - uses: actions/download-artifact@v4
-        with:
           name: prepared-release
           path: prepared
 
@@ -163,7 +158,6 @@ jobs:
             macos/Fluvel-macos.dmg \
             linux/Fluvel-linux.AppImage \
             linux/Fluvel-linux.flatpak \
-            linux/Fluvel-linux.deb \
             prepared/BUILD_INFO.txt \
             --clobber
 

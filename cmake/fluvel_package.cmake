@@ -16,14 +16,6 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "Real-time computer vision and image analysis for research"
 )
 
-set(CPACK_DEBIAN_PACKAGE_DESCRIPTION
-    "Research-oriented image segmentation application using active contour and level-set methods."
-)
-
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER
-    "Fabien Bessy <fabien.bessy@gmail.com>"
-)
-
 # =========================================================
 # Linux
 # =========================================================
@@ -31,23 +23,6 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER
 if(FLUVEL_PLATFORM_LINUX)
 
     include(GNUInstallDirs)
-
-    set(CPACK_GENERATOR "DEB")
-
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS
-        "libqt6core6,
-         libqt6gui6,
-         libqt6widgets6,
-         libqt6multimedia6,
-         libqt6svg6,
-         qt6-image-formats-plugins"
-    )
-
-    if(FLUVEL_USE_FFMPEG)
-        string(APPEND CPACK_DEBIAN_PACKAGE_DEPENDS
-            ", libavformat60, libavcodec60, libavutil58, libswscale7"
-        )
-    endif()
 
     # =====================================================
     # Linux install directories (FHS)
