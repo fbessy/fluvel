@@ -5,7 +5,10 @@
 
 #include "application_settings.hpp"
 #include "file_utils.hpp"
+
+#ifdef FLUVEL_USE_FFMPEG
 #include "video_exporter_utils.hpp"
+#endif
 
 namespace fluvel
 {
@@ -38,8 +41,6 @@ CaptureController::CaptureController(QObject* parent)
 
 void CaptureController::submitFrame(const fluvel::VideoFrame& frame)
 {
-    snapshotImage_ = frame.image;
-
 #ifdef FLUVEL_USE_FFMPEG
 
     if (recorder_.isAcceptingFrames())
@@ -123,9 +124,14 @@ void CaptureController::onRecordingStateChanged(RecorderState state)
 
 #endif
 
-void CaptureController::takeSnapshot()
+void CaptureController::requestSnapshot()
 {
-    if (snapshotImage_.isNull())
+    emit snapshotRequested();
+}
+
+void CaptureController::saveSnapshot(const QImage& image)
+{
+    if (image.isNull())
     {
         emit snapshotError(tr("No frame available."));
         return;
@@ -137,7 +143,7 @@ void CaptureController::takeSnapshot()
         preferences.directory, preferences.baseName,
         QString::fromLatin1(preferences.preferredFormat), preferences.appendTimestamp);
 
-    if (!snapshotImage_.save(fileName, preferences.preferredFormat.constData()))
+    if (!image.save(fileName, preferences.preferredFormat.constData()))
     {
         emit snapshotError(tr("Failed to save snapshot: %1").arg(fileName));
         return;

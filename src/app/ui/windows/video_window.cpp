@@ -6,9 +6,6 @@
 #include "application_settings.hpp"
 #include "autofit_behavior.hpp"
 #include "camera_format_utils.hpp"
-#include "capture_controller.hpp"
-#include "capture_controls_widget.hpp"
-#include "capture_stats_utils.hpp"
 #include "clickable_label.hpp"
 #include "configuration_actions_widget.hpp"
 #include "device_id_utils.hpp"
@@ -33,6 +30,13 @@
 #include "video_types.hpp"
 #include "volume_controller.hpp"
 #include "volume_slider.hpp"
+
+#include "capture_controller.hpp"
+#include "capture_controls_widget.hpp"
+
+#ifdef FLUVEL_USE_FFMPEG
+#include "capture_stats_utils.hpp"
+#endif
 
 #include <QAbstractItemView>
 #include <QCameraDevice>
@@ -849,8 +853,6 @@ void VideoWindow::setupConnections()
     connect(videoController_, &VideoController::playbackStateChanged, this,
             &VideoWindow::onPlaybackStateChanged);
 
-    connectFrameToCapture();
-
     connect(videoController_, &VideoController::streamingStarted, captureController_,
             [this]
             {
@@ -871,6 +873,8 @@ void VideoWindow::setupConnections()
 
 #ifdef FLUVEL_USE_FFMPEG
 
+    connectFrameToCapture();
+
     connect(captureController_, &CaptureController::recordingStatsChanged, this,
             &VideoWindow::onRecordingStatsChanged);
 
@@ -887,6 +891,27 @@ void VideoWindow::setupConnections()
             &VideoWindow::onRecordingFinalized);
 
 #endif
+
+    connect(captureController_, &CaptureController::snapshotRequested, this,
+            [this]
+            {
+                const DisplayFrame frame = imageViewer_->displayFrame();
+
+                if (frame.image.isNull())
+                {
+                    captureController_->saveSnapshot({});
+                    return;
+                }
+
+                QImage image = frame.image;
+
+                const auto& config = ApplicationSettings::instance().videoSettings();
+
+                frame_rendering_utils::drawContourOverlay(image, frame, config.display,
+                                                          config.compute.downscale);
+
+                captureController_->saveSnapshot(image);
+            });
 
     connect(captureController_, &CaptureController::snapshotSaved, this,
             &VideoWindow::onSnapshotSaved);
@@ -1308,30 +1333,6 @@ void VideoWindow::connectFrameToView()
     disconnect(frameToViewConnection_);
     frameToViewConnection_ = connect(videoController_, &VideoController::displayFrameReady,
                                      imageViewer_, &ImageViewerWidget::setDisplayFrame);
-}
-
-void VideoWindow::connectFrameToCapture()
-{
-    disconnect(frameToCaptureConnection_);
-
-    frameToCaptureConnection_ =
-        connect(videoController_, &VideoController::displayFrameReady, this,
-                [this](const DisplayFrame& displayFrame)
-                {
-                    if (!captureController_->isAcceptingFrames())
-                        return;
-
-                    const auto& config = ApplicationSettings::instance().videoSettings();
-
-                    VideoFrame videoFrame;
-                    videoFrame.image = displayFrame.image;
-                    videoFrame.presentationTimestampNs = displayFrame.receiveTimestampNs;
-
-                    frame_rendering_utils::drawContourOverlay(
-                        videoFrame.image, displayFrame, config.display, config.compute.downscale);
-
-                    captureController_->submitFrame(videoFrame);
-                });
 }
 
 QCameraFormat VideoWindow::getSelectedFormat() const
@@ -2453,6 +2454,30 @@ void VideoWindow::onPlaybackStateChanged(QMediaPlayer::PlaybackState state)
 
 #ifdef FLUVEL_USE_FFMPEG
 
+void VideoWindow::connectFrameToCapture()
+{
+    disconnect(frameToCaptureConnection_);
+
+    frameToCaptureConnection_ =
+        connect(videoController_, &VideoController::displayFrameReady, this,
+                [this](const DisplayFrame& displayFrame)
+                {
+                    if (!captureController_->isAcceptingFrames())
+                        return;
+
+                    const auto& config = ApplicationSettings::instance().videoSettings();
+
+                    VideoFrame videoFrame;
+                    videoFrame.image = displayFrame.image;
+                    videoFrame.presentationTimestampNs = displayFrame.receiveTimestampNs;
+
+                    frame_rendering_utils::drawContourOverlay(
+                        videoFrame.image, displayFrame, config.display, config.compute.downscale);
+
+                    captureController_->submitFrame(videoFrame);
+                });
+}
+
 void VideoWindow::onToggleRecording()
 {
     if (captureController_->isRecording())
@@ -2484,18 +2509,6 @@ void VideoWindow::onRecordingError(const QString& message)
     QMessageBox::critical(this, tr("Recording error"), message);
 }
 
-#endif
-
-void VideoWindow::onSnapshotSaved(const QString& filename)
-{
-    statusBar()->showMessage(tr("Snapshot saved: %1").arg(filename), 5000);
-}
-
-void VideoWindow::onSnapshotError(const QString& message)
-{
-    statusBar()->showMessage(message, 5000);
-}
-
 void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
 {
     const auto status =
@@ -2510,6 +2523,18 @@ void VideoWindow::onRecordingStatsChanged(const RecorderStats& stats)
 
     recordingStatsLabel_->setText(status.text);
     recordingStatsLabel_->show();
+}
+
+#endif
+
+void VideoWindow::onSnapshotSaved(const QString& filename)
+{
+    statusBar()->showMessage(tr("Snapshot saved: %1").arg(filename), 5000);
+}
+
+void VideoWindow::onSnapshotError(const QString& message)
+{
+    statusBar()->showMessage(message, 5000);
 }
 
 } // namespace fluvel

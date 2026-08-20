@@ -189,6 +189,9 @@ private:
     QLabel* recordingStatsLabel_{nullptr};
 #endif
 
+    void onSnapshotSaved(const QString& filename);
+    void onSnapshotError(const QString& message);
+
     // --- UI ---
     std::unique_ptr<VideoWindow> videoWindow_;
     std::unique_ptr<AnalysisWindow> analysisWindow_;

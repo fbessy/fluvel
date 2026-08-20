@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: CeCILL-2.1
 // Copyright (C) 2010-2026 Fabien Bessy
 
+#ifdef FLUVEL_USE_FFMPEG
+
 #include "capture_stats_utils.hpp"
 
 #include "time_utils.hpp"
@@ -71,3 +73,5 @@ RecordingStatus formatRecordingStatus(RecorderState state, const RecorderStats& 
 }
 
 } // namespace fluvel::capture_utils
+
+#endif

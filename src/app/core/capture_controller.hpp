@@ -3,12 +3,12 @@
 
 #pragma once
 
+#include "frame_pipeline.hpp"
+
 #ifdef FLUVEL_USE_FFMPEG
 #include "video_export_settings.hpp"
 #include "video_recorder_worker.hpp"
 #endif
-
-// #include "frame_pipeline.hpp"
 
 #include <QObject>
 
@@ -67,6 +67,23 @@ public:
     [[nodiscard]]
     bool isStreaming() const noexcept;
 
+    /**
+     * @brief Requests a snapshot of the current displayed frame.
+     *
+     * Emits snapshotRequested(). The associated window is responsible for
+     * providing the current display frame to the controller.
+     */
+    void requestSnapshot();
+
+    /**
+     * @brief Saves a snapshot image.
+     *
+     * The image is saved according to the persistent snapshot preferences.
+     *
+     * @param image Image to save.
+     */
+    void saveSnapshot(const QImage& image);
+
 #ifdef FLUVEL_USE_FFMPEG
 
     /**
@@ -102,11 +119,6 @@ public:
     RecorderState recordingState() const noexcept;
 
 #endif
-
-    /**
-     * @brief Saves the latest available frame as an image.
-     */
-    void takeSnapshot();
 
 signals:
 
@@ -145,6 +157,14 @@ signals:
 #endif
 
     /**
+     * @brief Emitted when a snapshot is requested.
+     *
+     * The window displaying the current frame should respond by providing
+     * the image to save through saveSnapshot().
+     */
+    void snapshotRequested();
+
+    /**
      * @brief Emitted after a snapshot has been saved.
      */
     void snapshotSaved(const QString& filename);
@@ -174,7 +194,6 @@ private:
 
 #endif
 
-    QImage snapshotImage_;
     bool streaming_{false};
 };
 

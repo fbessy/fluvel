@@ -38,6 +38,15 @@ public:
     /// Sets the contour points.
     void setPoints(const QVector<QPointF>& points);
 
+    /**
+     * @brief Returns the current contour points.
+     */
+    [[nodiscard]]
+    const QVector<QPointF>& points() const noexcept
+    {
+        return points_;
+    }
+
     /// Clears all contour points.
     void clearPoints();
 

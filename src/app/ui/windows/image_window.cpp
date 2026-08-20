@@ -24,7 +24,11 @@
 
 #include "capture_controller.hpp"
 #include "capture_controls_widget.hpp"
+
+#ifdef FLUVEL_USE_FFMPEG
 #include "capture_stats_utils.hpp"
+#endif
+
 #include "frame_rendering_utils.hpp"
 
 #include "file_utils.hpp"
@@ -450,6 +454,8 @@ void ImageWindow::setupConnections()
                     captureController_->setStreaming(true);
             });
 
+#ifdef FLUVEL_USE_FFMPEG
+
     // Record video with the evolving contour.
     connect(
         imageController_, &ImageController::contourUpdated, this,
@@ -478,16 +484,60 @@ void ImageWindow::setupConnections()
         },
         Qt::QueuedConnection);
 
-    // Update the displayed contour.
-    connect(imageController_, &ImageController::contourUpdated, imageViewer_,
-            &ImageViewerWidget::setContour, Qt::QueuedConnection);
-
     connect(imageController_, &ImageController::stateChanged, this,
             [this](WorkerState state)
             {
                 if (state == WorkerState::Finished && captureController_->isRecording())
                     captureController_->stopRecording();
             });
+
+    connect(captureController_, &CaptureController::recordingStatsChanged, this,
+            &ImageWindow::onRecordingStatsChanged);
+
+    connect(captureController_, &CaptureController::recordingWarning, this,
+            &ImageWindow::onRecordingWarning);
+
+    connect(captureController_, &CaptureController::recordingError, this,
+            &ImageWindow::onRecordingError);
+
+    connect(captureController_, &CaptureController::recordingStarted, this,
+            &ImageWindow::onRecordingStarted);
+
+    connect(captureController_, &CaptureController::recordingFinalized, this,
+            &ImageWindow::onRecordingFinalized);
+
+#endif
+
+    connect(captureController_, &CaptureController::snapshotRequested, this,
+            [this]
+            {
+                const DisplayFrame frame = imageViewer_->displayFrame();
+
+                if (frame.image.isNull())
+                {
+                    captureController_->saveSnapshot({});
+                    return;
+                }
+
+                QImage image = frame.image;
+
+                const auto& config = ApplicationSettings::instance().imageSettings();
+
+                frame_rendering_utils::drawContourOverlay(image, frame, config.display,
+                                                          config.compute.downscale);
+
+                captureController_->saveSnapshot(image);
+            });
+
+    connect(captureController_, &CaptureController::snapshotSaved, this,
+            &ImageWindow::onSnapshotSaved);
+
+    connect(captureController_, &CaptureController::snapshotError, this,
+            &ImageWindow::onSnapshotError);
+
+    // Update the displayed contour.
+    connect(imageController_, &ImageController::contourUpdated, imageViewer_,
+            &ImageViewerWidget::setContour, Qt::QueuedConnection);
 
     // to refresh the view with a new text info algo overlay (mean out, iterations, ect)
     connect(imageController_, &ImageController::textDiagnosticsUpdated, imageViewer_,
@@ -562,25 +612,6 @@ void ImageWindow::setupConnections()
                 if (fullscreenOpacity_->opacity() < 0.01)
                     fullscreenBar_->hide();
             });
-
-#ifdef FLUVEL_USE_FFMPEG
-
-    connect(captureController_, &CaptureController::recordingStatsChanged, this,
-            &ImageWindow::onRecordingStatsChanged);
-
-    connect(captureController_, &CaptureController::recordingWarning, this,
-            &ImageWindow::onRecordingWarning);
-
-    connect(captureController_, &CaptureController::recordingError, this,
-            &ImageWindow::onRecordingError);
-
-    connect(captureController_, &CaptureController::recordingStarted, this,
-            &ImageWindow::onRecordingStarted);
-
-    connect(captureController_, &CaptureController::recordingFinalized, this,
-            &ImageWindow::onRecordingFinalized);
-
-#endif
 }
 
 void ImageWindow::bindApplicationSettingsToController()
@@ -1244,5 +1275,15 @@ void ImageWindow::onRecordingStatsChanged(const RecorderStats& stats)
 }
 
 #endif
+
+void ImageWindow::onSnapshotSaved(const QString& filename)
+{
+    statusBar()->showMessage(tr("Snapshot saved: %1").arg(filename), 5000);
+}
+
+void ImageWindow::onSnapshotError(const QString& message)
+{
+    statusBar()->showMessage(message, 5000);
+}
 
 } // namespace fluvel

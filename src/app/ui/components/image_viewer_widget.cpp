@@ -295,6 +295,15 @@ void ImageViewerWidget::setDisplayFrame(const DisplayFrame& frame)
     submitFrame(frame);
 }
 
+DisplayFrame ImageViewerWidget::displayFrame() const
+{
+    DisplayFrame frame;
+    frame.image = lastDisplayedImage_;
+    frame.outerContour = outerContour_->points();
+    frame.innerContour = innerContour_->points();
+    return frame;
+}
+
 void ImageViewerWidget::clearContour()
 {
     assert(outerContour_ && innerContour_);

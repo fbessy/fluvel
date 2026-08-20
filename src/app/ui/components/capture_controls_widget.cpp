@@ -52,7 +52,7 @@ CaptureControlsWidget::CaptureControlsWidget(QWidget* parent)
             [this]
             {
                 if (controller_ != nullptr)
-                    controller_->takeSnapshot();
+                    controller_->requestSnapshot();
             });
 
 #ifdef FLUVEL_USE_FFMPEG

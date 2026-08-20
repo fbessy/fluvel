@@ -99,8 +99,15 @@ if(FLUVEL_BUILD_APP)
 endif()
 
 message(STATUS
-    "FFmpeg video export: requested=${FLUVEL_ENABLE_FFMPEG}, available=${FLUVEL_USE_FFMPEG}"
+    "FFmpeg video export: requested=${FLUVEL_ENABLE_FFMPEG}, enabled=${FLUVEL_USE_FFMPEG}"
 )
+
+if(FLUVEL_ENABLE_FFMPEG AND NOT FLUVEL_USE_FFMPEG)
+    message(WARNING
+        "FFmpeg video export was requested but FFmpeg was not found. "
+        "Building without FFmpeg support."
+    )
+endif()
 
 if(FLUVEL_BUILD_BIND)
     include(cmake/fluvel_python.cmake)

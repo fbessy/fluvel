@@ -243,7 +243,6 @@ private:
     QCameraFormat getSelectedFormat() const;
 
     void connectFrameToView();
-    void connectFrameToCapture();
 
     void startSource();
     void stopSource();
@@ -253,6 +252,8 @@ private:
     void onStreamingStopped();
 
 #ifdef FLUVEL_USE_FFMPEG
+    void connectFrameToCapture();
+
     void onRecordingStateChanged(RecorderState state);
     void onRecordingStatsChanged(const RecorderStats& stats);
     void onRecordingStarted(const QString& outputPath);

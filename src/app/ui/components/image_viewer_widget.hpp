@@ -138,6 +138,17 @@ public:
     void setDisplayFrame(const DisplayFrame& frame);
 
     /**
+     * @brief Returns the current display frame.
+     *
+     * The returned frame contains the current image and contour data
+     * displayed by the viewer.
+     *
+     * @return Current display frame.
+     */
+    [[nodiscard]]
+    DisplayFrame displayFrame() const;
+
+    /**
      * @brief Clears contour overlays.
      */
     void clearContour();
