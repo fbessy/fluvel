@@ -41,12 +41,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: C:/Users/runneradmin/Qt
-          key: qt-windows-6.9.2
+          key: qt-windows-6.9.3
 
       - name: Setup Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.9.2'
+          version: '6.9.3'
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2022_64'
@@ -160,6 +160,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s "/Applications/Xcode_26.5.app"
+          xcodebuild -version
+
       - name: Compute version
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
@@ -172,7 +177,7 @@ jobs:
       - name: Setup Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: '6.9.2'
+          version: '6.9.3'
           host: 'mac'
           target: 'desktop'
           modules: 'qtmultimedia'
