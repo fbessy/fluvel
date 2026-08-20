@@ -103,10 +103,18 @@ message(STATUS
 )
 
 if(FLUVEL_ENABLE_FFMPEG AND NOT FLUVEL_USE_FFMPEG)
-    message(WARNING
-        "FFmpeg video export was requested but FFmpeg was not found. "
-        "Building without FFmpeg support."
-    )
+
+    if(FLUVEL_IS_CI)
+        message(FATAL_ERROR
+            "FFmpeg video export was requested but FFmpeg was not found."
+        )
+    else()
+        message(WARNING
+            "FFmpeg video export was requested but FFmpeg was not found. "
+            "Building without FFmpeg support."
+        )
+    endif()
+
 endif()
 
 if(FLUVEL_BUILD_BIND)

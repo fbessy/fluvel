@@ -151,6 +151,15 @@ jobs:
 
               BUILD_TIMESTAMP=\$(date -u +\"%Y-%m-%d %H:%M:%S\")
 
+              echo "=== FFmpeg environment ==="
+              which pkg-config
+              pkg-config --version
+              pkg-config --modversion libavformat
+              pkg-config --modversion libavcodec
+              pkg-config --modversion libavutil
+              pkg-config --modversion libswscale
+              echo "=========================="
+
               cmake --fresh -S . -B build -G Ninja \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DQt6_DIR=\$Qt6_DIR \
