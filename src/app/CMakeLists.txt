@@ -415,9 +415,22 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
 
 if(FLUVEL_USE_FFMPEG)
 
-    target_link_libraries(${APP_TARGET_NAME} PRIVATE
-        PkgConfig::FFMPEG
-    )
+    if(WIN32)
+        target_link_libraries(${APP_TARGET_NAME} PRIVATE
+            ffmpeg::ffmpeg
+        )
+    else()
+        target_link_libraries(${APP_TARGET_NAME} PRIVATE
+            PkgConfig::FFMPEG
+        )
+
+        target_link_libraries(${APP_TARGET_NAME} PRIVATE
+            ${AVFORMAT_LIBRARIES}
+            ${AVCODEC_LIBRARIES}
+            ${AVUTIL_LIBRARIES}
+            ${SWSCALE_LIBRARIES}
+        )
+    endif()
 
 endif()
 
@@ -443,17 +456,6 @@ target_link_libraries(${APP_TARGET_NAME} PRIVATE
     ${APP_QT_LIBS}
     fluvel::image_processing
 )
-
-if(FLUVEL_USE_FFMPEG)
-
-    target_link_libraries(${APP_TARGET_NAME} PRIVATE
-        ${AVFORMAT_LIBRARIES}
-        ${AVCODEC_LIBRARIES}
-        ${AVUTIL_LIBRARIES}
-        ${SWSCALE_LIBRARIES}
-    )
-
-endif()
 
 include(${FLUVEL_ROOT_DIR}/cmake/fluvel_compile_definitions.cmake)
 include(${FLUVEL_ROOT_DIR}/cmake/fluvel_build_info.cmake)

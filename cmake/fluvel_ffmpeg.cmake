@@ -7,19 +7,32 @@ endif()
 
 set(FLUVEL_USE_FFMPEG OFF)
 
-find_package(PkgConfig QUIET)
+if(WIN32)
+    find_package(ffmpeg CONFIG QUIET)
 
-if(PkgConfig_FOUND)
-
-    pkg_check_modules(FFMPEG QUIET IMPORTED_TARGET
-        libavformat
-        libavcodec
-        libavutil
-        libswscale
-    )
-
-    if(FFMPEG_FOUND)
+    if(ffmpeg_FOUND)
         set(FLUVEL_USE_FFMPEG ON)
+        set(FLUVEL_FFMPEG_TARGET ffmpeg::ffmpeg)
+    endif()
+endif()
+
+if(NOT FLUVEL_USE_FFMPEG)
+
+    find_package(PkgConfig QUIET)
+
+    if(PkgConfig_FOUND)
+
+        pkg_check_modules(FFMPEG QUIET IMPORTED_TARGET
+            libavformat
+            libavcodec
+            libavutil
+            libswscale
+        )
+
+        if(FFMPEG_FOUND)
+            set(FLUVEL_USE_FFMPEG ON)
+        endif()
+
     endif()
 
 endif()
