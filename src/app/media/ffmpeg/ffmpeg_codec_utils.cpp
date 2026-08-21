@@ -150,18 +150,26 @@ QList<CodecInfo> FFmpegCodecUtils::detectAvailableCodecs()
 
             const AVPixelFormat* pixelFormats = encoderPixelFormats(encoder);
 
-            if (pixelFormats == nullptr)
-                continue;
-
             bool usable = false;
 
-            for (const AVPixelFormat* fmt = pixelFormats; *fmt != AV_PIX_FMT_NONE; ++fmt)
+            if (pixelFormats != nullptr)
             {
-                if (isEncoderUsable(encoder, entry.codecId, *fmt))
+                for (const AVPixelFormat* fmt = pixelFormats; *fmt != AV_PIX_FMT_NONE; ++fmt)
                 {
-                    usable = true;
-                    break;
+                    if (isEncoderUsable(encoder, entry.codecId, *fmt))
+                    {
+                        usable = true;
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                //
+                // FFmpeg does not report an explicit pixel-format restriction.
+                // Validate the encoder with a reasonable default format.
+                //
+                usable = isEncoderUsable(encoder, entry.codecId, AV_PIX_FMT_YUV420P);
             }
 
             if (!usable)
@@ -223,7 +231,7 @@ bool FFmpegCodecUtils::supportsPixelFormat(const AVCodec* encoder, AVPixelFormat
     const AVPixelFormat* pixelFormats = encoderPixelFormats(encoder);
 
     if (pixelFormats == nullptr)
-        return false;
+        return true;
 
     for (const AVPixelFormat* fmt = pixelFormats; *fmt != AV_PIX_FMT_NONE; ++fmt)
     {
