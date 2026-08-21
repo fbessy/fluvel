@@ -133,14 +133,16 @@ void AnimatedIcon::drawIcon(QPainter& painter, const QPointF& center, const QSiz
         painter.scale(sx, 1.0);
     }
 
-    // scale indépendant de l'effet Flip
     painter.scale(scale, scale);
 
     painter.setOpacity(finalOpacity);
 
     painter.translate(offsetX, 0.0);
 
-    painter.translate(-pixmap.width() / 2.0, -pixmap.height() / 2.0);
+    const qreal dpr = pixmap.devicePixelRatio();
+    const QSizeF logicalSize = dpr > 0.0 ? QSizeF(pixmap.size()) / dpr : QSizeF(pixmap.size());
+
+    painter.translate(-logicalSize.width() / 2.0, -logicalSize.height() / 2.0);
 
     painter.drawPixmap(QPointF(), pixmap);
 
