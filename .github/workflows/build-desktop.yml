@@ -15,7 +15,7 @@ jobs:
   # WINDOWS BUILD
   # =========================
   windows:
-    runs-on: windows-2025-vs2026
+    runs-on: windows-2022
 
     steps:
       - uses: actions/checkout@v4
