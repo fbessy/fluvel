@@ -4,6 +4,7 @@
 #include "capture_controls_widget.hpp"
 #include "animated_push_button.hpp"
 #include "capture_controller.hpp"
+#include "ffmpeg_codec_utils.hpp"
 #include "icon_loader.hpp"
 
 #include <QHBoxLayout>
@@ -30,19 +31,22 @@ CaptureControlsWidget::CaptureControlsWidget(QWidget* parent)
 
 #ifdef FLUVEL_USE_FFMPEG
 
-    recordingButton_ = new AnimatedPushButton(this);
-    recordingButton_->setCheckable(true);
-    recordingButton_->setEnabled(false);
+    if (hasRecordingSupport())
+    {
+        recordingButton_ = new AnimatedPushButton(this);
+        recordingButton_->setCheckable(true);
+        recordingButton_->setEnabled(false);
 
-    const QColor redRecording = QColor::fromRgb(0xFF453A);
+        const QColor redRecording = QColor::fromRgb(0xFF453A);
 
-    stoppedIcon_ = il::createDisk(palette().color(QPalette::WindowText));
-    recordingIcon_ = il::createSquare(redRecording);
-    drainingIcon_ = il::createSmallSquare(redRecording);
+        stoppedIcon_ = il::createDisk(palette().color(QPalette::WindowText));
+        recordingIcon_ = il::createSquare(redRecording);
+        drainingIcon_ = il::createSmallSquare(redRecording);
 
-    recordingButton_->setIcon(stoppedIcon_);
+        recordingButton_->setIcon(stoppedIcon_);
 
-    layout->insertWidget(0, recordingButton_);
+        layout->insertWidget(0, recordingButton_);
+    }
 
 #endif
 
@@ -57,8 +61,11 @@ CaptureControlsWidget::CaptureControlsWidget(QWidget* parent)
 
 #ifdef FLUVEL_USE_FFMPEG
 
-    connect(recordingButton_, &QPushButton::clicked, this,
-            &CaptureControlsWidget::onToggleRecording);
+    if (recordingButton_ != nullptr)
+    {
+        connect(recordingButton_, &QPushButton::clicked, this,
+                &CaptureControlsWidget::onToggleRecording);
+    }
 
 #endif
 }
@@ -124,8 +131,16 @@ void CaptureControlsWidget::updateSnapshotButton()
 
 #ifdef FLUVEL_USE_FFMPEG
 
+bool CaptureControlsWidget::hasRecordingSupport() const
+{
+    return !FFmpegCodecUtils::availableCodecs().isEmpty();
+}
+
 void CaptureControlsWidget::updateRecordingButton()
 {
+    if (recordingButton_ == nullptr)
+        return;
+
     recordingButton_->setEnabled(controller_ != nullptr && controller_->isStreaming());
 }
 
@@ -135,6 +150,9 @@ void CaptureControlsWidget::updateRecordingButton()
 
 void CaptureControlsWidget::onRecordingStateChanged(RecorderState state)
 {
+    if (recordingButton_ == nullptr)
+        return;
+
     switch (state)
     {
         case RecorderState::Stopped:

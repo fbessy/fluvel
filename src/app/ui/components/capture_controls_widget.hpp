@@ -87,6 +87,13 @@ private:
 #ifdef FLUVEL_USE_FFMPEG
 
     /**
+     * @brief Returns whether video recording is available.
+     *
+     * @return True if at least one usable video encoder is available.
+     */
+    bool hasRecordingSupport() const;
+
+    /**
      * @brief Updates the recording button state.
      */
     void updateRecordingButton();
