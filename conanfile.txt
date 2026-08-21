@@ -1,6 +1,25 @@
 [requires]
 ffmpeg/7.1.3
 
+[options]
+ffmpeg/*:shared=False
+ffmpeg/*:with_programs=False
+
+ffmpeg/*:with_libx264=True
+ffmpeg/*:with_libx265=True
+ffmpeg/*:with_libvpx=True
+ffmpeg/*:with_libaom=True
+
+ffmpeg/*:with_libsvtav1=False
+ffmpeg/*:with_libdav1d=False
+ffmpeg/*:with_openh264=False
+ffmpeg/*:with_libfdk_aac=False
+ffmpeg/*:with_libmp3lame=False
+ffmpeg/*:with_libopus=False
+ffmpeg/*:with_libvorbis=False
+ffmpeg/*:with_libwebp=False
+ffmpeg/*:with_openjpeg=False
+
 [generators]
 CMakeDeps
 CMakeToolchain
