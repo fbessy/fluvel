@@ -63,7 +63,8 @@ jobs:
         shell: pwsh
         run: |
           conan install . `
-            --profile:host=windows-msvc `
+            --profile:host=.github/conan/windows-msvc `
+            --profile:build=.github/conan/windows-msvc `
             --output-folder=build/conan `
             --build=missing `
             -s build_type=Release
