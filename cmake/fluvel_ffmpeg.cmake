@@ -13,21 +13,11 @@ if(WIN32)
     if(ffmpeg_FOUND)
         set(FLUVEL_USE_FFMPEG ON)
 
-        foreach(target
-            ffmpeg::ffmpeg
-            ffmpeg::avcodec
+        set(FLUVEL_FFMPEG_TARGET
             ffmpeg::avformat
+            ffmpeg::avcodec
             ffmpeg::avutil
-            ffmpeg::swscale
-        )
-            if(TARGET ${target})
-                message(STATUS "FFmpeg CMake target FOUND: ${target}")
-            else()
-                message(STATUS "FFmpeg CMake target NOT FOUND: ${target}")
-            endif()
-        endforeach()
-
-        set(FLUVEL_FFMPEG_TARGET ffmpeg::ffmpeg)
+            ffmpeg::swscale)
     endif()
 endif()
 
