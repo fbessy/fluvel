@@ -139,8 +139,7 @@ void VideoWindow::createUi()
 
     sourceTypeLabel_ = new QLabel(tr("Source: "));
 
-    QIcon cameraIcon =
-        il::loadIcon(QIcon::ThemeIcon::CameraVideo, ":/icons/actions/camera-video-symbolic.svg");
+    QIcon cameraIcon = il::loadIcon(":/icons/actions/camera-video-symbolic.svg");
 
     QIcon videoIcon = il::loadIcon("video-x-generic-symbolic", ":/icons/file/video-symbolic.svg");
 
@@ -419,15 +418,7 @@ void VideoWindow::createUi()
 
 QIcon VideoWindow::createActiveFormatIcon()
 {
-    QIcon icon;
-
-#ifndef FLUVEL_PLATFORM_LINUX
-    icon = il::loadIcon("emblem-default", ":/icons/actions/check-symbolic.svg");
-#else
-    icon = il::loadIcon(":/icons/status/check-symbolic.svg");
-#endif
-
-    return icon;
+    return il::loadIcon(":/icons/status/check-symbolic.svg");
 }
 
 void VideoWindow::setupView()
