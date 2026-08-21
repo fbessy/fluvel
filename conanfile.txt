@@ -11,7 +11,7 @@ ffmpeg/*:postproc=True
 ffmpeg/*:swresample=True
 ffmpeg/*:swscale=True
 
-ffmpeg/*:shared=True
+ffmpeg/*:shared=False
 ffmpeg/*:with_asm=True
 ffmpeg/*:with_bzip2=True
 ffmpeg/*:with_fontconfig=False

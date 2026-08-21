@@ -73,7 +73,7 @@ jobs:
             --profile:host=.github/conan/windows-msvc `
             --profile:build=.github/conan/windows-msvc `
             --output-folder=build/conan `
-            --build=missing `
+            --build=never `
             -s build_type=Release
 
       - name: Inspect Conan CMake configuration
