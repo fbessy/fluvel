@@ -415,22 +415,15 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
 
 if(FLUVEL_USE_FFMPEG)
 
-    if(WIN32)
-        target_link_libraries(${APP_TARGET_NAME} PRIVATE
-            ffmpeg::ffmpeg
-        )
-    else()
-        target_link_libraries(${APP_TARGET_NAME} PRIVATE
-            PkgConfig::FFMPEG
-        )
-
-        target_link_libraries(${APP_TARGET_NAME} PRIVATE
-            ${AVFORMAT_LIBRARIES}
-            ${AVCODEC_LIBRARIES}
-            ${AVUTIL_LIBRARIES}
-            ${SWSCALE_LIBRARIES}
-        )
-    endif()
+        if(WIN32)
+            target_link_libraries(${APP_TARGET_NAME} PRIVATE
+                ${FLUVEL_FFMPEG_TARGET}
+            )
+        else()
+            target_link_libraries(${APP_TARGET_NAME} PRIVATE
+                PkgConfig::FFMPEG
+            )
+        endif()
 
 endif()
 
