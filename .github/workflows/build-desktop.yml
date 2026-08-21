@@ -20,6 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Inspect MSVC toolsets
+        shell: pwsh
+        run: |
+          Get-ChildItem `
+            "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC" |
+            Select-Object Name
+
       # Clean (important)
       - name: Clean
         shell: pwsh
