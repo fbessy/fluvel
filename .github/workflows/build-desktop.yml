@@ -65,7 +65,7 @@ jobs:
           conan profile detect --force
           conan install . `
             --output-folder=build/conan `
-            --build=missing `
+            --build=never `
             -s build_type=Release
 
       - name: Inspect Conan CMake configuration
