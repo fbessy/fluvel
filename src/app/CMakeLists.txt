@@ -417,7 +417,7 @@ if(FLUVEL_USE_FFMPEG)
 
         if(WIN32)
             target_link_libraries(${APP_TARGET_NAME} PRIVATE
-                ${FLUVEL_FFMPEG_TARGET}
+                ffmpeg::ffmpeg
             )
         else()
             target_link_libraries(${APP_TARGET_NAME} PRIVATE

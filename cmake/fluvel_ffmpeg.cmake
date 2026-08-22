@@ -12,12 +12,6 @@ if(WIN32)
 
     if(ffmpeg_FOUND)
         set(FLUVEL_USE_FFMPEG ON)
-
-        set(FLUVEL_FFMPEG_TARGET
-            ffmpeg::avformat
-            ffmpeg::avcodec
-            ffmpeg::avutil
-            ffmpeg::swscale)
     endif()
 endif()
 
