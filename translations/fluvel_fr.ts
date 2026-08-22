@@ -68,27 +68,27 @@ R : %3  G : %4  B : %5</translation>
         <translation>Aucun</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="23"/>
+        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="25"/>
         <source>Recorded: %1</source>
         <translation>Enregistré : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="36"/>
+        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="38"/>
         <source>Finalizing... Writing remaining %1</source>
         <translation>Finalisation… Écriture des %1 restants</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="49"/>
+        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="51"/>
         <source> · %1 MiB RAM</source>
         <translation> · %1 MiB RAM</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="53"/>
+        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="55"/>
         <source> + %1 MiB temporary</source>
         <translation>+ %1 MiB de stockage temporaire</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="65"/>
+        <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="67"/>
         <source> · Discarded frames: %1% (%2)</source>
         <translation>Images ignorées : %1 % (%2)</translation>
     </message>
@@ -668,35 +668,35 @@ ou cliquez sur Ouvrir...</translation>
 <context>
     <name>fluvel::CaptureController</name>
     <message>
-        <location filename="../src/app/core/capture_controller.cpp" line="130"/>
+        <location filename="../src/app/core/capture_controller.cpp" line="142"/>
         <source>No frame available.</source>
         <translation>Aucune image disponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/capture_controller.cpp" line="142"/>
-        <source>Failed to save snapshot: %1</source>
-        <translation>Impossible d&apos;enregistrer la capture d&apos;écran : %1</translation>
+        <location filename="../src/app/core/capture_controller.cpp" line="148"/>
+        <source>Snapshot queue is full.</source>
+        <translation>La file d&apos;attente des captures est pleine.</translation>
     </message>
 </context>
 <context>
     <name>fluvel::CaptureControlsWidget</name>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="27"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="28"/>
         <source>Take snapshot</source>
         <translation>Prendre une capture d&apos;écran</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="143"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="161"/>
         <source>Start video recording.</source>
         <translation>Démarrer l’enregistrement vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="149"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="167"/>
         <source>Stop video recording.</source>
         <translation>Arrêter l’enregistrement vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="155"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="173"/>
         <source>Finalizing video recording...</source>
         <translation>Finalisation de l’enregistrement vidéo…</translation>
     </message>
@@ -926,27 +926,27 @@ ou cliquez sur Ouvrir...</translation>
 <context>
     <name>fluvel::ImageViewerWidget</name>
     <message>
-        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="438"/>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="447"/>
         <source>Auto Fit</source>
         <translation>Ajustement automatique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1030"/>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1039"/>
         <source>Mirror On</source>
         <translation>Miroir activé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1030"/>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1039"/>
         <source>Mirror Off</source>
         <translation>Miroir désactivé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1035"/>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1044"/>
         <source>Smooth Display On</source>
         <translation>Affichage lissé activé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1036"/>
+        <location filename="../src/app/ui/components/image_viewer_widget.cpp" line="1045"/>
         <source>Smooth Display Off</source>
         <translation>Affichage lissé désactivé</translation>
     </message>
@@ -954,59 +954,59 @@ ou cliquez sur Ouvrir...</translation>
 <context>
     <name>fluvel::ImageWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="98"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="142"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1005"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="108"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1062"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="99"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1007"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="109"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1064"/>
         <source>Run the active contour.</source>
         <translation>Lancer le contour actif.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="102"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="142"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1022"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="112"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1079"/>
         <source>Resume</source>
         <translation>Reprendre</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="106"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1024"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="116"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1081"/>
         <source>Resume the active contour execution.</source>
         <translation>Reprendre l’exécution du contour actif.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="109"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="142"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1031"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="119"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1088"/>
         <source>Step</source>
         <translation>Étape</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="110"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1033"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="120"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1090"/>
         <source>Advance the active contour by one iteration.</source>
         <translation>Avancer le contour actif d’une itération.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="121"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="142"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1039"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="131"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1096"/>
         <source>Converge</source>
         <translation>Convergence</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="122"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1042"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="132"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1099"/>
         <source>Run until completion without displaying intermediate steps.</source>
         <translation>Aller jusqu’à la fin sans afficher les étapes intermédiaires.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="188"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="202"/>
         <source>Drop an image here
 
 or choose File → Open</source>
@@ -1015,179 +1015,179 @@ or choose File → Open</source>
 ou choisissez Fichier → Ouvrir</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="249"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="270"/>
         <source>&amp;Image</source>
         <translation>&amp;Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="250"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="271"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="258"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="279"/>
         <source>Switch to the image session.</source>
         <translation>Basculer vers la session image.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="272"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="293"/>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="280"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="301"/>
         <source>&amp;Open...</source>
         <translation>&amp;Ouvrir...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="297"/>
-        <source>&amp;Save...</source>
-        <translation>&amp;Enregistrer...</translation>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1183"/>
+        <source>Recording warning</source>
+        <translation>Avertissement d’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="300"/>
-        <source>Save the displayed image.</source>
-        <translation>Enregistrer l’image affichée.</translation>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1188"/>
+        <source>Recording error</source>
+        <translation>Erreur d’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="318"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1193"/>
+        <source>Recording to: %1</source>
+        <translation>Enregistrement vers : %1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1201"/>
+        <source>Recording saved: %1</source>
+        <translation>Enregistrement sauvegardé : %1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1224"/>
+        <source>Snapshot saved: %1</source>
+        <translation>Capture d&apos;écran sauvegardée : %1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="329"/>
         <source>&amp;Analysis</source>
         <translation>&amp;Analyse</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="319"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="330"/>
         <source>Compute the Hausdorff distance.</source>
         <translation>Calculer la distance de Hausdorff.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="320"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="331"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="325"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="336"/>
         <source>&amp;About</source>
         <translation>&amp;À propos</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="770"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="866"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="283"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="304"/>
         <source>Supported image formats: %1</source>
         <translation>Formats d’image pris en charge : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="260"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="281"/>
         <source>&amp;Video</source>
         <translation>&amp;Vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="262"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="283"/>
         <source>Ctrl+V</source>
         <translation>Ctrl+V</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="270"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="291"/>
         <source>Open a video session.</source>
         <translation>Ouvrir une session vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="290"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="311"/>
         <source>Clear recent files</source>
         <translation>Effacer les fichiers récents</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="326"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="337"/>
         <source>Application information, license and home page.</source>
         <translation>Informations sur l’application, licence et page d’accueil.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="336"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="347"/>
         <source>&amp;Session</source>
         <translation>&amp;Session</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="342"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="353"/>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="357"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="364"/>
         <source>&amp;Segmentation</source>
         <translation>&amp;Segmentation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="360"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="367"/>
         <source>&amp;Help</source>
         <translation>Ai&amp;de</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="559"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="659"/>
         <source>Open Image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="676"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="774"/>
         <source>&amp;%1</source>
         <translation>&amp;%1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="874"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="931"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="747"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="845"/>
         <source>Opened image: %1</source>
         <translation>Image ouverte : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="794"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="890"/>
         <source>Gray</source>
         <translation>Niveaux de gris</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="817"/>
-        <source>displayed</source>
-        <translation>affichee</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="822"/>
-        <source>Save displayed image</source>
-        <translation>Enregistrer l’image affichée</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="842"/>
-        <source>Failed to save image: %1</source>
-        <translation>Impossible de sauvegarder l’image : %1</translation>
-    </message>
-    <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="142"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="999"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1056"/>
         <source>Restart</source>
         <translation>Redémarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1001"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1058"/>
         <source>Restart the active contour from its initial state.</source>
         <translation>Redémarrer le contour actif depuis son état initial.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="142"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1016"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1073"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1018"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1075"/>
         <source>Suspend execution and display the current state.</source>
         <translation>Mettre en pause et afficher l’état actuel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="867"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="924"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
@@ -1703,6 +1703,14 @@ ou choisissez Fichier → Ouvrir</translation>
     </message>
 </context>
 <context>
+    <name>fluvel::SnapshotWorker</name>
+    <message>
+        <location filename="../src/app/core/snapshot_worker.cpp" line="82"/>
+        <source>Failed to save snapshot: %1</source>
+        <translation>Impossible d&apos;enregistrer la capture d&apos;écran : %1</translation>
+    </message>
+</context>
+<context>
     <name>fluvel::VideoController</name>
     <message>
         <location filename="../src/app/core/video_controller.cpp" line="203"/>
@@ -1783,52 +1791,52 @@ Contour : %7 pts</translation>
 <context>
     <name>fluvel::VideoWindow</name>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="156"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="159"/>
         <source>Device: </source>
         <translation>Périphérique : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="177"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="180"/>
         <source>Format: </source>
         <translation>Format : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="294"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="297"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="136"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="140"/>
         <source>Source: </source>
         <translation>Source : </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="146"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="149"/>
         <source>File / URL</source>
         <translation>Fichier / URL</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="147"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="150"/>
         <source>Select a camera, video file, or network stream.</source>
         <translation>Sélectionnez une caméra, un fichier vidéo ou un flux réseau.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="183"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="186"/>
         <source>Camera resolution, frame rate and pixel format.</source>
         <translation>Résolution, fréquence d&apos;images et format de pixels de la caméra.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="204"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="207"/>
         <source>Open...</source>
         <translation>Ouvrir...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="206"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="209"/>
         <source>Select a local video file.</source>
         <translation>Sélectionnez un fichier vidéo local.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="223"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="226"/>
         <source>Media URL examples:
 
 HTTP video:
@@ -1859,12 +1867,12 @@ https://192.168.1.110:8080/video
 rtsp://192.168.1.110:1935/live</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="295"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="298"/>
         <source>Restart the active source using the selected configuration.</source>
         <translation>Redémarrer la source active avec la configuration sélectionnée.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="447"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="442"/>
         <source>Drop a video here
 
 or click Open...</source>
@@ -1873,33 +1881,33 @@ or click Open...</source>
 ou cliquez sur Ouvrir...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1214"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1230"/>
         <source>Recommended format</source>
         <translation>Format recommandé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1413"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1405"/>
         <source>Started</source>
         <translation>Démarré</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1418"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1410"/>
         <source>Camera started: %1</source>
         <translation>Caméra démarrée : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1427"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1419"/>
         <source>Opened video: %1</source>
         <translation>Vidéo ouverte : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1514"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1506"/>
         <source>Stopped</source>
         <translation>Arrêté</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1528"/>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1550"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1520"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1542"/>
         <source>Source: %1
 
 %2</source>
@@ -1908,143 +1916,143 @@ ou cliquez sur Ouvrir...</translation>
 %2</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1530"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1522"/>
         <source>Camera error</source>
         <translation>Erreur de caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1552"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1544"/>
         <source>Media error</source>
         <translation>Erreur multimédia</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2474"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2490"/>
         <source>Recording saved: %1</source>
         <translation>Enregistrement sauvegardé : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2491"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2523"/>
         <source>Snapshot saved: %1</source>
         <translation>Capture d&apos;écran sauvegardée : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2466"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2482"/>
         <source>Recording to: %1</source>
         <translation>Enregistrement vers : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2479"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2495"/>
         <source>Recording warning</source>
         <translation>Avertissement d’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2484"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2500"/>
         <source>Recording error</source>
         <translation>Erreur d’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1663"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1655"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1664"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1656"/>
         <source>Start selected source.</source>
         <translation>Démarrer la source sélectionnée.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1675"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1667"/>
         <source>Stop active source.</source>
         <translation>Arrêter la source active.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2154"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2146"/>
         <source>Volume: %1%</source>
         <translation>Volume : %1 %</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2390"/>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2415"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2382"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2407"/>
         <source>Volume %1%</source>
         <translation>Volume : %1 %</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2430"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2422"/>
         <source>Muted</source>
         <translation>Son coupé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2430"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2422"/>
         <source>Unmuted</source>
         <translation>Son réactivé</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2442"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2434"/>
         <source>Play</source>
         <translation>Lecture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="2446"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="2438"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1478"/>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1914"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1470"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1906"/>
         <source>Video</source>
         <translation>Vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1586"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1578"/>
         <source>Source startup failed</source>
         <translation>Échec du démarrage de la source</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1587"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1579"/>
         <source>The source did not produce a valid frame within %1 seconds.
 The source may be unavailable or not responding.</source>
         <translation>La source n’a produit aucune image valide dans un délai de %1 secondes.
 La source est peut-être indisponible ou ne répond pas.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1604"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1596"/>
         <source>Source stream lost</source>
         <translation>Flux de la source perdu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1605"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1597"/>
         <source>No valid frame was received for %1 seconds.
 The source stream may have stalled or become unavailable.</source>
         <translation>Aucune image valide n’a été reçue depuis %1 secondes.
 Le flux de la source est peut-être bloqué ou devenu indisponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1929"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1921"/>
         <source>Open Video File</source>
         <translation>Ouvrir un fichier vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1982"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1974"/>
         <source>Clear source history</source>
         <translation>Effacer l&apos;historique des sources</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1674"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1666"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1684"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1676"/>
         <source>Starting...</source>
         <translation>Démarrage…</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="1685"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="1677"/>
         <source>Camera startup in progress.</source>
         <translation>Démarrage de la caméra en cours.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/video_window.cpp" line="145"/>
+        <location filename="../src/app/ui/windows/video_window.cpp" line="148"/>
         <source>Camera</source>
         <translation>Caméra</translation>
     </message>
