@@ -33,6 +33,7 @@ Execution
 
 .. doxygenfile:: video_recorder_worker.hpp
 
+.. doxygenfile:: snapshot_worker.hpp
 
 
 Configuration
