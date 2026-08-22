@@ -37,6 +37,12 @@ CaptureController::CaptureController(QObject* parent)
             });
 
 #endif
+
+    connect(&snapshotWorker_, &SnapshotWorker::snapshotSaved, this,
+            &CaptureController::snapshotSaved);
+
+    connect(&snapshotWorker_, &SnapshotWorker::snapshotError, this,
+            &CaptureController::snapshotError);
 }
 
 void CaptureController::submitFrame(const fluvel::VideoFrame& frame)
@@ -137,19 +143,10 @@ void CaptureController::saveSnapshot(const QImage& image)
         return;
     }
 
-    const auto& preferences = ApplicationSettings::instance().snapshotPreferences();
-
-    const QString fileName = file_utils::buildOutputFileName(
-        preferences.directory, preferences.baseName,
-        QString::fromLatin1(preferences.preferredFormat), preferences.appendTimestamp);
-
-    if (!image.save(fileName, preferences.preferredFormat.constData()))
+    if (!snapshotWorker_.enqueue(image))
     {
-        emit snapshotError(tr("Failed to save snapshot: %1").arg(fileName));
-        return;
+        emit snapshotError(tr("Snapshot queue is full."));
     }
-
-    emit snapshotSaved(fileName);
 }
 
 } // namespace fluvel

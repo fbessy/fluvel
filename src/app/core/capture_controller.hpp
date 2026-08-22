@@ -4,6 +4,7 @@
 #pragma once
 
 #include "frame_pipeline.hpp"
+#include "snapshot_worker.hpp"
 
 #ifdef FLUVEL_USE_FFMPEG
 #include "video_export_settings.hpp"
@@ -195,6 +196,8 @@ private:
 #endif
 
     bool streaming_{false};
+
+    SnapshotWorker snapshotWorker_;
 };
 
 } // namespace fluvel
