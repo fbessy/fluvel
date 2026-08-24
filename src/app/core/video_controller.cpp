@@ -20,7 +20,6 @@
 #include <QVideoSink>
 #include <QtNumeric>
 
-#include <cassert>
 #include <utility>
 
 namespace fluvel
@@ -252,7 +251,7 @@ void VideoController::stop()
     if (state_ == StreamingState::Stopped)
         return;
 
-    resetWatchdog();
+    watchdog_.reset();
 
     startupTimer_.stop();
     watchdogTimer_.stop();
@@ -299,9 +298,7 @@ void VideoController::onFrameReceived(const QVideoFrame& frame)
 
     const int64_t now = FrameClock::nowNs();
 
-    lastValidFrameTsNs_ = now;
-
-    tryArmWatchdog();
+    watchdog_.frameReceived(now);
 
     if (state_ == StreamingState::Starting)
     {
@@ -369,56 +366,21 @@ void VideoController::onStartupTimeout()
     emit startupTimeout(startupInfo_, static_cast<double>(kStartupTimeoutMs) / 1000.0);
 }
 
-void VideoController::resetWatchdog()
-{
-    watchdogArmed_ = false;
-    watchdogStabilizing_ = false;
-    watchdogStableSinceNs_ = 0;
-    stableFrameCount_ = 0;
-}
-
-void VideoController::armWatchdog()
-{
-    watchdogArmed_ = true;
-    watchdogStabilizing_ = false;
-    watchdogStableSinceNs_ = 0;
-    stableFrameCount_ = 0;
-}
-
-void VideoController::tryArmWatchdog()
-{
-    if (watchdogArmed_)
-        return;
-
-    ++stableFrameCount_;
-
-    if (!watchdogStabilizing_)
-    {
-        watchdogStabilizing_ = true;
-        watchdogStableSinceNs_ = lastValidFrameTsNs_;
-    }
-    else if (stableFrameCount_ >= kWatchdogMinFrames &&
-             lastValidFrameTsNs_ - watchdogStableSinceNs_ >= kWatchdogStabilizationNs)
-    {
-        armWatchdog();
-    }
-}
-
 void VideoController::checkWatchdog()
 {
-    assert(!(watchdogArmed_ && watchdogStabilizing_));
-
-    if (!watchdogArmed_)
+    if (!watchdog_.isArmed())
         return;
 
-    const int64_t frameAgeNs = FrameClock::nowNs() - lastValidFrameTsNs_;
+    const int64_t now = FrameClock::nowNs();
 
-    if (frameAgeNs > kStreamLossTimeoutNs)
-    {
-        stop();
+    if (!watchdog_.hasTimedOut(now))
+        return;
 
-        emit streamingLost(streamingInfo_, static_cast<double>(frameAgeNs) / 1e9);
-    }
+    const int64_t frameAgeNs = watchdog_.frameAgeNs(now);
+
+    stop();
+
+    emit streamingLost(streamingInfo_, static_cast<double>(frameAgeNs) / 1e9);
 }
 
 void VideoController::updateDiagnostics()
@@ -571,7 +533,7 @@ void VideoController::seek(qint64 positionMs)
 
     positionMs = std::clamp(positionMs, 0LL, durationMs());
 
-    resetWatchdog();
+    watchdog_.reset();
 
     mediaPlayer_.setPosition(positionMs);
 }
@@ -657,7 +619,7 @@ void VideoController::pause()
     if (!isMediaActive())
         return;
 
-    resetWatchdog();
+    watchdog_.reset();
 
     mediaPlayer_.pause();
 }

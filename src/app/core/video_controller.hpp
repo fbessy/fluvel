@@ -9,8 +9,8 @@
 
 #include "frame_pipeline.hpp"
 #include "frame_stats_collector.hpp"
+#include "stream_watchdog.hpp"
 #include "video_processing_thread.hpp"
-
 #include "video_types.hpp"
 
 #include <QAudioOutput>
@@ -420,34 +420,6 @@ private:
      */
     void onMetaDataChanged();
 
-    /**
-     * @brief Reset the watchdog state.
-     *
-     * Disarms the watchdog and clears any pending
-     * stabilization state.
-     */
-    void resetWatchdog();
-
-    /**
-     * @brief Arm the watchdog.
-     *
-     * Enables stream-loss detection and clears the
-     * stabilization state.
-     */
-    void armWatchdog();
-
-    /**
-     * @brief Attempt to arm the watchdog.
-     *
-     * The watchdog becomes active only after a stable
-     * stream has been observed for a minimum duration
-     * and number of valid frames.
-     *
-     * This function should be called whenever a valid
-     * video frame is received.
-     */
-    void tryArmWatchdog();
-
     /// Periodic watchdog to detect stream loss.
     void checkWatchdog();
 
@@ -515,17 +487,14 @@ private:
     /// Frame statistics and diagnostics view.
     FrameStatsCollector frameStats_{};
 
+    /// Monitors the continuity of the active video stream.
+    StreamWatchdog watchdog_;
+
     // --- Timing configuration ---
 
     static constexpr int kStartupTimeoutMs{7'000};                // 7 sec
-    static constexpr int64_t kStreamLossTimeoutNs{2'000'000'000}; // 2 sec
     static constexpr int kWatchdogPeriodMs{200};                  // 0.2 sec
     static constexpr int kDiagnosticsPeriodMs{500};               // 0.5 sec
-
-    // --- Watchdog stabilization policy ---
-
-    static constexpr int64_t kWatchdogStabilizationNs{500'000'000};
-    static constexpr int kWatchdogMinFrames{5};
 
     /// Timer used to detect startup timeout.
     QTimer startupTimer_;
@@ -548,26 +517,9 @@ private:
     /// Information about the currently loaded media.
     MediaInfo mediaInfo_{};
 
-    //! Monotonic timestamp (ns) of the last valid frame, used for stream loss detection.
-    int64_t lastValidFrameTsNs_{0};
-
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     int testFrameCounter_{0};
 #endif
-
-    /// Whether stream-loss detection is currently enabled.
-    /// Mutually exclusive with watchdogStabilizing_.
-    bool watchdogArmed_{false};
-
-    /// Whether the watchdog is waiting for a stable stream
-    /// before being armed.
-    bool watchdogStabilizing_{false};
-
-    /// Timestamp of the first valid frame of the stabilization period.
-    int64_t watchdogStableSinceNs_{0};
-
-    /// Number of valid frames received during stabilization.
-    int stableFrameCount_{0};
 
 #ifdef FLUVEL_USE_FFMPEG
     /// Video export settings used for the current recording session.
