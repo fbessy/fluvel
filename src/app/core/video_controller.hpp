@@ -7,8 +7,10 @@
 #include "application_settings_types.hpp"
 #endif
 
+#include "camera_video_source.hpp"
 #include "frame_pipeline.hpp"
 #include "frame_stats_collector.hpp"
+#include "media_video_source.hpp"
 #include "stream_watchdog.hpp"
 #include "video_processing_thread.hpp"
 #include "video_types.hpp"
@@ -16,7 +18,7 @@
 #include <QAudioOutput>
 #include <QByteArray>
 #include <QCamera>
-#include <QMediaCaptureSession>
+#include <QCameraFormat>
 #include <QMediaPlayer>
 #include <QObject>
 #include <QTimer>
@@ -393,7 +395,7 @@ private:
     /// Handle camera error callback.
     void onCameraError(QCamera::Error error, const QString& errorString);
 
-    /// Handle media player error callback.
+    /// Handles media source errors.
     void onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString);
 
     /// Called when a new video frame is received from the active source.
@@ -409,27 +411,17 @@ private:
     void onStartupTimeout();
 
     /**
-     * @brief Handle media player status changes.
+     * @brief Handles media source status changes.
      *
      * @param status New media status.
      */
     void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
-
-    /**
-     * @brief Handle media metadata updates.
-     */
-    void onMetaDataChanged();
 
     /// Periodic watchdog to detect stream loss.
     void checkWatchdog();
 
     /// Update internal diagnostics.
     void updateDiagnostics();
-
-    /**
-     * @brief Refresh media information from the active source.
-     */
-    void updateMediaInfo();
 
 #ifdef FLUVEL_USE_FFMPEG
 
@@ -455,28 +447,13 @@ private:
 
 #endif
 
-    /**
-     * @brief Determine whether a media title is suitable for display.
-     *
-     * Filters out empty or non-informative titles returned by multimedia
-     * backends.
-     *
-     * @param title Media title to evaluate.
-     * @return True if the title is considered useful.
-     */
-    static bool isUsefulMediaTitle(const QString& title);
-
     /// Whether to use an optimized camera format when available.
     bool useOptimizedFormat_{true};
 
-    /// Qt camera object.
-    QCamera* camera_{nullptr};
+    CameraVideoSource cameraSource_;
 
-    /// Qt capture session.
-    QMediaCaptureSession captureSession_;
-
-    QMediaPlayer mediaPlayer_;
     QAudioOutput audioOutput_;
+    MediaVideoSource mediaSource_;
 
     /// Video sink receiving frames.
     QVideoSink videoSink_;
@@ -513,9 +490,6 @@ private:
 
     /// Runtime information about the active stream.
     StreamingInfo streamingInfo_{};
-
-    /// Information about the currently loaded media.
-    MediaInfo mediaInfo_{};
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     int testFrameCounter_{0};

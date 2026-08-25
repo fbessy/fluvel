@@ -21,7 +21,7 @@ namespace fluvel
  * CameraVideoSource encapsulates the Qt Multimedia camera backend used to
  * configure, start and stop a camera source.
  *
- * The class owns the camera instance and its capture session, while the
+ * The class owns the camera instance and the capture session, while the
  * video sink is supplied by the caller and is not owned by this class.
  *
  * Camera-specific errors are reported through the error() signal. The caller
@@ -103,6 +103,7 @@ signals:
 private:
     QCamera* camera_{nullptr};
     QMediaCaptureSession captureSession_;
+    QVideoSink* videoSink_{nullptr};
 };
 
 } // namespace fluvel

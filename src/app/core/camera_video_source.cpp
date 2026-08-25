@@ -51,6 +51,7 @@ bool CameraVideoSource::start(const CameraConfig& config)
                 camera_->setCameraFormat(*it);
         }
 
+        captureSession_.setVideoSink(videoSink_);
         captureSession_.setCamera(camera_);
 
         connect(camera_, &QCamera::errorOccurred, this, &CameraVideoSource::error);
@@ -73,6 +74,7 @@ void CameraVideoSource::stop()
     camera_->stop();
 
     captureSession_.setCamera(nullptr);
+    captureSession_.setVideoSink(nullptr);
 
     delete camera_;
     camera_ = nullptr;
@@ -80,6 +82,7 @@ void CameraVideoSource::stop()
 
 void CameraVideoSource::setVideoSink(QVideoSink* sink)
 {
+    videoSink_ = sink;
     captureSession_.setVideoSink(sink);
 }
 
