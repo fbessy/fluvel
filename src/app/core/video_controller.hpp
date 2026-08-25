@@ -372,19 +372,18 @@ signals:
 
 private:
     /**
-     * @brief Start streaming using a specific device.
+     * @brief Starts the requested camera.
+     *
+     * @param config Camera source configuration.
      */
-    void start(const QByteArray& deviceId);
+    void start(const CameraConfig& config);
 
     /**
-     * @brief Start streaming with a specific device and format.
+     * @brief Starts the requested media source.
+     *
+     * @param config Media source configuration.
      */
-    void start(const QByteArray& deviceId, const QCameraFormat& format);
-
-    /**
-     * @brief Starts streaming from a media URL.
-     */
-    void start(const QUrl& url);
+    void start(const MediaSourceConfig& config);
 
     /// Handle updates in available video inputs.
     void onVideoInputsChanged();

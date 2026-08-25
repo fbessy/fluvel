@@ -23,20 +23,12 @@ namespace fluvel
 /**
  * @brief Configuration of a camera video source.
  *
- * Contains the parameters required to select and configure a camera
- * before the source is started.
+ * A null device format means that no specific format is requested.
  */
 struct CameraConfig
 {
-    /**
-     * @brief Unique identifier of the camera device.
-     */
     QByteArray deviceId;
-
-    /**
-     * @brief Camera format requested for the source.
-     */
-    QCameraFormat deviceFormat;
+    QCameraFormat deviceFormat{};
 };
 
 /**

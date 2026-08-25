@@ -105,16 +105,16 @@ VideoController::~VideoController()
     processingThread_.wait();
 }
 
-void VideoController::start(const SourceConfig& sourceConfig)
+void VideoController::start(const SourceConfig& config)
 {
-    switch (sourceConfig.type)
+    switch (config.type)
     {
         case SourceType::Camera:
-            start(sourceConfig.camera.deviceId, sourceConfig.camera.deviceFormat);
+            start(config.camera);
             return;
 
         case SourceType::Media:
-            start(sourceConfig.media.sourceUrl);
+            start(config.media);
             return;
 
         case SourceType::None:
@@ -124,20 +124,13 @@ void VideoController::start(const SourceConfig& sourceConfig)
     std::unreachable();
 }
 
-void VideoController::start(const QByteArray& deviceId)
-{
-    start(deviceId, QCameraFormat());
-}
-
-void VideoController::start(const QByteArray& deviceId, const QCameraFormat& format)
+void VideoController::start(const CameraConfig& config)
 {
     if (state_ != StreamingState::Stopped || cameraSource_.isActive())
         return;
 
     state_ = StreamingState::Starting;
     emit streamingStarting();
-
-    const CameraConfig config{.deviceId = deviceId, .deviceFormat = format};
 
     if (!cameraSource_.start(config))
     {
@@ -146,7 +139,7 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
         err.errorString = tr("Camera not found");
         err.state = StreamingState::Starting;
         err.sourceInfo.type = SourceType::Camera;
-        err.sourceInfo.camera.deviceId = deviceId;
+        err.sourceInfo.camera.deviceId = config.deviceId;
 
         emit cameraError(err);
         return;
@@ -163,9 +156,9 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
     startupTimer_.start(kStartupTimeoutMs);
 }
 
-void VideoController::start(const QUrl& url)
+void VideoController::start(const MediaSourceConfig& config)
 {
-    if (state_ != StreamingState::Stopped || cameraSource_.isActive())
+    if (state_ != StreamingState::Stopped || mediaSource_.isActive())
         return;
 
     state_ = StreamingState::Starting;
@@ -173,9 +166,7 @@ void VideoController::start(const QUrl& url)
 
     startupInfo_ = {};
     startupInfo_.type = SourceType::Media;
-    startupInfo_.media.sourceUrl = url;
-
-    const MediaSourceConfig config{.sourceUrl = url};
+    startupInfo_.media.sourceUrl = config.sourceUrl;
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     testFrameCounter_ = 0;
