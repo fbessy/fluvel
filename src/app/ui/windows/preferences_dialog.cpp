@@ -329,14 +329,6 @@ QWidget* PreferencesDialog::createRecordingBufferSection()
     layout->addRow(tr("Maximum temporary storage usage:"), recordingDiskSpin_);
     layout->addRow(tr("When buffer is full:"), recordingOverflowCombo_);
 
-    connect(
-        recordingOverflowCombo_, &QComboBox::currentIndexChanged, this,
-        [this]
-        {
-            const auto policy =
-                static_cast<BufferOverflowPolicy>(recordingOverflowCombo_->currentData().toInt());
-        });
-
     return groupBox;
 }
 
