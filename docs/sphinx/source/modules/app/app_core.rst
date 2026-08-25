@@ -44,6 +44,14 @@ Configuration
 .. doxygenfile:: application_settings_types.hpp
 
 
+Video Sources
+-------------
+
+.. doxygenfile:: camera_video_source.hpp
+
+.. doxygenfile:: media_video_source.hpp
+
+
 Video Processing
 ----------------
 
@@ -102,4 +110,6 @@ Utilities
 .. doxygenfile:: device_id_utils.hpp
 
 .. doxygenfile:: time_utils.hpp
+
+.. doxygenfile:: stream_watchdog.hpp
 
