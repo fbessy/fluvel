@@ -52,6 +52,9 @@ void CaptureController::submitFrame(const fluvel::VideoFrame& frame)
     if (recorder_.isAcceptingFrames())
         recorder_.addFrame(frame);
 
+#else
+    static_cast<void>(frame);
+
 #endif
 }
 
