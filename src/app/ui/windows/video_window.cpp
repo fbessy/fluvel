@@ -610,10 +610,10 @@ void VideoWindow::setupConnections()
 
                 const auto fmt = getSelectedFormat();
 
-                if (!fmt.isNull() && !sourceConfig_.cameraId.isEmpty())
+                if (!fmt.isNull() && !sourceConfig_.camera.deviceId.isEmpty())
                 {
-                    sourceConfig_.cameraFormat = fmt;
-                    preferredFormats_[sourceConfig_.cameraId] = fmt;
+                    sourceConfig_.camera.deviceFormat = fmt;
+                    preferredFormats_[sourceConfig_.camera.deviceId] = fmt;
                     savePreferredFormats();
                 }
 
@@ -997,12 +997,12 @@ void VideoWindow::updateSourceConfigFromUi(int sourceTypeComboIndex)
     switch (sourceConfig_.type)
     {
         case SourceType::Camera:
-            sourceConfig_.cameraId = deviceSelector_->currentData().toByteArray();
-            sourceConfig_.cameraFormat = getSelectedFormat();
+            sourceConfig_.camera.deviceId = deviceSelector_->currentData().toByteArray();
+            sourceConfig_.camera.deviceFormat = getSelectedFormat();
             return;
 
         case SourceType::Media:
-            sourceConfig_.url = QUrl::fromUserInput(urlCombo_->currentText().trimmed());
+            sourceConfig_.media.sourceUrl = QUrl::fromUserInput(urlCombo_->currentText().trimmed());
             return;
 
         case SourceType::None:
@@ -1074,7 +1074,7 @@ int VideoWindow::computeBestDeviceIndex(const QByteArray& previousSelection,
 {
     assert(deviceSelector_ && videoController_);
 
-    const auto streamingDeviceId = videoController_->activeSource().deviceId;
+    const auto streamingDeviceId = videoController_->activeSource().camera.deviceId;
 
     int index = -1;
 
@@ -1172,7 +1172,7 @@ void VideoWindow::refreshFormatListFromSelection()
     }
 
     QByteArray deviceId = deviceSelector_->itemData(index).toByteArray();
-    sourceConfig_.cameraId = deviceId;
+    sourceConfig_.camera.deviceId = deviceId;
 
     // Retrieve the device directly from the current device list.
     const auto devices = videoController_->videoInputs();
@@ -1209,7 +1209,7 @@ void VideoWindow::updateFormatList(const QList<QCameraFormat>& formats)
     int bestFormatIndex = camera_utils::findBestFormatIndex(formats);
 
     int indexToSelect = -1;
-    const auto activeFormat = videoController_->activeSource().deviceFormat;
+    const auto activeFormat = videoController_->activeSource().camera.deviceFormat;
 
     for (int i = 0; i < formats.size(); ++i)
     {
@@ -1231,9 +1231,9 @@ void VideoWindow::updateFormatList(const QList<QCameraFormat>& formats)
     }
 
     // 1. Highest priority: the preferred format for this device.
-    if (!sourceConfig_.cameraId.isEmpty())
+    if (!sourceConfig_.camera.deviceId.isEmpty())
     {
-        auto preferred = preferredFormats_.value(sourceConfig_.cameraId);
+        auto preferred = preferredFormats_.value(sourceConfig_.camera.deviceId);
 
         if (!preferred.isNull())
         {
@@ -1373,12 +1373,13 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
 
     if (info.source.type == SourceType::Camera)
     {
-        deviceStreamingStatus_[info.source.deviceId] = DeviceStreamingStatus::Streaming;
-        preferredFormats_[info.source.deviceId] = info.source.deviceFormat;
+        deviceStreamingStatus_[info.source.camera.deviceId] = DeviceStreamingStatus::Streaming;
+
+        preferredFormats_[info.source.camera.deviceId] = info.source.camera.deviceFormat;
     }
-    else if (info.source.sourceUrl.isLocalFile())
+    else if (info.source.media.sourceUrl.isLocalFile())
     {
-        saveLastVideoDirectory(QFileInfo(info.source.sourceUrl.toLocalFile()).absolutePath());
+        saveLastVideoDirectory(QFileInfo(info.source.media.sourceUrl.toLocalFile()).absolutePath());
     }
 
     if (!restartPending_)
@@ -1398,7 +1399,7 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
     }
     else
     {
-        addSourceToHistory(info.source.sourceUrl);
+        addSourceToHistory(info.source.media.sourceUrl);
     }
 
     if (streamingInfo_.source.type == SourceType::Camera)
@@ -1407,14 +1408,15 @@ void VideoWindow::onStreamingStarted(const StreamingInfo& info)
     switch (info.source.type)
     {
         case SourceType::Camera:
-            statusBar()->showMessage(tr("Camera started: %1").arg(info.source.description), 5000);
+            statusBar()->showMessage(tr("Camera started: %1").arg(info.source.camera.description),
+                                     5000);
             break;
 
         case SourceType::Media:
         {
-            const QString source = info.source.sourceUrl.isLocalFile()
-                                       ? info.source.sourceUrl.toLocalFile()
-                                       : info.source.sourceUrl.toDisplayString();
+            const QString source = info.source.media.sourceUrl.isLocalFile()
+                                       ? info.source.media.sourceUrl.toLocalFile()
+                                       : info.source.media.sourceUrl.toDisplayString();
 
             statusBar()->showMessage(tr("Opened video: %1").arg(source), 5000);
 
@@ -1447,22 +1449,31 @@ void VideoWindow::saveLastVideoDirectory(const QString& directory)
 
 QString VideoWindow::sourceTitle(const StreamingInfo& info) const
 {
-    QString title = info.source.description;
+    QString title;
 
-    if (title.isEmpty() && info.source.type == SourceType::Media)
+    if (info.source.type == SourceType::Camera)
     {
-        const QUrl& url = info.source.sourceUrl;
+        title = info.source.camera.description;
+    }
+    else if (info.source.type == SourceType::Media)
+    {
+        const QUrl& url = info.source.media.sourceUrl;
 
-        if (url.isLocalFile())
-        {
-            title = url.fileName();
-        }
-        else
-        {
-            title = url.host();
+        title = info.source.media.description;
 
-            if (title.isEmpty())
+        if (title.isEmpty())
+        {
+            if (url.isLocalFile())
+            {
                 title = url.fileName();
+            }
+            else
+            {
+                title = url.host();
+
+                if (title.isEmpty())
+                    title = url.fileName();
+            }
         }
     }
 
@@ -1517,11 +1528,11 @@ void VideoWindow::onCameraError(const CameraErrorInfo& errorInfo)
     imageViewer_->showPlaceholder(true);
 
     QString message =
-        tr("Source: %1\n\n%2").arg(errorInfo.sourceInfo.description, errorInfo.errorString);
+        tr("Source: %1\n\n%2").arg(errorInfo.sourceInfo.camera.description, errorInfo.errorString);
 
     QMessageBox::warning(this, tr("Camera error"), message);
 
-    deviceStreamingStatus_[errorInfo.sourceInfo.deviceId] = DeviceStreamingStatus::Error;
+    deviceStreamingStatus_[errorInfo.sourceInfo.camera.deviceId] = DeviceStreamingStatus::Error;
 
     refreshUi();
 }
@@ -1539,7 +1550,7 @@ void VideoWindow::onMediaPlayerError(const MediaPlayerErrorInfo& errorInfo)
     imageViewer_->showPlaceholder(true);
 
     QString message =
-        tr("Source: %1\n\n%2").arg(errorInfo.sourceInfo.description, errorInfo.errorString);
+        tr("Source: %1\n\n%2").arg(errorInfo.sourceInfo.media.description, errorInfo.errorString);
 
     QMessageBox::warning(this, tr("Media error"), message);
 
@@ -1556,7 +1567,7 @@ bool VideoWindow::shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo)
 
     constexpr int kDeduplicationDelayMs = 5000;
 
-    const bool sameSource = lastReportedError_.source == errorInfo.sourceInfo.description;
+    const bool sameSource = lastReportedError_.source == errorInfo.sourceInfo.media.description;
 
     const bool sameMessage = lastReportedError_.message == errorInfo.errorString;
 
@@ -1566,7 +1577,7 @@ bool VideoWindow::shouldShowMediaError(const MediaPlayerErrorInfo& errorInfo)
     if (sameSource && sameMessage && recent)
         return false;
 
-    lastReportedError_.source = errorInfo.sourceInfo.description;
+    lastReportedError_.source = errorInfo.sourceInfo.media.description;
     lastReportedError_.message = errorInfo.errorString;
     lastReportedError_.timer.restart();
 
@@ -1581,7 +1592,7 @@ void VideoWindow::onStartupTimeout(const SourceInfo& sourceInfo, double timeoutS
                              .arg(timeoutSec, 0, 'f', 1));
 
     if (sourceInfo.type == SourceType::Camera)
-        deviceStreamingStatus_[sourceInfo.deviceId] = DeviceStreamingStatus::Error;
+        deviceStreamingStatus_[sourceInfo.camera.deviceId] = DeviceStreamingStatus::Error;
 
     refreshUi();
 }
@@ -1599,7 +1610,7 @@ void VideoWindow::onStreamingLost(const StreamingInfo& streamingInfo, double fra
                              .arg(frameAgeSec, 0, 'f', 1));
 
     if (streamingInfo.source.type == SourceType::Camera)
-        deviceStreamingStatus_[streamingInfo.source.deviceId] = DeviceStreamingStatus::Error;
+        deviceStreamingStatus_[streamingInfo.source.camera.deviceId] = DeviceStreamingStatus::Error;
 
     refreshUi();
 }

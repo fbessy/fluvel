@@ -16,17 +16,27 @@ bool SourceInfo::matches(const SourceConfig& config) const
     switch (type)
     {
         case SourceType::Camera:
-            return deviceId == config.cameraId &&
-                   camera_utils::isSameCameraFormat(deviceFormat, config.cameraFormat);
+            return camera.matches(config.camera);
 
         case SourceType::Media:
-            return sourceUrl == config.url;
+            return media.matches(config.media);
 
         case SourceType::None:
             return true;
     }
 
     return false;
+}
+
+bool CameraInfo::matches(const CameraConfig& config) const
+{
+    return deviceId == config.deviceId &&
+           camera_utils::isSameCameraFormat(deviceFormat, config.deviceFormat);
+}
+
+bool MediaSourceInfo::matches(const MediaSourceConfig& config) const
+{
+    return sourceUrl == config.sourceUrl;
 }
 
 } // namespace fluvel

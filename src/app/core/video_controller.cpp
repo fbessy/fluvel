@@ -116,11 +116,11 @@ void VideoController::start(const SourceConfig& sourceConfig)
     switch (sourceConfig.type)
     {
         case SourceType::Camera:
-            start(sourceConfig.cameraId, sourceConfig.cameraFormat);
+            start(sourceConfig.camera.deviceId, sourceConfig.camera.deviceFormat);
             return;
 
         case SourceType::Media:
-            start(sourceConfig.url);
+            start(sourceConfig.media.sourceUrl);
             return;
 
         case SourceType::None:
@@ -171,9 +171,9 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
 
             startupInfo_ = {};
             startupInfo_.type = SourceType::Camera;
-            startupInfo_.deviceId = camera_->cameraDevice().id();
-            startupInfo_.deviceFormat = camera_->cameraFormat();
-            startupInfo_.description = camera_->cameraDevice().description();
+            startupInfo_.camera.deviceId = camera_->cameraDevice().id();
+            startupInfo_.camera.deviceFormat = camera_->cameraFormat();
+            startupInfo_.camera.description = camera_->cameraDevice().description();
 
             mediaInfo_ = {};
 
@@ -203,7 +203,7 @@ void VideoController::start(const QByteArray& deviceId, const QCameraFormat& for
         err.state = StreamingState::Starting;
 
         err.sourceInfo.type = SourceType::Camera;
-        err.sourceInfo.deviceId = deviceId;
+        err.sourceInfo.camera.deviceId = deviceId;
 
         emit cameraError(err);
     }
@@ -219,7 +219,7 @@ void VideoController::start(const QUrl& url)
 
     startupInfo_ = {};
     startupInfo_.type = SourceType::Media;
-    startupInfo_.sourceUrl = url;
+    startupInfo_.media.sourceUrl = url;
 
     mediaInfo_ = {};
 
@@ -422,7 +422,7 @@ void VideoController::handleActiveDeviceUnplug(const QList<QCameraDevice>& devic
     const bool cameraStillExists = std::any_of(devices.begin(), devices.end(),
                                                [&](const QCameraDevice& dev)
                                                {
-                                                   return dev.id() == startupInfo_.deviceId;
+                                                   return dev.id() == startupInfo_.camera.deviceId;
                                                });
 
     if (!cameraStillExists)

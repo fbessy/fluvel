@@ -21,6 +21,104 @@ namespace fluvel
 {
 
 /**
+ * @brief Configuration of a camera video source.
+ *
+ * Contains the parameters required to select and configure a camera
+ * before the source is started.
+ */
+struct CameraConfig
+{
+    /**
+     * @brief Unique identifier of the camera device.
+     */
+    QByteArray deviceId;
+
+    /**
+     * @brief Camera format requested for the source.
+     */
+    QCameraFormat deviceFormat;
+};
+
+/**
+ * @brief Configuration of a media video source.
+ *
+ * Contains the parameters required to open a media source.
+ */
+struct MediaSourceConfig
+{
+    /**
+     * @brief Media source URL.
+     *
+     * Can represent a local file, an HTTP/HTTPS stream, an RTSP stream,
+     * or any other media source supported by the backend.
+     */
+    QUrl sourceUrl;
+};
+
+/**
+ * @brief Runtime information about a configured camera source.
+ *
+ * Contains information resolved by the camera backend during source
+ * initialization.
+ */
+struct CameraInfo
+{
+    /**
+     * @brief Unique identifier of the camera device.
+     */
+    QByteArray deviceId;
+
+    /**
+     * @brief Active camera format.
+     */
+    QCameraFormat deviceFormat;
+
+    /**
+     * @brief Human-readable camera description.
+     */
+    QString description;
+
+    /**
+     * @brief Checks whether this camera matches the given configuration.
+     *
+     * The comparison checks the camera identifier and camera format.
+     * The human-readable description is ignored.
+     *
+     * @param config Camera configuration to compare against.
+     *
+     * @return true if the camera matches the configuration, false otherwise.
+     */
+    bool matches(const CameraConfig& config) const;
+};
+
+/**
+ * @brief Runtime information about a configured media source.
+ *
+ * Contains information resolved during media source initialization.
+ */
+struct MediaSourceInfo
+{
+    /**
+     * @brief Media source URL.
+     */
+    QUrl sourceUrl;
+
+    /**
+     * @brief Human-readable source description.
+     */
+    QString description;
+
+    /**
+     * @brief Checks whether this media source matches the given configuration.
+     *
+     * @param config Media source configuration to compare against.
+     *
+     * @return true if the source URL matches the configuration, false otherwise.
+     */
+    bool matches(const MediaSourceConfig& config) const;
+};
+
+/**
  * @brief Supported video source types.
  */
 enum class SourceType
@@ -35,21 +133,17 @@ enum class SourceType
  *
  * Contains the parameters required to start a video source.
  *
- * This structure represents the desired source state as configured
- * from the user interface before the source is started.
- *
- * Depending on the source type, only a subset of the fields is used:
- * - cameraId and cameraFormat for camera sources
- * - url for media sources
+ * Depending on the source type, only the corresponding configuration
+ * is used:
+ * - @ref CameraConfig for camera sources
+ * - @ref MediaSourceConfig for media sources
  */
 struct SourceConfig
 {
     SourceType type{SourceType::None};
 
-    QByteArray cameraId;
-    QCameraFormat cameraFormat;
-
-    QUrl url;
+    CameraConfig camera;
+    MediaSourceConfig media;
 };
 
 /**
@@ -65,12 +159,12 @@ enum class StreamingState
 /**
  * @brief Runtime information about a configured video source.
  *
- * Extends SourceConfig with information resolved during source
- * initialization, such as the source description.
+ * Contains the source type and the runtime information resolved by the
+ * corresponding video source during initialization.
  *
- * This information is available before the first frame is received
- * and can therefore be used for startup failures, source errors,
- * stream loss notifications and successful stream initialization.
+ * Depending on the source type, only the corresponding information is used:
+ * - @ref CameraInfo for camera sources
+ * - @ref MediaSourceInfo for media sources
  */
 struct SourceInfo
 {
@@ -82,48 +176,25 @@ struct SourceInfo
     SourceType type{SourceType::None};
 
     /**
-     * @brief Unique camera identifier.
+     * @brief Runtime information for a camera source.
      *
      * Only valid when @ref type is SourceType::Camera.
      */
-    QByteArray deviceId;
+    CameraInfo camera;
 
     /**
-     * @brief Active camera format.
+     * @brief Runtime information for a media source.
      *
-     * Only valid when @ref type is SourceType::Camera.
+     * Only valid when @ref type is SourceType::Media.
      */
-    QCameraFormat deviceFormat;
-
-    /**
-     * @brief Source URL.
-     *
-     * Can represent:
-     * - a local file (file://)
-     * - an HTTP/HTTPS stream
-     * - an RTSP stream
-     * - any other supported media source
-     */
-    QUrl sourceUrl;
-
-    /**
-     * @brief Human-readable source description.
-     *
-     * Examples:
-     * - Camera device name
-     * - Stream name or host
-     * - Video file name
-     */
-    QString description;
+    MediaSourceInfo media;
 
     /**
      * @brief Checks whether this active source matches the given source configuration.
      *
-     * Compares the source type and the parameters that uniquely identify the source:
-     * - camera device and format for camera sources
-     * - URL for media sources
-     *
-     * The human-readable description is ignored.
+     * The comparison is delegated to the source-specific information:
+     * - @ref CameraInfo::matches for camera sources
+     * - @ref MediaSourceInfo::matches for media sources
      *
      * @param config Source configuration to compare against.
      *

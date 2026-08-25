@@ -178,6 +178,9 @@ set(app_src
     ${CORE_DIR}/video_controller.cpp
     ${CORE_DIR}/video_controller.hpp
 
+    ${CORE_DIR}/camera_video_source.cpp
+    ${CORE_DIR}/camera_video_source.hpp
+
     ${CORE_DIR}/stream_watchdog.cpp
     ${CORE_DIR}/stream_watchdog.hpp
 
