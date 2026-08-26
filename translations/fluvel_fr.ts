@@ -956,52 +956,52 @@ ou cliquez sur Ouvrir...</translation>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="108"/>
         <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1062"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1070"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="109"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1064"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1072"/>
         <source>Run the active contour.</source>
         <translation>Lancer le contour actif.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="112"/>
         <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1079"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1087"/>
         <source>Resume</source>
         <translation>Reprendre</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="116"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1081"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1089"/>
         <source>Resume the active contour execution.</source>
         <translation>Reprendre l’exécution du contour actif.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="119"/>
         <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1088"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1096"/>
         <source>Step</source>
         <translation>Étape</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="120"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1090"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1098"/>
         <source>Advance the active contour by one iteration.</source>
         <translation>Avancer le contour actif d’une itération.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="131"/>
         <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1096"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1104"/>
         <source>Converge</source>
         <translation>Convergence</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="132"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1099"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1107"/>
         <source>Run until completion without displaying intermediate steps.</source>
         <translation>Aller jusqu’à la fin sans afficher les étapes intermédiaires.</translation>
     </message>
@@ -1040,27 +1040,27 @@ ou choisissez Fichier → Ouvrir</translation>
         <translation>&amp;Ouvrir...</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1183"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1191"/>
         <source>Recording warning</source>
         <translation>Avertissement d’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1188"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1196"/>
         <source>Recording error</source>
         <translation>Erreur d’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1193"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1201"/>
         <source>Recording to: %1</source>
         <translation>Enregistrement vers : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1201"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1209"/>
         <source>Recording saved: %1</source>
         <translation>Enregistrement sauvegardé : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1224"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1232"/>
         <source>Snapshot saved: %1</source>
         <translation>Capture d&apos;écran sauvegardée : %1</translation>
     </message>
@@ -1085,7 +1085,7 @@ ou choisissez Fichier → Ouvrir</translation>
         <translation>&amp;À propos</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="866"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="874"/>
         <source>Image</source>
         <translation>Image</translation>
     </message>
@@ -1140,54 +1140,54 @@ ou choisissez Fichier → Ouvrir</translation>
         <translation>Ai&amp;de</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="659"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="665"/>
         <source>Open Image</source>
         <translation>Ouvrir une image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="774"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="780"/>
         <source>&amp;%1</source>
         <translation>&amp;%1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="931"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="939"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="845"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="853"/>
         <source>Opened image: %1</source>
         <translation>Image ouverte : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="890"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="898"/>
         <source>Gray</source>
         <translation>Niveaux de gris</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1056"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1064"/>
         <source>Restart</source>
         <translation>Redémarrer</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1058"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1066"/>
         <source>Restart the active contour from its initial state.</source>
         <translation>Redémarrer le contour actif depuis son état initial.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/image_window.cpp" line="152"/>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1073"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1081"/>
         <source>Pause</source>
         <translation>Pause</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="1075"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="1083"/>
         <source>Suspend execution and display the current state.</source>
         <translation>Mettre en pause et afficher l’état actuel.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/image_window.cpp" line="924"/>
+        <location filename="../src/app/ui/windows/image_window.cpp" line="932"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
@@ -1713,12 +1713,12 @@ ou choisissez Fichier → Ouvrir</translation>
 <context>
     <name>fluvel::VideoController</name>
     <message>
-        <location filename="../src/app/core/video_controller.cpp" line="139"/>
+        <location filename="../src/app/core/video_controller.cpp" line="343"/>
         <source>Camera not found</source>
         <translation>Caméra introuvable</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_controller.cpp" line="317"/>
+        <location filename="../src/app/core/video_controller.cpp" line="281"/>
         <source>In | Proc | Disp: %1 | %2 | %3 fps
 Lat: %4 ms (proc %5) | Drop: %6 %
 Contour: %7 pts</source>
