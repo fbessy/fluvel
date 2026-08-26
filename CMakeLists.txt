@@ -3,6 +3,10 @@
 
 cmake_minimum_required(VERSION 3.16)
 
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    set(QT_CREATOR_SKIP_CONAN_SETUP ON)
+endif()
+
 project(Fluvel VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
