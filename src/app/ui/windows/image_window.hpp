@@ -165,7 +165,10 @@ private:
     void showWarningMessage(const QString& msg);
 
     void onImageSessionActionTriggered();
+
+#if defined(FLUVEL_ENABLE_CAMERA_SOURCE) && defined(FLUVEL_ENABLE_MEDIA_SOURCE)
     void onStartVideoActionTriggered();
+#endif
 
     void toggleFullscreen();
     void enterFullscreen();
@@ -191,7 +194,9 @@ private:
     void onSnapshotError(const QString& message);
 
     // --- UI ---
+#if defined(FLUVEL_ENABLE_CAMERA_SOURCE) && defined(FLUVEL_ENABLE_MEDIA_SOURCE)
     std::unique_ptr<VideoWindow> videoWindow_;
+#endif
     std::unique_ptr<AnalysisWindow> analysisWindow_;
     SettingsDialog* settingsDialog_{nullptr};
     AboutDialog* AboutDialog_{nullptr};

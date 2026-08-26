@@ -386,7 +386,9 @@ void ImageWindow::setupChildWindows()
 {
     const auto& config = ApplicationSettings::instance().imageSettings();
 
+#if defined(FLUVEL_ENABLE_CAMERA_SOURCE) && defined(FLUVEL_ENABLE_MEDIA_SOURCE)
     videoWindow_ = std::make_unique<VideoWindow>();
+#endif
     analysisWindow_ = std::make_unique<AnalysisWindow>();
 
     settingsDialog_ = new SettingsDialog(config.compute, this);
@@ -418,10 +420,12 @@ void ImageWindow::setupConnections()
     setupUserActionsConnections();
 
     // Keep the video session action synchronized with the window state.
+#if defined(FLUVEL_ENABLE_CAMERA_SOURCE) && defined(FLUVEL_ENABLE_MEDIA_SOURCE)
     connect(videoWindow_.get(), &VideoWindow::videoWindowShown, this,
             &ImageWindow::onVideoWindowShown);
     connect(videoWindow_.get(), &VideoWindow::videoWindowClosed, this,
             &ImageWindow::onVideoWindowClosed);
+#endif
 
     setupFileEventConnections();
 
@@ -645,7 +649,9 @@ void ImageWindow::setupUserActionsConnections()
     connect(imageSessionAct_, &QAction::triggered, this,
             &ImageWindow::onImageSessionActionTriggered);
 
+#if defined(FLUVEL_ENABLE_CAMERA_SOURCE) && defined(FLUVEL_ENABLE_MEDIA_SOURCE)
     connect(videoSessionAct_, &QAction::triggered, this, &ImageWindow::onStartVideoActionTriggered);
+#endif
 
     connect(quitAct_, &QAction::triggered, this, &ImageWindow::close);
 
@@ -801,6 +807,7 @@ void ImageWindow::onImageSessionActionTriggered()
     imageSessionAct_->setChecked(true);
 }
 
+#if defined(FLUVEL_ENABLE_CAMERA_SOURCE) && defined(FLUVEL_ENABLE_MEDIA_SOURCE)
 void ImageWindow::onStartVideoActionTriggered()
 {
     assert(videoWindow_);
@@ -812,6 +819,7 @@ void ImageWindow::onStartVideoActionTriggered()
 
     videoSessionAct_->setChecked(videoWindow_->isVisible());
 }
+#endif
 
 void ImageWindow::closeEvent(QCloseEvent* event)
 {

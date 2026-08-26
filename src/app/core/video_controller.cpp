@@ -23,13 +23,15 @@ namespace fluvel
 
 VideoController::VideoController(const VideoSessionSettings& session, QObject* parent)
     : QObject(parent)
+#ifdef FLUVEL_ENABLE_CAMERA_SOURCE
     , cameraSource_(this)
+#endif
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
     , audioOutput_(this)
     , mediaSource_(&audioOutput_, this)
+#endif
     , processingThread_(this)
 {
-    auto mediaDevices = new QMediaDevices(this);
-
     onVideoSettingsChanged(session);
     onVideoDisplaySettingsChanged(session.display);
 
@@ -37,10 +39,26 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
     watchdogTimer_.setInterval(kWatchdogPeriodMs);
     diagnosticsTimer_.setInterval(kDiagnosticsPeriodMs);
 
+    //
+    // Camera
+    //
+#ifdef FLUVEL_ENABLE_CAMERA_SOURCE
+    auto mediaDevices = new QMediaDevices(this);
+
     cameraSource_.setVideoSink(&videoSink_);
-    mediaSource_.setVideoSink(&videoSink_);
 
     connect(&cameraSource_, &CameraVideoSource::error, this, &VideoController::onCameraError);
+
+    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this,
+            &VideoController::onVideoInputsChanged);
+#endif
+
+    //
+    // Media
+    //
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
+    mediaSource_.setVideoSink(&videoSink_);
+
     connect(&mediaSource_, &MediaVideoSource::error, this, &VideoController::onMediaPlayerError);
 
     connect(&audioOutput_, &QAudioOutput::volumeChanged, this,
@@ -70,20 +88,20 @@ VideoController::VideoController(const VideoSessionSettings& session, QObject* p
 
     connect(&mediaSource_, &MediaVideoSource::mediaInfoChanged, this,
             &VideoController::mediaInfoChanged);
-
-    //
-    // Devices
-    //
-    connect(mediaDevices, &QMediaDevices::videoInputsChanged, this,
-            &VideoController::onVideoInputsChanged);
+#endif
 
     //
     // Timers
     //
     connect(&startupTimer_, &QTimer::timeout, this, &VideoController::onStartupTimeout);
+
     connect(&watchdogTimer_, &QTimer::timeout, this, &VideoController::checkWatchdog);
+
     connect(&diagnosticsTimer_, &QTimer::timeout, this, &VideoController::updateDiagnostics);
 
+    //
+    // Video sink
+    //
     connect(&videoSink_, &QVideoSink::videoFrameChanged, this, &VideoController::onFrameReceived);
 
     //
@@ -110,11 +128,15 @@ void VideoController::start(const SourceConfig& config)
     switch (config.type)
     {
         case SourceType::Camera:
+#ifdef FLUVEL_ENABLE_CAMERA_SOURCE
             start(config.camera);
+#endif
             return;
 
         case SourceType::Media:
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
             start(config.media);
+#endif
             return;
 
         case SourceType::None:
@@ -122,63 +144,6 @@ void VideoController::start(const SourceConfig& config)
     }
 
     std::unreachable();
-}
-
-void VideoController::start(const CameraConfig& config)
-{
-    if (state_ != StreamingState::Stopped || cameraSource_.isActive())
-        return;
-
-    state_ = StreamingState::Starting;
-    emit streamingStarting();
-
-    if (!cameraSource_.start(config))
-    {
-        CameraErrorInfo err;
-        err.error = QCamera::NoError;
-        err.errorString = tr("Camera not found");
-        err.state = StreamingState::Starting;
-        err.sourceInfo.type = SourceType::Camera;
-        err.sourceInfo.camera.deviceId = config.deviceId;
-
-        emit cameraError(err);
-        return;
-    }
-
-    startupInfo_ = {};
-    startupInfo_.type = SourceType::Camera;
-    startupInfo_.camera = cameraSource_.cameraInfo();
-
-#ifdef FLUVEL_SIMULATE_STREAM_LOSS
-    testFrameCounter_ = 0;
-#endif
-
-    startupTimer_.start(kStartupTimeoutMs);
-}
-
-void VideoController::start(const MediaSourceConfig& config)
-{
-    if (state_ != StreamingState::Stopped || mediaSource_.isActive())
-        return;
-
-    state_ = StreamingState::Starting;
-    emit streamingStarting();
-
-    startupInfo_ = {};
-    startupInfo_.type = SourceType::Media;
-    startupInfo_.media.sourceUrl = config.sourceUrl;
-
-#ifdef FLUVEL_SIMULATE_STREAM_LOSS
-    testFrameCounter_ = 0;
-#endif
-
-    startupTimer_.start(kStartupTimeoutMs);
-
-    if (!mediaSource_.start(config))
-    {
-        state_ = StreamingState::Stopped;
-        return;
-    }
 }
 
 void VideoController::stop()
@@ -192,8 +157,13 @@ void VideoController::stop()
     watchdogTimer_.stop();
     diagnosticsTimer_.stop();
 
+#ifdef FLUVEL_ENABLE_CAMERA_SOURCE
     cameraSource_.stop();
+#endif
+
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
     mediaSource_.stop();
+#endif
 
     state_ = StreamingState::Stopped;
     emit streamingStopped();
@@ -244,12 +214,6 @@ void VideoController::onFrameReceived(const QVideoFrame& frame)
     cf.receiveTimestampNs = now;
 
     processingThread_.submitFrame(cf);
-}
-
-void VideoController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
-{
-    if (status == QMediaPlayer::EndOfMedia)
-        stop();
 }
 
 void VideoController::onFrameProcessed(quint64 contourSize)
@@ -328,6 +292,74 @@ void VideoController::updateDiagnostics()
     emit textStatsUpdated(textStats);
 }
 
+void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session)
+{
+    downscaleParams_ = session.compute.downscale;
+
+    processingThread_.setAlgoConfig(session.compute);
+
+    emit downscaleChanged(session.compute.downscale);
+}
+
+void VideoController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
+{
+    displayConfig_ = display;
+
+    processingThread_.setDisplayMode(display.displayMode);
+}
+
+bool VideoController::isStreaming() const
+{
+    return state_ == StreamingState::Streaming;
+}
+
+StreamingState VideoController::streamingState() const
+{
+    return state_;
+}
+
+SourceInfo VideoController::activeSource() const
+{
+    if (state_ != StreamingState::Streaming)
+        return {};
+
+    return streamingInfo_.source;
+}
+
+#ifdef FLUVEL_ENABLE_CAMERA_SOURCE
+
+void VideoController::start(const CameraConfig& config)
+{
+    if (state_ != StreamingState::Stopped || cameraSource_.isActive())
+        return;
+
+    state_ = StreamingState::Starting;
+    emit streamingStarting();
+
+    if (!cameraSource_.start(config))
+    {
+        CameraErrorInfo err;
+        err.error = QCamera::NoError;
+        err.errorString = tr("Camera not found");
+        err.state = StreamingState::Starting;
+        err.sourceInfo.type = SourceType::Camera;
+        err.sourceInfo.camera.deviceId = config.deviceId;
+
+        emit cameraError(err);
+        return;
+    }
+
+    startupInfo_ = {};
+    startupInfo_.type = SourceType::Camera;
+    startupInfo_.camera = cameraSource_.cameraInfo();
+
+#ifdef FLUVEL_SIMULATE_STREAM_LOSS
+    testFrameCounter_ = 0;
+#endif
+
+    startupTimer_.start(kStartupTimeoutMs);
+}
+
 void VideoController::onVideoInputsChanged()
 {
     const auto devices = QMediaDevices::videoInputs();
@@ -373,6 +405,46 @@ void VideoController::onCameraError(QCamera::Error error, const QString& errorSt
     }
 }
 
+QList<QCameraDevice> VideoController::videoInputs() const
+{
+    return QMediaDevices::videoInputs();
+}
+
+#endif
+
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
+
+void VideoController::start(const MediaSourceConfig& config)
+{
+    if (state_ != StreamingState::Stopped || mediaSource_.isActive())
+        return;
+
+    state_ = StreamingState::Starting;
+    emit streamingStarting();
+
+    startupInfo_ = {};
+    startupInfo_.type = SourceType::Media;
+    startupInfo_.media.sourceUrl = config.sourceUrl;
+
+#ifdef FLUVEL_SIMULATE_STREAM_LOSS
+    testFrameCounter_ = 0;
+#endif
+
+    startupTimer_.start(kStartupTimeoutMs);
+
+    if (!mediaSource_.start(config))
+    {
+        state_ = StreamingState::Stopped;
+        return;
+    }
+}
+
+void VideoController::onMediaStatusChanged(QMediaPlayer::MediaStatus status)
+{
+    if (status == QMediaPlayer::EndOfMedia)
+        stop();
+}
+
 void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString)
 {
     const StreamingState state = state_;
@@ -389,48 +461,9 @@ void VideoController::onMediaPlayerError(QMediaPlayer::Error error, const QStrin
     emit mediaPlayerError(mediaError);
 }
 
-void VideoController::onVideoSettingsChanged(const VideoSessionSettings& session)
-{
-    downscaleParams_ = session.compute.downscale;
-
-    processingThread_.setAlgoConfig(session.compute);
-
-    emit downscaleChanged(session.compute.downscale);
-}
-
-void VideoController::onVideoDisplaySettingsChanged(const DisplayConfig& display)
-{
-    displayConfig_ = display;
-
-    processingThread_.setDisplayMode(display.displayMode);
-}
-
-bool VideoController::isStreaming() const
-{
-    return state_ == StreamingState::Streaming;
-}
-
-StreamingState VideoController::streamingState() const
-{
-    return state_;
-}
-
-SourceInfo VideoController::activeSource() const
-{
-    if (state_ != StreamingState::Streaming)
-        return {};
-
-    return streamingInfo_.source;
-}
-
 bool VideoController::isMediaActive() const
 {
     return activeSource().type == SourceType::Media;
-}
-
-QList<QCameraDevice> VideoController::videoInputs() const
-{
-    return QMediaDevices::videoInputs();
 }
 
 qint64 VideoController::positionMs() const
@@ -512,5 +545,7 @@ void VideoController::resume()
 
     mediaSource_.resume();
 }
+
+#endif
 
 } // namespace fluvel

@@ -38,6 +38,14 @@ set(FLUVEL_LOCAL_DEFAULT_FFMPEG OFF)
 # Video export option
 # =========================
 
+option(FLUVEL_ENABLE_CAMERA_SOURCE
+       "Enable camera video source"
+       ON)
+
+option(FLUVEL_ENABLE_MEDIA_SOURCE
+       "Enable media video source"
+       ON)
+
 option(FLUVEL_ENABLE_FFMPEG
        "Enable FFmpeg video export"
        ${FLUVEL_LOCAL_DEFAULT_FFMPEG})

@@ -120,6 +120,8 @@ public:
      */
     void onFrameDisplayed(const FrameTimestamps& ts);
 
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
+
     /**
      * @brief Returns the current playback position in the active media.
      *
@@ -200,9 +202,9 @@ public:
     [[nodiscard]]
     bool isMediaActive() const;
 
+#endif
+
 signals:
-    /// Emitted when available video inputs change.
-    void videoInputsChanged(const QList<QCameraDevice>& devices);
 
     /**
      * @brief Emitted when source startup begins.
@@ -228,12 +230,6 @@ signals:
      */
     void streamingStopped();
 
-    /// Emitted on camera error.
-    void cameraError(const fluvel::CameraErrorInfo& errorInfo);
-
-    /// Emitted on media player error.
-    void mediaPlayerError(const fluvel::MediaPlayerErrorInfo& errorInfo);
-
     /// Emitted when startup timeout is reached.
     void startupTimeout(const fluvel::SourceInfo& sourceInfo, double timeoutSec);
 
@@ -248,6 +244,21 @@ signals:
 
     /// Emitted when downscale parameters change.
     void downscaleChanged(const fluvel::DownscaleParams& downscaleParams);
+
+#ifdef FLUVEL_ENABLE_CAMERA_SOURCE
+
+    /// Emitted when available video inputs change.
+    void videoInputsChanged(const QList<QCameraDevice>& devices);
+
+    /// Emitted on camera error.
+    void cameraError(const fluvel::CameraErrorInfo& errorInfo);
+
+#endif
+
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
+
+    /// Emitted on media player error.
+    void mediaPlayerError(const fluvel::MediaPlayerErrorInfo& errorInfo);
 
     /**
      * @brief Emitted when the playback state changes.
@@ -301,6 +312,8 @@ signals:
      * @param muted @c true if the audio output is muted, @c false otherwise.
      */
     void mutedChanged(bool muted);
+
+#endif
 
 #ifdef FLUVEL_USE_FFMPEG
 
@@ -371,19 +384,14 @@ signals:
     void snapshotError(const QString& message);
 
 private:
+#ifdef FLUVEL_ENABLE_CAMERA_SOURCE
+
     /**
      * @brief Starts the requested camera.
      *
      * @param config Camera source configuration.
      */
     void start(const CameraConfig& config);
-
-    /**
-     * @brief Starts the requested media source.
-     *
-     * @param config Media source configuration.
-     */
-    void start(const MediaSourceConfig& config);
 
     /// Handle updates in available video inputs.
     void onVideoInputsChanged();
@@ -394,8 +402,36 @@ private:
     /// Handle camera error callback.
     void onCameraError(QCamera::Error error, const QString& errorString);
 
+    /// Camera video source.
+    CameraVideoSource cameraSource_;
+
+#endif
+
+#ifdef FLUVEL_ENABLE_MEDIA_SOURCE
+    /**
+     * @brief Starts the requested media source.
+     *
+     * @param config Media source configuration.
+     */
+    void start(const MediaSourceConfig& config);
+
+    /**
+     * @brief Handles media source status changes.
+     *
+     * @param status New media status.
+     */
+    void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
+
     /// Handles media source errors.
     void onMediaPlayerError(QMediaPlayer::Error error, const QString& errorString);
+
+    /// Audio output used for media playback.
+    QAudioOutput audioOutput_;
+
+    /// Media video source.
+    MediaVideoSource mediaSource_;
+
+#endif
 
     /// Called when a new video frame is received from the active source.
     void onFrameReceived(const QVideoFrame& frame);
@@ -408,13 +444,6 @@ private:
 
     /// Triggered when startup timeout is reached.
     void onStartupTimeout();
-
-    /**
-     * @brief Handles media source status changes.
-     *
-     * @param status New media status.
-     */
-    void onMediaStatusChanged(QMediaPlayer::MediaStatus status);
 
     /// Periodic watchdog to detect stream loss.
     void checkWatchdog();
@@ -444,15 +473,13 @@ private:
      */
     void onRecordingStateChanged(RecorderState state);
 
+    /// Video export settings used for the current recording session.
+    VideoExportSettings recordingSettings_{};
+
 #endif
 
     /// Whether to use an optimized camera format when available.
     bool useOptimizedFormat_{true};
-
-    CameraVideoSource cameraSource_;
-
-    QAudioOutput audioOutput_;
-    MediaVideoSource mediaSource_;
 
     /// Video sink receiving frames.
     QVideoSink videoSink_;
@@ -492,11 +519,6 @@ private:
 
 #ifdef FLUVEL_SIMULATE_STREAM_LOSS
     int testFrameCounter_{0};
-#endif
-
-#ifdef FLUVEL_USE_FFMPEG
-    /// Video export settings used for the current recording session.
-    VideoExportSettings recordingSettings_{};
 #endif
 
     /// Current video display configuration.

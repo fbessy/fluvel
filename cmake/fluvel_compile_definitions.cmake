@@ -26,23 +26,38 @@ target_compile_definitions(${APP_TARGET_NAME} PRIVATE
 )
 
 if(OpenCV_FOUND)
-    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_USE_OPENCV)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
+        FLUVEL_USE_OPENCV)
 endif()
 
 if(Qt6_FOUND)
-    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_USE_QT)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
+        FLUVEL_USE_QT)
+endif()
+
+if(FLUVEL_ENABLE_CAMERA_SOURCE)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
+        FLUVEL_ENABLE_CAMERA_SOURCE)
+endif()
+
+if(FLUVEL_ENABLE_MEDIA_SOURCE)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
+        FLUVEL_ENABLE_MEDIA_SOURCE)
 endif()
 
 if(FLUVEL_USE_FFMPEG)
-    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_USE_FFMPEG)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
+        FLUVEL_USE_FFMPEG)
 endif()
 
 if(FLUVEL_UI_DESKTOP)
-    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_UI_DESKTOP)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
+        FLUVEL_UI_DESKTOP)
 endif()
 
 if(ENABLE_ASAN)
-    target_compile_definitions(${APP_TARGET_NAME} PRIVATE FLUVEL_ASAN)
+    target_compile_definitions(${APP_TARGET_NAME} PRIVATE
+        FLUVEL_ASAN)
 else()
     target_compile_definitions(${APP_TARGET_NAME} PRIVATE
         $<$<CONFIG:Debug>:FLUVEL_DEBUG>

@@ -17,9 +17,6 @@ set(app_src
     ${UI_WIN_DIR}/image_window.cpp
     ${UI_WIN_DIR}/image_window.hpp
 
-    ${UI_WIN_DIR}/video_window.cpp
-    ${UI_WIN_DIR}/video_window.hpp
-
     ${UI_WIN_DIR}/analysis_window.cpp
     ${UI_WIN_DIR}/analysis_window.hpp
 
@@ -178,12 +175,6 @@ set(app_src
     ${CORE_DIR}/video_controller.cpp
     ${CORE_DIR}/video_controller.hpp
 
-    ${CORE_DIR}/camera_video_source.cpp
-    ${CORE_DIR}/camera_video_source.hpp
-
-    ${CORE_DIR}/media_video_source.cpp
-    ${CORE_DIR}/media_video_source.hpp
-
     ${CORE_DIR}/stream_watchdog.cpp
     ${CORE_DIR}/stream_watchdog.hpp
 
@@ -278,6 +269,27 @@ set(app_src
     ${INTEROP_DIR}/color_adapters.hpp
     ${INTEROP_DIR}/contour_adapters.hpp
 )
+
+if(FLUVEL_ENABLE_CAMERA_SOURCE)
+    list(APPEND app_src
+        ${CORE_DIR}/camera_video_source.cpp
+        ${CORE_DIR}/camera_video_source.hpp
+    )
+endif()
+
+if(FLUVEL_ENABLE_MEDIA_SOURCE)
+    list(APPEND app_src
+        ${CORE_DIR}/media_video_source.cpp
+        ${CORE_DIR}/media_video_source.hpp
+    )
+endif()
+
+if(FLUVEL_ENABLE_CAMERA_SOURCE AND FLUVEL_ENABLE_MEDIA_SOURCE)
+    list(APPEND app_src
+        ${UI_WIN_DIR}/video_window.cpp
+        ${UI_WIN_DIR}/video_window.hpp
+    )
+endif()
 
 if(FLUVEL_USE_FFMPEG)
 
@@ -422,10 +434,13 @@ target_include_directories(${APP_TARGET_NAME} PRIVATE
     ${UI_WIN_DIR}
     ${INTEROP_DIR}
     ${MEDIA_DIR}
-    ${FFMPEG_DIR}
 )
 
 if(FLUVEL_USE_FFMPEG)
+
+    target_include_directories(${APP_TARGET_NAME} PRIVATE
+            ${FFMPEG_DIR}
+        )
 
         if(WIN32)
             target_link_libraries(${APP_TARGET_NAME} PRIVATE
