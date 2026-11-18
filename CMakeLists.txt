@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: CeCILL-2.1
 # Copyright (C) 2010-2026 Fabien Bessy
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
     set(QT_CREATOR_SKIP_CONAN_SETUP ON)
