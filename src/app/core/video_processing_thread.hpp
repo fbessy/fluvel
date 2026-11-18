@@ -143,8 +143,8 @@ private:
     /// Whether a new frame is available.
     bool frameAvailable_{false};
 
-    /// Thread running flag.
-    std::atomic<bool> running_{false};
+    /// Thread running flag (set to false by stop()).
+    std::atomic<bool> running_{true};
 
     /// Flags indicating pending updates.
     bool configChanged_{false};

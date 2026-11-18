@@ -34,8 +34,6 @@ void VideoProcessingThread::submitFrame(const ReceivedFrame& frame)
 
 void VideoProcessingThread::run()
 {
-    running_ = true;
-
     int readIndex = 0;
 
     while (running_)
