@@ -127,7 +127,8 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
         case VideoFrameBuffer::PushStatus::BufferLimitExceeded:
             emit stateChanged(RecorderState::Draining);
 
-            emit errorOccurred(tr("Video recording stopped because the recording buffer is full."));
+            emit errorOccurred(tr("Video recording stopped because the recording buffer is full or "
+                                  "cannot be written."));
             break;
     }
 }
