@@ -16,6 +16,7 @@ namespace fluvel
 {
 
 class AnimatedPushButton;
+class MorphButton;
 class CaptureController;
 
 /**
@@ -106,11 +107,7 @@ private:
 
 #ifdef FLUVEL_USE_FFMPEG
 
-    AnimatedPushButton* recordingButton_{nullptr};
-
-    QIcon stoppedIcon_;
-    QIcon recordingIcon_;
-    QIcon drainingIcon_;
+    MorphButton* recordingButton_{nullptr};
 
 #endif
 };

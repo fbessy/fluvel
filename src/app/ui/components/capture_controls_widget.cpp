@@ -6,8 +6,22 @@
 #include "capture_controller.hpp"
 #include "ffmpeg_codec_utils.hpp"
 #include "icon_loader.hpp"
+#include "morph_button.hpp"
 
 #include <QHBoxLayout>
+
+namespace
+{
+
+// Indices into the shapes given to MorphButton::setShapes().
+enum RecordingShape
+{
+    ShapeStopped = 0,
+    ShapeRecording = 1,
+    ShapeDraining = 2
+};
+
+} // namespace
 
 namespace fluvel
 {
@@ -33,17 +47,19 @@ CaptureControlsWidget::CaptureControlsWidget(QWidget* parent)
 
     if (hasRecordingSupport())
     {
-        recordingButton_ = new AnimatedPushButton(this);
+        recordingButton_ = new MorphButton(this);
         recordingButton_->setCheckable(true);
         recordingButton_->setEnabled(false);
 
         const QColor redRecording = QColor::fromRgb(0xFF453A);
 
-        stoppedIcon_ = il::createDisk(palette().color(QPalette::WindowText));
-        recordingIcon_ = il::createSquare(redRecording);
-        drainingIcon_ = il::createSmallSquare(redRecording);
-
-        recordingButton_->setIcon(stoppedIcon_);
+        // One shape per state: size ratio, corner radius ratio, color.
+        // An empty color follows the button text color.
+        recordingButton_->setShapes({
+            {0.75, 0.50, {}},           // Stopped: disk
+            {0.75, 0.15, redRecording}, // Recording: rounded square
+            {0.45, 0.15, redRecording}  // Draining: small rounded square
+        });
 
         layout->insertWidget(0, recordingButton_);
     }
@@ -157,19 +173,19 @@ void CaptureControlsWidget::onRecordingStateChanged(RecorderState state)
     {
         case RecorderState::Stopped:
             recordingButton_->setChecked(false);
-            recordingButton_->setIcon(stoppedIcon_);
+            recordingButton_->setShapeIndex(ShapeStopped);
             recordingButton_->setToolTip(tr("Start video recording."));
             break;
 
         case RecorderState::Recording:
             recordingButton_->setChecked(true);
-            recordingButton_->setIcon(recordingIcon_);
+            recordingButton_->setShapeIndex(ShapeRecording);
             recordingButton_->setToolTip(tr("Stop video recording."));
             break;
 
         case RecorderState::Draining:
             recordingButton_->setChecked(true);
-            recordingButton_->setIcon(drainingIcon_);
+            recordingButton_->setShapeIndex(ShapeDraining);
             recordingButton_->setToolTip(tr("Finalizing video recording..."));
             break;
     }

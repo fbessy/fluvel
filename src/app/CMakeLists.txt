@@ -172,6 +172,12 @@ set(app_src
     ${UI_COMP_DIR}/capture_status_presenter.cpp
     ${UI_COMP_DIR}/capture_status_presenter.hpp
 
+    ${UI_COMP_DIR}/shape_morph.cpp
+    ${UI_COMP_DIR}/shape_morph.hpp
+
+    ${UI_COMP_DIR}/morph_button.cpp
+    ${UI_COMP_DIR}/morph_button.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 
