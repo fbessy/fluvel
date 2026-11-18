@@ -65,7 +65,8 @@ public:
 
     /**
      * @brief Returns the video codecs available through this export backend.
-     *      * @return Available video codecs.
+     *
+     * @return Available video codecs.
      */
     virtual QList<VideoCodec> availableCodecs() const = 0;
 };
