@@ -344,26 +344,9 @@ set_target_properties(${APP_TARGET_NAME} PROPERTIES
     # )
 #endif()
 
-# --- TS ---
-file(GLOB TS_FILES
-    "${FLUVEL_TRANSLATIONS_DIR}/*.ts"
-)
-
-# --- TS -> QM ---
-qt6_add_translation(QM_FILES ${TS_FILES})
-
-# --- Alias obligatoires ---
-foreach(qm ${QM_FILES})
-    get_filename_component(qm_name ${qm} NAME)
-    set_source_files_properties(${qm}
-        PROPERTIES QT_RESOURCE_ALIAS "${qm_name}"
-    )
-endforeach()
-
-# --- Resources ---
-qt_add_resources(${APP_TARGET_NAME} fluvel_translations
-    PREFIX "/i18n"
-    FILES ${QM_FILES}
+# --- Translations (.ts -> .qm, embedded under :/i18n) ---
+qt_add_translations(${APP_TARGET_NAME}
+    TS_FILES ${FLUVEL_TRANSLATIONS_DIR}/fluvel_fr.ts
 )
 
 set(APP_RESOURCES
