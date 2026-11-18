@@ -24,10 +24,7 @@
 
 #include "capture_controller.hpp"
 #include "capture_controls_widget.hpp"
-
-#ifdef FLUVEL_USE_FFMPEG
-#include "capture_stats_utils.hpp"
-#endif
+#include "capture_status_presenter.hpp"
 
 #include "frame_rendering_utils.hpp"
 
@@ -252,13 +249,6 @@ void ImageWindow::setupUi()
 
     setStatusBar(new QStatusBar(this));
     statusBar()->setStyleSheet("border: none;");
-
-#ifdef FLUVEL_USE_FFMPEG
-    recordingStatsLabel_ = new QLabel(this);
-    recordingStatsLabel_->hide();
-
-    statusBar()->addPermanentWidget(recordingStatsLabel_);
-#endif
 }
 
 void ImageWindow::setupActions()
@@ -481,22 +471,10 @@ void ImageWindow::setupConnections()
                     captureController_->stopRecording();
             });
 
-    connect(captureController_, &CaptureController::recordingStatsChanged, this,
-            &ImageWindow::onRecordingStatsChanged);
-
-    connect(captureController_, &CaptureController::recordingWarning, this,
-            &ImageWindow::onRecordingWarning);
-
-    connect(captureController_, &CaptureController::recordingError, this,
-            &ImageWindow::onRecordingError);
-
-    connect(captureController_, &CaptureController::recordingStarted, this,
-            &ImageWindow::onRecordingStarted);
-
-    connect(captureController_, &CaptureController::recordingFinalized, this,
-            &ImageWindow::onRecordingFinalized);
-
 #endif
+
+    // Reports recording and snapshot events (status bar, message boxes).
+    new CaptureStatusPresenter(this, captureController_);
 
     connect(captureController_, &CaptureController::snapshotRequested, this,
             [this]
@@ -518,12 +496,6 @@ void ImageWindow::setupConnections()
 
                 captureController_->saveSnapshot(image);
             });
-
-    connect(captureController_, &CaptureController::snapshotSaved, this,
-            &ImageWindow::onSnapshotSaved);
-
-    connect(captureController_, &CaptureController::snapshotError, this,
-            &ImageWindow::onSnapshotError);
 
     // Update the displayed contour.
     connect(imageController_, &ImageController::contourUpdated, imageViewer_,
@@ -1182,59 +1154,6 @@ void ImageWindow::onIdle()
     hideAnimation_->stop();
 
     hideAnimation_->start();
-}
-
-#ifdef FLUVEL_USE_FFMPEG
-
-void ImageWindow::onRecordingWarning(const QString& message)
-{
-    QMessageBox::warning(this, tr("Recording warning"), message);
-}
-
-void ImageWindow::onRecordingError(const QString& message)
-{
-    QMessageBox::critical(this, tr("Recording error"), message);
-}
-
-void ImageWindow::onRecordingStarted(const QString& outputPath)
-{
-    statusBar()->showMessage(tr("Recording to: %1").arg(outputPath), 5000);
-}
-
-void ImageWindow::onRecordingFinalized(const QString& outputPath)
-{
-    recordingStatsLabel_->clear();
-    recordingStatsLabel_->hide();
-
-    statusBar()->showMessage(tr("Recording saved: %1").arg(outputPath), 5000);
-}
-
-void ImageWindow::onRecordingStatsChanged(const RecorderStats& stats)
-{
-    const auto status =
-        capture_utils::formatRecordingStatus(captureController_->recordingState(), stats);
-
-    if (status.text.isEmpty())
-    {
-        recordingStatsLabel_->clear();
-        recordingStatsLabel_->hide();
-        return;
-    }
-
-    recordingStatsLabel_->setText(status.text);
-    recordingStatsLabel_->show();
-}
-
-#endif
-
-void ImageWindow::onSnapshotSaved(const QString& filename)
-{
-    statusBar()->showMessage(tr("Snapshot saved: %1").arg(filename), 5000);
-}
-
-void ImageWindow::onSnapshotError(const QString& message)
-{
-    statusBar()->showMessage(message, 5000);
 }
 
 } // namespace fluvel

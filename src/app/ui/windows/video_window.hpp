@@ -255,9 +255,6 @@ private:
     void connectFrameToCapture();
 
     void onRecordingStateChanged(RecorderState state);
-    void onRecordingStatsChanged(const RecorderStats& stats);
-    void onRecordingStarted(const QString& outputPath);
-    void onRecordingFinalized(const QString& outputPath);
 #endif
 
     //
@@ -273,15 +270,6 @@ private:
     // Application-level errors
     void onStartupTimeout(const SourceInfo& sourceInfo, double timeoutSec);
     void onStreamingLost(const StreamingInfo& streamingInfo, double frameAgeSec);
-
-#ifdef FLUVEL_USE_FFMPEG
-    // Recording warnings and errors
-    void onRecordingWarning(const QString& message);
-    void onRecordingError(const QString& message);
-#endif
-
-    void onSnapshotSaved(const QString& filename);
-    void onSnapshotError(const QString& message);
 
 #ifdef Q_OS_ANDROID
     void ensureCameraPermission();
@@ -506,10 +494,6 @@ private:
     QLabel* playbackSeparatorLabel_{nullptr};
 
     VideoShortcutManager shortcutManager_;
-
-#ifdef FLUVEL_USE_FFMPEG
-    QLabel* recordingStatsLabel_{nullptr};
-#endif
 };
 
 } // namespace fluvel

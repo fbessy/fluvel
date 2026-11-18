@@ -180,19 +180,6 @@ private:
     void onActivityDetected(const QPoint& pos);
     void onIdle();
 
-#ifdef FLUVEL_USE_FFMPEG
-    void onRecordingStatsChanged(const RecorderStats& stats);
-    void onRecordingStarted(const QString& outputPath);
-    void onRecordingFinalized(const QString& outputPath);
-    void onRecordingWarning(const QString& message);
-    void onRecordingError(const QString& message);
-
-    QLabel* recordingStatsLabel_{nullptr};
-#endif
-
-    void onSnapshotSaved(const QString& filename);
-    void onSnapshotError(const QString& message);
-
     // --- UI ---
 #if defined(FLUVEL_ENABLE_CAMERA_SOURCE) && defined(FLUVEL_ENABLE_MEDIA_SOURCE)
     std::unique_ptr<VideoWindow> videoWindow_;

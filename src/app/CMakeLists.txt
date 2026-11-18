@@ -166,6 +166,9 @@ set(app_src
     ${UI_COMP_DIR}/capture_stats_utils.cpp
     ${UI_COMP_DIR}/capture_stats_utils.hpp
 
+    ${UI_COMP_DIR}/capture_status_presenter.cpp
+    ${UI_COMP_DIR}/capture_status_presenter.hpp
+
     ${CORE_DIR}/image_controller.cpp
     ${CORE_DIR}/image_controller.hpp
 
