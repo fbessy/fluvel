@@ -72,6 +72,7 @@ jobs:
           conan install . `
             --profile:host=.github/conan/windows-msvc `
             --profile:build=.github/conan/windows-msvc `
+            --lockfile=conan.lock `
             --output-folder=build/conan `
             --build=never `
             -s build_type=Release
@@ -85,20 +86,6 @@ jobs:
               Write-Host "===== $($_.FullName) ====="
               Get-Content $_.FullName
             }
-
-      - name: Create lockfile
-        shell: pwsh
-        run: |
-          conan lock create . `
-            --profile:host=.github/conan/windows-msvc `
-            --profile:build=.github/conan/windows-msvc `
-            -s build_type=Release `
-            --lockfile-out=conan.lock
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: conan.lock
-          path: conan.lock
 
       - name: Configure
         shell: bash
