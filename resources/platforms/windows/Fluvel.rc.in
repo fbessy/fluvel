@@ -24,7 +24,7 @@ BEGIN
             VALUE "BuildId",          "@FLUVEL_GIT_COMMIT_SHORT@"
             VALUE "OriginalFilename", "Fluvel.exe"
             VALUE "InternalName",     "Fluvel"
-            VALUE "LegalCopyright",   "Copyright (C) 2010-2026 Fabien Bessy"
+            VALUE "LegalCopyright",   "Copyright (C) 2010-2026 Fabien Bessy - CeCILL v2.1"
             VALUE "Comments",         "Licensed under CeCILL v2.1"
         END
     END
