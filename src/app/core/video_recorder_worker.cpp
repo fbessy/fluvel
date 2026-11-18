@@ -3,8 +3,6 @@
 #include "frame_clock.hpp"
 #include "video_exporter.hpp"
 
-#include <QThread>
-
 namespace fluvel
 {
 
@@ -136,8 +134,6 @@ void VideoRecorderWorker::enqueue(const VideoFrame& frame)
 
 void VideoRecorderWorker::processQueue()
 {
-    constexpr int kMaxEncodingAttempts = 3;
-
     for (;;)
     {
         std::optional<VideoFrame> frame;
@@ -162,20 +158,7 @@ void VideoRecorderWorker::processQueue()
                 break;
         }
 
-        bool success = false;
-
-        for (int attempt = 0; attempt < kMaxEncodingAttempts; ++attempt)
-        {
-            if (recordingSession_.addFrame(*frame))
-            {
-                success = true;
-                break;
-            }
-
-            QThread::msleep(50);
-        }
-
-        if (!success)
+        if (!recordingSession_.addFrame(*frame))
         {
             {
                 QMutexLocker locker(&mutex_);

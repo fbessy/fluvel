@@ -245,12 +245,9 @@ bool FFmpegVideoExporter::addFrame(const VideoFrame& frame)
 
     if (!fillFrame(image) || !updateFrameTimestamp(frame) || !encodeFrame())
     {
-        qWarning() << "Frame export failed, finalizing the output file.";
-
-        // Best effort: flush the encoder and write the trailer so that the
-        // frames already written remain playable, then release everything.
-        if (!close())
-            qWarning() << "The output file could not be finalized properly.";
+        // The caller is expected to stop and call close(), which flushes the
+        // encoder and writes the trailer so the frames already written stay playable.
+        qWarning() << "Frame export failed.";
 
         return false;
     }

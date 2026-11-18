@@ -18,6 +18,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <optional>
 #include <thread>
 
 namespace fluvel
