@@ -53,6 +53,9 @@ namespace fluvel
  * No data copy is performed. The returned ImageView directly references the
  * internal buffer of the QImage.
  *
+ * @pre The image must not be null and its format must be one of
+ *      Grayscale8, RGB888, ARGB32 or RGB32 (see VideoProcessingThread::convertFrame()).
+ *
  * @param img Source QImage.
  * @return ImageView referencing the QImage pixel data.
  *
