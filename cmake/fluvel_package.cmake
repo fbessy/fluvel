@@ -170,8 +170,12 @@ endif()
 
 if(FLUVEL_PLATFORM_MACOS)
 
-    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
+    # The deployment target itself is passed on the command line (it must be
+    # known before project()). Here we only reuse it for Info.plist.
+    if(CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(FLUVEL_MACOS_MIN_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    else()
+        set(FLUVEL_MACOS_MIN_VERSION "14.0")
     endif()
 
     set(MACOSX_BUNDLE_ICON_FILE Fluvel.icns)

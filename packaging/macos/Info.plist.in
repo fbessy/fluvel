@@ -24,8 +24,17 @@
         <key>CFBundlePackageType</key>
         <string>APPL</string>
 
+        <key>CFBundleIconFile</key>
+        <string>Fluvel</string>
+
+        <key>NSPrincipalClass</key>
+        <string>NSApplication</string>
+
+        <key>NSHighResolutionCapable</key>
+        <true/>
+
         <key>LSMinimumSystemVersion</key>
-        <string>11.0</string>
+        <string>@FLUVEL_MACOS_MIN_VERSION@</string>
 
         <key>NSCameraUsageDescription</key>
         <string>Fluvel requires access to the camera for real-time image segmentation.</string>

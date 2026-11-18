@@ -133,6 +133,9 @@ jobs:
           # Import library and export file are only useful for development
           Remove-Item package\*.lib, package\*.exp -ErrorAction SilentlyContinue
 
+          # First-launch help shown next to the executable
+          Copy-Item packaging\windows\README-windows.txt package\README.txt
+
           Compress-Archive `
             -Path package\* `
             -DestinationPath Fluvel-win64-portable.zip `
@@ -230,6 +233,7 @@ jobs:
 
           cmake --fresh -S . -B build \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
             -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
             \
             -DFLUVEL_BUILD_APP=ON \
@@ -251,13 +255,32 @@ jobs:
 
       - name: Deploy Qt
         run: |
-          "${{ env.Qt6_DIR }}/bin/macdeployqt" "${{ env.APP_PATH }}" -codesign=off
+          # Ad-hoc signature (identity "-"): install_name_tool invalidates signatures
+          # and Apple Silicon refuses to run unsigned or broken-signature binaries.
+          "${{ env.Qt6_DIR }}/bin/macdeployqt" "${{ env.APP_PATH }}" -codesign=-
+
+      - name: Verify bundle
+        continue-on-error: true
+        run: |
+          codesign --verify --deep --strict --verbose=2 "${{ env.APP_PATH }}"
+          # Fail if any binary still depends on a library outside the bundle
+          bad=0
+          while IFS= read -r -d '' f; do
+            if file "$f" | grep -q "Mach-O"; then
+              if otool -L "$f" | grep -E "/opt/homebrew|/usr/local/"; then
+                echo "Unbundled dependency in $f"
+                bad=1
+              fi
+            fi
+          done < <(find "${{ env.APP_PATH }}" -type f -print0)
+          exit $bad
 
       - name: Create DMG
         run: |
           rm -rf dmg
           mkdir dmg
           cp -R "${{ env.APP_PATH }}" dmg/
+          cp packaging/macos/README-macos.txt dmg/README.txt
           ln -s /Applications dmg/Applications
           hdiutil create Fluvel-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
 
