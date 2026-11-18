@@ -117,7 +117,7 @@ jobs:
           & "${{ env.Qt6_DIR }}/bin/windeployqt.exe" `
             --release `
             --compiler-runtime `
-            --no-translations `
+            --translations fr,en `
             --no-system-d3d-compiler `
             build\src\app\Release\Fluvel.exe
 
@@ -129,6 +129,9 @@ jobs:
           New-Item -ItemType Directory package | Out-Null
 
           Copy-Item build\src\app\Release\* package\ -Recurse
+
+          # Import library and export file are only useful for development
+          Remove-Item package\*.lib, package\*.exp -ErrorAction SilentlyContinue
 
           Compress-Archive `
             -Path package\* `
