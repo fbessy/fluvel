@@ -4,18 +4,18 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/app/core/file_utils.cpp" line="29"/>
+        <location filename="../src/app/core/file_utils.cpp" line="32"/>
         <source>Image Files (%1)</source>
         <translation>Fichiers image (%1)</translation>
     </message>
     <message>
-        <location filename="../src/app/core/file_utils.cpp" line="153"/>
+        <location filename="../src/app/core/file_utils.cpp" line="156"/>
         <source>Video Files (%1)</source>
         <translation>Fichiers vidéo (%1)</translation>
     </message>
     <message>
-        <location filename="../src/app/core/file_utils.cpp" line="232"/>
-        <location filename="../src/app/core/file_utils.cpp" line="294"/>
+        <location filename="../src/app/core/file_utils.cpp" line="235"/>
+        <location filename="../src/app/core/file_utils.cpp" line="297"/>
         <source>Unspecified</source>
         <translation>Non spécifié</translation>
     </message>
@@ -85,12 +85,12 @@ R : %3  G : %4  B : %5</translation>
     <message>
         <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="55"/>
         <source> + %1 MiB temporary</source>
-        <translation>+ %1 MiB de stockage temporaire</translation>
+        <translation> + %1 MiB de stockage temporaire</translation>
     </message>
     <message>
         <location filename="../src/app/ui/components/capture_stats_utils.cpp" line="67"/>
         <source> · Discarded frames: %1% (%2)</source>
-        <translation>Images ignorées : %1 % (%2)</translation>
+        <translation> · Images ignorées : %1 % (%2)</translation>
     </message>
 </context>
 <context>
@@ -129,7 +129,7 @@ R : %3  G : %4  B : %5</translation>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="338"/>
         <source>&lt;p&gt;&lt;b&gt;Scientific Background&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel integrates several fundamental methods in image segmentation, including discrete level-set approximation (Shi &amp; Karl, 2008), region-based active contours (Chan &amp; Vese, 2001), anisotropic diffusion filtering (Perona &amp; Malik, 1990), and quantitative evaluation using the Hausdorff distance.&lt;/p&gt;&lt;p&gt;These methods provide a balance between computational efficiency, topological flexibility, and rigorous segmentation assessment.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="360"/>
@@ -656,7 +656,7 @@ ou cliquez sur Ouvrir...</translation>
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="127"/>
         <source>Distance between centroids: </source>
-        <translation>Distance entre les centroïdes :</translation>
+        <translation>Distance entre les centroïdes : </translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/analysis_window.cpp" line="212"/>
@@ -872,7 +872,7 @@ ou cliquez sur Ouvrir...</translation>
         <location filename="../src/app/core/image_controller.cpp" line="244"/>
         <source>Reason: %1
 </source>
-        <translation>Motif: %1
+        <translation>Motif : %1
 </translation>
     </message>
     <message>
@@ -1730,22 +1730,22 @@ Contour : %7 pts</translation>
 <context>
     <name>fluvel::VideoRecorderWorker</name>
     <message>
-        <location filename="../src/app/core/video_recorder_worker.cpp" line="33"/>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="31"/>
         <source>Failed to start video recording.</source>
         <translation>Échec du démarrage de l’enregistrement vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_recorder_worker.cpp" line="132"/>
-        <source>Video recording stopped because the recording buffer is full.</source>
-        <translation>L&apos;enregistrement vidéo a été arrêté car le tampon d&apos;enregistrement est plein.</translation>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="130"/>
+        <source>Video recording stopped because the recording buffer is full or cannot be written.</source>
+        <translation>L&apos;enregistrement vidéo a été arrêté, car le tampon d&apos;enregistrement est plein ou ne peut pas être écrit.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_recorder_worker.cpp" line="186"/>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="170"/>
         <source>Failed to encode video frame.</source>
         <translation>Échec de l’encodage de l’image vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_recorder_worker.cpp" line="209"/>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="193"/>
         <source>Failed to finalize video recording.</source>
         <translation>Échec de la finalisation de l’enregistrement vidéo.</translation>
     </message>
