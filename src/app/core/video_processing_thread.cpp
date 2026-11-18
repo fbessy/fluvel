@@ -239,7 +239,6 @@ void VideoProcessingThread::setDisplayMode(ImageDisplayMode mode)
 {
     QMutexLocker locker(&configMutex_);
     displayMode_ = mode;
-    displayModeChanged_ = true;
 }
 
 } // namespace fluvel
