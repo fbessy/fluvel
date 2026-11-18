@@ -63,7 +63,7 @@ jobs:
         shell: pwsh
         run: |
           python -m pip install --upgrade pip
-          pip install conan
+          pip install conan==2.31.2
           conan --version
 
       - name: Setup Conan
@@ -85,6 +85,20 @@ jobs:
               Write-Host "===== $($_.FullName) ====="
               Get-Content $_.FullName
             }
+
+      - name: Create lockfile
+        shell: pwsh
+        run: |
+          conan lock create . `
+            --profile:host=.github/conan/windows-msvc `
+            --profile:build=.github/conan/windows-msvc `
+            -s build_type=Release `
+            --lockfile-out=conan.lock
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: conan.lock
+          path: conan.lock
 
       - name: Configure
         shell: bash
