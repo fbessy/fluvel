@@ -659,6 +659,11 @@ bool FFmpegVideoExporter::updateFrameTimestamp(const VideoFrame& frame)
         qWarning() << "timestampNs =" << timestampNs
                    << "absolute =" << *frame.presentationTimestampNs
                    << "pts =" << context_->frame->pts << "lastPts =" << lastPts_;
+
+        // The muxer requires strictly increasing timestamps: two frames closer
+        // than one codec tick (or a jittery source) would otherwise make the
+        // encoder fail and abort the whole recording. Advance by one tick.
+        context_->frame->pts = lastPts_ + 1;
     }
 
     lastPts_ = context_->frame->pts;
