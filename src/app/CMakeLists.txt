@@ -14,6 +14,9 @@ set(app_src
 
     ${APP_DIR}/main.cpp
 
+    ${APP_DIR}/translator.cpp
+    ${APP_DIR}/translator.hpp
+
     ${UI_WIN_DIR}/image_window.cpp
     ${UI_WIN_DIR}/image_window.hpp
 

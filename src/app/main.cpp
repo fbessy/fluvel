@@ -22,12 +22,11 @@
 #include "application_settings.hpp"
 #include "frame_clock.hpp"
 #include "icon_loader.hpp"
+#include "translator.hpp"
 
 #include <QApplication>
 #include <QCoreApplication>
 #include <QGuiApplication>
-#include <QLibraryInfo>
-#include <QTranslator>
 
 int main(int argc, char* argv[])
 {
@@ -57,29 +56,7 @@ int main(int argc, char* argv[])
     const auto& config = fluvel::ApplicationSettings::instance();
     fluvel::Language language = config.appLanguage();
 
-    static QTranslator translator_qt;
-    static QTranslator translator_fluvel;
-
-    QString locale;
-    switch (language)
-    {
-        case fluvel::Language::System:
-            locale = QLocale::system().name().section('_', 0, 0);
-            break;
-        case fluvel::Language::French:
-            locale = "fr";
-            break;
-        case fluvel::Language::English:
-        default:
-            locale = "en";
-            break;
-    }
-
-    if (translator_qt.load("qt_" + locale, QLibraryInfo::path(QLibraryInfo::TranslationsPath)))
-        app.installTranslator(&translator_qt);
-
-    if (translator_fluvel.load(QString(":/i18n/fluvel_%1.qm").arg(locale)))
-        app.installTranslator(&translator_fluvel);
+    const fluvel::Translator translator(app, language);
 
 #ifdef FLUVEL_PLATFORM_DESKTOP
     QApplication::setWindowIcon(fluvel::il::desktopAppIcon());
