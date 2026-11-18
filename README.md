@@ -168,7 +168,6 @@ Fluvel follows a hybrid architecture:
 Build, release and deployment automation are intentionally kept outside the source tree and are handled through repository workflows and helper scripts.
 
 Some components (such as additional UI technologies and language integrations) are experimental and may evolve over time.
-```
 
 ## 🛠️ Build
 
@@ -176,14 +175,23 @@ Some components (such as additional UI technologies and language integrations) a
 
 #### Core library
 
-- CMake ≥ 3.x
+- CMake ≥ 3.22
 - C++23 compiler (tested with Clang, GCC and MSVC)
 
 #### Desktop application
 
-Additional dependency:
+Additional dependencies:
 
-- Qt6
+- Qt6 (Core, Gui, Widgets, Multimedia, MultimediaWidgets, Svg, LinguistTools),
+  tested with Qt 6.9 and 6.11
+
+Optional:
+
+- FFmpeg development libraries (`libavformat`, `libavcodec`, `libavutil`,
+  `libswscale`) to enable video recording and export.
+  Off by default; enable it with `-DFLUVEL_ENABLE_FFMPEG=ON`.
+  FFmpeg is found with pkg-config on Linux and macOS, and through Conan
+  on Windows.
 
 #### Python bindings
 
@@ -207,7 +215,7 @@ cmake -S . -B build \
     -DFLUVEL_BUILD_BIND=OFF
 
 cmake --build build
-./build/Fluvel
+./build/src/app/fluvel
 ```
 
 ---
@@ -254,6 +262,16 @@ cmake --build build
 
 ---
 
+### Linux packages
+
+- **Flatpak** (recommended): runs on any distribution that supports Flatpak.
+- **AppImage**: built on Ubuntu 25.10 so that the FFmpeg headers match the
+  FFmpeg version used by Qt. Because AppImages rely on the host's glibc and
+  C++ standard library, it requires a recent distribution (roughly the
+  versions released since late 2025). On older systems, use the Flatpak.
+
+---
+  
 ## 📜 License
 
 Fluvel is licensed under the CeCILL 2.1 license
