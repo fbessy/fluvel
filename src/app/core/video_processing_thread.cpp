@@ -113,6 +113,11 @@ ProcessedFrame VideoProcessingThread::processFrame(const QVideoFrame& frame)
         QMutexLocker locker(&configMutex_);
         config = config_;
         displayMode = displayMode_;
+        if (configChanged_)
+        {
+            configChanged_ = false;
+            resetRequested_ = true;
+        }
     }
 
     ProcessedFrame df;
@@ -131,7 +136,7 @@ ProcessedFrame VideoProcessingThread::processFrame(const QVideoFrame& frame)
     const auto& algoConfig = config.contourConfig;
 
     const auto newSize = preprocessed.size();
-    const bool needReset = !activeContour_ || configChanged_ || newSize != currentSize_;
+    const bool needReset = !activeContour_ || resetRequested_ || newSize != currentSize_;
 
     // ------------------------------------------------------------
     // 1) Filtering pipeline
@@ -163,7 +168,7 @@ ProcessedFrame VideoProcessingThread::processFrame(const QVideoFrame& frame)
             algoConfig.contourParams);
 
         currentSize_ = newSize;
-        configChanged_ = false;
+        resetRequested_ = false;
     }
 
     // ------------------------------------------------------------

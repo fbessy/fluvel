@@ -148,6 +148,7 @@ private:
 
     /// Flags indicating pending updates.
     bool configChanged_{false};
+    bool resetRequested_{false};
     bool displayModeChanged_{false};
 
     /// Active contour instance.
