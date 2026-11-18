@@ -190,15 +190,12 @@ bool FFmpegVideoExporter::close()
         if (!flushSucceeded)
             qWarning() << "Failed to flush encoder.";
 
-        bool trailerSucceeded = false;
+        // Always try to write the trailer: the packets already muxed are
+        // worth keeping even if the last frames could not be flushed.
+        const bool trailerSucceeded = writeTrailer();
 
-        if (flushSucceeded)
-        {
-            trailerSucceeded = writeTrailer();
-
-            if (!trailerSucceeded)
-                qWarning() << "Failed to write trailer.";
-        }
+        if (!trailerSucceeded)
+            qWarning() << "Failed to write trailer.";
 
         success = flushSucceeded && trailerSucceeded;
     }
@@ -248,8 +245,13 @@ bool FFmpegVideoExporter::addFrame(const VideoFrame& frame)
 
     if (!fillFrame(image) || !updateFrameTimestamp(frame) || !encodeFrame())
     {
-        release();
-        state_ = ExportState::Closed;
+        qWarning() << "Frame export failed, finalizing the output file.";
+
+        // Best effort: flush the encoder and write the trailer so that the
+        // frames already written remain playable, then release everything.
+        if (!close())
+            qWarning() << "The output file could not be finalized properly.";
+
         return false;
     }
 
