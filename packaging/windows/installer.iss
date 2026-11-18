@@ -17,6 +17,8 @@ VersionInfoDescription=Fluvel Installer
 VersionInfoCopyright=Copyright (C) 2010-2026 Fabien Bessy
 
 DefaultDirName={autopf}\Fluvel
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
 DefaultGroupName=Fluvel
 OutputDir=Output
 OutputBaseFilename=FluvelSetup
