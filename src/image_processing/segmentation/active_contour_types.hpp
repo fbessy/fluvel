@@ -128,6 +128,10 @@ struct ActiveContourParams
 
     /**
      * @brief Defines how failures are handled during execution.
+     *
+     * Also selects the convergence strategy: the Hausdorff-based stopping
+     * criterion is evaluated only in StopOnFailure mode. In RecoverOnFailure
+     * mode, evolution is bounded by the number of cycles requested by the caller.
      */
     FailureHandlingMode failureMode{kDefaultFailureMode};
 
