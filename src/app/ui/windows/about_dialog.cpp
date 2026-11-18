@@ -170,7 +170,18 @@ QString availableVideoEncoders()
 
 #endif
 
-    return encoders.isEmpty() ? QObject::tr("None") : encoders.join(QStringLiteral(", "));
+    if (!encoders.isEmpty())
+        return encoders.join(QStringLiteral(", "));
+
+    // No usable encoder: append a detection report to help diagnose why.
+    QString report = QObject::tr("None");
+
+#ifdef FLUVEL_USE_FFMPEG
+    report += QStringLiteral("<br><pre>%1</pre>")
+                  .arg(FFmpegCodecUtils::diagnostics().toHtmlEscaped());
+#endif
+
+    return report;
 }
 
 #endif

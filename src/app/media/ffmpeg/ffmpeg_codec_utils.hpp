@@ -6,6 +6,7 @@
 #include "video_export_settings.hpp"
 
 #include <QList>
+#include <QString>
 
 extern "C"
 {
@@ -65,6 +66,17 @@ public:
      * @return True if the encoder supports the pixel format, false otherwise.
      */
     static bool supportsPixelFormat(const AVCodec* encoder, AVPixelFormat pixelFormat);
+
+    /**
+     * @brief Builds a human-readable report of the encoder detection.
+     *
+     * For every preferred encoder, reports whether it was found and whether
+     * it could be opened (with the FFmpeg error message on failure).
+     * Intended to explain an empty codec list in the About dialog.
+     *
+     * @return Multi-line plain text report.
+     */
+    static QString diagnostics();
 
 private:
     /**

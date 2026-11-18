@@ -6,10 +6,17 @@
 extern "C"
 {
 #include <libavcodec/version.h>
+#include <libavutil/error.h>
 #include <libavutil/pixdesc.h>
 }
 
+#include <QStringList>
+
+#include <array>
 #include <cassert>
+#include <cerrno>
+#include <iterator>
+#include <span>
 
 namespace fluvel
 {
@@ -36,7 +43,7 @@ struct CodecEntry
     AVCodecID codecId;
 
     /// Preferred FFmpeg encoders ordered by priority.
-    std::initializer_list<const char*> preferredEncoders;
+    std::span<const char* const> preferredEncoders;
 
     /// Indicates whether the codec uses lossless compression.
     bool lossless;
@@ -53,30 +60,33 @@ struct CodecEntry
 // them are mutually exclusive depending on the operating system and the
 // available hardware.
 //
+// Each list lives in its own static array so that the spans below never
+// point to temporary storage (std::initializer_list backing arrays inside a
+// constexpr table are not reliable with MSVC).
+static constexpr std::array kFfv1Encoders = {"ffv1"};
+static constexpr std::array kMpeg4Encoders = {"mpeg4"};
+static constexpr std::array kH264Encoders = {
+    "h264_nvenc",        // NVIDIA
+    "h264_amf",          // AMD
+    "h264_qsv",          // Intel
+    "h264_videotoolbox", // Apple
+    "h264_vaapi",        // Generic Linux
+    "libx264"            // Software
+};
+static constexpr std::array kH265Encoders = {"hevc_nvenc", "hevc_amf",  "hevc_qsv",
+                                             "hevc_videotoolbox", "hevc_vaapi", "libx265"};
+static constexpr std::array kVp9Encoders = {"vp9_vaapi", "libvpx-vp9"};
+static constexpr std::array kAv1Encoders = {"av1_nvenc", "av1_amf",   "av1_qsv",
+                                            "av1_videotoolbox", "av1_vaapi", "libsvtav1",
+                                            "librav1e", "libaom-av1"};
+
 static constexpr CodecEntry kCodecTable[] = {
-    {VideoCodec::FFV1, AV_CODEC_ID_FFV1, {"ffv1"}, true},
-    {VideoCodec::MPEG4Part2, AV_CODEC_ID_MPEG4, {"mpeg4"}, false},
-    {VideoCodec::H264,
-     AV_CODEC_ID_H264,
-     {
-         "h264_nvenc",        // NVIDIA
-         "h264_amf",          // AMD
-         "h264_qsv",          // Intel
-         "h264_videotoolbox", // Apple
-         "h264_vaapi",        // Generic Linux
-         "libx264"            // Software
-     },
-     false},
-    {VideoCodec::H265,
-     AV_CODEC_ID_HEVC,
-     {"hevc_nvenc", "hevc_amf", "hevc_qsv", "hevc_videotoolbox", "hevc_vaapi", "libx265"},
-     false},
-    {VideoCodec::VP9, AV_CODEC_ID_VP9, {"vp9_vaapi", "libvpx-vp9"}, false},
-    {VideoCodec::AV1,
-     AV_CODEC_ID_AV1,
-     {"av1_nvenc", "av1_amf", "av1_qsv", "av1_videotoolbox", "av1_vaapi", "libsvtav1", "librav1e",
-      "libaom-av1"},
-     false},
+    {VideoCodec::FFV1, AV_CODEC_ID_FFV1, kFfv1Encoders, true},
+    {VideoCodec::MPEG4Part2, AV_CODEC_ID_MPEG4, kMpeg4Encoders, false},
+    {VideoCodec::H264, AV_CODEC_ID_H264, kH264Encoders, false},
+    {VideoCodec::H265, AV_CODEC_ID_HEVC, kH265Encoders, false},
+    {VideoCodec::VP9, AV_CODEC_ID_VP9, kVp9Encoders, false},
+    {VideoCodec::AV1, AV_CODEC_ID_AV1, kAv1Encoders, false},
 };
 
 /**
@@ -108,6 +118,33 @@ static const AVPixelFormat* encoderPixelFormats(const AVCodec* encoder)
     return encoder->pix_fmts;
 
 #endif
+}
+
+/**
+ * @brief Tries to open an encoder with a small dummy configuration.
+ *
+ * @return 0 on success, a negative FFmpeg error code otherwise.
+ */
+static int tryOpenEncoder(const AVCodec* encoder, AVCodecID codecId, AVPixelFormat pixelFormat)
+{
+    AVCodecContext* ctx = avcodec_alloc_context3(encoder);
+
+    if (ctx == nullptr)
+        return AVERROR(ENOMEM);
+
+    ctx->codec_id = codecId;
+    ctx->codec_type = AVMEDIA_TYPE_VIDEO;
+    ctx->width = 16;
+    ctx->height = 16;
+    ctx->time_base = AVRational{1, 25};
+    ctx->framerate = AVRational{25, 1};
+    ctx->pix_fmt = pixelFormat;
+
+    const int ret = avcodec_open2(ctx, encoder, nullptr);
+
+    avcodec_free_context(&ctx);
+
+    return ret < 0 ? ret : 0;
 }
 
 } // namespace
@@ -191,6 +228,56 @@ QList<CodecInfo> FFmpegCodecUtils::detectAvailableCodecs()
     }
 
     return codecs;
+}
+
+QString FFmpegCodecUtils::diagnostics()
+{
+    QStringList lines;
+
+    lines << QStringLiteral("avcodec %1.%2.%3")
+                 .arg(LIBAVCODEC_VERSION_MAJOR)
+                 .arg(LIBAVCODEC_VERSION_MINOR)
+                 .arg(LIBAVCODEC_VERSION_MICRO);
+    lines << QStringLiteral("codec table entries: %1").arg(std::size(kCodecTable));
+
+    for (const CodecEntry& entry : kCodecTable)
+    {
+        lines << QStringLiteral("codec id %1: %2 preferred encoder(s)")
+                     .arg(static_cast<int>(entry.codecId))
+                     .arg(entry.preferredEncoders.size());
+
+        for (const char* encoderName : entry.preferredEncoders)
+        {
+            const AVCodec* encoder = avcodec_find_encoder_by_name(encoderName);
+
+            if (encoder == nullptr)
+            {
+                lines << QStringLiteral("  %1: not found").arg(QString::fromLatin1(encoderName));
+                continue;
+            }
+
+            const AVPixelFormat* formats = encoderPixelFormats(encoder);
+            const AVPixelFormat fmt = formats ? formats[0] : AV_PIX_FMT_YUV420P;
+
+            const int ret = tryOpenEncoder(encoder, entry.codecId, fmt);
+
+            if (ret == 0)
+            {
+                lines << QStringLiteral("  %1: ok").arg(QString::fromLatin1(encoderName));
+            }
+            else
+            {
+                char err[AV_ERROR_MAX_STRING_SIZE] = {};
+                av_strerror(ret, err, sizeof(err));
+
+                lines << QStringLiteral("  %1: open failed (%2, pix_fmt %3)")
+                             .arg(QString::fromLatin1(encoderName), QString::fromLatin1(err))
+                             .arg(static_cast<int>(fmt));
+            }
+        }
+    }
+
+    return lines.join(QLatin1Char('\n'));
 }
 
 bool FFmpegCodecUtils::isEncoderUsable(const AVCodec* encoder, AVCodecID codecId,
