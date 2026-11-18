@@ -170,16 +170,6 @@ public:
     void update(const ImageView& image);
 
     /**
-     * @brief Checks for contour-related failure conditions.
-     */
-    void checkContourFailure();
-
-    /**
-     * @brief Checks for failures in the external speed model.
-     */
-    void checkSpeedModelFailure();
-
-    /**
      * @brief Runs the contour evolution until a stopping condition is reached.
      */
     void converge();
@@ -266,6 +256,16 @@ public:
     }
 
 private:
+    /**
+     * @brief Checks for contour-related failure conditions.
+     */
+    void checkContourFailure();
+
+    /**
+     * @brief Checks for failures in the external speed model.
+     */
+    void checkSpeedModelFailure();
+
     /**
      * @brief Runs a fixed number of elementary steps.
      */
