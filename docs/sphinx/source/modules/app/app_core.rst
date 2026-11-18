@@ -113,3 +113,9 @@ Utilities
 
 .. doxygenfile:: stream_watchdog.hpp
 
+
+Localization
+------------
+
+.. doxygenfile:: translator.hpp
+

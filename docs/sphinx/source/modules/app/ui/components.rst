@@ -95,6 +95,8 @@ Capture
 
 .. doxygenfile:: capture_stats_utils.hpp
 
+.. doxygenfile:: capture_status_presenter.hpp
+
 
 Fullscreen Controls
 -------------------
@@ -112,6 +114,10 @@ Animated Controls
 .. doxygenfile:: animated_push_button.hpp
 
 .. doxygenfile:: animated_tab_widget.hpp
+
+.. doxygenfile:: shape_morph.hpp
+
+.. doxygenfile:: morph_button.hpp
 
 .. NOTE::
    The following files are temporarily excluded because current

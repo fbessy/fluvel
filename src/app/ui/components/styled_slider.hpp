@@ -10,6 +10,9 @@
 #include <QColor>
 #include <QPainter>
 
+namespace fluvel
+{
+
 /**
  * @brief Base class for Fluvel custom sliders.
  *
@@ -22,9 +25,6 @@
  * When the Native style is selected, the widget falls back to the
  * standard Qt QSlider rendering.
  */
-namespace fluvel
-{
-
 class StyledSlider : public JumpSlider
 {
     Q_OBJECT

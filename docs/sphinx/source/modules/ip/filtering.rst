@@ -41,12 +41,6 @@ Filter
 .. doxygennamespace:: fluvel_ip::filter
    :members:
 
-Morphology
-----------
-
-.. doxygennamespace:: fluvel_ip::filter::morpho
-   :members:
-
 Noise
 -----
 
