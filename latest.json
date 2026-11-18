@@ -1,8 +1,8 @@
 {
-  "version": "dev-600fa56",
+  "version": "dev-890f8ba",
   "branch": "release",
-  "commit": "600fa560",
-  "date": "2026-08-26T06:59:58Z",
+  "commit": "890f8ba3",
+  "date": "2026-11-18T17:53:06Z",
 
   "windows": {
     "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
@@ -18,5 +18,5 @@
     "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
   },
 
-  "checksums": "3933b2d1157528e62419af56e9cac4002ed5e50da3eb5ebbdde1d62c4efe1292  Fluvel-win64-installer.exe\r\n33ba641ac179ea0071281797199001797da21217929298a0e86cbe361cf897b9  Fluvel-win64-portable.zip\r\nd56ea7eb647b302f97d46d54d818c0cec629846440380550f7beb98727ccfa9d  Fluvel-macos.dmg\na77e96c1c7c77940da854d53325ee57e7ea9257b33180938409745598ad78bab  Fluvel-linux.AppImage\n64d12da16619c8d9a54b450d1cc87c154245777a287a76e83ca9c9b97aa71867  Fluvel-linux.flatpak"
+  "checksums": "f7cbc731b5e2cd1497b2a2c014991d7621d6a02d4bcd66be04349c1fae963538  Fluvel-win64-installer.exe\r\n87c336b4b7b384696c3dcf211357a4ac44fe60059ff5637b835cd98de00d957e  Fluvel-win64-portable.zip\r\n7617c844aa278257c5b6f3b7332caaaad71b0495da2f2999cdf8727db95ac950  Fluvel-macos.dmg\n500fcba6f97c1fcca5040d4959c239a758430a24a8a48795c2535be47823612a  Fluvel-linux.AppImage\n169f581034fbcb08412e54d950d94f3cb1784771dca99e129ebff011660aa22d  Fluvel-linux.flatpak"
 }
