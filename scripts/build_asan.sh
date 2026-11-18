@@ -19,7 +19,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 USE_CLANG=1
 # USE_GCC=1
 
-QT_PATH="$HOME/Qt/6.11.0/gcc_64"
+QT_PATH="$HOME/Qt/6.11.2/gcc_64"
 BUILD_TYPE="Debug"
 
 #######################################

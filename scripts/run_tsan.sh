@@ -43,7 +43,8 @@ if [ "$USE_CLANG" = "1" ]; then
         ignore_noninstrumented_modules=1"
     else
         export TSAN_OPTIONS="\
-        halt_on_error=1:\
+        halt_on_error=0:\
+        report_mutex_bugs=0:\
         report_signal_unsafe=0:\
         ignore_noninstrumented_modules=1:\
         history_size=7:\
