@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: CeCILL-2.1
 # Copyright (C) 2010-2026 Fabien Bessy
 
-name: Fluvel Stable
+name: Fluvel Set Stable
 
 concurrency:
   group: fluvel-stable
@@ -142,11 +142,11 @@ jobs:
       - name: Create stable release
         run: |
           gh release create "${GITHUB_REF_NAME}" \
-            windows/Fluvel-win64-portable.zip \
-            windows/Fluvel-win64-installer.exe \
-            macos/Fluvel-macos.dmg \
-            linux/Fluvel-linux.AppImage \
-            linux/Fluvel-linux.flatpak \
+            windows/FluvelSet-win64-portable.zip \
+            windows/FluvelSet-win64-installer.exe \
+            macos/FluvelSet-macos.dmg \
+            linux/FluvelSet-linux.AppImage \
+            linux/FluvelSet-linux.flatpak \
             prepared/BUILD_INFO.txt \
-            --title "Fluvel ${GITHUB_REF_NAME#v}" \
+            --title "Fluvel Set ${GITHUB_REF_NAME#v}" \
             --notes-file "release-notes/${GITHUB_REF_NAME}.md"

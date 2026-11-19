@@ -1,9 +1,9 @@
 {
-  "id": "org.fluvel.Fluvel",
+  "id": "org.fluvel.FluvelSet",
   "runtime": "org.kde.Platform",
   "runtime-version": "6.9",
   "sdk": "org.kde.Sdk",
-  "command": "fluvel",
+  "command": "fluvel-set",
 
   "add-extensions": {
     "org.freedesktop.Platform.ffmpeg-full": {
@@ -55,12 +55,12 @@
       "name": "fluvel-metadata",
       "buildsystem": "simple",
       "build-commands": [
-        "install -Dm644 packaging/linux/org.fluvel.Fluvel.desktop /app/share/applications/org.fluvel.Fluvel.desktop",
-        "install -Dm644 metainfo.ci.xml /app/share/metainfo/org.fluvel.Fluvel.metainfo.xml",
-        "install -Dm644 packaging/linux/org.fluvel.Fluvel.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.Fluvel.svg",
-        "install -Dm644 resources/icons/app/fluvel-64.png /app/share/icons/hicolor/64x64/apps/org.fluvel.Fluvel.png",
-        "install -Dm644 resources/icons/app/fluvel-128.png /app/share/icons/hicolor/128x128/apps/org.fluvel.Fluvel.png",
-        "install -Dm644 resources/icons/app/fluvel-256.png /app/share/icons/hicolor/256x256/apps/org.fluvel.Fluvel.png"
+        "install -Dm644 packaging/linux/org.fluvel.FluvelSet.desktop /app/share/applications/org.fluvel.FluvelSet.desktop",
+        "install -Dm644 metainfo.ci.xml /app/share/metainfo/org.fluvel.FluvelSet.metainfo.xml",
+        "install -Dm644 packaging/linux/org.fluvel.FluvelSet.svg /app/share/icons/hicolor/scalable/apps/org.fluvel.FluvelSet.svg",
+        "install -Dm644 resources/icons/app/fluvel-64.png /app/share/icons/hicolor/64x64/apps/org.fluvel.FluvelSet.png",
+        "install -Dm644 resources/icons/app/fluvel-128.png /app/share/icons/hicolor/128x128/apps/org.fluvel.FluvelSet.png",
+        "install -Dm644 resources/icons/app/fluvel-256.png /app/share/icons/hicolor/256x256/apps/org.fluvel.FluvelSet.png"
       ],
       "sources": [
         {

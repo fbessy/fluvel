@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center" style="color:#6b6fcf;">
-  Fluvel
+  Fluvel Set
 </h1>
 
 <p align="center">
@@ -88,7 +88,7 @@ for reproducibility and long-term experimentation.
 
 ## 🧠 Overview
 
-Fluvel is a research-oriented image segmentation platform
+Fluvel Set is a research-oriented image segmentation platform
 focused on region-based active contour methods.
 
 The project emphasizes:
@@ -154,7 +154,7 @@ fluvel/
 
 ### Main modules
 
-- **fluvel** — Qt-based user interface and application orchestration
+- **Fluvel Set** — Qt-based user interface and application orchestration
 - **fluvel_ip** — Image processing and segmentation library (C++)
 - **fluvel_bindings** — Python bindings for Fluvel IP (pybind11/C++)
 

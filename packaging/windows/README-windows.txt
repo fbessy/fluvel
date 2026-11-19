@@ -1,7 +1,7 @@
 ﻿FLUVEL - First launch / Premier lancement
 =========================================
 
-Fluvel is not code-signed yet, so Windows may show a warning
+Fluvel Set is not code-signed yet, so Windows may show a warning
 ("Windows protected your PC") the first time you run it.
 This is expected.
 
@@ -12,7 +12,7 @@ You only need to do this once.
 
 ------------------------------------------------------------------
 
-Fluvel n'est pas encore signé numériquement : Windows peut afficher un
+Fluvel Set n'est pas encore signé numériquement : Windows peut afficher un
 avertissement (« Windows a protégé votre ordinateur ») au premier
 lancement. C'est normal.
 

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: CeCILL-2.1
 # Copyright (C) 2010-2026 Fabien Bessy
 
-name: Fluvel Latest
+name: Fluvel Set Latest
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -153,11 +153,11 @@ jobs:
       - name: Upload assets
         run: |
           gh release upload latest \
-            windows/Fluvel-win64-portable.zip \
-            windows/Fluvel-win64-installer.exe \
-            macos/Fluvel-macos.dmg \
-            linux/Fluvel-linux.AppImage \
-            linux/Fluvel-linux.flatpak \
+            windows/FluvelSet-win64-portable.zip \
+            windows/FluvelSet-win64-installer.exe \
+            macos/FluvelSet-macos.dmg \
+            linux/FluvelSet-linux.AppImage \
+            linux/FluvelSet-linux.flatpak \
             prepared/BUILD_INFO.txt \
             --clobber
 

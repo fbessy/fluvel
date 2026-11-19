@@ -16,17 +16,17 @@ cat > latest.json <<EOF
   "date": "$BUILD_DATE",
 
   "windows": {
-    "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
-    "portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip"
+    "installer": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-win64-installer.exe",
+    "portable": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-win64-portable.zip"
   },
 
   "macos": {
-    "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
+    "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-macos.dmg"
   },
 
   "linux": {
-    "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-    "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+    "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-linux.AppImage",
+    "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-linux.flatpak"
   },
 
   "checksums": $ALL_CHECKSUMS

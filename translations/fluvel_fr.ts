@@ -97,8 +97,8 @@ R : %3  G : %4  B : %5</translation>
     <name>fluvel::AboutDialog</name>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="185"/>
-        <source>About Fluvel</source>
-        <translation>À propos de Fluvel</translation>
+        <source>About Fluvel Set</source>
+        <translation>À propos de Fluvel Set</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="220"/>
@@ -123,13 +123,13 @@ R : %3  G : %4  B : %5</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="315"/>
-        <source>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.&lt;/p&gt;&lt;p&gt;The software integrates real-time image processing, video stream handling, image pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.&lt;/p&gt;&lt;p&gt;It provides an interactive environment for testing and analyzing discrete level-set implementations in both static images and dynamic video scenarios.&lt;/p&gt;&lt;p&gt;Fluvel focuses on performance, reproducibility, and clarity, making it suitable for research, teaching, and experimental validation.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Fluvel&lt;/b&gt; est une application de segmentation d’images orientée recherche, conçue pour permettre des expérimentations rapides et efficaces avec des méthodes de contours actifs de type level-set.&lt;/p&gt;&lt;p&gt;Le logiciel intègre du traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement d’image ainsi que des métriques d’évaluation quantitative telles que la distance de Hausdorff pour l’analyse de segmentation.&lt;/p&gt;&lt;p&gt;Il offre un environnement interactif pour tester et analyser des implémentations discrètes de level-set, aussi bien sur des images statiques que dans des scénarios vidéo dynamiques.&lt;/p&gt;&lt;p&gt;Fluvel met l’accent sur les performances, la reproductibilité et la clarté, ce qui le rend adapté à la recherche, à l’enseignement et à la validation expérimentale.&lt;/p&gt;</translation>
+        <source>&lt;p&gt;&lt;b&gt;Fluvel Set&lt;/b&gt; is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.&lt;/p&gt;&lt;p&gt;The software integrates real-time image processing, video stream handling, image pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.&lt;/p&gt;&lt;p&gt;It provides an interactive environment for testing and analyzing discrete level-set implementations in both static images and dynamic video scenarios.&lt;/p&gt;&lt;p&gt;Fluvel Set focuses on performance, reproducibility, and clarity, making it suitable for research, teaching, and experimental validation.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Fluvel Set&lt;/b&gt; est une application de segmentation d’images orientée recherche, conçue pour permettre des expérimentations rapides et efficaces avec des méthodes de contours actifs de type level-set.&lt;/p&gt;&lt;p&gt;Le logiciel intègre du traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement d’image ainsi que des métriques d’évaluation quantitative telles que la distance de Hausdorff pour l’analyse de segmentation.&lt;/p&gt;&lt;p&gt;Il offre un environnement interactif pour tester et analyser des implémentations discrètes de level-set, aussi bien sur des images statiques que dans des scénarios vidéo dynamiques.&lt;/p&gt;&lt;p&gt;Fluvel Set met l’accent sur les performances, la reproductibilité et la clarté, ce qui le rend adapté à la recherche, à l’enseignement et à la validation expérimentale.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="338"/>
-        <source>&lt;p&gt;&lt;b&gt;Scientific Background&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel integrates several fundamental methods in image segmentation, including discrete level-set approximation (Shi &amp; Karl, 2008), region-based active contours (Chan &amp; Vese, 2001), anisotropic diffusion filtering (Perona &amp; Malik, 1990), and quantitative evaluation using the Hausdorff distance.&lt;/p&gt;&lt;p&gt;These methods provide a balance between computational efficiency, topological flexibility, and rigorous segmentation assessment.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
+        <source>&lt;p&gt;&lt;b&gt;Scientific Background&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set integrates several fundamental methods in image segmentation, including discrete level-set approximation (Shi &amp; Karl, 2008), region-based active contours (Chan &amp; Vese, 2001), anisotropic diffusion filtering (Perona &amp; Malik, 1990), and quantitative evaluation using the Hausdorff distance.&lt;/p&gt;&lt;p&gt;These methods provide a balance between computational efficiency, topological flexibility, and rigorous segmentation assessment.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="360"/>
@@ -138,8 +138,8 @@ R : %3  G : %4  B : %5</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="388"/>
-        <source>&lt;p&gt;&lt;b&gt;Support Fluvel&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel is developed and maintained as an independent research-oriented project.&lt;/p&gt;&lt;p&gt;If you find the software useful for research, teaching, or experimentation, you may support its continued development through a voluntary donation.&lt;/p&gt;&lt;p&gt;Your support helps sustain long-term maintenance, improvements, and future extensions of the project.&lt;/p&gt;&lt;p&gt;&lt;i&gt;No features are restricted. Donations are entirely optional.&lt;/i&gt;&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Soutenir Fluvel&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel est développé et maintenu comme un projet indépendant orienté recherche.&lt;/p&gt;&lt;p&gt;Si vous trouvez ce logiciel utile pour la recherche, l’enseignement ou l’expérimentation, vous pouvez soutenir son développement par un don volontaire.&lt;/p&gt;&lt;p&gt;Votre soutien contribue à assurer la maintenance à long terme, les améliorations et les évolutions futures du projet.&lt;/p&gt;&lt;p&gt;&lt;i&gt;Aucune fonctionnalité n’est restreinte. Les dons sont entièrement facultatifs.&lt;/i&gt;&lt;/p&gt;</translation>
+        <source>&lt;p&gt;&lt;b&gt;Support Fluvel Set&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set is developed and maintained as an independent research-oriented project.&lt;/p&gt;&lt;p&gt;If you find the software useful for research, teaching, or experimentation, you may support its continued development through a voluntary donation.&lt;/p&gt;&lt;p&gt;Your support helps sustain long-term maintenance, improvements, and future extensions of the project.&lt;/p&gt;&lt;p&gt;&lt;i&gt;No features are restricted. Donations are entirely optional.&lt;/i&gt;&lt;/p&gt;</source>
+        <translation>&lt;p&gt;&lt;b&gt;Soutenir Fluvel Set&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set est développé et maintenu comme un projet indépendant orienté recherche.&lt;/p&gt;&lt;p&gt;Si vous trouvez ce logiciel utile pour la recherche, l’enseignement ou l’expérimentation, vous pouvez soutenir son développement par un don volontaire.&lt;/p&gt;&lt;p&gt;Votre soutien contribue à assurer la maintenance à long terme, les améliorations et les évolutions futures du projet.&lt;/p&gt;&lt;p&gt;&lt;i&gt;Aucune fonctionnalité n’est restreinte. Les dons sont entièrement facultatifs.&lt;/i&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="402"/>
@@ -223,8 +223,8 @@ R : %3  G : %4  B : %5</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="527"/>
-        <source>Media source support is provided by Fluvel and Qt Multimedia.</source>
-        <translation>Les sources multimédias sont prises en charge par Fluvel et Qt Multimedia.</translation>
+        <source>Media source support is provided by Fluvel Set and Qt Multimedia.</source>
+        <translation>Les sources multimédias sont prises en charge par Fluvel Set et Qt Multimedia.</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/about_dialog.cpp" line="528"/>

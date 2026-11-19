@@ -7,21 +7,21 @@
 #endif
 
 [Setup]
-AppName=Fluvel
+AppName=Fluvel Set
 AppVersion={#MyAppVersion}
 AppPublisher=Fluvel
 
 VersionInfoVersion={#MyVersionInfo}
 VersionInfoCompany=Fluvel
-VersionInfoDescription=Fluvel Installer
+VersionInfoDescription=Fluvel Set Installer
 VersionInfoCopyright=Copyright (C) 2010-2026 Fabien Bessy
 
-DefaultDirName={autopf}\Fluvel
+DefaultDirName={autopf}\Fluvel Set
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
-DefaultGroupName=Fluvel
+DefaultGroupName=Fluvel Set
 OutputDir=Output
-OutputBaseFilename=FluvelSetup
+OutputBaseFilename=FluvelSet-Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -40,11 +40,11 @@ Name: "french"; MessagesFile: "compiler:Languages\French.isl"; LicenseFile: "Lic
 Source: "..\..\build\src\app\Release\*"; DestDir: "{app}"; Excludes: "*.lib,*.exp"; Flags: recursesubdirs
 
 [Icons]
-Name: "{group}\Fluvel"; Filename: "{app}\Fluvel.exe"
-Name: "{autodesktop}\Fluvel"; Filename: "{app}\Fluvel.exe"; Tasks: desktopicon
+Name: "{group}\Fluvel Set"; Filename: "{app}\FluvelSet.exe"
+Name: "{autodesktop}\Fluvel Set"; Filename: "{app}\FluvelSet.exe"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
 
 [Run]
-Filename: "{app}\Fluvel.exe"; Description: "Launch Fluvel"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\FluvelSet.exe"; Description: "Launch Fluvel Set"; Flags: nowait postinstall skipifsilent

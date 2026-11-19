@@ -2,7 +2,7 @@ Qt Application
 ==============
 
 The Qt application provides the graphical user interface and runtime
-infrastructure of Fluvel.
+infrastructure of Fluvel Set.
 
 It is responsible for user interaction, session management, camera and
 image workflows, and integration with the underlying Fluvel IP image

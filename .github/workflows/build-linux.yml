@@ -63,7 +63,7 @@ jobs:
               APP_DATE=\$(date +%Y-%m-%d)
 
               cp packaging/flatpak/fluvel.json fluvel.ci.json
-              cp packaging/linux/org.fluvel.Fluvel.metainfo.xml.in metainfo.ci.xml
+              cp packaging/linux/org.fluvel.FluvelSet.metainfo.xml.in metainfo.ci.xml
 
               ESCAPED_ROOT=\$(printf '%s\n' \"\$PROJECT_ROOT\" | sed 's/[\/&]/\\\\&/g')
 
@@ -84,12 +84,12 @@ jobs:
 
               flatpak-builder --repo=repo --force-clean build-flatpak fluvel.ci.json
               flatpak build-export repo build-flatpak
-              flatpak build-bundle repo Fluvel-linux.flatpak org.fluvel.Fluvel
+              flatpak build-bundle repo FluvelSet-linux.flatpak org.fluvel.FluvelSet
             "
 
       - name: Generate checksum
         run: |
-          sha256sum Fluvel-linux.flatpak > Fluvel-linux.flatpak.sha256
+          sha256sum FluvelSet-linux.flatpak > FluvelSet-linux.flatpak.sha256
 
       - name: Generate commit info
         run: |
@@ -100,8 +100,8 @@ jobs:
         with:
           name: linux-flatpak
           path: |
-            Fluvel-linux.flatpak
-            Fluvel-linux.flatpak.sha256
+            FluvelSet-linux.flatpak
+            FluvelSet-linux.flatpak.sha256
             commit-linux-flatpak.txt
 
   # =========================
@@ -190,19 +190,19 @@ jobs:
 
               /opt/tools/linuxdeploy.AppImage \
                 --appdir AppDir \
-                --executable AppDir/usr/bin/fluvel \
+                --executable AppDir/usr/bin/fluvel-set \
                 --desktop-file AppDir/fluvel.desktop \
                 --icon-file AppDir/fluvel.png \
                 --plugin qt \
                 --output appimage
 
-              mv *.AppImage Fluvel-linux.AppImage
-              chmod +x Fluvel-linux.AppImage
+              mv *.AppImage FluvelSet-linux.AppImage
+              chmod +x FluvelSet-linux.AppImage
             "
 
       - name: Generate checksum
         run: |
-          sha256sum Fluvel-linux.AppImage > Fluvel-linux.AppImage.sha256
+          sha256sum FluvelSet-linux.AppImage > FluvelSet-linux.AppImage.sha256
 
       - name: Generate commit info
         run: |
@@ -213,6 +213,6 @@ jobs:
         with:
           name: linux-appimage
           path: |
-            Fluvel-linux.AppImage
-            Fluvel-linux.AppImage.sha256
+            FluvelSet-linux.AppImage
+            FluvelSet-linux.AppImage.sha256
             commit-linux-appimage.txt

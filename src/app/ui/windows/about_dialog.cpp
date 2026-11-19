@@ -193,7 +193,7 @@ AboutDialog::AboutDialog(QWidget* parent)
 {
     QSettings settings;
 
-    setWindowTitle(tr("About Fluvel"));
+    setWindowTitle(tr("About Fluvel Set"));
 
     if (settings.contains("ui_geometry/about_dialog"))
         restoreGeometry(settings.value("ui_geometry/about_dialog").toByteArray());
@@ -208,7 +208,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     iconLabel->setPixmap(il::appIcon().pixmap(48 * 3, 48 * 3));
     iconLabel->setAlignment(Qt::AlignCenter);
 
-    QLabel* nameLabel = new QLabel("Fluvel");
+    QLabel* nameLabel = new QLabel("Fluvel Set");
 
     nameLabel->setStyleSheet("font-size:24px;"
                              "font-weight:700;"
@@ -323,7 +323,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     overviewLabel->setWordWrap(true);
 
     overviewLabel->setText(
-        tr("<p><b>Fluvel</b> is a research-oriented image segmentation application "
+        tr("<p><b>Fluvel Set</b> is a research-oriented image segmentation application "
            "designed for fast and efficient experimentation with level-set active contour "
            "methods.</p>"
 
@@ -335,7 +335,7 @@ AboutDialog::AboutDialog(QWidget* parent)
            "discrete level-set implementations in both static images and dynamic video "
            "scenarios.</p>"
 
-           "<p>Fluvel focuses on performance, reproducibility, and clarity, "
+           "<p>Fluvel Set focuses on performance, reproducibility, and clarity, "
            "making it suitable for research, teaching, and experimental validation.</p>"));
 
     QVBoxLayout* overviewLayout = new QVBoxLayout;
@@ -348,7 +348,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     scientificLabel->setText(
         tr("<p><b>Scientific Background</b></p>"
 
-           "<p>Fluvel integrates several fundamental methods in image segmentation, "
+           "<p>Fluvel Set integrates several fundamental methods in image segmentation, "
            "including discrete level-set approximation (Shi & Karl, 2008), "
            "region-based active contours (Chan & Vese, 2001), "
            "anisotropic diffusion filtering (Perona & Malik, 1990), "
@@ -396,9 +396,9 @@ AboutDialog::AboutDialog(QWidget* parent)
     supportLabel->setWordWrap(true);
 
     supportLabel->setText(
-        tr("<p><b>Support Fluvel</b></p>"
+        tr("<p><b>Support Fluvel Set</b></p>"
 
-           "<p>Fluvel is developed and maintained as an independent "
+           "<p>Fluvel Set is developed and maintained as an independent "
            "research-oriented project.</p>"
 
            "<p>If you find the software useful for research, teaching, "
@@ -535,7 +535,7 @@ QString AboutDialog::buildTechnicalSection()
     html += "<div style='margin-bottom:4px;'><b>" + tr("Media sources") + "</b></div>";
 
     html += "<div style='margin-left:12px; font-size:9pt; color:#444; margin-bottom:6px;'>";
-    html += tr("Media source support is provided by Fluvel and Qt Multimedia.") + "<br>";
+    html += tr("Media source support is provided by Fluvel Set and Qt Multimedia.") + "<br>";
     html += tr("Available features depend on the platform and multimedia backend.");
     html += "</div>";
 

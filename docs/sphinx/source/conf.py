@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Fluvel'
+project = 'Fluvel Set'
 copyright = '2026, Fabien Bessy'
 author = 'Fabien Bessy'
 release = '0.1'

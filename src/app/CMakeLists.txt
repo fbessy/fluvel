@@ -323,9 +323,9 @@ qt_add_executable(${APP_TARGET_NAME}
     ${app_src})
 
 if(FLUVEL_PLATFORM_LINUX)
-    set(FLUVEL_OUTPUT_NAME "fluvel")
+    set(FLUVEL_OUTPUT_NAME "fluvel-set")
 else()
-    set(FLUVEL_OUTPUT_NAME "Fluvel")
+    set(FLUVEL_OUTPUT_NAME "FluvelSet")
 endif()
 
 set_target_properties(${APP_TARGET_NAME} PROPERTIES

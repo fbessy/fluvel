@@ -48,17 +48,17 @@ jobs:
           set -e
 
           cd windows
-          sha256sum -c Fluvel-win64-portable.zip.sha256
-          sha256sum -c Fluvel-win64-installer.exe.sha256
+          sha256sum -c FluvelSet-win64-portable.zip.sha256
+          sha256sum -c FluvelSet-win64-installer.exe.sha256
           cd ..
 
           cd macos
-          sha256sum -c Fluvel-macos.dmg.sha256
+          sha256sum -c FluvelSet-macos.dmg.sha256
           cd ..
 
           cd linux
-          sha256sum -c Fluvel-linux.AppImage.sha256
-          sha256sum -c Fluvel-linux.flatpak.sha256
+          sha256sum -c FluvelSet-linux.AppImage.sha256
+          sha256sum -c FluvelSet-linux.flatpak.sha256
           cd ..
 
       - name: Compute version
@@ -86,7 +86,7 @@ jobs:
           BUILD_DATE=$(date -u +"%d %B %Y at %H:%M:%S UTC")
 
           cat > BUILD_INFO.txt <<EOF
-          Fluvel Build Information
+          Fluvel Set Build Information
           ==========================
 
           Version : $VERSION
@@ -97,11 +97,11 @@ jobs:
           Artifacts
           =========
 
-          Fluvel-win64-installer.exe
-          Fluvel-win64-portable.zip
-          Fluvel-macos.dmg
-          Fluvel-linux.AppImage
-          Fluvel-linux.flatpak
+          FluvelSet-win64-installer.exe
+          FluvelSet-win64-portable.zip
+          FluvelSet-macos.dmg
+          FluvelSet-linux.AppImage
+          FluvelSet-linux.flatpak
 
           Checksums
           =========
@@ -112,7 +112,7 @@ jobs:
 
           --
 
-          Generated automatically by the Fluvel release workflow.
+          Generated automatically by the Fluvel Set release workflow.
 
           EOF
 

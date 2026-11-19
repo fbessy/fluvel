@@ -4,16 +4,16 @@
     <dict>
 
         <key>CFBundleName</key>
-        <string>Fluvel</string>
+        <string>Fluvel Set</string>
 
         <key>CFBundleDisplayName</key>
-        <string>Fluvel</string>
+        <string>Fluvel Set</string>
 
         <key>CFBundleIdentifier</key>
-        <string>org.fluvel.app</string>
+        <string>org.fluvel.FluvelSet</string>
 
         <key>CFBundleExecutable</key>
-        <string>Fluvel</string>
+        <string>FluvelSet</string>
 
         <key>CFBundleVersion</key>
         <string>@FLUVEL_VERSION@</string>
@@ -37,7 +37,7 @@
         <string>@FLUVEL_MACOS_MIN_VERSION@</string>
 
         <key>NSCameraUsageDescription</key>
-        <string>Fluvel requires access to the camera for real-time image segmentation.</string>
+        <string>Fluvel Set requires access to the camera for real-time image segmentation.</string>
 
     </dict>
 </plist>

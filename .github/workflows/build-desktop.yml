@@ -120,7 +120,7 @@ jobs:
             --compiler-runtime `
             --translations fr,en `
             --no-system-d3d-compiler `
-            build\src\app\Release\Fluvel.exe
+            build\src\app\Release\FluvelSet.exe
 
       - name: Package
         shell: pwsh
@@ -139,7 +139,7 @@ jobs:
 
           Compress-Archive `
             -Path package\* `
-            -DestinationPath Fluvel-win64-portable.zip `
+            -DestinationPath FluvelSet-win64-portable.zip `
             -Force
 
       - name: Install Inno Setup
@@ -165,18 +165,18 @@ jobs:
         shell: pwsh
         run: |
           $exe = Get-ChildItem packaging\windows\Output\*.exe | Select-Object -First 1
-          Rename-Item $exe.FullName "Fluvel-win64-installer.exe"
-          Copy-Item packaging\windows\Output\Fluvel-win64-installer.exe .
+          Rename-Item $exe.FullName "FluvelSet-win64-installer.exe"
+          Copy-Item packaging\windows\Output\FluvelSet-win64-installer.exe .
 
       - name: Generate checksum
         run: |
-          Get-FileHash Fluvel-win64-portable.zip -Algorithm SHA256 |
-            ForEach-Object { "$($_.Hash.ToLower())  Fluvel-win64-portable.zip" } |
-            Out-File Fluvel-win64-portable.zip.sha256 -Encoding ascii
+          Get-FileHash FluvelSet-win64-portable.zip -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  FluvelSet-win64-portable.zip" } |
+            Out-File FluvelSet-win64-portable.zip.sha256 -Encoding ascii
 
-          Get-FileHash Fluvel-win64-installer.exe -Algorithm SHA256 |
-            ForEach-Object { "$($_.Hash.ToLower())  Fluvel-win64-installer.exe" } |
-            Out-File Fluvel-win64-installer.exe.sha256 -Encoding ascii
+          Get-FileHash FluvelSet-win64-installer.exe -Algorithm SHA256 |
+            ForEach-Object { "$($_.Hash.ToLower())  FluvelSet-win64-installer.exe" } |
+            Out-File FluvelSet-win64-installer.exe.sha256 -Encoding ascii
 
       - name: Generate commit info
         run: |
@@ -187,10 +187,10 @@ jobs:
         with:
           name: windows
           path: |
-            Fluvel-win64-portable.zip
-            Fluvel-win64-portable.zip.sha256
-            Fluvel-win64-installer.exe
-            Fluvel-win64-installer.exe.sha256
+            FluvelSet-win64-portable.zip
+            FluvelSet-win64-portable.zip.sha256
+            FluvelSet-win64-installer.exe
+            FluvelSet-win64-installer.exe.sha256
             commit-windows.txt
 
 
@@ -251,7 +251,7 @@ jobs:
 
       - name: Find app
         run: |
-          APP_PATH=$(find build -name "Fluvel.app" -type d | head -n 1)
+          APP_PATH=$(find build -name "FluvelSet.app" -type d | head -n 1)
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
 
       - name: Deploy Qt
@@ -283,11 +283,11 @@ jobs:
           cp -R "${{ env.APP_PATH }}" dmg/
           cp packaging/macos/README-macos.txt dmg/README.txt
           ln -s /Applications dmg/Applications
-          hdiutil create Fluvel-macos.dmg -volname Fluvel -srcfolder dmg -ov -format UDZO
+          hdiutil create FluvelSet-macos.dmg -volname "Fluvel Set" -srcfolder dmg -ov -format UDZO
 
       - name: Generate checksum
         run: |
-          shasum -a 256 Fluvel-macos.dmg > Fluvel-macos.dmg.sha256
+          shasum -a 256 FluvelSet-macos.dmg > FluvelSet-macos.dmg.sha256
 
       - name: Generate commit info
         run: |
@@ -298,6 +298,6 @@ jobs:
         with:
           name: macos
           path: |
-            Fluvel-macos.dmg
-            Fluvel-macos.dmg.sha256
+            FluvelSet-macos.dmg
+            FluvelSet-macos.dmg.sha256
             commit-macos.txt

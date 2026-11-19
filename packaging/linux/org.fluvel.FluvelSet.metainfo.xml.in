@@ -2,10 +2,10 @@
 
 <component type="desktop-application">
 
-  <id>org.fluvel.Fluvel</id>
+  <id>org.fluvel.FluvelSet</id>
 
-  <name>Fluvel</name>
-  <name xml:lang="fr">Fluvel</name>
+  <name>Fluvel Set</name>
+  <name xml:lang="fr">Fluvel Set</name>
 
   <summary>
     Real-time computer vision and image analysis for research
@@ -23,7 +23,7 @@
   <description>
 
     <p>
-      Fluvel is a research-oriented image segmentation application designed
+      Fluvel Set is a research-oriented image segmentation application designed
       for fast and efficient experimentation with level-set active contour methods.
     </p>
 
@@ -34,7 +34,7 @@
     </p>
 
     <p xml:lang="fr">
-      Fluvel est une application de segmentation d’image orientée recherche,
+      Fluvel Set est une application de segmentation d’image orientée recherche,
       conçue pour des expérimentations rapides et efficaces avec des méthodes
       de contours actifs basées sur les ensembles de niveaux.
     </p>
@@ -54,7 +54,7 @@
   </categories>
 
   <launchable type="desktop-id">
-    org.fluvel.Fluvel.desktop
+    org.fluvel.FluvelSet.desktop
   </launchable>
 
   <developer id="org.fluvel">

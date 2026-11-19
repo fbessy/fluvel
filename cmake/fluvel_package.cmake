@@ -2,14 +2,14 @@
 # Copyright (C) 2010-2026 Fabien Bessy
 
 # =========================================================
-# Fluvel Packaging
+# Fluvel Set Packaging
 # =========================================================
 
 # ---------------------------------------------------------
 # Common package metadata
 # ---------------------------------------------------------
 
-set(CPACK_PACKAGE_NAME "fluvel")
+set(CPACK_PACKAGE_NAME "fluvel-set")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
@@ -55,7 +55,7 @@ if(FLUVEL_PLATFORM_LINUX)
     # =====================================================
 
     install(FILES
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.desktop
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.FluvelSet.desktop
         DESTINATION ${LINUX_INSTALL_DESKTOPDIR}
     )
 
@@ -66,13 +66,13 @@ if(FLUVEL_PLATFORM_LINUX)
     string(TIMESTAMP FLUVEL_RELEASE_DATE "%Y-%m-%d")
 
     configure_file(
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.metainfo.xml.in
-        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.Fluvel.metainfo.xml
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.FluvelSet.metainfo.xml.in
+        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.FluvelSet.metainfo.xml
         @ONLY
     )
 
     install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.Fluvel.metainfo.xml
+        ${CMAKE_CURRENT_BINARY_DIR}/org.fluvel.FluvelSet.metainfo.xml
         DESTINATION ${LINUX_INSTALL_METAINFO_DIR}
     )
 
@@ -81,7 +81,7 @@ if(FLUVEL_PLATFORM_LINUX)
     # =====================================================
 
     install(FILES
-        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.Fluvel.svg
+        ${FLUVEL_PACKAGING_DIR}/linux/org.fluvel.FluvelSet.svg
         DESTINATION ${LINUX_INSTALL_ICONS_DIR}/scalable/apps
     )
 
@@ -92,31 +92,31 @@ if(FLUVEL_PLATFORM_LINUX)
     install(FILES
         ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-32.png
         DESTINATION ${LINUX_INSTALL_ICONS_DIR}/32x32/apps
-        RENAME org.fluvel.Fluvel.png
+        RENAME org.fluvel.FluvelSet.png
     )
 
     install(FILES
         ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-48.png
         DESTINATION ${LINUX_INSTALL_ICONS_DIR}/48x48/apps
-        RENAME org.fluvel.Fluvel.png
+        RENAME org.fluvel.FluvelSet.png
     )
 
     install(FILES
         ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-64.png
         DESTINATION ${LINUX_INSTALL_ICONS_DIR}/64x64/apps
-        RENAME org.fluvel.Fluvel.png
+        RENAME org.fluvel.FluvelSet.png
     )
 
     install(FILES
         ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-128.png
         DESTINATION ${LINUX_INSTALL_ICONS_DIR}/128x128/apps
-        RENAME org.fluvel.Fluvel.png
+        RENAME org.fluvel.FluvelSet.png
     )
 
     install(FILES
         ${FLUVEL_RESOURCES_DIR}/icons/app/fluvel-256.png
         DESTINATION ${LINUX_INSTALL_ICONS_DIR}/256x256/apps
-        RENAME org.fluvel.Fluvel.png
+        RENAME org.fluvel.FluvelSet.png
     )
 
 endif()
@@ -192,7 +192,7 @@ if(FLUVEL_PLATFORM_MACOS)
 
     set_target_properties(${APP_TARGET_NAME} PROPERTIES
         MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_BUNDLE_NAME "Fluvel"
+        MACOSX_BUNDLE_BUNDLE_NAME "Fluvel Set"
     )
 
     set(FLUVEL_VERSION ${PROJECT_VERSION})

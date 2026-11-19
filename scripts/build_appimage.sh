@@ -5,8 +5,8 @@
 set -euo pipefail
 
 # -------- Config --------
-APP_NAME="Fluvel"
-APP_EXECUTABLE="fluvel"
+APP_NAME="Fluvel Set"
+APP_EXECUTABLE="fluvel-set"
 INSTALL_PREFIX="/usr"
 
 # -------- Paths --------

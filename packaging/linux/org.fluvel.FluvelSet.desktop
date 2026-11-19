@@ -2,8 +2,8 @@
 
 Type=Application
 
-Name=Fluvel
-Name[fr]=Fluvel
+Name=Fluvel Set
+Name[fr]=Fluvel Set
 
 GenericName=Computer vision and image analysis
 GenericName[fr]=Vision par ordinateur et analyse d'images
@@ -11,12 +11,12 @@ GenericName[fr]=Vision par ordinateur et analyse d'images
 Comment=Explore image segmentation with interactive and real-time visualization
 Comment[fr]=Explorer la segmentation d'images avec visualisation interactive et en temps réel
 
-Exec=fluvel
-Icon=org.fluvel.Fluvel
+Exec=fluvel-set
+Icon=org.fluvel.FluvelSet
 
 Terminal=false
 StartupNotify=false
-StartupWMClass=Fluvel
+StartupWMClass=fluvel-set
 
 Categories=Graphics;Science;
 

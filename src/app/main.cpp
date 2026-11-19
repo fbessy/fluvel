@@ -38,18 +38,18 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef FLUVEL_PLATFORM_WINDOWS
-    SetCurrentProcessExplicitAppUserModelID(L"org.fluvel.Fluvel");
+    SetCurrentProcessExplicitAppUserModelID(L"org.fluvel.FluvelSet");
 #endif
 
     QCoreApplication::setOrganizationName("fluvel");
     QCoreApplication::setOrganizationDomain("fluvel.org");
-    QCoreApplication::setApplicationName("fluvel");
+    QCoreApplication::setApplicationName("fluvel-set");
 
 #ifdef FLUVEL_PLATFORM_LINUX
-    QGuiApplication::setDesktopFileName("org.fluvel.Fluvel");
+    QGuiApplication::setDesktopFileName("org.fluvel.FluvelSet");
 #endif
 
-    QGuiApplication::setApplicationDisplayName("Fluvel");
+    QGuiApplication::setApplicationDisplayName("Fluvel Set");
 
     fluvel::FrameClock::init();
 
