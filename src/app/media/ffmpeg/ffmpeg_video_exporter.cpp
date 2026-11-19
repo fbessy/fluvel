@@ -461,7 +461,16 @@ bool FFmpegVideoExporter::openOutputFile()
 
 bool FFmpegVideoExporter::writeHeader()
 {
-    const int ret = avformat_write_header(context_->formatContext, nullptr);
+    AVDictionary* options = nullptr;
+
+    // Fragmented MP4: the file stays playable even if the trailer is never
+    // written (crash, power loss), at the cost of losing at most one fragment.
+    if (settings_.container == VideoContainer::Mp4)
+        av_dict_set(&options, "movflags", "frag_keyframe+empty_moov+default_base_moof", 0);
+
+    const int ret = avformat_write_header(context_->formatContext, &options);
+
+    av_dict_free(&options);
 
     if (ret < 0)
     {

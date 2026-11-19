@@ -60,6 +60,28 @@ enum class RecorderState
 };
 
 /**
+ * @brief Reason why a frame could not be recorded.
+ */
+enum class RecordingFailure
+{
+    /// No failure.
+    None,
+
+    /// The frame is null or empty.
+    InvalidFrame,
+
+    /// The frame size or pixel format differs from the first frame of the
+    /// output file (single-file mode only).
+    FrameFormatChanged,
+
+    /// The current segment could not be finalized or the next one opened.
+    SegmentRotationFailed,
+
+    /// The encoder or the muxer failed to process the frame.
+    EncodingFailed
+};
+
+/**
  * @brief Runtime statistics of the video recorder.
  */
 struct RecorderStats

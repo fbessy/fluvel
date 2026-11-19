@@ -8,8 +8,12 @@
 
 #pragma once
 
+#include "recording_types.hpp"
 #include "video_export_settings.hpp"
 #include "video_exporter.hpp"
+
+#include <QImage>
+#include <QSize>
 
 #include <optional>
 
@@ -68,6 +72,15 @@ public:
      */
     bool close();
 
+    /**
+     * @brief Returns the reason of the last failed addFrame() call.
+     *
+     * @return Failure reason, or RecordingFailure::None if the last call
+     *         succeeded.
+     */
+    [[nodiscard]]
+    RecordingFailure lastFailure() const noexcept;
+
 private:
     /**
      * @brief Starts a new recording segment.
@@ -85,6 +98,12 @@ private:
 
     VideoExporter exporter_;
     VideoExportSettings settings_{};
+
+    // Size and format of the frames of the current output file.
+    QSize frameSize_;
+    QImage::Format frameFormat_{QImage::Format_Invalid};
+
+    RecordingFailure lastFailure_{RecordingFailure::None};
 
     QString segmentDirectory_;
     std::optional<int64_t> currentSegmentStartNs_;

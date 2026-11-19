@@ -147,6 +147,9 @@ private:
 
     void resetSession();
 
+    /// Returns the user-facing message describing a recording failure.
+    static QString failureMessage(RecordingFailure failure);
+
     void updateStats();
 
     RecordingSession recordingSession_;

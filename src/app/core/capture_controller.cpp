@@ -65,6 +65,16 @@ void CaptureController::setStreaming(bool streaming)
 
     streaming_ = streaming;
 
+#ifdef FLUVEL_USE_FFMPEG
+
+    // The stream is gone (stopped by the user or lost): finalize the output
+    // file now instead of waiting for frames that may never come, or may come
+    // with a different size or format.
+    if (!streaming_ && recorder_.isAcceptingFrames())
+        recorder_.stop();
+
+#endif
+
     emit streamingChanged(streaming_);
 }
 

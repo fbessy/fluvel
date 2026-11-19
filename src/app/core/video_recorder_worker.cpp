@@ -167,7 +167,7 @@ void VideoRecorderWorker::processQueue()
             }
 
             emit stateChanged(RecorderState::Draining);
-            emit errorOccurred(tr("Failed to encode video frame."));
+            emit errorOccurred(failureMessage(recordingSession_.lastFailure()));
 
             break;
         }
@@ -195,6 +195,29 @@ void VideoRecorderWorker::processQueue()
         emit recordingFinalized();
 
     emit stateChanged(RecorderState::Stopped);
+}
+
+QString VideoRecorderWorker::failureMessage(RecordingFailure failure)
+{
+    switch (failure)
+    {
+        case RecordingFailure::InvalidFrame:
+            return tr("Video recording stopped: an invalid video frame was received.");
+
+        case RecordingFailure::FrameFormatChanged:
+            return tr("Video recording stopped: the frame size or format changed during "
+                      "recording. The video file has been saved up to this point.");
+
+        case RecordingFailure::SegmentRotationFailed:
+            return tr("Video recording stopped: unable to start a new video segment. Check the "
+                      "output folder and the available disk space.");
+
+        case RecordingFailure::EncodingFailed:
+        case RecordingFailure::None:
+            break;
+    }
+
+    return tr("Failed to encode video frame.");
 }
 
 void VideoRecorderWorker::resetSession()

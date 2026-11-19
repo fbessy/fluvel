@@ -47,8 +47,32 @@ bool RecordingSession::open(const VideoExportSettings& settings)
     return true;
 }
 
+RecordingFailure RecordingSession::lastFailure() const noexcept
+{
+    return lastFailure_;
+}
+
 bool RecordingSession::addFrame(const VideoFrame& frame)
 {
+    lastFailure_ = RecordingFailure::None;
+
+    if (frame.image.isNull() || frame.image.size().isEmpty())
+    {
+        lastFailure_ = RecordingFailure::InvalidFrame;
+        return false;
+    }
+
+    const bool formatChanged =
+        frameSize_.isValid() &&
+        (frame.image.size() != frameSize_ || frame.image.format() != frameFormat_);
+
+    // In single-file mode the size and format are fixed for the whole file.
+    if (formatChanged && settings_.recordingMode == RecordingMode::SingleFile)
+    {
+        lastFailure_ = RecordingFailure::FrameFormatChanged;
+        return false;
+    }
+
     if (settings_.recordingMode == RecordingMode::Circular)
     {
         const int64_t timestampNs =
@@ -58,21 +82,41 @@ bool RecordingSession::addFrame(const VideoFrame& frame)
         {
             currentSegmentStartNs_ = timestampNs;
         }
-        else if (timestampNs - *currentSegmentStartNs_ >= segmentDurationNs_)
+        else if (formatChanged || timestampNs - *currentSegmentStartNs_ >= segmentDurationNs_)
         {
+            // A change of frame size or format also starts a new segment,
+            // since the size and format are fixed for a given output file.
             if (!rotateSegment())
+            {
+                lastFailure_ = RecordingFailure::SegmentRotationFailed;
                 return false;
+            }
 
             currentSegmentStartNs_ = timestampNs;
         }
     }
 
-    return exporter_.addFrame(frame);
+    if (!exporter_.addFrame(frame))
+    {
+        lastFailure_ = RecordingFailure::EncodingFailed;
+        return false;
+    }
+
+    if (!frameSize_.isValid() || settings_.recordingMode == RecordingMode::Circular)
+    {
+        frameSize_ = frame.image.size();
+        frameFormat_ = frame.image.format();
+    }
+
+    return true;
 }
 
 bool RecordingSession::close()
 {
     settings_ = {};
+
+    frameSize_ = QSize();
+    frameFormat_ = QImage::Format_Invalid;
 
     currentSegmentStartNs_.reset();
     segmentDurationNs_ = 0;
