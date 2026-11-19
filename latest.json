@@ -1,22 +1,22 @@
 {
-  "version": "dev-4732b02",
+  "version": "dev-cb82e12",
   "branch": "release",
-  "commit": "4732b027",
-  "date": "2026-11-18T19:57:22Z",
+  "commit": "cb82e120",
+  "date": "2026-11-19T21:00:08Z",
 
   "windows": {
-    "installer": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-installer.exe",
-    "portable": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-win64-portable.zip"
+    "installer": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-win64-installer.exe",
+    "portable": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-win64-portable.zip"
   },
 
   "macos": {
-    "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-macos.dmg"
+    "dmg": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-macos.dmg"
   },
 
   "linux": {
-    "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.AppImage",
-    "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/Fluvel-linux.flatpak"
+    "appimage": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-linux.AppImage",
+    "flatpak": "https://github.com/fbessy/fluvel/releases/latest/download/FluvelSet-linux.flatpak"
   },
 
-  "checksums": "76166c362cd98585e17171fea87ca32cd9becbc73d9d9be282fee41bd669351b  Fluvel-win64-installer.exe\r\nbfeb1d0dcdfecf6423f6b31d3a4ee984912f16afea0f1ec611570f0a58177a5e  Fluvel-win64-portable.zip\r\nc0d93020cd912ceaeb760ad1993a771b33fb5ef4b74e3ef1573e822fcf1a413d  Fluvel-macos.dmg\nb3cc57c7d8e9447f794c5925414666ddb31edfaed7960b4ac8faef0e663fde0d  Fluvel-linux.AppImage\n2301f0f8b7ffb3461e5bb3457a41f7491b10fab1bffb8904a6ae29d7440294a8  Fluvel-linux.flatpak"
+  "checksums": "476d22f02ceebcd75ad009b72afaa009bce39692e9d2e39426ddecbf07955cd5  FluvelSet-win64-installer.exe\r\nc7dda033d57ff7064fe7325e42da3660174fb8ed56e4391c3324722afb0e7aad  FluvelSet-win64-portable.zip\r\nda86a3989b950cbc5c5d672d5284c669eead9368af30929645148ed515239efb  FluvelSet-macos.dmg\n75f5ce81430b0a029189b36ddce18238d0167e77c7104c945dfb5f3b0e13c1f5  FluvelSet-linux.AppImage\n99d881a8be69827973852fe55b61a3a4947dd3d8ae26801536d4eb61d16b8fc0  FluvelSet-linux.flatpak"
 }
