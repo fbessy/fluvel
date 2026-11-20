@@ -63,7 +63,7 @@ R : %3  G : %4  B : %5</translation>
         <translation>Ajustement automatique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="173"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="177"/>
         <source>None</source>
         <translation>Aucun</translation>
     </message>
@@ -96,248 +96,248 @@ R : %3  G : %4  B : %5</translation>
 <context>
     <name>fluvel::AboutDialog</name>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="185"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="196"/>
         <source>About Fluvel Set</source>
         <translation>À propos de Fluvel Set</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="220"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="231"/>
         <source>Version </source>
         <translation>Version </translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="235"/>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="261"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="246"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="272"/>
         <source>License</source>
         <translation>Licence</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="289"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="300"/>
         <source>Documentation</source>
         <translation>Documentation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="289"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="300"/>
         <source>Home</source>
         <translation>Accueil</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="315"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="326"/>
         <source>&lt;p&gt;&lt;b&gt;Fluvel Set&lt;/b&gt; is a research-oriented image segmentation application designed for fast and efficient experimentation with level-set active contour methods.&lt;/p&gt;&lt;p&gt;The software integrates real-time image processing, video stream handling, image pre-processing tools, and quantitative evaluation metrics such as Hausdorff distance for segmentation analysis.&lt;/p&gt;&lt;p&gt;It provides an interactive environment for testing and analyzing discrete level-set implementations in both static images and dynamic video scenarios.&lt;/p&gt;&lt;p&gt;Fluvel Set focuses on performance, reproducibility, and clarity, making it suitable for research, teaching, and experimental validation.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fluvel Set&lt;/b&gt; est une application de segmentation d’images orientée recherche, conçue pour permettre des expérimentations rapides et efficaces avec des méthodes de contours actifs de type level-set.&lt;/p&gt;&lt;p&gt;Le logiciel intègre du traitement d’image en temps réel, la gestion de flux vidéo, des outils de prétraitement d’image ainsi que des métriques d’évaluation quantitative telles que la distance de Hausdorff pour l’analyse de segmentation.&lt;/p&gt;&lt;p&gt;Il offre un environnement interactif pour tester et analyser des implémentations discrètes de level-set, aussi bien sur des images statiques que dans des scénarios vidéo dynamiques.&lt;/p&gt;&lt;p&gt;Fluvel Set met l’accent sur les performances, la reproductibilité et la clarté, ce qui le rend adapté à la recherche, à l’enseignement et à la validation expérimentale.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="338"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="349"/>
         <source>&lt;p&gt;&lt;b&gt;Scientific Background&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set integrates several fundamental methods in image segmentation, including discrete level-set approximation (Shi &amp; Karl, 2008), region-based active contours (Chan &amp; Vese, 2001), anisotropic diffusion filtering (Perona &amp; Malik, 1990), and quantitative evaluation using the Hausdorff distance.&lt;/p&gt;&lt;p&gt;These methods provide a balance between computational efficiency, topological flexibility, and rigorous segmentation assessment.&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fondements scientifiques&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set intègre plusieurs méthodes fondamentales en segmentation d’images, notamment l’approximation discrète des level-set (Shi &amp; Karl, 2008), les contours actifs basés région (Chan &amp; Vese, 2001), le filtrage par diffusion anisotrope (Perona &amp; Malik, 1990), ainsi qu’une évaluation quantitative à l’aide de la distance de Hausdorff.&lt;/p&gt;&lt;p&gt;Ces méthodes offrent un équilibre entre performances de calcul, flexibilité topologique et évaluation rigoureuse de la segmentation.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="360"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="371"/>
         <source>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;This project was originally developed in 2010 within the Pattern Recognition and Image Analysis research team, Laboratory of Computer Science (LIFAT), François Rabelais University, Tours, as part of the MSc in Medical Imaging.&lt;/p&gt;&lt;p&gt;It has been modernized and extended in 2024–2026.&lt;/p&gt;&lt;p&gt;Contact: &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Fabien Bessy&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Ce projet a été initialement développé en 2010 au sein de l’équipe de recherche en reconnaissance des formes et analyse d’images, au Laboratoire d’informatique (LIFAT), Université François-Rabelais de Tours, dans le cadre du Master en imagerie médicale.&lt;/p&gt;&lt;p&gt;Il a été modernisé et étendu entre 2024 et 2026.&lt;/p&gt;&lt;p&gt;Contact : &lt;a href=&apos;mailto:fabien.bessy@gmail.com&apos;&gt;fabien.bessy@gmail.com&lt;/a&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="388"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="399"/>
         <source>&lt;p&gt;&lt;b&gt;Support Fluvel Set&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set is developed and maintained as an independent research-oriented project.&lt;/p&gt;&lt;p&gt;If you find the software useful for research, teaching, or experimentation, you may support its continued development through a voluntary donation.&lt;/p&gt;&lt;p&gt;Your support helps sustain long-term maintenance, improvements, and future extensions of the project.&lt;/p&gt;&lt;p&gt;&lt;i&gt;No features are restricted. Donations are entirely optional.&lt;/i&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Soutenir Fluvel Set&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Fluvel Set est développé et maintenu comme un projet indépendant orienté recherche.&lt;/p&gt;&lt;p&gt;Si vous trouvez ce logiciel utile pour la recherche, l’enseignement ou l’expérimentation, vous pouvez soutenir son développement par un don volontaire.&lt;/p&gt;&lt;p&gt;Votre soutien contribue à assurer la maintenance à long terme, les améliorations et les évolutions futures du projet.&lt;/p&gt;&lt;p&gt;&lt;i&gt;Aucune fonctionnalité n’est restreinte. Les dons sont entièrement facultatifs.&lt;/i&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="402"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="413"/>
         <source>Donate via PayPal</source>
         <translation>Faire un don via PayPal</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="436"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="447"/>
         <source>Overview</source>
         <translation>Aperçu</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="437"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="448"/>
         <source>Scientific</source>
         <translation>Scientifique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="438"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="449"/>
         <source>Author</source>
         <translation>Auteur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="439"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="450"/>
         <source>Technical</source>
         <translation>Technique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="440"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="451"/>
         <source>Support</source>
         <translation>Soutien</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="493"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="504"/>
         <source>Technical information</source>
         <translation>Informations techniques</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="499"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="510"/>
         <source>Application</source>
         <translation>Application</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="504"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="515"/>
         <source>Version</source>
         <translation>Version</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="507"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="518"/>
         <source>Configuration directory</source>
         <translation>Répertoire de configuration</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="511"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="522"/>
         <source>Image formats</source>
         <translation>Formats d’image</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="514"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="525"/>
         <source>Image format support is provided by Qt image format plugins.</source>
         <translation>La prise en charge des formats d’image est assurée par les plugins de formats d’image Qt.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="515"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="526"/>
         <source>Available formats depend on the Qt installation and platform.</source>
         <translation>Les formats disponibles dépendent de l’installation de Qt et de la plateforme.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="520"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="531"/>
         <source>Read</source>
         <translation>Lecture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="521"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="532"/>
         <source>Write</source>
         <translation>Écriture</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="524"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="535"/>
         <source>Media sources</source>
         <translation>Sources multimédias</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="527"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="538"/>
         <source>Media source support is provided by Fluvel Set and Qt Multimedia.</source>
         <translation>Les sources multimédias sont prises en charge par Fluvel Set et Qt Multimedia.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="528"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="539"/>
         <source>Available features depend on the platform and multimedia backend.</source>
         <translation>Les fonctionnalités disponibles dépendent de la plateforme et du moteur multimédia.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="538"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="549"/>
         <source>Local video files</source>
         <translation>Fichiers vidéo locaux</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="532"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="543"/>
         <source>Camera devices</source>
         <translation>Périphériques caméra</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="542"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="553"/>
         <source>Video codecs: %1</source>
         <translation>Codecs vidéo : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="543"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="554"/>
         <source>Audio codecs: %1</source>
         <translation>Codecs audio : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="544"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="555"/>
         <source>File formats: %1</source>
         <translation>Formats de fichiers : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="548"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="559"/>
         <source>Video export</source>
         <translation>Export vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="551"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="562"/>
         <source>Video export support is provided by FFmpeg.</source>
         <translation>La prise en charge de l’export vidéo est assurée par FFmpeg.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="552"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="563"/>
         <source>Available encoders depend on the FFmpeg build bundled with the application, the platform, and available hardware.</source>
         <translation>Les encodeurs disponibles dépendent de la version de FFmpeg fournie avec l’application, de la plateforme et du matériel disponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="560"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="571"/>
         <source>Encoders</source>
         <translation>Encodeurs</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="571"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="582"/>
         <source>Environment</source>
         <translation>Environnement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="575"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="586"/>
         <source>Qt (runtime)</source>
         <translation>Qt (version d’exécution)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="581"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="592"/>
         <source>Package</source>
         <translation>Paquet</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="584"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="595"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="592"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="603"/>
         <source>Build</source>
         <translation>Build</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="602"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="613"/>
         <source>Git commit</source>
         <translation>Git commit</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="603"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="614"/>
         <source>Build type</source>
         <translation>Type de build</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="604"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="615"/>
         <source>Build origin</source>
         <translation>Environnement de compilation</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="605"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="616"/>
         <source>Build date (UTC)</source>
         <translation>Date de build (UTC)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="606"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="617"/>
         <source>Qt (build)</source>
         <translation>Qt (version de build)</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="607"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="618"/>
         <source>Compiler</source>
         <translation>Compilateur</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="608"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="619"/>
         <source>CMake</source>
         <translation>CMake</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/about_dialog.cpp" line="619"/>
+        <location filename="../src/app/ui/windows/about_dialog.cpp" line="630"/>
         <source>Build fingerprint</source>
         <translation>Empreinte de build</translation>
     </message>
@@ -668,12 +668,12 @@ ou cliquez sur Ouvrir...</translation>
 <context>
     <name>fluvel::CaptureController</name>
     <message>
-        <location filename="../src/app/core/capture_controller.cpp" line="145"/>
+        <location filename="../src/app/core/capture_controller.cpp" line="159"/>
         <source>No frame available.</source>
         <translation>Aucune image disponible.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/capture_controller.cpp" line="151"/>
+        <location filename="../src/app/core/capture_controller.cpp" line="165"/>
         <source>Snapshot queue is full.</source>
         <translation>La file d&apos;attente des captures est pleine.</translation>
     </message>
@@ -681,22 +681,22 @@ ou cliquez sur Ouvrir...</translation>
 <context>
     <name>fluvel::CaptureControlsWidget</name>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="28"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="42"/>
         <source>Take snapshot</source>
         <translation>Prendre une capture d&apos;écran</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="161"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="177"/>
         <source>Start video recording.</source>
         <translation>Démarrer l’enregistrement vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="167"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="183"/>
         <source>Stop video recording.</source>
         <translation>Arrêter l’enregistrement vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="173"/>
+        <location filename="../src/app/ui/components/capture_controls_widget.cpp" line="189"/>
         <source>Finalizing video recording...</source>
         <translation>Finalisation de l’enregistrement vidéo…</translation>
     </message>
@@ -704,32 +704,32 @@ ou cliquez sur Ouvrir...</translation>
 <context>
     <name>fluvel::CaptureStatusPresenter</name>
     <message>
-        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="63"/>
+        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="66"/>
         <source>Snapshot saved: %1</source>
         <translation>Capture d’écran sauvegardée : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="82"/>
+        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="85"/>
         <source>Recording to: %1</source>
         <translation>Enregistrement vers : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="90"/>
+        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="101"/>
         <source>Recording saved: %1</source>
         <translation>Enregistrement sauvegardé : %1</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="84"/>
+        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="94"/>
         <source>Converting to standard MP4... Please wait.</source>
         <translation>Conversion en MP4 standard… Veuillez patienter.</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="96"/>
+        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="107"/>
         <source>Recording warning</source>
         <translation>Avertissement d’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="101"/>
+        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="112"/>
         <source>Recording error</source>
         <translation>Erreur d’enregistrement</translation>
     </message>
@@ -1244,12 +1244,12 @@ ou choisissez Fichier → Ouvrir</translation>
         <translation>Ajouter un horodatage</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="222"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="223"/>
         <source>Convert to standard MP4 when recording ends</source>
         <translation>Convertir en MP4 standard à la fin de l’enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="223"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="225"/>
         <source>MP4 files are recorded in a fragmented form so they stay playable after a crash. This option rewrites them as standard MP4 files when the recording ends, which improves compatibility with some players and editors. The conversion does not re-encode the video, but it rewrites the whole file: it takes extra time and extra disk writes, especially for long recordings.</source>
         <translation>Les fichiers MP4 sont enregistrés en mode fragmenté pour rester lisibles après un plantage. Cette option les réécrit en MP4 standard à la fin de l’enregistrement, ce qui améliore la compatibilité avec certains lecteurs et logiciels de montage. La conversion ne ré-encode pas la vidéo, mais elle réécrit tout le fichier : elle demande plus de temps et plus d’écritures sur le disque, surtout pour les longs enregistrements.</translation>
     </message>
@@ -1261,13 +1261,13 @@ ou choisissez Fichier → Ouvrir</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="168"/>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="243"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="252"/>
         <source>Directory:</source>
         <translation>Répertoire :</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="169"/>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="244"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="253"/>
         <source>Base name:</source>
         <translation>Nom de base :</translation>
     </message>
@@ -1278,7 +1278,7 @@ ou choisissez Fichier → Ouvrir</translation>
     </message>
     <message>
         <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="172"/>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="247"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="256"/>
         <source>Preview:</source>
         <translation>Aperçu :</translation>
     </message>
@@ -1288,107 +1288,107 @@ ou choisissez Fichier → Ouvrir</translation>
         <translation>Enregistrement vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="224"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="233"/>
         <source>Single file</source>
         <translation>Fichier unique</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="225"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="234"/>
         <source>Circular</source>
         <translation>Circulaire</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="229"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="238"/>
         <source>Retention time:</source>
         <translation>Durée de conservation :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="232"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="241"/>
         <source> min</source>
         <translation> min</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="235"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="244"/>
         <source>Segments:</source>
         <translation>Segments :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="240"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="249"/>
         <source>Segment duration:</source>
         <translation>Durée d&apos;un segment :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="245"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="254"/>
         <source>Codec:</source>
         <translation>Codec :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="248"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="257"/>
         <source>Recording mode:</source>
         <translation>Mode d&apos;enregistrement :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="302"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="325"/>
         <source>Recording buffer</source>
         <translation>Tampon d&apos;enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="308"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="331"/>
         <source> MiB</source>
         <translation> MiB</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="312"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="335"/>
         <source> GiB</source>
         <translation> GiB</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="315"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="338"/>
         <source>Stop recording</source>
         <translation>Arrêter l&apos;enregistrement</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="318"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="341"/>
         <source>Discard oldest frames</source>
         <translation>Supprimer les images les plus anciennes</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="328"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="351"/>
         <source>Maximum RAM usage:</source>
         <translation>Utilisation maximale de la RAM :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="329"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="352"/>
         <source>Maximum temporary storage usage:</source>
         <translation>Utilisation maximale du stockage temporaire :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="330"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="353"/>
         <source>When buffer is full:</source>
         <translation>Lorsque le tampon est plein :</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="338"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="361"/>
         <source>Select snapshot directory</source>
         <translation>Sélectionner le répertoire des captures d&apos;écran</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="347"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="370"/>
         <source>Select video recording directory</source>
         <translation>Sélectionner le répertoire des enregistrements vidéo</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="460"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="485"/>
         <source>%1 min</source>
         <translation>%1 min</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="463"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="488"/>
         <source> %1 s</source>
         <translation> %1 s</translation>
     </message>
     <message>
-        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="467"/>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="492"/>
         <source>%1 s</source>
         <translation>%1 s</translation>
     </message>
@@ -1758,17 +1758,32 @@ Contour : %7 pts</translation>
         <translation>L&apos;enregistrement vidéo a été arrêté, car le tampon d&apos;enregistrement est plein ou ne peut pas être écrit.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_recorder_worker.cpp" line="170"/>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="221"/>
+        <source>Video recording stopped: an invalid video frame was received.</source>
+        <translation>L’enregistrement vidéo a été arrêté : une image vidéo invalide a été reçue.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="224"/>
+        <source>Video recording stopped: the frame size or format changed during recording. The video file has been saved up to this point.</source>
+        <translation>L’enregistrement vidéo a été arrêté : la taille ou le format des images a changé pendant l’enregistrement. Le fichier vidéo a été sauvegardé jusqu’à ce point.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="228"/>
+        <source>Video recording stopped: unable to start a new video segment. Check the output folder and the available disk space.</source>
+        <translation>L’enregistrement vidéo a été arrêté : impossible de démarrer un nouveau segment vidéo. Vérifiez le dossier de sortie et l’espace disque disponible.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="236"/>
         <source>Failed to encode video frame.</source>
         <translation>Échec de l’encodage de l’image vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_recorder_worker.cpp" line="193"/>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="194"/>
         <source>Failed to finalize video recording.</source>
         <translation>Échec de la finalisation de l’enregistrement vidéo.</translation>
     </message>
     <message>
-        <location filename="../src/app/core/video_recorder_worker.cpp" line="198"/>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="206"/>
         <source>Some video files could not be converted to standard MP4. They were kept as fragmented MP4 and remain playable.</source>
         <translation>Certains fichiers vidéo n’ont pas pu être convertis en MP4 standard. Ils ont été conservés en MP4 fragmenté et restent lisibles.</translation>
     </message>
