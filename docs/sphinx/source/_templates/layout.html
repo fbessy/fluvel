@@ -29,8 +29,8 @@
 {% block extrahead %}
 {{ super() }}
 
-<link rel="icon" type="image/svg+xml" href="_static/fluvel.svg">
+<link rel="icon" type="image/svg+xml" href="{{ pathto('_static/fluvel.svg', 1) }}">
 
-<link rel="alternate icon" type="image/x-icon" href="_static/favicon.ico">
+<link rel="alternate icon" type="image/x-icon" href="{{ pathto('_static/favicon.ico', 1) }}">
 
 {% endblock %}
