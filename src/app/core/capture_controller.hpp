@@ -119,6 +119,23 @@ public:
     [[nodiscard]]
     RecorderState recordingState() const noexcept;
 
+    /**
+     * @brief Enables or disables automatic recording.
+     *
+     * When enabled, a recording is started each time a new stream starts.
+     * Stopping a recording manually does not restart it: the next recording
+     * starts with the next stream.
+     *
+     * @param enabled True to enable automatic recording.
+     */
+    void setAutoRecord(bool enabled);
+
+    /**
+     * @brief Returns whether automatic recording is enabled.
+     */
+    [[nodiscard]]
+    bool autoRecord() const noexcept;
+
 #endif
 
 signals:
@@ -198,6 +215,12 @@ private:
 
     VideoExportSettings recordingSettings_{};
     VideoRecorderWorker recorder_;
+
+    bool autoRecord_{false};
+
+    // A new stream started while the previous recording was still being
+    // finalized: the automatic recording starts once the recorder is stopped.
+    bool autoStartPending_{false};
 
 #endif
 

@@ -10,6 +10,7 @@
 #include <QIcon>
 #include <QWidget>
 
+class QCheckBox;
 class QPushButton;
 
 namespace fluvel
@@ -54,6 +55,20 @@ public:
      */
     void setCaptureController(CaptureController* controller);
 
+#ifdef FLUVEL_USE_FFMPEG
+
+    /**
+     * @brief Shows or hides the automatic recording option.
+     *
+     * When available, the option is restored from the persistent settings
+     * and applied to the capture controller.
+     *
+     * @param available True to show the option.
+     */
+    void setAutoRecordAvailable(bool available);
+
+#endif
+
 private slots:
 
 #ifdef FLUVEL_USE_FFMPEG
@@ -69,6 +84,13 @@ private slots:
      * @param state Current recorder state.
      */
     void onRecordingStateChanged(RecorderState state);
+
+    /**
+     * @brief Saves and applies the automatic recording option.
+     *
+     * @param checked True if automatic recording is enabled.
+     */
+    void onAutoRecordToggled(bool checked);
 
 #endif
 
@@ -99,6 +121,11 @@ private:
      */
     void updateRecordingButton();
 
+    /**
+     * @brief Applies the automatic recording option to the controller.
+     */
+    void applyAutoRecord();
+
 #endif
 
     CaptureController* controller_{nullptr};
@@ -108,6 +135,8 @@ private:
 #ifdef FLUVEL_USE_FFMPEG
 
     MorphButton* recordingButton_{nullptr};
+    QCheckBox* autoRecordCheck_{nullptr};
+    bool autoRecordAvailable_{false};
 
 #endif
 };

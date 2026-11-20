@@ -76,9 +76,25 @@ void CaptureController::setStreaming(bool streaming)
     if (!streaming_ && recorder_.isAcceptingFrames())
         recorder_.stop();
 
+    if (!streaming_)
+        autoStartPending_ = false;
+
 #endif
 
     emit streamingChanged(streaming_);
+
+#ifdef FLUVEL_USE_FFMPEG
+
+    // Automatic recording: one new recording per new stream.
+    if (streaming_ && autoRecord_)
+    {
+        if (!recorder_.isRecording())
+            startRecording();
+        else
+            autoStartPending_ = true;
+    }
+
+#endif
 }
 
 bool CaptureController::isStreaming() const noexcept
@@ -143,6 +159,27 @@ void CaptureController::onRecordingStateChanged(RecorderState state)
 
     if (state == RecorderState::Recording)
         emit recordingStarted(recordingSettings_.outputPath);
+
+    if (state == RecorderState::Stopped && autoStartPending_)
+    {
+        autoStartPending_ = false;
+
+        if (streaming_ && autoRecord_ && !recorder_.isRecording())
+            startRecording();
+    }
+}
+
+void CaptureController::setAutoRecord(bool enabled)
+{
+    autoRecord_ = enabled;
+
+    if (!autoRecord_)
+        autoStartPending_ = false;
+}
+
+bool CaptureController::autoRecord() const noexcept
+{
+    return autoRecord_;
 }
 
 #endif

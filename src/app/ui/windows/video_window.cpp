@@ -298,6 +298,10 @@ void VideoWindow::createUi()
     captureWidget_ = new CaptureControlsWidget(central_);
     captureWidget_->setCaptureController(captureController_);
 
+#ifdef FLUVEL_USE_FFMPEG
+    captureWidget_->setAutoRecordAvailable(true);
+#endif
+
     // --- Display bar ---
     displayBar_ = new DisplaySettingsWidget(config.display, central_);
 

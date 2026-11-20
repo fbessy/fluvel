@@ -8,7 +8,10 @@
 #include "icon_loader.hpp"
 #include "morph_button.hpp"
 
+#include <QCheckBox>
 #include <QHBoxLayout>
+#include <QSettings>
+#include <QSignalBlocker>
 
 namespace
 {
@@ -62,6 +65,13 @@ CaptureControlsWidget::CaptureControlsWidget(QWidget* parent)
         });
 
         layout->insertWidget(0, recordingButton_);
+
+        // Shown only by windows that support it (see setAutoRecordAvailable()).
+        autoRecordCheck_ = new QCheckBox(tr("Auto"), this);
+        autoRecordCheck_->setToolTip(tr("Start recording automatically when a new stream starts."));
+        autoRecordCheck_->setVisible(false);
+
+        layout->insertWidget(0, autoRecordCheck_);
     }
 
 #endif
@@ -83,6 +93,12 @@ CaptureControlsWidget::CaptureControlsWidget(QWidget* parent)
                 &CaptureControlsWidget::onToggleRecording);
     }
 
+    if (autoRecordCheck_ != nullptr)
+    {
+        connect(autoRecordCheck_, &QCheckBox::toggled, this,
+                &CaptureControlsWidget::onAutoRecordToggled);
+    }
+
 #endif
 }
 
@@ -98,6 +114,10 @@ void CaptureControlsWidget::setCaptureController(CaptureController* controller)
 
     if (controller_ == nullptr)
         return;
+
+#ifdef FLUVEL_USE_FFMPEG
+    applyAutoRecord();
+#endif
 
     connect(controller_, &CaptureController::streamingChanged, this,
             &CaptureControlsWidget::onStreamingChanged);
@@ -117,6 +137,37 @@ void CaptureControlsWidget::setCaptureController(CaptureController* controller)
 }
 
 #ifdef FLUVEL_USE_FFMPEG
+
+void CaptureControlsWidget::setAutoRecordAvailable(bool available)
+{
+    if (autoRecordCheck_ == nullptr)
+        return;
+
+    autoRecordAvailable_ = available;
+    autoRecordCheck_->setVisible(available);
+
+    {
+        const QSignalBlocker blocker(autoRecordCheck_);
+
+        autoRecordCheck_->setChecked(available &&
+                                     QSettings().value("capture/auto_record", false).toBool());
+    }
+
+    applyAutoRecord();
+}
+
+void CaptureControlsWidget::onAutoRecordToggled(bool checked)
+{
+    QSettings().setValue("capture/auto_record", checked);
+
+    applyAutoRecord();
+}
+
+void CaptureControlsWidget::applyAutoRecord()
+{
+    if (controller_ != nullptr && autoRecordCheck_ != nullptr)
+        controller_->setAutoRecord(autoRecordAvailable_ && autoRecordCheck_->isChecked());
+}
 
 void CaptureControlsWidget::onToggleRecording()
 {
