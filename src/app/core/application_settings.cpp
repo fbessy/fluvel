@@ -678,6 +678,9 @@ void ApplicationSettings::loadUserPreferences()
         settings.value("preferences/video_recording/recording_mode", int(RecordingMode::SingleFile))
             .toInt());
 
+    videoRecordingPreferences_.convertToStandardMp4 =
+        settings.value("preferences/video_recording/convert_to_standard_mp4", false).toBool();
+
     videoRecordingPreferences_.retentionTimeMinutes =
         settings
             .value("preferences/video_recording/retention_time_minutes",
@@ -745,6 +748,8 @@ void ApplicationSettings::saveUserPreferences()
                       videoRecordingPreferences_.appendTimestamp);
     settings.setValue("preferences/video_recording/recording_mode",
                       int(videoRecordingPreferences_.recordingMode));
+    settings.setValue("preferences/video_recording/convert_to_standard_mp4",
+                      videoRecordingPreferences_.convertToStandardMp4);
     settings.setValue("preferences/video_recording/retention_time_minutes",
                       videoRecordingPreferences_.retentionTimeMinutes);
     settings.setValue("preferences/video_recording/segment_count",

@@ -81,6 +81,31 @@ public:
     [[nodiscard]]
     RecordingFailure lastFailure() const noexcept;
 
+    /**
+     * @brief Returns whether the last close() failed to convert some files
+     *        to standard MP4.
+     *
+     * The files that could not be converted are kept as fragmented MP4 and
+     * remain playable.
+     */
+    [[nodiscard]]
+    bool conversionFailed() const noexcept;
+
+    /**
+     * @brief Returns whether the files of the closed session still have to
+     *        be converted to standard MP4.
+     */
+    [[nodiscard]]
+    bool hasPendingConversion() const noexcept;
+
+    /**
+     * @brief Converts the files of the closed session to standard MP4.
+     *
+     * Must be called after close(). Does nothing if no conversion is
+     * pending. The files that cannot be converted are kept unchanged.
+     */
+    void convertFiles();
+
 private:
     /**
      * @brief Starts a new recording segment.
@@ -104,6 +129,11 @@ private:
     QImage::Format frameFormat_{QImage::Format_Invalid};
 
     RecordingFailure lastFailure_{RecordingFailure::None};
+    bool conversionFailed_{false};
+
+    bool pendingConversion_{false};
+    VideoExportSettings conversionSettings_{};
+    QString conversionDirectory_;
 
     QString segmentDirectory_;
     std::optional<int64_t> currentSegmentStartNs_;

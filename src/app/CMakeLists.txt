@@ -315,6 +315,9 @@ if(FLUVEL_USE_FFMPEG)
 
         ${FFMPEG_DIR}/ffmpeg_utils.cpp
         ${FFMPEG_DIR}/ffmpeg_utils.hpp
+
+        ${FFMPEG_DIR}/ffmpeg_remux.cpp
+        ${FFMPEG_DIR}/ffmpeg_remux.hpp
     )
 
 endif()

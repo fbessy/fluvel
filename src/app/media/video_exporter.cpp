@@ -6,6 +6,7 @@
 
 #ifdef FLUVEL_USE_FFMPEG
 
+#include "ffmpeg_remux.hpp"
 #include "ffmpeg_video_exporter.hpp"
 
 #endif
@@ -51,6 +52,16 @@ bool VideoExporter::isRecording() const
 QList<VideoCodec> VideoExporter::availableCodecs() const
 {
     return exporter_ ? exporter_->availableCodecs() : QList<VideoCodec>{};
+}
+
+bool VideoExporter::convertToStandardMp4(const QString& path)
+{
+#ifdef FLUVEL_USE_FFMPEG
+    return ffmpeg_utils::remuxToStandardMp4(path);
+#else
+    static_cast<void>(path);
+    return false;
+#endif
 }
 
 } // namespace fluvel

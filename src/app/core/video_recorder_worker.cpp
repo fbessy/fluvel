@@ -190,9 +190,25 @@ void VideoRecorderWorker::processQueue()
     }
 
     if (!success)
+    {
         emit errorOccurred(tr("Failed to finalize video recording."));
+    }
     else
+    {
+        if (recordingSession_.hasPendingConversion())
+        {
+            emit conversionStarted();
+            recordingSession_.convertFiles();
+        }
+
+        if (recordingSession_.conversionFailed())
+        {
+            emit warningOccurred(tr("Some video files could not be converted to standard MP4. "
+                                    "They were kept as fragmented MP4 and remain playable."));
+        }
+
         emit recordingFinalized();
+    }
 
     emit stateChanged(RecorderState::Stopped);
 }

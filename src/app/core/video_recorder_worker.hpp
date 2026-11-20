@@ -122,6 +122,12 @@ signals:
     void statsChanged(const RecorderStats& stats);
 
     /**
+     * @brief Emitted when the recorded files start being converted to
+     *        standard MP4.
+     */
+    void conversionStarted();
+
+    /**
      * @brief Emitted when the output video has been successfully finalized.
      */
     void recordingFinalized();

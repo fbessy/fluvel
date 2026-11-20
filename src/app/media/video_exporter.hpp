@@ -5,6 +5,8 @@
 
 #include "video_exporter_backend.hpp"
 
+#include <QString>
+
 #include <memory>
 
 namespace fluvel
@@ -95,6 +97,17 @@ public:
      * @return Available video codecs.
      */
     QList<VideoCodec> availableCodecs() const;
+
+    /**
+     * @brief Converts a fragmented MP4 file into a standard MP4 file.
+     *
+     * The original file is kept if the conversion fails.
+     *
+     * @param path Path of the MP4 file.
+     * @return True on success, false otherwise.
+     */
+    [[nodiscard]]
+    static bool convertToStandardMp4(const QString& path);
 
 private:
     std::unique_ptr<IVideoExporter> exporter_;

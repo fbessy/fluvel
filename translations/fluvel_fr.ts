@@ -719,6 +719,11 @@ ou cliquez sur Ouvrir...</translation>
         <translation>Enregistrement sauvegardé : %1</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="84"/>
+        <source>Converting to standard MP4... Please wait.</source>
+        <translation>Conversion en MP4 standard… Veuillez patienter.</translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/components/capture_status_presenter.cpp" line="96"/>
         <source>Recording warning</source>
         <translation>Avertissement d’enregistrement</translation>
@@ -1239,6 +1244,16 @@ ou choisissez Fichier → Ouvrir</translation>
         <translation>Ajouter un horodatage</translation>
     </message>
     <message>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="222"/>
+        <source>Convert to standard MP4 when recording ends</source>
+        <translation>Convertir en MP4 standard à la fin de l’enregistrement</translation>
+    </message>
+    <message>
+        <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="223"/>
+        <source>MP4 files are recorded in a fragmented form so they stay playable after a crash. This option rewrites them as standard MP4 files when the recording ends, which improves compatibility with some players and editors. The conversion does not re-encode the video, but it rewrites the whole file: it takes extra time and extra disk writes, especially for long recordings.</source>
+        <translation>Les fichiers MP4 sont enregistrés en mode fragmenté pour rester lisibles après un plantage. Cette option les réécrit en MP4 standard à la fin de l’enregistrement, ce qui améliore la compatibilité avec certains lecteurs et logiciels de montage. La conversion ne ré-encode pas la vidéo, mais elle réécrit tout le fichier : elle demande plus de temps et plus d’écritures sur le disque, surtout pour les longs enregistrements.</translation>
+    </message>
+    <message>
         <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="150"/>
         <location filename="../src/app/ui/windows/preferences_dialog.cpp" line="203"/>
         <source>Browse...</source>
@@ -1751,6 +1766,11 @@ Contour : %7 pts</translation>
         <location filename="../src/app/core/video_recorder_worker.cpp" line="193"/>
         <source>Failed to finalize video recording.</source>
         <translation>Échec de la finalisation de l’enregistrement vidéo.</translation>
+    </message>
+    <message>
+        <location filename="../src/app/core/video_recorder_worker.cpp" line="198"/>
+        <source>Some video files could not be converted to standard MP4. They were kept as fragmented MP4 and remain playable.</source>
+        <translation>Certains fichiers vidéo n’ont pas pu être convertis en MP4 standard. Ils ont été conservés en MP4 fragmenté et restent lisibles.</translation>
     </message>
 </context>
 <context>

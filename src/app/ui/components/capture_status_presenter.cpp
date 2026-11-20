@@ -47,6 +47,9 @@ CaptureStatusPresenter::CaptureStatusPresenter(QMainWindow* window, CaptureContr
     connect(controller_, &CaptureController::recordingStarted, this,
             &CaptureStatusPresenter::onRecordingStarted);
 
+    connect(controller_, &CaptureController::recordingConversionStarted, this,
+            &CaptureStatusPresenter::onRecordingConversionStarted);
+
     connect(controller_, &CaptureController::recordingFinalized, this,
             &CaptureStatusPresenter::onRecordingFinalized);
 #endif
@@ -81,6 +84,14 @@ void CaptureStatusPresenter::onRecordingStarted(const QString& outputPath)
 {
     window_->statusBar()->showMessage(tr("Recording to: %1").arg(outputPath),
                                       kStatusMessageTimeoutMs);
+}
+
+void CaptureStatusPresenter::onRecordingConversionStarted()
+{
+    clearStatsLabel();
+
+    // No timeout: the message stays until the recording is saved.
+    window_->statusBar()->showMessage(tr("Converting to standard MP4... Please wait."));
 }
 
 void CaptureStatusPresenter::onRecordingFinalized(const QString& outputPath)

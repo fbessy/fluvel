@@ -141,6 +141,12 @@ signals:
     void recordingStarted(const QString& filename);
 
     /**
+     * @brief Emitted when the recorded files start being converted to
+     *        standard MP4.
+     */
+    void recordingConversionStarted();
+
+    /**
      * @brief Emitted when recording has been finalized.
      */
     void recordingFinalized(const QString& filename);

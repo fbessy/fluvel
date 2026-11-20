@@ -30,6 +30,9 @@ CaptureController::CaptureController(QObject* parent)
     connect(&recorder_, &VideoRecorderWorker::errorOccurred, this,
             &CaptureController::recordingError);
 
+    connect(&recorder_, &VideoRecorderWorker::conversionStarted, this,
+            &CaptureController::recordingConversionStarted);
+
     connect(&recorder_, &VideoRecorderWorker::recordingFinalized, this,
             [this]()
             {
@@ -105,6 +108,7 @@ void CaptureController::startRecording()
     settings.recordingMode = preferences.recordingMode;
     settings.retentionTimeMinutes = preferences.retentionTimeMinutes;
     settings.segmentCount = preferences.segmentCount;
+    settings.convertToStandardMp4 = preferences.convertToStandardMp4;
 
     settings.bufferSettings = ApplicationSettings::instance().recordingBufferSettings();
 

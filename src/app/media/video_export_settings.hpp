@@ -237,6 +237,17 @@ namespace fluvel
       int segmentCount{10};
 
       /**
+       * @brief Converts MP4 recordings to standard MP4 once recording ends.
+       *
+       * MP4 files are written in fragmented form while recording, so they
+       * stay playable after a crash. When enabled, they are rewritten as
+       * standard MP4 files (without re-encoding) when the recording ends.
+       *
+       * Ignored for containers other than MP4.
+       */
+      bool convertToStandardMp4{false};
+
+      /**
        * @brief Target frame rate.
        *
        * Specifies the frame rate written to the exported video.

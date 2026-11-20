@@ -220,6 +220,15 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
 
     videoTimestampCheck_->setChecked(preferences.appendTimestamp);
 
+    convertMp4Check_ = new QCheckBox(tr("Convert to standard MP4 when recording ends"), group);
+    convertMp4Check_->setToolTip(
+        tr("MP4 files are recorded in a fragmented form so they stay playable after a crash. "
+           "This option rewrites them as standard MP4 files when the recording ends, which "
+           "improves compatibility with some players and editors. The conversion does not "
+           "re-encode the video, but it rewrites the whole file: it takes extra time and "
+           "extra disk writes, especially for long recordings."));
+    convertMp4Check_->setChecked(preferences.convertToStandardMp4);
+
     recordingModeCombo_ = new QComboBox(group);
     recordingModeCombo_->addItem(tr("Single file"), int(RecordingMode::SingleFile));
     recordingModeCombo_->addItem(tr("Circular"), int(RecordingMode::Circular));
@@ -246,12 +255,26 @@ QWidget* PreferencesDialog::createVideoRecordingSection()
     layout->addRow(QString(), videoTimestampCheck_);
     layout->addRow(tr("Preview:"), videoPreviewLabel_);
     layout->addRow(tr("Recording mode:"), recordingModeCombo_);
+    layout->addRow(QString(), convertMp4Check_);
     layout->addRow(retentionTimeLabel_, retentionTimeSpin_);
     layout->addRow(segmentCountLabel_, segmentCountSpin_);
     layout->addRow(segmentDurationTextLabel_, segmentDurationLabel_);
 
     updateVideoPreview();
     updateSegmentDuration();
+
+    // Only MP4 recordings can be converted (FFV1 uses MKV, VP9 uses WebM).
+    auto updateConvertOption = [this]
+    {
+        const auto codec = static_cast<VideoCodec>(videoCodecCombo_->currentData().toInt());
+
+        convertMp4Check_->setVisible(exporter_utils::preferredContainer(codec) ==
+                                     VideoContainer::Mp4);
+    };
+
+    updateConvertOption();
+
+    connect(videoCodecCombo_, &QComboBox::currentIndexChanged, this, updateConvertOption);
 
     auto updateCircularControls = [this]
     {
@@ -415,6 +438,8 @@ void PreferencesDialog::accept()
 
     videoPreferences.recordingMode =
         static_cast<RecordingMode>(recordingModeCombo_->currentData().toInt());
+
+    videoPreferences.convertToStandardMp4 = convertMp4Check_->isChecked();
 
     videoPreferences.retentionTimeMinutes = retentionTimeSpin_->value();
 

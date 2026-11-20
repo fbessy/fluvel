@@ -67,6 +67,8 @@ struct VideoRecordingPreferences
 
     RecordingMode recordingMode{RecordingMode::SingleFile};
 
+    bool convertToStandardMp4{false};
+
     int retentionTimeMinutes{kDefaultRetentionTimeMinutes};
 
     int segmentCount{kDefaultSegmentCount};

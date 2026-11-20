@@ -113,6 +113,13 @@ bool RecordingSession::addFrame(const VideoFrame& frame)
 
 bool RecordingSession::close()
 {
+    // Remember what has to be converted once the files are closed.
+    pendingConversion_ = settings_.convertToStandardMp4 && settings_.container == VideoContainer::Mp4;
+    conversionSettings_ = settings_;
+    conversionDirectory_ = segmentDirectory_;
+
+    conversionFailed_ = false;
+
     settings_ = {};
 
     frameSize_ = QSize();
@@ -123,7 +130,60 @@ bool RecordingSession::close()
     segmentIndex_ = 1;
     segmentDirectory_.clear();
 
-    return exporter_.close();
+    const bool success = exporter_.close();
+
+    if (!success)
+        pendingConversion_ = false;
+
+    return success;
+}
+
+bool RecordingSession::hasPendingConversion() const noexcept
+{
+    return pendingConversion_;
+}
+
+void RecordingSession::convertFiles()
+{
+    // The conversion is done once, at the very end: all the files are final.
+    if (!pendingConversion_)
+        return;
+
+    pendingConversion_ = false;
+
+    const VideoExportSettings settings = conversionSettings_;
+    const QString directory = conversionDirectory_;
+
+    conversionSettings_ = {};
+    conversionDirectory_.clear();
+
+    QStringList files;
+
+    if (settings.recordingMode == RecordingMode::SingleFile)
+    {
+        files << settings.outputPath;
+    }
+    else
+    {
+        const QDir dir(directory);
+
+        const QStringList names = dir.entryList({"*.mp4"}, QDir::Files, QDir::Name);
+
+        for (const QString& name : names)
+            files << dir.filePath(name);
+    }
+
+    // A failed file keeps its fragmented original; the others are still converted.
+    for (const QString& file : files)
+    {
+        if (!VideoExporter::convertToStandardMp4(file))
+            conversionFailed_ = true;
+    }
+}
+
+bool RecordingSession::conversionFailed() const noexcept
+{
+    return conversionFailed_;
 }
 
 bool RecordingSession::rotateSegment()

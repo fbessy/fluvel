@@ -117,6 +117,8 @@ private:
 
     QComboBox* recordingModeCombo_{nullptr};
 
+    QCheckBox* convertMp4Check_{nullptr};
+
     QLabel* retentionTimeLabel_{nullptr};
     QSpinBox* retentionTimeSpin_{nullptr};
 
