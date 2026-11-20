@@ -1,0 +1,101 @@
+# SPDX-License-Identifier: CeCILL-2.1
+# Copyright (C) 2010-2026 Fabien Bessy
+
+# Builds the online documentation (Doxygen + Sphinx) and publishes it in
+# the "docs/" folder of the gh-pages branch, next to the distribution page
+# deployed by latest.yml (which never touches this folder).
+
+name: Fluvel Set Docs
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [release]
+    paths:
+      - 'docs/**'
+      - 'assets/**'
+      - 'src/**'
+      - 'README.md'
+      - '.github/workflows/docs.yml'
+
+permissions:
+  contents: write
+
+jobs:
+
+  docs:
+    runs-on: ubuntu-24.04
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
+          pip install \
+            sphinx==7.4.7 \
+            pydata-sphinx-theme==0.15.4 \
+            breathe==4.36.0 \
+            myst-parser==3.0.1 \
+            sphinx-design==0.6.1 \
+            docutils==0.21.2
+
+      - name: Build documentation
+        run: |
+          source .venv/bin/activate
+
+          rm -rf docs/xml public
+          cp README.md docs/sphinx/source/README.md
+
+          doxygen docs/doxygen/Doxyfile
+
+          sphinx-build -E -a -b html docs/sphinx/source public
+
+          mkdir -p public/assets/gifs public/assets/videos public/assets/logo public/mermaid
+          cp assets/gifs/*.gif public/assets/gifs/
+          cp assets/videos/*.webm public/assets/videos/
+          cp assets/logo/fluvel.svg public/assets/logo/
+          cp docs/mermaid/*.svg docs/mermaid/*.mmd public/mermaid/
+
+      - name: Deploy to GitHub Pages (docs/ folder)
+        run: |
+          git clone --branch gh-pages \
+            "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages
+          cd gh-pages
+
+          # Sphinx uses folders starting with an underscore (_static, ...),
+          # which GitHub Pages would ignore without this file.
+          touch .nojekyll
+
+          rm -rf docs
+          mkdir docs
+          cp -r ../public/. docs/
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+          git add -A
+          git commit -m "Update documentation" || { echo "Nothing to publish"; exit 0; }
+
+          # latest.yml may push to the same branch at the same time: retry.
+          for attempt in 1 2 3; do
+            git pull --rebase origin gh-pages
+            if git push origin gh-pages; then
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "Unable to push the documentation to gh-pages"
+          exit 1
