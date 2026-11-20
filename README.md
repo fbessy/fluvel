@@ -214,7 +214,7 @@ cmake -S . -B build \
     -DFLUVEL_BUILD_BIND=OFF
 
 cmake --build build
-./build/src/app/fluvel
+./build/src/app/fluvel-set
 ```
 
 ---
