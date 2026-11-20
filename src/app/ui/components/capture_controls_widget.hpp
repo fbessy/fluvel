@@ -61,11 +61,15 @@ public:
      * @brief Shows or hides the automatic recording option.
      *
      * When available, the option is restored from the persistent settings
-     * and applied to the capture controller.
+     * and applied to the capture controller. Each window has its own setting,
+     * since the event that starts the recording is not the same.
      *
      * @param available True to show the option.
+     * @param settingsKey Key under which the option is saved.
+     * @param toolTip Tooltip of the option (a default one if empty).
      */
-    void setAutoRecordAvailable(bool available);
+    void setAutoRecordAvailable(bool available, const QString& settingsKey,
+                                const QString& toolTip = QString());
 
 #endif
 
@@ -137,6 +141,7 @@ private:
     MorphButton* recordingButton_{nullptr};
     QCheckBox* autoRecordCheck_{nullptr};
     bool autoRecordAvailable_{false};
+    QString autoRecordSettingsKey_;
 
 #endif
 };

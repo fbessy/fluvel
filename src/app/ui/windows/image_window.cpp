@@ -370,6 +370,15 @@ void ImageWindow::setupControllers()
 
     captureController_ = new CaptureController(this);
     captureWidget_->setCaptureController(captureController_);
+
+#ifdef FLUVEL_USE_FFMPEG
+    // Here the recording follows the processing, not the display of an image.
+    captureController_->setAutoRecordOnStream(false);
+
+    captureWidget_->setAutoRecordAvailable(
+        true, "capture/auto_record_image",
+        tr("Start recording automatically when the processing starts."));
+#endif
 }
 
 void ImageWindow::setupChildWindows()
@@ -465,10 +474,19 @@ void ImageWindow::setupConnections()
         Qt::QueuedConnection);
 
     connect(imageController_, &ImageController::stateChanged, this,
-            [this](WorkerState state)
+            [this, previous = WorkerState::Uninitialized](WorkerState state) mutable
             {
+                // A new run starts (resuming after a pause does not count).
+                if (state == WorkerState::Running && previous != WorkerState::Suspended)
+                    captureController_->requestAutoRecording();
+
+                if (state != WorkerState::Running && state != WorkerState::Suspended)
+                    captureController_->cancelAutoRecording();
+
                 if (state == WorkerState::Finished && captureController_->isRecording())
                     captureController_->stopRecording();
+
+                previous = state;
             });
 
 #endif

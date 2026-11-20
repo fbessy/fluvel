@@ -136,6 +136,31 @@ public:
     [[nodiscard]]
     bool autoRecord() const noexcept;
 
+    /**
+     * @brief Chooses whether a new stream triggers the automatic recording.
+     *
+     * Enabled by default. A window whose recording is tied to another event
+     * (for example the start of an image processing run) disables it and
+     * calls requestAutoRecording() itself.
+     *
+     * @param enabled True to start the automatic recording with each stream.
+     */
+    void setAutoRecordOnStream(bool enabled);
+
+    /**
+     * @brief Starts a recording if automatic recording is enabled.
+     *
+     * If the previous recording is still being finalized, the new one starts
+     * as soon as the recorder is stopped, unless cancelAutoRecording() is
+     * called before.
+     */
+    void requestAutoRecording();
+
+    /**
+     * @brief Cancels an automatic recording waiting for the recorder.
+     */
+    void cancelAutoRecording();
+
 #endif
 
 signals:
@@ -217,6 +242,7 @@ private:
     VideoRecorderWorker recorder_;
 
     bool autoRecord_{false};
+    bool autoRecordOnStream_{true};
 
     // A new stream started while the previous recording was still being
     // finalized: the automatic recording starts once the recorder is stopped.

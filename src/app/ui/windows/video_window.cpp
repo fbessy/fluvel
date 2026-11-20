@@ -299,7 +299,7 @@ void VideoWindow::createUi()
     captureWidget_->setCaptureController(captureController_);
 
 #ifdef FLUVEL_USE_FFMPEG
-    captureWidget_->setAutoRecordAvailable(true);
+    captureWidget_->setAutoRecordAvailable(true, "capture/auto_record_video");
 #endif
 
     // --- Display bar ---

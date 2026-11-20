@@ -138,10 +138,16 @@ void CaptureControlsWidget::setCaptureController(CaptureController* controller)
 
 #ifdef FLUVEL_USE_FFMPEG
 
-void CaptureControlsWidget::setAutoRecordAvailable(bool available)
+void CaptureControlsWidget::setAutoRecordAvailable(bool available, const QString& settingsKey,
+                                                   const QString& toolTip)
 {
     if (autoRecordCheck_ == nullptr)
         return;
+
+    autoRecordSettingsKey_ = settingsKey;
+
+    if (!toolTip.isEmpty())
+        autoRecordCheck_->setToolTip(toolTip);
 
     autoRecordAvailable_ = available;
     autoRecordCheck_->setVisible(available);
@@ -150,7 +156,7 @@ void CaptureControlsWidget::setAutoRecordAvailable(bool available)
         const QSignalBlocker blocker(autoRecordCheck_);
 
         autoRecordCheck_->setChecked(available &&
-                                     QSettings().value("capture/auto_record", false).toBool());
+                                     QSettings().value(autoRecordSettingsKey_, false).toBool());
     }
 
     applyAutoRecord();
@@ -158,7 +164,8 @@ void CaptureControlsWidget::setAutoRecordAvailable(bool available)
 
 void CaptureControlsWidget::onAutoRecordToggled(bool checked)
 {
-    QSettings().setValue("capture/auto_record", checked);
+    if (!autoRecordSettingsKey_.isEmpty())
+        QSettings().setValue(autoRecordSettingsKey_, checked);
 
     applyAutoRecord();
 }
