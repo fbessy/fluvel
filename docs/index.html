@@ -1,0 +1,812 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Fluvel Set — Documentation</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/fluvel.css?v=15263156" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=2709fde1"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Qt Application" href="modules/app/index.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+<link rel="icon" type="image/svg+xml" href="_static/fluvel.svg">
+
+<link rel="alternate icon" type="image/x-icon" href="_static/favicon.ico">
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/fluvel.svg" class="logo__image only-light" alt="Fluvel Set 0.1 documentation - Home"/>
+    <script>document.write(`<img src="_static/fluvel.svg" class="logo__image only-dark" alt="Fluvel Set 0.1 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules/app/index.html">
+    Qt Application
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules/ip/index.html">
+    Image Processing Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules/py/index.html">
+    Python Bindings
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules/app/index.html">
+    Qt Application
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules/ip/index.html">
+    Image Processing Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="modules/py/index.html">
+    Python Bindings
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p align="center">
+  <img src="assets/logo/fluvel.svg" width="96">
+</p>
+<h1 align="center" style="color:#6b6fcf;">
+  Fluvel Set
+</h1>
+<p align="center">
+  <strong>
+    Real-time image segmentation and active contour experimentation platform
+  </strong>
+</p>
+<p align="center">
+  Modern C++ framework for active contour algorithms,
+  real-time visualization and reproducible experimentation.
+</p>
+<p align="center">
+  <img src="https://img.shields.io/badge/license-CeCILL--2.1-6b6fcf">
+  <img src="https://img.shields.io/badge/C%2B%2B-23-6b6fcf">
+  <img src="https://img.shields.io/badge/Qt-6-4fc98a">
+</p>
+<hr class="docutils" />
+<section id="demo">
+<h1>Demo<a class="headerlink" href="#demo" title="Link to this heading">#</a></h1>
+<section id="real-time-tracking">
+<h2>Real-time tracking<a class="headerlink" href="#real-time-tracking" title="Link to this heading">#</a></h2>
+<p align="center">
+  <img src="assets/gifs/phone_tracking.gif" width="900">
+</p>
+<p align="center">
+  <a href="assets/videos/phone_tracking.webm">
+    Open full video
+  </a>
+</p>
+</section>
+<section id="mri-contour-evolution">
+<h2>MRI contour evolution<a class="headerlink" href="#mri-contour-evolution" title="Link to this heading">#</a></h2>
+<p align="center">
+  <img src="assets/gifs/mri_segmentation.gif" width="900">
+</p>
+<p align="center">
+  <a href="assets/videos/mri_segmentation.webm">
+    Open full video
+  </a>
+</p>
+</section>
+<section id="downloads">
+<h2>🚀 Downloads<a class="headerlink" href="#downloads" title="Link to this heading">#</a></h2>
+<p>Latest builds and packages for all supported platforms:</p>
+<p><a class="reference external" href="https://fluvel-io.github.io/fluvel-set/">Download page</a></p>
+</section>
+<hr class="docutils" />
+<section id="documentation">
+<h2>📚 Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>The online documentation is generated automatically from the source code
+and follows the latest development version.</p>
+<p>Documentation is versioned and tied to specific commits
+for reproducibility and long-term experimentation.</p>
+<p><a class="reference external" href="https://fluvel-io.github.io/fluvel-set/docs/">Documentation site</a></p>
+</section>
+<hr class="docutils" />
+<section id="features">
+<h2>✨ Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Region-based active contour evolution</p></li>
+<li><p>Real-time image processing</p></li>
+<li><p>Video stream support</p></li>
+<li><p>Modular architecture for feature extensions</p></li>
+<li><p>Qt-based visualization interface</p></li>
+<li><p>Reproducible builds (CMake, Flatpak, AppImage)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="overview">
+<h2>🧠 Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h2>
+<p>Fluvel Set is a research-oriented image segmentation platform
+focused on region-based active contour methods.</p>
+<p>The project emphasizes:</p>
+<ul class="simple">
+<li><p>Modern C++ architecture</p></li>
+<li><p>Real-time experimentation</p></li>
+<li><p>Separation between processing engine and UI</p></li>
+<li><p>Reusable image processing components</p></li>
+<li><p>Reproducible scientific workflows</p></li>
+</ul>
+<p>The processing core does not depend on Qt.
+Qt is used only for visualization and interaction.</p>
+</section>
+<hr class="docutils" />
+<section id="architecture">
+<h2>🏗️ Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h2>
+<p>The project is organized into:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>fluvel-set/
+├── src/                           # Source code
+│   ├── app/                       # Desktop/mobile Qt application
+│   │   ├── ui/                    # Windows and reusable UI components
+│   │   ├── qml/                   # Experimental UI layer
+│   │   ├── core/                  # Application logic and orchestration
+│   │   └── interop/               # Application integration and adapters
+│   │
+│   ├── bindings/                  # Language and scripting integrations
+│   │   └── python/                # Python bindings (pybind11)
+│   │
+│   └── image_processing/          # Image processing library
+│       ├── filtering/             # Filtering, denoising and preprocessing
+│       ├── segmentation/          # Active contours and segmentation models
+│       ├── analysis/              # Shape analysis and image metrics
+│       └── core/                  # Shared processing infrastructure
+│
+├── examples/                      # Python examples demonstrating Fluvel IP features
+│   ├── filtering/                 # Image filtering examples and experiments
+│   ├── hausdorff/                 # Shape comparison and Hausdorff distance examples
+│   ├── segmentation/              # Active contour segmentation examples
+│   ├── workflow/                  # Complete processing pipeline examples
+│   ├── resources/                 # Shared datasets and images used by examples
+│   └── utils.py                   # Shared utilities used across examples
+│
+├── resources/                     # Icons and application assets
+├── translations/                  # Application translations (.ts, .qm)
+│
+├── scripts/                       # Development, packaging and utility scripts
+│                                  # Includes local testing and maintenance helpers
+│
+├── docs/                          # Documentation configuration and assets
+├── web/                           # Project homepage and download portal
+│
+├── cmake/                         # Shared CMake modules and configuration
+├── packaging/                     # Flatpak, AppImage and distribution files
+│
+├── .github/                       # CI workflows, releases and automation
+│
+└── CMakeLists.txt                 # Main build configuration
+</pre></div>
+</div>
+<section id="main-modules">
+<h3>Main modules<a class="headerlink" href="#main-modules" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>fluvel_app</strong> — Qt desktop application (user interface and orchestration)</p></li>
+<li><p><strong>fluvel_ip</strong> — Image processing and segmentation library (C++)</p></li>
+<li><p><strong>fluvel_bindings</strong> — Python bindings for Fluvel IP (pybind11/C++)</p></li>
+</ul>
+<hr class="docutils" />
+<p>Fluvel follows a hybrid architecture:</p>
+<ul class="simple">
+<li><p><strong>Technical organization</strong> for application layers (UI, integration and execution flow)</p></li>
+<li><p><strong>Functional organization</strong> for image processing modules (filtering, segmentation and analysis)</p></li>
+</ul>
+<p>Build, release and deployment automation are intentionally kept outside the source tree and are handled through repository workflows and helper scripts.</p>
+<p>Some components (such as additional UI technologies and language integrations) are experimental and may evolve over time.</p>
+</section>
+</section>
+<section id="build">
+<h2>🛠️ Build<a class="headerlink" href="#build" title="Link to this heading">#</a></h2>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h3>
+<section id="core-library">
+<h4>Core library<a class="headerlink" href="#core-library" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p>CMake ≥ 3.22</p></li>
+<li><p>C++23 compiler (tested with Clang, GCC and MSVC)</p></li>
+</ul>
+</section>
+<section id="desktop-application">
+<h4>Desktop application<a class="headerlink" href="#desktop-application" title="Link to this heading">#</a></h4>
+<p>Additional dependencies:</p>
+<ul class="simple">
+<li><p>Qt6 (Core, Gui, Widgets, Multimedia, MultimediaWidgets, Svg, LinguistTools),
+tested with Qt 6.9 and 6.11</p></li>
+</ul>
+<p>Optional:</p>
+<ul class="simple">
+<li><p>FFmpeg development libraries (<code class="docutils literal notranslate"><span class="pre">libavformat</span></code>, <code class="docutils literal notranslate"><span class="pre">libavcodec</span></code>, <code class="docutils literal notranslate"><span class="pre">libavutil</span></code>,
+<code class="docutils literal notranslate"><span class="pre">libswscale</span></code>) to enable video recording and export.
+Off by default; enable it with <code class="docutils literal notranslate"><span class="pre">-DFLUVEL_ENABLE_FFMPEG=ON</span></code>.
+FFmpeg is found with pkg-config on Linux and macOS, and through Conan
+on Windows.</p></li>
+</ul>
+</section>
+<section id="python-bindings">
+<h4>Python bindings<a class="headerlink" href="#python-bindings" title="Link to this heading">#</a></h4>
+<p>Additional dependencies:</p>
+<ul class="simple">
+<li><p>Python ≥ 3.10</p></li>
+<li><p>pybind11</p></li>
+<li><p>NumPy</p></li>
+</ul>
+<p>Optional (examples only):</p>
+<ul class="simple">
+<li><p>OpenCV</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="build-desktop-application">
+<h3>Build desktop application<a class="headerlink" href="#build-desktop-application" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DFLUVEL_BUILD_APP<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DFLUVEL_BUILD_BIND<span class="o">=</span>OFF
+
+cmake<span class="w"> </span>--build<span class="w"> </span>build
+./build/src/app/fluvel
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="build-python-bindings">
+<h3>Build Python bindings<a class="headerlink" href="#build-python-bindings" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DFLUVEL_BUILD_APP<span class="o">=</span>OFF<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DFLUVEL_BUILD_BIND<span class="o">=</span>ON
+
+cmake<span class="w"> </span>--build<span class="w"> </span>build
+</pre></div>
+</div>
+<p>Generated module:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>build/python/fluvel.*
+</pre></div>
+</div>
+<p>Install runtime dependencies for examples:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>opencv-python
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/filtering/showcase.py
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="build-everything">
+<h3>Build everything<a class="headerlink" href="#build-everything" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-S<span class="w"> </span>.<span class="w"> </span>-B<span class="w"> </span>build<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DFLUVEL_BUILD_APP<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DFLUVEL_BUILD_BIND<span class="o">=</span>ON
+
+cmake<span class="w"> </span>--build<span class="w"> </span>build
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="linux-packages">
+<h3>Linux packages<a class="headerlink" href="#linux-packages" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Flatpak</strong> (recommended): runs on any distribution that supports Flatpak.</p></li>
+<li><p><strong>AppImage</strong>: built on Ubuntu 25.10 so that the FFmpeg headers match the
+FFmpeg version used by Qt. Because AppImages rely on the host’s glibc and
+C++ standard library, it requires a recent distribution (roughly the
+versions released since late 2025). On older systems, use the Flatpak.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="license">
+<h2>📜 License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
+<p>Fluvel is licensed under the CeCILL 2.1 license
+(CEA · CNRS · INRIA).</p>
+<p>CeCILL is a French free software license compatible with the GNU GPL,
+widely used in research and academic software.</p>
+<p><a class="reference external" href="https://cecill.info/licences/Licence_CeCILL_V2.1-en.html">CeCILL 2.1 License</a></p>
+</section>
+</section>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules/app/index.html">Qt Application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/app/ui/index.html">UI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/ui/index.html#image-viewer-architecture">Image Viewer Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules/app/app_core.html">Application Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#controllers">Controllers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#execution">Execution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#configuration">Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#video-sources">Video Sources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#video-processing">Video Processing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#recording">Recording</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#image-editing">Image Editing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#utilities">Utilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_core.html#localization">Localization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules/app/app_media.html">Media</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_media.html#media-export">Media Export</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_media.html#ffmpeg-backend">FFmpeg Backend</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules/app/app_interop.html">Application Interoperability</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_interop.html#_CPPv46fluvel"><code class="docutils literal notranslate"><span class="pre">fluvel</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_interop.html#_CPPv4N6fluvel8toQColorERKN9fluvel_ip6Rgb_ucE"><code class="docutils literal notranslate"><span class="pre">toQColor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_interop.html#_CPPv4N6fluvel8toRgb_ucERK6QColor"><code class="docutils literal notranslate"><span class="pre">toRgb_uc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_interop.html#_CPPv4N6fluvel8toRgb_ucE4QRgb"><code class="docutils literal notranslate"><span class="pre">toRgb_uc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/app/app_interop.html#_CPPv4N6fluvel16convertToQVectorERKN9fluvel_ip7ContourE"><code class="docutils literal notranslate"><span class="pre">convertToQVector()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/ip/index.html">Image Processing Library</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/ip/filtering.html">Image Filtering</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/filtering.html#references">References</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/filtering.html#related-components">Related Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/filtering.html#filter">Filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/filtering.html#noise">Noise</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/filtering.html#pixel-wise-operations">Pixel-wise Operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/filtering.html#pipeline">Pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules/ip/segmentation.html">Segmentation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/segmentation.html#architecture">Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/segmentation.html#references">References</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/segmentation.html#active-contours">Active Contours</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/segmentation.html#speed-models">Speed Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/segmentation.html#contour-initialization">Contour Initialization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules/ip/analysis.html">Shape Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/analysis.html#references">References</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules/ip/ip_core.html">Image Processing Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv49fluvel_ip"><code class="docutils literal notranslate"><span class="pre">fluvel_ip</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip11ImageFormatE"><code class="docutils literal notranslate"><span class="pre">ImageFormat</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip12channelCountE11ImageFormat"><code class="docutils literal notranslate"><span class="pre">channelCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip22formatFromChannelCountEi"><code class="docutils literal notranslate"><span class="pre">formatFromChannelCount()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip9ImageViewE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::ImageView</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip10ImageOwnerE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::ImageOwner</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip18convertRgbFToBgr32ERK6Grid2DI5Rgb_fER10ImageOwner"><code class="docutils literal notranslate"><span class="pre">convertRgbFToBgr32()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip9Point2D_iE"><code class="docutils literal notranslate"><span class="pre">Point2D_i</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip9Point2D_fE"><code class="docutils literal notranslate"><span class="pre">Point2D_f</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4I0EN9fluvel_ip7Point2DE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Point2D</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4St"><code class="docutils literal notranslate"><span class="pre">std</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip8PointSetE"><code class="docutils literal notranslate"><span class="pre">PointSet</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip4mathE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::math</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip6Rgb_ucE"><code class="docutils literal notranslate"><span class="pre">Rgb_uc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip7Rgb_64iE"><code class="docutils literal notranslate"><span class="pre">Rgb_64i</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip5Rgb_fE"><code class="docutils literal notranslate"><span class="pre">Rgb_f</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip8Color_3iE"><code class="docutils literal notranslate"><span class="pre">Color_3i</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip13scaleAndRoundEfff"><code class="docutils literal notranslate"><span class="pre">scaleAndRound()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip6Bgra32E"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Bgra32</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip13Components_3iE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Components_3i</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip5Lab_fE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Lab_f</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip5Luv_fE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Luv_f</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4I_10ArithmeticEN9fluvel_ip3RgbE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Rgb</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip5Xyz_fE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Xyz_f</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip5colorE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::color</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip12fullyInside8Eiiii"><code class="docutils literal notranslate"><span class="pre">fullyInside8()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip11kNeighbors4E"><code class="docutils literal notranslate"><span class="pre">kNeighbors4</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip15kNeighbors4DiagE"><code class="docutils literal notranslate"><span class="pre">kNeighbors4Diag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip5Vec2iE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::Vec2i</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/ip/ip_core.html#_CPPv4N9fluvel_ip12ElapsedTimerE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::ElapsedTimer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/py/index.html">Python Bindings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/py/python_interop.html">Python Interoperability</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToImageView()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerE"><code class="docutils literal notranslate"><span class="pre">imageOwnerToPyArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv416contourToPyArrayRKN9fluvel_ip13ContourPointsE"><code class="docutils literal notranslate"><span class="pre">contourToPyArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv414pyArrayToShapeRKN2py7array_tIiEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToShape()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="modules/py/python_bindings.html">Python Bindings</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv49bindNoiseRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindNoise()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv413bindFilteringRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindFiltering()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv414bindMorphologyRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindMorphology()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv417bindActiveContourRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindActiveContour()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv413bindHausdorffRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindHausdorff()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv413validateImageRKN2py7array_tI7uint8_tEE"><code class="docutils literal notranslate"><span class="pre">validateImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv414validateRadiusi"><code class="docutils literal notranslate"><span class="pre">validateRadius()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv413validateSigmaf"><code class="docutils literal notranslate"><span class="pre">validateSigma()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv419validateProbabilityf"><code class="docutils literal notranslate"><span class="pre">validateProbability()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="modules/app/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Qt Application</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#real-time-tracking">Real-time tracking</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mri-contour-evolution">MRI contour evolution</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#downloads">🚀 Downloads</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">📚 Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#features">✨ Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">🧠 Overview</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture">🏗️ Architecture</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#main-modules">Main modules</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build">🛠️ Build</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#core-library">Core library</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#desktop-application">Desktop application</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#python-bindings">Python bindings</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-desktop-application">Build desktop application</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-python-bindings">Build Python bindings</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-everything">Build everything</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linux-packages">Linux packages</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#license">📜 License</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/index.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+
+<footer class="bd-footer">
+    <div class="bd-footer__inner bd-page-width">
+
+        <div class="footer-items__start">
+            <p>
+                Fluvel Set — Real-time level-set experimentation platform
+            </p>
+        </div>
+
+        <div class="footer-items__end">
+            <p>
+                Built with Sphinx, PyData Theme, Breathe and Doxygen
+            </p>
+        </div>
+
+    </div>
+</footer>
+
+
+  </body>
+</html>

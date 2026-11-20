@@ -1,0 +1,1669 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<title>Fluvel Set — Documentation</title>
+
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../../_static/fluvel.css?v=15263156" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'modules/app/app_media';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Application Interoperability" href="app_interop.html" />
+    <link rel="prev" title="Application Core" href="app_core.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+<link rel="icon" type="image/svg+xml" href="_static/fluvel.svg">
+
+<link rel="alternate icon" type="image/x-icon" href="_static/favicon.ico">
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/fluvel.svg" class="logo__image only-light" alt="Fluvel Set 0.1 documentation - Home"/>
+    <script>document.write(`<img src="../../_static/fluvel.svg" class="logo__image only-dark" alt="Fluvel Set 0.1 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Qt Application
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ip/index.html">
+    Image Processing Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../py/index.html">
+    Python Bindings
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Qt Application
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../ip/index.html">
+    Image Processing Library
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../py/index.html">
+    Python Bindings
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="ui/index.html">UI</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="ui/windows.html">UI Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ui/components.html">UI Components</a></li>
+
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="app_core.html">Application Core</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Media</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app_interop.html">Application Interoperability</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Qt Application</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Media</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="media">
+<h1>Media<a class="headerlink" href="#media" title="Link to this heading">#</a></h1>
+<p>The Media module provides video export infrastructure and media backend
+integrations used by the Fluvel application.</p>
+<p>It defines the generic video export API, export settings and backend
+abstractions, and provides FFmpeg-based video encoding support when
+available.</p>
+<section id="media-export">
+<h2>Media Export<a class="headerlink" href="#media-export" title="Link to this heading">#</a></h2>
+<p>This file defines the public video export API.</p>
+<p>The API is backend-independent. Codec and container selection are implementation details. </p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv46fluvel">
+<span id="_CPPv36fluvel"></span><span id="_CPPv26fluvel"></span><span id="fluvel"></span><span class="target" id="namespacefluvel"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13ExportProfileE">
+<span id="_CPPv3N6fluvel13ExportProfileE"></span><span id="_CPPv2N6fluvel13ExportProfileE"></span><span class="target" id="namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExportProfile</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13ExportProfileE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Video export profiles. </p>
+<p>A profile represents the intended use of the exported video. The backend automatically selects the most appropriate codec and container for each profile. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13ExportProfile7ArchiveE">
+<span id="_CPPv3N6fluvel13ExportProfile7ArchiveE"></span><span id="_CPPv2N6fluvel13ExportProfile7ArchiveE"></span><span class="target" id="namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6ae727b00944f81e1d0a95c12886ac4641"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Archive</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13ExportProfile7ArchiveE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Lossless archival. </p>
+<p>Intended for computer vision, scientific work, debugging and long-term storage.</p>
+<p>Default backend:<ul class="simple">
+<li><p>Codec: FFV1</p></li>
+<li><p>Container: Matroska (.mkv) </p></li>
+</ul>
+</p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13ExportProfile10CompatibleE">
+<span id="_CPPv3N6fluvel13ExportProfile10CompatibleE"></span><span id="_CPPv2N6fluvel13ExportProfile10CompatibleE"></span><span class="target" id="namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6a923b5fd7dc0ac6f70f77bcc7ec3f5546"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Compatible</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13ExportProfile10CompatibleE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Maximum compatibility. </p>
+<p>Intended for video players, web browsers and video sharing.</p>
+<p>Default backend:<ul class="simple">
+<li><p>Codec: H.264</p></li>
+<li><p>Container: MP4 </p></li>
+</ul>
+</p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13ExportProfile8BalancedE">
+<span id="_CPPv3N6fluvel13ExportProfile8BalancedE"></span><span id="_CPPv2N6fluvel13ExportProfile8BalancedE"></span><span class="target" id="namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6ac6589f5236c0c434d0c63dc5f9a856f2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Balanced</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13ExportProfile8BalancedE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Balanced quality, size and compatibility. </p>
+<p>Intended for everyday use.</p>
+<p>Default backend:<ul class="simple">
+<li><p>Codec: H.265</p></li>
+<li><p>Container: MP4 </p></li>
+</ul>
+</p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13ExportProfile9EfficientE">
+<span id="_CPPv3N6fluvel13ExportProfile9EfficientE"></span><span id="_CPPv2N6fluvel13ExportProfile9EfficientE"></span><span class="target" id="namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6a392257c4628a5b47dfef533b8a6877d8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Efficient</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13ExportProfile9EfficientE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Best compression efficiency. </p>
+<p>Intended for minimizing file size while preserving visual quality.</p>
+<p>Default backend:<ul class="simple">
+<li><p>Codec: AV1</p></li>
+<li><p>Container: MP4 </p></li>
+</ul>
+</p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13ExportProfile6CustomE">
+<span id="_CPPv3N6fluvel13ExportProfile6CustomE"></span><span id="_CPPv2N6fluvel13ExportProfile6CustomE"></span><span class="target" id="namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6a90589c47f06eb971d548591f23c285af"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Custom</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13ExportProfile6CustomE" title="Link to this definition">#</a><br /></dt>
+<dd><p>User-defined codec and container. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel10VideoCodecE">
+<span id="_CPPv3N6fluvel10VideoCodecE"></span><span id="_CPPv2N6fluvel10VideoCodecE"></span><span class="target" id="namespacefluvel_1a759983732340ea0a588c35bfb1767bf1"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VideoCodec</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel10VideoCodecE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Supported video codecs. </p>
+<p>The codecs are ordered by their typical usage rather than by their release date. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel10VideoCodec4FFV1E">
+<span id="_CPPv3N6fluvel10VideoCodec4FFV1E"></span><span id="_CPPv2N6fluvel10VideoCodec4FFV1E"></span><span class="target" id="namespacefluvel_1a759983732340ea0a588c35bfb1767bf1a9718bcc752581ca0bd5c0b7db2448902"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FFV1</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel10VideoCodec4FFV1E" title="Link to this definition">#</a><br /></dt>
+<dd><p>FFV1 lossless codec. </p>
+<p>Best suited for scientific image processing and archival. Provides mathematically lossless compression. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel10VideoCodec4H264E">
+<span id="_CPPv3N6fluvel10VideoCodec4H264E"></span><span id="_CPPv2N6fluvel10VideoCodec4H264E"></span><span class="target" id="namespacefluvel_1a759983732340ea0a588c35bfb1767bf1a8ba63b54352f7053b055235a9ec7ac09"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">H264</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel10VideoCodec4H264E" title="Link to this definition">#</a><br /></dt>
+<dd><p>H.264 / AVC codec. </p>
+<p>Excellent compatibility across operating systems, web browsers and media players. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel10VideoCodec4H265E">
+<span id="_CPPv3N6fluvel10VideoCodec4H265E"></span><span id="_CPPv2N6fluvel10VideoCodec4H265E"></span><span class="target" id="namespacefluvel_1a759983732340ea0a588c35bfb1767bf1a5be0961e6e8a5cd49abb33d4c0f0ffc0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">H265</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel10VideoCodec4H265E" title="Link to this definition">#</a><br /></dt>
+<dd><p>H.265 / HEVC codec. </p>
+<p>Better compression efficiency than H.264 at the cost of increased encoding complexity. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel10VideoCodec3AV1E">
+<span id="_CPPv3N6fluvel10VideoCodec3AV1E"></span><span id="_CPPv2N6fluvel10VideoCodec3AV1E"></span><span class="target" id="namespacefluvel_1a759983732340ea0a588c35bfb1767bf1acae4ca30163749b891686f95532519bd"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AV1</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel10VideoCodec3AV1E" title="Link to this definition">#</a><br /></dt>
+<dd><p>AV1 codec. </p>
+<p>State-of-the-art open video codec providing excellent compression efficiency. Encoding is computationally demanding. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel10VideoCodec3VP9E">
+<span id="_CPPv3N6fluvel10VideoCodec3VP9E"></span><span id="_CPPv2N6fluvel10VideoCodec3VP9E"></span><span class="target" id="namespacefluvel_1a759983732340ea0a588c35bfb1767bf1aae4cfaa9283a4f2150ac3da08e388723"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VP9</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel10VideoCodec3VP9E" title="Link to this definition">#</a><br /></dt>
+<dd><p>VP9 codec. </p>
+<p>Open codec mainly used with the WebM container. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel10VideoCodec10MPEG4Part2E">
+<span id="_CPPv3N6fluvel10VideoCodec10MPEG4Part2E"></span><span id="_CPPv2N6fluvel10VideoCodec10MPEG4Part2E"></span><span class="target" id="namespacefluvel_1a759983732340ea0a588c35bfb1767bf1a0bad4971b4a5484a6b907b0ee602cf8c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MPEG4Part2</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel10VideoCodec10MPEG4Part2E" title="Link to this definition">#</a><br /></dt>
+<dd><p>MPEG-4 Part 2 Visual codec. </p>
+<p>Legacy codec historically used by DivX and Xvid. Mostly kept for compatibility with older software and hardware. </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14VideoContainerE">
+<span id="_CPPv3N6fluvel14VideoContainerE"></span><span id="_CPPv2N6fluvel14VideoContainerE"></span><span class="target" id="namespacefluvel_1a168cefa24664071d8ac99590d93fb5b0"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VideoContainer</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14VideoContainerE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Supported video containers. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14VideoContainer8MatroskaE">
+<span id="_CPPv3N6fluvel14VideoContainer8MatroskaE"></span><span id="_CPPv2N6fluvel14VideoContainer8MatroskaE"></span><span class="target" id="namespacefluvel_1a168cefa24664071d8ac99590d93fb5b0a94fcbb36d283c79c69945caf88e7ecfc"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Matroska</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14VideoContainer8MatroskaE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Matroska container (.mkv). </p>
+<p>Recommended for lossless codecs such as FFV1. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14VideoContainer3Mp4E">
+<span id="_CPPv3N6fluvel14VideoContainer3Mp4E"></span><span id="_CPPv2N6fluvel14VideoContainer3Mp4E"></span><span class="target" id="namespacefluvel_1a168cefa24664071d8ac99590d93fb5b0a7d761542d4b5ea168dc156e85a9a2949"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mp4</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14VideoContainer3Mp4E" title="Link to this definition">#</a><br /></dt>
+<dd><p>MPEG-4 container (.mp4). </p>
+<p>Widely supported by modern media players and devices. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14VideoContainer4WebME">
+<span id="_CPPv3N6fluvel14VideoContainer4WebME"></span><span id="_CPPv2N6fluvel14VideoContainer4WebME"></span><span class="target" id="namespacefluvel_1a168cefa24664071d8ac99590d93fb5b0a84f150cd3bd226ebb3708b998d164d4c"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WebM</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14VideoContainer4WebME" title="Link to this definition">#</a><br /></dt>
+<dd><p>WebM container. </p>
+<p>Typically used with VP8 or VP9. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14VideoContainer3MovE">
+<span id="_CPPv3N6fluvel14VideoContainer3MovE"></span><span id="_CPPv2N6fluvel14VideoContainer3MovE"></span><span class="target" id="namespacefluvel_1a168cefa24664071d8ac99590d93fb5b0a0e42a6c144b97e218e655ff7973cc413"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Mov</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14VideoContainer3MovE" title="Link to this definition">#</a><br /></dt>
+<dd><p>QuickTime container (.mov). </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14VideoContainer3AviE">
+<span id="_CPPv3N6fluvel14VideoContainer3AviE"></span><span id="_CPPv2N6fluvel14VideoContainer3AviE"></span><span class="target" id="namespacefluvel_1a168cefa24664071d8ac99590d93fb5b0a75614c3fca429c06226ca2518abb73aa"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Avi</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14VideoContainer3AviE" title="Link to this definition">#</a><br /></dt>
+<dd><p>AVI container. </p>
+<p>Legacy multimedia container. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettingsE">
+<span id="_CPPv3N6fluvel19VideoExportSettingsE"></span><span id="_CPPv2N6fluvel19VideoExportSettingsE"></span><span id="fluvel::VideoExportSettings"></span><span class="target" id="structfluvel_1_1VideoExportSettings"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VideoExportSettings</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettingsE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;video_export_settings.hpp&gt;</em></div>
+<p>Video export settings. </p>
+<p>Defines the parameters used to export a recorded video, including the output file, encoding options and buffering configuration. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings10outputPathE">
+<span id="_CPPv3N6fluvel19VideoExportSettings10outputPathE"></span><span id="_CPPv2N6fluvel19VideoExportSettings10outputPathE"></span><span id="fluvel::VideoExportSettings::outputPath__QString"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1a4b21a5f98503cd45841e7d4080859887"></span><span class="n"><span class="pre">QString</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">outputPath</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings10outputPathE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Output path. </p>
+<p>In single-file recording mode, this is the path of the exported video.</p>
+<p>In circular recording mode, this is the directory (or base path, depending on the implementation) where the recording segments are stored. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings13recordingModeE">
+<span id="_CPPv3N6fluvel19VideoExportSettings13recordingModeE"></span><span id="_CPPv2N6fluvel19VideoExportSettings13recordingModeE"></span><span id="fluvel::VideoExportSettings::recordingMode__RecordingMode"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1a63d5347775c456d00511d0cdf6220efa"></span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel13RecordingModeE" title="fluvel::RecordingMode"><span class="n"><span class="pre">RecordingMode</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recordingMode</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel13RecordingModeE" title="fluvel::RecordingMode"><span class="n"><span class="pre">RecordingMode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel13RecordingMode10SingleFileE" title="fluvel::RecordingMode::SingleFile"><span class="n"><span class="pre">SingleFile</span></span></a><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings13recordingModeE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Recording mode. </p>
+<p>Defines how the recording is stored.</p>
+<p><ul class="simple">
+<li><p><a class="reference internal" href="app_core.html#namespacefluvel_1aa33aabe26c706d9b1a6a8318a7480604aa8d9b4340d3451ee74b59bee929a91ec"><span class="std std-ref">RecordingMode::SingleFile</span></a> records everything into a single file.</p></li>
+<li><p><a class="reference internal" href="app_core.html#namespacefluvel_1aa33aabe26c706d9b1a6a8318a7480604aae2fd93db7a96c6c8eb65aa02dc03217"><span class="std std-ref">RecordingMode::Circular</span></a> records successive video segments and automatically removes the oldest ones according to the retention settings. </p></li>
+</ul>
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings20retentionTimeMinutesE">
+<span id="_CPPv3N6fluvel19VideoExportSettings20retentionTimeMinutesE"></span><span id="_CPPv2N6fluvel19VideoExportSettings20retentionTimeMinutesE"></span><span id="fluvel::VideoExportSettings::retentionTimeMinutes__i"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1a612c7afe9e36e6908a6782bc255167ac"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">retentionTimeMinutes</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">30</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings20retentionTimeMinutesE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Total retention time. </p>
+<p>In circular recording mode, the oldest recording segments are automatically removed so that approximately this amount of video history is preserved.</p>
+<p>Expressed in minutes.</p>
+<p>Ignored in single-file recording mode. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings12segmentCountE">
+<span id="_CPPv3N6fluvel19VideoExportSettings12segmentCountE"></span><span id="_CPPv2N6fluvel19VideoExportSettings12segmentCountE"></span><span id="fluvel::VideoExportSettings::segmentCount__i"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1a4f64b02a8a4cdc44aaaf54a863350256"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">segmentCount</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">10</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings12segmentCountE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Number of recording segments. </p>
+<p>The retention time is divided into this number of segments.</p>
+<p>Larger values produce shorter segments, while smaller values produce longer segments.</p>
+<p>Ignored in single-file recording mode. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings3fpsE">
+<span id="_CPPv3N6fluvel19VideoExportSettings3fpsE"></span><span id="_CPPv2N6fluvel19VideoExportSettings3fpsE"></span><span id="fluvel::VideoExportSettings::fps__i"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1a45b67662d620a977a2cfe519f7ab6273"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fps</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">30</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings3fpsE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Target frame rate. </p>
+<p>Specifies the frame rate written to the exported video. This value should normally match the acquisition frame rate. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings7profileE">
+<span id="_CPPv3N6fluvel19VideoExportSettings7profileE"></span><span id="_CPPv2N6fluvel19VideoExportSettings7profileE"></span><span id="fluvel::VideoExportSettings::profile__ExportProfile"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1ae0a67fca5519e9ce9381be7d9c2ade25"></span><a class="reference internal" href="#_CPPv4N6fluvel13ExportProfileE" title="fluvel::ExportProfile"><span class="n"><span class="pre">ExportProfile</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">profile</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="#_CPPv4N6fluvel13ExportProfileE" title="fluvel::ExportProfile"><span class="n"><span class="pre">ExportProfile</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6fluvel13ExportProfile7ArchiveE" title="fluvel::ExportProfile::Archive"><span class="n"><span class="pre">Archive</span></span></a><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings7profileE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Export profile. </p>
+<p>Fluvel is primarily a computer vision application; therefore, Archive is the default profile. When set to Custom, the codec and container specified below are used. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings5codecE">
+<span id="_CPPv3N6fluvel19VideoExportSettings5codecE"></span><span id="_CPPv2N6fluvel19VideoExportSettings5codecE"></span><span id="fluvel::VideoExportSettings::codec__VideoCodec"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1aaf305d18965221c5d3c63059ab7d2d04"></span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodecE" title="fluvel::VideoCodec"><span class="n"><span class="pre">VideoCodec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">codec</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodecE" title="fluvel::VideoCodec"><span class="n"><span class="pre">VideoCodec</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodec4FFV1E" title="fluvel::VideoCodec::FFV1"><span class="n"><span class="pre">FFV1</span></span></a><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings5codecE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Video codec. </p>
+<p>Used only when <a class="reference internal" href="#structfluvel_1_1VideoExportSettings_1ae0a67fca5519e9ce9381be7d9c2ade25"><span class="std std-ref">profile</span></a> is set to <a class="reference internal" href="#namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6a90589c47f06eb971d548591f23c285af"><span class="std std-ref">ExportProfile::Custom</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings9containerE">
+<span id="_CPPv3N6fluvel19VideoExportSettings9containerE"></span><span id="_CPPv2N6fluvel19VideoExportSettings9containerE"></span><span id="fluvel::VideoExportSettings::container__VideoContainer"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1af389f85fe821b9e0fdea94c792db6d2b"></span><a class="reference internal" href="#_CPPv4N6fluvel14VideoContainerE" title="fluvel::VideoContainer"><span class="n"><span class="pre">VideoContainer</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">container</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="#_CPPv4N6fluvel14VideoContainerE" title="fluvel::VideoContainer"><span class="n"><span class="pre">VideoContainer</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6fluvel14VideoContainer8MatroskaE" title="fluvel::VideoContainer::Matroska"><span class="n"><span class="pre">Matroska</span></span></a><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings9containerE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Video container. </p>
+<p>Used only when <a class="reference internal" href="#structfluvel_1_1VideoExportSettings_1ae0a67fca5519e9ce9381be7d9c2ade25"><span class="std std-ref">profile</span></a> is set to <a class="reference internal" href="#namespacefluvel_1a0df1b58a360e562bdfe02e12a1f0e8d6a90589c47f06eb971d548591f23c285af"><span class="std std-ref">ExportProfile::Custom</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoExportSettings14bufferSettingsE">
+<span id="_CPPv3N6fluvel19VideoExportSettings14bufferSettingsE"></span><span id="_CPPv2N6fluvel19VideoExportSettings14bufferSettingsE"></span><span id="fluvel::VideoExportSettings::bufferSettings__RecordingBufferSettings"></span><span class="target" id="structfluvel_1_1VideoExportSettings_1aa35a9814cdcce8d2099dea02385490d9"></span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel23RecordingBufferSettingsE" title="fluvel::RecordingBufferSettings"><span class="n"><span class="pre">RecordingBufferSettings</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bufferSettings</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel19VideoExportSettings14bufferSettingsE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Recording buffer configuration. </p>
+<p>Defines the buffering strategy used during recording, including RAM limits, temporary storage limits and overflow handling. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacefluvel"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel</span></span></span><br /></dt>
+<dd><dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14IVideoExporterE">
+<span id="_CPPv3N6fluvel14IVideoExporterE"></span><span id="_CPPv2N6fluvel14IVideoExporterE"></span><span id="fluvel::IVideoExporter"></span><span class="target" id="classfluvel_1_1IVideoExporter"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IVideoExporter</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14IVideoExporterE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;video_exporter_backend.hpp&gt;</em></div>
+<p>Video exporter backend interface. </p>
+<p>A video exporter backend is responsible for encoding a sequence of images into a video file.</p>
+<p>The implementation may rely on FFmpeg or any other encoding library, but must expose the same high-level API. </p>
+<p>Subclassed by <a class="reference internal" href="#classfluvel_1_1FFmpegVideoExporter"><span class="std std-ref">FFmpegVideoExporter</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14IVideoExporterD0Ev">
+<span id="_CPPv3N6fluvel14IVideoExporterD0Ev"></span><span id="_CPPv2N6fluvel14IVideoExporterD0Ev"></span><span id="fluvel::IVideoExporter::~IVideoExporter"></span><span class="target" id="classfluvel_1_1IVideoExporter_1a4359de200b38e43cb892b9bbf3b16f5f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~IVideoExporter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N6fluvel14IVideoExporterD0Ev" title="Link to this definition">#</a><br /></dt>
+<dd><p>Virtual destructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14IVideoExporter4openERK19VideoExportSettings">
+<span id="_CPPv3N6fluvel14IVideoExporter4openERK19VideoExportSettings"></span><span id="_CPPv2N6fluvel14IVideoExporter4openERK19VideoExportSettings"></span><span id="fluvel::IVideoExporter::open__VideoExportSettingsCR"></span><span class="target" id="classfluvel_1_1IVideoExporter_1aae91543500c62a47547bbc11c3a437ae"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel19VideoExportSettingsE" title="fluvel::VideoExportSettings"><span class="n"><span class="pre">VideoExportSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">settings</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N6fluvel14IVideoExporter4openERK19VideoExportSettings" title="Link to this definition">#</a><br /></dt>
+<dd><p>Opens a new video. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> – Video export settings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14IVideoExporter8addFrameERK10VideoFrame">
+<span id="_CPPv3N6fluvel14IVideoExporter8addFrameERK10VideoFrame"></span><span id="_CPPv2N6fluvel14IVideoExporter8addFrameERK10VideoFrame"></span><span id="fluvel::IVideoExporter::addFrame__VideoFrameCR"></span><span class="target" id="classfluvel_1_1IVideoExporter_1acf1c33b1c96bb4fa5fa539f94cb34f8b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFrame</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel10VideoFrameE" title="fluvel::VideoFrame"><span class="n"><span class="pre">VideoFrame</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frame</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N6fluvel14IVideoExporter8addFrameERK10VideoFrame" title="Link to this definition">#</a><br /></dt>
+<dd><p>Encodes a video frame. </p>
+<p>Frames are encoded in the order they are received.</p>
+<p>Depending on the selected timestamp mode, the presentation timestamp contained in the frame may be ignored and generated automatically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> – Video frame to encode. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14IVideoExporter5closeEv">
+<span id="_CPPv3N6fluvel14IVideoExporter5closeEv"></span><span id="_CPPv2N6fluvel14IVideoExporter5closeEv"></span><span id="fluvel::IVideoExporter::close"></span><span class="target" id="classfluvel_1_1IVideoExporter_1aad0a9e425479bdb0239facdf6626fbc8"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N6fluvel14IVideoExporter5closeEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Finalizes the video. </p>
+<p>Flushes any buffered frames and closes the output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel14IVideoExporter11isRecordingEv">
+<span id="_CPPv3NK6fluvel14IVideoExporter11isRecordingEv"></span><span id="_CPPv2NK6fluvel14IVideoExporter11isRecordingEv"></span><span id="fluvel::IVideoExporter::isRecordingC"></span><span class="target" id="classfluvel_1_1IVideoExporter_1a0a9d98d686cabab91840c55e608088ac"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRecording</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK6fluvel14IVideoExporter11isRecordingEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns whether the exporter is opened. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel14IVideoExporter15availableCodecsEv">
+<span id="_CPPv3NK6fluvel14IVideoExporter15availableCodecsEv"></span><span id="_CPPv2NK6fluvel14IVideoExporter15availableCodecsEv"></span><span id="fluvel::IVideoExporter::availableCodecsC"></span><span class="target" id="classfluvel_1_1IVideoExporter_1ae72d39ec789e94b1fcac30ec6c689216"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">QList</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodecE" title="fluvel::VideoCodec"><span class="n"><span class="pre">VideoCodec</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">availableCodecs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK6fluvel14IVideoExporter15availableCodecsEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns the video codecs available through this export backend. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Available video codecs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacefluvel"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel</span></span></span><br /></dt>
+<dd><dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporterE">
+<span id="_CPPv3N6fluvel13VideoExporterE"></span><span id="_CPPv2N6fluvel13VideoExporterE"></span><span id="fluvel::VideoExporter"></span><span class="target" id="classfluvel_1_1VideoExporter"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">VideoExporter</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporterE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;video_exporter.hpp&gt;</em></div>
+<p>High-level video exporter. </p>
+<p>This class provides a simple backend-independent API to export a sequence of images into a video.</p>
+<p>The actual encoding backend (FFmpeg, etc.) is hidden behind an internal implementation interface. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporter13VideoExporterEv">
+<span id="_CPPv3N6fluvel13VideoExporter13VideoExporterEv"></span><span id="_CPPv2N6fluvel13VideoExporter13VideoExporterEv"></span><span id="fluvel::VideoExporter::VideoExporter"></span><span class="target" id="classfluvel_1_1VideoExporter_1a36e9565f528e1c0dcfb8e696abb0d6c7"></span><span class="sig-name descname"><span class="n"><span class="pre">VideoExporter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Constructs a video exporter. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporterD0Ev">
+<span id="_CPPv3N6fluvel13VideoExporterD0Ev"></span><span id="_CPPv2N6fluvel13VideoExporterD0Ev"></span><span id="fluvel::VideoExporter::~VideoExporter"></span><span class="target" id="classfluvel_1_1VideoExporter_1ac5ba73b93fabba2f48e74c42261de434"></span><span class="sig-name descname"><span class="n"><span class="pre">~VideoExporter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporterD0Ev" title="Link to this definition">#</a><br /></dt>
+<dd><p>Destroys the video exporter. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporter13VideoExporterERK13VideoExporter">
+<span id="_CPPv3N6fluvel13VideoExporter13VideoExporterERK13VideoExporter"></span><span id="_CPPv2N6fluvel13VideoExporter13VideoExporterERK13VideoExporter"></span><span id="fluvel::VideoExporter::VideoExporter__VideoExporterCR"></span><span class="target" id="classfluvel_1_1VideoExporter_1adcd2ad9533fedb4b57d28ab2a40ea461"></span><span class="sig-name descname"><span class="n"><span class="pre">VideoExporter</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterERK13VideoExporter" title="fluvel::VideoExporter::VideoExporter"><span class="n"><span class="pre">VideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterERK13VideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporteraSERK13VideoExporter">
+<span id="_CPPv3N6fluvel13VideoExporteraSERK13VideoExporter"></span><span id="_CPPv2N6fluvel13VideoExporteraSERK13VideoExporter"></span><span id="fluvel::VideoExporter::assign-operator__VideoExporterCR"></span><span class="target" id="classfluvel_1_1VideoExporter_1a7a6a642d0a30e119abfc16b39f998d70"></span><a class="reference internal" href="#_CPPv4N6fluvel13VideoExporterE" title="fluvel::VideoExporter"><span class="n"><span class="pre">VideoExporter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel13VideoExporterE" title="fluvel::VideoExporter"><span class="n"><span class="pre">VideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporteraSERK13VideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporter13VideoExporterERR13VideoExporter">
+<span id="_CPPv3N6fluvel13VideoExporter13VideoExporterERR13VideoExporter"></span><span id="_CPPv2N6fluvel13VideoExporter13VideoExporterERR13VideoExporter"></span><span id="fluvel::VideoExporter::VideoExporter__VideoExporterRR"></span><span class="target" id="classfluvel_1_1VideoExporter_1ad182547a52781116558971d3b93616f6"></span><span class="sig-name descname"><span class="n"><span class="pre">VideoExporter</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterERR13VideoExporter" title="fluvel::VideoExporter::VideoExporter"><span class="n"><span class="pre">VideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterERR13VideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporteraSERR13VideoExporter">
+<span id="_CPPv3N6fluvel13VideoExporteraSERR13VideoExporter"></span><span id="_CPPv2N6fluvel13VideoExporteraSERR13VideoExporter"></span><span id="fluvel::VideoExporter::assign-operator__VideoExporterRR"></span><span class="target" id="classfluvel_1_1VideoExporter_1a29f1b3851af71348e61c98fb0baa007d"></span><a class="reference internal" href="#_CPPv4N6fluvel13VideoExporterE" title="fluvel::VideoExporter"><span class="n"><span class="pre">VideoExporter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6fluvel13VideoExporterE" title="fluvel::VideoExporter"><span class="n"><span class="pre">VideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporteraSERR13VideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporter4openERK19VideoExportSettings">
+<span id="_CPPv3N6fluvel13VideoExporter4openERK19VideoExportSettings"></span><span id="_CPPv2N6fluvel13VideoExporter4openERK19VideoExportSettings"></span><span id="fluvel::VideoExporter::open__VideoExportSettingsCR"></span><span class="target" id="classfluvel_1_1VideoExporter_1a2443adc89cb783becfcb3b5a11e2fbb3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel19VideoExportSettingsE" title="fluvel::VideoExportSettings"><span class="n"><span class="pre">VideoExportSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">settings</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporter4openERK19VideoExportSettings" title="Link to this definition">#</a><br /></dt>
+<dd><p>Opens a new video. </p>
+<p>This function must be called before <a class="reference internal" href="#classfluvel_1_1VideoExporter_1af7bf81346c59d3f55047bc32152ea058"><span class="std std-ref">addFrame()</span></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> – Video export settings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success, false otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporter8addFrameERK10VideoFrame">
+<span id="_CPPv3N6fluvel13VideoExporter8addFrameERK10VideoFrame"></span><span id="_CPPv2N6fluvel13VideoExporter8addFrameERK10VideoFrame"></span><span id="fluvel::VideoExporter::addFrame__VideoFrameCR"></span><span class="target" id="classfluvel_1_1VideoExporter_1af7bf81346c59d3f55047bc32152ea058"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFrame</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel10VideoFrameE" title="fluvel::VideoFrame"><span class="n"><span class="pre">VideoFrame</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frame</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporter8addFrameERK10VideoFrame" title="Link to this definition">#</a><br /></dt>
+<dd><p>Encodes a video frame. </p>
+<p>Frames are encoded in the order they are received.</p>
+<p>Depending on the selected timestamp mode, the presentation timestamp contained in the frame may be ignored and generated automatically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> – Video frame to encode. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporter5closeEv">
+<span id="_CPPv3N6fluvel13VideoExporter5closeEv"></span><span id="_CPPv2N6fluvel13VideoExporter5closeEv"></span><span id="fluvel::VideoExporter::close"></span><span class="target" id="classfluvel_1_1VideoExporter_1a46143fd6de3be9ab9951f140d3ae8c2f"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporter5closeEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Finalizes the video. </p>
+<p>Flushes the encoder, writes the trailer and closes the output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True on success, false otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel13VideoExporter11isRecordingEv">
+<span id="_CPPv3NK6fluvel13VideoExporter11isRecordingEv"></span><span id="_CPPv2NK6fluvel13VideoExporter11isRecordingEv"></span><span id="fluvel::VideoExporter::isRecordingC"></span><span class="target" id="classfluvel_1_1VideoExporter_1a5191d39ffb83928d29dbe1bc3a8aa6da"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRecording</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6fluvel13VideoExporter11isRecordingEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns whether the exporter is currently opened. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True if a video is currently opened. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel13VideoExporter15availableCodecsEv">
+<span id="_CPPv3NK6fluvel13VideoExporter15availableCodecsEv"></span><span id="_CPPv2NK6fluvel13VideoExporter15availableCodecsEv"></span><span id="fluvel::VideoExporter::availableCodecsC"></span><span class="target" id="classfluvel_1_1VideoExporter_1a5bbe3dd729488eeeb84e7617fc53db5a"></span><span class="n"><span class="pre">QList</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodecE" title="fluvel::VideoCodec"><span class="n"><span class="pre">VideoCodec</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">availableCodecs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK6fluvel13VideoExporter15availableCodecsEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns the video codecs available for export. </p>
+<p>The available codecs depend on the active export backend and the encoders available on the current system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Available video codecs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel13VideoExporter9exporter_E">
+<span id="_CPPv3N6fluvel13VideoExporter9exporter_E"></span><span id="_CPPv2N6fluvel13VideoExporter9exporter_E"></span><span id="fluvel::VideoExporter::exporter___std::unique_ptr:IVideoExporter:"></span><span class="target" id="classfluvel_1_1VideoExporter_1a7de251f7a1901a721a48face2e66b11d"></span><a class="reference internal" href="../ip/ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unique_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6fluvel14IVideoExporterE" title="fluvel::IVideoExporter"><span class="n"><span class="pre">IVideoExporter</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">exporter_</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel13VideoExporter9exporter_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacefluvel"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel</span></span></span><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel14exporter_utilsE">
+<span id="_CPPv3N6fluvel14exporter_utilsE"></span><span id="_CPPv2N6fluvel14exporter_utilsE"></span><span id="fluvel::exporter_utils"></span><span class="target" id="namespacefluvel_1_1exporter__utils"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">exporter_utils</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel14exporter_utilsE" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="ffmpeg-backend">
+<h2>FFmpeg Backend<a class="headerlink" href="#ffmpeg-backend" title="Link to this heading">#</a></h2>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacefluvel"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel11ExportStateE">
+<span id="_CPPv3N6fluvel11ExportStateE"></span><span id="_CPPv2N6fluvel11ExportStateE"></span><span class="target" id="namespacefluvel_1a7d778113b0b4537924fb0c822e6187f0"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExportState</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel11ExportStateE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Internal state of the exporter. </p>
+<p>The exporter is initially closed. Calling open() starts a new export session but defers the FFmpeg initialization until the first frame is received. Once initialized, frames can be encoded until close() is called. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel11ExportState6ClosedE">
+<span id="_CPPv3N6fluvel11ExportState6ClosedE"></span><span id="_CPPv2N6fluvel11ExportState6ClosedE"></span><span class="target" id="namespacefluvel_1a7d778113b0b4537924fb0c822e6187f0a03f4a47830f97377a35321051685071e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Closed</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel11ExportState6ClosedE" title="Link to this definition">#</a><br /></dt>
+<dd><p>No export session is active. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel11ExportState20WaitingForFirstFrameE">
+<span id="_CPPv3N6fluvel11ExportState20WaitingForFirstFrameE"></span><span id="_CPPv2N6fluvel11ExportState20WaitingForFirstFrameE"></span><span class="target" id="namespacefluvel_1a7d778113b0b4537924fb0c822e6187f0a493860a1c396788741dcbbf0ba7956f5"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WaitingForFirstFrame</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel11ExportState20WaitingForFirstFrameE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Waiting for the first frame to determine the output format and to initialize FFmpeg. </p>
+</dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel11ExportState9RecordingE">
+<span id="_CPPv3N6fluvel11ExportState9RecordingE"></span><span id="_CPPv2N6fluvel11ExportState9RecordingE"></span><span class="target" id="namespacefluvel_1a7d778113b0b4537924fb0c822e6187f0ac5564d2e8b8e0ae08bf4363f2b947166"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Recording</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel11ExportState9RecordingE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Export session initialized and ready to encode frames. </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporterE">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporterE"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporterE"></span><span id="fluvel::FFmpegVideoExporter"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel14IVideoExporterE" title="fluvel::IVideoExporter"><span class="n"><span class="pre">IVideoExporter</span></span></a><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporterE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ffmpeg_video_exporter.hpp&gt;</em></div>
+<p>FFmpeg implementation of the video exporter. </p>
+<p>This class implements the <a class="reference internal" href="#classfluvel_1_1IVideoExporter"><span class="std std-ref">IVideoExporter</span></a> interface using the FFmpeg multimedia framework.</p>
+<p>The public API remains backend-independent. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterEv"></span><span id="fluvel::FFmpegVideoExporter::FFmpegVideoExporter"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a29dadf0635710ded653acb03657a2db5"></span><span class="sig-name descname"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Constructs a FFmpeg video exporter. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporterD0Ev">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporterD0Ev"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporterD0Ev"></span><span id="fluvel::FFmpegVideoExporter::~FFmpegVideoExporter"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a04631ad808ec20ecefba755b98d55f53"></span><span class="sig-name descname"><span class="n"><span class="pre">~FFmpegVideoExporter</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporterD0Ev" title="Link to this definition">#</a><br /></dt>
+<dd><p>Destroys the exporter. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERK19FFmpegVideoExporter">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERK19FFmpegVideoExporter"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERK19FFmpegVideoExporter"></span><span id="fluvel::FFmpegVideoExporter::FFmpegVideoExporter__FFmpegVideoExporterCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a2e38da22ee73410fbf240d7bc5c1887f"></span><span class="sig-name descname"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERK19FFmpegVideoExporter" title="fluvel::FFmpegVideoExporter::FFmpegVideoExporter"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERK19FFmpegVideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporteraSERK19FFmpegVideoExporter">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporteraSERK19FFmpegVideoExporter"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporteraSERK19FFmpegVideoExporter"></span><span id="fluvel::FFmpegVideoExporter::assign-operator__FFmpegVideoExporterCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a327a962572bffb7f49443e10a6063ef5"></span><a class="reference internal" href="#_CPPv4N6fluvel19FFmpegVideoExporterE" title="fluvel::FFmpegVideoExporter"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel19FFmpegVideoExporterE" title="fluvel::FFmpegVideoExporter"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporteraSERK19FFmpegVideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERR19FFmpegVideoExporter">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERR19FFmpegVideoExporter"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERR19FFmpegVideoExporter"></span><span id="fluvel::FFmpegVideoExporter::FFmpegVideoExporter__FFmpegVideoExporterRR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a0bf97c3a05c52cb8c92871e56b7379fd"></span><span class="sig-name descname"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERR19FFmpegVideoExporter" title="fluvel::FFmpegVideoExporter::FFmpegVideoExporter"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERR19FFmpegVideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporteraSERR19FFmpegVideoExporter">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporteraSERR19FFmpegVideoExporter"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporteraSERR19FFmpegVideoExporter"></span><span id="fluvel::FFmpegVideoExporter::assign-operator__FFmpegVideoExporterRR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a6f5d9fefb205ed2c313b2052b75dda03"></span><a class="reference internal" href="#_CPPv4N6fluvel19FFmpegVideoExporterE" title="fluvel::FFmpegVideoExporter"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">=</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6fluvel19FFmpegVideoExporterE" title="fluvel::FFmpegVideoExporter"><span class="n"><span class="pre">FFmpegVideoExporter</span></span></a><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">delete</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporteraSERR19FFmpegVideoExporter" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter4openERK19VideoExportSettings">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter4openERK19VideoExportSettings"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter4openERK19VideoExportSettings"></span><span id="fluvel::FFmpegVideoExporter::open__VideoExportSettingsCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1abe0aa2e976442abca5445c77976afce3"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel19VideoExportSettingsE" title="fluvel::VideoExportSettings"><span class="n"><span class="pre">VideoExportSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">settings</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter4openERK19VideoExportSettings" title="Link to this definition">#</a><br /></dt>
+<dd><p>Opens a new video.   </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> – Video export settings.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True on success.   </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter8addFrameERK10VideoFrame">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter8addFrameERK10VideoFrame"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter8addFrameERK10VideoFrame"></span><span id="fluvel::FFmpegVideoExporter::addFrame__VideoFrameCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a644f9727d633eebb85aa44c0a3950376"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">addFrame</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel10VideoFrameE" title="fluvel::VideoFrame"><span class="n"><span class="pre">VideoFrame</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frame</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter8addFrameERK10VideoFrame" title="Link to this definition">#</a><br /></dt>
+<dd><p>Encodes a video frame.   </p>
+<p>Frames are encoded in the order they are received.</p>
+<p>Depending on the selected timestamp mode, the presentation timestamp contained in the frame may be ignored and generated automatically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> – Video frame to encode. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise.   </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter5closeEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter5closeEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter5closeEv"></span><span id="fluvel::FFmpegVideoExporter::close"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a087d0b0ef7418af61f60f4e1965b24e5"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter5closeEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Finalizes the video.   </p>
+<p>Flushes any buffered frames and closes the output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True on success.   </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel19FFmpegVideoExporter11isRecordingEv">
+<span id="_CPPv3NK6fluvel19FFmpegVideoExporter11isRecordingEv"></span><span id="_CPPv2NK6fluvel19FFmpegVideoExporter11isRecordingEv"></span><span id="fluvel::FFmpegVideoExporter::isRecordingC"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1ae7e2ef6ba91cc88289c58483cf31a589"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRecording</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK6fluvel19FFmpegVideoExporter11isRecordingEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns whether the exporter is opened.   </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel19FFmpegVideoExporter15availableCodecsEv">
+<span id="_CPPv3NK6fluvel19FFmpegVideoExporter15availableCodecsEv"></span><span id="_CPPv2NK6fluvel19FFmpegVideoExporter15availableCodecsEv"></span><span id="fluvel::FFmpegVideoExporter::availableCodecsC"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a6b3a41a3ac2a873760287be7fc03b0ee"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">QList</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodecE" title="fluvel::VideoCodec"><span class="n"><span class="pre">VideoCodec</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">availableCodecs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK6fluvel19FFmpegVideoExporter15availableCodecsEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns the video codecs available through the FFmpeg backend. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Available video codecs. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter24initializeFromFirstFrameERK6QImage">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter24initializeFromFirstFrameERK6QImage"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter24initializeFromFirstFrameERK6QImage"></span><span id="fluvel::FFmpegVideoExporter::initializeFromFirstFrame__QImageCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a8066727b352510713daf697bbfeb8aec"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">initializeFromFirstFrame</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">QImage</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">firstFrame</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter24initializeFromFirstFrameERK6QImage" title="Link to this definition">#</a><br /></dt>
+<dd><p>Initializes the exporter from the first input frame. </p>
+<p>The first frame defines the output image characteristics and triggers the FFmpeg initialization (container, codec, stream, frame allocation, scaler, output file and header).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>firstFrame</strong> – First frame to export. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter19initializeContainerERK19VideoExportSettings">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter19initializeContainerERK19VideoExportSettings"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter19initializeContainerERK19VideoExportSettings"></span><span id="fluvel::FFmpegVideoExporter::initializeContainer__VideoExportSettingsCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a5dbdf8e617ddcaf2c6657a1362ef6f61"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">initializeContainer</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel19VideoExportSettingsE" title="fluvel::VideoExportSettings"><span class="n"><span class="pre">VideoExportSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">settings</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter19initializeContainerERK19VideoExportSettings" title="Link to this definition">#</a><br /></dt>
+<dd><p>Initializes the output container. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> – Export settings. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter15initializeCodecERK19VideoExportSettingsPK13AVPixelFormat">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter15initializeCodecERK19VideoExportSettingsPK13AVPixelFormat"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter15initializeCodecERK19VideoExportSettingsPK13AVPixelFormat"></span><span id="fluvel::FFmpegVideoExporter::initializeCodec__VideoExportSettingsCR.AVPixelFormatCP"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1af8dbe2ebfd0039112a3999942a004bf2"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">initializeCodec</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N6fluvel19VideoExportSettingsE" title="fluvel::VideoExportSettings"><span class="n"><span class="pre">VideoExportSettings</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">settings</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">AVPixelFormat</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">preferredFormats</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter15initializeCodecERK19VideoExportSettingsPK13AVPixelFormat" title="Link to this definition">#</a><br /></dt>
+<dd><p>Initializes the video codec. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>settings</strong> – Export settings. </p></li>
+<li><p><strong>preferredFormats</strong> – Preferred pixel formats ordered by priority. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter16initializeStreamEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter16initializeStreamEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter16initializeStreamEv"></span><span id="fluvel::FFmpegVideoExporter::initializeStream"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1aea08975f79d9ba66cd8e3cb8d45da744"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">initializeStream</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter16initializeStreamEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Initializes the output stream. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter13allocateFrameEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter13allocateFrameEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter13allocateFrameEv"></span><span id="fluvel::FFmpegVideoExporter::allocateFrame"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a80f8a615eb77ed744abeb7c240168424"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allocateFrame</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter13allocateFrameEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Allocates the video frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter14allocatePacketEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter14allocatePacketEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter14allocatePacketEv"></span><span id="fluvel::FFmpegVideoExporter::allocatePacket"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a0591c6122436032c9de5ded1097a7b6b"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">allocatePacket</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter14allocatePacketEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Allocates the packet used for encoded data. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter16initializeScalerEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter16initializeScalerEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter16initializeScalerEv"></span><span id="fluvel::FFmpegVideoExporter::initializeScaler"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a80481d6247e2df7982ed28eedc8ce840"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">initializeScaler</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter16initializeScalerEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Initializes the pixel format conversion context. </p>
+<p>Creates the libswscale context when a conversion from the input image format to the encoder pixel format is required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter14openOutputFileEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter14openOutputFileEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter14openOutputFileEv"></span><span id="fluvel::FFmpegVideoExporter::openOutputFile"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1aab075baf161915f02e54f9050bd41896"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">openOutputFile</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter14openOutputFileEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Opens the output file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter11writeHeaderEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter11writeHeaderEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter11writeHeaderEv"></span><span id="fluvel::FFmpegVideoExporter::writeHeader"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a71260916b31668ed8727d8e382b27c80"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">writeHeader</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter11writeHeaderEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Writes the container header. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter17makeFrameWritableEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter17makeFrameWritableEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter17makeFrameWritableEv"></span><span id="fluvel::FFmpegVideoExporter::makeFrameWritable"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a9e6963c25543d87bf8d6331a10f36109"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeFrameWritable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter17makeFrameWritableEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Makes the frame writable. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter9fillFrameERK6QImage">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter9fillFrameERK6QImage"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter9fillFrameERK6QImage"></span><span id="fluvel::FFmpegVideoExporter::fillFrame__QImageCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1aef84cdad659c10142a4b96093bbcba7d"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fillFrame</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">QImage</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter9fillFrameERK6QImage" title="Link to this definition">#</a><br /></dt>
+<dd><p>Fills the encoder frame from an image. </p>
+<p>Dispatches the operation according to the encoder pixel format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – Source image. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter14fillFrameGray8ERK6QImage">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter14fillFrameGray8ERK6QImage"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter14fillFrameGray8ERK6QImage"></span><span id="fluvel::FFmpegVideoExporter::fillFrameGray8__QImageCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a2d938c7b4fc9dd2e5dfcf5e827fa55ab"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fillFrameGray8</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">QImage</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter14fillFrameGray8ERK6QImage" title="Link to this definition">#</a><br /></dt>
+<dd><p>Fills the encoder frame with grayscale image data. </p>
+<p>The source image is converted to <code class="docutils literal notranslate"><span class="pre">QImage::Format_Grayscale8</span></code> when required and copied into the <code class="docutils literal notranslate"><span class="pre">AV_PIX_FMT_GRAY8</span></code> frame buffer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – Source image. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, otherwise <code class="docutils literal notranslate"><span class="pre">false</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter14fillFrameRgb24ERK6QImage">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter14fillFrameRgb24ERK6QImage"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter14fillFrameRgb24ERK6QImage"></span><span id="fluvel::FFmpegVideoExporter::fillFrameRgb24__QImageCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a0040a384571187d59f3af11af49a76fd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fillFrameRgb24</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">QImage</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter14fillFrameRgb24ERK6QImage" title="Link to this definition">#</a><br /></dt>
+<dd><p>Fills the encoder frame with RGB24 image data. </p>
+<p>The source image is converted to <code class="docutils literal notranslate"><span class="pre">QImage::Format_RGB888</span></code> when required and copied into the <code class="docutils literal notranslate"><span class="pre">AV_PIX_FMT_RGB24</span></code> frame buffer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – Source image. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, otherwise <code class="docutils literal notranslate"><span class="pre">false</span></code>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter13fillFrameBgr0ERK6QImage">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter13fillFrameBgr0ERK6QImage"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter13fillFrameBgr0ERK6QImage"></span><span id="fluvel::FFmpegVideoExporter::fillFrameBgr0__QImageCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a8a575167b881988ce76d25b7085f393e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fillFrameBgr0</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">QImage</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter13fillFrameBgr0ERK6QImage" title="Link to this definition">#</a><br /></dt>
+<dd><p>Copies a BGRA image into the encoder frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – Source image. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter15fillFrameYuv420ERK6QImage">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter15fillFrameYuv420ERK6QImage"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter15fillFrameYuv420ERK6QImage"></span><span id="fluvel::FFmpegVideoExporter::fillFrameYuv420__QImageCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a784aa39afe6ead75de97ce09daa77c13"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fillFrameYuv420</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">QImage</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter15fillFrameYuv420ERK6QImage" title="Link to this definition">#</a><br /></dt>
+<dd><p>Converts an image to YUV420 and fills the encoder frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – Source image. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter20updateFrameTimestampERK10VideoFrame">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter20updateFrameTimestampERK10VideoFrame"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter20updateFrameTimestampERK10VideoFrame"></span><span id="fluvel::FFmpegVideoExporter::updateFrameTimestamp__VideoFrameCR"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a09b9be3bb97adfcf277b101f1e89f5ae"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">updateFrameTimestamp</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="app_core.html#_CPPv4N6fluvel10VideoFrameE" title="fluvel::VideoFrame"><span class="n"><span class="pre">VideoFrame</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">frame</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter20updateFrameTimestampERK10VideoFrame" title="Link to this definition">#</a><br /></dt>
+<dd><p>Updates the presentation timestamp of the encoder frame. </p>
+<p>The timestamp is generated from the configured frame rate or derived from the timestamp provided by the input frame, depending on the configured timestamp mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frame</strong> – Input video frame. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter11encodeFrameEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter11encodeFrameEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter11encodeFrameEv"></span><span id="fluvel::FFmpegVideoExporter::encodeFrame"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a0fa623738bff627cfde5ff87adfe1657"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">encodeFrame</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter11encodeFrameEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Encodes the current frame. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter14receivePacketsEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter14receivePacketsEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter14receivePacketsEv"></span><span id="fluvel::FFmpegVideoExporter::receivePackets"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1ac6997812860c5f241323a898e11e5eec"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">receivePackets</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter14receivePacketsEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Retrieves and writes all available encoded packets. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter12flushEncoderEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter12flushEncoderEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter12flushEncoderEv"></span><span id="fluvel::FFmpegVideoExporter::flushEncoder"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1ab3b75b861f89461cfbfa7121d9308065"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">flushEncoder</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter12flushEncoderEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Flushes the encoder. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter12writeTrailerEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter12writeTrailerEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter12writeTrailerEv"></span><span id="fluvel::FFmpegVideoExporter::writeTrailer"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1ac8e40cb6ce8dadb36f688e41d94fc77e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">writeTrailer</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter12writeTrailerEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Writes the container trailer. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> on success, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter7releaseEv">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter7releaseEv"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter7releaseEv"></span><span id="fluvel::FFmpegVideoExporter::release"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a23b477d0e2d399f75d585d154c346591"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">release</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter7releaseEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Releases all allocated FFmpeg resources. </p>
+<p>Restores the exporter to an uninitialized state. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter9settings_E">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter9settings_E"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter9settings_E"></span><span id="fluvel::FFmpegVideoExporter::settings___VideoExportSettings"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a9d8efbe2508b5d6d6a5de468289b5153"></span><a class="reference internal" href="#_CPPv4N6fluvel19VideoExportSettingsE" title="fluvel::VideoExportSettings"><span class="n"><span class="pre">VideoExportSettings</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">settings_</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter9settings_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter6state_E">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter6state_E"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter6state_E"></span><span id="fluvel::FFmpegVideoExporter::state___ExportState"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1a3bebcf1955f729b470b56a24056b9be2"></span><a class="reference internal" href="#_CPPv4N6fluvel11ExportStateE" title="fluvel::ExportState"><span class="n"><span class="pre">ExportState</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">state_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="#_CPPv4N6fluvel11ExportStateE" title="fluvel::ExportState"><span class="n"><span class="pre">ExportState</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6fluvel11ExportState6ClosedE" title="fluvel::ExportState::Closed"><span class="n"><span class="pre">Closed</span></span></a><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter6state_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter10frameSize_E">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter10frameSize_E"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter10frameSize_E"></span><span id="fluvel::FFmpegVideoExporter::frameSize___QSize"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1aa00a8cafe03bb6f6aef141b47f14076a"></span><span class="n"><span class="pre">QSize</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">frameSize_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="o"><span class="pre">-</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter10frameSize_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter12frameFormat_E">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter12frameFormat_E"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter12frameFormat_E"></span><span id="fluvel::FFmpegVideoExporter::frameFormat___QImage::Format"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1acfae42161d1404604d2c075d45ca19a9"></span><span class="n"><span class="pre">QImage</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Format</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">frameFormat_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="n"><span class="pre">QImage</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Format_Invalid</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter12frameFormat_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter8lastPts_E">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter8lastPts_E"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter8lastPts_E"></span><span id="fluvel::FFmpegVideoExporter::lastPts___int64_t"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1adadfe455ff6fd45fc3605e7c083b981f"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lastPts_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="n"><span class="pre">AV_NOPTS_VALUE</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter8lastPts_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19FFmpegVideoExporter8context_E">
+<span id="_CPPv3N6fluvel19FFmpegVideoExporter8context_E"></span><span id="_CPPv2N6fluvel19FFmpegVideoExporter8context_E"></span><span id="fluvel::FFmpegVideoExporter::context___std::unique_ptr:Context:"></span><span class="target" id="classfluvel_1_1FFmpegVideoExporter_1ad9faafa6503264913ce259fd09569f14"></span><a class="reference internal" href="../ip/ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unique_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Context</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">context_</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel19FFmpegVideoExporter8context_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacefluvel"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel</span></span></span><br /></dt>
+<dd><dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel9CodecInfoE">
+<span id="_CPPv3N6fluvel9CodecInfoE"></span><span id="_CPPv2N6fluvel9CodecInfoE"></span><span id="fluvel::CodecInfo"></span><span class="target" id="structfluvel_1_1CodecInfo"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CodecInfo</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel9CodecInfoE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ffmpeg_codec_utils.hpp&gt;</em></div>
+<p>Describes an available FFmpeg video codec. </p>
+<p>A codec is considered available when:<ul class="simple">
+<li><p>a suitable FFmpeg encoder is found;</p></li>
+<li><p>a compatible pixel format is selected;</p></li>
+<li><p>the encoder can be successfully opened. </p></li>
+</ul>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel9CodecInfo5codecE">
+<span id="_CPPv3N6fluvel9CodecInfo5codecE"></span><span id="_CPPv2N6fluvel9CodecInfo5codecE"></span><span id="fluvel::CodecInfo::codec__VideoCodec"></span><span class="target" id="structfluvel_1_1CodecInfo_1aaf305d18965221c5d3c63059ab7d2d04"></span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodecE" title="fluvel::VideoCodec"><span class="n"><span class="pre">VideoCodec</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">codec</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel9CodecInfo5codecE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Fluvel video codec. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel9CodecInfo8losslessE">
+<span id="_CPPv3N6fluvel9CodecInfo8losslessE"></span><span id="_CPPv2N6fluvel9CodecInfo8losslessE"></span><span id="fluvel::CodecInfo::lossless__b"></span><span class="target" id="structfluvel_1_1CodecInfo_1a17a68ce6d7e9c42c2f21cf2200a8d397"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lossless</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel9CodecInfo8losslessE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Indicates whether the codec uses lossless compression. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel9CodecInfo7encoderE">
+<span id="_CPPv3N6fluvel9CodecInfo7encoderE"></span><span id="_CPPv2N6fluvel9CodecInfo7encoderE"></span><span id="fluvel::CodecInfo::encoder__AVCodecCP"></span><span class="target" id="structfluvel_1_1CodecInfo_1a60f3cf0d9392fcb7eb86e13ab2440aa7"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">AVCodec</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">encoder</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel9CodecInfo7encoderE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Selected FFmpeg encoder. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16FFmpegCodecUtilsE">
+<span id="_CPPv3N6fluvel16FFmpegCodecUtilsE"></span><span id="_CPPv2N6fluvel16FFmpegCodecUtilsE"></span><span id="fluvel::FFmpegCodecUtils"></span><span class="target" id="classfluvel_1_1FFmpegCodecUtils"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FFmpegCodecUtils</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel16FFmpegCodecUtilsE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;ffmpeg_codec_utils.hpp&gt;</em></div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16FFmpegCodecUtils15availableCodecsEv">
+<span id="_CPPv3N6fluvel16FFmpegCodecUtils15availableCodecsEv"></span><span id="_CPPv2N6fluvel16FFmpegCodecUtils15availableCodecsEv"></span><span id="fluvel::FFmpegCodecUtils::availableCodecs"></span><span class="target" id="classfluvel_1_1FFmpegCodecUtils_1a7773b9397171af6e56bfe9dd8f22048a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">QList</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6fluvel9CodecInfoE" title="fluvel::CodecInfo"><span class="n"><span class="pre">CodecInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">availableCodecs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel16FFmpegCodecUtils15availableCodecsEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns all video codecs available on the current system. </p>
+<p>The returned list is cached after the first call.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Available codec descriptions. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16FFmpegCodecUtils9codecInfoE10VideoCodec">
+<span id="_CPPv3N6fluvel16FFmpegCodecUtils9codecInfoE10VideoCodec"></span><span id="_CPPv2N6fluvel16FFmpegCodecUtils9codecInfoE10VideoCodec"></span><span id="fluvel::FFmpegCodecUtils::codecInfo__VideoCodec"></span><span class="target" id="classfluvel_1_1FFmpegCodecUtils_1a840de8f2943a308219087df4bd55bf72"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="../ip/ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6fluvel9CodecInfoE" title="fluvel::CodecInfo"><span class="n"><span class="pre">CodecInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">codecInfo</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N6fluvel10VideoCodecE" title="fluvel::VideoCodec"><span class="n"><span class="pre">VideoCodec</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">codec</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel16FFmpegCodecUtils9codecInfoE10VideoCodec" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns information about a specific codec. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>codec</strong> – Fluvel video codec. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Codec information if available, std::nullopt otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16FFmpegCodecUtils19supportsPixelFormatEPK7AVCodec13AVPixelFormat">
+<span id="_CPPv3N6fluvel16FFmpegCodecUtils19supportsPixelFormatEPK7AVCodec13AVPixelFormat"></span><span id="_CPPv2N6fluvel16FFmpegCodecUtils19supportsPixelFormatEPK7AVCodec13AVPixelFormat"></span><span id="fluvel::FFmpegCodecUtils::supportsPixelFormat__AVCodecCP.AVPixelFormat"></span><span class="target" id="classfluvel_1_1FFmpegCodecUtils_1a69963b70de585f72485ec4385dbefeb9"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">supportsPixelFormat</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">AVCodec</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">encoder</span></span>, <span class="n"><span class="pre">AVPixelFormat</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pixelFormat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel16FFmpegCodecUtils19supportsPixelFormatEPK7AVCodec13AVPixelFormat" title="Link to this definition">#</a><br /></dt>
+<dd><p>Checks whether an encoder supports a pixel format. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder</strong> – FFmpeg video encoder. </p></li>
+<li><p><strong>pixelFormat</strong> – Pixel format to test. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the encoder supports the pixel format, false otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16FFmpegCodecUtils11diagnosticsEv">
+<span id="_CPPv3N6fluvel16FFmpegCodecUtils11diagnosticsEv"></span><span id="_CPPv2N6fluvel16FFmpegCodecUtils11diagnosticsEv"></span><span id="fluvel::FFmpegCodecUtils::diagnostics"></span><span class="target" id="classfluvel_1_1FFmpegCodecUtils_1a827a1db4dac7cb2620fe50100437e86f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">QString</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">diagnostics</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel16FFmpegCodecUtils11diagnosticsEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Builds a human-readable report of the encoder detection. </p>
+<p>For every preferred encoder, reports whether it was found and whether it could be opened (with the FFmpeg error message on failure). Intended to explain an empty codec list in the About dialog.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Multi-line plain text report. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-functions">Private Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16FFmpegCodecUtils21detectAvailableCodecsEv">
+<span id="_CPPv3N6fluvel16FFmpegCodecUtils21detectAvailableCodecsEv"></span><span id="_CPPv2N6fluvel16FFmpegCodecUtils21detectAvailableCodecsEv"></span><span id="fluvel::FFmpegCodecUtils::detectAvailableCodecs"></span><span class="target" id="classfluvel_1_1FFmpegCodecUtils_1ac21f1dbef8e8ccd97f0dd50c7ca20098"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">QList</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N6fluvel9CodecInfoE" title="fluvel::CodecInfo"><span class="n"><span class="pre">CodecInfo</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">detectAvailableCodecs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel16FFmpegCodecUtils21detectAvailableCodecsEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Detects all video codecs available on the current system. </p>
+<p>For each codec, the detection tries the preferred FFmpeg encoders in priority order. For each encoder, it tests the supported pixel formats until a compatible configuration can be successfully initialized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of available codec descriptions. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16FFmpegCodecUtils15isEncoderUsableEPK7AVCodec9AVCodecID13AVPixelFormat">
+<span id="_CPPv3N6fluvel16FFmpegCodecUtils15isEncoderUsableEPK7AVCodec9AVCodecID13AVPixelFormat"></span><span id="_CPPv2N6fluvel16FFmpegCodecUtils15isEncoderUsableEPK7AVCodec9AVCodecID13AVPixelFormat"></span><span id="fluvel::FFmpegCodecUtils::isEncoderUsable__AVCodecCP.AVCodecID.AVPixelFormat"></span><span class="target" id="classfluvel_1_1FFmpegCodecUtils_1a800d19f8514e2074ef22eda7abe642c4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isEncoderUsable</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">AVCodec</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">encoder</span></span>, <span class="n"><span class="pre">AVCodecID</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">codecId</span></span>, <span class="n"><span class="pre">AVPixelFormat</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">pixelFormat</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel16FFmpegCodecUtils15isEncoderUsableEPK7AVCodec9AVCodecID13AVPixelFormat" title="Link to this definition">#</a><br /></dt>
+<dd><p>Checks whether an encoder can be successfully opened. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder</strong> – FFmpeg encoder. </p></li>
+<li><p><strong>codecId</strong> – FFmpeg codec identifier. </p></li>
+<li><p><strong>pixelFormat</strong> – Pixel format used for the validation. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if the encoder can be opened, <code class="docutils literal notranslate"><span class="pre">false</span></code> otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacefluvel"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel</span></span></span><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel12ffmpeg_utilsE">
+<span id="_CPPv3N6fluvel12ffmpeg_utilsE"></span><span id="_CPPv2N6fluvel12ffmpeg_utilsE"></span><span id="fluvel::ffmpeg_utils"></span><span class="target" id="namespacefluvel_1_1ffmpeg__utils"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ffmpeg_utils</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel12ffmpeg_utilsE" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="app_core.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Application Core</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="app_interop.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Application Interoperability</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#media-export">Media Export</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv46fluvel"><code class="docutils literal notranslate"><span class="pre">fluvel</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13ExportProfileE"><code class="docutils literal notranslate"><span class="pre">ExportProfile</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13ExportProfile7ArchiveE"><code class="docutils literal notranslate"><span class="pre">Archive</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13ExportProfile10CompatibleE"><code class="docutils literal notranslate"><span class="pre">Compatible</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13ExportProfile8BalancedE"><code class="docutils literal notranslate"><span class="pre">Balanced</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13ExportProfile9EfficientE"><code class="docutils literal notranslate"><span class="pre">Efficient</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13ExportProfile6CustomE"><code class="docutils literal notranslate"><span class="pre">Custom</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel10VideoCodecE"><code class="docutils literal notranslate"><span class="pre">VideoCodec</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel10VideoCodec4FFV1E"><code class="docutils literal notranslate"><span class="pre">FFV1</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel10VideoCodec4H264E"><code class="docutils literal notranslate"><span class="pre">H264</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel10VideoCodec4H265E"><code class="docutils literal notranslate"><span class="pre">H265</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel10VideoCodec3AV1E"><code class="docutils literal notranslate"><span class="pre">AV1</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel10VideoCodec3VP9E"><code class="docutils literal notranslate"><span class="pre">VP9</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel10VideoCodec10MPEG4Part2E"><code class="docutils literal notranslate"><span class="pre">MPEG4Part2</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14VideoContainerE"><code class="docutils literal notranslate"><span class="pre">VideoContainer</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14VideoContainer8MatroskaE"><code class="docutils literal notranslate"><span class="pre">Matroska</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14VideoContainer3Mp4E"><code class="docutils literal notranslate"><span class="pre">Mp4</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14VideoContainer4WebME"><code class="docutils literal notranslate"><span class="pre">WebM</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14VideoContainer3MovE"><code class="docutils literal notranslate"><span class="pre">Mov</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14VideoContainer3AviE"><code class="docutils literal notranslate"><span class="pre">Avi</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettingsE"><code class="docutils literal notranslate"><span class="pre">fluvel::VideoExportSettings</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings10outputPathE"><code class="docutils literal notranslate"><span class="pre">outputPath</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings13recordingModeE"><code class="docutils literal notranslate"><span class="pre">recordingMode</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings20retentionTimeMinutesE"><code class="docutils literal notranslate"><span class="pre">retentionTimeMinutes</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings12segmentCountE"><code class="docutils literal notranslate"><span class="pre">segmentCount</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings3fpsE"><code class="docutils literal notranslate"><span class="pre">fps</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings7profileE"><code class="docutils literal notranslate"><span class="pre">profile</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings5codecE"><code class="docutils literal notranslate"><span class="pre">codec</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings9containerE"><code class="docutils literal notranslate"><span class="pre">container</span></code></a></li>
+<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoExportSettings14bufferSettingsE"><code class="docutils literal notranslate"><span class="pre">bufferSettings</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14IVideoExporterE"><code class="docutils literal notranslate"><span class="pre">fluvel::IVideoExporter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14IVideoExporterD0Ev"><code class="docutils literal notranslate"><span class="pre">~IVideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14IVideoExporter4openERK19VideoExportSettings"><code class="docutils literal notranslate"><span class="pre">open()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14IVideoExporter8addFrameERK10VideoFrame"><code class="docutils literal notranslate"><span class="pre">addFrame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14IVideoExporter5closeEv"><code class="docutils literal notranslate"><span class="pre">close()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel14IVideoExporter11isRecordingEv"><code class="docutils literal notranslate"><span class="pre">isRecording()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel14IVideoExporter15availableCodecsEv"><code class="docutils literal notranslate"><span class="pre">availableCodecs()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporterE"><code class="docutils literal notranslate"><span class="pre">fluvel::VideoExporter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterEv"><code class="docutils literal notranslate"><span class="pre">VideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporterD0Ev"><code class="docutils literal notranslate"><span class="pre">~VideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterERK13VideoExporter"><code class="docutils literal notranslate"><span class="pre">VideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporteraSERK13VideoExporter"><code class="docutils literal notranslate"><span class="pre">operator=()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporter13VideoExporterERR13VideoExporter"><code class="docutils literal notranslate"><span class="pre">VideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporteraSERR13VideoExporter"><code class="docutils literal notranslate"><span class="pre">operator=()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporter4openERK19VideoExportSettings"><code class="docutils literal notranslate"><span class="pre">open()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporter8addFrameERK10VideoFrame"><code class="docutils literal notranslate"><span class="pre">addFrame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporter5closeEv"><code class="docutils literal notranslate"><span class="pre">close()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel13VideoExporter11isRecordingEv"><code class="docutils literal notranslate"><span class="pre">isRecording()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel13VideoExporter15availableCodecsEv"><code class="docutils literal notranslate"><span class="pre">availableCodecs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel13VideoExporter9exporter_E"><code class="docutils literal notranslate"><span class="pre">exporter_</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel14exporter_utilsE"><code class="docutils literal notranslate"><span class="pre">fluvel::exporter_utils</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ffmpeg-backend">FFmpeg Backend</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel11ExportStateE"><code class="docutils literal notranslate"><span class="pre">ExportState</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel11ExportState6ClosedE"><code class="docutils literal notranslate"><span class="pre">Closed</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel11ExportState20WaitingForFirstFrameE"><code class="docutils literal notranslate"><span class="pre">WaitingForFirstFrame</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel11ExportState9RecordingE"><code class="docutils literal notranslate"><span class="pre">Recording</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporterE"><code class="docutils literal notranslate"><span class="pre">fluvel::FFmpegVideoExporter</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterEv"><code class="docutils literal notranslate"><span class="pre">FFmpegVideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporterD0Ev"><code class="docutils literal notranslate"><span class="pre">~FFmpegVideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERK19FFmpegVideoExporter"><code class="docutils literal notranslate"><span class="pre">FFmpegVideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporteraSERK19FFmpegVideoExporter"><code class="docutils literal notranslate"><span class="pre">operator=()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter19FFmpegVideoExporterERR19FFmpegVideoExporter"><code class="docutils literal notranslate"><span class="pre">FFmpegVideoExporter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporteraSERR19FFmpegVideoExporter"><code class="docutils literal notranslate"><span class="pre">operator=()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter4openERK19VideoExportSettings"><code class="docutils literal notranslate"><span class="pre">open()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter8addFrameERK10VideoFrame"><code class="docutils literal notranslate"><span class="pre">addFrame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter5closeEv"><code class="docutils literal notranslate"><span class="pre">close()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel19FFmpegVideoExporter11isRecordingEv"><code class="docutils literal notranslate"><span class="pre">isRecording()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel19FFmpegVideoExporter15availableCodecsEv"><code class="docutils literal notranslate"><span class="pre">availableCodecs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter24initializeFromFirstFrameERK6QImage"><code class="docutils literal notranslate"><span class="pre">initializeFromFirstFrame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter19initializeContainerERK19VideoExportSettings"><code class="docutils literal notranslate"><span class="pre">initializeContainer()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter15initializeCodecERK19VideoExportSettingsPK13AVPixelFormat"><code class="docutils literal notranslate"><span class="pre">initializeCodec()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter16initializeStreamEv"><code class="docutils literal notranslate"><span class="pre">initializeStream()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter13allocateFrameEv"><code class="docutils literal notranslate"><span class="pre">allocateFrame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter14allocatePacketEv"><code class="docutils literal notranslate"><span class="pre">allocatePacket()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter16initializeScalerEv"><code class="docutils literal notranslate"><span class="pre">initializeScaler()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter14openOutputFileEv"><code class="docutils literal notranslate"><span class="pre">openOutputFile()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter11writeHeaderEv"><code class="docutils literal notranslate"><span class="pre">writeHeader()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter17makeFrameWritableEv"><code class="docutils literal notranslate"><span class="pre">makeFrameWritable()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter9fillFrameERK6QImage"><code class="docutils literal notranslate"><span class="pre">fillFrame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter14fillFrameGray8ERK6QImage"><code class="docutils literal notranslate"><span class="pre">fillFrameGray8()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter14fillFrameRgb24ERK6QImage"><code class="docutils literal notranslate"><span class="pre">fillFrameRgb24()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter13fillFrameBgr0ERK6QImage"><code class="docutils literal notranslate"><span class="pre">fillFrameBgr0()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter15fillFrameYuv420ERK6QImage"><code class="docutils literal notranslate"><span class="pre">fillFrameYuv420()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter20updateFrameTimestampERK10VideoFrame"><code class="docutils literal notranslate"><span class="pre">updateFrameTimestamp()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter11encodeFrameEv"><code class="docutils literal notranslate"><span class="pre">encodeFrame()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter14receivePacketsEv"><code class="docutils literal notranslate"><span class="pre">receivePackets()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter12flushEncoderEv"><code class="docutils literal notranslate"><span class="pre">flushEncoder()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter12writeTrailerEv"><code class="docutils literal notranslate"><span class="pre">writeTrailer()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter7releaseEv"><code class="docutils literal notranslate"><span class="pre">release()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter9settings_E"><code class="docutils literal notranslate"><span class="pre">settings_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter6state_E"><code class="docutils literal notranslate"><span class="pre">state_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter10frameSize_E"><code class="docutils literal notranslate"><span class="pre">frameSize_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter12frameFormat_E"><code class="docutils literal notranslate"><span class="pre">frameFormat_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter8lastPts_E"><code class="docutils literal notranslate"><span class="pre">lastPts_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19FFmpegVideoExporter8context_E"><code class="docutils literal notranslate"><span class="pre">context_</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel9CodecInfoE"><code class="docutils literal notranslate"><span class="pre">fluvel::CodecInfo</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel9CodecInfo5codecE"><code class="docutils literal notranslate"><span class="pre">codec</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel9CodecInfo8losslessE"><code class="docutils literal notranslate"><span class="pre">lossless</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel9CodecInfo7encoderE"><code class="docutils literal notranslate"><span class="pre">encoder</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16FFmpegCodecUtilsE"><code class="docutils literal notranslate"><span class="pre">fluvel::FFmpegCodecUtils</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16FFmpegCodecUtils15availableCodecsEv"><code class="docutils literal notranslate"><span class="pre">availableCodecs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16FFmpegCodecUtils9codecInfoE10VideoCodec"><code class="docutils literal notranslate"><span class="pre">codecInfo()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16FFmpegCodecUtils19supportsPixelFormatEPK7AVCodec13AVPixelFormat"><code class="docutils literal notranslate"><span class="pre">supportsPixelFormat()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16FFmpegCodecUtils11diagnosticsEv"><code class="docutils literal notranslate"><span class="pre">diagnostics()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16FFmpegCodecUtils21detectAvailableCodecsEv"><code class="docutils literal notranslate"><span class="pre">detectAvailableCodecs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16FFmpegCodecUtils15isEncoderUsableEPK7AVCodec9AVCodecID13AVPixelFormat"><code class="docutils literal notranslate"><span class="pre">isEncoderUsable()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel12ffmpeg_utilsE"><code class="docutils literal notranslate"><span class="pre">fluvel::ffmpeg_utils</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/modules/app/app_media.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+
+<footer class="bd-footer">
+    <div class="bd-footer__inner bd-page-width">
+
+        <div class="footer-items__start">
+            <p>
+                Fluvel Set — Real-time level-set experimentation platform
+            </p>
+        </div>
+
+        <div class="footer-items__end">
+            <p>
+                Built with Sphinx, PyData Theme, Breathe and Doxygen
+            </p>
+        </div>
+
+    </div>
+</footer>
+
+
+  </body>
+</html>
