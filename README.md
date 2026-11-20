@@ -59,7 +59,7 @@
 
 Latest builds and packages for all supported platforms:
 
-[Download page](https://fbessy.github.io/fluvel/)
+[Download page](https://fluvel-io.github.io/fluvel-set/)
 
 ---
 
@@ -71,7 +71,7 @@ and follows the latest development version.
 Documentation is versioned and tied to specific commits
 for reproducibility and long-term experimentation.
 
-[Documentation site](https://fabienip.gitlab.io/fluvel/)
+[Documentation site](https://fluvel-io.github.io/fluvel-set/docs/)
 
 ---
 
@@ -109,7 +109,7 @@ Qt is used only for visualization and interaction.
 The project is organized into:
 
 ```text
-fluvel/
+fluvel-set/
 ├── src/                           # Source code
 │   ├── app/                       # Desktop/mobile Qt application
 │   │   ├── ui/                    # Windows and reusable UI components
@@ -147,14 +147,13 @@ fluvel/
 ├── packaging/                     # Flatpak, AppImage and distribution files
 │
 ├── .github/                       # CI workflows, releases and automation
-├── .gitlab-ci.yml                 # Online documentation pipeline
 │
 └── CMakeLists.txt                 # Main build configuration
 ```
 
 ### Main modules
 
-- **Fluvel Set** — Qt-based user interface and application orchestration
+- **fluvel_app** — Qt desktop application (user interface and orchestration)
 - **fluvel_ip** — Image processing and segmentation library (C++)
 - **fluvel_bindings** — Python bindings for Fluvel IP (pybind11/C++)
 

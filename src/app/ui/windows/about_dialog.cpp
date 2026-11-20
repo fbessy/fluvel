@@ -41,7 +41,7 @@ namespace fluvel
 namespace
 {
 
-constexpr auto kProjectUrl = "https://fbessy.github.io/fluvel/";
+constexpr auto kProjectUrl = "https://fluvel-io.github.io/fluvel-set/";
 
 QString buildVersionString()
 {
@@ -294,9 +294,9 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     QLabel* linksLabel = new QLabel;
 
-    linksLabel->setText(QString("<a href='https://fabienip.gitlab.io/fluvel/'>%1</a><br>"
-                                "<a href='https://github.com/fbessy/fluvel/'>GitHub</a><br>"
-                                "<a href='https://fbessy.github.io/fluvel/'>%2</a>")
+    linksLabel->setText(QString("<a href='https://fluvel-io.github.io/fluvel-set/docs/'>%1</a><br>"
+                                "<a href='https://github.com/fluvel-io/fluvel-set/'>GitHub</a><br>"
+                                "<a href='https://fluvel-io.github.io/fluvel-set/'>%2</a>")
                             .arg(tr("Documentation"), tr("Home")));
 
     linksLabel->setOpenExternalLinks(true);

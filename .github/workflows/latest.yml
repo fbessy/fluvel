@@ -198,7 +198,7 @@ jobs:
       - name: Deploy GitHub Pages
         run: |
 
-          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/fbessy/fluvel.git gh-pages
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git gh-pages
           cd gh-pages
 
           git fetch origin gh-pages || true

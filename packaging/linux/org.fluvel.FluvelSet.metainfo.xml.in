@@ -62,11 +62,11 @@
   </developer>
 
   <url type="homepage">
-    https://fbessy.github.io/fluvel
+    https://fluvel-io.github.io/fluvel-set
   </url>
 
   <url type="vcs-browser">
-    https://github.com/fbessy/fluvel
+    https://github.com/fluvel-io/fluvel-set
   </url>
 
   <releases>
@@ -78,19 +78,19 @@
 
     <screenshot type="default">
       <image>
-        https://fbessy.github.io/fluvel/assets/images/segmentation-start.webp
+        https://fluvel-io.github.io/fluvel-set/assets/images/segmentation-start.webp
       </image>
     </screenshot>
 
     <screenshot>
       <image>
-        https://fbessy.github.io/fluvel/assets/images/segmentation-result.webp
+        https://fluvel-io.github.io/fluvel-set/assets/images/segmentation-result.webp
       </image>
     </screenshot>
 
     <screenshot>
       <image>
-        https://fbessy.github.io/fluvel/assets/images/settings.webp
+        https://fluvel-io.github.io/fluvel-set/assets/images/settings.webp
       </image>
     </screenshot>
 
