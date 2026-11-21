@@ -69,6 +69,10 @@ void ImageViewerWidget::initializeView()
 
 void ImageViewerWidget::setupView()
 {
+    // The contour item is repainted over a pixmap that changes often; the default
+    // dirty-region computation left stale contour pixels on screen.
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
     setFrameShape(QFrame::NoFrame);
     setFrameStyle(QFrame::NoFrame);
 
