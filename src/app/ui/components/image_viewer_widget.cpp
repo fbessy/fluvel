@@ -215,7 +215,7 @@ void ImageViewerWidget::displayFrameNow(const DisplayFrame& f)
 {
     updatePixmap(f.image);
 
-    if (!f.outerContour.isEmpty() || !f.innerContour.isEmpty())
+    if (!f.keepContour)
         setContour(f.outerContour, f.innerContour);
 
     displayTimer_.restart();
@@ -277,6 +277,7 @@ void ImageViewerWidget::setImage(const QImage& img)
 {
     DisplayFrame f;
     f.image = img;
+    f.keepContour = true;
 
     int64_t now = FrameClock::nowNs();
     f.receiveTimestampNs = now;
@@ -306,14 +307,6 @@ DisplayFrame ImageViewerWidget::displayFrame() const
     frame.outerContour = outerContour_->points();
     frame.innerContour = innerContour_->points();
     return frame;
-}
-
-void ImageViewerWidget::clearContour()
-{
-    assert(outerContour_ && innerContour_);
-
-    outerContour_->clearPoints();
-    innerContour_->clearPoints();
 }
 
 // ------------------------------------------------------------

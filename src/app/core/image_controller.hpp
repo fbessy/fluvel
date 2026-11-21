@@ -107,9 +107,6 @@ signals:
     /// Emitted with textual diagnostics information.
     void textDiagnosticsUpdated(QString string);
 
-    /// Request to clear displayed contours.
-    void clearContourRequested();
-
 private:
     /// Handle processed image from worker.
     void onProcessedImageReady(const QImage& processed);

@@ -118,6 +118,16 @@ struct DisplayFrame
     QVector<QPointF> innerContour;
 
     /**
+     * @brief Keeps the contours currently displayed.
+     *
+     * By default, a frame fully describes what is displayed: empty
+     * contours remove the contours from the view. Set this flag for
+     * frames that only carry an image (e.g. a darkened placeholder)
+     * and must leave the displayed contours untouched.
+     */
+    bool keepContour{false};
+
+    /**
      * @brief Timestamp when the frame was received (ns).
      */
     int64_t receiveTimestampNs{0};

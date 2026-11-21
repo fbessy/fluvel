@@ -129,7 +129,8 @@ void ImageController::reinitializeWorker()
             downscaledImage_.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
     }
 
-    emit clearContourRequested();
+    // Empty contours clear the displayed contours.
+    emit contourUpdated({}, {});
 
 #ifdef FLUVEL_DEBUG
     qDebug() << __FILE__ << ":" << __LINE__ << __func__

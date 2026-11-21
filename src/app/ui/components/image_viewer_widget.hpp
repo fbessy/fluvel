@@ -149,11 +149,6 @@ public:
     DisplayFrame displayFrame() const;
 
     /**
-     * @brief Clears contour overlays.
-     */
-    void clearContour();
-
-    /**
      * @brief Displays a text overlay.
      */
     void setText(const QString& text);

@@ -523,11 +523,6 @@ void ImageWindow::setupConnections()
     connect(imageController_, &ImageController::textDiagnosticsUpdated, imageViewer_,
             &ImageViewerWidget::setText);
 
-    // to refresh the view and clear the former contour
-    // (it's performed the first time or when a new image is loaded)
-    connect(imageController_, &ImageController::clearContourRequested, imageViewer_,
-            &ImageViewerWidget::clearContour);
-
     // Update the window title.
     connect(imageController_, &ImageController::inputImageReady, this,
             &ImageWindow::onInputImageReady);
