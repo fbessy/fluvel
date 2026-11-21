@@ -30,15 +30,24 @@ void ContourPointsItem::setPoints(const QVector<QPointF>& points)
 {
     prepareGeometryChange();
     points_ = points;
+    boundingRect_ = computeBoundingRect();
 }
 
 void ContourPointsItem::clearPoints()
 {
     prepareGeometryChange();
     points_.clear();
+    boundingRect_ = computeBoundingRect();
 }
 
 QRectF ContourPointsItem::boundingRect() const
+{
+    // Cached: the rectangle only changes with the points, and the scene
+    // queries it on every update.
+    return boundingRect_;
+}
+
+QRectF ContourPointsItem::computeBoundingRect() const
 {
     if (points_.isEmpty())
         return QRectF(0.0, 0.0, 1.0, 1.0);

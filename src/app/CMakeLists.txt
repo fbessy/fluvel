@@ -203,6 +203,7 @@ set(app_src
     ${CORE_DIR}/video_processing_thread.hpp
 
     ${CORE_DIR}/frame_pipeline.hpp
+    ${CORE_DIR}/point_layer.hpp
 
     ${CORE_DIR}/frame_clock.cpp
     ${CORE_DIR}/frame_clock.hpp

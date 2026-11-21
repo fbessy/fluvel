@@ -9,6 +9,7 @@
 
 #include "contour_point_item.hpp"
 #include "frame_pipeline.hpp"
+#include "point_layer.hpp"
 #include "image_viewer_listener.hpp"
 #include "overlay_text_item.hpp"
 
@@ -124,7 +125,19 @@ public:
     void setImage(const QImage& img);
 
     /**
+     * @brief Sets the point layers drawn over the image.
+     *
+     * Each layer is drawn with its own color; the viewer does not know
+     * which algorithm produced the points. Layers beyond the given list
+     * are emptied.
+     */
+    void setLayers(const QVector<PointLayer>& layers);
+
+    /**
      * @brief Sets contour overlays.
+     *
+     * Adapter over setLayers(): the outer and inner contours become two
+     * layers colored from the display configuration.
      */
     void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
 
@@ -373,7 +386,8 @@ private:
     void setupGlobalOverlays();
     void setupMiniMap();
     void setupInfoOverlay();
-    void setupContourItems();
+    ContourPointsItem* layerItem(int index);
+    void applyLayerColors();
     void setupTimers();
 
     // internal image display
@@ -457,8 +471,14 @@ private:
     DisplayConfig displayConfig_{};
     DownscaleParams downscaleConfig_{};
 
-    ContourPointsItem* outerContour_{nullptr};
-    ContourPointsItem* innerContour_{nullptr};
+    /// One graphics item per layer (created on demand, never destroyed).
+    QVector<ContourPointsItem*> layerItems_;
+
+    /// Colors requested for each layer (hidden layers are transparent).
+    QVector<QColor> layerColors_;
+
+    /// Scale applied to the layer items (downscale factor in source mode).
+    qreal layerScale_{1.0};
 
     OverlayTextItem* infoOverlay_{nullptr};
 

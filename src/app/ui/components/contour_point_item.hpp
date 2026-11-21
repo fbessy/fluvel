@@ -59,6 +59,9 @@ public:
      */
     void setColor(QColor color)
     {
+        if (color_ == color)
+            return;
+
         color_ = color;
         update();
     }
@@ -78,7 +81,11 @@ protected:
     /** @} */
 
 private:
+    /// Computes the bounding rectangle of the current points (stroke included).
+    QRectF computeBoundingRect() const;
+
     QVector<QPointF> points_;
+    QRectF boundingRect_{0.0, 0.0, 1.0, 1.0};
     QColor color_{Qt::red};
 };
 

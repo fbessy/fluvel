@@ -21,6 +21,7 @@
 #include <QWheelEvent>
 
 #include <cassert>
+#include <utility>
 
 namespace
 {
@@ -45,7 +46,6 @@ ImageViewerWidget::ImageViewerWidget(const DisplayConfig& displayConfig,
 {
     initializeView();
 
-    setupContourItems();
     setupInfoOverlay();
 
     updateSmoothDisplay();
@@ -168,13 +168,34 @@ void ImageViewerWidget::setupInfoOverlay()
     infoOverlay_->setCursor(Qt::ArrowCursor);
 }
 
-void ImageViewerWidget::setupContourItems()
+ContourPointsItem* ImageViewerWidget::layerItem(int index)
 {
-    outerContour_ = new ContourPointsItem(contentRoot_);
-    outerContour_->setZValue(100.0);
+    // Items are created on demand and kept: a layer that disappears is
+    // simply emptied, which avoids allocating graphics items on every frame.
+    while (layerItems_.size() <= index)
+    {
+        auto* item = new ContourPointsItem(contentRoot_);
+        item->setZValue(100.0);
+        item->setScale(layerScale_);
 
-    innerContour_ = new ContourPointsItem(contentRoot_);
-    innerContour_->setZValue(100.0);
+        layerItems_.push_back(item);
+        layerColors_.push_back(Qt::transparent);
+    }
+
+    return layerItems_[index];
+}
+
+void ImageViewerWidget::applyLayerColors()
+{
+    for (int i = 0; i < layerItems_.size(); ++i)
+    {
+        QColor color = layerColors_[i];
+
+        if (placeholderVisible_)
+            color = qcolor_utils::desaturateAndDarken(color, 0.4, 0.6);
+
+        layerItems_[i]->setColor(color);
+    }
 }
 
 void ImageViewerWidget::setupTimers()
@@ -289,10 +310,34 @@ void ImageViewerWidget::setImage(const QImage& img)
 void ImageViewerWidget::setContour(const QVector<QPointF>& outerContour,
                                    const QVector<QPointF>& innerContour)
 {
-    assert(outerContour_ && innerContour_);
+    // Adapter: colors and visibility come from the display configuration.
+    // Moving them to the caller is the next step of the layer migration.
+    PointLayer outer;
+    outer.points = outerContour;
+    outer.color = toQColor(displayConfig_.outerContourColor);
+    outer.visible = displayConfig_.outerContourVisible;
 
-    outerContour_->setPoints(outerContour);
-    innerContour_->setPoints(innerContour);
+    PointLayer inner;
+    inner.points = innerContour;
+    inner.color = toQColor(displayConfig_.innerContourColor);
+    inner.visible = displayConfig_.innerContourVisible;
+
+    setLayers({outer, inner});
+}
+
+void ImageViewerWidget::setLayers(const QVector<PointLayer>& layers)
+{
+    for (int i = 0; i < layers.size(); ++i)
+    {
+        layerItem(i)->setPoints(layers[i].points);
+        layerColors_[i] = layers[i].visible ? layers[i].color : QColor(Qt::transparent);
+    }
+
+    // Layers that are no longer provided are emptied.
+    for (int i = layers.size(); i < layerItems_.size(); ++i)
+        layerItems_[i]->clearPoints();
+
+    applyLayerColors();
 }
 
 void ImageViewerWidget::setDisplayFrame(const DisplayFrame& frame)
@@ -304,8 +349,14 @@ DisplayFrame ImageViewerWidget::displayFrame() const
 {
     DisplayFrame frame;
     frame.image = lastDisplayedImage_;
-    frame.outerContour = outerContour_->points();
-    frame.innerContour = innerContour_->points();
+
+    // Adapter: the first two layers are the outer and inner contours.
+    if (layerItems_.size() > 0)
+        frame.outerContour = layerItems_[0]->points();
+
+    if (layerItems_.size() > 1)
+        frame.innerContour = layerItems_[1]->points();
+
     return frame;
 }
 
@@ -1005,7 +1056,7 @@ bool ImageViewerWidget::isGrayscale() const
 
 void ImageViewerWidget::upscaleItems()
 {
-    assert(useEnhancedDisplayConfig_ && outerContour_ && innerContour_);
+    assert(useEnhancedDisplayConfig_);
 
     const bool has_ds = downscaleConfig_.downscaleEnabled;
     const int df = downscaleConfig_.downscaleFactor;
@@ -1015,8 +1066,10 @@ void ImageViewerWidget::upscaleItems()
     if (has_ds && displayConfig_.displayMode == ImageDisplayMode::Source)
         factor = qreal(df);
 
-    outerContour_->setScale(factor);
-    innerContour_->setScale(factor);
+    layerScale_ = factor;
+
+    for (ContourPointsItem* item : std::as_const(layerItems_))
+        item->setScale(factor);
 }
 
 void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
@@ -1055,22 +1108,25 @@ void ImageViewerWidget::updateDisplayWithConfig()
 
 void ImageViewerWidget::updateContourColors()
 {
-    assert(useEnhancedDisplayConfig_ && outerContour_ && innerContour_);
+    assert(useEnhancedDisplayConfig_);
 
-    QColor col_lout, col_lin;
+    // Adapter: when the display configuration changes, the first two layers
+    // (outer and inner contours) take their colors from it.
+    const QColor outerColor = displayConfig_.outerContourVisible
+                                  ? toQColor(displayConfig_.outerContourColor)
+                                  : QColor(Qt::transparent);
 
-    if (displayConfig_.outerContourVisible)
-        col_lout = toQColor(displayConfig_.outerContourColor);
-    else
-        col_lout = Qt::transparent;
+    const QColor innerColor = displayConfig_.innerContourVisible
+                                  ? toQColor(displayConfig_.innerContourColor)
+                                  : QColor(Qt::transparent);
 
-    if (displayConfig_.innerContourVisible)
-        col_lin = toQColor(displayConfig_.innerContourColor);
-    else
-        col_lin = Qt::transparent;
+    layerItem(0);
+    layerItem(1);
 
-    outerContour_->setColor(col_lout);
-    innerContour_->setColor(col_lin);
+    layerColors_[0] = outerColor;
+    layerColors_[1] = innerColor;
+
+    applyLayerColors();
 }
 
 void ImageViewerWidget::updateFlip()
@@ -1160,23 +1216,17 @@ void ImageViewerWidget::showPlaceholder(bool showEffect)
         if (!lastDisplayedImage_.isNull())
             setImage(qimage_utils::darkenImage(lastDisplayedImage_));
 
-        if (outerContour_)
-            outerContour_->setColor(qcolor_utils::desaturateAndDarken(
-                toQColor(displayConfig_.outerContourColor), 0.4, 0.6));
-
-        if (innerContour_)
-            innerContour_->setColor(qcolor_utils::desaturateAndDarken(
-                toQColor(displayConfig_.innerContourColor), 0.4, 0.6));
-
         blur_->setBlurRadius(6);
     }
     else
     {
-        updateContourColors();
         blur_->setBlurRadius(0);
     }
 
     placeholderVisible_ = showEffect;
+
+    // Layers are drawn desaturated while the placeholder is shown.
+    applyLayerColors();
 }
 
 void ImageViewerWidget::notifyImageDropped(const QString& path)
