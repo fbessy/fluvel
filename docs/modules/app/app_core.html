@@ -512,12 +512,6 @@ used throughout the application.</p>
 <dd><p>Emitted with textual diagnostics information. </p>
 </dd></dl>
 
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N6fluvel15ImageController21clearContourRequestedEv">
-<span id="_CPPv3N6fluvel15ImageController21clearContourRequestedEv"></span><span id="_CPPv2N6fluvel15ImageController21clearContourRequestedEv"></span><span id="fluvel::ImageController::clearContourRequested"></span><span class="target" id="classfluvel_1_1ImageController_1a068a6d9c1ca27e21e825f617a085b3f3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clearContourRequested</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel15ImageController21clearContourRequestedEv" title="Link to this definition">#</a><br /></dt>
-<dd><p>Request to clear displayed contours. </p>
-</dd></dl>
-
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
@@ -4039,6 +4033,13 @@ used throughout the application.</p>
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel12DisplayFrame11keepContourE">
+<span id="_CPPv3N6fluvel12DisplayFrame11keepContourE"></span><span id="_CPPv2N6fluvel12DisplayFrame11keepContourE"></span><span id="fluvel::DisplayFrame::keepContour__b"></span><span class="target" id="structfluvel_1_1DisplayFrame_1aebee4119f77fcc26f987fe7fe51f2db8"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">keepContour</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel12DisplayFrame11keepContourE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Keeps the contours currently displayed. </p>
+<p>By default, a frame fully describes what is displayed: empty contours remove the contours from the view. Set this flag for frames that only carry an image (e.g. a darkened placeholder) and must leave the displayed contours untouched. </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6fluvel12DisplayFrame18receiveTimestampNsE">
 <span id="_CPPv3N6fluvel12DisplayFrame18receiveTimestampNsE"></span><span id="_CPPv2N6fluvel12DisplayFrame18receiveTimestampNsE"></span><span id="fluvel::DisplayFrame::receiveTimestampNs__int64_t"></span><span class="target" id="structfluvel_1_1DisplayFrame_1a4fdd21a292095edd8487a761da118fe0"></span><span class="n"><span class="pre">int64_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">receiveTimestampNs</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel12DisplayFrame18receiveTimestampNsE" title="Link to this definition">#</a><br /></dt>
 <dd><p>Timestamp when the frame was received (ns). </p>
@@ -6304,7 +6305,6 @@ used throughout the application.</p>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel15ImageController14contourUpdatedERK7QVectorI7QPointFERK7QVectorI7QPointFE"><code class="docutils literal notranslate"><span class="pre">contourUpdated</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel15ImageController12stateChangedEN6fluvel11WorkerStateE"><code class="docutils literal notranslate"><span class="pre">stateChanged</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel15ImageController22textDiagnosticsUpdatedE7QString"><code class="docutils literal notranslate"><span class="pre">textDiagnosticsUpdated</span></code></a></li>
-<li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel15ImageController21clearContourRequestedEv"><code class="docutils literal notranslate"><span class="pre">clearContourRequested</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel15ImageController21onProcessedImageReadyERK6QImage"><code class="docutils literal notranslate"><span class="pre">onProcessedImageReady()</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel15ImageController16onContourUpdatedERKN9fluvel_ip7ContourERKN9fluvel_ip7ContourE"><code class="docutils literal notranslate"><span class="pre">onContourUpdated()</span></code></a></li>
 <li class="toc-h5 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel15ImageController14onStateChangedEN6fluvel11WorkerStateE"><code class="docutils literal notranslate"><span class="pre">onStateChanged()</span></code></a></li>
@@ -6854,6 +6854,7 @@ used throughout the application.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel12DisplayFrame5imageE"><code class="docutils literal notranslate"><span class="pre">image</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel12DisplayFrame12outerContourE"><code class="docutils literal notranslate"><span class="pre">outerContour</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel12DisplayFrame12innerContourE"><code class="docutils literal notranslate"><span class="pre">innerContour</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel12DisplayFrame11keepContourE"><code class="docutils literal notranslate"><span class="pre">keepContour</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel12DisplayFrame18receiveTimestampNsE"><code class="docutils literal notranslate"><span class="pre">receiveTimestampNs</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel12DisplayFrame18processTimestampNsE"><code class="docutils literal notranslate"><span class="pre">processTimestampNs</span></code></a></li>
 </ul>
