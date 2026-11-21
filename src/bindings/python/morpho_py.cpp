@@ -193,16 +193,16 @@ void bindMorphology(py::module_& m)
     m.def(
         "dilate",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::morpho::max(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::morpho::max(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kDilateDoc);
@@ -210,16 +210,16 @@ void bindMorphology(py::module_& m)
     m.def(
         "erode",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::morpho::min(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::morpho::min(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kErodeDoc);
@@ -227,16 +227,16 @@ void bindMorphology(py::module_& m)
     m.def(
         "opening",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::morpho::opening(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::morpho::opening(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kOpeningDoc);
@@ -244,16 +244,16 @@ void bindMorphology(py::module_& m)
     m.def(
         "closing",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::morpho::closing(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::morpho::closing(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kClosingDoc);
@@ -261,16 +261,16 @@ void bindMorphology(py::module_& m)
     m.def(
         "top_hat",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::morpho::topHat(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::morpho::topHat(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kTopHatDoc);
@@ -278,16 +278,16 @@ void bindMorphology(py::module_& m)
     m.def(
         "black_top_hat",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::morpho::blackTopHat(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::morpho::blackTopHat(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kBlackTopHatDoc);
@@ -295,16 +295,16 @@ void bindMorphology(py::module_& m)
     m.def(
         "gradient",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::morpho::gradient(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::morpho::gradient(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kGradientDoc);

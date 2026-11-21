@@ -12,6 +12,8 @@
 #include "py_array_conversion.hpp"
 #include "py_validation.hpp"
 
+#include <string>
+
 namespace
 {
 
@@ -188,20 +190,31 @@ void bindFiltering(py::module_& m)
         .def_readwrite("conduction", &fluvel_ip::filter::AnisoParams::conduction)
         .def_readwrite("iterations", &fluvel_ip::filter::AnisoParams::iterations)
         .def_readwrite("lambda_", &fluvel_ip::filter::AnisoParams::lambda)
-        .def_readwrite("kappa", &fluvel_ip::filter::AnisoParams::kappa);
+        .def_readwrite("kappa", &fluvel_ip::filter::AnisoParams::kappa)
+
+        .def("__repr__",
+             [](const fluvel_ip::filter::AnisoParams& p)
+             {
+                 return "AnisoParams(conduction=" +
+                        std::string(py::str(py::cast(p.conduction).attr("name"))) +
+                        ", iterations=" + std::to_string(p.iterations) +
+                        ", lambda_=" + std::to_string(p.lambda) +
+                        ", kappa=" + std::to_string(p.kappa) + ")";
+             });
 
     m.def(
         "anisotropic_diffusion",
 
-        [](const py::array_t<uint8_t>& input, const fluvel_ip::filter::AnisoParams& params)
+        [](const py::array& input, const fluvel_ip::filter::AnisoParams& params)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
+            validateAnisoParams(params);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::anisotropicDiffusion(img, params);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::anisotropicDiffusion(img, params); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("params") = fluvel_ip::filter::AnisoParams{}, kAnisoDiffusionDoc);
@@ -209,16 +222,16 @@ void bindFiltering(py::module_& m)
     m.def(
         "mean",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::mean(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::mean(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kMeanDoc);
@@ -226,16 +239,16 @@ void bindFiltering(py::module_& m)
     m.def(
         "median",
 
-        [](const py::array_t<uint8_t>& input, int radius)
+        [](const py::array& input, int radius)
         {
-            validateImage(input);
+            const auto array = toImageArray(input);
             validateRadius(radius);
 
-            auto img = pyArrayToImageView(input);
+            auto img = pyArrayToImageView(array);
 
-            auto out = fluvel_ip::filter::median(img, radius);
+            auto out = runWithoutGil([&] { return fluvel_ip::filter::median(img, radius); });
 
-            return imageOwnerToPyArray(out);
+            return imageOwnerToPyArray(out, input.ndim());
         },
 
         py::arg("image"), py::arg("radius"), kMedianDoc);

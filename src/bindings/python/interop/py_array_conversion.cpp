@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 
-fluvel_ip::ImageView pyArrayToImageView(const py::array_t<uint8_t>& input)
+fluvel_ip::ImageView pyArrayToImageView(const py::array_t<uint8_t, py::array::c_style>& input)
 {
     auto buf = input.request();
 
@@ -25,8 +25,13 @@ fluvel_ip::ImageView pyArrayToImageView(const py::array_t<uint8_t>& input)
     return {static_cast<uint8_t*>(buf.ptr), w, h, format, stride};
 }
 
-py::array_t<uint8_t> imageOwnerToPyArray(const fluvel_ip::ImageOwner& image)
+py::array_t<uint8_t> imageOwnerToPyArray(const fluvel_ip::ImageOwner& image, py::ssize_t inputNdim)
 {
-    return py::array_t<uint8_t>(
-        {image.height(), image.width(), fluvel_ip::channelCount(image.format())}, image.data());
+    const int channels = fluvel_ip::channelCount(image.format());
+
+    // Grayscale given as (H, W) comes back as (H, W).
+    if (inputNdim == 2 && channels == 1)
+        return py::array_t<uint8_t>({image.height(), image.width()}, image.data());
+
+    return py::array_t<uint8_t>({image.height(), image.width(), channels}, image.data());
 }

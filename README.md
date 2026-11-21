@@ -247,6 +247,21 @@ Example:
 python examples/filtering/showcase.py
 ```
 
+Image conventions of the Python functions:
+
+- Images are `uint8` NumPy arrays of shape `(H, W)`, `(H, W, 3)` or `(H, W, 4)`.
+  Other types (`float`, `uint16`, ...) are refused with an explicit error.
+- Color channels are in **BGR** order, like OpenCV. For an RGB image, use
+  `image[..., ::-1]`.
+- Results have the same shape as the input image.
+- Segmentation results provide the contour points and the region mask (`result.mask`).
+
+Run the tests (requires `pytest`):
+
+```bash
+PYTHONPATH=build/python python -m pytest tests/python
+```
+
 ---
 
 ### Build everything

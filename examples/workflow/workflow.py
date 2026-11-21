@@ -14,6 +14,7 @@ import time
 
 import cv2
 import fluvel
+import numpy as np
 
 
 dataset_dir = Path(__file__).parent.parent / "resources" / "dataset_demo"
@@ -63,7 +64,7 @@ for image_path in sorted(dataset_dir.glob("*.png")):
 
     mask_gt = utils.weizmann_gt_to_mask(gt_image)
 
-    cv2.imwrite(str(masks_dir / f"{image_path.stem}_mask.png"), mask_gt)
+    cv2.imwrite(str(masks_dir / f"{image_path.stem}_gt_mask.png"), mask_gt)
 
     gt_contours = fluvel.find_contours(mask_gt, connectivity=fluvel.Connectivity.Eight)
 
@@ -82,6 +83,19 @@ for image_path in sorted(dataset_dir.glob("*.png")):
     #
 
     metrics = fluvel.hausdorff_metrics(gt_contours.outer, result.outer, quantile=95)
+
+    # Region metrics, from the mask of the segmented region.
+    cv2.imwrite(str(masks_dir / f"{image_path.stem}_result_mask.png"), result.mask)
+
+    result_region = result.mask > 0
+    gt_region = mask_gt > 0
+
+    intersection = np.logical_and(result_region, gt_region).sum()
+    union = np.logical_or(result_region, gt_region).sum()
+    total = result_region.sum() + gt_region.sum()
+
+    iou = intersection / union if union > 0 else 1.0
+    dice = 2.0 * intersection / total if total > 0 else 1.0
 
     #
     # Overlay
@@ -106,6 +120,8 @@ for image_path in sorted(dataset_dir.glob("*.png")):
             f"{metrics.modified_distance:.2f}",
             f"{metrics.quantile_distance:.2f}",
             f"{metrics.centroids_distance:.2f}",
+            f"{dice:.4f}",
+            f"{iou:.4f}",
             f"{elapsed_ms:.0f}",
         ]
     )
@@ -126,6 +142,8 @@ with open(csv_path, "w", newline="") as f:
             "modified_hausdorff",
             "hd95",
             "centroid_distance",
+            "dice",
+            "iou",
             "runtime_ms",
         ]
     )

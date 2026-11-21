@@ -16,7 +16,12 @@
 #include "py_array_conversion.hpp"
 #include "py_validation.hpp"
 
+#include <array>
+#include <memory>
+#include <optional>
+#include <string>
 #include <utility>
+#include <vector>
 
 namespace
 {
@@ -172,18 +177,19 @@ cycle2_enabled : bool
     evolution after the data-driven phase.
 
 disk_radius : int
-    Radius of the smoothing disk used during Cycle 2.
+    Radius of the smoothing disk used during Cycle 2 (>= 1).
 
     Larger values produce stronger contour regularization.
 
 Na : int
-    Maximum number of iterations for Cycle 1.
+    Maximum number of iterations for Cycle 1 (>= 1).
 
     Cycle 1 is the data-driven evolution phase and is responsible
     for fitting the contour to image structures.
 
 Ns : int
-    Maximum number of iterations for Cycle 2.
+    Maximum number of iterations for Cycle 2 (>= 1 when
+    the smoothing phase is enabled).
 
     Cycle 2 performs contour smoothing and regularization.
 
@@ -303,12 +309,24 @@ grid_width : int
 grid_height : int
     Height of the grid on which the contour is defined.
 
+mask : numpy.ndarray
+    Binary mask of the region delimited by the contour,
+    with shape (grid_height, grid_width) and dtype uint8.
+
+    Pixels inside the contour (boundary included) are 255,
+    all the others are 0. This is the segmentation result to
+    use for region metrics (Dice, IoU) or to save as an image.
+
 Notes
 -----
 The contour arrays are returned as NumPy arrays of shape
 (N, 2), where each row contains a point coordinate:
 
     [x, y]
+
+The points are the pixels of the boundary, in no particular
+order: they cannot be used directly as a polygon. Use ``mask``
+when a region is needed.
 
 Examples
 --------
@@ -317,7 +335,7 @@ Examples
 >>> outer = contours.outer
 >>> inner = contours.inner
 
->>> mask = fluvel.contours_to_mask(contours)
+>>> region = contours.mask
 
 )";
 
@@ -334,12 +352,16 @@ initialization mask.
 Parameters
 ----------
 image
-    Input image.
+    Input image: uint8 array of shape (H, W), (H, W, 1),
+    (H, W, 3) or (H, W, 4). Color channels are in BGR order
+    (the order used by OpenCV). For an RGB image, reverse the
+    channels first: ``image[..., ::-1]``.
 
 phi_mask : numpy.ndarray, optional
-    Initial contour mask.
+    Initial contour mask (uint8, pixels >= 128 are inside).
 
-    If omitted, the contour is initialized automatically
+    If omitted, or if the mask contains no pixel inside,
+    the contour is initialized automatically
     using a centered ellipse.
 
     The ellipse covers approximately 80% of the image width
@@ -401,22 +423,25 @@ Extract contour boundaries from a binary mask.
 
 Pixels greater than or equal to 128 are considered foreground.
 
-Supported image layouts:
-
-- Gray8
-- BGR24
-- BGRA32
-
-For multi-channel images, only the first channel is used.
+Supported masks: uint8 arrays of shape (H, W), (H, W, 1),
+(H, W, 3) or (H, W, 4). For multi-channel masks, only the
+first channel is used.
 
 Parameters
 ----------
 mask
     Binary mask image.
 
+connectivity
+    Pixel connectivity used to extract the contour.
+
 Returns
 -------
 ContourSet
+    ``outer`` and ``inner`` are empty arrays of shape (0, 2)
+    when the mask has no foreground pixel. When the whole mask is
+    foreground, ``outer`` is empty and ``inner`` contains the pixels
+    of the image border.
 
 Examples
 --------
@@ -433,9 +458,125 @@ struct ContourSet
     py::array_t<int> outer;
     py::array_t<int> inner;
 
+    // Region inside the contour (255 inside, 0 outside), shape (H, W).
+    py::array_t<uint8_t> mask;
+
     int gridWidth;
     int gridHeight;
 };
+
+// Result of a computation done without the GIL (no Python object inside).
+struct RawContours
+{
+    fluvel_ip::ContourPoints outer;
+    fluvel_ip::ContourPoints inner;
+
+    std::vector<uint8_t> mask;
+
+    int width{0};
+    int height{0};
+};
+
+using PixelList = std::vector<std::array<int, 2>>;
+
+py::array_t<int> pixelsToPyArray(const PixelList& pixels)
+{
+    py::array_t<int> out({static_cast<py::ssize_t>(pixels.size()), py::ssize_t(2)});
+
+    auto view = out.mutable_unchecked<2>();
+
+    for (size_t i = 0; i < pixels.size(); ++i)
+    {
+        view(i, 0) = pixels[i][0];
+        view(i, 1) = pixels[i][1];
+    }
+
+    return out;
+}
+
+py::array_t<uint8_t> maskToPyArray(const std::vector<uint8_t>& mask, int width, int height)
+{
+    return py::array_t<uint8_t>({height, width}, mask.data());
+}
+
+// 255 inside the contour (boundary included), 0 outside.
+std::vector<uint8_t> phiToMask(const fluvel_ip::DiscreteLevelSet& phi)
+{
+    std::vector<uint8_t> mask(static_cast<size_t>(phi.width()) * static_cast<size_t>(phi.height()));
+
+    for (int y = 0; y < phi.height(); ++y)
+    {
+        for (int x = 0; x < phi.width(); ++x)
+        {
+            const auto value = phi.at(x, y);
+
+            const bool inside = value == fluvel_ip::PhiValue::InsideRegion ||
+                                value == fluvel_ip::PhiValue::InteriorBoundary;
+
+            mask[static_cast<size_t>(y) * static_cast<size_t>(phi.width()) + static_cast<size_t>(x)] =
+                inside ? 255 : 0;
+        }
+    }
+
+    return mask;
+}
+
+ContourSet toContourSet(const RawContours& raw)
+{
+    return ContourSet{contourToPyArray(raw.outer), contourToPyArray(raw.inner),
+                      maskToPyArray(raw.mask, raw.width, raw.height), raw.width, raw.height};
+}
+
+// Contours of a mask without any pixel inside, or entirely inside.
+ContourSet trivialContourSet(int width, int height, bool allInside)
+{
+    PixelList inner;
+
+    if (allInside)
+    {
+        // The object covers the image: its boundary is the image border.
+        for (int x = 0; x < width; ++x)
+        {
+            inner.push_back({x, 0});
+
+            if (height > 1)
+                inner.push_back({x, height - 1});
+        }
+
+        for (int y = 1; y < height - 1; ++y)
+        {
+            inner.push_back({0, y});
+
+            if (width > 1)
+                inner.push_back({width - 1, y});
+        }
+    }
+
+    const std::vector<uint8_t> mask(static_cast<size_t>(width) * static_cast<size_t>(height),
+                                    allInside ? 255 : 0);
+
+    return ContourSet{pixelsToPyArray({}), pixelsToPyArray(inner),
+                      maskToPyArray(mask, width, height), width, height};
+}
+
+std::string boolToString(bool value)
+{
+    return value ? "True" : "False";
+}
+
+template <class Enum>
+std::string enumName(Enum value)
+{
+    return std::string(py::str(py::cast(value).attr("name")));
+}
+
+std::string contourSetRepr(const ContourSet& set)
+{
+    return "ContourSet(outer=" + std::to_string(set.outer.shape(0)) +
+           " points, inner=" + std::to_string(set.inner.shape(0)) +
+           " points, grid=" + std::to_string(set.gridWidth) + "x" + std::to_string(set.gridHeight) +
+           ")";
+}
 
 } // namespace
 
@@ -465,7 +606,14 @@ void bindActiveContour(py::module_& m)
 
         .def_readwrite("c1", &fluvel_ip::Components_3i::c1)
         .def_readwrite("c2", &fluvel_ip::Components_3i::c2)
-        .def_readwrite("c3", &fluvel_ip::Components_3i::c3);
+        .def_readwrite("c3", &fluvel_ip::Components_3i::c3)
+
+        .def("__repr__",
+             [](const fluvel_ip::Components_3i& c)
+             {
+                 return "Components3i(" + std::to_string(c.c1) + ", " + std::to_string(c.c2) +
+                        ", " + std::to_string(c.c3) + ")";
+             });
 
     py::class_<fluvel_ip::ActiveContourParams>(m, "ActiveContourParams", kActiveContourParamsDoc)
         .def(py::init<>())
@@ -474,7 +622,16 @@ void bindActiveContour(py::module_& m)
         .def_readwrite("disk_radius", &fluvel_ip::ActiveContourParams::diskRadius)
         .def_readwrite("Na", &fluvel_ip::ActiveContourParams::Na)
         .def_readwrite("Ns", &fluvel_ip::ActiveContourParams::Ns)
-        .def_readwrite("failure_mode", &fluvel_ip::ActiveContourParams::failureMode);
+        .def_readwrite("failure_mode", &fluvel_ip::ActiveContourParams::failureMode)
+
+        .def("__repr__",
+             [](const fluvel_ip::ActiveContourParams& p)
+             {
+                 return "ActiveContourParams(cycle2_enabled=" + boolToString(p.cycle2Enabled) +
+                        ", disk_radius=" + std::to_string(p.diskRadius) +
+                        ", Na=" + std::to_string(p.Na) + ", Ns=" + std::to_string(p.Ns) +
+                        ", failure_mode=" + enumName(p.failureMode) + ")";
+             });
 
     py::class_<fluvel_ip::RegionColorParams>(m, "RegionModelParams", kRegionModelParamsDoc)
         .def(py::init<>())
@@ -482,56 +639,87 @@ void bindActiveContour(py::module_& m)
         .def_readwrite("lambda_in", &fluvel_ip::RegionColorParams::lambdaIn)
         .def_readwrite("lambda_out", &fluvel_ip::RegionColorParams::lambdaOut)
         .def_readwrite("color_space", &fluvel_ip::RegionColorParams::colorSpace)
-        .def_readwrite("weights", &fluvel_ip::RegionColorParams::weights);
+        .def_readwrite("weights", &fluvel_ip::RegionColorParams::weights)
+
+        .def("__repr__",
+             [](const fluvel_ip::RegionColorParams& p)
+             {
+                 return "RegionModelParams(lambda_in=" + std::to_string(p.lambdaIn) +
+                        ", lambda_out=" + std::to_string(p.lambdaOut) +
+                        ", color_space=" + enumName(p.colorSpace) + ", weights=Components3i(" +
+                        std::to_string(p.weights.c1) + ", " + std::to_string(p.weights.c2) + ", " +
+                        std::to_string(p.weights.c3) + "))";
+             });
 
     py::class_<ContourSet>(m, "ContourSet", kContourSetDoc)
         .def_readonly("outer", &ContourSet::outer)
         .def_readonly("inner", &ContourSet::inner)
+        .def_readonly("mask", &ContourSet::mask)
         .def_readonly("grid_width", &ContourSet::gridWidth)
-        .def_readonly("grid_height", &ContourSet::gridHeight);
+        .def_readonly("grid_height", &ContourSet::gridHeight)
+        .def("__repr__", &contourSetRepr);
 
     m.def(
         "active_contour",
 
-        [](const py::array_t<uint8_t>& image, const py::object& phiMask,
+        [](const py::array& image, const py::object& phiMask,
            const fluvel_ip::ActiveContourParams& acParams,
            const fluvel_ip::RegionColorParams& regionParams)
         {
-            validateImage(image);
+            const auto imageArray = toImageArray(image);
 
-            auto img = pyArrayToImageView(image);
+            validateActiveContourParams(acParams);
+            validateRegionParams(regionParams);
 
-            fluvel_ip::ContourData cd = [&]()
+            const auto img = pyArrayToImageView(imageArray);
+
+            // Both arrays must stay alive while the views are used.
+            std::optional<PyImageArray> phiArray;
+
+            if (!phiMask.is_none())
             {
-                if (phiMask.is_none())
-                    return fluvel_ip::ContourData(img.width(), img.height());
+                if (!py::isinstance<py::array>(phiMask))
+                    throw py::type_error("phi_mask must be a NumPy array or None");
 
-                auto phiMaskPyArray = phiMask.cast<py::array_t<uint8_t>>();
-                validateImage(phiMaskPyArray);
-                auto phiView = pyArrayToImageView(phiMaskPyArray);
+                phiArray = toImageArray(phiMask.cast<py::array>());
+            }
 
-                if (phiView.width() != img.width() || phiView.height() != img.height())
+            std::optional<fluvel_ip::ImageView> phiView;
+
+            if (phiArray)
+            {
+                phiView = pyArrayToImageView(*phiArray);
+
+                if (phiView->width() != img.width() || phiView->height() != img.height())
                     throw py::value_error("phi_mask must have the same dimensions as image");
+            }
 
-                return fluvel_ip::ContourData(phiView);
-            }();
+            // The computation does not need Python: other threads can run meanwhile.
+            const RawContours raw = runWithoutGil(
+                [&]()
+                {
+                    fluvel_ip::ContourData cd = phiView
+                                                    ? fluvel_ip::ContourData(*phiView)
+                                                    : fluvel_ip::ContourData(img.width(), img.height());
 
-            std::unique_ptr<fluvel_ip::ISpeedModel> model;
+                    std::unique_ptr<fluvel_ip::ISpeedModel> model;
 
-            if (img.format() == fluvel_ip::ImageFormat::Gray8)
-                model = std::make_unique<fluvel_ip::RegionGraySpeedModel>(regionParams);
-            else
-                model = std::make_unique<fluvel_ip::RegionColorSpeedModel>(regionParams);
+                    if (img.format() == fluvel_ip::ImageFormat::Gray8)
+                        model = std::make_unique<fluvel_ip::RegionGraySpeedModel>(regionParams);
+                    else
+                        model = std::make_unique<fluvel_ip::RegionColorSpeedModel>(regionParams);
 
-            fluvel_ip::ActiveContour ac(std::move(cd), std::move(model), acParams);
+                    fluvel_ip::ActiveContour ac(std::move(cd), std::move(model), acParams);
 
-            ac.update(img);
+                    ac.update(img);
 
-            ac.converge();
+                    ac.converge();
 
-            return ContourSet{contourToPyArray(ac.outerBoundary()),
-                              contourToPyArray(ac.innerBoundary()), ac.phi().width(),
-                              ac.phi().height()};
+                    return RawContours{ac.outerBoundary(), ac.innerBoundary(), phiToMask(ac.phi()),
+                                       ac.phi().width(), ac.phi().height()};
+                });
+
+            return toContourSet(raw);
         },
 
         py::arg("image"), py::arg("phi_mask") = py::none(),
@@ -541,17 +729,43 @@ void bindActiveContour(py::module_& m)
     m.def(
         "find_contours",
 
-        [](const py::array_t<uint8_t>& mask, fluvel_ip::Connectivity connectivity)
+        [](const py::array& mask, fluvel_ip::Connectivity connectivity)
         {
-            validateImage(mask);
+            const auto maskArray = toImageArray(mask);
 
-            auto img = pyArrayToImageView(mask);
+            const auto img = pyArrayToImageView(maskArray);
 
-            fluvel_ip::ContourData cd(img, connectivity);
+            const int width = img.width();
+            const int height = img.height();
 
-            return ContourSet{contourToPyArray(cd.outerBoundary()),
-                              contourToPyArray(cd.innerBoundary()), cd.phi().width(),
-                              cd.phi().height()};
+            size_t foreground = 0;
+
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    if (img.at(x, y) >= 128u)
+                        ++foreground;
+                }
+            }
+
+            // ContourData falls back to a default ellipse when the mask has no
+            // boundary: an empty or full mask must not turn into a fake object.
+            const size_t total = static_cast<size_t>(width) * static_cast<size_t>(height);
+
+            if (foreground == 0 || foreground == total)
+                return trivialContourSet(width, height, foreground == total);
+
+            const RawContours raw = runWithoutGil(
+                [&]()
+                {
+                    fluvel_ip::ContourData cd(img, connectivity);
+
+                    return RawContours{cd.outerBoundary(), cd.innerBoundary(), phiToMask(cd.phi()),
+                                       cd.phi().width(), cd.phi().height()};
+                });
+
+            return toContourSet(raw);
         },
 
         py::arg("mask"), py::arg("connectivity") = fluvel_ip::Connectivity::Eight,

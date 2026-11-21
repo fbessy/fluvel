@@ -6,23 +6,35 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include "active_contour_types.hpp"
+#include "anisotropic_diffusion.hpp"
+#include "speed_model_types.hpp"
+
 namespace py = pybind11;
 
+/// C-contiguous uint8 array, as expected by the image processing functions.
+using PyImageArray = py::array_t<uint8_t, py::array::c_style>;
+
 /**
- * @brief Validate an image array received from Python.
+ * @brief Validate an image array received from Python and make it contiguous.
  *
- * Supported image layouts are:
- * - Grayscale: (H, W)
- * - RGB:       (H, W, 3)
- * - RGBA:      (H, W, 4)
+ * Only 8-bit images are accepted (dtype uint8). Supported layouts are:
+ * - Grayscale: (H, W) or (H, W, 1)
+ * - Color:     (H, W, 3), channels in BGR order
+ * - Color+A:   (H, W, 4), channels in BGR order followed by an unused/alpha channel
  *
  * Images must have non-zero dimensions.
  *
- * @param image NumPy image array to validate.
+ * Arrays that are not C-contiguous (slices with a step, transposed or
+ * reversed views such as @c img[..., ::-1]) are copied.
  *
- * @throws py::value_error If the image shape is invalid.
+ * @param image NumPy array to validate.
+ * @return C-contiguous uint8 array (the input itself when it already is).
+ *
+ * @throws py::type_error  If the dtype is not uint8.
+ * @throws py::value_error If the shape is invalid.
  */
-void validateImage(const py::array_t<uint8_t>& image);
+PyImageArray toImageArray(const py::array& image);
 
 /**
  * @brief Validate a radius parameter received from Python.
@@ -59,3 +71,32 @@ void validateSigma(float sigma);
  * @throws py::value_error If probability is outside the range [0, 1].
  */
 void validateProbability(float probability);
+
+/**
+ * @brief Validate the parameters of the anisotropic diffusion.
+ *
+ * Requires iterations >= 0, kappa > 0 and 0 < lambda <= 0.25
+ * (larger time steps make the diffusion unstable).
+ *
+ * @throws py::value_error If a parameter is out of range.
+ */
+void validateAnisoParams(const fluvel_ip::filter::AnisoParams& params);
+
+/**
+ * @brief Validate the parameters of the active contour evolution.
+ *
+ * Requires Na >= 1, disk_radius >= 1 and, when the smoothing phase is
+ * enabled, Ns >= 1.
+ *
+ * @throws py::value_error If a parameter is out of range.
+ */
+void validateActiveContourParams(const fluvel_ip::ActiveContourParams& params);
+
+/**
+ * @brief Validate the parameters of the region-based model.
+ *
+ * Requires lambda_in >= 0, lambda_out >= 0 and non-negative weights.
+ *
+ * @throws py::value_error If a parameter is out of range.
+ */
+void validateRegionParams(const fluvel_ip::RegionColorParams& params);
