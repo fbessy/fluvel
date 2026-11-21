@@ -88,8 +88,6 @@ struct ContourDiagnostics
 
     float hausdorffDistance{0.f}; ///< Normalized Hausdorff distance between successive contours.
 
-    float relativeCentroidDistance{0.f}; ///< Normalized centroid displacement.
-
     double elapsedSec{0.0}; ///< Execution time in seconds.
 
     std::size_t contourSize{0}; ///< Number of points in the contour.

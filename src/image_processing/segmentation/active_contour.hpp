@@ -91,8 +91,6 @@ struct EvolutionData
         std::numeric_limits<float>::quiet_NaN()}; //!< Previous normalized Hausdorff distance.
     float hausdorffDistance{
         std::numeric_limits<float>::quiet_NaN()}; //!< Current normalized Hausdorff distance.
-    float relativeCentroidDistance{
-        std::numeric_limits<float>::quiet_NaN()}; //!< Normalized centroid distance.
 
     PointSet intersection; //!< Intersection between current and previous shapes.
 

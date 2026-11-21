@@ -435,18 +435,16 @@ void ActiveContour::checkHausdorffStoppingCondition()
 
         calculateShapesIntersection();
 
-        // Exact Hausdorff distance in absolute coordinates: it measures
-        // how much the contour moved since the previous check.
+        // Exact Hausdorff distance in absolute coordinates: it is the largest
+        // displacement of the contour since the previous check, so it covers
+        // both a change of shape and a translation.
         HausdorffDistance hd(ed_.l_out_shape, ed_.previousShape, &ed_.intersection);
 
         const float sizeFactor = 100.f / diagonal;
         ed_.hausdorffDistance = sizeFactor * hd.distance();
-        ed_.relativeCentroidDistance = sizeFactor * hd.centroidsDistance();
         const float deltaHausdorff = ed_.previousHausdorff - ed_.hausdorffDistance;
 
-        if ((ed_.relativeCentroidDistance < 1.f && ed_.hausdorffDistance < 1.f) ||
-            (ed_.relativeCentroidDistance < 1.f && ed_.hausdorffDistance < 2.f &&
-             deltaHausdorff < 0.f))
+        if (ed_.hausdorffDistance < 1.f || (ed_.hausdorffDistance < 2.f && deltaHausdorff < 0.f))
         {
             ed_.stoppingStatus = StoppingStatus::Hausdorff;
             stop();
@@ -492,7 +490,6 @@ void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const
     d.stoppingStatus = ed_.stoppingStatus;
 
     d.hausdorffDistance = ed_.hausdorffDistance;
-    d.relativeCentroidDistance = ed_.relativeCentroidDistance;
 
     d.contourSize = cd_.outerBoundary().size() + cd_.innerBoundary().size();
 

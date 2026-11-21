@@ -254,8 +254,6 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
 
     s += QString(tr("Hausdorff: %1 %\n")).arg(diag.hausdorffDistance, 0, 'f', 2);
 
-    s += QString(tr("Centroid dist: %1 %\n")).arg(diag.relativeCentroidDistance, 0, 'f', 2);
-
     s += QString(tr("Elapsed: %1 s\n")).arg(diag.elapsedSec, 0, 'f', 2);
 
     s += QString(tr("Contour: %1 pts")).arg(diag.contourSize);
