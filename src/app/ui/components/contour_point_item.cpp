@@ -5,6 +5,13 @@
 
 #include <QPainter>
 
+namespace
+{
+// Width of the pen used to draw the contour points, in image pixels
+// (the pen is not cosmetic, so it is scaled with the zoom).
+constexpr qreal kPenWidth = 1.1;
+} // namespace
+
 namespace fluvel
 {
 
@@ -53,8 +60,11 @@ QRectF ContourPointsItem::boundingRect() const
 
     // Pixel (x, y) spans [x, x+1) × [y, y+1) in image space.
     // Its geometric center is therefore at (x + 0.5, y + 0.5).
+    //
+    // The bounding rectangle must also contain the whole stroke of the
+    // outermost points: half of the pen width goes beyond the pixel.
 
-    constexpr qreal margin = 0.5;
+    constexpr qreal margin = 0.5 + kPenWidth;
     rf.adjust(-margin, -margin, margin, margin);
 
     return rf;
@@ -67,7 +77,7 @@ void ContourPointsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->setRenderHint(QPainter::TextAntialiasing, false);
 
     QPen pen(color_);
-    pen.setWidthF(1.1);
+    pen.setWidthF(kPenWidth);
     pen.setCosmetic(false);
 
     painter->setPen(pen);
