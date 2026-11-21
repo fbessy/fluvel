@@ -86,7 +86,7 @@ struct ContourDiagnostics
     fluvel_ip::StoppingStatus stoppingStatus{
         fluvel_ip::StoppingStatus::None}; ///< Reason for stopping.
 
-    float hausdorffQuantile{0.f}; ///< Normalized Hausdorff distance (quantile).
+    float hausdorffDistance{0.f}; ///< Normalized Hausdorff distance between successive contours.
 
     float relativeCentroidDistance{0.f}; ///< Normalized centroid displacement.
 

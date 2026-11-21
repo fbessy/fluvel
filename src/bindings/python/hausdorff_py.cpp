@@ -4,6 +4,7 @@
 #include "hausdorff_py.hpp"
 #include "contour_conversion.hpp"
 #include "hausdorff_distance.hpp"
+#include "hausdorff_statistics.hpp"
 
 #include <pybind11/numpy.h>
 
@@ -28,26 +29,23 @@ Hausdorff distance metrics between two contours.
 Attributes
 ----------
 distance
-    Hausdorff distance, computed after aligning the centroids
-    of the two contours: a translation between the contours
-    does not change it (it is given by ``centroids_distance``).
+    Hausdorff distance (maximum of the two directed distances).
 
 modified_distance
-    Modified Hausdorff distance (mean of the minimum distances),
-    computed after aligning the centroids.
+    Modified Hausdorff distance (mean of the minimum distances,
+    maximum of the two directions).
 
 quantile_distance
-    Quantile Hausdorff distance, computed after aligning
-    the centroids.
+    Quantile Hausdorff distance. The quantile is taken in each
+    direction (nearest rank, lower index) and the larger value is kept.
 
 centroids_distance
     Distance between contour centroids.
 
 Notes
 -----
-``modified_distance`` and ``quantile_distance`` may be
-overestimated: the algorithm used to speed up the computation
-is exact only for ``distance``.
+All the distances are exact. They are measured in absolute pixel
+coordinates unless ``align_centroids=True`` was requested.
 
 )";
 
@@ -71,6 +69,16 @@ quantile
     - 95 for HD95
     - 90 for HD90
     - 80 for HD80
+
+align_centroids
+    If False (default), distances are measured in absolute pixel
+    coordinates, as in most libraries and papers: a translation
+    between the contours increases the distance.
+
+    If True, the centroids of both contours are aligned first, so
+    only the difference of shape is measured; the translation is
+    then given by ``centroids_distance``. This is what the Fluvel Set
+    application can do in its analysis window.
 
 Returns
 -------
@@ -99,7 +107,8 @@ void bindHausdorff(py::module_& m)
     m.def(
         "hausdorff_metrics",
 
-        [](const py::array_t<int>& contourA, const py::array_t<int>& contourB, int quantile)
+        [](const py::array_t<int>& contourA, const py::array_t<int>& contourB, int quantile,
+           bool alignCentroids)
         {
             if (quantile < 0 || quantile > 100)
                 throw py::value_error("quantile must be in the range [0, 100]");
@@ -107,11 +116,17 @@ void bindHausdorff(py::module_& m)
             auto shapeA = pyArrayToShape(contourA);
             auto shapeB = pyArrayToShape(contourB);
 
-            fluvel_ip::HausdorffDistance hd(std::move(shapeA), std::move(shapeB));
+            const fluvel_ip::HausdorffOptions options{.alignCentroids = alignCentroids};
 
-            return HausdorffMetricsResult{hd.distance(), hd.modifiedDistance(),
-                                          hd.hausdorffQuantile(quantile), hd.centroidsDistance()};
+            const fluvel_ip::HausdorffStatistics stats(shapeA, shapeB, nullptr, options);
+            const fluvel_ip::HausdorffDistance hd(std::move(shapeA), std::move(shapeB), nullptr,
+                                                  options);
+
+            return HausdorffMetricsResult{hd.distance(), stats.modifiedDistance(),
+                                          stats.quantileDistance(quantile),
+                                          hd.centroidsDistance()};
         },
 
-        py::arg("contour_a"), py::arg("contour_b"), py::arg("quantile") = 95, kHausdorffMetricsDoc);
+        py::arg("contour_a"), py::arg("contour_b"), py::arg("quantile") = 95,
+        py::arg("align_centroids") = false, kHausdorffMetricsDoc);
 }

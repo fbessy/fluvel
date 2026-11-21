@@ -435,16 +435,18 @@ void ActiveContour::checkHausdorffStoppingCondition()
 
         calculateShapesIntersection();
 
+        // Exact Hausdorff distance in absolute coordinates: it measures
+        // how much the contour moved since the previous check.
         HausdorffDistance hd(ed_.l_out_shape, ed_.previousShape, &ed_.intersection);
 
         const float sizeFactor = 100.f / diagonal;
-        ed_.hausdorffQuantile = sizeFactor * hd.hausdorffQuantile(80);
+        ed_.hausdorffDistance = sizeFactor * hd.distance();
         ed_.relativeCentroidDistance = sizeFactor * hd.centroidsDistance();
-        const float deltaQuantile = ed_.previousQuantile - ed_.hausdorffQuantile;
+        const float deltaHausdorff = ed_.previousHausdorff - ed_.hausdorffDistance;
 
-        if ((ed_.relativeCentroidDistance < 1.f && ed_.hausdorffQuantile < 1.f) ||
-            (ed_.relativeCentroidDistance < 1.f && ed_.hausdorffQuantile < 2.f &&
-             deltaQuantile < 0.f))
+        if ((ed_.relativeCentroidDistance < 1.f && ed_.hausdorffDistance < 1.f) ||
+            (ed_.relativeCentroidDistance < 1.f && ed_.hausdorffDistance < 2.f &&
+             deltaHausdorff < 0.f))
         {
             ed_.stoppingStatus = StoppingStatus::Hausdorff;
             stop();
@@ -454,7 +456,7 @@ void ActiveContour::checkHausdorffStoppingCondition()
         // to prepare data for the next periodic check of the hausdorff condition
         ed_.l_out_shape.swap(ed_.previousShape);
         ed_.previous_step_count = ed_.stepCount;
-        ed_.previousQuantile = ed_.hausdorffQuantile;
+        ed_.previousHausdorff = ed_.hausdorffDistance;
     }
 }
 
@@ -489,7 +491,7 @@ void ActiveContour::fillDiagnostics(ContourDiagnostics& d) const
     d.state = state_;
     d.stoppingStatus = ed_.stoppingStatus;
 
-    d.hausdorffQuantile = ed_.hausdorffQuantile;
+    d.hausdorffDistance = ed_.hausdorffDistance;
     d.relativeCentroidDistance = ed_.relativeCentroidDistance;
 
     d.contourSize = cd_.outerBoundary().size() + cd_.innerBoundary().size();

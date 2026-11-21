@@ -252,7 +252,7 @@ void ImageController::onDiagnosticsUpdated(const fluvel_ip::ContourDiagnostics& 
         s += QString(tr("Mean out: %1\n")).arg(formatChannels(diag.meanOutside));
     }
 
-    s += QString(tr("Hausdorff q: %1 %\n")).arg(diag.hausdorffQuantile, 0, 'f', 2);
+    s += QString(tr("Hausdorff: %1 %\n")).arg(diag.hausdorffDistance, 0, 'f', 2);
 
     s += QString(tr("Centroid dist: %1 %\n")).arg(diag.relativeCentroidDistance, 0, 'f', 2);
 

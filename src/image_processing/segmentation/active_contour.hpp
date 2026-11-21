@@ -87,10 +87,10 @@ struct EvolutionData
 
     int previous_step_count{0}; //!< Step count at the previous Cycle2.
 
-    float previousQuantile{
-        std::numeric_limits<float>::quiet_NaN()}; //!< Previous Hausdorff quantile.
-    float hausdorffQuantile{
-        std::numeric_limits<float>::quiet_NaN()}; //!< Current Hausdorff quantile.
+    float previousHausdorff{
+        std::numeric_limits<float>::quiet_NaN()}; //!< Previous normalized Hausdorff distance.
+    float hausdorffDistance{
+        std::numeric_limits<float>::quiet_NaN()}; //!< Current normalized Hausdorff distance.
     float relativeCentroidDistance{
         std::numeric_limits<float>::quiet_NaN()}; //!< Normalized centroid distance.
 

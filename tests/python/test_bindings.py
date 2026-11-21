@@ -388,18 +388,80 @@ def test_hausdorff_metrics():
     assert same.quantile_distance == 0
     assert same.centroids_distance == 0
 
-    # The distances are computed after aligning the centroids:
-    # a translation only appears in centroids_distance.
-    shifted = fluvel.hausdorff_metrics(contour, contour + np.array([3, 0], np.int32))
+    # Absolute coordinates by default: a translation is a distance.
+    moved = contour + np.array([3, 0], np.int32)
+    shifted = fluvel.hausdorff_metrics(contour, moved)
 
-    assert shifted.distance == 0
     assert shifted.centroids_distance == pytest.approx(3.0)
+    assert 0 < shifted.distance <= 3.0 + 1e-6
+
+    # With aligned centroids, only the shape matters.
+    aligned = fluvel.hausdorff_metrics(contour, moved, align_centroids=True)
+
+    assert aligned.distance == 0
+    assert aligned.modified_distance == 0
+    assert aligned.quantile_distance == 0
+    assert aligned.centroids_distance == pytest.approx(3.0)
 
     # A different shape gives a positive distance.
     other = np.zeros((40, 50), np.uint8)
     other[5:35, 20:30] = 255
 
     assert fluvel.hausdorff_metrics(contour, fluvel.find_contours(other).outer).distance > 0
+
+
+def reference_hausdorff(a, b, quantile, align):
+    """Brute-force reference, same definitions as the library."""
+    a = a.astype(np.float64)
+    b = b.astype(np.float64)
+
+    if align:
+        a = a - a.mean(axis=0)
+        b = b - b.mean(axis=0)
+
+    d = np.sqrt(((a[:, None, :] - b[None, :, :]) ** 2).sum(axis=2))
+    ab = np.sort(d.min(axis=1))
+    ba = np.sort(d.min(axis=0))
+
+    def q(v):
+        return v[((len(v) - 1) * quantile) // 100]
+
+    return (max(ab.max(), ba.max()), max(ab.mean(), ba.mean()), max(q(ab), q(ba)))
+
+
+@pytest.mark.parametrize("align", [False, True])
+@pytest.mark.parametrize("quantile", [0, 50, 80, 95, 100])
+def test_hausdorff_metrics_are_exact(align, quantile):
+    rng = np.random.default_rng(1234)
+
+    for _ in range(5):
+        a = rng.integers(0, 60, size=(int(rng.integers(20, 200)), 2)).astype(np.int32)
+        b = rng.integers(10, 80, size=(int(rng.integers(20, 200)), 2)).astype(np.int32)
+
+        result = fluvel.hausdorff_metrics(a, b, quantile=quantile, align_centroids=align)
+        expected = reference_hausdorff(a, b, quantile, align)
+
+        assert result.distance == pytest.approx(expected[0], rel=1e-5)
+        assert result.modified_distance == pytest.approx(expected[1], rel=1e-5)
+        assert result.quantile_distance == pytest.approx(expected[2], rel=1e-5)
+
+
+def test_hausdorff_metrics_exact_on_contours():
+    gt = np.zeros((120, 160), np.uint8)
+    gt[20:100, 30:130] = 255
+    other = np.zeros((120, 160), np.uint8)
+    other[28:95, 38:140] = 255
+
+    a = fluvel.find_contours(gt).outer
+    b = fluvel.find_contours(other).outer
+
+    for align in (False, True):
+        result = fluvel.hausdorff_metrics(a, b, quantile=95, align_centroids=align)
+        expected = reference_hausdorff(a, b, 95, align)
+
+        assert result.distance == pytest.approx(expected[0], rel=1e-5)
+        assert result.modified_distance == pytest.approx(expected[1], rel=1e-5)
+        assert result.quantile_distance == pytest.approx(expected[2], rel=1e-5)
 
 
 def test_hausdorff_metrics_invalid_arguments():

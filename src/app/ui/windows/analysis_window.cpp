@@ -8,8 +8,10 @@
 #include "color_adapters.hpp"
 #include "elapsed_timer.hpp"
 #include "hausdorff_distance.hpp"
+#include "hausdorff_statistics.hpp"
 #include "icon_loader.hpp"
 
+#include <QCheckBox>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -57,8 +59,19 @@ AnalysisWindow::AnalysisWindow(QWidget* parent)
     computeButton_->setEnabled(false);
     computeButton_->setIcon(measureIcon);
 
+    alignCentroidsCheck_ = new QCheckBox(tr("Align centroids"));
+    alignCentroidsCheck_->setChecked(
+        settings.value("analysis_window/align_centroids", false).toBool());
+    alignCentroidsCheck_->setToolTip(
+        tr("Unchecked: distances are measured between the shapes as they are positioned in the "
+           "images, so a shift between them increases the distance.\n"
+           "Checked: the centroids of both shapes are superimposed first, so only the difference "
+           "of shape is measured (the shift is given by the distance between centroids).\n"
+           "Click on Compute again to apply the change."));
+
     QVBoxLayout* inputLayout = new QVBoxLayout;
     inputLayout->addLayout(listsSelectLayout);
+    inputLayout->addWidget(alignCentroidsCheck_);
     inputLayout->addWidget(computeButton_);
 
     connect(computeButton_, &QPushButton::clicked, this, &AnalysisWindow::computeHd);
@@ -177,13 +190,19 @@ void AnalysisWindow::computeHd()
     fluvel_ip::ElapsedTimer timer;
     timer.start();
 
+    const fluvel_ip::HausdorffOptions options{.alignCentroids = alignCentroidsCheck_->isChecked()};
+
     hd_ = std::make_unique<fluvel_ip::HausdorffDistance>(widget1_->shape(), widget2_->shape(),
-                                                         &intersection_);
+                                                         &intersection_, options);
+
+    stats_ = std::make_unique<fluvel_ip::HausdorffStatistics>(widget1_->shape(),
+                                                              widget2_->shape(), &intersection_,
+                                                              options);
 
     const double elapsed = timer.elapsedSec();
 
     const float hausdorffDist = hd_->distance();
-    const float hausdorffQuantile = hd_->hausdorffQuantile(percentileSp_->value());
+    const float hausdorffQuantile = stats_->quantileDistance(percentileSp_->value());
     const float centroidsGap = hd_->centroidsDistance();
 
     factor_ = 100.f / fluvel_ip::Shape::gridDiagonal(
@@ -235,9 +254,9 @@ void AnalysisWindow::computeHd()
 
 void AnalysisWindow::refreshQuantile(int hundredth)
 {
-    if (hd_ != nullptr)
+    if (stats_ != nullptr)
     {
-        const float hausdorffQuantile = hd_->hausdorffQuantile(hundredth);
+        const float hausdorffQuantile = stats_->quantileDistance(hundredth);
         const float quantileRatio = factor_ * hausdorffQuantile;
 
         quantileLabel_->setText(
@@ -295,6 +314,7 @@ void AnalysisWindow::closeEvent(QCloseEvent* event)
     QSettings settings;
 
     settings.setValue("ui_geometry/analysis_window", saveGeometry());
+    settings.setValue("analysis_window/align_centroids", alignCentroidsCheck_->isChecked());
 
     widget1_->saveSettings();
     widget2_->saveSettings();

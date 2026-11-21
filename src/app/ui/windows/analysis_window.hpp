@@ -5,6 +5,7 @@
 
 #include "analysis_widget.hpp"
 #include "hausdorff_distance.hpp"
+#include "hausdorff_statistics.hpp"
 #include "point_containers.hpp"
 
 #include <QMainWindow>
@@ -13,6 +14,7 @@ class QWidget;
 class QCloseEvent;
 class QLabel;
 class QSpinBox;
+class QCheckBox;
 class QDialog;
 
 namespace fluvel
@@ -58,6 +60,7 @@ private:
     AnalysisWidget* widget1_{nullptr};
     AnalysisWidget* widget2_{nullptr};
     AnimatedPushButton* computeButton_{nullptr};
+    QCheckBox* alignCentroidsCheck_{nullptr};
 
     fluvel_ip::PointSet intersection_;
 
@@ -72,6 +75,7 @@ private:
     QLabel* timeLabel_{nullptr};
 
     std::unique_ptr<fluvel_ip::HausdorffDistance> hd_;
+    std::unique_ptr<fluvel_ip::HausdorffStatistics> stats_;
     float factor_{0.f};
 };
 

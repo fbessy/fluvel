@@ -7,157 +7,95 @@
 #include "shape.hpp"
 
 #include <limits>
-#include <vector>
 
 namespace fluvel_ip
 {
 
 /**
- * @brief Compute Hausdorff-based distances between two shapes.
+ * @brief Options shared by the Hausdorff-based measures.
+ */
+struct HausdorffOptions
+{
+    /**
+     * @brief Align the centroids of both shapes before measuring distances.
+     *
+     * When false (default), distances are measured in absolute pixel
+     * coordinates, which is the usual definition (MONAI, MedPy, SimpleITK...):
+     * a translation between the shapes increases the distance.
+     *
+     * When true, every point is expressed relatively to the centroid of its
+     * own shape, so only the difference of shape is measured. The translation
+     * is available through HausdorffDistance::centroidsDistance().
+     */
+    bool alignCentroids{false};
+};
+
+/**
+ * @brief Exact Hausdorff distance between two shapes.
  *
- * This class provides:
- * - the exact Hausdorff distance,
- * - a modified (mean-based) Hausdorff distance,
- * - a quantile-based Hausdorff distance,
- * - the centroid distance between shapes.
+ * Computes the symmetric Hausdorff distance, max(d(A → B), d(B → A)),
+ * with the algorithm of Taha and Hanbury (IEEE PAMI, 2015), which is
+ * exact for the maximum:
+ * - early breaking of the inner loop,
+ * - random sampling of the points,
+ * - exclusion of the points shared by both shapes (when coordinates are absolute).
  *
- * It internally computes directed distances (A → B and B → A),
- * and stores intermediate minimum distances for reuse.
- *
- * @note An optional intersection set can be provided to speed up
- *       computations (common points between shapes).
+ * @note This algorithm discards most of the minimum distances it evaluates.
+ *       For the mean or the quantiles of these distances, use
+ *       HausdorffStatistics, which is exact too.
  */
 class HausdorffDistance
 {
 public:
     /**
-     * @brief Construct a HausdorffDistance object and compute all distance metrics.
-     * The input shapes are copied or moved into the object and remain owned
-     * by the HausdorffDistance instance for its entire lifetime.
+     * @brief Construct the object and compute the distance.
+     *
+     * The shapes are copied or moved into the object.
+     *
      * @param shapeA First shape.
      * @param shapeB Second shape.
-     * @param intersectionAB Optional set of points shared by both shapes.
-     *        Providing this set can reduce the computation cost by avoiding
-     *        distance evaluations for points already known to belong to both
-     *        shapes. This optimization is most useful when the intersection
-     *        can be obtained at negligible cost.
+     * @param intersectionAB Optional set of points shared by both shapes. Such
+     *        points are at distance 0, so they are not evaluated, which speeds
+     *        up the computation when the shapes overlap. It is ignored when
+     *        the centroids are aligned, since a shared pixel is then no longer
+     *        at distance 0.
+     * @param options Measurement options, see HausdorffOptions.
      */
-    HausdorffDistance(Shape shapeA, Shape shapeB, const PointSet* intersectionAB = nullptr);
+    HausdorffDistance(Shape shapeA, Shape shapeB, const PointSet* intersectionAB = nullptr,
+                      HausdorffOptions options = {});
 
     /**
-     * @brief Compute the symmetric Hausdorff distance.
+     * @brief Symmetric Hausdorff distance, in pixels.
      *
-     * Defined as:
-     * max( d(A → B), d(B → A) )
-     *
-     * @return Hausdorff distance.
+     * @return max( d(A → B), d(B → A) ), or NaN if a shape is not valid.
      */
+    [[nodiscard]]
     float distance() const;
 
     /**
-     * @brief Compute the modified Hausdorff distance.
+     * @brief Euclidean distance between the centroids of both shapes, in pixels.
      *
-     * Typically based on the mean of minimum distances instead of the maximum.
-     *
-     * @note The result may be overestimated if EARLY_BREAKING optimization is used.
-     *
-     * @return Modified Hausdorff distance.
+     * @return Distance, or NaN if a shape is not valid.
      */
-    float modifiedDistance() const;
-
-    /**
-     * @brief Compute the Hausdorff distance quantile.
-     *
-     * Instead of taking the maximum, this returns a percentile of the
-     * distribution of minimum distances.
-     *
-     * @param hundredth Percentile in [0,100].
-     * @return Quantile Hausdorff distance.
-     */
-    float hausdorffQuantile(int hundredth);
-
-    /**
-     * @brief Compute the distance between centroids of both shapes.
-     *
-     * @return Euclidean distance between centroids.
-     */
+    [[nodiscard]]
     float centroidsDistance() const;
 
 private:
     /**
-     * @brief Compute all Hausdorff-related distances.
-     *
-     * Populates directed distances and minimum distance arrays.
+     * @brief Directed Hausdorff distance from one shape to the other.
      */
-    void compute();
+    [[nodiscard]]
+    float computeDirected(const Shape& fromShape, const Shape& toShape) const;
 
-    /**
-     * @brief Compute directed Hausdorff distance.
-     *
-     * For each point in @p fromShape, computes the minimum distance
-     * to points in @p toShape.
-     *
-     * @param fromShape Source shape.
-     * @param toShape Target shape.
-     * @param directedDistance Output maximum of minimum distances.
-     * @param minDistances Output vector of minimum distances.
-     */
-    void computeDirectedHausdorff(const Shape& fromShape, const Shape& toShape,
-                                  float& directedDistance, std::vector<float>& minDistances);
+    Shape shapeA_;
+    Shape shapeB_;
 
-    /**
-     * @brief Compute the mean of minimum distances.
-     *
-     * @param minDists Vector of minimum distances.
-     * @return Mean value.
-     */
-    static float calculateMean(const std::vector<float>& minDists);
-
-    /**
-     * @brief Compute a quantile from minimum distances.
-     *
-     * @param minDists Vector of minimum distances.
-     * @param hundredth Percentile in [0,100].
-     * @return Quantile value.
-     */
-    static float hausdorffQuantile(const std::vector<float>& minDists, int hundredth);
-
-    Shape shapeA_; ///< First shape (point set representation).
-    Shape shapeB_; ///< Second shape (point set representation).
-
-    /**
-     * @brief Optional intersection between shapes A and B.
-     *
-     * Used to speed up distance computation.
-     */
     const PointSet* intersectionAB_{nullptr};
 
-    /**
-     * @brief Directed Hausdorff distance from A to B.
-     */
+    HausdorffOptions options_{};
+
     float distanceFromAToB_{std::numeric_limits<float>::quiet_NaN()};
-
-    /**
-     * @brief Directed Hausdorff distance from B to A.
-     */
     float distanceFromBToA_{std::numeric_limits<float>::quiet_NaN()};
-
-    /**
-     * @brief Minimum distances from A to B.
-     */
-    std::vector<float> minDistancesFromAToB_;
-
-    /**
-     * @brief Minimum distances from B to A.
-     */
-    std::vector<float> minDistancesFromBToA_;
-
-    /**
-     * @brief Indicates whether minimum distance arrays are sorted.
-     *
-     * Used for quantile computation optimization.
-     */
-    bool isSorted_{false};
 };
 
 } // namespace fluvel_ip
