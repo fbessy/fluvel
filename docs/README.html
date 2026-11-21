@@ -547,7 +547,7 @@ on Windows.</p></li>
 <span class="w">    </span>-DFLUVEL_BUILD_BIND<span class="o">=</span>OFF
 
 cmake<span class="w"> </span>--build<span class="w"> </span>build
-./build/src/app/fluvel
+./build/src/app/fluvel-set
 </pre></div>
 </div>
 </section>
@@ -571,6 +571,24 @@ cmake<span class="w"> </span>--build<span class="w"> </span>build
 </div>
 <p>Example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/filtering/showcase.py
+</pre></div>
+</div>
+<p>Image conventions of the Python functions:</p>
+<ul class="simple">
+<li><p>Images are <code class="docutils literal notranslate"><span class="pre">uint8</span></code> NumPy arrays of shape <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W)</span></code>, <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code> or <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">4)</span></code>.
+Other types (<code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">uint16</span></code>, …) are refused with an explicit error.</p></li>
+<li><p>Color channels are in <strong>BGR</strong> order, like OpenCV. For an RGB image, use
+<code class="docutils literal notranslate"><span class="pre">image[...,</span> <span class="pre">::-1]</span></code>.</p></li>
+<li><p>Results have the same shape as the input image.</p></li>
+<li><p>Segmentation results provide the contour points and the region mask (<code class="docutils literal notranslate"><span class="pre">result.mask</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hausdorff_metrics</span></code> returns exact distances (Hausdorff, modified, quantile) in absolute
+pixel coordinates, like MONAI or MedPy. Use <code class="docutils literal notranslate"><span class="pre">align_centroids=True</span></code> to ignore the
+translation between the contours and measure the difference of shape only, as the
+analysis window of the application can do. The quantile is taken in each direction
+(nearest rank) and the larger value is kept.</p></li>
+</ul>
+<p>Run the tests (requires <code class="docutils literal notranslate"><span class="pre">pytest</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PYTHONPATH</span><span class="o">=</span>build/python<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/python
 </pre></div>
 </div>
 </section>

@@ -50,9 +50,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
 
-<link rel="icon" type="image/svg+xml" href="_static/fluvel.svg">
+<link rel="icon" type="image/svg+xml" href="../../_static/fluvel.svg">
 
-<link rel="alternate icon" type="image/x-icon" href="_static/favicon.ico">
+<link rel="alternate icon" type="image/x-icon" href="../../_static/favicon.ico">
 
 
   </head>
@@ -434,24 +434,40 @@ document.write(`
 
 </div>
 <div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv412PyImageArray">
+<span id="_CPPv312PyImageArray"></span><span id="_CPPv212PyImageArray"></span><span class="target" id="py__validation_8hpp_1a46d8be08f731002fa31c54cbd884fa09"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PyImageArray</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">c_style</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv412PyImageArray" title="Link to this definition">#</a><br /></dt>
+<dd><p>C-contiguous uint8 array, as expected by the image processing functions. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv413validateImageRKN2py7array_tI7uint8_tEE">
-<span id="_CPPv313validateImageRKN2py7array_tI7uint8_tEE"></span><span id="_CPPv213validateImageRKN2py7array_tI7uint8_tEE"></span><span id="validateImage__py::array_t:uint8_t:CR"></span><span class="target" id="py__validation_8hpp_1a625ee634ce838d986b8af731ec3fe103"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">validateImage</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413validateImageRKN2py7array_tI7uint8_tEE" title="Link to this definition">#</a><br /></dt>
-<dd><p>Validate an image array received from Python. </p>
-<p>Supported image layouts are:<ul class="simple">
-<li><p>Grayscale: (H, W)</p></li>
-<li><p>RGB: (H, W, 3)</p></li>
-<li><p>RGBA: (H, W, 4)</p></li>
+<dt class="sig sig-object cpp" id="_CPPv412toImageArrayRKN2py5arrayE">
+<span id="_CPPv312toImageArrayRKN2py5arrayE"></span><span id="_CPPv212toImageArrayRKN2py5arrayE"></span><span id="toImageArray__py::arrayCR"></span><span class="target" id="py__validation_8hpp_1a67574c5d7fef3a2e5841a50f7f9aa619"></span><a class="reference internal" href="#_CPPv412PyImageArray" title="PyImageArray"><span class="n"><span class="pre">PyImageArray</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">toImageArray</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412toImageArrayRKN2py5arrayE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Validate an image array received from Python and make it contiguous. </p>
+<p>Only 8-bit images are accepted (dtype uint8). Supported layouts are:<ul class="simple">
+<li><p>Grayscale: (H, W) or (H, W, 1)</p></li>
+<li><p>Color: (H, W, 3), channels in BGR order</p></li>
+<li><p>Color+A: (H, W, 4), channels in BGR order followed by an unused/alpha channel</p></li>
 </ul>
 </p>
 <p>Images must have non-zero dimensions.</p>
+<p>Arrays that are not C-contiguous (slices with a step, transposed or reversed views such as <code class="docutils literal notranslate"><span class="pre">img</span></code>[…, ::-1]) are copied.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>image</strong> – NumPy image array to validate.</p>
+<dd class="field-odd"><p><strong>image</strong> – NumPy array to validate. </p>
 </dd>
 <dt class="field-even">Throws<span class="colon">:</span></dt>
-<dd class="field-even"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">py</span><span class="p">::</span><span class="n">value_error</span></span></span> – If the image shape is invalid. </p>
+<dd class="field-even"><ul class="simple">
+<li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">py</span><span class="p">::</span><span class="n">type_error</span></span></span> – If the dtype is not uint8. </p></li>
+<li><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">py</span><span class="p">::</span><span class="n">value_error</span></span></span> – If the shape is invalid. </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>C-contiguous uint8 array (the input itself when it already is).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -502,6 +518,42 @@ document.write(`
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419validateAnisoParamsRKN9fluvel_ip6filter11AnisoParamsE">
+<span id="_CPPv319validateAnisoParamsRKN9fluvel_ip6filter11AnisoParamsE"></span><span id="_CPPv219validateAnisoParamsRKN9fluvel_ip6filter11AnisoParamsE"></span><span id="validateAnisoParams__fluvel_ip::filter::AnisoParamsCR"></span><span class="target" id="py__validation_8hpp_1ac14c85fbc3ec16a34fd06abc14ee8a37"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">validateAnisoParams</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../ip/analysis.html#_CPPv49fluvel_ip" title="fluvel_ip"><span class="n"><span class="pre">fluvel_ip</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/filtering.html#_CPPv4N9fluvel_ip6filterE" title="fluvel_ip::filter"><span class="n"><span class="pre">filter</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/filtering.html#_CPPv4N9fluvel_ip6filter11AnisoParamsE" title="fluvel_ip::filter::AnisoParams"><span class="n"><span class="pre">AnisoParams</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">params</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419validateAnisoParamsRKN9fluvel_ip6filter11AnisoParamsE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Validate the parameters of the anisotropic diffusion. </p>
+<p>Requires iterations &gt;= 0, kappa &gt; 0 and 0 &lt; lambda &lt;= 0.25 (larger time steps make the diffusion unstable).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">py</span><span class="p">::</span><span class="n">value_error</span></span></span> – If a parameter is out of range. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427validateActiveContourParamsRKN9fluvel_ip19ActiveContourParamsE">
+<span id="_CPPv327validateActiveContourParamsRKN9fluvel_ip19ActiveContourParamsE"></span><span id="_CPPv227validateActiveContourParamsRKN9fluvel_ip19ActiveContourParamsE"></span><span id="validateActiveContourParams__fluvel_ip::ActiveContourParamsCR"></span><span class="target" id="py__validation_8hpp_1a5ffdac6d9b4fe988ebe6e17514d55c22"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">validateActiveContourParams</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../ip/analysis.html#_CPPv49fluvel_ip" title="fluvel_ip"><span class="n"><span class="pre">fluvel_ip</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/segmentation.html#_CPPv4N9fluvel_ip19ActiveContourParamsE" title="fluvel_ip::ActiveContourParams"><span class="n"><span class="pre">ActiveContourParams</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">params</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427validateActiveContourParamsRKN9fluvel_ip19ActiveContourParamsE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Validate the parameters of the active contour evolution. </p>
+<p>Requires Na &gt;= 1, disk_radius &gt;= 1 and, when the smoothing phase is enabled, Ns &gt;= 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">py</span><span class="p">::</span><span class="n">value_error</span></span></span> – If a parameter is out of range. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420validateRegionParamsRKN9fluvel_ip17RegionColorParamsE">
+<span id="_CPPv320validateRegionParamsRKN9fluvel_ip17RegionColorParamsE"></span><span id="_CPPv220validateRegionParamsRKN9fluvel_ip17RegionColorParamsE"></span><span id="validateRegionParams__fluvel_ip::RegionColorParamsCR"></span><span class="target" id="py__validation_8hpp_1a89e23b3330007ed456cc113899872068"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">validateRegionParams</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../ip/analysis.html#_CPPv49fluvel_ip" title="fluvel_ip"><span class="n"><span class="pre">fluvel_ip</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/segmentation.html#_CPPv4N9fluvel_ip17RegionColorParamsE" title="fluvel_ip::RegionColorParams"><span class="n"><span class="pre">RegionColorParams</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">params</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420validateRegionParamsRKN9fluvel_ip17RegionColorParamsE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Validate the parameters of the region-based model. </p>
+<p>Requires lambda_in &gt;= 0, lambda_out &gt;= 0 and non-negative weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Throws<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span><span class="cpp-expr sig sig-inline cpp"><span class="n">py</span><span class="p">::</span><span class="n">value_error</span></span></span> – If a parameter is out of range. </p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </section>
 
@@ -547,10 +599,14 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv414bindMorphologyRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindMorphology()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv417bindActiveContourRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindActiveContour()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv413bindHausdorffRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindHausdorff()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv413validateImageRKN2py7array_tI7uint8_tEE"><code class="docutils literal notranslate"><span class="pre">validateImage()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv412PyImageArray"><code class="docutils literal notranslate"><span class="pre">PyImageArray</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv412toImageArrayRKN2py5arrayE"><code class="docutils literal notranslate"><span class="pre">toImageArray()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv414validateRadiusi"><code class="docutils literal notranslate"><span class="pre">validateRadius()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv413validateSigmaf"><code class="docutils literal notranslate"><span class="pre">validateSigma()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv419validateProbabilityf"><code class="docutils literal notranslate"><span class="pre">validateProbability()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv419validateAnisoParamsRKN9fluvel_ip6filter11AnisoParamsE"><code class="docutils literal notranslate"><span class="pre">validateAnisoParams()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv427validateActiveContourParamsRKN9fluvel_ip19ActiveContourParamsE"><code class="docutils literal notranslate"><span class="pre">validateActiveContourParams()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv420validateRegionParamsRKN9fluvel_ip17RegionColorParamsE"><code class="docutils literal notranslate"><span class="pre">validateRegionParams()</span></code></a></li>
 </ul>
   </nav></div>
 

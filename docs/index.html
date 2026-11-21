@@ -522,7 +522,7 @@ on Windows.</p></li>
 <span class="w">    </span>-DFLUVEL_BUILD_BIND<span class="o">=</span>OFF
 
 cmake<span class="w"> </span>--build<span class="w"> </span>build
-./build/src/app/fluvel
+./build/src/app/fluvel-set
 </pre></div>
 </div>
 </section>
@@ -546,6 +546,24 @@ cmake<span class="w"> </span>--build<span class="w"> </span>build
 </div>
 <p>Example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/filtering/showcase.py
+</pre></div>
+</div>
+<p>Image conventions of the Python functions:</p>
+<ul class="simple">
+<li><p>Images are <code class="docutils literal notranslate"><span class="pre">uint8</span></code> NumPy arrays of shape <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W)</span></code>, <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code> or <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">4)</span></code>.
+Other types (<code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">uint16</span></code>, …) are refused with an explicit error.</p></li>
+<li><p>Color channels are in <strong>BGR</strong> order, like OpenCV. For an RGB image, use
+<code class="docutils literal notranslate"><span class="pre">image[...,</span> <span class="pre">::-1]</span></code>.</p></li>
+<li><p>Results have the same shape as the input image.</p></li>
+<li><p>Segmentation results provide the contour points and the region mask (<code class="docutils literal notranslate"><span class="pre">result.mask</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hausdorff_metrics</span></code> returns exact distances (Hausdorff, modified, quantile) in absolute
+pixel coordinates, like MONAI or MedPy. Use <code class="docutils literal notranslate"><span class="pre">align_centroids=True</span></code> to ignore the
+translation between the contours and measure the difference of shape only, as the
+analysis window of the application can do. The quantile is taken in each direction
+(nearest rank) and the larger value is kept.</p></li>
+</ul>
+<p>Run the tests (requires <code class="docutils literal notranslate"><span class="pre">pytest</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PYTHONPATH</span><span class="o">=</span>build/python<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/python
 </pre></div>
 </div>
 </section>
@@ -676,8 +694,9 @@ widely used in research and academic software.</p>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules/py/index.html">Python Bindings</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="modules/py/python_interop.html">Python Interoperability</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToImageView()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerE"><code class="docutils literal notranslate"><span class="pre">imageOwnerToPyArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tN2py5array7c_styleEEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToImageView()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerEN2py7ssize_tE"><code class="docutils literal notranslate"><span class="pre">imageOwnerToPyArray()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv4I0E13runWithoutGilDcRR8Function"><code class="docutils literal notranslate"><span class="pre">runWithoutGil()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv416contourToPyArrayRKN9fluvel_ip13ContourPointsE"><code class="docutils literal notranslate"><span class="pre">contourToPyArray()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_interop.html#_CPPv414pyArrayToShapeRKN2py7array_tIiEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToShape()</span></code></a></li>
 </ul>
@@ -688,10 +707,14 @@ widely used in research and academic software.</p>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv414bindMorphologyRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindMorphology()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv417bindActiveContourRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindActiveContour()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv413bindHausdorffRN2py7module_E"><code class="docutils literal notranslate"><span class="pre">bindHausdorff()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv413validateImageRKN2py7array_tI7uint8_tEE"><code class="docutils literal notranslate"><span class="pre">validateImage()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv412PyImageArray"><code class="docutils literal notranslate"><span class="pre">PyImageArray</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv412toImageArrayRKN2py5arrayE"><code class="docutils literal notranslate"><span class="pre">toImageArray()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv414validateRadiusi"><code class="docutils literal notranslate"><span class="pre">validateRadius()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv413validateSigmaf"><code class="docutils literal notranslate"><span class="pre">validateSigma()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv419validateProbabilityf"><code class="docutils literal notranslate"><span class="pre">validateProbability()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv419validateAnisoParamsRKN9fluvel_ip6filter11AnisoParamsE"><code class="docutils literal notranslate"><span class="pre">validateAnisoParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv427validateActiveContourParamsRKN9fluvel_ip19ActiveContourParamsE"><code class="docutils literal notranslate"><span class="pre">validateActiveContourParams()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="modules/py/python_bindings.html#_CPPv420validateRegionParamsRKN9fluvel_ip17RegionColorParamsE"><code class="docutils literal notranslate"><span class="pre">validateRegionParams()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -51,9 +51,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
 
-<link rel="icon" type="image/svg+xml" href="_static/fluvel.svg">
+<link rel="icon" type="image/svg+xml" href="../../_static/fluvel.svg">
 
-<link rel="alternate icon" type="image/x-icon" href="_static/favicon.ico">
+<link rel="alternate icon" type="image/x-icon" href="../../_static/favicon.ico">
 
 
   </head>
@@ -376,14 +376,14 @@ keeping conversion logic isolated from the public API.</p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tEE">
-<span id="_CPPv318pyArrayToImageViewRKN2py7array_tI7uint8_tEE"></span><span id="_CPPv218pyArrayToImageViewRKN2py7array_tI7uint8_tEE"></span><span id="pyArrayToImageView__py::array_t:uint8_t:CR"></span><span class="target" id="py__array__conversion_8hpp_1a231797abedf3c556a333542612cfde73"></span><a class="reference internal" href="../ip/analysis.html#_CPPv49fluvel_ip" title="fluvel_ip"><span class="n"><span class="pre">fluvel_ip</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/ip_core.html#_CPPv4N9fluvel_ip9ImageViewE" title="fluvel_ip::ImageView"><span class="n"><span class="pre">ImageView</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pyArrayToImageView</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tEE" title="Link to this definition">#</a><br /></dt>
-<dd><p>Convert a NumPy array into an ImageView. </p>
+<dt class="sig sig-object cpp" id="_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tN2py5array7c_styleEEE">
+<span id="_CPPv318pyArrayToImageViewRKN2py7array_tI7uint8_tN2py5array7c_styleEEE"></span><span id="_CPPv218pyArrayToImageViewRKN2py7array_tI7uint8_tN2py5array7c_styleEEE"></span><span id="pyArrayToImageView__py::array_t:uint8_t.py::array::c_style:CR"></span><span class="target" id="py__array__conversion_8hpp_1ac86eff526ad3b6485ba34616489cd94a"></span><a class="reference internal" href="../ip/analysis.html#_CPPv49fluvel_ip" title="fluvel_ip"><span class="n"><span class="pre">fluvel_ip</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/ip_core.html#_CPPv4N9fluvel_ip9ImageViewE" title="fluvel_ip::ImageView"><span class="n"><span class="pre">ImageView</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pyArrayToImageView</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">c_style</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tN2py5array7c_styleEEE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Convert a C-contiguous NumPy array into an ImageView. </p>
 <p>Creates a non-owning view over the memory contained in the provided NumPy array. No pixel data is copied.</p>
 <p>The returned ImageView directly references the NumPy array buffer, therefore the array must remain alive for the entire lifetime of the ImageView.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>input</strong> – Input NumPy array containing image data. </p>
+<dd class="field-odd"><p><strong>input</strong> – C-contiguous uint8 array (see toImageArray()). </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Non-owning image view referencing the NumPy array memory. </p>
@@ -392,16 +392,35 @@ keeping conversion logic isolated from the public API.</p>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerE">
-<span id="_CPPv319imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerE"></span><span id="_CPPv219imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerE"></span><span id="imageOwnerToPyArray__fluvel_ip::ImageOwnerCR"></span><span class="target" id="py__array__conversion_8hpp_1a95e689498dc894eb45ab2f49be19277f"></span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">imageOwnerToPyArray</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../ip/analysis.html#_CPPv49fluvel_ip" title="fluvel_ip"><span class="n"><span class="pre">fluvel_ip</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/ip_core.html#_CPPv4N9fluvel_ip10ImageOwnerE" title="fluvel_ip::ImageOwner"><span class="n"><span class="pre">ImageOwner</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerE" title="Link to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerEN2py7ssize_tE">
+<span id="_CPPv319imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerEN2py7ssize_tE"></span><span id="_CPPv219imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerEN2py7ssize_tE"></span><span id="imageOwnerToPyArray__fluvel_ip::ImageOwnerCR.py::ssize_t"></span><span class="target" id="py__array__conversion_8hpp_1ad1eca570f7c10bd28082897bb014cf0d"></span><span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array_t</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">uint8_t</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">imageOwnerToPyArray</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../ip/analysis.html#_CPPv49fluvel_ip" title="fluvel_ip"><span class="n"><span class="pre">fluvel_ip</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../ip/ip_core.html#_CPPv4N9fluvel_ip10ImageOwnerE" title="fluvel_ip::ImageOwner"><span class="n"><span class="pre">ImageOwner</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">image</span></span>, <span class="n"><span class="pre">py</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">inputNdim</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerEN2py7ssize_tE" title="Link to this definition">#</a><br /></dt>
 <dd><p>Convert an ImageOwner into a NumPy array. </p>
 <p>Allocates a new NumPy array and copies all image pixels into it. The returned array owns its memory independently from the source image.</p>
+<p>The result has the same number of dimensions as the input image: a grayscale image given as (H, W) is returned as (H, W).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>image</strong> – Source image. </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – Source image. </p></li>
+<li><p><strong>inputNdim</strong> – Number of dimensions of the input array (2 or 3). </p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>NumPy array containing a copy of the image data. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0E13runWithoutGilDcRR8Function">
+<span id="_CPPv3I0E13runWithoutGilRR8Function"></span><span id="_CPPv2I0E13runWithoutGilRR8Function"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Function</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="py__array__conversion_8hpp_1aff8ec18259a4e0b5d924796707f90e70"></span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">auto</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">runWithoutGil</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0E13runWithoutGilDcRR8Function" title="runWithoutGil::Function"><span class="n"><span class="pre">Function</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">function</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0E13runWithoutGilDcRR8Function" title="Link to this definition">#</a><br /></dt>
+<dd><p>Run a computation with the Python GIL released. </p>
+<p>Must not touch any Python object. Other Python threads can run while the computation is in progress.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>function</strong> – Callable returning a C++ value. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Value returned by the callable. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -519,8 +538,9 @@ The resulting Shape contains all contour points and its centroid is computed aut
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToImageView()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerE"><code class="docutils literal notranslate"><span class="pre">imageOwnerToPyArray()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv418pyArrayToImageViewRKN2py7array_tI7uint8_tN2py5array7c_styleEEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToImageView()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv419imageOwnerToPyArrayRKN9fluvel_ip10ImageOwnerEN2py7ssize_tE"><code class="docutils literal notranslate"><span class="pre">imageOwnerToPyArray()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4I0E13runWithoutGilDcRR8Function"><code class="docutils literal notranslate"><span class="pre">runWithoutGil()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv416contourToPyArrayRKN9fluvel_ip13ContourPointsE"><code class="docutils literal notranslate"><span class="pre">contourToPyArray()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv414pyArrayToShapeRKN2py7array_tIiEE"><code class="docutils literal notranslate"><span class="pre">pyArrayToShape()</span></code></a></li>
 </ul>

@@ -214,7 +214,7 @@ cmake -S . -B build \
     -DFLUVEL_BUILD_BIND=OFF
 
 cmake --build build
-./build/src/app/fluvel
+./build/src/app/fluvel-set
 ```
 
 ---
@@ -245,6 +245,26 @@ Example:
 
 ```bash
 python examples/filtering/showcase.py
+```
+
+Image conventions of the Python functions:
+
+- Images are `uint8` NumPy arrays of shape `(H, W)`, `(H, W, 3)` or `(H, W, 4)`.
+  Other types (`float`, `uint16`, ...) are refused with an explicit error.
+- Color channels are in **BGR** order, like OpenCV. For an RGB image, use
+  `image[..., ::-1]`.
+- Results have the same shape as the input image.
+- Segmentation results provide the contour points and the region mask (`result.mask`).
+- `hausdorff_metrics` returns exact distances (Hausdorff, modified, quantile) in absolute
+  pixel coordinates, like MONAI or MedPy. Use `align_centroids=True` to ignore the
+  translation between the contours and measure the difference of shape only, as the
+  analysis window of the application can do. The quantile is taken in each direction
+  (nearest rank) and the larger value is kept.
+
+Run the tests (requires `pytest`):
+
+```bash
+PYTHONPATH=build/python python -m pytest tests/python
 ```
 
 ---

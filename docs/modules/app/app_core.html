@@ -51,9 +51,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
 
-<link rel="icon" type="image/svg+xml" href="_static/fluvel.svg">
+<link rel="icon" type="image/svg+xml" href="../../_static/fluvel.svg">
 
-<link rel="alternate icon" type="image/x-icon" href="_static/favicon.ico">
+<link rel="alternate icon" type="image/x-icon" href="../../_static/favicon.ico">
 
 
   </head>
@@ -2047,6 +2047,12 @@ used throughout the application.</p>
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoRecorderWorker17conversionStartedEv">
+<span id="_CPPv3N6fluvel19VideoRecorderWorker17conversionStartedEv"></span><span id="_CPPv2N6fluvel19VideoRecorderWorker17conversionStartedEv"></span><span id="fluvel::VideoRecorderWorker::conversionStarted"></span><span class="target" id="classfluvel_1_1VideoRecorderWorker_1a84ec8daf1ad5995d4efa9f3d489b2ce4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">conversionStarted</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19VideoRecorderWorker17conversionStartedEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Emitted when the recorded files start being converted to standard MP4. </p>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N6fluvel19VideoRecorderWorker18recordingFinalizedEv">
 <span id="_CPPv3N6fluvel19VideoRecorderWorker18recordingFinalizedEv"></span><span id="_CPPv2N6fluvel19VideoRecorderWorker18recordingFinalizedEv"></span><span id="fluvel::VideoRecorderWorker::recordingFinalized"></span><span class="target" id="classfluvel_1_1VideoRecorderWorker_1a1f1aedf615a1b378dbe3889ab19bc61a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recordingFinalized</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel19VideoRecorderWorker18recordingFinalizedEv" title="Link to this definition">#</a><br /></dt>
 <dd><p>Emitted when the output video has been successfully finalized. </p>
@@ -3115,6 +3121,11 @@ used throughout the application.</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6fluvel25VideoRecordingPreferences13recordingModeE">
 <span id="_CPPv3N6fluvel25VideoRecordingPreferences13recordingModeE"></span><span id="_CPPv2N6fluvel25VideoRecordingPreferences13recordingModeE"></span><span id="fluvel::VideoRecordingPreferences::recordingMode__RecordingMode"></span><span class="target" id="structfluvel_1_1VideoRecordingPreferences_1a63d5347775c456d00511d0cdf6220efa"></span><a class="reference internal" href="#_CPPv4N6fluvel13RecordingModeE" title="fluvel::RecordingMode"><span class="n"><span class="pre">RecordingMode</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">recordingMode</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="#_CPPv4N6fluvel13RecordingModeE" title="fluvel::RecordingMode"><span class="n"><span class="pre">RecordingMode</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6fluvel13RecordingMode10SingleFileE" title="fluvel::RecordingMode::SingleFile"><span class="n"><span class="pre">SingleFile</span></span></a><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel25VideoRecordingPreferences13recordingModeE" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel25VideoRecordingPreferences20convertToStandardMp4E">
+<span id="_CPPv3N6fluvel25VideoRecordingPreferences20convertToStandardMp4E"></span><span id="_CPPv2N6fluvel25VideoRecordingPreferences20convertToStandardMp4E"></span><span id="fluvel::VideoRecordingPreferences::convertToStandardMp4__b"></span><span class="target" id="structfluvel_1_1VideoRecordingPreferences_1a1541e4f24de4a6bbecbc5e198118e442"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">convertToStandardMp4</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel25VideoRecordingPreferences20convertToStandardMp4E" title="Link to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -4765,6 +4776,26 @@ used throughout the application.</p>
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel16RecordingSession16conversionFailedEv">
+<span id="_CPPv3NK6fluvel16RecordingSession16conversionFailedEv"></span><span id="_CPPv2NK6fluvel16RecordingSession16conversionFailedEv"></span><span id="fluvel::RecordingSession::conversionFailedC"></span><span class="target" id="classfluvel_1_1RecordingSession_1afbcd5a3612ddcb6bfe5aae5ad4a4bca7"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">conversionFailed</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK6fluvel16RecordingSession16conversionFailedEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns whether the last <a class="reference internal" href="#classfluvel_1_1RecordingSession_1a46143fd6de3be9ab9951f140d3ae8c2f"><span class="std std-ref">close()</span></a> failed to convert some files to standard MP4. </p>
+<p>The files that could not be converted are kept as fragmented MP4 and remain playable. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK6fluvel16RecordingSession20hasPendingConversionEv">
+<span id="_CPPv3NK6fluvel16RecordingSession20hasPendingConversionEv"></span><span id="_CPPv2NK6fluvel16RecordingSession20hasPendingConversionEv"></span><span id="fluvel::RecordingSession::hasPendingConversionC"></span><span class="target" id="classfluvel_1_1RecordingSession_1a45e80bd53d4c01d06f5bfda1ed8f7fbd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hasPendingConversion</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">noexcept</span></span><a class="headerlink" href="#_CPPv4NK6fluvel16RecordingSession20hasPendingConversionEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Returns whether the files of the closed session still have to be converted to standard MP4. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16RecordingSession12convertFilesEv">
+<span id="_CPPv3N6fluvel16RecordingSession12convertFilesEv"></span><span id="_CPPv2N6fluvel16RecordingSession12convertFilesEv"></span><span id="fluvel::RecordingSession::convertFiles"></span><span class="target" id="classfluvel_1_1RecordingSession_1a0ca1d979ab414ab0890e486bf1ba4361"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">convertFiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N6fluvel16RecordingSession12convertFilesEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Converts the files of the closed session to standard MP4. </p>
+<p>Must be called after <a class="reference internal" href="#classfluvel_1_1RecordingSession_1a46143fd6de3be9ab9951f140d3ae8c2f"><span class="std std-ref">close()</span></a>. Does nothing if no conversion is pending. The files that cannot be converted are kept unchanged. </p>
+</dd></dl>
+
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
@@ -4816,6 +4847,26 @@ used throughout the application.</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N6fluvel16RecordingSession12lastFailure_E">
 <span id="_CPPv3N6fluvel16RecordingSession12lastFailure_E"></span><span id="_CPPv2N6fluvel16RecordingSession12lastFailure_E"></span><span id="fluvel::RecordingSession::lastFailure___RecordingFailure"></span><span class="target" id="classfluvel_1_1RecordingSession_1a5c5df7203a267f79b94015de15d027eb"></span><a class="reference internal" href="#_CPPv4N6fluvel16RecordingFailureE" title="fluvel::RecordingFailure"><span class="n"><span class="pre">RecordingFailure</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lastFailure_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="#_CPPv4N6fluvel16RecordingFailureE" title="fluvel::RecordingFailure"><span class="n"><span class="pre">RecordingFailure</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N6fluvel16RecordingFailure4NoneE" title="fluvel::RecordingFailure::None"><span class="n"><span class="pre">None</span></span></a><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel16RecordingSession12lastFailure_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16RecordingSession17conversionFailed_E">
+<span id="_CPPv3N6fluvel16RecordingSession17conversionFailed_E"></span><span id="_CPPv2N6fluvel16RecordingSession17conversionFailed_E"></span><span id="fluvel::RecordingSession::conversionFailed___b"></span><span class="target" id="classfluvel_1_1RecordingSession_1ab52e9a01d3e0bd07472b20436fc756e8"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">conversionFailed_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel16RecordingSession17conversionFailed_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16RecordingSession18pendingConversion_E">
+<span id="_CPPv3N6fluvel16RecordingSession18pendingConversion_E"></span><span id="_CPPv2N6fluvel16RecordingSession18pendingConversion_E"></span><span id="fluvel::RecordingSession::pendingConversion___b"></span><span class="target" id="classfluvel_1_1RecordingSession_1a2b9248f2b317813fd9fbadafdb86f220"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pendingConversion_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel16RecordingSession18pendingConversion_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16RecordingSession19conversionSettings_E">
+<span id="_CPPv3N6fluvel16RecordingSession19conversionSettings_E"></span><span id="_CPPv2N6fluvel16RecordingSession19conversionSettings_E"></span><span id="fluvel::RecordingSession::conversionSettings___VideoExportSettings"></span><span class="target" id="classfluvel_1_1RecordingSession_1aca232cb6ec4a5f61108c8920262c0475"></span><a class="reference internal" href="app_media.html#_CPPv4N6fluvel19VideoExportSettingsE" title="fluvel::VideoExportSettings"><span class="n"><span class="pre">VideoExportSettings</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">conversionSettings_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N6fluvel16RecordingSession19conversionSettings_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N6fluvel16RecordingSession20conversionDirectory_E">
+<span id="_CPPv3N6fluvel16RecordingSession20conversionDirectory_E"></span><span id="_CPPv2N6fluvel16RecordingSession20conversionDirectory_E"></span><span id="fluvel::RecordingSession::conversionDirectory___QString"></span><span class="target" id="classfluvel_1_1RecordingSession_1a0b6d664a0accfd85ad0b1d81a669c15a"></span><span class="n"><span class="pre">QString</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">conversionDirectory_</span></span></span><a class="headerlink" href="#_CPPv4N6fluvel16RecordingSession20conversionDirectory_E" title="Link to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -6480,6 +6531,7 @@ used throughout the application.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoRecorderWorker8addFrameERK10VideoFrame"><code class="docutils literal notranslate"><span class="pre">addFrame()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoRecorderWorker12stateChangedE13RecorderState"><code class="docutils literal notranslate"><span class="pre">stateChanged</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoRecorderWorker12statsChangedERK13RecorderStats"><code class="docutils literal notranslate"><span class="pre">statsChanged</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoRecorderWorker17conversionStartedEv"><code class="docutils literal notranslate"><span class="pre">conversionStarted</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoRecorderWorker18recordingFinalizedEv"><code class="docutils literal notranslate"><span class="pre">recordingFinalized</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoRecorderWorker15warningOccurredERK7QString"><code class="docutils literal notranslate"><span class="pre">warningOccurred</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel19VideoRecorderWorker13errorOccurredERK7QString"><code class="docutils literal notranslate"><span class="pre">errorOccurred</span></code></a></li>
@@ -6658,6 +6710,7 @@ used throughout the application.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel25VideoRecordingPreferences14preferredCodecE"><code class="docutils literal notranslate"><span class="pre">preferredCodec</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel25VideoRecordingPreferences15appendTimestampE"><code class="docutils literal notranslate"><span class="pre">appendTimestamp</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel25VideoRecordingPreferences13recordingModeE"><code class="docutils literal notranslate"><span class="pre">recordingMode</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel25VideoRecordingPreferences20convertToStandardMp4E"><code class="docutils literal notranslate"><span class="pre">convertToStandardMp4</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel25VideoRecordingPreferences20retentionTimeMinutesE"><code class="docutils literal notranslate"><span class="pre">retentionTimeMinutes</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel25VideoRecordingPreferences12segmentCountE"><code class="docutils literal notranslate"><span class="pre">segmentCount</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel25VideoRecordingPreferences28kDefaultRetentionTimeMinutesE"><code class="docutils literal notranslate"><span class="pre">kDefaultRetentionTimeMinutes</span></code></a></li>
@@ -6923,6 +6976,9 @@ used throughout the application.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession8addFrameERK10VideoFrame"><code class="docutils literal notranslate"><span class="pre">addFrame()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession5closeEv"><code class="docutils literal notranslate"><span class="pre">close()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel16RecordingSession11lastFailureEv"><code class="docutils literal notranslate"><span class="pre">lastFailure()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel16RecordingSession16conversionFailedEv"><code class="docutils literal notranslate"><span class="pre">conversionFailed()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel16RecordingSession20hasPendingConversionEv"><code class="docutils literal notranslate"><span class="pre">hasPendingConversion()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession12convertFilesEv"><code class="docutils literal notranslate"><span class="pre">convertFiles()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession13rotateSegmentEv"><code class="docutils literal notranslate"><span class="pre">rotateSegment()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK6fluvel16RecordingSession15segmentFilenameEi"><code class="docutils literal notranslate"><span class="pre">segmentFilename()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession17removeOldSegmentsEv"><code class="docutils literal notranslate"><span class="pre">removeOldSegments()</span></code></a></li>
@@ -6931,6 +6987,10 @@ used throughout the application.</p>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession10frameSize_E"><code class="docutils literal notranslate"><span class="pre">frameSize_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession12frameFormat_E"><code class="docutils literal notranslate"><span class="pre">frameFormat_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession12lastFailure_E"><code class="docutils literal notranslate"><span class="pre">lastFailure_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession17conversionFailed_E"><code class="docutils literal notranslate"><span class="pre">conversionFailed_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession18pendingConversion_E"><code class="docutils literal notranslate"><span class="pre">pendingConversion_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession19conversionSettings_E"><code class="docutils literal notranslate"><span class="pre">conversionSettings_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession20conversionDirectory_E"><code class="docutils literal notranslate"><span class="pre">conversionDirectory_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession17segmentDirectory_E"><code class="docutils literal notranslate"><span class="pre">segmentDirectory_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession22currentSegmentStartNs_E"><code class="docutils literal notranslate"><span class="pre">currentSegmentStartNs_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N6fluvel16RecordingSession13segmentIndex_E"><code class="docutils literal notranslate"><span class="pre">segmentIndex_</span></code></a></li>

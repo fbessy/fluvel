@@ -51,9 +51,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
 
-<link rel="icon" type="image/svg+xml" href="_static/fluvel.svg">
+<link rel="icon" type="image/svg+xml" href="../../_static/fluvel.svg">
 
-<link rel="alternate icon" type="image/x-icon" href="_static/favicon.ico">
+<link rel="alternate icon" type="image/x-icon" href="../../_static/favicon.ico">
 
 
   </head>
@@ -561,31 +561,31 @@ IEEE Transactions on Pattern Analysis and Machine Intelligence,
 <span id="_CPPv3N9fluvel_ip17HausdorffDistanceE"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistanceE"></span><span id="fluvel_ip::HausdorffDistance"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HausdorffDistance</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistanceE" title="Link to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
 <em>#include &lt;hausdorff_distance.hpp&gt;</em></div>
-<p>Compute Hausdorff-based distances between two shapes. </p>
-<p>This class provides:<ul class="simple">
-<li><p>the exact Hausdorff distance,</p></li>
-<li><p>a modified (mean-based) Hausdorff distance,</p></li>
-<li><p>a quantile-based Hausdorff distance,</p></li>
-<li><p>the centroid distance between shapes.</p></li>
+<p>Exact Hausdorff distance between two shapes. </p>
+<p>Computes the symmetric Hausdorff distance, max(d(A → B), d(B → A)), with the algorithm of Taha and Hanbury (IEEE PAMI, 2015), which is exact for the maximum:<ul class="simple">
+<li><p>early breaking of the inner loop,</p></li>
+<li><p>random sampling of the points,</p></li>
+<li><p>exclusion of the points shared by both shapes (when coordinates are absolute).</p></li>
 </ul>
 </p>
-<p>It internally computes directed distances (A → B and B → A), and stores intermediate minimum distances for reuse.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>An optional intersection set can be provided to speed up computations (common points between shapes). </p>
+<p>This algorithm discards most of the minimum distances it evaluates. For the mean or the quantiles of these distances, use <a class="reference internal" href="#classfluvel__ip_1_1HausdorffStatistics"><span class="std std-ref">HausdorffStatistics</span></a>, which is exact too. </p>
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet"></span><span id="fluvel_ip::HausdorffDistance::HausdorffDistance__Shape.Shape.PointSetCP"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1aff40cde2a8b27da69f18c0a716b28684"></span><span class="sig-name descname"><span class="n"><span class="pre">HausdorffDistance</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shapeA</span></span>, <a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shapeB</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4N9fluvel_ip8PointSetE" title="fluvel_ip::PointSet"><span class="n"><span class="pre">PointSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">intersectionAB</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet" title="Link to this definition">#</a><br /></dt>
-<dd><p>Construct a <a class="reference internal" href="#classfluvel__ip_1_1HausdorffDistance"><span class="std std-ref">HausdorffDistance</span></a> object and compute all distance metrics. The input shapes are copied or moved into the object and remain owned by the <a class="reference internal" href="#classfluvel__ip_1_1HausdorffDistance"><span class="std std-ref">HausdorffDistance</span></a> instance for its entire lifetime. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet16HausdorffOptions">
+<span id="_CPPv3N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet16HausdorffOptions"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet16HausdorffOptions"></span><span id="fluvel_ip::HausdorffDistance::HausdorffDistance__Shape.Shape.PointSetCP.HausdorffOptions"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a05badfbee8da139510c539233f1ad097"></span><span class="sig-name descname"><span class="n"><span class="pre">HausdorffDistance</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shapeA</span></span>, <a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">shapeB</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4N9fluvel_ip8PointSetE" title="fluvel_ip::PointSet"><span class="n"><span class="pre">PointSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">intersectionAB</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <a class="reference internal" href="#_CPPv4N9fluvel_ip16HausdorffOptionsE" title="fluvel_ip::HausdorffOptions"><span class="n"><span class="pre">HausdorffOptions</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">options</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet16HausdorffOptions" title="Link to this definition">#</a><br /></dt>
+<dd><p>Construct the object and compute the distance. </p>
+<p>The shapes are copied or moved into the object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>shapeA</strong> – First shape. </p></li>
 <li><p><strong>shapeB</strong> – Second shape. </p></li>
-<li><p><strong>intersectionAB</strong> – Optional set of points shared by both shapes. Providing this set can reduce the computation cost by avoiding distance evaluations for points already known to belong to both shapes. This optimization is most useful when the intersection can be obtained at negligible cost. </p></li>
+<li><p><strong>intersectionAB</strong> – Optional set of points shared by both shapes. Such points are at distance 0, so they are not evaluated, which speeds up the computation when the shapes overlap. It is ignored when the centroids are aligned, since a shared pixel is then no longer at distance 0. </p></li>
+<li><p><strong>options</strong> – Measurement options, see <a class="reference internal" href="#structfluvel__ip_1_1HausdorffOptions"><span class="std std-ref">HausdorffOptions</span></a>. </p></li>
 </ul>
 </dd>
 </dl>
@@ -594,42 +594,10 @@ IEEE Transactions on Pattern Analysis and Machine Intelligence,
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK9fluvel_ip17HausdorffDistance8distanceEv">
 <span id="_CPPv3NK9fluvel_ip17HausdorffDistance8distanceEv"></span><span id="_CPPv2NK9fluvel_ip17HausdorffDistance8distanceEv"></span><span id="fluvel_ip::HausdorffDistance::distanceC"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a858cf934b3668c4918ca0367e04686b6"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">distance</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9fluvel_ip17HausdorffDistance8distanceEv" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute the symmetric Hausdorff distance. </p>
-<p>Defined as: max( d(A → B), d(B → A) )</p>
+<dd><p>Symmetric Hausdorff distance, in pixels. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Hausdorff distance. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK9fluvel_ip17HausdorffDistance16modifiedDistanceEv">
-<span id="_CPPv3NK9fluvel_ip17HausdorffDistance16modifiedDistanceEv"></span><span id="_CPPv2NK9fluvel_ip17HausdorffDistance16modifiedDistanceEv"></span><span id="fluvel_ip::HausdorffDistance::modifiedDistanceC"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1abd26dab14d7cd8665f620c06286d45f1"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modifiedDistance</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9fluvel_ip17HausdorffDistance16modifiedDistanceEv" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute the modified Hausdorff distance. </p>
-<p>Typically based on the mean of minimum distances instead of the maximum.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The result may be overestimated if EARLY_BREAKING optimization is used.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Modified Hausdorff distance. </p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance17hausdorffQuantileEi">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance17hausdorffQuantileEi"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance17hausdorffQuantileEi"></span><span id="fluvel_ip::HausdorffDistance::hausdorffQuantile__i"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a6a0109422b1a42fce2d2ee27cfa1735d"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hausdorffQuantile</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hundredth</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance17hausdorffQuantileEi" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute the Hausdorff distance quantile. </p>
-<p>Instead of taking the maximum, this returns a percentile of the distribution of minimum distances.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>hundredth</strong> – Percentile in [0,100]. </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Quantile Hausdorff distance. </p>
+<dd class="field-odd"><p>max( d(A → B), d(B → A) ), or NaN if a shape is not valid. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -637,10 +605,10 @@ IEEE Transactions on Pattern Analysis and Machine Intelligence,
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK9fluvel_ip17HausdorffDistance17centroidsDistanceEv">
 <span id="_CPPv3NK9fluvel_ip17HausdorffDistance17centroidsDistanceEv"></span><span id="_CPPv2NK9fluvel_ip17HausdorffDistance17centroidsDistanceEv"></span><span id="fluvel_ip::HausdorffDistance::centroidsDistanceC"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a9e8dee6140b3737fbdb501d846645104"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">centroidsDistance</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9fluvel_ip17HausdorffDistance17centroidsDistanceEv" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute the distance between centroids of both shapes. </p>
+<dd><p>Euclidean distance between the centroids of both shapes, in pixels. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Euclidean distance between centroids. </p>
+<dd class="field-odd"><p>Distance, or NaN if a shape is not valid. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -649,27 +617,9 @@ IEEE Transactions on Pattern Analysis and Machine Intelligence,
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance7computeEv">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance7computeEv"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance7computeEv"></span><span id="fluvel_ip::HausdorffDistance::compute"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a4993c97a669fa259c6574a18d547c117"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance7computeEv" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute all Hausdorff-related distances. </p>
-<p>Populates directed distances and minimum distance arrays. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance24computeDirectedHausdorffERK5ShapeRK5ShapeRfRNSt6vectorIfEE">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance24computeDirectedHausdorffERK5ShapeRK5ShapeRfRNSt6vectorIfEE"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance24computeDirectedHausdorffERK5ShapeRK5ShapeRfRNSt6vectorIfEE"></span><span id="fluvel_ip::HausdorffDistance::computeDirectedHausdorff__ShapeCR.ShapeCR.floatR.std::vector:float:R"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1af08a1da437a6abdabec044a1517bae75"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">computeDirectedHausdorff</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fromShape</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">toShape</span></span>, <span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">directedDistance</span></span>, <a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">minDistances</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance24computeDirectedHausdorffERK5ShapeRK5ShapeRfRNSt6vectorIfEE" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute directed Hausdorff distance. </p>
-<p>For each point in <code class="docutils literal notranslate"><span class="pre">fromShape</span></code>, computes the minimum distance to points in <code class="docutils literal notranslate"><span class="pre">toShape</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fromShape</strong> – Source shape. </p></li>
-<li><p><strong>toShape</strong> – Target shape. </p></li>
-<li><p><strong>directedDistance</strong> – Output maximum of minimum distances. </p></li>
-<li><p><strong>minDistances</strong> – Output vector of minimum distances. </p></li>
-</ul>
-</dd>
-</dl>
+<dt class="sig sig-object cpp" id="_CPPv4NK9fluvel_ip17HausdorffDistance15computeDirectedERK5ShapeRK5Shape">
+<span id="_CPPv3NK9fluvel_ip17HausdorffDistance15computeDirectedERK5ShapeRK5Shape"></span><span id="_CPPv2NK9fluvel_ip17HausdorffDistance15computeDirectedERK5ShapeRK5Shape"></span><span id="fluvel_ip::HausdorffDistance::computeDirected__ShapeCR.ShapeCRC"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a643495706a83e52ba5cb59519ace1d99"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">computeDirected</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fromShape</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">toShape</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9fluvel_ip17HausdorffDistance15computeDirectedERK5ShapeRK5Shape" title="Link to this definition">#</a><br /></dt>
+<dd><p>Directed Hausdorff distance from one shape to the other. </p>
 </dd></dl>
 
 </div>
@@ -678,86 +628,164 @@ IEEE Transactions on Pattern Analysis and Machine Intelligence,
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance7shapeA_E">
 <span id="_CPPv3N9fluvel_ip17HausdorffDistance7shapeA_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance7shapeA_E"></span><span id="fluvel_ip::HausdorffDistance::shapeA___Shape"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1ab03beb49ffa5ec3fe38a74f4d75edd74"></span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shapeA_</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance7shapeA_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>First shape (point set representation). </p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance7shapeB_E">
 <span id="_CPPv3N9fluvel_ip17HausdorffDistance7shapeB_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance7shapeB_E"></span><span id="fluvel_ip::HausdorffDistance::shapeB___Shape"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a1ba8b6d2947fa158db41187c37fa6178"></span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">shapeB_</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance7shapeB_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>Second shape (point set representation). </p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance15intersectionAB_E">
 <span id="_CPPv3N9fluvel_ip17HausdorffDistance15intersectionAB_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance15intersectionAB_E"></span><span id="fluvel_ip::HausdorffDistance::intersectionAB___PointSetCP"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a5c16e226c79c04862337f126bb7f8a9a"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4N9fluvel_ip8PointSetE" title="fluvel_ip::PointSet"><span class="n"><span class="pre">PointSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">intersectionAB_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">nullptr</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance15intersectionAB_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>Optional intersection between shapes A and B. </p>
-<p>Used to speed up distance computation. </p>
-</dd></dl>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance8options_E">
+<span id="_CPPv3N9fluvel_ip17HausdorffDistance8options_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance8options_E"></span><span id="fluvel_ip::HausdorffDistance::options___HausdorffOptions"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1aaf2a27ea7eb19e748ef0550992b79fea"></span><a class="reference internal" href="#_CPPv4N9fluvel_ip16HausdorffOptionsE" title="fluvel_ip::HausdorffOptions"><span class="n"><span class="pre">HausdorffOptions</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">options_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance8options_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance17distanceFromAToB_E">
 <span id="_CPPv3N9fluvel_ip17HausdorffDistance17distanceFromAToB_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance17distanceFromAToB_E"></span><span id="fluvel_ip::HausdorffDistance::distanceFromAToB___float"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a882c75b964daa372859f7d371d881f6b"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">distanceFromAToB_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quiet_NaN</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance17distanceFromAToB_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>Directed Hausdorff distance from A to B. </p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance17distanceFromBToA_E">
 <span id="_CPPv3N9fluvel_ip17HausdorffDistance17distanceFromBToA_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance17distanceFromBToA_E"></span><span id="fluvel_ip::HausdorffDistance::distanceFromBToA___float"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a91fa571be50c84ce487a2def0e600b2a"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">distanceFromBToA_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">numeric_limits</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quiet_NaN</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance17distanceFromBToA_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>Directed Hausdorff distance from B to A. </p>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip16HausdorffOptionsE">
+<span id="_CPPv3N9fluvel_ip16HausdorffOptionsE"></span><span id="_CPPv2N9fluvel_ip16HausdorffOptionsE"></span><span id="fluvel_ip::HausdorffOptions"></span><span class="target" id="structfluvel__ip_1_1HausdorffOptions"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HausdorffOptions</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip16HausdorffOptionsE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;hausdorff_distance.hpp&gt;</em></div>
+<p>Options shared by the Hausdorff-based measures. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip16HausdorffOptions14alignCentroidsE">
+<span id="_CPPv3N9fluvel_ip16HausdorffOptions14alignCentroidsE"></span><span id="_CPPv2N9fluvel_ip16HausdorffOptions14alignCentroidsE"></span><span id="fluvel_ip::HausdorffOptions::alignCentroids__b"></span><span class="target" id="structfluvel__ip_1_1HausdorffOptions_1ad5e2ece5333ac00d297394bcf3d3d86a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">alignCentroids</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip16HausdorffOptions14alignCentroidsE" title="Link to this definition">#</a><br /></dt>
+<dd><p>Align the centroids of both shapes before measuring distances. </p>
+<p>When false (default), distances are measured in absolute pixel coordinates, which is the usual definition (MONAI, MedPy, SimpleITK…): a translation between the shapes increases the distance.</p>
+<p>When true, every point is expressed relatively to the centroid of its own shape, so only the difference of shape is measured. The translation is available through <a class="reference internal" href="#classfluvel__ip_1_1HausdorffDistance_1a9e8dee6140b3737fbdb501d846645104"><span class="std std-ref">HausdorffDistance::centroidsDistance()</span></a>. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacefluvel__ip"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fluvel_ip</span></span></span><br /></dt>
+<dd><dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatisticsE">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatisticsE"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatisticsE"></span><span id="fluvel_ip::HausdorffStatistics"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HausdorffStatistics</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatisticsE" title="Link to this definition">#</a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;hausdorff_statistics.hpp&gt;</em></div>
+<p>Exact statistics of the point-to-shape distances of two shapes. </p>
+<p>For each point of a shape, the distance to the other shape is the minimum distance to the points of that shape. This class computes all these distances exactly (no early breaking), in both directions (A → B and B → A), and provides:<ul class="simple">
+<li><p>the modified Hausdorff distance (mean of the distances),</p></li>
+<li><p>the quantile Hausdorff distance (e.g. HD95), more robust to outliers than the maximum.</p></li>
+</ul>
+</p>
+<p>Both values are exact. The algorithm of Taha and Hanbury used by <a class="reference internal" href="#classfluvel__ip_1_1HausdorffDistance"><span class="std std-ref">HausdorffDistance</span></a> cannot provide them, because it keeps only partial minima, which overestimate the mean and the quantiles without any bound.</p>
+<p>The cost is O(n × m) for shapes of n and m points, paid once in the constructor; the getters are then cheap. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatistics19HausdorffStatisticsERK5ShapeRK5ShapePK8PointSet16HausdorffOptions">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatistics19HausdorffStatisticsERK5ShapeRK5ShapePK8PointSet16HausdorffOptions"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatistics19HausdorffStatisticsERK5ShapeRK5ShapePK8PointSet16HausdorffOptions"></span><span id="fluvel_ip::HausdorffStatistics::HausdorffStatistics__ShapeCR.ShapeCR.PointSetCP.HausdorffOptions"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1a5bfcb6d0f47c297ab50c5ec59c1e8a63"></span><span class="sig-name descname"><span class="n"><span class="pre">HausdorffStatistics</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">shapeA</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">shapeB</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4N9fluvel_ip8PointSetE" title="fluvel_ip::PointSet"><span class="n"><span class="pre">PointSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">intersectionAB</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">nullptr</span></span>, <a class="reference internal" href="#_CPPv4N9fluvel_ip16HausdorffOptionsE" title="fluvel_ip::HausdorffOptions"><span class="n"><span class="pre">HausdorffOptions</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">options</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatistics19HausdorffStatisticsERK5ShapeRK5ShapePK8PointSet16HausdorffOptions" title="Link to this definition">#</a><br /></dt>
+<dd><p>Construct the object and compute all the distances. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shapeA</strong> – First shape. </p></li>
+<li><p><strong>shapeB</strong> – Second shape. </p></li>
+<li><p><strong>intersectionAB</strong> – Optional set of points shared by both shapes. Such points are at distance 0 and are not searched. It is ignored when the centroids are aligned. </p></li>
+<li><p><strong>options</strong> – Measurement options, see <a class="reference internal" href="#structfluvel__ip_1_1HausdorffOptions"><span class="std std-ref">HausdorffOptions</span></a>. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9fluvel_ip19HausdorffStatistics16modifiedDistanceEv">
+<span id="_CPPv3NK9fluvel_ip19HausdorffStatistics16modifiedDistanceEv"></span><span id="_CPPv2NK9fluvel_ip19HausdorffStatistics16modifiedDistanceEv"></span><span id="fluvel_ip::HausdorffStatistics::modifiedDistanceC"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1abd26dab14d7cd8665f620c06286d45f1"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">modifiedDistance</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9fluvel_ip19HausdorffStatistics16modifiedDistanceEv" title="Link to this definition">#</a><br /></dt>
+<dd><p>Modified Hausdorff distance. </p>
+<p>Mean of the minimum distances in each direction; the larger of the two means is returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Distance in pixels, or NaN if a shape is not valid. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9fluvel_ip19HausdorffStatistics16quantileDistanceEi">
+<span id="_CPPv3NK9fluvel_ip19HausdorffStatistics16quantileDistanceEi"></span><span id="_CPPv2NK9fluvel_ip19HausdorffStatistics16quantileDistanceEi"></span><span id="fluvel_ip::HausdorffStatistics::quantileDistance__iC"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1aa8b585263c4936047273e456135edd74"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quantileDistance</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hundredth</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9fluvel_ip19HausdorffStatistics16quantileDistanceEi" title="Link to this definition">#</a><br /></dt>
+<dd><p>Quantile Hausdorff distance. </p>
+<p>The quantile of the minimum distances is taken in each direction with the nearest-rank rule (lower index, ((n - 1) * h) / 100), and the larger of the two is returned. 100 gives the Hausdorff distance, 0 the smallest minimum distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hundredth</strong> – Percentile in [0, 100] (clamped). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance in pixels, or NaN if a shape is not valid. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK9fluvel_ip19HausdorffStatistics12sortedMinimaERK5ShapeRK5Shape">
+<span id="_CPPv3NK9fluvel_ip19HausdorffStatistics12sortedMinimaERK5ShapeRK5Shape"></span><span id="_CPPv2NK9fluvel_ip19HausdorffStatistics12sortedMinimaERK5ShapeRK5Shape"></span><span id="fluvel_ip::HausdorffStatistics::sortedMinima__ShapeCR.ShapeCRC"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1a278a0c61012e4f84abbc3a115fd24923"></span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sortedMinima</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">fromShape</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N9fluvel_ip5ShapeE" title="fluvel_ip::Shape"><span class="n"><span class="pre">Shape</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">toShape</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK9fluvel_ip19HausdorffStatistics12sortedMinimaERK5ShapeRK5Shape" title="Link to this definition">#</a><br /></dt>
+<dd><p>Exact minimum distance of every point of fromShape to toShape, sorted. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatistics15intersectionAB_E">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatistics15intersectionAB_E"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatistics15intersectionAB_E"></span><span id="fluvel_ip::HausdorffStatistics::intersectionAB___PointSetCP"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1a5c16e226c79c04862337f126bb7f8a9a"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4N9fluvel_ip8PointSetE" title="fluvel_ip::PointSet"><span class="n"><span class="pre">PointSet</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">intersectionAB_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">nullptr</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatistics15intersectionAB_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatistics8options_E">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatistics8options_E"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatistics8options_E"></span><span id="fluvel_ip::HausdorffStatistics::options___HausdorffOptions"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1aaf2a27ea7eb19e748ef0550992b79fea"></span><a class="reference internal" href="#_CPPv4N9fluvel_ip16HausdorffOptionsE" title="fluvel_ip::HausdorffOptions"><span class="n"><span class="pre">HausdorffOptions</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">options_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatistics8options_E" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatistics11minimaAToB_E">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatistics11minimaAToB_E"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatistics11minimaAToB_E"></span><span id="fluvel_ip::HausdorffStatistics::minimaAToB___std::vector:float:"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1a8a9ba8be5252ee7e343759d624708272"></span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">minimaAToB_</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatistics11minimaAToB_E" title="Link to this definition">#</a><br /></dt>
+<dd><p>Sorted minimum distances, A → B. </p>
 </dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance21minDistancesFromAToB_E">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance21minDistancesFromAToB_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance21minDistancesFromAToB_E"></span><span id="fluvel_ip::HausdorffDistance::minDistancesFromAToB___std::vector:float:"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a51e12867326d6e5e87c5e008f5b0e11d"></span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">minDistancesFromAToB_</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance21minDistancesFromAToB_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>Minimum distances from A to B. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance21minDistancesFromBToA_E">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance21minDistancesFromBToA_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance21minDistancesFromBToA_E"></span><span id="fluvel_ip::HausdorffDistance::minDistancesFromBToA___std::vector:float:"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a547a7b78ad8ed7437bee091cb645d696"></span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">minDistancesFromBToA_</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance21minDistancesFromBToA_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>Minimum distances from B to A. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance9isSorted_E">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance9isSorted_E"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance9isSorted_E"></span><span id="fluvel_ip::HausdorffDistance::isSorted___b"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a1f93cc5a64f1ce4a9f95384315f41703"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isSorted_</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="k"><span class="pre">false</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance9isSorted_E" title="Link to this definition">#</a><br /></dt>
-<dd><p>Indicates whether minimum distance arrays are sorted. </p>
-<p>Used for quantile computation optimization. </p>
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatistics11minimaBToA_E">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatistics11minimaBToA_E"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatistics11minimaBToA_E"></span><span id="fluvel_ip::HausdorffStatistics::minimaBToA___std::vector:float:"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1a2485d797347d626fb7cd02fdcb658b11"></span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">minimaBToA_</span></span></span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatistics11minimaBToA_E" title="Link to this definition">#</a><br /></dt>
+<dd><p>Sorted minimum distances, B → A. </p>
 </dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-static-functions">Private Static Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance13calculateMeanERKNSt6vectorIfEE">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance13calculateMeanERKNSt6vectorIfEE"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance13calculateMeanERKNSt6vectorIfEE"></span><span id="fluvel_ip::HausdorffDistance::calculateMean__std::vector:float:CR"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a6552bcd87a352c73f509ed99d5fa7555"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">calculateMean</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">minDists</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance13calculateMeanERKNSt6vectorIfEE" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute the mean of minimum distances. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>minDists</strong> – Vector of minimum distances. </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Mean value. </p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatistics4meanERKNSt6vectorIfEE">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatistics4meanERKNSt6vectorIfEE"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatistics4meanERKNSt6vectorIfEE"></span><span id="fluvel_ip::HausdorffStatistics::mean__std::vector:float:CR"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1ac1718b6f8cefd93f87785eea9fcaf578"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mean</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatistics4meanERKNSt6vectorIfEE" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip17HausdorffDistance17hausdorffQuantileERKNSt6vectorIfEEi">
-<span id="_CPPv3N9fluvel_ip17HausdorffDistance17hausdorffQuantileERKNSt6vectorIfEEi"></span><span id="_CPPv2N9fluvel_ip17HausdorffDistance17hausdorffQuantileERKNSt6vectorIfEEi"></span><span id="fluvel_ip::HausdorffDistance::hausdorffQuantile__std::vector:float:CR.i"></span><span class="target" id="classfluvel__ip_1_1HausdorffDistance_1a962a78b20421923e0c587828826b152b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hausdorffQuantile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">minDists</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hundredth</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip17HausdorffDistance17hausdorffQuantileERKNSt6vectorIfEEi" title="Link to this definition">#</a><br /></dt>
-<dd><p>Compute a quantile from minimum distances. </p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>minDists</strong> – Vector of minimum distances. </p></li>
-<li><p><strong>hundredth</strong> – Percentile in [0,100]. </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Quantile value. </p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object cpp" id="_CPPv4N9fluvel_ip19HausdorffStatistics8quantileERKNSt6vectorIfEEi">
+<span id="_CPPv3N9fluvel_ip19HausdorffStatistics8quantileERKNSt6vectorIfEEi"></span><span id="_CPPv2N9fluvel_ip19HausdorffStatistics8quantileERKNSt6vectorIfEEi"></span><span id="fluvel_ip::HausdorffStatistics::quantile__std::vector:float:CR.i"></span><span class="target" id="classfluvel__ip_1_1HausdorffStatistics_1adef3027ecdb20839f9ee7007d748dd59"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quantile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="ip_core.html#_CPPv4St" title="std"><span class="n"><span class="pre">std</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sortedValues</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hundredth</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9fluvel_ip19HausdorffStatistics8quantileERKNSt6vectorIfEEi" title="Link to this definition">#</a><br /></dt>
+<dd></dd></dl>
 
 </div>
 </dd></dl>
@@ -836,23 +864,33 @@ IEEE Transactions on Pattern Analysis and Machine Intelligence,
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistanceE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::HausdorffDistance</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet"><code class="docutils literal notranslate"><span class="pre">HausdorffDistance()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance17HausdorffDistanceE5Shape5ShapePK8PointSet16HausdorffOptions"><code class="docutils literal notranslate"><span class="pre">HausdorffDistance()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK9fluvel_ip17HausdorffDistance8distanceEv"><code class="docutils literal notranslate"><span class="pre">distance()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK9fluvel_ip17HausdorffDistance16modifiedDistanceEv"><code class="docutils literal notranslate"><span class="pre">modifiedDistance()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance17hausdorffQuantileEi"><code class="docutils literal notranslate"><span class="pre">hausdorffQuantile()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK9fluvel_ip17HausdorffDistance17centroidsDistanceEv"><code class="docutils literal notranslate"><span class="pre">centroidsDistance()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance7computeEv"><code class="docutils literal notranslate"><span class="pre">compute()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance24computeDirectedHausdorffERK5ShapeRK5ShapeRfRNSt6vectorIfEE"><code class="docutils literal notranslate"><span class="pre">computeDirectedHausdorff()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK9fluvel_ip17HausdorffDistance15computeDirectedERK5ShapeRK5Shape"><code class="docutils literal notranslate"><span class="pre">computeDirected()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance7shapeA_E"><code class="docutils literal notranslate"><span class="pre">shapeA_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance7shapeB_E"><code class="docutils literal notranslate"><span class="pre">shapeB_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance15intersectionAB_E"><code class="docutils literal notranslate"><span class="pre">intersectionAB_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance8options_E"><code class="docutils literal notranslate"><span class="pre">options_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance17distanceFromAToB_E"><code class="docutils literal notranslate"><span class="pre">distanceFromAToB_</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance17distanceFromBToA_E"><code class="docutils literal notranslate"><span class="pre">distanceFromBToA_</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance21minDistancesFromAToB_E"><code class="docutils literal notranslate"><span class="pre">minDistancesFromAToB_</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance21minDistancesFromBToA_E"><code class="docutils literal notranslate"><span class="pre">minDistancesFromBToA_</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance9isSorted_E"><code class="docutils literal notranslate"><span class="pre">isSorted_</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance13calculateMeanERKNSt6vectorIfEE"><code class="docutils literal notranslate"><span class="pre">calculateMean()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip17HausdorffDistance17hausdorffQuantileERKNSt6vectorIfEEi"><code class="docutils literal notranslate"><span class="pre">hausdorffQuantile()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip16HausdorffOptionsE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::HausdorffOptions</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip16HausdorffOptions14alignCentroidsE"><code class="docutils literal notranslate"><span class="pre">alignCentroids</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatisticsE"><code class="docutils literal notranslate"><span class="pre">fluvel_ip::HausdorffStatistics</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatistics19HausdorffStatisticsERK5ShapeRK5ShapePK8PointSet16HausdorffOptions"><code class="docutils literal notranslate"><span class="pre">HausdorffStatistics()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK9fluvel_ip19HausdorffStatistics16modifiedDistanceEv"><code class="docutils literal notranslate"><span class="pre">modifiedDistance()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK9fluvel_ip19HausdorffStatistics16quantileDistanceEi"><code class="docutils literal notranslate"><span class="pre">quantileDistance()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4NK9fluvel_ip19HausdorffStatistics12sortedMinimaERK5ShapeRK5Shape"><code class="docutils literal notranslate"><span class="pre">sortedMinima()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatistics15intersectionAB_E"><code class="docutils literal notranslate"><span class="pre">intersectionAB_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatistics8options_E"><code class="docutils literal notranslate"><span class="pre">options_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatistics11minimaAToB_E"><code class="docutils literal notranslate"><span class="pre">minimaAToB_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatistics11minimaBToA_E"><code class="docutils literal notranslate"><span class="pre">minimaBToA_</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatistics4meanERKNSt6vectorIfEE"><code class="docutils literal notranslate"><span class="pre">mean()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#_CPPv4N9fluvel_ip19HausdorffStatistics8quantileERKNSt6vectorIfEEi"><code class="docutils literal notranslate"><span class="pre">quantile()</span></code></a></li>
 </ul>
 </li>
 </ul>
