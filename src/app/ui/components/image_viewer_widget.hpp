@@ -125,21 +125,13 @@ public:
     void setImage(const QImage& img);
 
     /**
-     * @brief Sets the point layers drawn over the image.
+     * @brief Sets the layers of points drawn over the image.
      *
-     * Each layer is drawn with its own color; the viewer does not know
+     * Each layer is drawn with its own style; the viewer does not know
      * which algorithm produced the points. Layers beyond the given list
      * are emptied.
      */
     void setLayers(const QVector<PointLayer>& layers);
-
-    /**
-     * @brief Sets contour overlays.
-     *
-     * Adapter over setLayers(): the outer and inner contours become two
-     * layers colored from the display configuration.
-     */
-    void setContour(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
 
     /**
      * @brief Sets the current display frame.
@@ -414,7 +406,6 @@ private:
     double currentZoom() const;
 
     void updateDisplayWithConfig();
-    void updateContourColors();
     void upscaleItems();
     void updateFlip();
     void updateSmoothDisplay();
@@ -474,8 +465,11 @@ private:
     /// One graphics item per layer (created on demand, never destroyed).
     QVector<ContourPointsItem*> layerItems_;
 
-    /// Colors requested for each layer (hidden layers are transparent).
+    /// Color requested for each layer.
     QVector<QColor> layerColors_;
+
+    /// Visibility requested for each layer.
+    QVector<bool> layerVisible_;
 
     /// Scale applied to the layer items (downscale factor in source mode).
     qreal layerScale_{1.0};

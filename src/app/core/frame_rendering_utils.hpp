@@ -3,8 +3,11 @@
 
 #pragma once
 
+#include "point_layer.hpp"
+
 #include <QColor>
 #include <QImage>
+#include <QVector>
 
 namespace fluvel
 {
@@ -17,24 +20,28 @@ namespace frame_rendering_utils
 {
 
 /**
- * @brief Draws visible contour overlays onto an image.
- *
- * Renders the outer and inner contours from the specified display frame
- * directly onto the target image.
- *
- * Contours are expressed in processing image coordinates and are scaled
- * to the represented image space according to the current display and
- * downscale configuration.
- *
- * Only contours marked as visible in the display configuration are rendered.
- * Contour colors are also taken from the display configuration.
+ * @brief Draws styled layers of points onto an image.
  *
  * The rendering parameters match those used by the interactive image viewer.
+ * Hidden layers are skipped.
  *
- * @param image Image onto which the contours are rendered.
- * @param frame Display frame containing the contours.
- * @param displayConfig Display configuration controlling contour visibility,
- *        colors and image representation.
+ * @param image Image onto which the layers are rendered.
+ * @param layers Layers of points, in processing image coordinates.
+ * @param scale Scale applied to the point coordinates.
+ */
+void drawLayers(QImage& image, const QVector<PointLayer>& layers, qreal scale);
+
+/**
+ * @brief Draws the layers of a display frame onto an image.
+ *
+ * Layers carry their own style (color, visibility), set by the controller.
+ * They are expressed in processing image coordinates and are scaled to the
+ * represented image space according to the current display and downscale
+ * configuration.
+ *
+ * @param image Image onto which the layers are rendered.
+ * @param frame Display frame containing the layers.
+ * @param displayConfig Display configuration (image representation).
  * @param downscaleParams Processing downscale parameters.
  */
 void drawContourOverlay(QImage& image, const DisplayFrame& frame,

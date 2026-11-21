@@ -448,7 +448,7 @@ void ImageWindow::setupConnections()
     // Record video with the evolving contour.
     connect(
         imageController_, &ImageController::contourUpdated, this,
-        [this](const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour)
+        [this](const QVector<PointLayer>& layers)
         {
             if (!captureController_->isAcceptingFrames())
                 return;
@@ -460,8 +460,7 @@ void ImageWindow::setupConnections()
 
             DisplayFrame displayFrame;
             displayFrame.image = captureImage_;
-            displayFrame.outerContour = outerContour;
-            displayFrame.innerContour = innerContour;
+            displayFrame.layers = layers;
 
             VideoFrame videoFrame;
             videoFrame.image = captureImage_;
@@ -517,7 +516,7 @@ void ImageWindow::setupConnections()
 
     // Update the displayed contour.
     connect(imageController_, &ImageController::contourUpdated, imageViewer_,
-            &ImageViewerWidget::setContour, Qt::QueuedConnection);
+            &ImageViewerWidget::setLayers, Qt::QueuedConnection);
 
     // to refresh the view with a new text info algo overlay (mean out, iterations, ect)
     connect(imageController_, &ImageController::textDiagnosticsUpdated, imageViewer_,

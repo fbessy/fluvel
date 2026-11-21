@@ -205,6 +205,9 @@ set(app_src
     ${CORE_DIR}/frame_pipeline.hpp
     ${CORE_DIR}/point_layer.hpp
 
+    ${CORE_DIR}/contour_layers.cpp
+    ${CORE_DIR}/contour_layers.hpp
+
     ${CORE_DIR}/frame_clock.cpp
     ${CORE_DIR}/frame_clock.hpp
 

@@ -3,6 +3,7 @@
 
 #include "image_controller.hpp"
 #include "contour_adapters.hpp"
+#include "contour_layers.hpp"
 #include "file_utils.hpp"
 
 #include <QFileInfo>
@@ -129,8 +130,12 @@ void ImageController::reinitializeWorker()
             downscaledImage_.size(), Qt::IgnoreAspectRatio, Qt::FastTransformation);
     }
 
-    // Empty contours clear the displayed contours.
-    emit contourUpdated({}, {});
+    // No layers clear the displayed contours.
+    lastOuterContour_.clear();
+    lastInnerContour_.clear();
+    hasContour_ = false;
+
+    emit contourUpdated({});
 
 #ifdef FLUVEL_DEBUG
     qDebug() << __FILE__ << ":" << __LINE__ << __func__
@@ -162,6 +167,13 @@ void ImageController::onImageDisplaySettingsChanged(const DisplayConfig& display
 
     if (needs_refresh)
         refreshView();
+
+    // Contour colors and visibility may have changed: restyle the displayed contour.
+    if (hasContour_)
+    {
+        emit contourUpdated(
+            contour_layers::make(lastOuterContour_, lastInnerContour_, displayConfig_));
+    }
 }
 
 void ImageController::refreshView()
@@ -182,10 +194,11 @@ void ImageController::refreshView()
 void ImageController::onContourUpdated(const fluvel_ip::Contour& outerContour,
                                        const fluvel_ip::Contour& innerContour)
 {
-    auto q_l_out = convertToQVector(outerContour);
-    auto q_l_in = convertToQVector(innerContour);
+    lastOuterContour_ = convertToQVector(outerContour);
+    lastInnerContour_ = convertToQVector(innerContour);
+    hasContour_ = true;
 
-    emit contourUpdated(q_l_out, q_l_in);
+    emit contourUpdated(contour_layers::make(lastOuterContour_, lastInnerContour_, displayConfig_));
 }
 
 void ImageController::restart()

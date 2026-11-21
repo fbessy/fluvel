@@ -19,6 +19,7 @@
 #pragma once
 
 #include "contour_types.hpp"
+#include "point_layer.hpp"
 
 #include <QImage>
 #include <QVideoFrame>
@@ -108,24 +109,22 @@ struct DisplayFrame
     QImage image;
 
     /**
-     * @brief Outer contour (Qt representation).
+     * @brief Styled layers of points drawn over the image (Qt representation).
+     *
+     * The controller turns the algorithm output into styled layers, so the
+     * viewer does not need to know which algorithm produced them.
      */
-    QVector<QPointF> outerContour;
+    QVector<PointLayer> layers;
 
     /**
-     * @brief Inner contour (Qt representation).
-     */
-    QVector<QPointF> innerContour;
-
-    /**
-     * @brief Keeps the contours currently displayed.
+     * @brief Keeps the layers currently displayed.
      *
      * By default, a frame fully describes what is displayed: empty
-     * contours remove the contours from the view. Set this flag for
+     * layers remove the points from the view. Set this flag for
      * frames that only carry an image (e.g. a darkened placeholder)
-     * and must leave the displayed contours untouched.
+     * and must leave the displayed layers untouched.
      */
-    bool keepContour{false};
+    bool keepLayers{false};
 
     /**
      * @brief Timestamp when the frame was received (ns).

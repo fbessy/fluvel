@@ -923,6 +923,10 @@ void VideoWindow::bindApplicationSettingsToController()
 
     connect(&app, &ApplicationSettings::videoDisplaySettingsChanged, videoController_,
             &VideoController::onVideoDisplaySettingsChanged);
+
+    // Restyled layers (contour colors or visibility changed).
+    connect(videoController_, &VideoController::layersUpdated, imageViewer_,
+            &ImageViewerWidget::setLayers);
 }
 
 void VideoWindow::bindApplicationSettingsToView()

@@ -7,6 +7,7 @@
 
 #ifndef Q_MOC_RUN
 #include "application_settings_types.hpp"
+#include "point_layer.hpp"
 #endif
 
 #include <QImage>
@@ -98,8 +99,8 @@ signals:
     /// Emitted when the displayed image is updated.
     void displayedImageReady(const QImage& displayed);
 
-    /// Emitted when contours are updated (UI representation).
-    void contourUpdated(const QVector<QPointF>& outerContour, const QVector<QPointF>& innerContour);
+    /// Emitted when the contour layers are updated (UI representation, styled).
+    void contourUpdated(const QVector<fluvel::PointLayer>& layers);
 
     /// Emitted when worker state changes.
     void stateChanged(fluvel::WorkerState state);
@@ -141,6 +142,11 @@ private:
 
     /// Display configuration.
     DisplayConfig displayConfig_{};
+
+    /// Last contours, kept to restyle them when the display configuration changes.
+    QVector<QPointF> lastOuterContour_;
+    QVector<QPointF> lastInnerContour_;
+    bool hasContour_{false};
 
     /// Processing configuration.
     ImageComputeConfig computeConfig_{};

@@ -2,7 +2,6 @@
 // Copyright (C) 2010-2026 Fabien Bessy
 
 #include "image_viewer_widget.hpp"
-#include "color_adapters.hpp"
 #include "drag_drop_behavior.hpp"
 #include "frame_clock.hpp"
 #include "hud_overlay_controller.hpp"
@@ -179,7 +178,8 @@ ContourPointsItem* ImageViewerWidget::layerItem(int index)
         item->setScale(layerScale_);
 
         layerItems_.push_back(item);
-        layerColors_.push_back(Qt::transparent);
+        layerColors_.push_back(Qt::red);
+        layerVisible_.push_back(true);
     }
 
     return layerItems_[index];
@@ -189,7 +189,7 @@ void ImageViewerWidget::applyLayerColors()
 {
     for (int i = 0; i < layerItems_.size(); ++i)
     {
-        QColor color = layerColors_[i];
+        QColor color = layerVisible_[i] ? layerColors_[i] : QColor(Qt::transparent);
 
         if (placeholderVisible_)
             color = qcolor_utils::desaturateAndDarken(color, 0.4, 0.6);
@@ -236,8 +236,8 @@ void ImageViewerWidget::displayFrameNow(const DisplayFrame& f)
 {
     updatePixmap(f.image);
 
-    if (!f.keepContour)
-        setContour(f.outerContour, f.innerContour);
+    if (!f.keepLayers)
+        setLayers(f.layers);
 
     displayTimer_.restart();
 
@@ -298,7 +298,7 @@ void ImageViewerWidget::setImage(const QImage& img)
 {
     DisplayFrame f;
     f.image = img;
-    f.keepContour = true;
+    f.keepLayers = true;
 
     int64_t now = FrameClock::nowNs();
     f.receiveTimestampNs = now;
@@ -307,30 +307,13 @@ void ImageViewerWidget::setImage(const QImage& img)
     submitFrame(f);
 }
 
-void ImageViewerWidget::setContour(const QVector<QPointF>& outerContour,
-                                   const QVector<QPointF>& innerContour)
-{
-    // Adapter: colors and visibility come from the display configuration.
-    // Moving them to the caller is the next step of the layer migration.
-    PointLayer outer;
-    outer.points = outerContour;
-    outer.color = toQColor(displayConfig_.outerContourColor);
-    outer.visible = displayConfig_.outerContourVisible;
-
-    PointLayer inner;
-    inner.points = innerContour;
-    inner.color = toQColor(displayConfig_.innerContourColor);
-    inner.visible = displayConfig_.innerContourVisible;
-
-    setLayers({outer, inner});
-}
-
 void ImageViewerWidget::setLayers(const QVector<PointLayer>& layers)
 {
     for (int i = 0; i < layers.size(); ++i)
     {
         layerItem(i)->setPoints(layers[i].points);
-        layerColors_[i] = layers[i].visible ? layers[i].color : QColor(Qt::transparent);
+        layerColors_[i] = layers[i].color;
+        layerVisible_[i] = layers[i].visible;
     }
 
     // Layers that are no longer provided are emptied.
@@ -350,12 +333,10 @@ DisplayFrame ImageViewerWidget::displayFrame() const
     DisplayFrame frame;
     frame.image = lastDisplayedImage_;
 
-    // Adapter: the first two layers are the outer and inner contours.
-    if (layerItems_.size() > 0)
-        frame.outerContour = layerItems_[0]->points();
+    frame.layers.reserve(layerItems_.size());
 
-    if (layerItems_.size() > 1)
-        frame.innerContour = layerItems_[1]->points();
+    for (int i = 0; i < layerItems_.size(); ++i)
+        frame.layers.push_back({layerItems_[i]->points(), layerColors_[i], layerVisible_[i]});
 
     return frame;
 }
@@ -1098,35 +1079,11 @@ void ImageViewerWidget::applyDisplayConfig(const DisplayConfig& display)
 
 void ImageViewerWidget::updateDisplayWithConfig()
 {
-    updateContourColors();
     upscaleItems();
     updateFlip();
     updateSmoothDisplay();
     updateTextOverlayVisibility();
     updateMiniMapVisibility();
-}
-
-void ImageViewerWidget::updateContourColors()
-{
-    assert(useEnhancedDisplayConfig_);
-
-    // Adapter: when the display configuration changes, the first two layers
-    // (outer and inner contours) take their colors from it.
-    const QColor outerColor = displayConfig_.outerContourVisible
-                                  ? toQColor(displayConfig_.outerContourColor)
-                                  : QColor(Qt::transparent);
-
-    const QColor innerColor = displayConfig_.innerContourVisible
-                                  ? toQColor(displayConfig_.innerContourColor)
-                                  : QColor(Qt::transparent);
-
-    layerItem(0);
-    layerItem(1);
-
-    layerColors_[0] = outerColor;
-    layerColors_[1] = innerColor;
-
-    applyLayerColors();
 }
 
 void ImageViewerWidget::updateFlip()

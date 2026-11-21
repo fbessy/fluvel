@@ -242,6 +242,9 @@ signals:
     /// Emitted with processed frame and contour overlay.
     void displayFrameReady(const fluvel::DisplayFrame& frame);
 
+    /// Emitted when the layers of the last frame are restyled (display configuration change).
+    void layersUpdated(const QVector<fluvel::PointLayer>& layers);
+
     /// Emitted when downscale parameters change.
     void downscaleChanged(const fluvel::DownscaleParams& downscaleParams);
 

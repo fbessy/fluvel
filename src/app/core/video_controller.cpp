@@ -3,6 +3,7 @@
 
 #include "video_controller.hpp"
 #include "contour_adapters.hpp"
+#include "contour_layers.hpp"
 #include "frame_clock.hpp"
 #include "frame_rendering_utils.hpp"
 #include "streaming_stats.hpp"
@@ -235,8 +236,8 @@ void VideoController::onProcessedFrameReady(const ProcessedFrame& frame)
     if (displayFrame.image.isNull())
         return;
 
-    displayFrame.outerContour = convertToQVector(frame.outerContour);
-    displayFrame.innerContour = convertToQVector(frame.innerContour);
+    displayFrame.layers = contour_layers::make(convertToQVector(frame.outerContour),
+                                               convertToQVector(frame.innerContour), displayConfig_);
 
     displayFrame.receiveTimestampNs = frame.receiveTimestampNs;
     displayFrame.processTimestampNs = frame.processTimestampNs;
@@ -306,6 +307,15 @@ void VideoController::onVideoDisplaySettingsChanged(const DisplayConfig& display
     displayConfig_ = display;
 
     processingThread_.setDisplayMode(display.displayMode);
+
+    // Contour colors and visibility may have changed: restyle the displayed contour,
+    // which also applies when no new frame arrives (paused or stopped stream).
+    if (!lastDisplayFrame_.layers.isEmpty())
+    {
+        lastDisplayFrame_.layers = contour_layers::restyle(lastDisplayFrame_.layers, displayConfig_);
+
+        emit layersUpdated(lastDisplayFrame_.layers);
+    }
 }
 
 bool VideoController::isStreaming() const
